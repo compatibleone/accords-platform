@@ -1,0 +1,10 @@
+*.log
+*.status
+*.cache
+*.o
+Makefile
+configure
+*.scan
+*.tgz
+product/
+
