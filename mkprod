@@ -1,0 +1,22 @@
+function cleandir
+{
+	if [ -d $1 ]
+	then
+		rm -r $1 -f
+	fi
+	mkdir $1
+}
+
+cleandir product
+cp install.$1 product/install
+cp openssl.cnf product
+
+cleandir product/lib
+cp */lib/*.so product/lib
+
+cleandir product/bin
+cp */bin/*    product/bin
+
+cd product; tar -czvf ../co-prodball.$1.tgz *
+
+

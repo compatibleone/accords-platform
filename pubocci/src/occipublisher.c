@@ -1,0 +1,508 @@
+/* ------------------------------------------------------------------------------------	*/
+/*				 CompatibleOne Cloudware				*/
+/* ------------------------------------------------------------------------------------ */
+/*											*/
+/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
+/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
+/*											*/
+/*			 	Pas d'Utilisation Commerciale 				*/
+/*				Pas de Modification 					*/
+/*				3.0 non transcrit.					*/
+/*											*/
+/* ------------------------------------------------------------------------------------ */
+/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
+/*				   All rights reserved					*/
+/* ------------------------------------------------------------------------------------ */
+#ifndef	_occipublisher_c
+#define	_occipublisher_c
+
+#include "occipublisher.h"
+#include "occipub.c"
+#include "autopub.c"
+#include "document.h"
+#include "cp.h"
+#include "occilogin.h"
+#include "tlsload.h"
+
+private	struct	occi_publisher Publisher = {
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(struct occi_publication *) 0,
+	(struct occi_publication *) 0
+	};
+
+/*	---------------------------------------------------------	*/
+/*	     o c c i _ l o c a t e _ p u b l i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+private	struct	occi_publication * occi_locate_publication( struct occi_category * cptr )
+{
+	struct	occi_publication * pptr;
+	for (	pptr=Publisher.first;
+		pptr != (struct occi_publication *) 0;
+		pptr = pptr->next)
+	{
+		if (!( pptr->category ))
+			continue;
+		else if (!( pptr->id ))
+			continue;
+		else if (!( strcmp( cptr->id, pptr->category ) ))
+			break;
+	}
+	return( pptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*	   i n i t i a l i s e _ o c c i _ p u b l i s h e r		*/
+/*	---------------------------------------------------------	*/
+public	int	initialise_occi_publisher( char * host, char * room, char * publication, char * enquiry )
+{
+	char	*	sptr;
+	if ( host )
+	{
+		if (!( sptr = allocate_string( host ) ))
+			return( 27 );
+		if ( Publisher.host )
+			Publisher.host = liberate( Publisher.host );
+		Publisher.host = sptr;
+	}
+	if ( room )
+	{
+		if (!( sptr = allocate_string( room ) ))
+			return( 27 );
+		if ( Publisher.room )
+			Publisher.room = liberate( Publisher.room );
+		Publisher.room = sptr;
+	}
+	if ( publication )
+	{
+		if (!( sptr = allocate_string( publication ) ))
+			return( 27 );
+		if ( Publisher.publication )
+			Publisher.publication = liberate( Publisher.publication );
+		Publisher.publication = sptr;
+	}
+	if ( enquiry )
+	{
+		if (!( sptr = allocate_string( enquiry ) ))
+			return( 27 );
+		if ( Publisher.enquiry )
+			Publisher.enquiry = liberate( Publisher.enquiry );
+		Publisher.enquiry = sptr;
+	}
+	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*	     t e r m i n a t e _ o c c i _ p u b l i s h e r		*/
+/*	---------------------------------------------------------	*/
+public	int	terminate_occi_publisher()
+{
+	char	*	sptr;
+	if ( Publisher.host )
+		Publisher.host = liberate( Publisher.host );
+	if ( Publisher.room )
+		Publisher.room = liberate( Publisher.room );
+	if ( Publisher.publication )
+		Publisher.publication = liberate( Publisher.publication );
+	if ( Publisher.enquiry )
+		Publisher.enquiry = liberate( Publisher.enquiry );
+	if ( Publisher.uri )
+		Publisher.uri = liberate( Publisher.uri );
+	return(0);
+}
+
+/*	---------------------------------------------------------	*/
+/*		    p u b l i s h e r _ d e f a u l t 			*/
+/*	---------------------------------------------------------	*/
+public	int	occi_publisher_default()
+{
+	if (!( Publisher.host ))
+		Publisher.host = allocate_string( _DEFAULT_HOST );
+
+	if (!( Publisher.tls ))
+		if ( _DEFAULT_TLS )
+			Publisher.tls = allocate_string( _DEFAULT_TLS );
+
+	if (!( Publisher.room ))
+		Publisher.room = allocate_string( _DEFAULT_ROOM );
+
+	if (!( Publisher.publication ))
+		Publisher.publication = allocate_string( _DEFAULT_PUBLICATION );
+
+	if (!( Publisher.enquiry ))
+		Publisher.enquiry = allocate_string( _DEFAULT_ENQUIRY );
+
+	if (!( Publisher.uri ))
+	{
+		if (!( Publisher.uri = allocate(strlen(Publisher.host)+strlen(Publisher.publication)+16) ))
+			return(27);
+		else	sprintf(Publisher.uri,"%s/%s/",Publisher.host,Publisher.publication);
+	}
+	return(0);
+}
+
+/*	---------------------------------------------------------	*/
+/*	      u n p u b l i s h _ o c c i _ c a t e g o r y 		*/
+/*	---------------------------------------------------------	*/
+public	int	unpublish_occi_category( 
+		int item,
+		char * user,	char * password,
+		char * url,	char * agent, 
+		struct occi_category * category	 )
+{
+	struct	occi_client   *	cptr;
+	struct	occi_request  *	rptr;
+	struct	occi_response * aptr;
+	struct	occi_publication * pptr;
+	char *	uri;
+	char	username[256];
+	sprintf(username,"%s%u",user,item);
+
+	if (!( pptr = occi_locate_publication( category )))
+		return( 78 );
+	else if (!( uri = allocate( strlen( Publisher.host ) + strlen( Publisher.publication ) + strlen( pptr->id ) + 16 ) ))
+		return( 27 );
+	else	sprintf(uri,"%s/%s/%s",Publisher.host,Publisher.publication,pptr->id);
+
+	if (!( cptr = occi_create_client( uri, agent, Publisher.tls ) ))
+	{
+		liberate( uri );
+		return( 27 );
+	}
+
+	else if (!(rptr = occi_create_request( cptr, Publisher.publication, _OCCI_NORMAL )))
+	{
+		liberate( uri );
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else if (!( aptr = occi_client_delete( cptr, rptr ) )) 
+	{
+		liberate( uri );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else
+	{
+		pptr = drop_occi_publication( pptr );
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		liberate( uri );
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*	      p u b l i s h _ o c c i _ c a t e g o r y 		*/
+/*	---------------------------------------------------------	*/
+public	int	publish_occi_category( 
+		int item,
+		char * user,	char * password,
+		char * url,	char * agent, 
+		struct occi_category * category )
+{
+	struct	occi_element  *	eptr;
+	struct	occi_client   *	cptr;
+	struct	occi_request  *	rptr;
+	struct	occi_response * aptr;
+	struct	occi_publication * pptr;
+	char 	*	uri;
+	char	username[256];
+	sprintf(username,"%s%u",user,item);
+	if (!( uri = allocate( strlen( Publisher.host ) + strlen( Publisher.publication ) + 16 ) ))
+		return( 27 );
+	else	sprintf(uri,"%s/%s/",Publisher.host,Publisher.publication);
+
+	if (!( cptr = occi_create_client( uri, agent, Publisher.tls ) ))
+	{
+		liberate( uri );	
+		return( 27 );
+	}
+	else if (!(rptr = occi_create_request( cptr, Publisher.publication, _OCCI_NORMAL )))
+	{
+		liberate( uri );	
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else if ((!( eptr = occi_request_element( rptr, "occi.publication.who",username		)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.pass",password 	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",Publisher.room	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category->id 	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.why",url 		))))
+	{
+		liberate( uri );	
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else if (!( aptr = occi_client_post( cptr, rptr ) )) 
+	{
+		liberate( uri );	
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else if ( aptr->response->status >= 300 )
+	{
+		if ( check_verbose() )
+			printf("   OCCI Client : %s %u %s \n",
+				aptr->response->version,
+				aptr->response->status,
+				aptr->response->message );
+		liberate( uri );	
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return( 27 );
+	}
+	else if ((!( pptr = add_occi_publication( &Publisher ) ))
+	     ||  (!( pptr->category = allocate_string( category->id ) )))
+	{
+		liberate( uri );	
+		pptr = drop_occi_publication( pptr );
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return(27);
+	}
+	else if (!( eptr = occi_locate_element( aptr->first, Publisher.publication ) ))
+	{
+		liberate( uri );	
+		pptr = drop_occi_publication( pptr );
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return(40);
+	}
+	else if (!( pptr->id = occi_category_id( eptr->value ) ))
+	{
+		liberate( uri );	
+		pptr = drop_occi_publication( pptr );
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return(27);
+	}
+	else
+	{
+		liberate( uri );	
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return(0);
+	}	
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ a u t o _ p u b l i s h			*/
+/*	---------------------------------------------------------	*/
+private	int 	occi_auto_publish( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	occi_category * optr;
+	struct	rest_interface * iptr;
+	struct	auto_publication * pptr;
+	int	status;
+	if (!( optr = vptr ))
+		return;
+	else if (!( pptr = optr->payload ))
+		return;
+	else 	return( publish_occi_category( 
+				pptr->item, pptr->user, pptr->password, 
+				pptr->url, pptr->agent, optr ));
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ a u t o _ u n p u b l i s h			*/
+/*	---------------------------------------------------------	*/
+private	int 	occi_auto_unpublish( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	occi_category * optr;
+	struct	rest_interface * iptr;
+	struct	auto_publication * pptr;
+	int	status;
+	if (!( optr = vptr ))
+		return;
+	else if (!( pptr = optr->payload ))
+		return;
+	else 	return( unpublish_occi_category( 
+				pptr->item, pptr->user, pptr->password, 
+				pptr->url, pptr->agent, optr ));
+}
+
+/*	---------------------------------------------------------	*/
+/*	      p u b l i s h _ o c c i _ c a t e g o r i e s		*/
+/*	---------------------------------------------------------	*/
+public	int	occi_auto_publication( 
+		int	item,
+		char * user,	char * password,
+		char * url,	char * agent, 
+		struct occi_category * optr )
+{
+	struct	rest_interface * iptr;
+	struct	auto_publication * pptr;
+	if (!( iptr = optr->interface ))
+		return(56);
+	else if (!( pptr = allocate_auto_publication()))
+		return(27);
+	else if (!( pptr->user = allocate_string( user )))
+	{
+		pptr = liberate_auto_publication( pptr );
+		return( 27 );
+	}
+	else if (!( pptr->password = allocate_string( password )))
+	{
+		pptr = liberate_auto_publication( pptr );
+		return( 27 );
+	}
+	else if (!( pptr->url = allocate_string( url )))
+	{
+		pptr = liberate_auto_publication( pptr );
+		return( 27 );
+	}
+	else if (!( pptr->agent = allocate_string( agent )))
+	{
+		pptr = liberate_auto_publication( pptr );
+		return( 27 );
+	}
+	else
+	{
+		pptr->item = item;
+		optr->payload= pptr;
+		iptr->before = occi_auto_unpublish;
+		iptr->after  = occi_auto_publish;
+		return( 0 );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*	      p u b l i s h _ o c c i _ c a t e g o r i e s		*/
+/*	---------------------------------------------------------	*/
+public	int	publish_occi_categories( 
+		char * user,	char * password,
+		char * url,	char * agent, 
+		struct occi_category * category )
+{
+	int	items=0;
+	struct	occi_category *	optr;
+	int	status=0;
+	for (	optr=category;
+		optr != (struct occi_category *) 0;
+		optr = optr->next )
+	{
+		if ( optr->access & _OCCI_PRIVATE )
+			continue;
+		else if ((status = publish_occi_category( ++items, user, password, url, agent, optr )) != 0)
+			break;
+		else if (!( optr->access & _OCCI_AUTO_PUBLISH ))
+			continue;
+		else if (!(status = occi_auto_publication( items, user, password, url, agent, optr )))
+			continue;
+		else	break;
+	}
+	return( status );
+}
+
+/*	---------------------------------------------------------	*/
+/*	    u n p u b l i s h _ o c c i _ c a t e g o r i e s		*/
+/*	---------------------------------------------------------	*/
+public	int	unpublish_occi_categories( 
+		char * user,	char * password,
+		char * url,	char * agent, 
+		struct occi_category * category )
+{
+	int	items=0;
+	struct	occi_category *	optr;
+	int	status=0;
+	for (	optr=category;
+		optr != (struct occi_category *) 0;
+		optr = optr->next )
+	{
+		if ( optr->access & _OCCI_PRIVATE )
+			continue;
+		else if ((status = unpublish_occi_category( ++items, user, password,url,agent,optr)) != 0)
+			break;
+	}
+	return( status );
+}
+
+/*	---------------------------------------------------------	*/
+/*		p u b l i s h i n g _ o c c i _ s e r v e r		*/
+/*	---------------------------------------------------------	*/
+/*	this encapsulation function provides the compatible one 	*/
+/*	occi server with automatic publishing of all categories		*/
+/*	prior to server startup. 					*/
+/*	The publications will be cancelled on return from the 		*/
+/*	occi server prior to exit from the function.			*/
+/*	---------------------------------------------------------	*/
+public	int	publishing_occi_server( 
+		char * user,	char * password,
+		char * url,	char * agent, 
+		int port, char * tls, int max, struct occi_category * category )
+{
+	int	status;
+	int	result;
+	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if ((status = occi_publisher_default()) != 0 )
+		return( status );
+
+	if ( tls )
+	{
+		if (!( strlen(tls) ))
+			tls = (char *) 0;
+		else if (!( tlsconf = tls_configuration_load( tls ) ))
+			return( 40 );
+		else if ( tlsconf->authenticate )
+		{
+			if ((user) && (password))
+			{
+				if (!(Publisher.authorisation = login_occi_user( user, password, agent, tls )))
+					return( 403 );
+				else 	(void) occi_client_authentication( Publisher.authorisation );
+			}
+		}
+	}
+
+	if (( Publisher.host ) && ( Publisher.publication ))
+		if (( url ) && ( category ))
+			if ((status = publish_occi_categories( user, password, url, agent, category )) != 0)
+				return( status );
+
+	result = occi_server( agent, port, tls, max, category, Publisher.authorisation );
+
+	if (( Publisher.host ) && ( Publisher.publication ))
+		if (( url ) && ( category ))
+			if ((status = unpublish_occi_categories(user, password, url, agent, category)) != 0)
+				return( status );
+
+	if (( tls ) && ( tlsconf ))
+	{
+		if ( Publisher.authorisation )
+			Publisher.authorisation = logout_occi_user( 
+				user, password, agent, Publisher.authorisation, tls );
+		if ( tlsconf )
+			tlsconf = release_tls_configuration(tlsconf );
+	}
+	return( result );
+}
+
+	/* ---------------- */
+#endif	/* _occipublisher_c */
+	/* ---------------- */
+
+
+

@@ -1,0 +1,230 @@
+/* ------------------------------------------------------------------------------------	*/
+/*				 CompatibleOne Cloudware				*/
+/* ------------------------------------------------------------------------------------ */
+/*											*/
+/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
+/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
+/*											*/
+/*			 	Pas d'Utilisation Commerciale 				*/
+/*				Pas de Modification 					*/
+/*				3.0 non transcrit.					*/
+/*											*/
+/* ------------------------------------------------------------------------------------ */
+/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
+/*				   All rights reserved					*/
+/* ------------------------------------------------------------------------------------ */
+#ifndef	_rest_log_c
+#define	_rest_log_c
+
+#include "rest.h"
+#include "url.h"
+
+#define	_DEFAULT_LOGFILE	"./co-log"
+
+private	char *	restlogagent=(char *) 0;
+private	char *	restlogname=(char *) 0;
+private	int	restlogmons=0;
+private	int	restlognest=0;
+
+
+/*	---------------------------------------------------------	*/
+/*			r e s t _ l o g _ a g e n t 			*/
+/*	---------------------------------------------------------	*/
+public	void	rest_log_agent( char * aname )
+{
+	restlogagent = aname;
+	return;
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ i n i t i a l i s e _ l o g 			*/
+/*	---------------------------------------------------------	*/
+public	void	rest_initialise_log( int state )
+{
+	restlogmons = state;
+	return;
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ s e t _ l o g f i l e _ n a m  e		*/
+/*	---------------------------------------------------------	*/
+public	int	rest_set_logfile_name( char * nptr )
+{
+	if ( restlogname )
+		restlogname = liberate( restlogname );
+	if (!( nptr ))
+		return(0);
+	else if (!( restlogname = allocate_string( nptr )))
+		return( 27 );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ g e t _ l o g f i l e _ n a m  e		*/
+/*	---------------------------------------------------------	*/
+private	char *	rest_get_logfile_name()
+{
+	if (!( restlogname ))
+		if ( rest_set_logfile_name( _DEFAULT_LOGFILE ) != 0)
+			return( (char *) 0 );
+	return( restlogname );
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ c o m o n s  			*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_comons( char * buffer, char * nature )
+{
+	restlognest++;
+	occi_post_event( buffer, nature, ( restlogagent ? restlogagent : "unknown") );
+	restlognest--;
+	return(0);
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ m e s s a g e			*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_message( char * buffer )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( restlogmons ))
+	{
+		if (!( filename = rest_get_logfile_name() ))
+			return(30);
+		else if (!( h = fopen( filename,"a") ))
+			return(46);
+		else
+		{
+			fprintf(h,"%u:%u: %s\n",time((long *) 0),getpid(),buffer);
+			fclose(h);
+			return(0);
+		}
+	}
+	else if (!( restlognest ))
+		return( rest_log_comons( buffer, "message" ) );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ c h e c k _ d e b u g 			*/
+/*	---------------------------------------------------------	*/
+private	int	rest_debug=-1;
+public	int	rest_check_debug()
+{
+	char *	eptr;
+	if ( check_debug() )
+		return( 1 );
+	else if ( rest_debug != -1 )
+		return( rest_debug );
+	else if (!( eptr = getenv("RESTDEBUG") ))
+		return( 0 );
+	else	return((rest_debug = atoi(eptr)));
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ d e b u g 			*/
+/*	---------------------------------------------------------	*/
+public 	void	rest_log_debug( char * message )
+{
+	if ( rest_check_debug() )
+		rest_log_message( message );
+	return;
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ l o g _ h e a d e r 				*/
+/*	---------------------------------------------------------	*/
+private	int	rest_log_detail=0;
+
+public 	int	rest_log_header( char * agent, struct rest_header * hptr, char * symbol )
+{
+	char	buffer[4096];
+	int	status;
+	if (!( rest_log_detail ))
+		return( 0 );
+	rest_log_agent( agent );
+	for (	;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		sprintf(buffer,"%s %s %s: %s ",agent, symbol, hptr->name, hptr->value);
+		if ((status = rest_log_message( buffer )) != 0)
+			return( status );
+	}
+	return( 0 );
+
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ l o g _ s e n d _ r e q u e s t		*/
+/*	---------------------------------------------------------	*/
+public	int	rest_log_send_request ( char * agent, char * method, struct url * uptr )
+{
+	char	buffer[4096];
+	char *	symbol="-->";
+	rest_log_agent( agent );
+	sprintf(buffer,"%s %s %s %s://%s:%u%s ",agent, symbol, method, 
+			( uptr->service ? uptr->service : "http"),
+			uptr->host,uptr->port, uptr->object);
+	return( rest_log_message( buffer ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ l o g _ r e c v _ r e s p o n s e		*/
+/*	---------------------------------------------------------	*/
+public	int	rest_log_recv_response( char * agent, struct rest_response * aptr )
+{
+	char	buffer[4096];
+	char *	symbol="<--";
+	rest_log_agent( agent );
+	sprintf(buffer,"%s %s %s %u %s ",agent,symbol, 
+		(aptr ? aptr->version : "???" ),
+		(aptr ? aptr->status  : -1 ),
+		(aptr ? aptr->message : "no response"));
+	return( rest_log_message( buffer ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ l o g _ s e n d _ r e s p o n s e 		*/
+/*	---------------------------------------------------------	*/
+public	int	rest_log_send_response( char * agent, struct rest_response * aptr )
+{
+	char	buffer[4096];
+	int	status;
+	char *	symbol="-->";
+	rest_log_agent( agent );
+	sprintf(buffer,"%s %s %s %u %s ",agent,symbol,
+		(aptr ? aptr->version : "???" ),
+		(aptr ? aptr->status  : -1 ),
+		(aptr ? aptr->message : "no response"));
+	if ((status = rest_log_message( buffer )) != 0)
+		return( status );
+	else if (!( rest_log_detail ))
+		return( 0 );
+	else	return( rest_log_header( agent, aptr->first, symbol ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ l o g _ r e c v _ r e q u e s t		*/
+/*	---------------------------------------------------------	*/
+public	int	rest_log_recv_request ( char * agent, struct rest_request * rptr )
+{
+	char	buffer[4096];
+	int	status;
+	char *	symbol="<--";
+	rest_log_agent( agent );
+	sprintf(buffer,"%s %s %s %s ",agent,symbol, rptr->method, rptr->object );
+	if ((status = rest_log_message( buffer )) != 0)
+		return( status );
+	else if (!( rest_log_detail ))
+		return( 0 );
+	else 	return( rest_log_header( agent, rptr->first, symbol ) );
+}
+
+
+	/* ---------- */
+#endif	/* _restlog_h */
+	/* ---------- */
+
+

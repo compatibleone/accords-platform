@@ -1,0 +1,82 @@
+# -------------------------------------------------------------------------------------	#
+#				 CompatibleOne Cloudware				#
+# ------------------------------------------------------------------------------------- #
+#											#
+# Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	#
+# disposition selon les termes de la licence Creative Commons Paternit‚ : 		#
+#											#
+#			 	Pas d'Utilisation Commerciale 				#
+#				Pas de Modification 					#
+#				3.0 non transcrit.					#
+#											#
+# ------------------------------------------------------------------------------------- #
+# 			Copyright (c) 2011 Iain James Marshall for Prologue 		#
+#				   All rights reserved					#
+# ------------------------------------------------------------------------------------- #
+# @configure_input@
+
+package = @PACKAGE_NAME@
+version = @PACKAGE_VERSION@
+
+# -----------------------------------
+# Library Source and Production Paths
+# -----------------------------------
+PATHROOT    = ../../
+PATHCOXML   = $(PATHROOT)coxml/src/
+PATHOCCI    = $(PATHROOT)occi/src/
+PATHCORDS   = $(PATHROOT)cords/src/
+PATHCOREST  = $(PATHROOT)corest/src/
+PATHCOCCI   = $(PATHROOT)cocci/src/
+PATHPUB     = $(PATHROOT)pubocci/src/
+PATHCOPABR  = $(PATHROOT)copabr/src/
+PATHPROCCI  = $(PATHROOT)procci/src/
+PATHCOCARRIER = $(PATHROOT)cocarrier/src/
+
+# -----------------------------------
+# Library Definitions
+# -----------------------------------
+LIBUUID     = -luuid
+LIBTHREAD   = -lpthread
+LIBSSL      = /usr/lib/libssl.so
+LIBOCCI     = $(PATHLIB)libocci.so
+LIBCOXML    = $(PATHLIB)libcoxml.so
+LIBCORDS    = $(PATHLIB)libcords.so $(LIBCOXML)
+LIBCOREST   = $(PATHLIB)libcorest.so $(LIBUUID) $(LIBTHREAD) $(LIBSSL)
+LIBCOCCI    = $(PATHLIB)libcocci.so $(LIBOCCI) $(LIBCORDS) $(LIBCOREST)
+LIBCOPUB    = $(PATHLIB)libpubocci.so $(LIBCOCCI)
+LIBCOPABR   = $(PATHLIB)libcopabr.so $(LIBCOPUB)
+LIBCOCARRIER = $(PATHLIB)libcocarrier.so
+
+# -----------------------------------
+# Compilation and Link Definitions
+# -----------------------------------
+INCLUDE     = -I$(PATHCOXML) -I$(PATHCOREST) -I$(PATHOCCI)
+OPTIONS     = -DUNIX -Dunix -DCONE $(SYSOPT)
+SHARED      = -fPIC -shared
+DEBUG       = -g -ggdb
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+config.status: configure
+	cd .. && ./config.status --recheck
+
+all: ../lib/libcords.so
+
+clean:
+	-rm *.o *.so
+
+install:
+	$(SUDO) cp ../lib/libcords.so $(PATHLIB)
+	
+.c.o:
+	gcc -c -g -ggdb $(OPTIONS) $(INCLUDE) $*.c
+
+cordsbase.o: cordsbase.c
+cords2occi.o: cords2occi.c
+
+../lib/libcords.so: cords2occi.o cordsbase.o $(LIBCOXML)
+	gcc $(DEBUG) $(SHARED) -o $@ $?
+
+.PHONY: all clean install
+

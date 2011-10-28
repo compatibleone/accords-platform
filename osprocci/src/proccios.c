@@ -1,0 +1,825 @@
+/* ------------------------------------------------------------------------------------	*/
+/*				 CompatibleOne Cloudware				*/
+/* ------------------------------------------------------------------------------------ */
+/*											*/
+/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
+/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
+/*											*/
+/*			 	Pas d'Utilisation Commerciale 				*/
+/*				Pas de Modification 					*/
+/*				3.0 non transcrit.					*/
+/*											*/
+/* ------------------------------------------------------------------------------------ */
+/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
+/*				   All rights reserved					*/
+/* ------------------------------------------------------------------------------------ */
+
+#ifndef	_proccios_c
+#define	_proccios_c
+
+#include "osclient.h"
+#include "cordslang.h"
+#include "occiresolver.h"
+
+/*	-------------------------------------------	*/
+/* 	o p e n s t a c k _ i n s t r u c t i o n s
+/*	-------------------------------------------	*/
+private	char *	openstack_instructions( char * contract, char * result )
+{
+
+	char	*	ihost;
+	char 	*	vptr;
+
+	struct	occi_response * zptr=(struct occi_response *) 0;
+	struct	occi_response * zzptr=(struct occi_response *) 0;
+	struct	occi_response * yptr=(struct occi_response *) 0;
+	struct	occi_element  * fptr=(struct occi_element  *) 0;
+	struct	occi_element  * gptr=(struct occi_element  *) 0;
+	struct	occi_element  * jptr=(struct occi_element  *) 0;
+	struct	occi_element  * eptr=(struct occi_element  *) 0;
+	struct	occi_client   * kptr=(struct occi_client   *) 0;
+	struct	occi_request  * qptr=(struct occi_request  *) 0;
+	char	buffer[4096];
+	char	tempname[4096];
+	int	length=0;
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, OsProcci.tls ) ))
+	 	return( result );
+
+	sprintf(buffer,"%s/%s/",ihost,_CORDS_INSTRUCTION);
+	liberate( ihost );
+	length = strlen(buffer);
+
+	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, OsProcci.tls ) ))
+		return( result );
+
+	else if (!(qptr = occi_create_request( 
+			kptr, 
+			kptr->target->object, 
+			_OCCI_NORMAL )))
+		return(result);
+	else if (!( fptr = occi_request_element( 
+			qptr,
+			"occi.instruction.provision", contract ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( result );
+	}
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( result );
+	}
+
+	qptr = occi_remove_request ( qptr );
+
+	for (	eptr = yptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if (!( vptr = allocate_string( eptr->value )))
+			continue;
+		else if (!( vptr = occi_category_id( vptr ) ))
+			continue;
+		else
+		{
+			strcat( buffer, vptr );
+			liberate( vptr );
+		}
+
+		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, OsProcci.tls )) != (struct occi_response *) 0)
+		{
+			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
+				zptr = occi_remove_response ( zptr );
+			else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
+				zptr = occi_remove_response ( zptr );
+			else if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
+				zptr = occi_remove_response ( zptr );
+			else
+			{
+				sprintf(tempname,"\n%s_%s=%s",fptr->value,gptr->value,jptr->value);
+				zzptr = occi_remove_response ( zzptr );
+				zptr = occi_remove_response ( zptr );
+				if (!( vptr = allocate( strlen( result ) + strlen( tempname ) + 8 ) ))
+					break;
+				else	
+				{
+					sprintf(vptr, "%s%s",result,tempname);
+					liberate( result );
+					result = vptr;
+				}
+			}
+		}
+
+		/* quick reset of base url */
+		/* ----------------------- */
+		buffer[length] = 0;
+	}
+
+	yptr = occi_remove_response ( yptr );
+
+	return(result);
+}
+
+
+/* ---------------------------------------------------------------------------------- */
+/* if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0) */
+/* ---------------------------------------------------------------------------------- */
+private	struct	os_config * resolve_os_configuration( char * sptr )
+{
+	struct	occi_kind_node * nptr;
+	struct	os_config * pptr=(struct os_config *) 0;
+	struct	occi_kind_node  * occi_first_os_config_node();
+	for (	nptr = occi_first_os_config_node();
+		nptr != (struct occi_kind_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( pptr = nptr->contents ))
+			continue;
+		else if (!( pptr->name ))
+			continue;
+		else if (!( strcmp( pptr->name, sptr ) ))
+			break;
+	}
+	return( pptr );
+}
+
+/*	--------------------------------------------------------	*/
+/* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
+/*	--------------------------------------------------------	*/
+private	int	use_openstack_configuration( char * sptr )
+{
+	struct	os_config * pptr;
+
+	if (!( pptr = resolve_os_configuration( sptr )))
+	 	return( 404 );
+
+	else 	return( os_initialise_client( 
+			pptr->user, pptr->password, 
+			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
+}
+
+/*	--------------------------------------------------------	*/
+/* 	       r e s e t _ o p e n s t a c k _ s e r v e r		*/
+/*	--------------------------------------------------------	*/
+private	int	reset_openstack_server( struct openstack * pptr )
+{
+	if ( pptr )
+	{
+		if ( pptr->number ) pptr->number = liberate( pptr->number );
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
+		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
+		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
+		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+		pptr->number = allocate_string("");
+		pptr->hostname = allocate_string("");
+		pptr->rootpass  = allocate_string("");
+		pptr->publicaddr = allocate_string("");
+		pptr->privateaddr = allocate_string("");
+		pptr->status = _OCCI_IDLE;
+	}
+	return(0);
+}
+
+/*	--------------------------------------------------------	*/
+/* 	     c o n n e c t _ o p e n s t a c k _ i m a g e  		*/
+/*	--------------------------------------------------------	*/
+private	int	connect_openstack_image( struct os_response * rptr,struct openstack * pptr )
+{
+	struct	os_response * zptr;
+	struct	os_response * yptr;
+	char *	vptr;
+	if (!( pptr ))
+		return( 118 );
+	else if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
+	{
+		reset_openstack_server( pptr );
+		return( 27 );
+	}
+	else
+	{
+		if ( pptr->image )
+			pptr->image = liberate( pptr->image );
+		if (!( pptr->image = allocate_string( vptr ) ))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		autosave_openstack_nodes();
+		/* ----------------------------------------------------- */
+		/* we must now await ACTIVE status to be able to collect */
+		/* the final identification information to complete the  */
+		/* openstack provisioning request.			 */
+		/* ----------------------------------------------------- */
+		yptr = rptr;
+		zptr = (struct os_response *) 0;
+		while (1)
+		{
+			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			else if (!( strcmp( vptr, "SAVING" )))
+			{
+				sleep(1);
+				if ( zptr )
+					zptr = liberate_os_response( zptr );
+				if (!( zptr = os_get_image( pptr->image )))
+				{
+					reset_openstack_server( pptr );
+					return( 555 );
+				}
+				else	yptr = zptr;
+			}
+			else if (!( strcmp( vptr, "ACTIVE" )))
+				break;
+		}
+		return( 0 );
+	}
+}
+
+/*	--------------------------------------------------------	*/
+/* 	     c o n n e c t _ o p e n s t a c k _ s e r v e r		*/
+/*	--------------------------------------------------------	*/
+private	int	connect_openstack_server( struct os_response * rptr,struct openstack * pptr )
+{
+	struct	os_response * zptr;
+	struct	os_response * yptr;
+	char *	vptr;
+	if (!( pptr ))
+		return( 118 );
+	else
+	{
+		/* ---------------------------------------------------- */
+		/* we must now analyse the response from the open stack	*/
+		/* and collect the valuable data : admin pass is only 	*/
+		/* available at this point and cannot be retrieved by	*/
+		/* any other means so it must not be lost.		*/ 
+		/* ---------------------------------------------------- */
+		rest_log_message("*** OS PROCCI connect_openstack_server( entry ) ***");
+
+		if ( pptr->number ) 
+			pptr->number = liberate( pptr->number );
+
+		if ( pptr->rootpass ) 
+			pptr->rootpass = liberate( pptr->rootpass );
+
+		if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		else if (!( pptr->number = allocate_string(vptr)))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		rest_log_message("*** OS PROCCI Instance ID ***");
+		rest_log_message( pptr->number );
+		if (!( vptr = json_atribut( rptr->jsonroot, "adminPass") ))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		else if (!( pptr->rootpass  = allocate_string(vptr)))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+
+		rest_log_message("*** OS PROCCI Instance ADMIN PASS ***");
+		rest_log_message( pptr->rootpass );
+
+		autosave_openstack_nodes();
+
+		/* ----------------------------------------------------- */
+		/* we must now await ACTIVE status to be able to collect */
+		/* the final identification information to complete the  */
+		/* openstack provisioning request.			 */
+		/* ----------------------------------------------------- */
+		yptr = rptr;
+		zptr = (struct os_response *) 0;
+		while (1)
+		{
+			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			rest_log_message("*** OS PROCCI Testing Build Status ***");
+			rest_log_message( vptr );
+			if (!( strcmp( vptr, "BUILD" )))
+			{
+				sleep(1);
+				if ( zptr )
+					zptr = liberate_os_response( zptr );
+				if (!( zptr = os_get_server( pptr->number )))
+				{
+					reset_openstack_server( pptr );
+					return( 555 );
+				}
+				else	yptr = zptr;
+			}
+			else if (!( strcmp( vptr, "ACTIVE" )))
+				break;
+		}
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
+		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
+		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		else if (!( pptr->reference = allocate_string(vptr)))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+
+		rest_log_message("*** OS PROCCI Instance HOST ID ***");
+		rest_log_message( pptr->reference );
+
+		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
+		{
+			if (!( pptr->privateaddr  = allocate_string(vptr)))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
+			rest_log_message( pptr->privateaddr );
+		}
+
+		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0)
+		{
+			if (!( pptr->publicaddr  = allocate_string(vptr)))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
+			rest_log_message( pptr->privateaddr );
+		}
+		if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
+		{
+			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+		}
+		else if (( pptr->privateaddr ) && ( strlen( pptr->privateaddr ) != 0))
+		{
+			if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+		}
+		pptr->when = time((long *) 0);
+		pptr->status = _OCCI_RUNNING;
+		rest_log_message("*** OS PROCCI Instance is UP and RUNNING ***");
+		autosave_openstack_nodes();
+		rest_log_message("*** OS PROCCI connect_openstack_server( exit ) ***");
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      s t a r t  _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * start_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	os_response * osptr;
+	struct	openstack * pptr;
+	int		status;
+	char	*	filename;
+	char		buffer[512];
+	char 	*	personality;
+	char 	*	resource=_CORDS_LAUNCH_CFG;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->status != _OCCI_IDLE )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+
+	sprintf(buffer,"#compatibleone\n#personality data\ncontract=%s/%s/%s\npublisher=%s",
+		OsProcci.identity,_CORDS_OPENSTACK,pptr->id,OsProcci.publisher);
+	
+	if (!( personality = allocate_string(buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+
+	sprintf(buffer,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+
+	if (!( personality = openstack_instructions( buffer, personality ) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+
+
+	if (!( filename = os_create_server_request( 
+		pptr->name, pptr->image, pptr->flavor, personality, resource ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr = os_create_server( filename )))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else
+	{
+		/* --------------------------------- */
+		/* retrieve crucial data from server */
+		/* --------------------------------- */
+		status = connect_openstack_server( osptr, pptr );
+		osptr = liberate_os_response( osptr );
+		if (!( status ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	}
+
+}
+
+/*	-------------------------------------------	*/
+/* 	      s a v e  _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * save_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	os_response * osptr;
+	int		status;
+	struct	openstack * pptr;
+	char	*	filename;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->status == _OCCI_IDLE )
+		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr = os_create_image( filename ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else
+	{
+		/* --------------------------------- */
+		/* retrieve crucial data from server */
+		/* --------------------------------- */
+		status = connect_openstack_image( osptr, pptr );
+		osptr = liberate_os_response( osptr );
+		if (!( status ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      s t o p  _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * stop_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	os_response * osptr;
+	int		status;
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->status == _OCCI_IDLE )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if (!( osptr = os_delete_server( pptr->number )))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else
+	{
+		if ( pptr->status != _OCCI_IDLE )
+		{
+			reset_openstack_server( pptr );
+			pptr->when = time((long *) 0);
+			osptr = liberate_os_response( osptr );
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      r e s t a r t  _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * restart_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	int	status;
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else
+	{
+		if ( pptr->status == _OCCI_SUSPENDED )
+		{
+			pptr->when = time((long *) 0);
+			pptr->status = _OCCI_RUNNING;
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	     s u s p e n d  _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * suspend_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	int	status;
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	{
+		if ( pptr->status == _OCCI_RUNNING )
+		{
+			pptr->when = time((long *) 0);
+			pptr->status = _OCCI_SUSPENDED;
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	   s o f t b o o t _ o p e n s t a c k  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * softboot_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	   h a r d b o o t _ o p e n s t a c k  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * hardboot_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	     r e b u i l d_ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * rebuild_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	      r e s i z e _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * resize_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	    c o n f i r m _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * confirm_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	      r e v e r t _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * revert_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	openstack * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	int	create_openstack(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	openstack * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ o p e n s t a c k  	*/
+/*	-------------------------------------------	*/
+private	int	retrieve_openstack(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	openstack * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ o p e n s t a c k 	 	*/
+/*	-------------------------------------------	*/
+private	int	update_openstack(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	openstack * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+private	int	delete_openstack(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	openstack * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	openstack_interface = {
+	create_openstack,
+	retrieve_openstack,
+	update_openstack,
+	delete_openstack
+	};
+
+/*	-------------------------------------------	*/
+/* 	       b u i l d _ o p e n s t a c k  		*/
+/*	-------------------------------------------	*/
+/*	this function is to be called to build the	*/
+/*	complete openstack occi category to offer	*/
+/*	an openstack compute provisioning service	*/
+/*	through a compatible one published occi		*/
+/*	service interface.				*/
+/*	-------------------------------------------	*/
+public	struct	occi_category * build_openstack( char * domain )
+{
+	struct	occi_category * optr;
+	if (!( optr = occi_openstack_builder( domain,_CORDS_OPENSTACK ) ))
+		return( optr );
+	else
+	{
+		optr->callback  = &openstack_interface;
+
+		if (!( optr = occi_add_action( optr,"start","",start_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"save","",save_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"stop","",stop_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"suspend","",suspend_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"restart","",restart_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"softboot","",softboot_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"hardboot","",hardboot_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"rebuild","",rebuild_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"resize","",resize_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"confirm","",confirm_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"revert","",revert_openstack)))
+			return( optr );
+		else	return( optr );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	 s e t _ d e f a u l t _ o p e n s t a c k	*/
+/*	-------------------------------------------	*/
+private	int	set_default_openstack(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	os_config * pptr;
+	struct	os_config * wptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else
+	{
+		while ( nptr->previous )
+			nptr = nptr->previous;
+		while ( nptr )
+		{
+			if ((wptr = nptr->contents) != (struct os_config*) 0)
+				wptr->current = 0,
+			nptr = nptr->next;
+		}
+		pptr->current = 1;
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/* 	b u i l d _ o p e n s t a c k _ c o n f i g u r a t i o n	*/
+/*	---------------------------------------------------------	*/
+/*	this category handles the configuration of the interface	*/
+/*	to the oepn stack server for the preceeding category of		*/
+/*	provisioning instance requests.					*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_category * build_openstack_configuration( char * domain )
+{
+	struct	occi_category * optr;
+	if (!( optr = occi_os_config_builder( domain, "openstack_configuration" ) ))
+		return( optr );
+	else if (!( optr = occi_add_action( optr,"current","",set_default_openstack)))
+		return( optr );
+	else	return( optr );
+}
+
+#endif	/* _proccios_c */
+	/* ----------- */
+
+
