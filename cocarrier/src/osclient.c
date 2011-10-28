@@ -713,7 +713,7 @@ public	char * os_create_image_request(char * identity, char * server )
 		}
 		else if (!( strcmp( Os.version, "v1.1" ) ))
 		{
-			fprintf(h,"\tserverRef=%c%s%c />\n",0x0022,server,0x0022);
+			fprintf(h,"\tserverRef=%c%s/servers/%s%c\n",0x0022,Os.base,server,0x0022);
 		}
 		fclose(h);
 		return( filename );
