@@ -17,6 +17,7 @@
 #define	_testos_c
 
 #include "osclient.h"
+
 private	int	debug=0;
 private	int	verbose=0;
 private	char *	tls=(char *) 0;
@@ -72,10 +73,13 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 	char	*	nomfic;
 	char	*	personality="";
 	char	*	resource=_CORDS_LAUNCH_CFG;
+
 	if (!( p2 ))
 		return( failure( 30,"p2", "required") );
+
 	if (!( p1))
 		return( failure( 30,"p1", "required") );
+
 	if (!( strcmp(p1,"GET" ) ))
 		return( os_result( os_client_get_request( p2, 0, agent, hptr ) ) );
 	else if (!( strcmp(p1,"POST" ) ))
@@ -173,29 +177,11 @@ private	int	os_command(int argc, char * argv[] )
 	int	argi=1;
 	char *	aptr;
 
-// --------------------------------
-//	compte open stack prologue
-// --------------------------------
-//	char *	user="jamie";
-//	char *	pass="e8f78e39-30a7-49a1-ad71-febc2c82ec6a";
-//	char *	host="http://172.17.117.2:8774";
-
-// --------------------------------
-//	compte open stack prologue
-// --------------------------------
-//	char *	user="root";
-//	char *	pass="c9e4dab3-8167-4670-88a4-c56175ad3081";
-//	char *	host="http://172.17.117.2:8774";
-
-// --------------------------------
-//	compte open stack nuxeo
-// --------------------------------
-	char *	user="ijm";
-	char *	pass="4362355f-fd84-47c7-a1ca-582a368ddc50";
-	char *	host="http://94.143.119.4:8774";
-
+	char *	user=(char *) 0;
+	char *	pass=(char *) 0;
+	char *	host=(char *) 0;
 	char *	agent="CO-OSCLIENT/1.0";
-	char *	version="v1.0";
+	char *	version="v1.1";
 
 	rest_initialise_log(0);
 
@@ -205,13 +191,19 @@ private	int	os_command(int argc, char * argv[] )
 			break;
 		else if ( *aptr != '-' )
 		{
-			if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0)
+			if (!( host ))
+				return( failure( status, "missing", "--host parameter" ) );
+			else if (!( user ))
+				return( failure( status, "missing", "--user parameter" ) );
+			else if (!( pass ))
+				return( failure( status, "missing", "--password parameter" ) );
+			else if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0)
 				return( failure( status, "initialising", "client" ) );
-			return( os_operation( aptr, 
-				( argi < argc ? argv[argi] : (char *) 0 ),
-				( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
-				( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),
-				( (argi+3) < argc ? argv[argi+3] : (char *) 0 ) ) );
+			else 	return( os_operation( aptr, 
+					( argi < argc ? argv[argi] : (char *) 0 ),
+					( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
+					( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),
+					( (argi+3) < argc ? argv[argi+3] : (char *) 0 ) ) );
 		}
 		else if (  *(++aptr) == '-' )
 		{
@@ -254,8 +246,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.02");
-	printf("\n   Beta Version 26/10/2011");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.03");
+	printf("\n   Beta Version 29/10/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");

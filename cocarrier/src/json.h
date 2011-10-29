@@ -23,10 +23,11 @@
 
 public	int			json_show( struct data_element * dptr );
 public	int			json_serialise( struct data_element * dptr, char * filename );
-public	struct	data_element *	json_parse_file( char * filename );
+public	struct data_element *	json_parse_file( char * filename );
 public	int			json_set_echo( int v );
 public	struct data_element * 	drop_data_element( struct data_element * dptr );
 public	char *			json_atribut( struct data_element * dptr, char * nptr );
+public	struct data_element * 	json_element( struct data_element * dptr, char * nptr );
 
 	/* ------- */
 #endif	/* _json_h */

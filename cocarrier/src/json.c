@@ -449,7 +449,11 @@ public	char *			json_atribut( struct data_element * dptr, char * nptr )
 	if (!( dptr ))
 		return( (char *) 0 );
 	else if (!( dptr->name ))
-		return( (char *) 0 );
+	{
+		if (!( eptr = json_atribut( dptr->first, nptr ) ))
+			return( json_atribut( dptr->next, nptr ) );
+		else	return( eptr );
+	}
 	else if (!( strcmp( dptr->name, nptr ) ))
 	{
 		/* ---------------------------- */
@@ -465,6 +469,15 @@ public	char *			json_atribut( struct data_element * dptr, char * nptr )
 	}
 	else 
 	{
+		/* scan shallow before going deep */
+		/* ------------------------------ */
+		for (	eptr = dptr->next;
+			eptr != (struct data_element *) 0;
+			eptr = eptr->next )
+			if ( eptr->name )
+				if (!( strcmp( eptr->name, nptr ) ))
+					return( json_atribut( eptr, nptr ) );
+
 		for (	eptr = dptr->first;
 			eptr != (struct data_element *) 0;
 			eptr = eptr->next )
@@ -474,6 +487,49 @@ public	char *			json_atribut( struct data_element * dptr, char * nptr )
 	}			
 
 }
+
+/*	------------------------------------------------	*/
+/*		    j s o n _ e l e m e n t			*/
+/*	------------------------------------------------	*/
+/*	rudimentary complex json atribut value search. 		*/
+/*	------------------------------------------------	*/
+public	struct data_element * json_element( struct data_element * dptr, char * nptr )
+{
+	struct	data_element * eptr;
+	struct	data_element * vptr;
+	if (!( dptr ))
+		return( (struct data_element *) 0 );
+	else if (!( dptr->name ))
+	{
+		if (!( eptr = json_element( dptr->first, nptr ) ))
+			return( json_element( dptr->next, nptr ) );
+		else	return( eptr );
+	}
+	else if (!( strcmp( dptr->name, nptr ) ))
+		return( dptr );
+	else 
+	{
+		/* scan shallow before going deep */
+		/* ------------------------------ */
+		for (	eptr = dptr->next;
+			eptr != (struct data_element *) 0;
+			eptr = eptr->next )
+		{
+			if (!( eptr->name ))
+				continue;
+			else if (!( strcmp( eptr->name, nptr ) ))
+				return( eptr );
+		}
+
+		for (	eptr = dptr->first;
+			eptr != (struct data_element *) 0;
+			eptr = eptr->next )
+			if ((vptr = json_element( eptr, nptr )) != (struct data_element *) 0)
+				return( vptr );
+		return( (struct data_element *) 0 );
+	}			
+}
+
 
 	/* ------- */
 #endif	/* _json_c */

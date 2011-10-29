@@ -21,6 +21,40 @@
 #include "cordslang.h"
 #include "occiresolver.h"
 
+/* ---------------------------------------------------------------------------- */
+/* 		r e s o l v e _ o s _ c o n f i g u r a t i o n			*/
+/* ---------------------------------------------------------------------------- */
+private	struct	os_config * resolve_os_configuration( char * sptr )
+{
+	struct	occi_kind_node * nptr;
+	struct	os_config * pptr=(struct os_config *) 0;
+	struct	occi_kind_node  * occi_first_os_config_node();
+	for (	nptr = occi_first_os_config_node();
+		nptr != (struct occi_kind_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( pptr = nptr->contents ))
+			continue;
+		else if (!( pptr->name ))
+			continue;
+		else if (!( strcmp( pptr->name, sptr ) ))
+			break;
+	}
+	return( pptr );
+}
+
+/*	--------------------------------------------------------	*/
+/* 	   r e s o l v e _ o p e n s t a c k _ v e r s i o n 		*/
+/*	--------------------------------------------------------	*/
+private	char *	resolve_openstack_version( char * sptr )
+{
+	struct	os_config * pptr;
+
+	if (!( pptr = resolve_os_configuration( sptr )))
+	 	return( "" );
+	else	return( ( pptr->version ? pptr->version : "" ) );
+}
+
 /*	-------------------------------------------	*/
 /* 	o p e n s t a c k _ i n s t r u c t i o n s
 /*	-------------------------------------------	*/
@@ -101,7 +135,7 @@ private	char *	openstack_instructions( char * contract, char * result )
 				zptr = occi_remove_response ( zptr );
 			else
 			{
-				sprintf(tempname,"\n%s_%s=%s",fptr->value,gptr->value,jptr->value);
+				sprintf(tempname,"%s_%s=%s\n",fptr->value,gptr->value,jptr->value);
 				zzptr = occi_remove_response ( zzptr );
 				zptr = occi_remove_response ( zptr );
 				if (!( vptr = allocate( strlen( result ) + strlen( tempname ) + 8 ) ))
@@ -125,28 +159,6 @@ private	char *	openstack_instructions( char * contract, char * result )
 	return(result);
 }
 
-
-/* ---------------------------------------------------------------------------------- */
-/* if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0) */
-/* ---------------------------------------------------------------------------------- */
-private	struct	os_config * resolve_os_configuration( char * sptr )
-{
-	struct	occi_kind_node * nptr;
-	struct	os_config * pptr=(struct os_config *) 0;
-	struct	occi_kind_node  * occi_first_os_config_node();
-	for (	nptr = occi_first_os_config_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( pptr = nptr->contents ))
-			continue;
-		else if (!( pptr->name ))
-			continue;
-		else if (!( strcmp( pptr->name, sptr ) ))
-			break;
-	}
-	return( pptr );
-}
 
 /*	--------------------------------------------------------	*/
 /* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
@@ -245,13 +257,95 @@ private	int	connect_openstack_image( struct os_response * rptr,struct openstack 
 }
 
 /*	--------------------------------------------------------	*/
+/*	    r e s o l v e _ o s _ v 1 0 _ a d d r e s s e s		*/
+/*	--------------------------------------------------------	*/
+private	int	resolve_os_v10_addresses( struct os_response * yptr, struct openstack * pptr )
+{
+	char *	vptr;
+	if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
+	{
+	if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
+		if (!( pptr->privateaddr  = allocate_string(vptr)))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
+			rest_log_message( pptr->privateaddr );
+		}
+	}
+
+	if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0)
+	{
+		if (!( pptr->publicaddr  = allocate_string(vptr)))
+		{
+			reset_openstack_server( pptr );
+			return( 27 );
+		}
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
+			rest_log_message( pptr->publicaddr );
+		}
+	}
+	return(0);
+}
+
+/*	--------------------------------------------------------	*/
+/*	    r e s o l v e _ o s _ v 1 1 _ a d d r e s s e s		*/
+/*	--------------------------------------------------------	*/
+private	int	resolve_os_v11_addresses( struct os_response * yptr, struct openstack * pptr )
+{
+	struct	data_element * eptr;
+	char *	vptr;
+	if (( eptr = json_element( yptr->jsonroot, "private" )) != (struct data_element *) 0)
+	{
+		if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
+		{
+			if (!( pptr->privateaddr  = allocate_string(vptr)))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			if ( check_debug() )
+			{
+				rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
+				rest_log_message( pptr->privateaddr );
+			}
+		}
+	}
+
+	if (( eptr = json_element( yptr->jsonroot, "public" )) != (struct data_element *) 0)
+	{
+		if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
+		{
+			if (!( pptr->publicaddr  = allocate_string(vptr)))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+			if ( check_debug() )
+			{
+				rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
+				rest_log_message( pptr->publicaddr );
+			}
+		}
+	}
+	return(0);
+}
+
+/*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ o p e n s t a c k _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
 private	int	connect_openstack_server( struct os_response * rptr,struct openstack * pptr )
 {
+	char *	version;
 	struct	os_response * zptr;
 	struct	os_response * yptr;
 	char *	vptr;
+
 	if (!( pptr ))
 		return( 118 );
 	else
@@ -262,7 +356,10 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		/* available at this point and cannot be retrieved by	*/
 		/* any other means so it must not be lost.		*/ 
 		/* ---------------------------------------------------- */
-		rest_log_message("*** OS PROCCI connect_openstack_server( entry ) ***");
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI connect_openstack_server( entry ) ***");
+		}
 
 		if ( pptr->number ) 
 			pptr->number = liberate( pptr->number );
@@ -280,8 +377,11 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 			reset_openstack_server( pptr );
 			return( 27 );
 		}
-		rest_log_message("*** OS PROCCI Instance ID ***");
-		rest_log_message( pptr->number );
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI Instance ID ***");
+			rest_log_message( pptr->number );
+		}
 		if (!( vptr = json_atribut( rptr->jsonroot, "adminPass") ))
 		{
 			reset_openstack_server( pptr );
@@ -293,8 +393,11 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 			return( 27 );
 		}
 
-		rest_log_message("*** OS PROCCI Instance ADMIN PASS ***");
-		rest_log_message( pptr->rootpass );
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI Instance ADMIN PASS ***");
+			rest_log_message( pptr->rootpass );
+		}
 
 		autosave_openstack_nodes();
 
@@ -312,8 +415,11 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 				reset_openstack_server( pptr );
 				return( 27 );
 			}
-			rest_log_message("*** OS PROCCI Testing Build Status ***");
-			rest_log_message( vptr );
+			if ( check_debug() )
+			{
+				rest_log_message("*** OS PROCCI Testing Build Status ***");
+				rest_log_message( vptr );
+			}
 			if (!( strcmp( vptr, "BUILD" )))
 			{
 				sleep(1);
@@ -329,10 +435,12 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 			else if (!( strcmp( vptr, "ACTIVE" )))
 				break;
 		}
+
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+
 		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
 		{
 			reset_openstack_server( pptr );
@@ -344,30 +452,27 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 			return( 27 );
 		}
 
-		rest_log_message("*** OS PROCCI Instance HOST ID ***");
-		rest_log_message( pptr->reference );
-
-		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
+		if ( check_debug() )
 		{
-			if (!( pptr->privateaddr  = allocate_string(vptr)))
-			{
-				reset_openstack_server( pptr );
-				return( 27 );
-			}
-			rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
-			rest_log_message( pptr->privateaddr );
+			rest_log_message("*** OS PROCCI Instance HOST ID ***");
+			rest_log_message( pptr->reference );
 		}
 
-		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0)
-		{
-			if (!( pptr->publicaddr  = allocate_string(vptr)))
-			{
-				reset_openstack_server( pptr );
-				return( 27 );
-			}
-			rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
-			rest_log_message( pptr->privateaddr );
-		}
+		/* ------------------------------------------------------------- */
+		/* determine the openstack message version and collect addresses */
+		/* ------------------------------------------------------------- */
+		if (!( version = resolve_openstack_version( pptr->profile ) ))
+			resolve_os_v10_addresses( yptr, pptr );
+
+		else if (!( strcmp( version, "v1.0" ) ))
+			resolve_os_v10_addresses( yptr, pptr );
+
+		else if (!( strcmp( version, "v1.1" ) ))
+			resolve_os_v11_addresses( yptr, pptr );
+
+		/* ------------------------------------------------------------ */
+		/* set the host name field now to the public or private address */
+		/* ------------------------------------------------------------ */
 		if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
 		{
 			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
@@ -384,11 +489,21 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 				return( 27 );
 			}
 		}
+
+		/* ------------------------------------------------- */
+		/* The instance is ready for use ( or more or less ) */
+		/* ------------------------------------------------- */
 		pptr->when = time((long *) 0);
 		pptr->status = _OCCI_RUNNING;
-		rest_log_message("*** OS PROCCI Instance is UP and RUNNING ***");
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI Instance is UP and RUNNING ***");
+		}
 		autosave_openstack_nodes();
-		rest_log_message("*** OS PROCCI connect_openstack_server( exit ) ***");
+		if ( check_debug() )
+		{
+			rest_log_message("*** OS PROCCI connect_openstack_server( exit ) ***");
+		}
 		return(0);
 	}
 }
@@ -403,10 +518,13 @@ private	struct	rest_response * start_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char		* idptr;
 	struct	os_response * osptr;
+	struct	os_response * metaptr;
 	struct	openstack * pptr;
 	int		status;
 	char	*	filename;
+	char	*	metafilename;
 	char		buffer[512];
 	char 	*	personality;
 	char 	*	resource=_CORDS_LAUNCH_CFG;
@@ -415,35 +533,54 @@ private	struct	rest_response * start_openstack(
 	else if ( pptr->status != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
+		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
 
-	sprintf(buffer,"#compatibleone\n#personality data\ncontract=%s/%s/%s\npublisher=%s",
+	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
 		OsProcci.identity,_CORDS_OPENSTACK,pptr->id,OsProcci.publisher);
 	
 	if (!( personality = allocate_string(buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
+		return( rest_html_response( aptr, 500, "Server Failure : Personality" ) );
 
 	sprintf(buffer,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
 	if (!( personality = openstack_instructions( buffer, personality ) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
+		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
 
 	if (!( filename = os_create_server_request( 
 		pptr->name, pptr->image, pptr->flavor, personality, resource ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Request" ) );
+
 	else
 	{
+		liberate( filename );
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_openstack_server( osptr, pptr );
+		if (!( status = connect_openstack_server( osptr, pptr ) ))
+		{
+			/* ----------------------- */
+			/* create server meta data */
+			/* ----------------------- */
+			if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
+			 	return( rest_html_response( aptr, 400, "Bad Request : Missing Meta Data Server ID" ) );
+
+			else if (!( metafilename = os_create_metadata_request( personality ) ))
+			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Message" ) );
+			else if (!( metaptr = os_create_metadata( idptr, metafilename )))
+			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Request" ) );
+			else
+			{
+				metaptr = liberate_os_response( metaptr );
+				liberate( metafilename );
+			}
+		}
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
 			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
 	}
 
 }

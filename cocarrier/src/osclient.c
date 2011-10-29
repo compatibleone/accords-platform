@@ -382,9 +382,9 @@ public	struct	os_response *	os_list_images( )
 
 
 /*	------------------------------------------------------------	*/
-/*	   o s _ c r e a t e _  m e t a d a t a _ r e q u e s t		*/
+/*		    o s _ p a r s e _  m e t a d a t a 			*/
 /*	------------------------------------------------------------	*/
-public	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
+private	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
 {
 	char *	sptr;
 	int	c;
@@ -454,6 +454,9 @@ public	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
 	return(1);	
 }
 			
+/*	------------------------------------------------------------	*/
+/*	   o s _ c r e a t e _  m e t a d a t a _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
 public	char * 	os_create_metadata_request( char * personality )
 {
 	char *	filename;
@@ -510,7 +513,7 @@ public	char * os_create_meta_request( char * key, char * value )
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
 		fprintf(h,"<meta xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
-		fprintf(h," key='%c%s%c>%s</meta>\n",0x0022,key,0x0022,value);
+		fprintf(h," key=%c%s%c>%s</meta>\n",0x0022,key,0x0022,value);
 		fclose(h);
 		return( filename );
 	}

@@ -20,15 +20,28 @@
 #           will be used as the local publisher service port.
 #        4) The publisher URL that will be used for allof the
 #           individual service configuration files
+#        5) This may be provided to activate TLS security
+#
+#        6) With security active monitoring may also be used
+#
 # ------------------------------------------------------------
 echo "-------------------------------------------"
 echo "CompatibleOn Accords Configuration Tool"
 echo "Verification of Command Line Parameters"
 
 export target=$1
-export resthost=$4
-export restport=$5
-export publisher=$3
+export resthost=$2
+export restport=$3
+export publisher=$4
+
+export tls=$5
+export monitor=$6
+
+export threads=1
+export verbose=1
+export debug=0
+export domain=occi
+export password=co-system
 
 if [ -z "$target" ]
 then
@@ -227,7 +240,6 @@ echo "</cords_users>" >> cords_user.xml
 # ----------------------------------------
 # Creation of Accords Security Files
 # ----------------------------------------
-export tls=security
 
 if [ -z "$tls" ]
 then
@@ -316,13 +328,6 @@ fi
 # ----------------------------------------
 # Creation of Accords Global Configuration 
 # ----------------------------------------
-
-export threads=1
-export verbose=1
-export debug=0
-export domain=occi
-export password=co-system
-export monitor=0
 
 function	mktls
 {
