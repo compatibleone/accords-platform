@@ -585,6 +585,11 @@ public	struct	occi_client *	occi_create_client( char * host, char * agent, char 
 	struct	url	    *	uptr;
 	struct	occi_client *	cptr;
 
+	if ( check_verbose() )
+	{
+		printf("OCCI CREATE CLIENT { \n\thost=%s,\n\tagent=%s,\n\ttls=%s };\n",host,agent,(tls ? tls : ""));
+	}
+
 	if ( OcciManager.optimise )
 		if ((cptr = occi_resolve_client( host )) != (struct occi_client *) 0)
 			return( occi_redirect_client( cptr, host ) );

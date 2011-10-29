@@ -47,7 +47,7 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 
 	sprintf(buffer,"occi.%s.",pptr->profile);
 
-	if (!( zptr = occi_simple_get( pptr->provider, _CORDS_CONTRACT_AGENT, Procci.tls ) ))
+	if (!( zptr = occi_simple_get( pptr->provider, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( 400 );
 	for (	fptr = zptr->first;
 		fptr != (struct occi_element *) 0;
@@ -108,14 +108,14 @@ private	int	contract_instructions( char * contract, char * provision )
 	char	tempname[4096];
 	int	length=0;
 
-	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, Procci.tls ) ))
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	 	return( 401 );
 
 	sprintf(buffer,"%s/%s/",ihost,_CORDS_INSTRUCTION);
 	liberate( ihost );
 	length = strlen(buffer);
 
-	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, Procci.tls ) ))
+	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( 401 );
 
 	else if (!(qptr = occi_create_request( 
@@ -156,7 +156,7 @@ private	int	contract_instructions( char * contract, char * provision )
 			liberate( vptr );
 		}
 
-		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, Procci.tls )) != (struct occi_response *) 0)
+		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		{
 			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.provision" )))
 				zptr = occi_remove_response ( zptr );
@@ -164,7 +164,7 @@ private	int	contract_instructions( char * contract, char * provision )
 			{
 				if ( fptr->value ) fptr->value = liberate( fptr->value );
 				fptr->value = allocate_string( provision );
-				zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, Procci.tls);
+				zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() );
 				zzptr = occi_remove_response ( zzptr );
 				zptr = occi_remove_response ( zptr );
 			}
@@ -200,7 +200,7 @@ private	struct	rest_response * start_contract(
 		{
 			sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
 			contract_instructions( fullid, pptr->provider );
-			cords_invoke_action( pptr->provider, "start", _CORDS_CONTRACT_AGENT, Procci.tls );
+			cords_invoke_action( pptr->provider, "start", _CORDS_CONTRACT_AGENT, default_tls() );
 			retrieve_provider_information( pptr );
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
@@ -227,7 +227,7 @@ private	struct	rest_response * restart_contract(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			cords_invoke_action( pptr->provider, "restart", _CORDS_CONTRACT_AGENT, Procci.tls );
+			cords_invoke_action( pptr->provider, "restart", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 		}
@@ -254,7 +254,7 @@ private	struct	rest_response * suspend_contract(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			cords_invoke_action( pptr->provider, "suspend", _CORDS_CONTRACT_AGENT, Procci.tls );
+			cords_invoke_action( pptr->provider, "suspend", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
 		}
@@ -278,7 +278,7 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			cords_invoke_action( pptr->provider, "stop", _CORDS_CONTRACT_AGENT, Procci.tls );
+			cords_invoke_action( pptr->provider, "stop", _CORDS_CONTRACT_AGENT, default_tls() );
 			if (pptr->reference) pptr->reference = liberate( pptr->reference );
 			if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
 			if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
@@ -309,7 +309,7 @@ private	struct	rest_response * save_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT,Procci.tls );
+			cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*) 0);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
