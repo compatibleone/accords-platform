@@ -417,11 +417,13 @@ if [ -z "$tls" ]
 then
 	echo "bin/testcp --publisher "$publisher" --verbose \$1.xml " > co-parser
 	echo "bin/testcb --publisher "$publisher" --verbose plan_\$1.xml " > co-broker
+	echo "bin/testresolver --publisher "$publisher" \$* " > co-resolver
 else
 	echo "bin/testcp --tls security/testcpTls.xml --publisher "$publisher" --verbose \$1.xml " > co-parser
 	echo "bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_\$1.xml " > co-broker
+	echo "bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" \$* " > co-resolver
 fi
-chmod ug+x co-parser co-broker
+chmod ug+x co-parser co-broker co-resolver
 
 echo "CompatibleOne Accords Configuration Complete"
 echo "--------------------------------------------"
