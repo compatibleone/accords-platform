@@ -401,6 +401,7 @@ mkpub
 mkmon coss 
 mkmon comons 
 mkcfg coes 
+mkcfg conets 
 mkcfg coobas 
 mkcfg parser 
 mkcfg broker 
@@ -409,7 +410,6 @@ mkcfg osprocci
 mkcfg onprocci
 mkcfg azprocci
 mkcfg fileserver
-mkcfg conets 
 
 echo "</accords>" >> $target
 chmod 0640 $target
