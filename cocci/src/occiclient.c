@@ -585,7 +585,7 @@ public	struct	occi_client *	occi_create_client( char * host, char * agent, char 
 	struct	url	    *	uptr;
 	struct	occi_client *	cptr;
 
-	if ( check_verbose() )
+	if ( check_debug() )
 	{
 		printf("OCCI CREATE CLIENT { \n\thost=%s,\n\tagent=%s,\n\ttls=%s };\n",host,agent,(tls ? tls : ""));
 	}

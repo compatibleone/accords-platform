@@ -19,10 +19,12 @@
 /*		64	private key is DER not PEM		*/
 /*	-------------------------------------------------	*/
 
+private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
+
 private	int	SSL_READY=0;
 
 #define	Portable_srandom	srandom
-#define	SSL_verbose 		check_debug()
+#define	SSL_debug 		check_debug()
 #define	SIGNAL_verbose 		check_verbose()
 
 #define	_DEFAULT_KEYFILE  	"server.pem"
@@ -33,6 +35,24 @@ char *	SslKeyFile=(char *) 0;
 char *	SslPassWord=(char *) 0;
 char *	SslCertFile=(char *) 0;
 char *	SslCaList=(char *) 0;
+
+void	security_lock(int h, char * f)
+{
+	char	buffer[1024];
+	sprintf(buffer,"%s_security_lock(%u)",f,h);
+	rest_log_debug( buffer );
+	pthread_mutex_lock( &security_control );
+	return;
+}
+
+void	security_unlock(int h, char * f)
+{
+	char	buffer[1024];
+	sprintf(buffer,"%s_security_unlock(%u)",f,h);
+	rest_log_debug( buffer );
+	pthread_mutex_unlock( &security_control );
+	return;
+}
 
 private	void	tls_show_errors( char * message)
 {
@@ -128,12 +148,19 @@ public	int	https_use_encryption(aptr)
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
 
+	if (( SslKeyFile ) && (!( strcmp( SslKeyFile, aptr ) )))
+		return( 0 );
+
+	security_lock( 0, "encryption" );
 	if ( SslKeyFile ) 
 	{
 		liberate( SslKeyFile );
 		SslKeyFile = (char *) 0;
 	}
-	if (!( SslKeyFile = allocate_string( aptr )))
+	SslKeyFile = allocate_string( aptr );
+	security_unlock( 0, "encryption" );
+
+	if (!( SslKeyFile ))
 		return( 27 );
 	else	return( 0  );
 }
@@ -151,12 +178,18 @@ public	int	https_use_certificate(aptr)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
+	if (( SslCertFile ) && (!( strcmp( SslCertFile, aptr ) )))
+		return( 0 );
+	security_lock( 0, "certificate" );
 	if ( SslCertFile ) 
 	{
 		liberate( SslCertFile );
 		SslCertFile = (char *) 0;
 	}
-	if (!( SslCertFile = allocate_string( aptr )))
+	SslCertFile = allocate_string( aptr );
+	security_unlock( 0, "certificate" );
+
+	if (!( SslCertFile ))
 		return( 27 );
 	else	return( 0  );
 }
@@ -174,12 +207,20 @@ public	int	https_use_password(aptr)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
+
+	if (( SslPassWord ) && (!( strcmp( SslPassWord, aptr ) )))
+		return( 0 );
+
+	security_lock( 0, "password" );
 	if ( SslPassWord ) 
 	{
 		liberate( SslPassWord );
 		SslPassWord = (char *) 0;
 	}
-	if (!( SslPassWord = allocate_string( aptr )))
+	SslPassWord = allocate_string( aptr );
+	security_unlock( 0, "password" );
+
+	if (!( SslPassWord  ))
 		return( 27 );
 	else	return( 0  );
 }
@@ -311,7 +352,7 @@ public	int	ssl_tcp_accept( handle )
 	start_socket_catcher(handle,"ssl accept");
 	status = SSL_accept( handle );
 	close_socket_catcher(handle,"ssl accept",errno);
-	if ( SSL_verbose ) 
+	if ( SSL_debug ) 
 	{
 		printf("SSL_accept(pid=%u,h=%x) => %d \r\n",getpid(),handle,status);
 	}
@@ -322,7 +363,7 @@ public	int	ssl_tcp_connect( handle )
 	SSL *	handle;
 {
 	int	status;
-	if ( SSL_verbose ) 
+	if ( SSL_debug ) 
 	{
 		printf("SSL_connect(pid=%u,h=%x)\r\n",getpid(),handle);
 	}
@@ -332,19 +373,36 @@ public	int	ssl_tcp_connect( handle )
 	return( status );
 }
 
+private	int	do_ssl_shutdown=0;
 public	int	ssl_tcp_shutdown( handle )
 	SSL *	handle;
 {
 	int	status=0;
-	if ( SSL_verbose ) 
+	if ( SSL_debug ) 
 	{
 		printf("SSL_shutdown(pid=%u,h=%x)\r\n",getpid(),handle);
 	}
 	start_socket_catcher(-1,"ssl shutdown");
-	SSL_shutdown(handle);
+	if ( do_ssl_shutdown )
+	{
+		SSL_shutdown(handle);
+		SSL_clear(handle);
+	}
 	close_socket_catcher(-1,"ssl shutdown",errno);
 	SSL_free( handle );
 	return( status );
+}
+
+public	int	connection_shutdown( CONNECTIONPTR cptr )
+{
+	int	status;
+	if ( cptr->object ) 
+	{
+		status = ssl_tcp_shutdown( cptr->object );
+		cptr->object = (void*) 0;
+		return( status );
+	}
+	else	return( shutdown( cptr->socket, 2 ) );
 }
 
 /*	------------------------------------------------	*/
@@ -360,28 +418,27 @@ int		mode;
 {
 	/* Check for an SSL object */
 	/* ----------------------- */
-
+	security_lock( cptr->socket, "close" );
 	if ( cptr->newobject ) 
 	{
 		ssl_tcp_shutdown(cptr->newobject);
 		cptr->newobject = (void *) 0;
 	}
+	security_unlock( cptr->socket, "close" );
 
 	if ( mode )
 	{
-		if ( cptr->object ) 
-		{
-			ssl_tcp_shutdown(cptr->object);
-			cptr->object = (void *) 0;
-		}
+		security_lock( cptr->socket, "close" );
+		connection_shutdown( cptr );
 
 		if ( cptr->context ) 
 		{
 			SSL_CTX_free( cptr->context );
 			cptr->context = (void *) 0;
 		}
-	}
 
+		security_unlock( cptr->socket, "close" );
+	}
 	return;
 }
 
@@ -426,18 +483,6 @@ public	int	connection_write( CONNECTIONPTR cptr, char * buffer, int length )
 	else	return(    socketwriter( cptr->socket, buffer, length ));
 }
 
-public	int	connection_shutdown( CONNECTIONPTR cptr )
-{
-	int	status;
-	if ( cptr->object ) 
-	{
-		status = ssl_tcp_shutdown( cptr->object );
-		cptr->object = (void*) 0;
-		return( status );
-	}
-	else	return( shutdown( cptr->socket, 2 ) );
-}
-
 public	int	connection_close( CONNECTIONPTR cptr, int mode )
 {
 	if ( cptr->object ) 
@@ -454,6 +499,7 @@ public	int	connection_close( CONNECTIONPTR cptr, int mode )
 
 void	check_ssl_ready()
 {
+	security_lock( 0, "check" );
 	if (!( SSL_READY )) 
 	{
 	        SSL_load_error_strings();                /* readable error messages */
@@ -461,6 +507,7 @@ void	check_ssl_ready()
 	        Portable_srandom(177);
 		SSL_READY=1;
 	}
+	security_unlock( 0, "check" );
 	return;
 }
 
@@ -502,62 +549,68 @@ CONNECTIONPTR	set_ssl_certificate_and_key( CONNECTIONPTR cptr, int mode )
 /*	operational modes.					*/
 /*	------------------------------------------------	*/
 
-CONNECTIONPTR	build_ssl_context( cptr, mode, service )
-CONNECTIONPTR	cptr;
-int		mode;
-int		service;
+private	int	build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 {
+	char 	buffer[1024];
 	int	oof=0;
 	void	*	fptr=(void *) 0;
+
+	if ( SSL_debug )
+	{
+		sprintf(buffer,"build ssl context( x=%x, h=%u, m=%u, s=%u )",cptr,cptr->socket,mode,service);
+		rest_log_message( buffer );
+	}
 
 	check_ssl_ready();
 
 	/* ----------- */
 	/* SSL OBJECT  */
 	/* ----------- */
-	if (!( SslKeyFile )) {
-		if (!( SslKeyFile = allocate_string( _DEFAULT_KEYFILE ) )) {
-			if ( SSL_verbose ) 
-			{
-				printf("SSL KeyFile : allocation failure\r\n");
-			}
-			return( close_connection( cptr ) );
-			}
+	if (!( SslKeyFile )) 
+	{
+		if ( https_use_encryption( _DEFAULT_KEYFILE ) )
+		{
+			close_connection( cptr );
+			return(0);
 		}
+	}
 			
-	if (!( SslCertFile )) {
-		if (!( SslCertFile = allocate_string( _DEFAULT_CA_LIST ) )) {
-			if ( SSL_verbose ) 
-			{
-				printf("SSL CertFile : allocation failure\r\n");
-			}
-			return( close_connection( cptr ) );
-			}
+	if (!( SslCertFile ))
+	{
+		if ( https_use_certificate( _DEFAULT_CA_LIST ) )
+		{
+			close_connection( cptr );
+			return(0);
 		}
-	if (!( SslPassWord )) {
-		if (!( SslPassWord = allocate_string( _DEFAULT_PASSWORD ) )) {
-			if ( SSL_verbose ) 
-			{
-				printf("SSL PassWord : allocation failure\r\n");
-			}
-			return( close_connection( cptr ) );
-			}
-		}
+	}
 
-	if (!( fptr = SSLv23_method() )) {
-		if ( SSL_verbose ) 
+	if (!( SslPassWord ))
+	{
+		if ( https_use_password( _DEFAULT_PASSWORD ) )
+		{
+			close_connection( cptr );
+			return(0);
+		}
+	}
+
+	if (!( fptr = SSLv23_method() )) 
+	{
+		if ( SSL_debug ) 
 		{
 			tls_show_errors( "SSLv23_method" );
 		}
-		return( close_connection( cptr ) );
-		}
-	else if (!(cptr->context = SSL_CTX_new(fptr) )) {
-		if ( SSL_verbose ) 
+		close_connection( cptr );
+		return( 0 );
+	}
+	else if (!(cptr->context = SSL_CTX_new(fptr) )) 
+	{
+		if ( SSL_debug ) 
 		{
 			tls_show_errors( "SSL_CTX_new" );
 		}
-		return( close_connection( cptr ) );
-		}
+		close_connection( cptr );
+		return( 0 );
+	}
 
 	if ( mode )
 	{
@@ -566,21 +619,23 @@ int		service;
 		{
 			if (!(oof=SSL_CTX_use_certificate_file(cptr->context,SslCertFile,SSL_FILETYPE_ASN1))) 
 			{
-				if ( SSL_verbose ) 
+				if ( SSL_debug ) 
 				{
 					tls_show_errors( "SSL_use_certificate_chain_file" );
 				}
-				return( close_connection( cptr ) );
+				close_connection( cptr );
+				return( 0 );
 			}
 		}
 	
 		else if (!(oof = SSL_CTX_use_certificate_chain_file(cptr->context,SslCertFile))) 
 		{
-			if ( SSL_verbose ) 
+			if ( SSL_debug ) 
 			{
 				tls_show_errors( "SSL_use_certificate_chain_file" );
 			}
-			return( close_connection( cptr ) );
+			close_connection( cptr );
+			return( 0 );
 		}
 	
 		SSL_CTX_set_default_passwd_cb(cptr->context,ssl_password_callback);
@@ -589,22 +644,24 @@ int		service;
 			cptr->context,SslKeyFile,
 			(mode & 32 ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
 		{
-			if ( SSL_verbose ) 
+			if ( SSL_debug ) 
 			{
 				tls_show_errors( "SSL_CTX_use_PrivateKey_file" );
 			}
-			return( close_connection( cptr ) );
+			close_connection( cptr );
+			return( 0 );
 		}
 		
 		if ( SslCaList )
 		{
 			if (!(SSL_CTX_load_verify_locations(cptr->context,SslCaList, 0))) 
 			{
-				if ( SSL_verbose ) 
+				if ( SSL_debug ) 
 				{
 					tls_show_errors( "SSL_CTX_load_verify_locations" );
 				}
-				return( close_connection( cptr ) );
+				close_connection( cptr );
+				return( 0 );
 			}
 		}
 
@@ -612,11 +669,12 @@ int		service;
 		{
 			if (!(SSL_CTX_load_verify_locations(cptr->context,SslCertFile, 0))) 
 			{
-				if ( SSL_verbose ) 
+				if ( SSL_debug ) 
 				{
 					tls_show_errors( "SSL_CTX_load_verify_locations" );
 				}
-				return( close_connection( cptr ) );
+				close_connection( cptr );
+				return( 0 );
 			}
 		}
 
@@ -627,20 +685,24 @@ int		service;
 
 	if (!( cptr->object = SSL_new( cptr->context ) )) 
 	{
-		if ( SSL_verbose ) 
+		if ( SSL_debug ) 
 		{
 			tls_show_errors( "SSL_new" );
 		}
-		return( close_connection( cptr ) );
+		close_connection( cptr );
+		return( 0 );
 	}
 	if ( mode & 16 )
 		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,NULL);
 	else if ( mode & 8 )
 		SSL_set_verify( cptr->object,SSL_VERIFY_PEER,NULL);
 	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,NULL);
-	return( cptr );
+	return( 1 );
 }
 
+/*	----------------------------------------------------------	*/
+/*		t l s _ c l i e n t _ h a n d s h a k e			*/
+/*	----------------------------------------------------------	*/
 public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 {
 	int	status;
@@ -668,18 +730,14 @@ public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 	}
 }
 
-public	int	tls_server_startup( CONNECTIONPTR cptr, int mode )
-{
-	if (!( build_ssl_context( cptr, mode, 1 ) ))
-		return(0);
-	else	return(1);
-}
-
+/*	----------------------------------------------------------	*/
+/*		t l s _ s e r v e r _ h a n d s h a k e		*/
+/*	----------------------------------------------------------	*/
 public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 {
 	if (!( cptr->newobject = SSL_new( cptr->context ) )) 
 	{
-		if ( SSL_verbose ) 
+		if ( SSL_debug ) 
 		{
 			tls_show_errors( "SSL_new" );
 		}
@@ -695,7 +753,7 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 		SSL_set_fd( cptr->newobject, cptr->socket );
 		if ( ssl_tcp_accept( cptr->newobject ) < 0 )
 		{
-			if ( SSL_verbose ) 
+			if ( SSL_debug ) 
 			{
 				tls_show_errors("SSL_accept");
 			}
@@ -703,6 +761,16 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 		}
 		else	return(1);
 	}
+}
+
+/*	----------------------------------------------------------	*/
+/*		t l s _ s e r v e r _ s t a r t u p    			*/
+/*	----------------------------------------------------------	*/
+public	int	tls_server_startup( CONNECTIONPTR cptr, int mode )
+{
+	if (!( build_ssl_context( cptr, mode, 1 ) ))
+		return(0);
+	else	return(1);
 }
 
 #endif	/* _abalssl_c */

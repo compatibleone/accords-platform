@@ -25,23 +25,24 @@
 #        6) With security active monitoring may also be used
 #
 # ------------------------------------------------------------
+
 echo "-------------------------------------------"
 echo "CompatibleOn Accords Configuration Tool"
 echo "Verification of Command Line Parameters"
 
 export target=$1
-export resthost=$4
-export restport=$5
-export publisher=$3
-export monitor=$6
+export resthost=$2
+export restport=$3
+export publisher=$4
+
 export tls=$5
+export monitor=$6
 
 export threads=1
 export verbose=1
 export debug=0
 export domain=occi
 export password=co-system
-
 
 if [ -z "$target" ]
 then
@@ -69,6 +70,8 @@ echo "Target Configuration : " $target
 echo "Rest Host Base URL   : " $resthost
 echo "Rest Host Base Port  : " $restport
 echo "Accords Publisher    : " $publisher
+echo "Accords Security     : " $tls
+echo "Accords Monitoring   : " $monitor
 echo "-------------------------------------------"
 echo "Installing Libraries"
 cp lib/*.so /lib

@@ -25,6 +25,9 @@
 #        6) With security active monitoring may also be used
 #
 # ------------------------------------------------------------
+echo command line parameters 
+echo $*
+
 echo "-------------------------------------------"
 echo "CompatibleOn Accords Configuration Tool"
 echo "Verification of Command Line Parameters"
@@ -69,6 +72,8 @@ echo "Target Configuration : " $target
 echo "Rest Host Base URL   : " $resthost
 echo "Rest Host Base Port  : " $restport
 echo "Accords Publisher    : " $publisher
+echo "Accords Security     : " $tls
+echo "Accords Monitoring   : " $monitor  
 echo "-------------------------------------------"
 echo "Installing Libraries"
 

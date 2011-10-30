@@ -450,9 +450,9 @@ public	char *			json_atribut( struct data_element * dptr, char * nptr )
 		return( (char *) 0 );
 	else if (!( dptr->name ))
 	{
-		if (!( eptr = json_atribut( dptr->first, nptr ) ))
+		if (!( vptr = json_atribut( dptr->first, nptr ) ))
 			return( json_atribut( dptr->next, nptr ) );
-		else	return( eptr );
+		else	return( vptr );
 	}
 	else if (!( strcmp( dptr->name, nptr ) ))
 	{
