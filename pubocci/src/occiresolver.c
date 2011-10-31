@@ -226,7 +226,7 @@ public	struct	occi_response * occi_resolver( char * category, char * agent )
 	char			*	vptr;
 	char				buffer[4096];
 
-	if ( check_verbose() )
+	if ( check_debug() )
 		printf("   OCCI Resolver( %s, %s )\n",category,agent);
 	if ( occi_resolver_default() != 0 )
 		return((struct occi_response * )0);

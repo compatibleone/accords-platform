@@ -46,19 +46,21 @@ private	int	os_result( struct os_response * rptr )
 	char	buffer[2048];
 	if ( rptr )
 	{
-		if ( rptr )
+		switch ( rptr->nature )
 		{
-			switch ( rptr->nature )
+		case	_TEXT_JSON	:
+			json_show( rptr->jsonroot );
+			printf("\n");		
+			break;
+		case	_TEXT_XML	:
+		default			:
+			if (( rptr->response->status != 204 )
+			&&  ( rptr->response->body ))
 			{
-			case	_TEXT_JSON	:
-				json_show( rptr->jsonroot );
-				break;
-			case	_TEXT_XML	:
-			default			:
 				sprintf(buffer,"cat %s",rptr->response->body);
 				system( buffer );
+				printf("\n");
 			}
-			printf("\n");
 		}
 		liberate_os_response( rptr );
 		return(0);

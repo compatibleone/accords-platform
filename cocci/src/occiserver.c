@@ -354,7 +354,7 @@ private	struct rest_response * occi_get_capacities(
 private	void	occi_show_request( struct rest_request * rptr )
 {
 	struct	rest_header * hptr;
-	if ( check_verbose() )
+	if ( check_debug() )
 	{
 		printf("   OCCI Server Request  : %s %s?%s %s \n",rptr->method,
 			rptr->object,

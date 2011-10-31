@@ -1315,6 +1315,11 @@ private	void *	rest_thread_message( void * vptr );
 /*	------------------------------------------------	*/
 /*	     r e s t _ t h r e a d _ m e s s a g e		*/
 /*	------------------------------------------------	*/
+private	void	rest_log_thread( char * mptr )
+{
+	rest_debug_log_file( mptr );
+}
+
 private	void *	rest_thread_message( void * vptr )
 {
 	struct rest_thread * tptr=vptr;
@@ -1322,13 +1327,13 @@ private	void *	rest_thread_message( void * vptr )
 	struct rest_client * cptr;
 	struct rest_request * rptr;
 
-	rest_log_debug("thread: pthread detach");
+	rest_log_thread("thread: pthread detach");
 	pthread_detach( tptr->id );
 	while(tptr->status)
 	{
 		/* await job for thread */
 		/* -------------------- */
-		rest_log_debug("thread: awaiting job message");
+		rest_log_thread("thread: awaiting job message");
 		while(1)
 		{
 			lock_rest_thread(tptr);
@@ -1342,9 +1347,9 @@ private	void *	rest_thread_message( void * vptr )
 		
 		/* process thread job */
 		/* ------------------ */
-		rest_log_debug("thread: rest process message start");
+		rest_log_thread("thread: rest process message start");
 		status = rest_process_message( cptr, rptr );
-		rest_log_debug("thread: rest process message exit");
+		rest_log_thread("thread: rest process message exit");
 
 		/* terminate thread job */
 		/* -------------------- */
@@ -1354,7 +1359,7 @@ private	void *	rest_thread_message( void * vptr )
 		unlock_rest_thread( tptr );
 	}
 	tptr->status = 0;
-	rest_log_debug("thread: rest pthread exit");
+	rest_log_thread("thread: rest pthread exit");
 	pthread_exit((void *) 0);
 }
 #endif
@@ -1544,6 +1549,7 @@ private	int	rest_server_select( struct rest_server * sptr )
 /*	------------------------------------------------	*/
 /*	  r e s t _ a c c e p t _ c o n n e c t i o n		*/
 /*	------------------------------------------------	*/
+private	int	handshakes=0;
 private	int	rest_accept_connection( struct rest_server * sptr )
 {
 	int	workerid=0;
@@ -1590,10 +1596,13 @@ private	int	rest_accept_connection( struct rest_server * sptr )
 	else 
 	{
 		rest_log_debug("server: accept handshake");
+		handshakes++;
 		if (!( tls_server_handshake( &cptr->net, sptr->tlsconf->option ) ))
 		{
-			rest_log_debug("server: accept handshake failure");
-			failure(550,"rest server","tls handshake");
+			sprintf(buffer,"rest server(%u): tls socket(%u) handshake(%u) failure(%u)",
+				getpid(),cptr->net.socket,sptr->tlsconf->option, handshakes);
+			rest_log_debug( buffer );
+			failure(550, buffer );
 			rest_drop_client( cptr );
 		}
 		sprintf(buffer,"server: accept (tls) (socket=%u)",cptr->net.socket);

@@ -82,28 +82,52 @@ public 	int	rest_log_comons( char * buffer, char * nature )
 }
 
 /*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ f i l e 				*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_file( char * buffer )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_get_logfile_name() ))
+		return(30);
+	else if (!( h = fopen( filename,"a") ))
+		return(46);
+	else
+	{
+		fprintf(h,"%u:%u: %s\n",time((long *) 0),getpid(),buffer);
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ f i l e 				*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_debug_log_file( char * buffer )
+{
+	if (!( check_debug() ))
+		return( 0 );
+	else	return( rest_log_file( buffer ) );
+}
+
+/*	---------------------------------------------------------	*/
 /*		    r e s t _ l o g _ m e s s a g e			*/
 /*	---------------------------------------------------------	*/
 public 	int	rest_log_message( char * buffer )
 {
-	char *	filename;
-	FILE *	h;
-	if (!( restlogmons ))
+
+	if ( restlogmons & 1 )
 	{
-		if (!( filename = rest_get_logfile_name() ))
-			return(30);
-		else if (!( h = fopen( filename,"a") ))
-			return(46);
-		else
-		{
-			fprintf(h,"%u:%u: %s\n",time((long *) 0),getpid(),buffer);
-			fclose(h);
-			return(0);
-		}
+		rest_log_file( buffer );
 	}
-	else if (!( restlognest ))
-		return( rest_log_comons( buffer, "message" ) );
-	else	return( 0 );
+
+	if ( restlogmons & 2 )
+	{
+		if (!( restlognest ))
+			rest_log_comons( buffer, "message" );
+	}
+
+	return(0);	
 }
 
 /*	---------------------------------------------------------	*/

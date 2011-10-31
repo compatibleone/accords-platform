@@ -276,8 +276,9 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	else
 	{
 		tls_configuration_use( cptr->tlsconf );
-		tls_client_handshake( &cptr->net, cptr->tlsconf->option );
-		return( cptr );
+		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
+			return( rest_liberate_client( cptr ) );
+		else	return( cptr );
 	}
 }
 
@@ -431,7 +432,7 @@ public	struct	rest_request * rest_send_request(
 	if (!( rptr ))	return( rptr );
 
 	if ( check_verbose() )
-		printf("\tRest Client Request : %s %s %s \n",rptr->method, rptr->object,rptr->version );
+		printf("Rest Client Request : %s %s %s \n",rptr->method, rptr->object,rptr->version );
 
 	rest_request_start( cptr );
 

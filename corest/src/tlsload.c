@@ -127,9 +127,11 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 /*	---------------------------------------------	*/
 public	void	tls_configuration_use(struct tls_configuration * cptr )
 {
+	security_lock("configuration");
 	https_use_encryption( cptr->key );
 	https_use_certificate( cptr->certificate );
 	https_use_password( cptr->passphrase );
+	security_unlock("configuration");
 	return;
 }
 
