@@ -18,6 +18,7 @@
 
 #include "cb.h"
 #include "csp.c"
+#include "restlog.h"
 
 /*	-------------------------------------------------------		*/
 /*	t e r m i n a t e _ c o r d s _ p r o v i s i o n i n g		*/
@@ -177,7 +178,7 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 	struct	cordscript_element * rvalue;
 	char	buffer[2048];
 
-	if (!( ihost = occi_resolve_category_provider( _CORDS_EVENT, agent, tls ) ))
+	if (!( ihost = rest_log_comons_identity(_CORDS_EVENT,agent,tls) ))
 		return(46);
 
 	sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);

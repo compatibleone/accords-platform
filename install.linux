@@ -38,6 +38,7 @@ export publisher=$4
 export tls=$5
 export monitor=$6
 
+export trace=1
 export threads=1
 export verbose=1
 export debug=0
@@ -62,6 +63,11 @@ fi
 if [ -z "$publisher" ]
 then
 	export publisher=$resthost:$restport
+fi
+
+if [ -z "$monitor" ]
+then
+	export monitor=$trace
 fi
 
 echo "Configuration Parameters Established       "
@@ -349,7 +355,7 @@ function	mkpub
 {
 	echo "<publisher>" >> $target
 	echo "<rest host='"$resthost"' port='"$restport"'/>" >> $target
-	echo "<security admin='admin' pass='admin' authorise='0' monitor='0' " >> $target
+	echo "<security admin='admin' pass='admin' authorise='0' monitor='"$trace"' " >> $target
 	mktls publisher
 	echo "<memory file='publications.xml' autosave='1'/>" >> $target
 	echo "<domain name='"$domain"'/>" >> $target
@@ -369,7 +375,7 @@ function	mkmon
 	echo "    <security" >> $target
 	echo "         user='service-"$1"'" >> $target
 	echo "         password='"$password"'" >> $target
-	echo "         monitor='0'" >> $target
+	echo "         monitor='"$trace"'" >> $target
 	mktls $1
 	echo "    <domain name='"$domain"'/>" >> $target
 	echo "</"$1">" >> $target

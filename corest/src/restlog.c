@@ -21,11 +21,36 @@
 
 #define	_DEFAULT_LOGFILE	"./co-log"
 
+#define	_OPTIMISE_LOG		4
+#define	_LOG_TO_FILE		1
+#define	_LOG_TO_COMONS		2
+
 private	char *	restlogagent=(char *) 0;
 private	char *	restlogname=(char *) 0;
+private	char *	restcomons=(char *) 0;
 private	int	restlogmons=0;
 private	int	restlognest=0;
 
+public	char *	occi_resolve_category_provider( char * c, char * a, char * t );
+
+/*	---------------------------------------------------------	*/
+/*	    r e s t _ l o g _ c o m o n s _ i d e n t i t y		*/
+/*	---------------------------------------------------------	*/
+/*	this function allows optimisation of the COMONS reference	*/
+/*	resolution when required by the configuration of the log	*/
+/*	subsystem via the "monitor" value of the accords config.	*/
+/*	---------------------------------------------------------	*/
+public	char *	rest_log_comons_identity(char * category, char * agent, char * tls)
+{
+	char *	result;
+	if ( restcomons )
+		return( allocate_string( restcomons ) );
+	else if (!( result = occi_resolve_category_provider( category, agent, tls ) ))
+		return( result );
+	else if (!( restlogmons & _OPTIMISE_LOG ))
+		return( result );
+	else	return( allocate_string( (restcomons=result) ) );
+}
 
 /*	---------------------------------------------------------	*/
 /*			r e s t _ l o g _ a g e n t 			*/
@@ -116,15 +141,75 @@ public 	int	rest_debug_log_file( char * buffer )
 public 	int	rest_log_message( char * buffer )
 {
 
-	if ( restlogmons & 1 )
+	if ( restlogmons & _LOG_TO_FILE )
 	{
 		rest_log_file( buffer );
 	}
 
-	if ( restlogmons & 2 )
+	if ( restlogmons & _LOG_TO_COMONS )
 	{
 		if (!( restlognest ))
 			rest_log_comons( buffer, "message" );
+	}
+
+	return(0);	
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ f a i l u r e			*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_failure( char * buffer )
+{
+
+	if ( restlogmons & _LOG_TO_FILE )
+	{
+		rest_log_file( buffer );
+	}
+
+	if ( restlogmons & _LOG_TO_COMONS )
+	{
+		if (!( restlognest ))
+			rest_log_comons( buffer, "failure" );
+	}
+
+	return(0);	
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ w a r n i n g 			*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_warning( char * buffer )
+{
+
+	if ( restlogmons & _LOG_TO_FILE )
+	{
+		rest_log_file( buffer );
+	}
+
+	if ( restlogmons & _LOG_TO_COMONS )
+	{
+		if (!( restlognest ))
+			rest_log_comons( buffer, "warning" );
+	}
+
+	return(0);	
+}
+
+/*	---------------------------------------------------------	*/
+/*		    r e s t _ l o g _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------------	*/
+public 	int	rest_log_transaction( char * buffer )
+{
+
+	if ( restlogmons & _LOG_TO_FILE )
+	{
+		rest_log_file( buffer );
+	}
+
+	if ( restlogmons & _LOG_TO_COMONS )
+	{
+		if (!( restlognest ))
+			rest_log_comons( buffer, "transaction" );
 	}
 
 	return(0);	

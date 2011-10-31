@@ -646,7 +646,7 @@ private	int	publisher_operation( char * nptr )
 	else if (!( optr = occi_add_action( optr,"stop","",stop_agency)))
 		return( 27 );
 
-	rest_initialise_log(0);
+	rest_initialise_log(Publisher.monitor);
 
 	/* ------------------------------------- */
 	/* launch the rest/occi server operation */
