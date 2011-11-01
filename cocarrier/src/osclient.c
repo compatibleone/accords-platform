@@ -630,6 +630,11 @@ public	char * os_create_server_request(
 		char * personality,	/* the source personality data	*/
 		char * resource )	/* the target personality file  */
 {
+	char *	sptr=(char *) 0;
+	char *	tptr=(char *) 0;
+	char *	kptr=(char *) 0;
+	char *	dptr=(char *) 0;
+
 	char	encoded[8192];
 	char *	eptr=encoded;
 	char *	filename;
@@ -647,6 +652,9 @@ public	char * os_create_server_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		/* ---------------------------------------- */
+		/* generate server creation request element */
+		/* ---------------------------------------- */
 		fprintf(h,"<server xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
 		if (!( strcmp( Os.version, "v1.0" ) ))
 		{
@@ -659,7 +667,29 @@ public	char * os_create_server_request(
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,Os.base,flavor,0x0022);
 		}
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
-		fprintf(h,"\t<metadata key=%cServerName%c>%s</metadata>\n",0x0022,0x0022,identity);
+
+		/* ----------------------------- */
+		/* generate meta data statements */
+		/* ----------------------------- */
+		fprintf(h,"\t<metadata>\n");
+		fprintf(h,"\t\t<meta key='ServerName'>%s<</meta>\n",identity);
+		if ( personality )
+		{
+			if (( sptr = allocate_string( personality )) != (char *) 0)
+			{
+				tptr = sptr;
+				while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
+				{
+					fprintf(h,"\t\t<meta key='%s'>%s</meta>\n",kptr,dptr);
+				}
+				liberate(tptr );
+			}
+		}
+		fprintf(h,"\t</metadata>\n");
+
+		/* ---------------------------- */
+		/* generate personality section */
+		/* ---------------------------- */
 		if (( personality ) && ( resource ))
 		{
 			if (( strlen( personality ) )
@@ -683,7 +713,6 @@ public	char * os_create_server_request(
 				fprintf(h,"</personality>\n");
 			}
 		}
-
 		fprintf(h,"</server>\n");
 		fclose(h);
 		return( filename );

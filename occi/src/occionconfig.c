@@ -27,7 +27,6 @@
 /*	--------------------------------------------------------------------	*/
 struct on_config * allocate_on_config();
 struct on_config * liberate_on_config(struct on_config * optr);
-private pthread_mutex_t list_on_config_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * on_config_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * on_config_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_on_config_node() { return( on_config_first ); }
@@ -35,7 +34,7 @@ public struct  occi_kind_node * occi_first_on_config_node() { return( on_config_
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_on_config_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * drop_on_config_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		on_config_first = nptr->next;
@@ -45,19 +44,12 @@ private struct occi_kind_node * ll_drop_on_config_node(struct occi_kind_node * n
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
-	return((struct occi_kind_node *)0);
-}
-private struct occi_kind_node * drop_on_config_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_on_config_control );
-	nptr = ll_drop_on_config_node( nptr );
-	pthread_mutex_unlock( &list_on_config_control );
-	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_on_config_node(char * id) {
+private struct occi_kind_node * locate_on_config_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	for ( nptr = on_config_first;
@@ -69,18 +61,11 @@ private struct occi_kind_node * ll_locate_on_config_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_on_config_node(char * id) {
-	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_on_config_control );
-	nptr = ll_locate_on_config_node(id);
-	pthread_mutex_unlock( &list_on_config_control );
-	return( nptr );
-}
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_on_config_node(int mode) {
+private struct occi_kind_node * add_on_config_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -101,13 +86,6 @@ private struct occi_kind_node * ll_add_on_config_node(int mode) {
 			}
 		}
 }
-private struct occi_kind_node * add_on_config_node(int mode) {
-	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_on_config_control );
-	nptr = ll_add_on_config_node( mode );
-	pthread_mutex_unlock( &list_on_config_control );
-	return(nptr);
-}
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
@@ -120,9 +98,9 @@ private void autoload_on_config_nodes() {
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
-	if (!( document = document_parse_file(fn)))
+	if (!( document = document_parse_file(fn) ))
 		return;
-	if ((eptr = document_element(document,"on_configs")) != (struct xml_element *) 0) {
+	else if ((eptr = document_element(document,"on_configs")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "on_config" ) ) continue;
@@ -130,6 +108,8 @@ private void autoload_on_config_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "user" )) != (struct xml_atribut *) 0)
@@ -168,8 +148,7 @@ public  void autosave_on_config_nodes() {
 	char * fn=autosave_on_config_name;	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_on_config_control );
-	if (( h = fopen(fn,"w")) != (FILE *) 0) {
+	if (!( h = fopen(fn,"w") )) return;
 	fprintf(h,"<on_configs>\n");
 	for ( nptr = on_config_first;
 		nptr != (struct occi_kind_node *) 0;
@@ -178,6 +157,9 @@ public  void autosave_on_config_nodes() {
 		fprintf(h,"<on_config\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
@@ -216,8 +198,6 @@ public  void autosave_on_config_nodes() {
 		}
 	fprintf(h,"</on_configs>\n");
 	fclose(h);
-	}
-	pthread_mutex_unlock( &list_on_config_control );
 	return;
 }
 
@@ -233,6 +213,8 @@ private void set_on_config_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "user" ) ))
@@ -284,6 +266,13 @@ private int pass_on_config_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
+			return(0);
+		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
 	if (( fptr->description )
@@ -370,6 +359,9 @@ private struct rest_response * on_config_occi_response(
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
@@ -811,6 +803,8 @@ public struct occi_category * occi_on_config_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		optr->interface = &occi_on_config_mt;
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "user",0,0) ))
@@ -858,6 +852,17 @@ public struct rest_header *  on_config_occi_headers(struct on_config * sptr)
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"on_config; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.on_config.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

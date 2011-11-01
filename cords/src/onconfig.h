@@ -5,6 +5,7 @@
 struct	on_config
 {
 	char	*	id;
+	char	*	name;
 	char 	*	description;
 	char	*	user;
 	char	*	password;

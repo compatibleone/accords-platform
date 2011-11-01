@@ -8,6 +8,8 @@ rm */configure */config.status -f
 rm -r */autom4te.cache -f
 rm */bin/* */lib/* -f
 rm -r product -f
+git add -A
+git status
 
 
 

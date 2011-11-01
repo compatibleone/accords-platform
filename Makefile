@@ -20,6 +20,7 @@ all clean install:
 	-$(MAKE) -C onprocci $@
 	-$(MAKE) -C azprocci $@
 	-$(MAKE) -C testos $@
+	-$(MAKE) -C teston $@
 	-$(MAKE) -C testcp $@
 	-$(MAKE) -C testcb $@
 	-$(MAKE) -C testaz $@

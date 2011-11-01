@@ -29,6 +29,8 @@ public struct on_config * liberate_on_config(struct on_config * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->user )
@@ -63,6 +65,7 @@ public struct on_config * reset_on_config(struct on_config * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->user = (char*) 0;
 		sptr->password = (char*) 0;
@@ -103,6 +106,10 @@ public int xmlin_on_config(struct on_config * sptr,struct xml_element * eptr)
 		if (!( strcmp(wptr->name,"id") ))
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"description") ))
 		{
@@ -163,6 +170,7 @@ public int rest_occi_on_config(FILE * fh,struct on_config * sptr,char * prefix, 
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.user='%s'\r\n",prefix,nptr,(sptr->user?sptr->user:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.password='%s'\r\n",prefix,nptr,(sptr->password?sptr->password:""));

@@ -43,6 +43,7 @@ cd ../fileserver; autoscan; autoconf; ./configure; make  all
 # Production of Executable Commands
 # ---------------------------------
 cd ../testos;     autoscan; autoconf; ./configure; make  all
+cd ../teston;     autoscan; autoconf; ./configure; make  all
 cd ../testcp;     autoscan; autoconf; ./configure; make  all
 cd ../testcb;     autoscan; autoconf; ./configure; make  all
 cd ../testaz;     autoscan; autoconf; ./configure; make  all

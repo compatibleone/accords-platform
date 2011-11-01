@@ -82,32 +82,32 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 	if (!( p1))
 		return( failure( 30,"p1", "required") );
 
-	if (!( strcmp(p1,"GET" ) ))
+	if (!( strcasecmp(p1,"GET" ) ))
 		return( os_result( os_client_get_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"POST" ) ))
+	else if (!( strcasecmp(p1,"POST" ) ))
 		return( os_result( os_client_post_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcmp(p1,"DELETE" ) ))
+	else if (!( strcasecmp(p1,"DELETE" ) ))
 		return( os_result( os_client_delete_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"PUT" ) ))
+	else if (!( strcasecmp(p1,"PUT" ) ))
 		return( os_result( os_client_put_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcmp(p1,"HEAD" ) ))
+	else if (!( strcasecmp(p1,"HEAD" ) ))
 		return( os_result( os_client_head_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"LIST" ) ))
+	else if (!( strcasecmp(p1,"LIST" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVERS" ) ))
+		else if (!( strcasecmp( p2, "SERVERS" ) ))
 			os_result( os_list_servers() );
-		else if (!( strcmp( p2, "FLAVORS" ) ))
+		else if (!( strcasecmp( p2, "FLAVORS" ) ))
 			os_result( os_list_flavors() );
-		else if (!( strcmp( p2, "IMAGES" ) ))
+		else if (!( strcasecmp( p2, "IMAGES" ) ))
 			os_result( os_list_images() );
-		else if (!( strcmp( p2, "METADATA" ) ))
+		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
-	else if (!( strcmp(p1,"CREATE" ) ))
+	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
 		if (!( nomfic = os_create_server_request( p2, p3, p4, personality, resource ) ))
 			return( failure(27,"cannot create","request" ) );
@@ -117,7 +117,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
-	else if (!( strcmp(p1,"METADATA" ) ))
+	else if (!( strcasecmp(p1,"METADATA" ) ))
 	{
 		if (!( nomfic = os_create_metadata_request( p3 ) ))
 			return( failure(27,"cannot create","request" ) );
@@ -127,28 +127,28 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
-	else if (!( strcmp(p1,"RETRIEVE" ) ))
+	else if (!( strcasecmp(p1,"RETRIEVE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 			os_result( os_get_server( p3 ) );
-		else if (!( strcmp( p2, "FLAVOR" ) ))
+		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			os_result( os_get_flavor( p3 ) );
-		else if (!( strcmp( p2, "IMAGE" ) ))
+		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_get_image( p3 ) );
-		else if (!( strcmp( p2, "METADATA" ) ))
+		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_get_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
-	else if (!( strcmp(p1,"UPDATE" ) ))
+	else if (!( strcasecmp(p1,"UPDATE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 			os_result( os_update_server( p4, nomfic ) );
-		else if (!( strcmp( p2, "METADATA" ) ))
+		else if (!( strcasecmp( p2, "METADATA" ) ))
 		{
 			if ((!( p3 )) || (!( p4 )) || (!( p5 )))
 				return( failure(33,p1,p2) );
@@ -157,15 +157,15 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
 	}
-	else if (!( strcmp(p1,"REMOVE" ) ))
+	else if (!( strcasecmp(p1,"REMOVE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 			os_result( os_delete_server( p3 ) );
-		else if (!( strcmp( p2, "IMAGE" ) ))
+		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_delete_image( p3 ) );
-		else if (!( strcmp( p2, "METADATA" ) ))
+		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_delete_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
@@ -211,21 +211,21 @@ private	int	os_command(int argc, char * argv[] )
 		{
 			aptr++;
 
-			if (!( strcmp( aptr,"user" ) ))
+			if (!( strcasecmp( aptr,"user" ) ))
 				user = argv[argi++];
-			else if (!( strcmp( aptr,"password" ) ))
+			else if (!( strcasecmp( aptr,"password" ) ))
 				pass = argv[argi++];
-			else if (!( strcmp( aptr,"version" ) ))
+			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
-			else if (!( strcmp( aptr,"host" ) ))
+			else if (!( strcasecmp( aptr,"host" ) ))
 				host = argv[argi++];
-			else if (!( strcmp( aptr,"agent" ) ))
+			else if (!( strcasecmp( aptr,"agent" ) ))
 				agent = argv[argi++];
-			else if (!( strcmp( aptr,"tls" ) ))
+			else if (!( strcasecmp( aptr,"tls" ) ))
 				tls = argv[argi++];
-			else if (!( strcmp( aptr,"verbose" ) ))
+			else if (!( strcasecmp( aptr,"verbose" ) ))
 				verbose = 1;
-			else if (!( strcmp( aptr,"debug" ) ))
+			else if (!( strcasecmp( aptr,"debug" ) ))
 				debug=1;
 			else	return(failure(30,"incorrect","option"));
 			continue;
