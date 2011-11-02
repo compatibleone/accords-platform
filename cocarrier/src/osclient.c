@@ -672,7 +672,7 @@ public	char * os_create_server_request(
 		/* generate meta data statements */
 		/* ----------------------------- */
 		fprintf(h,"\t<metadata>\n");
-		fprintf(h,"\t\t<meta key='ServerName'>%s<</meta>\n",identity);
+		fprintf(h,"\t\t<meta key='ServerName'>%s</meta>\n",identity);
 		if ( personality )
 		{
 			if (( sptr = allocate_string( personality )) != (char *) 0)
