@@ -18,6 +18,7 @@
 #define _on_client_c
 
 #include "onclient.h"
+#include "restpublic.h"
 
 private	struct	on_config On = {
 	(char *) 0,
@@ -326,90 +327,17 @@ public	struct	rest_header   *	on_authenticate	( )
 	char	buffer[256];
 
 	if (!( On.user ))
-		return( hptr );
+		return((struct rest_header *) 0);
 	else if (!( On.password ))
-		return( hptr );
+		return((struct rest_header *) 0);
 	else if (!( On.version ))
-		return( hptr );
+		return((struct rest_header *) 0);
 	else if (!( On.authenticate ))
-	{
-
-		strcpy(buffer,"/-/");
-
-		if (!( uptr = analyse_url( On.host )))
-			return( hptr );
-		else if (!( uptr = validate_url( uptr ) ))
-			return( hptr );
-		else if (!( uptr->object = allocate_string( buffer ) ))
-		{
-			uptr = liberate_url( uptr );
-			return( hptr );
-		}
-		else if (!( nptr = serialise_url( uptr,"" ) ))
-		{
-			uptr = liberate_url( uptr );
-			return( hptr );
-		}
-		else	uptr = liberate_url( uptr );
-
-		if (!( hptr = rest_create_header( "X-Auth-User", On.user ) ))
-		{
-			liberate( nptr );
-			return( hptr );
-		}
-		else if (!( hptr->next = rest_create_header( "X-Auth-Key", On.password ) ))
-		{
-			liberate( nptr );
-			return( liberate_rest_header( hptr ) );
-		}
-		else	hptr->next->previous = hptr;
-
-		if (!( rptr = on_client_get_request( nptr, On.tls, On.agent, hptr ) ))
-		{
-			liberate( nptr );
-			return( liberate_rest_header( hptr ) );
-		}
-		else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Auth-Token") ))
-		{
-			if (!( On.authenticate = allocate_string("abcde-1234-5678-fgh-ijklm") ))
-			{
-				liberate( nptr );
-				return( (struct rest_header *) 0 );
-			}
-		}
-		else if (!( On.authenticate = allocate_string( hptr->value ) ))
-		{
-			liberate( nptr );
-			return( (struct rest_header *) 0 );
-		}
-		else if (( hptr = rest_resolve_header(
-				rptr->response->first,"X-Server-Management-Url")) 
-				!= (struct rest_header *) 0)
-		{
-			if (!( On.base = allocate_string( hptr->value ) ))
-			{
-				liberate( nptr );
-				return( (struct rest_header *) 0 );
-			}
-		}
-		else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Identity") ))
-		{
-			if (!( On.base = allocate( strlen( On.host ) + 16 ) ))
-			{
-				liberate( nptr );
-				return( (struct rest_header *) 0 );
-			}
-			else	sprintf( On.base, "%s", On.host );
-		}
-		else if (!( On.base = allocate_string( hptr->value ) ))
-		{
-			liberate( nptr );
-			return( (struct rest_header *) 0 );
-		}
-	}
+		if (!( On.authenticate = rest_encode_credentials( On.user, On.password ) ))
+			return((struct rest_header *) 0);
 	if (!( On.authenticate ))
 		return((struct rest_header *) 0);
-	else if (!( hptr = rest_create_header( "X-Auth-Token", On.authenticate ) ))
+	else if (!( hptr = rest_create_header( "Authorization", On.authenticate ) ))
 		return( hptr );
 	else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, "text/xml" ) ))
 		return( liberate_rest_header( hptr ) );

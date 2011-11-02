@@ -10,6 +10,9 @@ public	struct	url *
 public	char	*	
 	rest_temporary_filename(char * extension);
 
+public	char *	
+	rest_encode_credentials( char * username, char * password );
+
 public	char 	*	
 	rest_allocate_uuid();
 
@@ -87,6 +90,7 @@ public struct rest_header *
 
 public struct rest_header * 	
 	rest_request_header(struct rest_request * rptr, char * nptr, char * vptr );
+
 
 #endif	/* _restpublic_h */
 	/* ------------- */
