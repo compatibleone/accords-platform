@@ -633,7 +633,7 @@ public	char *	rest_encode_credentials( char * username, char * password )
 /*	---------------------------------------------------------	*/
 /*		r e s t _ d e c o d e _ c r e d e n t i a l s		*/
 /*	---------------------------------------------------------	*/
-private	int	rest_decode_credentials( char * vptr, char * username, char * password )
+public	int	rest_decode_credentials( char * vptr, char * username, char * password )
 {
 	char	buffer[1024];
 	char	httpAuth[1024];

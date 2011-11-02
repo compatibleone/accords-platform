@@ -209,6 +209,7 @@ public	char * on_create_compute_request(
 		char * identity, 
 		char * flavour, 
 		char * image,
+		char * network, 
 		char * personality,
 		char * target ) 
 {
@@ -216,9 +217,6 @@ public	char * on_create_compute_request(
 	FILE *	h;
 	int	bytes;
 	struct	rest_header * hptr;
-	char *	netref="network-id";
-	char *	netaddr="ip-address";
-	char *	netmac="mac-address";
 
 	if (!( hptr = on_authenticate() ))
 		return((char *) 0);
@@ -241,9 +239,7 @@ public	char * on_create_compute_request(
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		fprintf(h,"</DISK>\n");
 		fprintf(h,"<NIC>\n");
-		fprintf(h,"<NETWORK href='%s'/>\n",netref);
-		fprintf(h,"<MAC>%s</MAC>\n",netmac);
-		fprintf(h,"<IP>%s</IP>\n",netaddr);
+		fprintf(h,"<NETWORK href='%s'/>\n",network);
 		fprintf(h,"</NIC>\n");
 		fprintf(h,"</COMPUTE>\n");
 		fclose(h);
@@ -258,10 +254,11 @@ public	char * on_create_server_request(
 		char * identity, 
 		char * flavour, 
 		char * image,
+		char * network, 
 		char * personality,
 		char * filename ) 
 {
-	return( on_create_compute_request( identity, flavour, image, personality, filename ) );
+	return( on_create_compute_request( identity, flavour, image, network, personality, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
@@ -325,7 +322,8 @@ public	struct	rest_header   *	on_authenticate	( )
 	char 			*	nptr;
 	int				status;
 	char	buffer[256];
-
+	char	uwork[256];
+	char	pwork[256];
 	if (!( On.user ))
 		return((struct rest_header *) 0);
 	else if (!( On.password ))

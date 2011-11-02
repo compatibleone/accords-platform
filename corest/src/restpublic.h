@@ -16,6 +16,9 @@ public	char *
 public	char 	*	
 	rest_allocate_uuid();
 
+public	int	
+	rest_decode_credentials( char * vptr, char * username, char * password );
+
 public	int		
 	rest_thread_control(int new_value);
 

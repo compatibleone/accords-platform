@@ -28,10 +28,10 @@ struct	on_response
 
 
 public	char * on_create_server_request(
-	char * identity, char * flavour, char * image, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* network, char * personality, char * resource );
 
 public	char * on_create_compute_request(
-	char * identity, char * flavour, char * image, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* network, char * personality, char * resource );
 
 public	char * on_create_storage_request(
 	char * name, char * description, char * type, char * size );
