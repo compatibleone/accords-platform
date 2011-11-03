@@ -186,9 +186,9 @@ echo "killall coes" >> co-stop
 echo "sleep 1" >> co-stop
 echo "killall coobas" >> co-stop
 echo "sleep 1" >> co-stop
-echo "killall comons" >> co-stop
-echo "sleep 1" >> co-stop
 echo "killall conets" >> co-stop
+echo "sleep 1" >> co-stop
+echo "killall comons" >> co-stop
 echo "sleep 1" >> co-stop
 echo "killall coss" >> co-stop
 echo "sleep 1" >> co-stop
