@@ -1811,7 +1811,10 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 	if (!( sptr = rest_open_server( port, tls, max, iptr ) ))
 		return(40);
 	else if (!( sptr->name = allocate_string( nptr ) ))
+	{
+		rest_liberate_server( sptr );
 		return( 27 );
+	}
 	else
 	{
 		/* ----------------------------------------------- */
@@ -1878,7 +1881,7 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 			}
 		}
 		if ( check_verbose() )
-			printf("   REST Server %s : shuting down\n");
+			printf("   REST Server %s : shuting down\n",sptr->name);
 		rest_liberate_server( sptr );
 		return(0);
 	}
