@@ -579,7 +579,7 @@ private	struct	xml_element * 	cords_build_contract(
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ t e r m i n a t e _ n o d e 		*/
 /*	-------------------------------------------------------		*/
-private	void 	cords_terminate_node( struct cords_core_descriptor * dptr )
+private	void 	cords_terminate_node( struct cords_node_descriptor * dptr )
 {
 	if ( dptr->nameApp )	dptr->nameApp = liberate( dptr->nameApp );
 	if ( dptr->hid )	dptr->hid = liberate( dptr->hid );
