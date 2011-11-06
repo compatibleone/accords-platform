@@ -28,10 +28,10 @@ struct	on_response
 
 
 public	char * on_create_server_request(
-	char * identity, char * flavour, char * image, char* network, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * personality, char * resource );
 
 public	char * on_create_compute_request(
-	char * identity, char * flavour, char * image, char* network, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * personality, char * resource );
 
 public	char * on_create_storage_request(
 	char * name, char * description, char * type, char * size );
@@ -60,6 +60,7 @@ public	struct	on_response *
 	on_client_put_request(
 		char * target, char * tls, char * agent, char * filename, struct rest_header * hptr );
 
+public	struct on_response * liberate_on_response( struct on_response * rptr )	;
 
 public	struct	on_response *	on_list_compute_pool();
 public	struct	on_response *	on_list_storage_pool();

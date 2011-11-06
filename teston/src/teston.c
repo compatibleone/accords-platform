@@ -124,13 +124,13 @@ private	struct	on_response * on_post_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_create_server_request( p3, p4, p5, p6, "", "" )))
+		if (!( filename = on_create_server_request( p3, p4, p5, p6,(char *) 0, "", "" )))
 			return((struct on_response *) 0);
 		else 	return( on_post_request( "/compute", filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_create_compute_request( p3, p4, p5, p6, "", "" )))
+		if (!( filename = on_create_compute_request( p3, p4, p5, p6,(char *) 0, "", "" )))
 			return((struct on_response *) 0);
 		else	return( on_post_request( "/compute", filename ) );
 	}

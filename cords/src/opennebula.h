@@ -6,14 +6,19 @@ struct	opennebula
 {
 	char *	id;
 	char *	name;
+	char *	number;
 	char *	hostname;
-	char *	flavour;
+	char *	flavor;
 	char *	image;
 	char *	publicaddr;
 	char *	privateaddr;
+	char *	profile;
+	char *	publicnetwork;
+	char *	privatenetwork;
 	char *	started;
 	char *	created;
 	char *	configuration;
+	int	when;
 	int	status;
 };
 

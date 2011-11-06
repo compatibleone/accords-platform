@@ -210,6 +210,7 @@ public	char * on_create_compute_request(
 		char * flavour, 
 		char * image,
 		char * network, 
+		char * local,
 		char * personality,
 		char * target ) 
 {
@@ -238,9 +239,18 @@ public	char * on_create_compute_request(
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		fprintf(h,"</DISK>\n");
-		fprintf(h,"<NIC>\n");
-		fprintf(h,"<NETWORK href='%s'/>\n",network);
-		fprintf(h,"</NIC>\n");
+		if ( network )
+		{
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n",network);
+			fprintf(h,"</NIC>\n");
+		}
+		if ( local )
+		{
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n",local);
+			fprintf(h,"</NIC>\n");
+		}
 		fprintf(h,"</COMPUTE>\n");
 		fclose(h);
 		return( filename );
@@ -255,10 +265,11 @@ public	char * on_create_server_request(
 		char * flavour, 
 		char * image,
 		char * network, 
+		char * local,
 		char * personality,
 		char * filename ) 
 {
-	return( on_create_compute_request( identity, flavour, image, network, personality, filename ) );
+	return( on_create_compute_request( identity, flavour, image, network,local, personality, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/

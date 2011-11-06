@@ -27,7 +27,6 @@
 /*	--------------------------------------------------------------------	*/
 struct opennebula * allocate_opennebula();
 struct opennebula * liberate_opennebula(struct opennebula * optr);
-private pthread_mutex_t list_opennebula_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * opennebula_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * opennebula_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_opennebula_node() { return( opennebula_first ); }
@@ -35,7 +34,7 @@ public struct  occi_kind_node * occi_first_opennebula_node() { return( opennebul
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_opennebula_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * drop_opennebula_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		opennebula_first = nptr->next;
@@ -45,19 +44,12 @@ private struct occi_kind_node * ll_drop_opennebula_node(struct occi_kind_node * 
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
-	return((struct occi_kind_node *)0);
-}
-private struct occi_kind_node * drop_opennebula_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_opennebula_control );
-	nptr = ll_drop_opennebula_node( nptr );
-	pthread_mutex_unlock( &list_opennebula_control );
-	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_opennebula_node(char * id) {
+private struct occi_kind_node * locate_opennebula_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	for ( nptr = opennebula_first;
@@ -69,18 +61,11 @@ private struct occi_kind_node * ll_locate_opennebula_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_opennebula_node(char * id) {
-	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_opennebula_control );
-	nptr = ll_locate_opennebula_node(id);
-	pthread_mutex_unlock( &list_opennebula_control );
-	return( nptr );
-}
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_opennebula_node(int mode) {
+private struct occi_kind_node * add_opennebula_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -101,13 +86,6 @@ private struct occi_kind_node * ll_add_opennebula_node(int mode) {
 			}
 		}
 }
-private struct occi_kind_node * add_opennebula_node(int mode) {
-	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_opennebula_control );
-	nptr = ll_add_opennebula_node( mode );
-	pthread_mutex_unlock( &list_opennebula_control );
-	return(nptr);
-}
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
@@ -120,9 +98,9 @@ private void autoload_opennebula_nodes() {
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
-	if (!( document = document_parse_file(fn)))
+	if (!( document = document_parse_file(fn) ))
 		return;
-	if ((eptr = document_element(document,"opennebulas")) != (struct xml_element *) 0) {
+	else if ((eptr = document_element(document,"opennebulas")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "opennebula" ) ) continue;
@@ -132,22 +110,32 @@ private void autoload_opennebula_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
+				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "flavour" )) != (struct xml_atribut *) 0)
-				pptr->flavour = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
+				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicaddr" )) != (struct xml_atribut *) 0)
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
 				pptr->privateaddr = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
+				pptr->profile = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
+				pptr->publicnetwork = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "privatenetwork" )) != (struct xml_atribut *) 0)
+				pptr->privatenetwork = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "started" )) != (struct xml_atribut *) 0)
 				pptr->started = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
 				pptr->created = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
+				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
 				pptr->status = document_atribut_value(aptr);
 			}
@@ -166,8 +154,7 @@ public  void autosave_opennebula_nodes() {
 	char * fn=autosave_opennebula_name;	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_opennebula_control );
-	if (( h = fopen(fn,"w")) != (FILE *) 0) {
+	if (!( h = fopen(fn,"w") )) return;
 	fprintf(h,"<opennebulas>\n");
 	for ( nptr = opennebula_first;
 		nptr != (struct occi_kind_node *) 0;
@@ -180,11 +167,14 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," number=%c",0x0022);
+		fprintf(h,"%s",(pptr->number?pptr->number:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," flavour=%c",0x0022);
-		fprintf(h,"%s",(pptr->flavour?pptr->flavour:""));
+		fprintf(h," flavor=%c",0x0022);
+		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
@@ -195,6 +185,15 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h," privateaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->privateaddr?pptr->privateaddr:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," profile=%c",0x0022);
+		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," publicnetwork=%c",0x0022);
+		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," privatenetwork=%c",0x0022);
+		fprintf(h,"%s",(pptr->privatenetwork?pptr->privatenetwork:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," started=%c",0x0022);
 		fprintf(h,"%s",(pptr->started?pptr->started:""));
 		fprintf(h,"%c",0x0022);
@@ -204,6 +203,9 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," when=%c",0x0022);
+		fprintf(h,"%u",pptr->when);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," status=%c",0x0022);
 		fprintf(h,"%u",pptr->status);
 		fprintf(h,"%c",0x0022);
@@ -211,8 +213,6 @@ public  void autosave_opennebula_nodes() {
 		}
 	fprintf(h,"</opennebulas>\n");
 	fclose(h);
-	}
-	pthread_mutex_unlock( &list_opennebula_control );
 	return;
 }
 
@@ -230,22 +230,32 @@ private void set_opennebula_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "number" ) ))
+			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
-		if (!( strcmp( nptr, "flavour" ) ))
-			pptr->flavour = allocate_string(vptr);
+		if (!( strcmp( nptr, "flavor" ) ))
+			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicaddr" ) ))
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
 			pptr->privateaddr = allocate_string(vptr);
+		if (!( strcmp( nptr, "profile" ) ))
+			pptr->profile = allocate_string(vptr);
+		if (!( strcmp( nptr, "publicnetwork" ) ))
+			pptr->publicnetwork = allocate_string(vptr);
+		if (!( strcmp( nptr, "privatenetwork" ) ))
+			pptr->privatenetwork = allocate_string(vptr);
 		if (!( strcmp( nptr, "started" ) ))
 			pptr->started = allocate_string(vptr);
 		if (!( strcmp( nptr, "created" ) ))
 			pptr->created = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
+		if (!( strcmp( nptr, "when" ) ))
+			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
 			pptr->status = atoi(vptr);
 		}
@@ -286,6 +296,13 @@ private int pass_opennebula_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
+	if (( fptr->number )
+	&&  (strlen( fptr->number ) != 0)) {
+		if (!( pptr->number ))
+			return(0);
+		else if ( strcmp(pptr->number,fptr->number) != 0)
+			return(0);
+		}
 	if (( fptr->hostname )
 	&&  (strlen( fptr->hostname ) != 0)) {
 		if (!( pptr->hostname ))
@@ -293,11 +310,11 @@ private int pass_opennebula_filter(
 		else if ( strcmp(pptr->hostname,fptr->hostname) != 0)
 			return(0);
 		}
-	if (( fptr->flavour )
-	&&  (strlen( fptr->flavour ) != 0)) {
-		if (!( pptr->flavour ))
+	if (( fptr->flavor )
+	&&  (strlen( fptr->flavor ) != 0)) {
+		if (!( pptr->flavor ))
 			return(0);
-		else if ( strcmp(pptr->flavour,fptr->flavour) != 0)
+		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
 			return(0);
 		}
 	if (( fptr->image )
@@ -321,6 +338,27 @@ private int pass_opennebula_filter(
 		else if ( strcmp(pptr->privateaddr,fptr->privateaddr) != 0)
 			return(0);
 		}
+	if (( fptr->profile )
+	&&  (strlen( fptr->profile ) != 0)) {
+		if (!( pptr->profile ))
+			return(0);
+		else if ( strcmp(pptr->profile,fptr->profile) != 0)
+			return(0);
+		}
+	if (( fptr->publicnetwork )
+	&&  (strlen( fptr->publicnetwork ) != 0)) {
+		if (!( pptr->publicnetwork ))
+			return(0);
+		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
+			return(0);
+		}
+	if (( fptr->privatenetwork )
+	&&  (strlen( fptr->privatenetwork ) != 0)) {
+		if (!( pptr->privatenetwork ))
+			return(0);
+		else if ( strcmp(pptr->privatenetwork,fptr->privatenetwork) != 0)
+			return(0);
+		}
 	if (( fptr->started )
 	&&  (strlen( fptr->started ) != 0)) {
 		if (!( pptr->started ))
@@ -342,6 +380,7 @@ private int pass_opennebula_filter(
 		else if ( strcmp(pptr->configuration,fptr->configuration) != 0)
 			return(0);
 		}
+	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
@@ -361,10 +400,13 @@ private struct rest_response * opennebula_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flavour=%s",optr->domain,optr->id,pptr->flavour);
+	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
@@ -376,6 +418,15 @@ private struct rest_response * opennebula_occi_response(
 	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.privatenetwork=%s",optr->domain,optr->id,pptr->privatenetwork);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.started=%s",optr->domain,optr->id,pptr->started);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -383,6 +434,9 @@ private struct rest_response * opennebula_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
@@ -796,9 +850,11 @@ public struct occi_category * occi_opennebula_builder(char * a,char * b) {
 		optr->interface = &occi_opennebula_mt;
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "flavour",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
@@ -806,11 +862,19 @@ public struct occi_category * occi_opennebula_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "privatenetwork",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "started",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
@@ -860,6 +924,17 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.opennebula.number='%s'\r\n",(sptr->number?sptr->number:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.opennebula.hostname='%s'\r\n",(sptr->hostname?sptr->hostname:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -871,7 +946,7 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.opennebula.flavour='%s'\r\n",(sptr->flavour?sptr->flavour:""));
+	sprintf(buffer,"occi.opennebula.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -915,6 +990,39 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.opennebula.profile='%s'\r\n",(sptr->profile?sptr->profile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.publicnetwork='%s'\r\n",(sptr->publicnetwork?sptr->publicnetwork:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.privatenetwork='%s'\r\n",(sptr->privatenetwork?sptr->privatenetwork:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.opennebula.started='%s'\r\n",(sptr->started?sptr->started:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -938,6 +1046,17 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.opennebula.configuration='%s'\r\n",(sptr->configuration?sptr->configuration:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.when='%u'\r\n",sptr->when);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

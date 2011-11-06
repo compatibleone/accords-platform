@@ -31,16 +31,24 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->number )
+			 sptr->number = liberate(sptr->number);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
-		if ( sptr->flavour )
-			 sptr->flavour = liberate(sptr->flavour);
+		if ( sptr->flavor )
+			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
 			 sptr->privateaddr = liberate(sptr->privateaddr);
+		if ( sptr->profile )
+			 sptr->profile = liberate(sptr->profile);
+		if ( sptr->publicnetwork )
+			 sptr->publicnetwork = liberate(sptr->publicnetwork);
+		if ( sptr->privatenetwork )
+			 sptr->privatenetwork = liberate(sptr->privatenetwork);
 		if ( sptr->started )
 			 sptr->started = liberate(sptr->started);
 		if ( sptr->created )
@@ -62,14 +70,19 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->number = (char*) 0;
 		sptr->hostname = (char*) 0;
-		sptr->flavour = (char*) 0;
+		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
+		sptr->profile = (char*) 0;
+		sptr->publicnetwork = (char*) 0;
+		sptr->privatenetwork = (char*) 0;
 		sptr->started = (char*) 0;
 		sptr->created = (char*) 0;
 		sptr->configuration = (char*) 0;
+		sptr->when =  0;
 		sptr->status =  0;
 	}
 	return(sptr);
@@ -105,13 +118,17 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"number") ))
+		{
+			if ( wptr->value ) { sptr->number = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"hostname") ))
 		{
 			if ( wptr->value ) { sptr->hostname = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"flavour") ))
+		else if (!( strcmp(wptr->name,"flavor") ))
 		{
-			if ( wptr->value ) { sptr->flavour = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->flavor = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"image") ))
 		{
@@ -125,6 +142,18 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->privateaddr = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"profile") ))
+		{
+			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"publicnetwork") ))
+		{
+			if ( wptr->value ) { sptr->publicnetwork = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"privatenetwork") ))
+		{
+			if ( wptr->value ) { sptr->privatenetwork = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"started") ))
 		{
 			if ( wptr->value ) { sptr->started = allocate_string(wptr->value); }
@@ -136,6 +165,10 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"configuration") ))
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"when") ))
+		{
+			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"status") ))
 		{
@@ -157,14 +190,19 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavour='%s'\r\n",prefix,nptr,(sptr->flavour?sptr->flavour:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.privatenetwork='%s'\r\n",prefix,nptr,(sptr->privatenetwork?sptr->privatenetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.started='%s'\r\n",prefix,nptr,(sptr->started?sptr->started:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%s'\r\n",prefix,nptr,(sptr->created?sptr->created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 
