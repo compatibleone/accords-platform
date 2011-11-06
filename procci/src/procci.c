@@ -205,7 +205,7 @@ private	int	procci_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_procci.xml");
 
-	if (!( optr = occi_cords_core_builder( Procci.domain,"core" ) ))
+	if (!( optr = occi_cords_node_builder( Procci.domain,"node" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

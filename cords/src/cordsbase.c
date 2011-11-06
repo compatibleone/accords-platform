@@ -35,7 +35,7 @@
 #include "system.c"
 #include "image.c"
 #include "infrastructure.c"
-#include "core.c"
+#include "node.c"
 #include "action.c"
 #include "user.c"
 #include "configuration.c"

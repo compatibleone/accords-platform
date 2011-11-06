@@ -547,7 +547,7 @@ private	struct	xml_element * 	cords_add_provider(
 /*	cords request/plan.						*/
 /*	-------------------------------------------------------		*/
 private	struct	xml_element * 	cords_build_contract( 
-		char * core, 	char * name, 
+		char * node, 	char * name, 
 		char * provider )
 {
 	struct	xml_element * eptr;
@@ -560,7 +560,7 @@ private	struct	xml_element * 	cords_build_contract(
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NAME, name ) ))
 		return(document_drop( eptr ));
-	else if (!( aptr = document_add_atribut( eptr, _CORDS_CORE, core ) ))
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_NODE, node ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_REFERENCE, "" ) ))
 		return(document_drop( eptr ));
@@ -577,9 +577,9 @@ private	struct	xml_element * 	cords_build_contract(
 
 
 /*	-------------------------------------------------------		*/
-/*	   c o r d s _ t e r m i n a t e _ a p p l i a n c e		*/
+/*		c o r d s _ t e r m i n a t e _ n o d e 		*/
 /*	-------------------------------------------------------		*/
-private	void 	cords_terminate_core( struct cords_core_descriptor * dptr )
+private	void 	cords_terminate_node( struct cords_core_descriptor * dptr )
 {
 	if ( dptr->nameApp )	dptr->nameApp = liberate( dptr->nameApp );
 	if ( dptr->hid )	dptr->hid = liberate( dptr->hid );
@@ -593,7 +593,7 @@ private	void 	cords_terminate_core( struct cords_core_descriptor * dptr )
 	if ( dptr->storage )	dptr->storage = occi_remove_response( dptr->storage );
 	if ( dptr->compute )	dptr->compute = occi_remove_response( dptr->compute );
 	if ( dptr->hardware )	dptr->hardware = occi_remove_response( dptr->hardware );
-	if ( dptr->core )	dptr->core = occi_remove_response( dptr->core );
+	if ( dptr->node )	dptr->node = occi_remove_response( dptr->node );
 	if ( dptr->contract )	dptr->contract = occi_remove_response( dptr->contract );
 	return;
 }
@@ -720,13 +720,13 @@ private	char *	cords_research_provider( char * defaut, char * agent, char * tls 
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ r e s o l v e _ p r o v i d e r		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_resolve_provider( struct occi_response * core, char * defaut, char * agent,char * tls )
+private	char *	cords_resolve_provider( struct occi_response * node, char * defaut, char * agent,char * tls )
 {
 	char	*	value;
 	/* ----------------------------------------- */
 	/* retrieve the provider information instance */
 	/* ----------------------------------------- */
-	if (!( value = cords_extract_atribut( core, "occi", _CORDS_CORE, _CORDS_PROVIDER ))) 
+	if (!( value = cords_extract_atribut( node, "occi", _CORDS_NODE, _CORDS_PROVIDER ))) 
 		return( cords_research_provider(defaut,agent,tls) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( cords_research_provider(defaut,agent,tls) );
@@ -742,13 +742,13 @@ private	char *	cords_resolve_provider( struct occi_response * core, char * defau
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ r e s o l v e _ p r o f i l e		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_resolve_profile( struct occi_response * core, char * defaut )
+private	char *	cords_resolve_profile( struct occi_response * node, char * defaut )
 {
 	char	*	value;
 	/* ----------------------------------------- */
 	/* retrieve the provider information instance */
 	/* ----------------------------------------- */
-	if (!( value = cords_extract_atribut( core, "occi", _CORDS_CORE, _CORDS_PROFILE ))) 
+	if (!( value = cords_extract_atribut( node, "occi", _CORDS_NODE, _CORDS_PROFILE ))) 
 		return( allocate_string( defaut ) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( allocate_string( defaut ) );
@@ -759,7 +759,7 @@ private	char *	cords_resolve_profile( struct occi_response * core, char * defaut
 /*	-------------------------------------------------------		*/
 /*	   c o r d s _ i n s t a n c e _ a p p l i a n c e		*/
 /*	-------------------------------------------------------		*/
-private	struct	xml_element * cords_instance_core( 
+private	struct	xml_element * cords_instance_node( 
 		char * host,
 		char * id,
 		char * agent,
@@ -771,7 +771,7 @@ private	struct	xml_element * cords_instance_core(
 	struct	xml_element 	* 	document=(struct xml_element *) 0;
 	struct	xml_atribut	*	aptr;
 
-	struct	cords_core_descriptor App = {
+	struct	cords_node_descriptor App = {
 		(char *) 0,
 		(char *) 0,
 		(char *) 0,
@@ -790,59 +790,59 @@ private	struct	xml_element * cords_instance_core(
 	};
 
 	if ( check_verbose() )
-		printf("   CORDS Core \n");
+		printf("   CORDS Node \n");
 
 	/* ------------------------------- */
-	/* retrieve the core instance */
+	/* retrieve the node instance */
 	/* ------------------------------- */
-	if (!( App.core = cords_retrieve_instance( host, id, agent,tls)))
+	if (!( App.node = cords_retrieve_instance( host, id, agent,tls)))
 		return((struct xml_element *) 0);
 
-	else if (!(App.nameApp = cords_extract_atribut(App.core,"occi",_CORDS_CORE,_CORDS_NAME)))
+	else if (!(App.nameApp = cords_extract_atribut(App.node,"occi",_CORDS_NODE,_CORDS_NAME)))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( App.provider = cords_resolve_provider( App.core, "openstack", agent,tls )))
+	else if (!( App.provider = cords_resolve_provider( App.node, "openstack", agent,tls )))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( App.profile = cords_resolve_profile( App.core, namePlan )))
+	else if (!( App.profile = cords_resolve_profile( App.node, namePlan )))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 	else if (!( document = cords_build_contract( id, App.nameApp, App.provider )))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 	else if (!( xptr = cords_add_provider( document, App.provider, App.nameApp, App.profile ) ))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 	else if (!( App.providerid = cords_create_provider( xptr, agent,tls ) ))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 	else if (!( aptr = document_add_atribut( xptr, _CORDS_ID, App.providerid ) ))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 
 	/* ------------------------------------ */
 	/* retrieve the infrastructure instance */
 	/* ------------------------------------ */
-	if (( App.hid  = cords_extract_atribut( App.core, "occi", 
-			_CORDS_CORE, _CORDS_INFRASTRUCTURE )) != (char *) 0)
+	if (( App.hid  = cords_extract_atribut( App.node, "occi", 
+			_CORDS_NODE, _CORDS_INFRASTRUCTURE )) != (char *) 0)
 	{
 		if (!( App.hardware = cords_retrieve_instance( host, App.hid, agent,tls )))
 		{
-			cords_terminate_core( &App );
+			cords_terminate_node( &App );
 			return(document_drop(document));
 		}
 		else	App.hid = liberate( App.hid );
@@ -854,7 +854,7 @@ private	struct	xml_element * cords_instance_core(
 		{
 			if (!( App.compute = cords_retrieve_instance( host, App.hid, agent,tls )))
 			{
-				cords_terminate_core( &App );
+				cords_terminate_node( &App );
 				return(document_drop(document));
 			}
 			else	App.hid = liberate( App.hid );
@@ -868,7 +868,7 @@ private	struct	xml_element * cords_instance_core(
 		{
 			if (!( App.storage = cords_retrieve_instance( host, App.hid, agent,tls )))
 			{
-				cords_terminate_core( &App );
+				cords_terminate_node( &App );
 				return(document_drop(document));
 			}
 			else	App.hid = liberate( App.hid );
@@ -882,7 +882,7 @@ private	struct	xml_element * cords_instance_core(
 		{
 			if (!( App.network = cords_retrieve_instance( host, App.hid, agent,tls )))
 			{
-				cords_terminate_core( &App );
+				cords_terminate_node( &App );
 				return(document_drop(document));
 			}
 			else	App.hid = liberate( App.hid );
@@ -894,12 +894,12 @@ private	struct	xml_element * cords_instance_core(
 	/* ------------------------------------ */
 	/* retrieve the infrastructure instance */
 	/* ------------------------------------ */
-	if (( App.sid  = cords_extract_atribut( App.core, "occi", 
-			_CORDS_CORE, _CORDS_IMAGE )) != (char *) 0)
+	if (( App.sid  = cords_extract_atribut( App.node, "occi", 
+			_CORDS_NODE, _CORDS_IMAGE )) != (char *) 0)
 	{
 		if (!( App.software = cords_retrieve_instance( host, App.sid, agent,tls )))
 		{
-			cords_terminate_core( &App );
+			cords_terminate_node( &App );
 			return(document_drop(document));
 		}
 		else	App.sid = liberate( App.sid );
@@ -909,7 +909,7 @@ private	struct	xml_element * cords_instance_core(
 		{
 			if (!( App.system = cords_retrieve_instance( host, App.sid, agent,tls )))
 			{
-				cords_terminate_core( &App );
+				cords_terminate_node( &App );
 				return(document_drop(document));
 			}
 			else	App.sid = liberate( App.sid );
@@ -920,21 +920,21 @@ private	struct	xml_element * cords_instance_core(
 	
 	if (!( App.contract = cords_create_category( document, agent,tls ) ))
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return(document_drop(document));
 	}
 	else if ((status = cords_resolve_location( App.contract, document )) != 0)
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return(document_drop(document));
 	}
 	else if ((status = cords_terminate_level( document, agent,tls )) != 0)
 	{
-		cords_terminate_core( &App );
+		cords_terminate_node( &App );
 		return((struct xml_element *) 0);
 	}
 
-	cords_terminate_core( &App );
+	cords_terminate_node( &App );
 
 	return( document );
 }
@@ -1178,7 +1178,7 @@ public	int cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_core( host, id, agent,tls, CbC.namePlan ) ))
+		else if (!( mptr = cords_instance_node( host, id, agent,tls, CbC.namePlan ) ))
 			return( cords_terminate_provisioning( 911, &CbC ) );
 		else	
 		{
@@ -1190,7 +1190,7 @@ public	int cords_manifest_broker(
 			else 	mptr->previous->next = mptr;
 			CbC.document->last = mptr;
 			id = liberate( id );
-			CbC.cores++;
+			CbC.nodes++;
 			continue;
 		}
 	}
@@ -1198,7 +1198,7 @@ public	int cords_manifest_broker(
 	(void) cords_terminate_level( CbC.document, agent,tls );
 
 	if ( check_verbose() )
-		printf("   CORDS Request Broker ( %s ) Provisioned %u Cores \n",agent,CbC.cores);
+		printf("   CORDS Request Broker ( %s ) Provisioned %u Nodes \n",agent,CbC.nodes);
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);

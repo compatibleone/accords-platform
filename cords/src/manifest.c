@@ -33,12 +33,12 @@ public struct cords_manifest * liberate_cords_manifest(struct cords_manifest * s
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->plan )
 			 sptr->plan = liberate(sptr->plan);
-		if ( sptr->cores )
-			 sptr->cores = liberate(sptr->cores);
+		if ( sptr->nodes )
+			 sptr->nodes = liberate(sptr->nodes);
 		if ( sptr->firstapp )
-			 sptr->firstapp = liberate_cords_core(sptr->firstapp);
+			 sptr->firstapp = liberate_cords_node(sptr->firstapp);
 		if ( sptr->lastapp )
-			 sptr->lastapp = liberate_cords_core(sptr->lastapp);
+			 sptr->lastapp = liberate_cords_node(sptr->lastapp);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
 		if ( sptr->account )
@@ -63,9 +63,9 @@ public struct cords_manifest * reset_cords_manifest(struct cords_manifest * sptr
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->plan = (char*) 0;
-		sptr->cores = (char*) 0;
-		sptr->firstapp = (struct cords_core*) 0;
-		sptr->lastapp = (struct cords_core*) 0;
+		sptr->nodes = (char*) 0;
+		sptr->firstapp = (struct cords_node*) 0;
+		sptr->lastapp = (struct cords_node*) 0;
 		sptr->configuration = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->security = (char*) 0;
@@ -109,9 +109,9 @@ public int xmlin_cords_manifest(struct cords_manifest * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->plan = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"cores") ))
+		else if (!( strcmp(wptr->name,"nodes") ))
 		{
-			if ( wptr->value ) { sptr->cores = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->nodes = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"configuration") ))
 		{
@@ -150,7 +150,7 @@ public int rest_occi_cords_manifest(FILE * fh,struct cords_manifest * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.plan='%s'\r\n",prefix,nptr,(sptr->plan?sptr->plan:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.cores='%s'\r\n",prefix,nptr,(sptr->cores?sptr->cores:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.nodes='%s'\r\n",prefix,nptr,(sptr->nodes?sptr->nodes:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));

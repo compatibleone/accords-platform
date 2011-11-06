@@ -20,23 +20,23 @@ struct	cords_provisioning
 	char			* instID;
 	struct	occi_response 	* instance;
 	struct	xml_element 	* document;
-	int			cores;
+	int			nodes;
 };
 
-struct	cords_core_descriptor
+struct	cords_node_descriptor
 {
 	char			* nameApp;
 	char			* hid;
 	char			* sid;
 	char			* provider;	/* the provisioner, supplier or "provider"		*/
 	char			* providerid;	/* the provisioner, supplier or "provider" identity	*/
-	char			* profile;	/* configuration profile for the use of provider		*/
-	struct	occi_response 	* core;		/* template core from the request			*/
-	struct	occi_response 	* hardware;	/* the template infrastructure from the core		*/
+	char			* profile;	/* configuration profile for the use of provider	*/
+	struct	occi_response 	* node;		/* template node from the request			*/
+	struct	occi_response 	* hardware;	/* the template infrastructure from the node		*/
 	struct	occi_response 	* compute;	/* the compute from the infrastructure			*/
 	struct	occi_response 	* storage;	/* the storage from the infrastructure			*/
 	struct	occi_response 	* network;	/* the network from the infrastructure			*/
-	struct	occi_response 	* software;	/* template image from the core				*/
+	struct	occi_response 	* software;	/* template image from the node				*/
 	struct	occi_response 	* system;	/* the system from the image				*/
 	struct	occi_response 	* package;	/* the package from the image				*/
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/

@@ -15,7 +15,7 @@ public struct occi_category * occi_cords_event_builder(char *a,char * b);
 public struct occi_category * occi_cords_report_builder(char *a,char * b);
 public struct occi_category * occi_cords_account_builder(char *a,char * b);
 public struct occi_category * occi_cords_action_builder(char *a,char * b);
-public struct occi_category * occi_cords_core_builder(char *a,char * b);
+public struct occi_category * occi_cords_node_builder(char *a,char * b);
 public struct occi_category * occi_cords_authorisation_builder(char *a,char * b);
 public struct occi_category * occi_cords_provider_builder(char *a,char * b);
 public struct occi_category * occi_cords_compute_builder(char *a,char * b);

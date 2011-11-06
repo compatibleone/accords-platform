@@ -110,8 +110,8 @@ private void autoload_cords_machine_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "core" )) != (struct xml_atribut *) 0)
-				pptr->core = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
 				pptr->provider = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
@@ -157,8 +157,8 @@ public  void autosave_cords_machine_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," core=%c",0x0022);
-		fprintf(h,"%s",(pptr->core?pptr->core:""));
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," provider=%c",0x0022);
 		fprintf(h,"%s",(pptr->provider?pptr->provider:""));
@@ -205,8 +205,8 @@ private void set_cords_machine_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "core" ) ))
-			pptr->core = allocate_string(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
 		if (!( strcmp( nptr, "provider" ) ))
 			pptr->provider = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
@@ -261,11 +261,11 @@ private int pass_cords_machine_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->core )
-	&&  (strlen( fptr->core ) != 0)) {
-		if (!( pptr->core ))
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
 			return(0);
-		else if ( strcmp(pptr->core,fptr->core) != 0)
+		else if ( strcmp(pptr->node,fptr->node) != 0)
 			return(0);
 		}
 	if (( fptr->provider )
@@ -330,7 +330,7 @@ private struct rest_response * cords_machine_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.core=%s",optr->domain,optr->id,pptr->core);
+	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.provider=%s",optr->domain,optr->id,pptr->provider);
@@ -765,7 +765,7 @@ public struct occi_category * occi_cords_machine_builder(char * a,char * b) {
 		optr->interface = &occi_cords_machine_mt;
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "core",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
 			return(optr);
@@ -829,7 +829,7 @@ public struct rest_header *  cords_machine_occi_headers(struct cords_machine * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_machine.core='%s'\r\n",(sptr->core?sptr->core:""));
+	sprintf(buffer,"occi.cords_machine.node='%s'\r\n",(sptr->node?sptr->node:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

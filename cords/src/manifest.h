@@ -7,9 +7,9 @@ struct	cords_manifest
 	char *				id;
 	char *				name;
 	char *				plan;
-	char *				cores;
-	struct	cords_core	 	* firstapp;
-	struct	cords_core	 	* lastapp;
+	char *				nodes;
+	struct	cords_node	 	* firstapp;
+	struct	cords_node	 	* lastapp;
 	char *				configuration;
 	char *				account;
 	char *				security;

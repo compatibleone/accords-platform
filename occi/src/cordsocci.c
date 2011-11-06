@@ -25,7 +25,7 @@
 #include "document.h"
 #include "occiaccount.c"
 #include "occiaction.c"
-#include "occicore.c"
+#include "occinode.c"
 #include "occiauthorise.c"
 #include "occicompute.c"
 #include "occiprovider.c"

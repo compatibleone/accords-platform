@@ -23,7 +23,7 @@
 #include "package.h"
 #include "system.h"
 #include "image.h"
-#include "core.h"
+#include "node.h"
 #include "action.h"
 #include "configuration.h"
 #include "instruction.h"

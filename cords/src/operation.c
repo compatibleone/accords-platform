@@ -27,7 +27,7 @@
 /*	---------------------------------	*/
 private	int	cords_account_parser( FILE * target, struct xml_element * eptr, char * domain );
 private	int	cords_action_parser( FILE * target, struct xml_element * eptr, char * domain );
-private	int	cords_core_parser( FILE * target, struct xml_element * eptr, char * domain );
+private	int	cords_node_parser( FILE * target, struct xml_element * eptr, char * domain );
 private	int	cords_compute_parser( FILE * target, struct xml_element * eptr, char * domain );
 private	int	cords_configuration_parser( FILE * target, struct xml_element * eptr, char * domain );
 private	int	cords_image_parser( FILE * target, struct xml_element * eptr, char * domain );
@@ -63,8 +63,8 @@ private	void	initialise_schema_parser()
 	CordsSchema[1].parser 	= cords_action_parser;
 	CordsSchema[1].attributes = cords_default_atb;
 	CordsSchema[1].actions	= cords_default_act;
-	CordsSchema[2].name	= "core";	
-	CordsSchema[2].parser 	= cords_core_parser;
+	CordsSchema[2].name	= "node";	
+	CordsSchema[2].parser 	= cords_node_parser;
 	CordsSchema[2].attributes = cords_default_atb;
 	CordsSchema[2].actions	= cords_default_act;
 	CordsSchema[3].name	= "compute";	
@@ -158,18 +158,18 @@ private	int	cords_action_parser( FILE * target, struct xml_element * eptr, char 
 	return(0);
 }
 
-private	int	cords_core_parser( FILE * target, struct xml_element * eptr, char * domain  )
+private	int	cords_node_parser( FILE * target, struct xml_element * eptr, char * domain  )
 {
-	struct	cords_core * rptr;
+	struct	cords_node * rptr;
 	if (!( eptr ))
 		return(118);
-	else if (!( rptr = allocate_cords_core()))
+	else if (!( rptr = allocate_cords_node()))
 		return(27);
 	else 
 	{
-		// printf("cords core instance\n");
-		xmlin_cords_core( rptr, eptr );
-		rest_occi_cords_core(target,rptr,domain,eptr->name);
+		// printf("cords node instance\n");
+		xmlin_cords_node( rptr, eptr );
+		rest_occi_cords_node(target,rptr,domain,eptr->name);
 		eptr->payload = rptr;
 		return( cords_nested_parser( target, eptr, domain ) );
 	}

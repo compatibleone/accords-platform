@@ -1205,7 +1205,7 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 	else if ((status = cords_instance_identifier( dptr, _CORDS_SECURITY )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_SECURITY));
 
-	else if ((status = cords_append_links(dptr,_CORDS_CORE,agent,tls)) != 0)
+	else if ((status = cords_append_links(dptr,_CORDS_NODE,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"linkage failure"));
 
 	else if ((status = cords_build_plan( dptr, agent,tls )) != 0)
@@ -1221,9 +1221,9 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 }
 
 /*	---------------------------------------------------	*/
-/*	 c o r d s _ t e r m i n a t e _ a p p l i a n c e	*/
+/*	      c o r d s _ t e r m i n a t e _ n o d e 		*/
 /*	---------------------------------------------------	*/
-private	int	cords_terminate_core( struct xml_element * dptr, char * agent,char * tls )
+private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char * tls )
 {
 	int	status;
 	struct	xml_atribut * aptr;
@@ -1335,8 +1335,8 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 		return( cords_terminate_instance( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_CONTRACT ) ))
 		return( cords_terminate_contract( dptr, agent,tls ) );
-	else if (!( strcmp( dptr->name, _CORDS_CORE ) ))
-		return( cords_terminate_core( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_NODE ) ))
+		return( cords_terminate_node( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_CONFIGURATION ) ))
 		return( cords_terminate_configuration( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_ACCOUNT ) ))

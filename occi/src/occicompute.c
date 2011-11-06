@@ -113,7 +113,7 @@ private struct occi_kind_node * add_cords_compute_node(int mode) {
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
 private char*autosave_cords_compute_name="cords_compute.xml";
-private void autoload_cords_compute_nodes() {
+private void autoload_cords_compute_cores() {
 	char * fn=autosave_cords_compute_name;	struct occi_kind_node * nptr;
 	struct cords_compute * pptr;
 	struct xml_element * document;
@@ -154,7 +154,7 @@ private void autoload_cords_compute_nodes() {
 public  void set_autosave_cords_compute_name(char * fn) {
 	autosave_cords_compute_name = fn;	return;
 }
-public  void autosave_cords_compute_nodes() {
+public  void autosave_cords_compute_cores() {
 	char * fn=autosave_cords_compute_name;	struct occi_kind_node * nptr;
 	struct cords_compute * pptr;
 	FILE * h;
@@ -344,7 +344,7 @@ private struct rest_response * cords_compute_get_item(
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_cords_compute_nodes();
+	autosave_cords_compute_cores();
 	return( cords_compute_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
@@ -435,7 +435,7 @@ private struct rest_response * cords_compute_post_item(
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_compute_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_cords_compute_nodes();
+	autosave_cords_compute_cores();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -463,7 +463,7 @@ private struct rest_response * cords_compute_put_item(
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_compute_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_cords_compute_nodes();
+	autosave_cords_compute_cores();
 	return( cords_compute_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
@@ -500,7 +500,7 @@ private struct rest_response * cords_compute_delete_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
 	drop_cords_compute_node( nptr );
-	autosave_cords_compute_nodes();
+	autosave_cords_compute_cores();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -568,7 +568,7 @@ private struct rest_response * cords_compute_delete_all(
 			nptr = sptr;
 			}
 		}
-	autosave_cords_compute_nodes();
+	autosave_cords_compute_cores();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -738,7 +738,7 @@ public struct occi_category * occi_cords_compute_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_cords_compute_nodes();
+		autoload_cords_compute_cores();
 		return(optr);
 	}
 

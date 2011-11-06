@@ -17,9 +17,9 @@
 #define	_CORDS_USER		"user"
 
 /*	------------------------	*/
-/*	cords core atributs		*/
+/*	cords node atributs		*/
 /*	------------------------	*/
-#define	_CORDS_CORE		"core"
+#define	_CORDS_NODE		"node"
 #define	_CORDS_PROVIDER		"provider"
 #define	_CORDS_PROFILE 		"profile"
 #define	_CORDS_INFRASTRUCTURE	"infrastructure"

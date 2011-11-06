@@ -31,8 +31,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->core )
-			 sptr->core = liberate(sptr->core);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
 		if ( sptr->provider )
 			 sptr->provider = liberate(sptr->provider);
 		if ( sptr->profile )
@@ -60,7 +60,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->core = (char*) 0;
+		sptr->node = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->reference = (char*) 0;
@@ -103,9 +103,9 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"core") ))
+		else if (!( strcmp(wptr->name,"node") ))
 		{
-			if ( wptr->value ) { sptr->core = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"provider") ))
 		{
@@ -155,7 +155,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.core='%s'\r\n",prefix,nptr,(sptr->core?sptr->core:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));

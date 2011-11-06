@@ -112,8 +112,8 @@ private void autoload_cords_request_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "plan" )) != (struct xml_atribut *) 0)
 				pptr->plan = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "cores" )) != (struct xml_atribut *) 0)
-				pptr->cores = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "nodes" )) != (struct xml_atribut *) 0)
+				pptr->nodes = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
@@ -154,8 +154,8 @@ public  void autosave_cords_request_nodes() {
 		fprintf(h," plan=%c",0x0022);
 		fprintf(h,"%s",(pptr->plan?pptr->plan:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," cores=%c",0x0022);
-		fprintf(h,"%s",(pptr->cores?pptr->cores:""));
+		fprintf(h," nodes=%c",0x0022);
+		fprintf(h,"%s",(pptr->nodes?pptr->nodes:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
@@ -192,8 +192,8 @@ private void set_cords_request_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "plan" ) ))
 			pptr->plan = allocate_string(vptr);
-		if (!( strcmp( nptr, "cores" ) ))
-			pptr->cores = allocate_string(vptr);
+		if (!( strcmp( nptr, "nodes" ) ))
+			pptr->nodes = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
@@ -247,11 +247,11 @@ private int pass_cords_request_filter(
 		else if ( strcmp(pptr->plan,fptr->plan) != 0)
 			return(0);
 		}
-	if (( fptr->cores )
-	&&  (strlen( fptr->cores ) != 0)) {
-		if (!( pptr->cores ))
+	if (( fptr->nodes )
+	&&  (strlen( fptr->nodes ) != 0)) {
+		if (!( pptr->nodes ))
 			return(0);
-		else if ( strcmp(pptr->cores,fptr->cores) != 0)
+		else if ( strcmp(pptr->nodes,fptr->nodes) != 0)
 			return(0);
 		}
 	if (( fptr->configuration )
@@ -297,7 +297,7 @@ private struct rest_response * cords_request_occi_response(
 	sprintf(cptr->buffer,"%s.%s.plan=%s",optr->domain,optr->id,pptr->plan);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.cores=%s",optr->domain,optr->id,pptr->cores);
+	sprintf(cptr->buffer,"%s.%s.nodes=%s",optr->domain,optr->id,pptr->nodes);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
@@ -722,7 +722,7 @@ public struct occi_category * occi_cords_request_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "plan",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "cores",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "nodes",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
 			return(optr);
@@ -789,7 +789,7 @@ public struct rest_header *  cords_request_occi_headers(struct cords_request * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_request.cores='%s'\r\n",(sptr->cores?sptr->cores:""));
+	sprintf(buffer,"occi.cords_request.nodes='%s'\r\n",(sptr->nodes?sptr->nodes:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

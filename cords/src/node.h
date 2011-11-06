@@ -1,8 +1,8 @@
 
-#ifndef	_cords_core_h
-#define	_cords_core_h
+#ifndef	_cords_node_h
+#define	_cords_node_h
 
-struct	cords_core
+struct	cords_node
 {
 	char *				id;
 	char *				name;

@@ -13,17 +13,17 @@
 /* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
 /*				   All rights reserved					*/
 /* ------------------------------------------------------------------------------------ */
-#ifndef _core_c_
-#define _core_c_
+#ifndef _node_c_
+#define _node_c_
 
 #include "element.h"
 
-#include "core.h"
+#include "node.h"
 
 /*	------------------------------------------------	*/
 /*	l i b e r a t e _ c o r d s _ a p p l i a n c e 	*/
 /*	------------------------------------------------	*/
-public struct cords_core * liberate_cords_core(struct cords_core * sptr)
+public struct cords_node * liberate_cords_node(struct cords_node * sptr)
 {
 	if ( sptr )
 	{
@@ -41,14 +41,14 @@ public struct cords_core * liberate_cords_core(struct cords_core * sptr)
 			 sptr->image = liberate(sptr->image);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_core *) 0);
+	return((struct cords_node *) 0);
 
 }
 
 /*	------------------------------------------	*/
 /*	r e s e t _ c o r d s _ a p p l i a n c e 	*/
 /*	------------------------------------------	*/
-public struct cords_core * reset_cords_core(struct cords_core * sptr)
+public struct cords_node * reset_cords_node(struct cords_node * sptr)
 {
 	if ( sptr )
 	{
@@ -67,18 +67,18 @@ public struct cords_core * reset_cords_core(struct cords_core * sptr)
 /*	------------------------------------------------	*/
 /*	a l l o c a t e _ c o r d s _ a p p l i a n c e 	*/
 /*	------------------------------------------------	*/
-public struct cords_core * allocate_cords_core()
+public struct cords_node * allocate_cords_node()
 {
-	struct cords_core * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_core ) ) ))
+	struct cords_node * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_node ) ) ))
 		return( sptr );
-	else	return( reset_cords_core(sptr) );
+	else	return( reset_cords_node(sptr) );
 }
 
 /*	------------------------------------------	*/
 /*	x m l i n _ c o r d s _ a p p l i a n c e 	*/
 /*	------------------------------------------	*/
-public int xmlin_cords_core(struct cords_core * sptr,struct xml_element * eptr)
+public int xmlin_cords_node(struct cords_node * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -121,7 +121,7 @@ public int xmlin_cords_core(struct cords_core * sptr,struct xml_element * eptr)
 /*	--------------------------------------------------	*/
 /*	r e s t _ o c c i _ c o r d s _ a p p l i a n c e 	*/
 /*	--------------------------------------------------	*/
-public int rest_occi_cords_core(FILE * fh,struct cords_core * sptr,char * prefix, char * nptr)
+public int rest_occi_cords_node(FILE * fh,struct cords_node * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -138,4 +138,4 @@ public int rest_occi_cords_core(FILE * fh,struct cords_core * sptr,char * prefix
 
 }
 
-#endif	/* _core_c_ */
+#endif	/* _node_c_ */

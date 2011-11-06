@@ -6,7 +6,7 @@ struct	cords_contract
 {
 	char *	id;
 	char *	name;
-	char *	core;
+	char *	node;
 	char *	provider;
 	char *	profile;
 	char *	reference;
