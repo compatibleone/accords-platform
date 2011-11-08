@@ -47,20 +47,24 @@ AC_DEFINE([CONE])
 ###
 ### Modules configuration
 ###
-dnl AC_ARG_ENABLE([coxml],
-dnl	      [AS_HELP_STRING([--disable-coxml],
-dnl			      [Disable coxml @<:@default=enable@:>@])],
-dnl	      [],
-dnl	      [enable_coxml=yes])
 enable_coxml=yes
 AM_CONDITIONAL([ENABLE_COXML], [test "$enable_coxml" = "yes"])
 AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml/src])
+AC_SUBST([LD_COXML], [\${abs_top_srcdir}/coxml/.libs/libcoxml.so])
 
-enable_occi=yes
+AC_ARG_ENABLE([occi],
+      [AS_HELP_STRING([--disable-occi],
+		      [Disable occi @<:@default=enable@:>@])],
+      [],
+      [enable_occi=yes])
 AM_CONDITIONAL([ENABLE_OCCI], [test "$enable_occi" = "yes"])
 AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi/src])
 
-enable_cords=no
+AC_ARG_ENABLE([cords],
+      [AS_HELP_STRING([--disable-cords],
+		      [Disable cords @<:@default=enable@:>@])],
+      [],
+      [enable_cords=yes])
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
 AC_SUBST([CFLAGS_CORDS], [-I\${abs_top_srcdir}/cords/src])
 
@@ -148,6 +152,7 @@ dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([coxml/Makefile coxml/src/Makefile])
 AC_CONFIG_FILES([occi/Makefile occi/src/Makefile])
+AC_CONFIG_FILES([cords/Makefile cords/src/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
