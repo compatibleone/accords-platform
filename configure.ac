@@ -15,11 +15,8 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE([-Wno-portability])
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES(yes)])
 AC_CONFIG_MACRO_DIR([m4])
-
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
 
 AC_PROG_CC
 AC_PROG_LIBTOOL
@@ -27,6 +24,25 @@ AC_PROG_MAKE_SET
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AC_HEADER_STDC
+
+# Some global compilation flags
+# http://www.gnu.org/software/autoconf/manual/automake.html#Flag-Variables-Ordering
+AC_SUBST([CFLAGS])
+AC_SUBST([CPPFLAGS])
+AC_SUBST([LDFLAGS])
+
+AC_ARG_ENABLE([debug],
+      [AS_HELP_STRING([--enable-debug],
+		      [Enable debug @<:@default=disable@:>@])],
+      [],
+      [enable_debug=no])
+if test "x$enable_debug" = "xyes"; then
+   AC_SUBST([CFLAGS], [-g -ggdb])
+fi
+
+AC_DEFINE([UNIX])
+AC_DEFINE([unix])
+AC_DEFINE([CONE])
 
 ###
 ### Modules configuration
@@ -38,27 +54,35 @@ dnl	      [],
 dnl	      [enable_coxml=yes])
 enable_coxml=yes
 AM_CONDITIONAL([ENABLE_COXML], [test "$enable_coxml" = "yes"])
+AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml/src])
 
-enable_occi=no
+enable_occi=yes
 AM_CONDITIONAL([ENABLE_OCCI], [test "$enable_occi" = "yes"])
+AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi/src])
 
 enable_cords=no
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
+AC_SUBST([CFLAGS_CORDS], [-I\${abs_top_srcdir}/cords/src])
 
 enable_corest=no
 AM_CONDITIONAL([ENABLE_COREST], [test "$enable_corest" = "yes"])
+AC_SUBST([CFLAGS_COREST], [-I\${abs_top_srcdir}/corest/src])
 
 enable_cocci=no
 AM_CONDITIONAL([ENABLE_COCCI], [test "$enable_cocci" = "yes"])
+AC_SUBST([CFLAGS_COCCI], [-I\${abs_top_srcdir}/cocci/src])
 
 enable_cocarrier=no
 AM_CONDITIONAL([ENABLE_COCARRIER], [test "$enable_cocarrier" = "yes"])
+AC_SUBST([CFLAGS_COCARRIER], [-I\${abs_top_srcdir}/cocarrier/src])
 
 enable_pubocci=no
 AM_CONDITIONAL([ENABLE_PUBOCCI], [test "$enable_pubocci" = "yes"])
+AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci/src])
 
 enable_copabr=no
 AM_CONDITIONAL([ENABLE_COPABR], [test "$enable_copabr" = "yes"])
+AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr/src])
 
 enable_coss=no
 AM_CONDITIONAL([ENABLE_COSS], [test "$enable_coss" = "yes"])
@@ -80,12 +104,15 @@ AM_CONDITIONAL([ENABLE_PUBLISHER], [test "$enable_publisher" = "yes"])
 
 enable_parser=no
 AM_CONDITIONAL([ENABLE_PARSER], [test "$enable_parser" = "yes"])
+AC_SUBST([CFLAGS_PARSER], [-I\${abs_top_srcdir}/parser/src])
 
 enable_broker=no
 AM_CONDITIONAL([ENABLE_BROKER], [test "$enable_broker" = "yes"])
+AC_SUBST([CFLAGS_BROKER], [-I\${abs_top_srcdir}/broker/src])
 
 enable_procci=no
 AM_CONDITIONAL([ENABLE_PROCCI], [test "$enable_procci" = "yes"])
+AC_SUBST([CFLAGS_PROCCI], [-I\${abs_top_srcdir}/procci/src])
 
 enable_osprocci=no
 AM_CONDITIONAL([ENABLE_OSPROCCI], [test "$enable_osprocci" = "yes"])
@@ -120,6 +147,7 @@ AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([coxml/Makefile coxml/src/Makefile])
+AC_CONFIG_FILES([occi/Makefile occi/src/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
