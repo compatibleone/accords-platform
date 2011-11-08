@@ -1,15 +1,13 @@
-rm *.bak */*.bak */*/*.bak -f
-rm *.so */*.so */*/*.so -f
-rm *.o */*.o */*/*.o -f
-rm */Makefile */*/Makefile -f
-rm *.log */*.log */*/*.log -f
-rm *.scan */*.scan */*/*.scan -f
-rm */configure */config.status -f
-rm -r */autom4te.cache -f
-rm */bin/* */lib/* -f
-rm -r product -f
-git add -A
-git status
+#!/bin/sh
+
+AUTOGEN_FILES="aclocal.m4 autom4te.cache configure config.guess config.log config.sub config.status depcomp compile libtool ltmain.sh missing mkinstalldirs config.h config.h.in py-compile install-sh"
+
+echo "Clean autogen generated files"
+( cd $(dirname $0)
+    for file in $AUTOGEN_FILES; do
+	rm -rf $file 
+    done
+)
 
 
 
