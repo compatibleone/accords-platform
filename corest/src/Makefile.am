@@ -18,3 +18,4 @@ libcorest_la_SOURCES = base64.c base64.h \
     restclient.c restclient.h
 
 libcorest_la_CFLAGS = $(CFLAGS_COXML)
+libcorest_la_LIBADD = -luuid -lpthread -lssl

@@ -14,3 +14,4 @@ libcocarrier_la_SOURCES = azclient.c azclient.h \
     json.c json.h
 
 libcocarrier_la_CFLAGS = $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI)
+libcocarrier_la_LIBADD = $(LD_COREST) $(LD_COXML) -luuid -lpthread -lssl

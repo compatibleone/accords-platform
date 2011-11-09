@@ -28,3 +28,4 @@ configure
 *.tgz
 product/
 *.bak
+*.loT

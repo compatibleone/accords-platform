@@ -149,58 +149,130 @@ AC_ARG_ENABLE([coes],
       [enable_coes=yes])
 AM_CONDITIONAL([ENABLE_COES], [test "$enable_coes" = "yes"])
 
-enable_coobas=no
+AC_ARG_ENABLE([coobas],
+      [AS_HELP_STRING([--disable-coobas],
+		      [Disable coobas @<:@default=enable@:>@])],
+      [],
+      [enable_coobas=yes])
 AM_CONDITIONAL([ENABLE_COOBAS], [test "$enable_coobas" = "yes"])
 
-enable_comons=no
+AC_ARG_ENABLE([comons],
+      [AS_HELP_STRING([--disable-comons],
+		      [Disable comons @<:@default=enable@:>@])],
+      [],
+      [enable_comons=yes])
 AM_CONDITIONAL([ENABLE_COMONS], [test "$enable_comons" = "yes"])
 
-enable_conets=no
+AC_ARG_ENABLE([conets],
+      [AS_HELP_STRING([--disable-conets],
+		      [Disable conets @<:@default=enable@:>@])],
+      [],
+      [enable_conets=yes])
 AM_CONDITIONAL([ENABLE_CONETS], [test "$enable_conets" = "yes"])
 
-enable_publisher=no
+AC_ARG_ENABLE([publisher],
+      [AS_HELP_STRING([--disable-publisher],
+		      [Disable publisher @<:@default=enable@:>@])],
+      [],
+      [enable_publisher=yes])
 AM_CONDITIONAL([ENABLE_PUBLISHER], [test "$enable_publisher" = "yes"])
 
-enable_parser=no
+AC_ARG_ENABLE([parser],
+      [AS_HELP_STRING([--disable-parser],
+		      [Disable parser @<:@default=enable@:>@])],
+      [],
+      [enable_parser=yes])
 AM_CONDITIONAL([ENABLE_PARSER], [test "$enable_parser" = "yes"])
 AC_SUBST([CFLAGS_PARSER], [-I\${abs_top_srcdir}/parser/src])
 
-enable_broker=no
+AC_ARG_ENABLE([broker],
+      [AS_HELP_STRING([--disable-broker],
+		      [Disable broker @<:@default=enable@:>@])],
+      [],
+      [enable_broker=yes])
 AM_CONDITIONAL([ENABLE_BROKER], [test "$enable_broker" = "yes"])
 AC_SUBST([CFLAGS_BROKER], [-I\${abs_top_srcdir}/broker/src])
 
-enable_procci=no
+AC_ARG_ENABLE([procci],
+      [AS_HELP_STRING([--disable-procci],
+		      [Disable procci @<:@default=enable@:>@])],
+      [],
+      [enable_procci=yes])
 AM_CONDITIONAL([ENABLE_PROCCI], [test "$enable_procci" = "yes"])
 AC_SUBST([CFLAGS_PROCCI], [-I\${abs_top_srcdir}/procci/src])
 
-enable_osprocci=no
+AC_ARG_ENABLE([osprocci],
+      [AS_HELP_STRING([--disable-osprocci],
+		      [Disable osprocci @<:@default=enable@:>@])],
+      [],
+      [enable_osprocci=yes])
 AM_CONDITIONAL([ENABLE_OSPROCCI], [test "$enable_osprocci" = "yes"])
+AC_SUBST([CFLAGS_OSPROCCI], [-I\${abs_top_srcdir}/osprocci/src])
 
-enable_onprocci=no
+AC_ARG_ENABLE([onprocci],
+      [AS_HELP_STRING([--disable-onprocci],
+		      [Disable onprocci @<:@default=enable@:>@])],
+      [],
+      [enable_onprocci=yes])
 AM_CONDITIONAL([ENABLE_ONPROCCI], [test "$enable_onprocci" = "yes"])
+AC_SUBST([CFLAGS_ONPROCCI], [-I\${abs_top_srcdir}/onprocci/src])
 
-enable_azprocci=no
+AC_ARG_ENABLE([azprocci],
+      [AS_HELP_STRING([--disable-azprocci],
+		      [Disable azprocci @<:@default=enable@:>@])],
+      [],
+      [enable_azprocci=yes])
 AM_CONDITIONAL([ENABLE_AZPROCCI], [test "$enable_azprocci" = "yes"])
+AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci/src])
 
-enable_testos=no
+AC_ARG_ENABLE([testos],
+      [AS_HELP_STRING([--disable-testos],
+		      [Disable testos @<:@default=enable@:>@])],
+      [],
+      [enable_testos=yes])
 AM_CONDITIONAL([ENABLE_TESTOS], [test "$enable_testos" = "yes"])
+AC_SUBST([CFLAGS_TESTOS], [-I\${abs_top_srcdir}/testos/src])
 
-enable_teston=no
+AC_ARG_ENABLE([teston],
+      [AS_HELP_STRING([--disable-teston],
+		      [Disable teston @<:@default=enable@:>@])],
+      [],
+      [enable_teston=yes])
 AM_CONDITIONAL([ENABLE_TESTON], [test "$enable_teston" = "yes"])
 
-enable_testcp=no
+AC_ARG_ENABLE([testcp],
+      [AS_HELP_STRING([--disable-testcp],
+		      [Disable testcp @<:@default=enable@:>@])],
+      [],
+      [enable_testcp=yes])
 AM_CONDITIONAL([ENABLE_TESTCP], [test "$enable_testcp" = "yes"])
 
-enable_testcb=no
+AC_ARG_ENABLE([testcb],
+      [AS_HELP_STRING([--disable-testcb],
+		      [Disable testcb @<:@default=enable@:>@])],
+      [],
+      [enable_testcb=yes])
 AM_CONDITIONAL([ENABLE_TESTCB], [test "$enable_testcb" = "yes"])
 
-enable_testaz=no
+AC_ARG_ENABLE([testaz],
+      [AS_HELP_STRING([--disable-testaz],
+		      [Disable testaz @<:@default=enable@:>@])],
+      [],
+      [enable_testaz=yes])
 AM_CONDITIONAL([ENABLE_TESTAZ], [test "$enable_testaz" = "yes"])
 
-enable_fileserver=no
+AC_ARG_ENABLE([fileserver],
+      [AS_HELP_STRING([--disable-fileserver],
+		      [Disable fileserver @<:@default=enable@:>@])],
+      [],
+      [enable_fileserver=yes])
 AM_CONDITIONAL([ENABLE_FILESERVER], [test "$enable_fileserver" = "yes"])
 
-enable_testresolver=no
+AC_ARG_ENABLE([testresolver],
+      [AS_HELP_STRING([--disable-testresolver],
+		      [Disable testresolver @<:@default=enable@:>@])],
+      [],
+      [enable_testresolver=yes])
 AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 
 dnl files to generate with automake
@@ -215,6 +287,23 @@ AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
 AC_CONFIG_FILES([coes/Makefile coes/src/Makefile])
+AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])
+AC_CONFIG_FILES([comons/Makefile comons/src/Makefile])
+AC_CONFIG_FILES([conets/Makefile conets/src/Makefile])
+AC_CONFIG_FILES([publisher/Makefile publisher/src/Makefile])
+AC_CONFIG_FILES([parser/Makefile parser/src/Makefile])
+AC_CONFIG_FILES([broker/Makefile broker/src/Makefile])
+AC_CONFIG_FILES([procci/Makefile procci/src/Makefile])
+AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
+AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
+AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
+AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
+AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
+AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
+AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
+AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
+AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
+AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
@@ -222,6 +311,7 @@ AC_OUTPUT
 ###
 ### Display results
 ###
+echo ""
 echo "********************************************************************"
 echo "  CompatibleOne ACCORDS configuration is now complete"
 echo "********************************************************************"
