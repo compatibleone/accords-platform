@@ -50,7 +50,8 @@ LIBCOCARRIER = $(PATHLIB)libcocarrier.so
 # -----------------------------------
 # Compilation and Link Definitions
 # -----------------------------------
-INCLUDE     = -I$(PATHCOXML) -I$(PATHOCCI) -I$(PATHCOREST) -I$(PATHCOCCI) -I$(PATHPUB) -I$(PATHCORDS)
+INCLUDE     = -I$(PATHCOXML) -I$(PATHOCCI) -I$(PATHCOREST) -I$(PATHCOCCI) -I$(PATHPUB) -I$(PATHCORDS) -I$(PATHCOPABR)
+
 DEBUG       = -g -ggdb 
 OPTIONS     = -DUNIX -Dunix -DCONE
 SHARED      = -fPIC -shared
