@@ -232,7 +232,7 @@ private	struct	rest_response * start_opennebula(
 	char	*	filename;
 	char	*	metafilename;
 	char		buffer[512];
-	char 	*	personality;
+	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -257,7 +257,7 @@ private	struct	rest_response * start_opennebula(
 #endif
 
 	if (!( filename = on_create_compute_request( 
-		pptr->name, pptr->image, pptr->flavor, pptr->publicnetwork, pptr->privatenetwork, personality, resource ) ))
+		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, personality, resource ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
 	else if (!( osptr = on_create_compute( filename )))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Request" ) );

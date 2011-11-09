@@ -757,7 +757,11 @@ public	int	on_initialise_client(
 	{
 		sprintf(On.namespace,"%s%s",_ON_NS_COMPUTE,On.version);
 		On.authenticate= (char *) 0;
-		On.tls = tls;
+		if (!( tls ))
+			On.tls = (char *) 0;
+		else if ((On.tls = allocate_string(tls)) != (char *) 0)
+			if ( (!( strlen( On.tls ) )) || ( *(On.tls) == '0' ) )
+				On.tls = liberate( On.tls );
 		return( 0 );
 	}
 }
