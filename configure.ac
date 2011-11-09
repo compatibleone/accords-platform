@@ -69,7 +69,7 @@ AC_ARG_ENABLE([coxml],
       [enable_coxml=yes])
 AM_CONDITIONAL([ENABLE_COXML], [test "$enable_coxml" = "yes"])
 AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml/src])
-AC_SUBST([LD_COXML], [\${abs_top_srcdir}/coxml/src/libcoxml.la])
+AC_SUBST([LD_COXML], ["-L\${abs_top_srcdir}/coxml/src -lcoxml"])
 
 AC_ARG_ENABLE([occi],
       [AS_HELP_STRING([--disable-occi],
@@ -78,7 +78,7 @@ AC_ARG_ENABLE([occi],
       [enable_occi=yes])
 AM_CONDITIONAL([ENABLE_OCCI], [test "$enable_occi" = "yes"])
 AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi/src])
-AC_SUBST([LD_OCCI], [\${abs_top_srcdir}/occi/src/libocci.la])
+AC_SUBST([LD_OCCI], ["-L\${abs_top_srcdir}/occi/src -locci"])
 
 AC_ARG_ENABLE([cords],
       [AS_HELP_STRING([--disable-cords],
@@ -87,7 +87,7 @@ AC_ARG_ENABLE([cords],
       [enable_cords=yes])
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
 AC_SUBST([CFLAGS_CORDS], [-I\${abs_top_srcdir}/cords/src])
-AC_SUBST([LD_CORDS], [\${abs_top_srcdir}/cords/src/libcords.la])
+AC_SUBST([LD_CORDS], ["-L\${abs_top_srcdir}/cords/src -lcords"])
 
 AC_ARG_ENABLE([corest],
       [AS_HELP_STRING([--disable-corest],
@@ -96,7 +96,7 @@ AC_ARG_ENABLE([corest],
       [enable_corest=yes])
 AM_CONDITIONAL([ENABLE_COREST], [test "$enable_corest" = "yes"])
 AC_SUBST([CFLAGS_COREST], [-I\${abs_top_srcdir}/corest/src])
-AC_SUBST([LD_COREST], [\${abs_top_srcdir}/corest/src/libcorest.la])
+AC_SUBST([LD_COREST], ["-L\${abs_top_srcdir}/corest/src -lcorest"])
 
 AC_ARG_ENABLE([cocci],
       [AS_HELP_STRING([--disable-cocci],
@@ -105,7 +105,7 @@ AC_ARG_ENABLE([cocci],
       [enable_cocci=yes])
 AM_CONDITIONAL([ENABLE_COCCI], [test "$enable_cocci" = "yes"])
 AC_SUBST([CFLAGS_COCCI], [-I\${abs_top_srcdir}/cocci/src])
-AC_SUBST([LD_COCCI], [\${abs_top_srcdir}/cocci/src/libcocci.la])
+AC_SUBST([LD_COCCI], ["-L\${abs_top_srcdir}/cocci/src -lcocci"])
 
 AC_ARG_ENABLE([cocarrier],
       [AS_HELP_STRING([--disable-cocarrier],
@@ -114,7 +114,7 @@ AC_ARG_ENABLE([cocarrier],
       [enable_cocarrier=yes])
 AM_CONDITIONAL([ENABLE_COCARRIER], [test "$enable_cocarrier" = "yes"])
 AC_SUBST([CFLAGS_COCARRIER], [-I\${abs_top_srcdir}/cocarrier/src])
-AC_SUBST([LD_COCARRIER], [\${abs_top_srcdir}/cocarrier/src/libcocarrier.la])
+AC_SUBST([LD_COCARRIER], ["-L\${abs_top_srcdir}/cocarrier/src -lcocarrier"])
 
 AC_ARG_ENABLE([pubocci],
       [AS_HELP_STRING([--disable-pubocci],
@@ -123,7 +123,7 @@ AC_ARG_ENABLE([pubocci],
       [enable_pubocci=yes])
 AM_CONDITIONAL([ENABLE_PUBOCCI], [test "$enable_pubocci" = "yes"])
 AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci/src])
-AC_SUBST([LD_PUBOCCI], [\${abs_top_srcdir}/pubocci/src/libpubocci.la])
+AC_SUBST([LD_PUBOCCI], ["-L\${abs_top_srcdir}/pubocci/src -lpubocci"])
 
 AC_ARG_ENABLE([copabr],
       [AS_HELP_STRING([--disable-copabr],
@@ -132,7 +132,7 @@ AC_ARG_ENABLE([copabr],
       [enable_copabr=yes])
 AM_CONDITIONAL([ENABLE_COPABR], [test "$enable_copabr" = "yes"])
 AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr/src])
-AC_SUBST([LD_COPABR], [\${abs_top_srcdir}/copabr/src/libcopabr.la])
+AC_SUBST([LD_COPABR], ["-L\${abs_top_srcdir}/copabr/src -lcopabr"])
 
 AC_ARG_ENABLE([coss],
       [AS_HELP_STRING([--disable-coss],
