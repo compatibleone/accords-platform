@@ -123,7 +123,12 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 			rptr->xmlroot = document_parse_file( aptr->body );
 			return( rptr );
 		}
-		else	return( rptr );
+		else
+		{
+			rptr->nature = _TEXT_XML;
+			rptr->xmlroot = document_parse_file( aptr->body );
+			return( rptr );
+		}
 		
 	}
 }
@@ -239,16 +244,16 @@ public	char * on_create_compute_request(
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		fprintf(h,"</DISK>\n");
-		if ( network )
-		{
-			fprintf(h,"<NIC>\n");
-			fprintf(h,"<NETWORK href='%s'/>\n",network);
-			fprintf(h,"</NIC>\n");
-		}
 		if ( local )
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",local);
+			fprintf(h,"</NIC>\n");
+		}
+		if ( network )
+		{
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n",network);
 			fprintf(h,"</NIC>\n");
 		}
 		fprintf(h,"</COMPUTE>\n");

@@ -22,6 +22,17 @@
 #include "occiresolver.h"
 
 /* ---------------------------------------------------------------------------- */
+/*			x m l _ a t r i b u t _ v a l u e			*/
+/* ---------------------------------------------------------------------------- */
+private	char *	xml_element_value( struct xml_element * eptr, char * nptr )
+{
+	struct	xml_element * aptr;
+	if (!( aptr = document_element( eptr, nptr ) ))
+		return( (char *) 0);
+	else	return( aptr->value );
+}
+
+/* ---------------------------------------------------------------------------- */
 /* 		r e s o l v e _ o n _ c o n f i g u r a t i o n			*/
 /* ---------------------------------------------------------------------------- */
 private	struct	on_config * resolve_on_configuration( char * sptr )
@@ -53,6 +64,49 @@ private	char *	resolve_opennebula_version( char * sptr )
 	if (!( pptr = resolve_on_configuration( sptr )))
 	 	return( "" );
 	else	return( ( pptr->version ? pptr->version : "" ) );
+}
+
+/*	--------------------------------------------------------	*/
+/*		r e s o l v e _ o n _ a d d r e s s e s			*/
+/*	--------------------------------------------------------	*/
+private	int	resolve_on_addresses( struct on_response * yptr, struct opennebula * pptr )
+{
+	char	*	vptr;
+	struct	xml_element * eptr;
+	struct	xml_element * iptr;
+
+	/* ---------------------------------------------- */
+	/* attempt to resolve a first and private address */
+	/* ---------------------------------------------- */
+	if (!( eptr = document_element( yptr->xmlroot, "NIC")))
+		return( 0 );
+	else if (!( iptr = document_element( eptr, "IP")))
+		return( 0 );
+	else if (!( pptr->privateaddr  = allocate_string(iptr->value)))	
+		return( 27 );
+
+	if ( check_debug() )
+	{
+		rest_log_message("*** ON PROCCI Instance PRIVATE IP ***");
+		rest_log_message( pptr->publicaddr );
+	}
+
+	/* ---------------------------------------------- */
+	/* attempt to resolve a second and public address */
+	/* ---------------------------------------------- */
+	if (!( eptr = document_element( eptr->next, "NIC")))
+		return( 0 );
+	else if (!( iptr = document_element( eptr, "IP")))
+		return( 0 );
+	else if (!( pptr->publicaddr  = allocate_string(iptr->value)))	
+		return( 27 );
+
+	if ( check_debug() )
+	{
+		rest_log_message("*** ON PROCCI Instance PUBLIC IP ***");
+		rest_log_message( pptr->publicaddr );
+	}
+	return(0);
 }
 
 
@@ -119,7 +173,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		if ( pptr->number ) 
 			pptr->number = liberate( pptr->number );
 
-		if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
+		if (!( vptr = xml_element_value( rptr->xmlroot, "ID") ))
 		{
 			reset_opennebula_server( pptr );
 			return( 27 );
@@ -146,7 +200,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		zptr = (struct on_response *) 0;
 		while (1)
 		{
-			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
+			if (!( vptr = xml_element_value( yptr->xmlroot, "STATE" )))
 			{
 				reset_opennebula_server( pptr );
 				return( 27 );
@@ -156,7 +210,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 				rest_log_message("*** ON PROCCI Testing Build Status ***");
 				rest_log_message( vptr );
 			}
-			if (!( strcmp( vptr, "BUILD" )))
+			if (!( strcmp( vptr, "PENDING" )))
 			{
 				sleep(1);
 				if ( zptr )
@@ -175,6 +229,13 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+
+		if ( resolve_on_addresses(yptr,pptr ) != 0 )
+		{
+			reset_opennebula_server( pptr );
+			return( 27 );
+		}
+
 
 		/* ------------------------------------------------------------ */
 		/* set the host name field now to the public or private address */
@@ -275,7 +336,7 @@ private	struct	rest_response * start_opennebula(
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
+			if (!( idptr = xml_element_value( osptr->xmlroot, "ID") ))
 			 	return( rest_html_response( aptr, 400, "Bad Request : Missing Meta Data Server ID" ) );
 
 			else if (!( metafilename = on_create_metadata_request( personality ) ))
