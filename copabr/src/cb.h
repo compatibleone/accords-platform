@@ -46,9 +46,11 @@ public 	struct	occi_element * cords_first_link( struct occi_response * zptr );
 public 	struct occi_element * cords_next_link( struct occi_element * eptr );
 
 #ifndef	_STAND_ALONE_BROKER
-public	int cords_manifest_broker(char * host,char * plan, char * nameplan, char * request,char * agent, char * tls );
+public	int cords_manifest_broker(
+	char * host, char * plan, char * nameplan, char * manifest, char * agent, char * tls );
 #else
-public	int cords_manifest_broker(char * host, char * plan, char * agent, char * tls, char * result );
+public	int cords_manifest_broker(
+	char * host, char * plan, char * agent, char * tls, char * result );
 #endif
 
 	/* ----- */

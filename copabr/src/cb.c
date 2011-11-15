@@ -416,6 +416,7 @@ private	char * 	cords_create_provider( struct xml_element * dptr , char * agent,
 	char *	sptr;
 	char *	host;
 	char 	buffer[2048];
+	char 	filter[1024];
 
 	/* -------------------------------------------- */
 	/* retrieve the provider identification category */
@@ -435,11 +436,13 @@ private	char * 	cords_create_provider( struct xml_element * dptr , char * agent,
 	else if (!( pptr = document_atribut( dptr, _CORDS_PROFILE ) ))
 		return((char *) 0);
 
-	/* -------------------------------- */
+	/* --------------------------------- */
 	/* select a list of provider records */
-	/* -------------------------------- */
-	else if (!( yptr = cords_retrieve_named_instance_list( 
-		cptr->value, "occi.contract.name", nptr->value, agent,tls )))
+	/* --------------------------------- */
+	sprintf(filter,"occi.%s.name",cptr->value);
+
+	if (!( yptr = cords_retrieve_named_instance_list( 
+		cptr->value, filter, nptr->value, agent,tls )))
 		return((char *) 0);
 
 	/* --------------------------------- */
@@ -1112,7 +1115,7 @@ public	int cords_manifest_broker(
 	/* --------------------------------------- */
 	if (!( CbC.planID = occi_unquoted_value( plan ) ))
 		return( cords_terminate_provisioning( 900, &CbC ) );
-	else if (!( CbC.plan = cords_retrieve_instance( host, CbC.planID, agent )))
+	else if (!( CbC.plan = cords_retrieve_instance( host, CbC.planID, agent,tls )))
 		return( cords_terminate_provisioning( 901, &CbC ) );
 	else if (!( CbC.namePlan = cords_extract_atribut( CbC.plan, "occi", _CORDS_PLAN, _CORDS_NAME ) ))
 		return( cords_terminate_provisioning( 902, &CbC ) );
