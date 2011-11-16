@@ -243,7 +243,7 @@ private	int	service_action( char * id, char * action )
 		}
 		else	liberate( wptr );
 
-		cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT );
+		cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() );
 
 		fprintf(h,"{ contract: %c%s%c, attributs: [ ",0x0022,lptr->target,0x0022);
 

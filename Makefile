@@ -24,6 +24,7 @@ all clean install:
 	-$(MAKE) -C testcp $@
 	-$(MAKE) -C testcb $@
 	-$(MAKE) -C testaz $@
+	-$(MAKE) -C command $@
 	-$(MAKE) -C fileserver $@
 	-$(MAKE) -C testresolver $@
 

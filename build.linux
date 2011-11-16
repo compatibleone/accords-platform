@@ -48,6 +48,7 @@ cd ../testcp;     autoscan; autoconf; ./configure; make  all
 cd ../testcb;     autoscan; autoconf; ./configure; make  all
 cd ../testaz;     autoscan; autoconf; ./configure; make  all
 cd ../testresolver; autoscan; autoconf; ./configure; make  all
+cd ../command; autoscan; autoconf; ./configure; make  all
 cd ..; 
 ls -tl */lib/*; ls -tl */lib/* | wc -l
 ls -tl */bin/*; ls -tl */bin/* | wc -l

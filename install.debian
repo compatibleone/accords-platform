@@ -86,7 +86,7 @@ echo "Installing Libraries"
 sudo cp lib/*.so /usr/lib
 sudo mkdir service
 sudo mkdir rest
-sudo chmod 0660 service rest
+sudo chmod 0777 service rest
 
 echo "Creating Start Script : co-start"
 echo "# -------------------------------------" >  co-start
@@ -424,12 +424,14 @@ then
 	echo "bin/testcp --publisher "$publisher" --verbose \$1.xml " > co-parser
 	echo "bin/testcb --publisher "$publisher" --verbose plan_\$1.xml " > co-broker
 	echo "bin/testresolver --publisher "$publisher" \$* " > co-resolver
+	echo "bin/command --publisher "$publisher" \$* " > co-command
 else
 	echo "bin/testcp --tls security/testcpTls.xml --publisher "$publisher" --verbose \$1.xml " > co-parser
 	echo "bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_\$1.xml " > co-broker
 	echo "bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" \$* " > co-resolver
+	echo "bin/command --tls security/testresolverTls.xml --publisher "$publisher" \$* " > co-command
 fi
-chmod ug+x co-parser co-broker co-resolver
+chmod ug+x co-parser co-broker co-resolver co-command
 
 echo "CompatibleOne Accords Configuration Complete"
 echo "--------------------------------------------"
