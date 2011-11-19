@@ -704,7 +704,8 @@ private	char *	cords_research_provider( char * defaut, char * agent, char * tls 
 						xptr = occi_remove_response( xptr );
 						yptr = occi_remove_response( yptr );
 						zptr = occi_remove_response( zptr );
-						printf("   Cords Resolved Provider : %s \n",sptr);
+						if ( check_verbose() )
+							printf("   Cords Resolved Provider : %s \n",sptr);
 						return( sptr );
 					}
 				}
@@ -716,7 +717,8 @@ private	char *	cords_research_provider( char * defaut, char * agent, char * tls 
 		continue;
 	}		
 	zptr = occi_remove_response( zptr );
-	printf("   Cords Default Provider : %s \n",defaut);
+	if ( check_verbose() )
+		printf("   Cords Default Provider : %s \n",defaut);
 	return( allocate_string( defaut ) );
 }
 
@@ -737,7 +739,8 @@ private	char *	cords_resolve_provider( struct occi_response * node, char * defau
 		return( cords_research_provider(defaut,agent,tls) );
 	else
 	{
-		printf("   Cords Explicite Provider : %s \n",value);
+		if ( check_verbose() )
+			printf("   Cords Explicite Provider : %s \n",value);
 		return( value );
 	}
 }

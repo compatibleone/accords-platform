@@ -105,7 +105,7 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 			tls_server_startup( &sptr->net, sptr->tlsconf->option );
 		}
 		sptr->port = port;
-		sptr->seconds = 1;
+		sptr->seconds = 60;
 		sptr->wakeup  = 5000;
 		sptr->fraction = 0;
 		if ( iptr->security )
@@ -1360,7 +1360,7 @@ private	void *	rest_thread_message( void * vptr )
 			rptr = tptr->request;
 			unlock_rest_thread( tptr );
 			if (!( cptr ))
-				usleep( 69 );
+				wait_rest_thread(tptr);
 			else	break;
 		}
 		

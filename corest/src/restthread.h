@@ -23,6 +23,8 @@ struct	rest_thread
 	struct 	rest_client *	client;
 	struct 	rest_request *	request;
 	int			status;
+	int			started;
+	pthread_mutex_t 	control;
 	pthread_mutex_t 	lock;
 	pthread_t		id;
 	pthread_attr_t		attributes;

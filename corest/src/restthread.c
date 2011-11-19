@@ -39,6 +39,47 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 	return;
 }
 
+/*	-----------------------------------------------------------	*/
+/*		w a i t _ r e s t _ t h r e a d 			*/
+/*	-----------------------------------------------------------	*/
+/*	called from the starting thread to await its order to start	*/
+/*	the thread will try to lock the control mutex and when this	*/
+/*	is not possible will sleep till it regains control.		*/
+/*	-----------------------------------------------------------	*/
+
+private	void	wait_rest_thread(struct rest_thread * tptr)
+{
+	pthread_mutex_lock( &tptr->control );
+	lock_rest_thread(tptr);
+	tptr->started=1;
+	unlock_rest_thread(tptr);
+	pthread_mutex_unlock( &tptr->control );
+	return;
+}
+
+/*	-----------------------------------------------------------	*/
+/*		s t a r t _ r e s t _ t h r e a d			*/
+/*	-----------------------------------------------------------	*/
+/*	called from the thread launcher to allow the target thread	*/
+/*	to proceed with processing.					*/
+/*	-----------------------------------------------------------	*/
+private	void	start_rest_thread(struct rest_thread * tptr)
+{
+	int	started;
+	lock_rest_thread(tptr);
+	tptr->started=0;
+	unlock_rest_thread(tptr);
+	pthread_mutex_unlock( &tptr->control );
+	do	{
+		lock_rest_thread(tptr);
+		started = tptr->started;
+		unlock_rest_thread(tptr);
+		}
+	while (!( started ));
+	pthread_mutex_lock( &tptr->control );
+	return;
+}
+
 /*	----------------------------------------	*/
 /*	l i b e r a t e _ r e s t _ t h r e a d 	*/
 /*	----------------------------------------	*/
@@ -48,6 +89,7 @@ public struct rest_thread * liberate_rest_thread(struct rest_thread * sptr)
 	{
 		sptr = liberate( sptr );
 		pthread_mutex_unlock( &sptr->lock );
+		pthread_mutex_unlock( &sptr->control );
 	}
 	return((struct rest_thread *) 0);
 }
@@ -66,6 +108,8 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		sptr->client = (struct rest_client *) 0;
 		sptr->request = (struct rest_request *) 0;
 		sptr->status = 1;
+		sptr->started = 0;
+		pthread_mutex_lock( &sptr->control );
 	}
 	return(sptr);
 
@@ -174,6 +218,8 @@ public	struct rest_thread * rest_start_thread
 	tptr->request = rptr;
 
 	unlock_rest_thread( tptr );
+
+	start_rest_thread( tptr );
 
 	return( tptr );
 
