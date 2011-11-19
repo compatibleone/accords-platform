@@ -307,6 +307,7 @@ private	struct	rest_response * start_service(
 			service_action( pptr->id, "start" );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
+			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -336,6 +337,7 @@ private	struct	rest_response * suspend_service(
 			service_action( pptr->id, "suspend" );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
+			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -365,6 +367,7 @@ private	struct	rest_response * restart_service(
 			service_action( pptr->id, "restart" );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
+			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -392,6 +395,7 @@ private	struct	rest_response * save_service(
 		{
 			service_action( pptr->id, "save" );
 			pptr->when  = time((long*) 0);
+			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -420,6 +424,7 @@ private	struct	rest_response * stop_service(
 			service_action( pptr->id, "stop" );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
+			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

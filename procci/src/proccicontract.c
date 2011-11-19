@@ -81,7 +81,7 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 }
 
 /*	-------------------------------------------	*/
-/* 	 c o n t r a c t _ i n s t r u c t i o n s
+/* 	 c o n t r a c t _ i n s t r u c t i o n s	*/
 /*	-------------------------------------------	*/
 /*	this function retrives the list of contract	*/
 /*	configuration instructions selected by the 	*/
@@ -181,7 +181,7 @@ private	int	contract_instructions( char * contract, char * provision )
 }
 
 /*	-------------------------------------------	*/
-/* 	       s t a r t _ c o n t r a c t
+/* 	       s t a r t _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * start_contract(
 		struct occi_category * optr, 
@@ -204,6 +204,7 @@ private	struct	rest_response * start_contract(
 			retrieve_provider_information( pptr );
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
+			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -211,7 +212,7 @@ private	struct	rest_response * start_contract(
 
 
 /*	-------------------------------------------	*/
-/* 	   r e s t a r t _ c o n t r a c t
+/* 	   r e s t a r t _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * restart_contract(
 		struct occi_category * optr, 
@@ -230,6 +231,7 @@ private	struct	rest_response * restart_contract(
 			cords_invoke_action( pptr->provider, "restart", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
+			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -238,7 +240,7 @@ private	struct	rest_response * restart_contract(
 
 
 /*	-------------------------------------------	*/
-/* 	   s u s p e n d _ c o n t r a c t
+/* 	   s u s p e n d _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * suspend_contract(
 		struct occi_category * optr, 
@@ -257,13 +259,14 @@ private	struct	rest_response * suspend_contract(
 			cords_invoke_action( pptr->provider, "suspend", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
+			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s t o p _ c o n t r a c t
+/* 	   	s t o p _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * stop_contract(
 		struct occi_category * optr, 
@@ -287,13 +290,14 @@ private	struct	rest_response * stop_contract(
 			pptr->hostname  =allocate_string("");
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
+			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s a v e _ c o n t r a c t
+/* 	   	s a v e _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_contract(
 		struct occi_category * optr, 
@@ -311,6 +315,7 @@ private	struct	rest_response * save_contract(
 		{
 			cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT, default_tls() );
 			pptr->when  = time((long*) 0);
+			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
