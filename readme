@@ -1,0 +1,123 @@
+---------------------------------------
+File	:	README 
+Project	:	COMPATIBLE ONE ACCORDS
+Author	:	Iain James Marshall
+Created	:	19th November 2011
+---------------------------------------
+
+This file provides useful information about the CompatibleOne Accords Platform.
+
+If you are reading this file then you will have cloned the accords-platform from the 
+CompatibleOne OW2 Gitorious and will perhaps want to build the binary package.
+
+Currently two build scripts are provided. The first one, build.debian, as its name
+suggests is for Debian based Linux platforms. The other one, build.linux, is to be used
+for non Debian based Linux platforms.
+
+In both cases, to build the Accords Platform Binary package, simply execute the required
+buils script and wait till the compilation and link has all completed.
+
+The Accords platforms depend on the following other tools and libraries which need to be 
+installed on your platform before launching your build script.
+
+	AUTOCONF
+	AUTOMAKE
+	AUTOTOOLS
+
+	MAKE
+
+	GCC
+
+	OPENSSL
+
+	UUID
+
+When the build script has completed it will leave a binary tarball named after the build type
+
+	prodball.debian.tgz is produced by the build.debian
+
+	prodball.linux.tgz is produced by the build.linux
+
+To install the Accords Platform you must create a directory into which you wish to install it,
+unzip the corresponding tar ball into the directory then launch the install script. The install
+script is a bash script and may need to be launched using 
+
+	bash install
+
+on certain debian based systems. Otherwise just run it as follows :
+
+	./install
+
+The installation script may take several parameters which will influence the way in which the
+installation will be performed.
+
+1) 	configuration file name
+2) 	host name of the platform
+3)	base port number of the installation
+4)	publisher url of the form http://host:port
+
+5)	this parameter when present will activate security
+6)	this parameter when present will specify the monitoring options
+
+When no parameters are passed the installation will be performed as if it had been launched as:
+
+	./install accords.xml http://127.0.0.1 8086 http://127.0.0.1:8086
+
+
+The installation procedure will create the master configuration file for all of the components 
+of the Accords platform and when security is active will generate the security configurations,
+certificates and private keys for all the OCCI server modules comprising the system. In addition
+a collection of scripts will be generated that are configured to use the different components of 
+the platform.
+
+1)	co-start
+	This script must be launched to start the Accords Platform and bring the servers online.
+
+2)	co-status
+	This script may be launched to inspect the status of the Accords Platform.
+
+3)	co-parser
+	This script allows a manifest to be submitted for parsing and results in the creation
+	of a fully qualified plan.
+
+4)	co-broker
+	This script allows the resources described by a plan to be provisioning as a service and started
+
+5)	co-resolver
+	This script allows the publisher to be queried for category service provider information.
+
+6)	co-command
+	This script allows a provisioned service to be started, stopped or saved.
+
+7)	co-stop
+	This script must be launched to stop the Accords Platform and bring the servers offline.
+
+
+During the platform operation, log and trace information will be generated to as described by the
+monitoring parameter of the installation script.
+
+0)	No monitoring
+1) 	All monitoring is sent to the file co-log
+2)	All monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
+3)	Monitoring information is sent to both the file co-log and to COMONS
+6)	Optimised Monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
+6)	Optimised Monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
+	and to the file co-log.
+
+The collection of XML files cords_*.xml and links_*.xml represent the internal state of the different
+server components of the platform. They are updated as their internal state changes and will be reloaded
+when the corrresponding component restarts.
+
+The directory "rest/" contains the contents of the messages exchanged by the server components during 
+operation and may be consulted. These may have several different extensions depending on the source
+of the information and may be XML, JSON, OCCI, HTML or TMP files.
+
+-----------
+End of File
+-----------
+		
+
+
+
+
+
