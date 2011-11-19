@@ -737,15 +737,22 @@ public	char * os_create_image_request(char * identity, char * server )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<image xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
-		fprintf(h,"\tname=%c%s%c\n",0x0022,identity,0x0022);
 		if (!( strcmp( Os.version, "v1.0" ) ))
 		{
+			fprintf(h,"<image xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
+			fprintf(h,"\tname=%c%s%c\n",0x0022,identity,0x0022);
 			fprintf(h,"\tserverId=%c%s%c />\n",0x0022,server,0x0022);
 		}
 		else if (!( strcmp( Os.version, "v1.1" ) ))
 		{
-			fprintf(h,"\tserverRef=%c%s/servers/%s%c\n",0x0022,Os.base,server,0x0022);
+			fprintf(h,"<createImage xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
+			fprintf(h,"\tname=%c%s%c\n>",0x0022,identity,0x0022);
+			fprintf(h,"\t<metadata>\n");
+			fprintf(h,"\t\t<meta key=%cactionAgent%c>OS Client</meta>\n",0x0022,0x0022);
+			fprintf(h,"\t\t<meta key=%ctimeStamp%c>%u</meta>\n",0x0022,0x0022,time((long *) 0));
+			fprintf(h,"\t\t<meta key=%coriginServer%c>%s</meta>\n",0x0022,0x0022,server);
+			fprintf(h,"\t</metadata>\n");
+			fprintf(h,"</createImage>\n");
 		}
 		fclose(h);
 		return( filename );
@@ -755,14 +762,19 @@ public	char * os_create_image_request(char * identity, char * server )
 /*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _  i m a g e   		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_image( char * filename )
+public	struct	os_response *	os_create_image( char * filename, char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images");
+	if (!( strcmp( Os.version, "v1.0" ) ))
+		sprintf(buffer,"/images");
+	else if (!( strcmp( Os.version, "v1.1" ) ))
+		sprintf(buffer,"/servers/%s/action",id);
+	else	return( rptr );
+
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Os.base )))

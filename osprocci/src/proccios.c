@@ -607,7 +607,7 @@ private	struct	rest_response * save_openstack(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = os_create_image( filename ) ))
+	else if (!( osptr = os_create_image( filename, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{

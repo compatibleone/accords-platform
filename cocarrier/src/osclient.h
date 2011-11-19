@@ -73,7 +73,7 @@ public	struct	os_response *	os_list_images  ( );
 public	struct	os_response *	os_list_metadata( char * id );
 
 public	struct	os_response *	os_create_server( char * filename );
-public	struct	os_response *	os_create_image( char * filename );
+public	struct	os_response *	os_create_image( char * filename, char * serverid );
 
 public	struct	os_response *	os_get_server	( char * id );
 public	struct	os_response *	os_get_flavor  ( char * id );

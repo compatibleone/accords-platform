@@ -165,6 +165,7 @@ private	int	banner()
 	printf("\n   Usage : ");
 	printf("\n         command <options> START <service_file> ");
 	printf("\n         command <options> STOP  <service_file> ");
+	printf("\n         command <options> SAVE  <service_file> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");

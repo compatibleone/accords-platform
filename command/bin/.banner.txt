@@ -1,0 +1,13 @@
+
+   CompatibleOne Command Line Tool : Version 1.0a.0.01
+   Copyright (c) Iain James Marshall 
+   Usage : 
+         command <options> START <service_file> 
+         command <options> STOP  <service_file> 
+         command <options> SAVE  <service_file> 
+   Options: 
+         --publisher <publisher>      specify publisher identity 
+         --agent     <agent>          specify agent identity 
+         --tls       <security>       specify security configuration 
+         --verbose                    activate verbose messages
+         --debug                      activate debug messages 
