@@ -245,7 +245,9 @@ private	int	service_action( char * id, char * action )
 
 		cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() );
 
-		fprintf(h,"{ contract: %c%s%c, attributs: [ ",0x0022,lptr->target,0x0022);
+		if ( contracts++ ) fprintf(h,",\n" );
+
+		fprintf(h,"{ contract: %c%s%c, attributs: { ",0x0022,lptr->target,0x0022);
 
 		if ((zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, "" )) 
 			!= (struct occi_response *) 0)
@@ -259,23 +261,13 @@ private	int	service_action( char * id, char * action )
 			{
 				if ( items++ )
 					fprintf(h,",\n");
+
 				/* output information to service report */
 				/* ------------------------------------ */
 				fprintf(h,"%c%s%c: %c%s%c",
 					0x0022,eptr->name,0x0022,
 					0x0022,eptr->value,0x0022);	
-#ifdef	_DO_SERVICE_CONFIGURATION
-				/* -------------------------------- */
-				/* Removed when the configuration   */
-				/* instructions were added. IJM	    */
-				/* -------------------------------- */
-				/* configure the instance parameter */
-				/* -------------------------------- */
-				service_configuration(	    
-					_CORDS_PARAMETER, 	    */
-					_CORDS_SERVICE_AGENT, 	    */
-					id, lptr->target, eptr->name, eptr->value );*/
-#endif
+
 				/* establish configuration instructions */
 				/* ------------------------------------ */
 				instruction_values(
@@ -283,7 +275,7 @@ private	int	service_action( char * id, char * action )
 					lptr->target, eptr->name, eptr->value );
 			}
 		}
-		fprintf(h," ] }\n");
+		fprintf(h," } }");
 
 	}
 
