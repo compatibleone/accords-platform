@@ -116,6 +116,8 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 				cptr->certificate = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "passphrase" )) != (struct xml_atribut *) 0)
 				cptr->passphrase = document_atribut_string( aptr );
+			if ((aptr = document_atribut( eptr, "authority" )) != (struct xml_atribut *) 0)
+				cptr->authority = document_atribut_string( aptr );
 		}
 		document = document_drop( document );
 	}
@@ -131,6 +133,7 @@ public	void	tls_configuration_use(struct tls_configuration * cptr )
 	https_use_encryption( cptr->key );
 	https_use_certificate( cptr->certificate );
 	https_use_password( cptr->passphrase );
+	https_use_CA_list( cptr->authority );
 	security_unlock("configuration");
 	return;
 }

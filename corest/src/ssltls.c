@@ -15,9 +15,15 @@
 /*		4	use ssl					*/
 /*		8	verify peer				*/
 /*		16	fail if no peer certificate		*/
-/*		32	certificate is DER not PEM		*/
-/*		64	private key is DER not PEM		*/
+/*		32	private key is DER not PEM		*/
+/*		64	certificate is DER not PEM		*/
 /*	-------------------------------------------------	*/
+
+#define	_USE_SSL		4
+#define	_REQUEST_PEER		8
+#define	_REQUIRE_PEER		16
+#define	_DER_KEY		32
+#define	_DER_CERTIFICATE	32
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
@@ -29,7 +35,8 @@ private	int	SSL_READY=0;
 
 #define	_DEFAULT_KEYFILE  	"server.pem"
 #define	_DEFAULT_PASSWORD 	"password"
-#define	_DEFAULT_CA_LIST	"root.pem"
+#define	_DEFAULT_CERTIFICATE	"root.pem"
+#define	_DEFAULT_CA_LIST	"calist.pem"
 
 char *	SslKeyFile=(char *) 0;
 char *	SslPassWord=(char *) 0;
@@ -186,6 +193,33 @@ public	int	https_use_certificate(aptr)
 	SslCertFile = allocate_string( aptr );
 
 	if (!( SslCertFile ))
+		return( 27 );
+	else	return( 0  );
+}
+
+/*	--------------------------------------------------	*/
+/*	   h t t p s _ u s e _ C A _ l i s t ( aptr )   	*/
+/*	--------------------------------------------------	*/
+/*	Called from the configuration and initialisation	*/
+/*	options analyser to submit the certification root	*/
+/*	Authority Chain File.					*/
+/*	--------------------------------------------------	*/
+
+public	int	https_use_CA_list(aptr)
+	char *	aptr;
+{
+	if ((!( aptr )) || (!( *aptr )))
+		return(0);
+	if (( SslCaList ) && (!( strcmp( SslCaList, aptr ) )))
+		return( 0 );
+	if ( SslCaList ) 
+	{
+		liberate( SslCaList );
+		SslCaList = (char *) 0;
+	}
+	SslCaList = allocate_string( aptr );
+
+	if (!( SslCaList ))
 		return( 27 );
 	else	return( 0  );
 }
@@ -569,7 +603,16 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 			
 	if (!( SslCertFile ))
 	{
-		if ( https_use_certificate( _DEFAULT_CA_LIST ) )
+		if ( https_use_certificate( _DEFAULT_CERTIFICATE ) )
+		{
+			close_connection( cptr );
+			return(0);
+		}
+	}
+
+	if (!( SslCaList ))
+	{
+		if ( https_use_CA_list( _DEFAULT_CA_LIST ) )
 		{
 			close_connection( cptr );
 			return(0);
@@ -601,7 +644,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 	if ( mode )
 	{
 
-		if ( mode & 64 )
+		if ( mode & _DER_CERTIFICATE )
 		{
 			if (!(oof=SSL_CTX_use_certificate_file(cptr->context,SslCertFile,SSL_FILETYPE_ASN1))) 
 			{
@@ -622,7 +665,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 
 		if (!(oof = SSL_CTX_use_PrivateKey_file(
 			cptr->context,SslKeyFile,
-			(mode & 32 ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
+			(mode & _DER_KEY ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
 		{
 			tls_show_errors( "SSL_CTX_use_PrivateKey_file" );
 			close_connection( cptr );
@@ -639,7 +682,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 			}
 		}
 
-		else if (!( mode &  64 ))
+		else if (!( mode &  _DER_CERTIFICATE ))
 		{
 			if (!(SSL_CTX_load_verify_locations(cptr->context,SslCertFile, 0))) 
 			{
@@ -660,9 +703,9 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
-	if ( mode & 16 )
+	if ( mode & _REQUIRE_PEER )
 		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,NULL);
-	else if ( mode & 8 )
+	else if ( mode & _REQUEST_PEER )
 		SSL_set_verify( cptr->object,SSL_VERIFY_PEER,NULL);
 	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,NULL);
 	return( 1 );
@@ -675,6 +718,18 @@ private	int	build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 	status = ll_build_ssl_context( cptr, mode, service );
 	security_unlock( 0, "build_context" );
 	return( status );
+}
+
+/*	----------------------------------------------------------	*/
+/*		t l s _ v a l i d a t e _ s e r v e r			*/
+/*	----------------------------------------------------------	*/
+public	int	tls_validate_server( CONNECTIONPTR cptr, int mode )
+{
+	if (!( mode & _REQUEST_PEER ) )
+		return(0);
+	else if (!( mode & _REQUIRE_PEER ) )
+		return(0);
+	else	return(0);
 }
 
 /*	----------------------------------------------------------	*/
@@ -712,14 +767,31 @@ public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 			rest_debug_log_file( "tls_client_handshake failed" );
 			return(1);
 		}
-		else
+		else if (!( tls_validate_server( cptr->object, mode ) ))
 		{
 			if ( check_debug() )
 				printf("SSL_connect(%u) handshake OK\n",mode);
-			rest_debug_log_file( "tls_client_handshake complete" );
-			return(1);	
+			rest_debug_log_file( "tls_server_handshake complete" );
+			return(1);
+		}
+		else
+		{
+			tls_show_errors("incorrect client certificate");
+			return(0);
 		}
 	}
+}
+
+/*	----------------------------------------------------------	*/
+/*		t l s _ v a l i d a t e _ c l i e n t			*/
+/*	----------------------------------------------------------	*/
+public	int	tls_validate_client( CONNECTIONPTR cptr, int mode )
+{
+	if (!( mode & _REQUEST_PEER ) )
+		return(0);
+	else if (!( mode & _REQUIRE_PEER ) )
+		return(0);
+	else	return(0);
 }
 
 /*	----------------------------------------------------------	*/
@@ -739,9 +811,9 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 	else
 	{
 		security_lock( 0, "server_set_verify" );
-		if ( mode & 16 )
+		if ( mode & _REQUIRE_PEER )
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,NULL);
-		else if ( mode & 8 )
+		else if ( mode & _REQUEST_PEER )
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER,NULL);
 		else	SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,NULL);
 		security_unlock( 0, "server_set_verify" );
@@ -755,11 +827,17 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 			tls_show_errors("SSL_accept");
 			return(0);
 		}
-		else
+		else if (!( tls_validate_client( cptr->newobject, mode ) ))
 		{
 			rest_debug_log_file( "tls_server_handshake complete" );
 			return(1);
 		}
+		else
+		{
+			tls_show_errors("incorrect client certificate");
+			return(0);
+		}
+
 	}
 }
 

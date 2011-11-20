@@ -25,7 +25,7 @@
 #        6) With security active monitoring may also be used
 #
 # ------------------------------------------------------------
-echo command line parameters 
+echo command line parameters
 echo $*
 
 echo "-------------------------------------------"
@@ -79,7 +79,7 @@ echo "Rest Host Base URL   : " $resthost
 echo "Rest Host Base Port  : " $restport
 echo "Accords Publisher    : " $publisher
 echo "Accords Security     : " $tls
-echo "Accords Monitoring   : " $monitor  
+echo "Accords Monitoring   : " $monitor
 echo "-------------------------------------------"
 echo "Installing Libraries"
 
@@ -258,18 +258,33 @@ echo "Accords Security Not Required"
 
 else
 echo "Creating Accords Security Files"
-function mksec
+
+function mksecs
 {
 	echo "<tls key='security/"$1"PrivateKey.pem'" > security/$1Tls.xml
 	echo "     certificate='security/"$1"Certificate.pem'" >> security/$1Tls.xml
 	echo "     passphrase='"$pass"'" >> security/$1Tls.xml
+	echo "     authority='"$calist"'" >> security/$1Tls.xml
 	echo "     authenticate='"$auth"'" >> security/$1Tls.xml
 	echo "     option='"$options"' />" >> security/$1Tls.xml
 	chmod 0640 security/$1Tls.xml
 }
 
+function mksect
+{
+	echo "<tls key='security/"$1"PrivateKey.pem'" > security/$1Tls.xml
+	echo "     certificate='security/"$1"Certificate.pem'" >> security/$1Tls.xml
+	echo "     passphrase='"$pass"'" >> security/$1Tls.xml
+	echo "     authority='"$calist"'" >> security/$1Tls.xml
+	echo "     authenticate='"$auth"'" >> security/$1Tls.xml
+	echo "     option='"$optiont"' />" >> security/$1Tls.xml
+	chmod 0640 security/$1Tls.xml
+}
+
+export calist=Certificates.crt
 export pass=Accords
 export auth=0
+export options=5
 export options=5
 
 if [ -d security ]
@@ -279,24 +294,27 @@ fi
 
 mkdir security
 
-mksec publisher
-mksec fileserver
-mksec coss
+mksecs publisher
+mksecs fileserver
+mksecs coss
 export auth=1
-mksec comons
-mksec coes
-mksec coobas
-mksec conets
-mksec broker
-mksec parser
-mksec procci
-mksec osprocci
-mksec onprocci
-mksec azprocci
+mksecs comons
+mksecs coes
+mksecs coobas
+mksecs conets
+mksecs broker
+mksecs parser
+mksecs procci
+mksecs osprocci
+mksecs onprocci
+mksecs azprocci
 
-mksec testcp
-mksec testcb
-mksec testresolver
+mksect testcp
+mksect testcb
+mksect teston
+mksect testos
+mksect testresolver
+mksect command
 
 # ----------------------------------------
 # Creation of Accords TLS Certificates
@@ -332,7 +350,10 @@ mkcert azprocci
 
 mkcert testcp
 mkcert testcb
+mkcert testos
+mkcert teston
 mkcert testresolver
+mkcert command
 
 fi
 
@@ -429,7 +450,7 @@ else
 	echo "bin/testcp --tls security/testcpTls.xml --publisher "$publisher" --verbose \$1.xml " > co-parser
 	echo "bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_\$1.xml " > co-broker
 	echo "bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" \$* " > co-resolver
-	echo "bin/command --tls security/testresolverTls.xml --publisher "$publisher" \$* " > co-command
+	echo "bin/command --tls security/commandTls.xml --publisher "$publisher" \$* " > co-command
 fi
 chmod ug+x co-parser co-broker co-resolver co-command
 

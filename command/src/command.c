@@ -1,6 +1,7 @@
 #include "command.h"
 #include "cordslang.h"
 #include "occiresolver.h"
+#include "occilogin.h"
 #include "cp.h"
 
 private	int	verbose=0;

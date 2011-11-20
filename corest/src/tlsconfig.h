@@ -12,6 +12,7 @@ struct	tls_configuration
 	char *	key;
 	char *	certificate;
 	char *	passphrase;
+	char *	authority;
 	int	option;
 	int	authenticate;
 };
