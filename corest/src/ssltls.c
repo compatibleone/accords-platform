@@ -17,13 +17,15 @@
 /*		16	fail if no peer certificate		*/
 /*		32	private key is DER not PEM		*/
 /*		64	certificate is DER not PEM		*/
+/*		128	SSL v23 compatible mode			*/
 /*	-------------------------------------------------	*/
 
 #define	_USE_SSL		4
 #define	_REQUEST_PEER		8
 #define	_REQUIRE_PEER		16
 #define	_DER_KEY		32
-#define	_DER_CERTIFICATE	32
+#define	_DER_CERTIFICATE	64
+#define	_SSL_COMPATIBLE		128
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
@@ -628,13 +630,22 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		}
 	}
 
-	if (!( fptr = SSLv23_method() )) 
+	if ( mode & _SSL_COMPATIBLE )
 	{
-		tls_show_errors( "SSLv23_method" );
+		if (!( fptr = SSLv23_method() )) 
+		{
+			tls_show_errors( "SSLv23_method" );
+			close_connection( cptr );
+			return( 0 );
+		}
+	}
+	else if (!( fptr = TLSv1_method() )) 
+	{
+		tls_show_errors( "TLSv1_method" );
 		close_connection( cptr );
 		return( 0 );
 	}
-	else if (!(cptr->context = SSL_CTX_new(fptr) )) 
+	if (!(cptr->context = SSL_CTX_new(fptr) )) 
 	{
 		tls_show_errors( "SSL_CTX_new" );
 		close_connection( cptr );
@@ -771,7 +782,7 @@ public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 		{
 			if ( check_debug() )
 				printf("SSL_connect(%u) handshake OK\n",mode);
-			rest_debug_log_file( "tls_server_handshake complete" );
+			rest_debug_log_file( "tls_client_handshake complete" );
 			return(1);
 		}
 		else
