@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _network_c_
 #define _network_c_
 
@@ -130,6 +137,8 @@ private void autoload_cords_network_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "label" )) != (struct xml_atribut *) 0)
 				pptr->label = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "vlan" )) != (struct xml_atribut *) 0)
@@ -163,6 +172,9 @@ public  void autosave_cords_network_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," label=%c",0x0022);
 		fprintf(h,"%s",(pptr->label?pptr->label:""));
 		fprintf(h,"%c",0x0022);
@@ -193,6 +205,8 @@ private void set_cords_network_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "label" ) ))
 			pptr->label = allocate_string(vptr);
 		if (!( strcmp( nptr, "vlan" ) ))
@@ -230,6 +244,13 @@ private int pass_cords_network_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
 	if (( fptr->label )
 	&&  (strlen( fptr->label ) != 0)) {
 		if (!( pptr->label ))
@@ -258,6 +279,9 @@ private struct rest_response * cords_network_occi_response(
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.label=%s",optr->domain,optr->id,pptr->label);
@@ -675,6 +699,8 @@ public struct occi_category * occi_cords_network_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		optr->interface = &occi_cords_network_mt;
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "label",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "vlan",0,0) ))
@@ -706,6 +732,17 @@ public struct rest_header *  cords_network_occi_headers(struct cords_network * s
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"cords_network; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_network.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

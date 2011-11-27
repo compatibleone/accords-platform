@@ -5,7 +5,9 @@
 struct	cords_storage
 {
 	char * id;
+	char *	name;
 	char *	size;
+	char *	type;
 	int	state;
 };
 

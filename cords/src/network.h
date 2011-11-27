@@ -5,6 +5,7 @@
 struct	cords_network
 {
 	char *	id;
+	char *	name;
 	char *	label;
 	char *	vlan;
 	int	state;
