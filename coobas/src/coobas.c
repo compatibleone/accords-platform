@@ -221,6 +221,14 @@ private	int	coobas_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
+	if (!( optr = occi_cords_price_builder( CooBas.domain, "price" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
 	if (!( optr = occi_cords_invoice_builder( CooBas.domain, "invoice" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

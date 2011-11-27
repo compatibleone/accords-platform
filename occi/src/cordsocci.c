@@ -43,6 +43,7 @@
 #include "occiparameter.c"
 #include "occiplan.c"
 #include "occiprofile.c"
+#include "occiprice.c"
 #include "occimanifest.c"
 #include "occirequirement.c"
 #include "occisecurity.c"

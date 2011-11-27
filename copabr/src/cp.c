@@ -1225,7 +1225,21 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 /*	---------------------------------------------------	*/
 private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char * tls )
 {
-	return(0);
+	int	status;
+	struct	xml_atribut * aptr;
+
+	if ((status = cords_instance_identifier( dptr, _CORDS_SYSTEM )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_SYSTEM ));
+
+	else if ((status = cords_append_links(dptr,_CORDS_PACKAGE,agent,tls)) != 0)
+		return(cords_append_error(dptr,status,"linkage failure"));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating category"));
+
+	else	return(0);
 }
 
 /*	-----------------------------------------------------------------	*/

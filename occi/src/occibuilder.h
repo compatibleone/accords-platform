@@ -30,6 +30,7 @@ public struct occi_category * occi_cords_network_builder(char *a,char * b);
 public struct occi_category * occi_cords_package_builder(char *a,char * b);
 public struct occi_category * occi_cords_profile_builder(char *a,char * b);
 public struct occi_category * occi_cords_plan_builder(char *a,char * b);
+public struct occi_category * occi_cords_price_builder(char *a,char * b);
 public struct occi_category * occi_cords_manifest_builder(char *a,char * b);
 public struct occi_category * occi_cords_requirement_builder(char *a,char * b);
 public struct occi_category * occi_cords_security_builder(char *a,char * b);
