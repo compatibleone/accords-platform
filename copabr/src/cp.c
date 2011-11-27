@@ -1221,6 +1221,36 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 }
 
 /*	---------------------------------------------------	*/
+/*	      c o r d s _ t e r m i n a t e _ i m a g e		*/
+/*	---------------------------------------------------	*/
+private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char * tls )
+{
+	return(0);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	      c o r d s _ t e r m i n a t e _ i n f r a s t r u c t u r e	*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_terminate_infrastructure( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+
+	if ((status = cords_instance_identifier( dptr, _CORDS_COMPUTE )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_COMPUTE));
+	else if ((status = cords_instance_identifier( dptr, _CORDS_STORAGE )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_STORAGE));
+	else if ((status = cords_instance_identifier( dptr, _CORDS_NETWORK )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_NETWORK));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating category"));
+	else	return(0);
+}
+
+
+/*	---------------------------------------------------	*/
 /*	      c o r d s _ t e r m i n a t e _ n o d e 		*/
 /*	---------------------------------------------------	*/
 private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char * tls )
@@ -1337,6 +1367,10 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 		return( cords_terminate_contract( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_NODE ) ))
 		return( cords_terminate_node( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_INFRASTRUCTURE ) ))
+		return( cords_terminate_infrastructure( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_IMAGE ) ))
+		return( cords_terminate_image( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_CONFIGURATION ) ))
 		return( cords_terminate_configuration( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_ACCOUNT ) ))

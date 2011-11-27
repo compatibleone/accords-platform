@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _compute_c_
 #define _compute_c_
 
@@ -113,7 +120,7 @@ private struct occi_kind_node * add_cords_compute_node(int mode) {
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
 private char*autosave_cords_compute_name="cords_compute.xml";
-private void autoload_cords_compute_cores() {
+private void autoload_cords_compute_nodes() {
 	char * fn=autosave_cords_compute_name;	struct occi_kind_node * nptr;
 	struct cords_compute * pptr;
 	struct xml_element * document;
@@ -130,6 +137,8 @@ private void autoload_cords_compute_cores() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "architecture" )) != (struct xml_atribut *) 0)
 				pptr->architecture = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "cores" )) != (struct xml_atribut *) 0)
@@ -154,7 +163,7 @@ private void autoload_cords_compute_cores() {
 public  void set_autosave_cords_compute_name(char * fn) {
 	autosave_cords_compute_name = fn;	return;
 }
-public  void autosave_cords_compute_cores() {
+public  void autosave_cords_compute_nodes() {
 	char * fn=autosave_cords_compute_name;	struct occi_kind_node * nptr;
 	struct cords_compute * pptr;
 	FILE * h;
@@ -168,6 +177,9 @@ public  void autosave_cords_compute_cores() {
 		fprintf(h,"<cords_compute\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," architecture=%c",0x0022);
 		fprintf(h,"%s",(pptr->architecture?pptr->architecture:""));
@@ -208,6 +220,8 @@ private void set_cords_compute_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "architecture" ) ))
 			pptr->architecture = allocate_string(vptr);
 		if (!( strcmp( nptr, "cores" ) ))
@@ -249,6 +263,13 @@ private int pass_cords_compute_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
+			return(0);
+		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
 	if (( fptr->architecture )
@@ -302,6 +323,9 @@ private struct rest_response * cords_compute_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.architecture=%s",optr->domain,optr->id,pptr->architecture);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -344,7 +368,7 @@ private struct rest_response * cords_compute_get_item(
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_cords_compute_cores();
+	autosave_cords_compute_nodes();
 	return( cords_compute_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
@@ -435,7 +459,7 @@ private struct rest_response * cords_compute_post_item(
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_compute_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_cords_compute_cores();
+	autosave_cords_compute_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -463,7 +487,7 @@ private struct rest_response * cords_compute_put_item(
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_compute_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_cords_compute_cores();
+	autosave_cords_compute_nodes();
 	return( cords_compute_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
@@ -500,7 +524,7 @@ private struct rest_response * cords_compute_delete_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
 	drop_cords_compute_node( nptr );
-	autosave_cords_compute_cores();
+	autosave_cords_compute_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -568,7 +592,7 @@ private struct rest_response * cords_compute_delete_all(
 			nptr = sptr;
 			}
 		}
-	autosave_cords_compute_cores();
+	autosave_cords_compute_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -726,6 +750,8 @@ public struct occi_category * occi_cords_compute_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		optr->interface = &occi_cords_compute_mt;
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "architecture",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "cores",0,0) ))
@@ -738,7 +764,7 @@ public struct occi_category * occi_cords_compute_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_cords_compute_cores();
+		autoload_cords_compute_nodes();
 		return(optr);
 	}
 
@@ -763,6 +789,17 @@ public struct rest_header *  cords_compute_occi_headers(struct cords_compute * s
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"cords_compute; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_compute.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

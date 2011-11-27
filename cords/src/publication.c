@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _publication_c_
 #define _publication_c_
 
@@ -43,6 +50,12 @@ public struct publication * liberate_publication(struct publication * sptr)
 			 sptr->identity = liberate(sptr->identity);
 		if ( sptr->zone )
 			 sptr->zone = liberate(sptr->zone);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->rating )
+			 sptr->rating = liberate(sptr->rating);
+		if ( sptr->operator )
+			 sptr->operator = liberate(sptr->operator);
 		sptr = liberate( sptr );
 	}
 	return((struct publication *) 0);
@@ -68,6 +81,9 @@ public struct publication * reset_publication(struct publication * sptr)
 		sptr->pass = (char*) 0;
 		sptr->identity = (char*) 0;
 		sptr->zone = (char*) 0;
+		sptr->price = (char*) 0;
+		sptr->rating = (char*) 0;
+		sptr->operator = (char*) 0;
 		sptr->pid =  0;
 		sptr->state =  0;
 	}
@@ -136,6 +152,18 @@ public int xmlin_publication(struct publication * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->zone = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"price") ))
+		{
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"rating") ))
+		{
+			if ( wptr->value ) { sptr->rating = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"operator") ))
+		{
+			if ( wptr->value ) { sptr->operator = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"pid") ))
 		{
 			if ( wptr->value ) { sptr->pid = atoi(wptr->value); }
@@ -168,6 +196,9 @@ public int rest_occi_publication(FILE * fh,struct publication * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.pass='%s'\r\n",prefix,nptr,(sptr->pass?sptr->pass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.rating='%s'\r\n",prefix,nptr,(sptr->rating?sptr->rating:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.pid='%u'\r\n",prefix,nptr,sptr->pid);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

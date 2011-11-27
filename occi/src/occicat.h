@@ -16,6 +16,8 @@ struct	occi_category
 	char			* title;
 	char 			* rel;
 	char			* location;
+	char 			* price;
+	char 			* rating;
 	int			  access;
 	void			* interface;
 	void			* callback;

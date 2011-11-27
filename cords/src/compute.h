@@ -4,6 +4,7 @@
 struct	cords_compute
 {
 	char *	id;
+	char *	name;
 	char *	architecture;
 	char *	cores;
 	char *	speed;

@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _compute_c_
 #define _compute_c_
 
@@ -29,6 +36,8 @@ public struct cords_compute * liberate_cords_compute(struct cords_compute * sptr
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
 		if ( sptr->architecture )
 			 sptr->architecture = liberate(sptr->architecture);
 		if ( sptr->cores )
@@ -53,6 +62,7 @@ public struct cords_compute * reset_cords_compute(struct cords_compute * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
 		sptr->architecture = (char*) 0;
 		sptr->cores = (char*) 0;
 		sptr->speed = (char*) 0;
@@ -88,6 +98,10 @@ public int xmlin_cords_compute(struct cords_compute * sptr,struct xml_element * 
 		if (!( strcmp(wptr->name,"id") ))
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"architecture") ))
 		{
@@ -128,6 +142,7 @@ public int rest_occi_cords_compute(FILE * fh,struct cords_compute * sptr,char * 
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.architecture='%s'\r\n",prefix,nptr,(sptr->architecture?sptr->architecture:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.cores='%s'\r\n",prefix,nptr,(sptr->cores?sptr->cores:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.speed='%s'\r\n",prefix,nptr,(sptr->speed?sptr->speed:""));

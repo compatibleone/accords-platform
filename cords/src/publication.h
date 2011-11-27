@@ -15,6 +15,9 @@ struct	publication
 	char *	pass;
 	char * 	identity;
 	char *  zone;
+	char *	price;
+	char *	rating;
+	char *	operator;
 	int	pid;
 	int	state;
 };
