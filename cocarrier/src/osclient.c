@@ -18,7 +18,8 @@
 
 #include "osclient.h"
 
-private	int	hack=0;
+private	int	hack=0;			/* forces the use of the EUCA scripts		*/
+private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
 private	struct os_config Os = {
 	(char *) 0,
@@ -690,7 +691,7 @@ public	char * os_create_server_request(
 		/* ---------------------------- */
 		/* generate personality section */
 		/* ---------------------------- */
-		if (( personality ) && ( resource ))
+		if (( personality ) && ( resource ) && ( use_personality_file ))
 		{
 			if (( strlen( personality ) )
 			&&  ( EncodeBase64( eptr, personality, strlen(personality) ) > 0 ))
