@@ -1,18 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_comons_c
 #define	_comons_c
 
@@ -25,13 +31,15 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
-struct	broker_configuration Comons = {
-	0,
-	0,
+struct	accords_configuration Comons = {
+	0,0,
 	0,0,0,
 	(char *) 0,
-	(char *) 0, (char *) 0,
-	"admin", "admin",
+	(char *) 0,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_DEFAULT_OPERATOR,
+	_CORDS_DEFAULT_USER,
+	_CORDS_DEFAULT_PASSWORD,
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
@@ -42,7 +50,8 @@ struct	broker_configuration Comons = {
 
 public	int	check_debug()		{	return(Comons.debug);		}
 public	int	check_verbose()		{	return(Comons.verbose);		}
-public	char *	default_publisher()	{	return(Comons.publisher);		}
+public	char *	default_publisher()	{	return(Comons.publisher);	}
+public	char *	default_operator()	{	return(Comons.operator);	}
 public	char *	default_tls()		{	return(Comons.tls);		}
 
 public	int	failure( int e, char * m1, char * m2 )
@@ -60,67 +69,14 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		c o m o n s _ l o a d 		*/
+/*	 	   c o m o n s _ l o a d 		*/
 /*	---------------------------------------------	*/
 /*	this function loads comons  configuration	*/
 /*	from the xml configuration file.		*/
 /*	---------------------------------------------	*/  
 private	void	comons_load()
 {
-	struct	xml_element * document;
-	struct	xml_element * eptr;
-	struct	xml_element * vptr;
-	struct	xml_atribut * aptr;
-	set_xml_echo(Comons.debug);
-	if (( document = document_parse_file( Comons.config )) != (struct xml_element *) 0)
-	{
-		if ( Comons.verbose )
-			printf("   Comons loading configuration from : %s \n",Comons.config);
-
-		if (( eptr = document_element( document, "comons" )) != (struct xml_element *) 0)
-		{
-			if ((aptr = document_atribut( eptr, "identity" )) != (struct xml_atribut *) 0)
-				Comons.identity = document_atribut_string( aptr );
-			if ((aptr = document_atribut( eptr, "publisher")) != (struct xml_atribut *) 0)
-				Comons.publisher = document_atribut_string( aptr );
-			if ((aptr = document_atribut( eptr, "verbose")) != (struct xml_atribut *) 0)
-				Comons.verbose = document_atribut_value( aptr );
-			if ((aptr = document_atribut( eptr, "debug")) != (struct xml_atribut *) 0)
-				Comons.debug = document_atribut_value( aptr );
-			if ((aptr = document_atribut( eptr, "threads")) != (struct xml_atribut *) 0)
-				Comons.threads = document_atribut_value( aptr );
-
-			if (( vptr = document_element( eptr, "rest" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
-					Comons.resthost = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
-					Comons.restport = document_atribut_value( aptr );
-			}
-			if (( vptr = document_element( eptr, "security" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "user" )) != (struct xml_atribut *) 0)
-					Comons.user = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "password"))  != (struct xml_atribut *) 0)
-					Comons.password = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
-					if ((Comons.tls = document_atribut_string( aptr )) != 0)
-						if (!( strlen(Comons.tls) ))
-							Comons.tls = (char *) 0;
-				if ((aptr = document_atribut( eptr, "monitor")) != (struct xml_atribut *) 0)
-					Comons.monitor = document_atribut_value( aptr );
-			}
-			if (( vptr = document_element( eptr, "domain" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
-					Comons.domain = document_atribut_string( aptr );
-			}
-		}
-		document = document_drop( document );
-	}
-	else if ( Comons.verbose )
-		printf("   Comons failed to load configuration from : %s \n",Comons.config);
-	set_xml_echo(0);
+	load_accords_configuration( &Comons, "comon" );
 	return;
 }
 
@@ -128,23 +84,11 @@ private	void	comons_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.02");
-	printf("\n   Beta Version : 26/10/2011");
+	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.03");
+	printf("\n   Beta Version : 28/11/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
 	printf("\n");
-	printf("\nOptions: ");
-	printf("\n   --debug                    activates debug messages");
-	printf("\n   --verbose                  activates info  messages");
-	printf("\n   --tls                      require transport layer security");
-	printf("\n   --threads                  activate thread handlers");
-	printf("\n   --resthost   <name>        specify rest server host name or address");
-	printf("\n   --restport   <number>      specify rest server port");
-	printf("\n   --chathost   <name>        specify chat server host name or address");
-	printf("\n   --chatport   <number>      specify chat server port");
-	printf("\n   --publisher  <name>        specify url of publisher");
-	printf("\n   --identity   <name>        specify url to publish  ");
-	printf("\n   --user       <name>        specify user log name   ");
-	printf("\n   --password   <value>       specify user password   ");
+	accords_configuration_options();
 	printf("\n\n");
 	return(0);
 
@@ -270,41 +214,9 @@ private	int	comons(int argc, char * argv[] )
 				Comons.debug = 0xFFFF;
 				continue;
 			case	'-'	:
-				if (!( strcmp( aptr, "auto" ) ))
-					Comons.autopub = 1;
-				else if (!( strcmp( aptr, "verbose" ) ))
-					Comons.verbose = 1;
-				else if (!( strcmp( aptr, "debug" ) ))
-					Comons.debug = 1;
-				else if (!( strcmp( aptr, "tls" ) ))
-					Comons.tls = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "config" ) ))
-				{
-					Comons.config = allocate_string( argv[++argi] );
-					comons_load();
-				}
-				else if (!( strcmp( aptr, "domain" ) ))
-					Comons.domain = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "publisher" ) ))
-					Comons.publisher = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "identity" ) ))
-					Comons.identity = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "user" ) ))
-					Comons.user = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "password" ) ))
-					Comons.password = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "resthost" ) ))
-					Comons.resthost = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "restport" ) ))
-					Comons.restport = atoi( argv[++argi] );
-				else if (!( strcmp( aptr, "chathost" ) ))
-					Comons.chathost = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "chatport" ) ))
-					Comons.chatport = atoi( argv[++argi] );
-				else if (!( strcmp( aptr, "threads" ) ))
-					Comons.threads = _REST_THREAD_WORKER;
-				else	break;
-				continue;
+				if (!( argi = accords_configuration_option( aptr, argi, argv )))
+					break;
+				else	continue;
 			}
 			status = 30;
 			break;

@@ -69,10 +69,11 @@ INCLUDE = -I$(PATHOCCI) -I$(PATHCORDS) -I$(PATHCOREST) -I$(PATHCOXML)
 .c.o:
 	gcc -c $(DEBUG) $(OPTIONS) $(INCLUDE) $*.c
 
+accords.o: accords.c accords.h
 occiclient.o: occiclient.c occic.c occim.c occiclient.h
 occiserver.o: occiserver.c 
 
-../lib/libcocci.so: occiserver.o occiclient.o $(LIBCOREST) $(LIBOCCI) $(LIBCORDS)
+../lib/libcocci.so: occiserver.o occiclient.o accords.o $(LIBCOREST) $(LIBOCCI) $(LIBCORDS)
 	gcc $(DEBUG) $(SHARED) -o $@ $?
 
 .PHONY: all clean install

@@ -49,6 +49,10 @@ public	char *	default_tls();
 
 #define	_CORDS_DEFAULT_PUBLISHER "http://publisher.compatibleone.fr:28001"
 #define	_DEFAULT_PUBLISHER default_publisher()
+#define	_CORDS_DEFAULT_OPERATOR	"accords"
+#define	_CORDS_DEFAULT_USER	"admin"
+#define	_CORDS_DEFAULT_PASSWORD	"admin"
+
 
 #define	_OCCI_PRIORITY		1	/* the service is to be offered first	*/
 #define	_OCCI_PRIVATE		2	/* the service is not to be published	*/
