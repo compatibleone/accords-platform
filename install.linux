@@ -122,51 +122,53 @@ echo "./run-comons& sleep 1;" >> co-start
 echo "echo starting accords accounting services" >> co-start
 echo "bin/coobas --config " $target " CO-BAS/1.0"     > ./run-coobas
 chmod ug+x ./run-coobas
+echo "./run-coobas& sleep 1;" >> co-start
 
 echo "echo starting accords networking services" >> co-start
 echo "bin/conets --config " $target " CO-NETS/1.0"    > ./run-conets
 chmod ug+x ./run-conets
 echo "./run-conets& sleep 1;" >> co-start
 
-echo "./run-coobas& sleep 1;" >> co-start
 echo "echo starting accords elasticity services" >> co-start
 echo "bin/coes --config " $target " CO-ES/1.0"        > ./run-coes
 chmod ug+x ./run-coes
-
 echo "./run-coes& sleep 1;" >> co-start
+
 echo "echo starting accords parser services" >> co-start
 echo "bin/parser --config " $target " CO-PARSER/1.0"  > ./run-parser
 chmod ug+x ./run-parser
-
 echo "./run-parser& sleep 1;" >> co-start
+
 echo "echo starting accords broker services" >> co-start
 echo "bin/broker --config " $target " CO-BROKER/1.0"  > ./run-broker
 chmod ug+x ./run-broker
-
 echo "./run-broker& sleep 1;" >> co-start
+
 echo "echo starting accords procci services" >> co-start
 echo "bin/procci --config " $target " CO-PROCCI/1.0"  > ./run-procci
 chmod ug+x ./run-procci
-
 echo "./run-procci& sleep 1;" >> co-start
+
 echo "echo starting accords open stack services" >> co-start
 echo "bin/osprocci --config " $target " CO-OSPROCCI/1.0"  > ./run-osprocci
 chmod ug+x ./run-osprocci
-
 echo "./run-osprocci& sleep 1;" >> co-start
+
 echo "echo starting accords open nebula services" >> co-start
 echo "bin/onprocci --config " $target " CO-ONPROCCI/1.0"  > ./run-onprocci
 chmod ug+x ./run-onprocci
-
 echo "./run-onprocci& sleep 1;" >> co-start
+
 echo "echo starting accords windows azure services" >> co-start
 echo "bin/azprocci --config " $target " CO-AZPROCCI/1.0"  > ./run-azprocci
 chmod ug+x ./run-azprocci
 echo "./run-azprocci& sleep 1;" >> co-start
-chmod ug+x co-start
 
 echo "echo ACCORDS ready" >> co-start
 echo "./co-status" >> co-start
+
+chmod ug+x co-start
+
 
 echo "# -------------------------------------" >> co-start
 echo "# end of compatibleone accords launcher" >> co-start
