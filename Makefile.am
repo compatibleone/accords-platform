@@ -27,11 +27,11 @@ endif
 if ENABLE_COCARRIER
 SUBDIRS += cocarrier
 endif
-if ENABLE_PUBOCCI
-SUBDIRS += pubocci
-endif
 if ENABLE_COPABR
 SUBDIRS += copabr
+endif
+if ENABLE_PUBOCCI
+SUBDIRS += pubocci
 endif
 if ENABLE_COSS
 SUBDIRS += coss

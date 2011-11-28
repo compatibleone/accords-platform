@@ -7,6 +7,9 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libcocarrier.la
+dist_data_DATA = dataelement.c dataelement.h \
+	eucahack.c azconfig.h \
+	onconfig.h osconfig.c osconfig.h
 
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     osclient.c osclient.h \

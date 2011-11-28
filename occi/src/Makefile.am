@@ -7,6 +7,22 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libocci.la
+dist_data_DATA = occiatb.h occienquiry.c occimachine.c occiparameter.c \
+	occiservice.c kindnode.c occiauthorise.c occievent.c occimanifest.c \
+	occipar.c occistorage.c kindnode.h occiazconfig.c occi.h \
+	occimixin.c occipar.h occisystem.c linknode.c occibuilder.h occihttp.c \
+	occimixin.h occiplan.c occitarif.c linknode.h occiimage.c \
+	occimonitor.c occiprice.c occithing.c occiaccount.c occicarrier.c \
+	occiinfrastructure.c occinetwork.c occiprofile.c occitransaction.c \
+	occiact.c occicat.c occiinstance.c occinode.c occiprovider.c occiuser.c \
+	occiact.h occicat.h occiinstruction.c occionconfig.c occipub.h occivalue.c \
+	occiaction.c occicompute.c occiinvoice.c occiopennebula.c occipublication.c \
+	occiwindowsazure.c occiagency.c occiconfiguration.c occiipaddress.c \
+	occiopenstack.c occireport.c occixlink.c occialgorithm.c occiconstraint.c \
+	occijson.c occioptimise.c occirequest.c occixml.c occiappliance.c \
+	occicontract.c occilink.c occiosconfig.c occirequirement.c \
+	occiatb.c occidomain.c occilink.h occipackage.c occisecurity.c
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
+libocci_la_LDLAGS = $(LD_COPABR)

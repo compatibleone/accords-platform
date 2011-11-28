@@ -44,9 +44,9 @@ AC_CHECK_SSL
 
 AC_CHECK_HEADERS_ONCE([uuid/uuid.h uuid.h],
                 [break],
-		[AC_MSG_ERROR([You're missing uuid development files])])
-AC_SUBST([CFLAGS_UUID], [`pkg-config --cflags uuid`])
-AC_SUBST([LDFLAGS_UUID], [`pkg-config --libs uuid`])
+		[AC_MSG_ERROR([You are missing uuid development files])])
+AC_SUBST([CFLAGS_UUID], ["`pkg-config --cflags uuid`"])
+AC_SUBST([LDFLAGS_UUID], ["`pkg-config --libs uuid`"])
 
 # Checks for pthread.
 AC_CHECK_HEADERS([pthread.h], [
@@ -69,7 +69,7 @@ AC_ARG_ENABLE([coxml],
       [enable_coxml=yes])
 AM_CONDITIONAL([ENABLE_COXML], [test "$enable_coxml" = "yes"])
 AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml/src])
-AC_SUBST([LD_COXML], ["-L\${abs_top_srcdir}/coxml/src -lcoxml"])
+AC_SUBST([LD_COXML], ["-L\${abs_top_builddir}/coxml/src -lcoxml"])
 
 AC_ARG_ENABLE([occi],
       [AS_HELP_STRING([--disable-occi],
@@ -78,7 +78,7 @@ AC_ARG_ENABLE([occi],
       [enable_occi=yes])
 AM_CONDITIONAL([ENABLE_OCCI], [test "$enable_occi" = "yes"])
 AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi/src])
-AC_SUBST([LD_OCCI], ["-L\${abs_top_srcdir}/occi/src -locci"])
+AC_SUBST([LD_OCCI], ["-L\${abs_top_builddir}/occi/src -locci"])
 
 AC_ARG_ENABLE([cords],
       [AS_HELP_STRING([--disable-cords],
@@ -87,7 +87,7 @@ AC_ARG_ENABLE([cords],
       [enable_cords=yes])
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
 AC_SUBST([CFLAGS_CORDS], [-I\${abs_top_srcdir}/cords/src])
-AC_SUBST([LD_CORDS], ["-L\${abs_top_srcdir}/cords/src -lcords"])
+AC_SUBST([LD_CORDS], ["-L\${abs_top_builddir}/cords/src -lcords"])
 
 AC_ARG_ENABLE([corest],
       [AS_HELP_STRING([--disable-corest],
@@ -96,7 +96,7 @@ AC_ARG_ENABLE([corest],
       [enable_corest=yes])
 AM_CONDITIONAL([ENABLE_COREST], [test "$enable_corest" = "yes"])
 AC_SUBST([CFLAGS_COREST], [-I\${abs_top_srcdir}/corest/src])
-AC_SUBST([LD_COREST], ["-L\${abs_top_srcdir}/corest/src -lcorest"])
+AC_SUBST([LD_COREST], ["-L\${abs_top_builddir}/corest/src -lcorest"])
 
 AC_ARG_ENABLE([cocci],
       [AS_HELP_STRING([--disable-cocci],
@@ -105,7 +105,7 @@ AC_ARG_ENABLE([cocci],
       [enable_cocci=yes])
 AM_CONDITIONAL([ENABLE_COCCI], [test "$enable_cocci" = "yes"])
 AC_SUBST([CFLAGS_COCCI], [-I\${abs_top_srcdir}/cocci/src])
-AC_SUBST([LD_COCCI], ["-L\${abs_top_srcdir}/cocci/src -lcocci"])
+AC_SUBST([LD_COCCI], ["-L\${abs_top_builddir}/cocci/src -lcocci"])
 
 AC_ARG_ENABLE([cocarrier],
       [AS_HELP_STRING([--disable-cocarrier],
@@ -114,16 +114,7 @@ AC_ARG_ENABLE([cocarrier],
       [enable_cocarrier=yes])
 AM_CONDITIONAL([ENABLE_COCARRIER], [test "$enable_cocarrier" = "yes"])
 AC_SUBST([CFLAGS_COCARRIER], [-I\${abs_top_srcdir}/cocarrier/src])
-AC_SUBST([LD_COCARRIER], ["-L\${abs_top_srcdir}/cocarrier/src -lcocarrier"])
-
-AC_ARG_ENABLE([pubocci],
-      [AS_HELP_STRING([--disable-pubocci],
-		      [Disable pubocci @<:@default=enable@:>@])],
-      [],
-      [enable_pubocci=yes])
-AM_CONDITIONAL([ENABLE_PUBOCCI], [test "$enable_pubocci" = "yes"])
-AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci/src])
-AC_SUBST([LD_PUBOCCI], ["-L\${abs_top_srcdir}/pubocci/src -lpubocci"])
+AC_SUBST([LD_COCARRIER], ["-L\${abs_top_builddir}/cocarrier/src -lcocarrier"])
 
 AC_ARG_ENABLE([copabr],
       [AS_HELP_STRING([--disable-copabr],
@@ -132,7 +123,16 @@ AC_ARG_ENABLE([copabr],
       [enable_copabr=yes])
 AM_CONDITIONAL([ENABLE_COPABR], [test "$enable_copabr" = "yes"])
 AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr/src])
-AC_SUBST([LD_COPABR], ["-L\${abs_top_srcdir}/copabr/src -lcopabr"])
+AC_SUBST([LD_COPABR], ["-L\${abs_top_builddir}/copabr/src -lcopabr"])
+
+AC_ARG_ENABLE([pubocci],
+      [AS_HELP_STRING([--disable-pubocci],
+		      [Disable pubocci @<:@default=enable@:>@])],
+      [],
+      [enable_pubocci=yes])
+AM_CONDITIONAL([ENABLE_PUBOCCI], [test "$enable_pubocci" = "yes"])
+AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci/src])
+AC_SUBST([LD_PUBOCCI], ["-L\${abs_top_builddir}/pubocci/src -lpubocci"])
 
 AC_ARG_ENABLE([coss],
       [AS_HELP_STRING([--disable-coss],
@@ -283,8 +283,8 @@ AC_CONFIG_FILES([cords/Makefile cords/src/Makefile])
 AC_CONFIG_FILES([corest/Makefile corest/src/Makefile])
 AC_CONFIG_FILES([cocci/Makefile cocci/src/Makefile])
 AC_CONFIG_FILES([cocarrier/Makefile cocarrier/src/Makefile])
-AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
+AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
 AC_CONFIG_FILES([coes/Makefile coes/src/Makefile])
 AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])

@@ -8,6 +8,7 @@
 #
 
 bin_PROGRAMS = coss
+dist_data_DATA = accountuser.c
 
 coss_SOURCES = coss.c
 coss_LDFLAGS = $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LD_PUBOCCI)

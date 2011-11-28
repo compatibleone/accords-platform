@@ -7,7 +7,12 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libcoxml.la
+dist_data_DATA = standard.h types.h
 
 AM_CPPFLAGS = -DUNIX -Dunix
 
-libcoxml_la_SOURCES = html.c document.c element.c xmlparse.c allocate.c
+libcoxml_la_SOURCES = html.c \
+                      document.c document.h \
+                      element.c element.h \ 
+                      xmlparse.c xmlparse.h \
+                      allocate.c allocate.h
