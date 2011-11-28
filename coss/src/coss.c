@@ -156,6 +156,7 @@ private	int	coss_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = account_user_builder( Coss.domain, "user" ) ))
 		return( 27 );
@@ -164,6 +165,7 @@ private	int	coss_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_authorisation_builder( Coss.domain, "authorisation" ) ))
 		return( 27 );
@@ -172,6 +174,7 @@ private	int	coss_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	rest_initialise_log(Coss.monitor);
 

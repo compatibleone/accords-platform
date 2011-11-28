@@ -59,6 +59,7 @@ public	char *	default_tls();
 #define	_OCCI_SECRET 		4	/* the will not appear in categories 	*/
 #define	_OCCI_AUTO_PUBLISH 	8	/* the service will be auto un/publish	*/
 #define	_OCCI_SECURE 		16	/* each access must be secure		*/
+#define	_OCCI_PRICING		32	/* inhibit category pricing 		*/
 
 #define	_OCCI_IDLE		0	/* the resource is idle			*/
 #define	_OCCI_ACTIVE		1	/* the resource is active		*/

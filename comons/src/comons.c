@@ -157,6 +157,7 @@ private	int	comons_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_event_builder( Comons.domain, "event" ) ))
 		return( 27 );
@@ -165,6 +166,7 @@ private	int	comons_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_report_builder( Comons.domain, "report" ) ))
 		return( 27 );
@@ -173,6 +175,7 @@ private	int	comons_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	rest_initialise_log(Comons.monitor);
 

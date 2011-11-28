@@ -618,6 +618,7 @@ private	int	publisher_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &publication_interface;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_add_action( optr,"suspend","",suspend_publication)))
 		return( 27 );
@@ -631,6 +632,7 @@ private	int	publisher_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &enquiry_interface;
+	optr->access |= _OCCI_PRICING;
 
 
 	if (!( optr = occi_agency_builder( Publisher.domain, "agency" ) ))
@@ -640,7 +642,8 @@ private	int	publisher_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &agency_interface;
-
+	optr->access |= _OCCI_PRICING;
+	
 	if (!( optr = occi_add_action( optr,"start","",start_agency)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,"stop","",stop_agency)))

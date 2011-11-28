@@ -235,9 +235,18 @@ public	int	publish_occi_category(
 	/* resolve an eventual price for the provision of instances of the category */
 	/* ------------------------------------------------------------------------ */
 	if (!( category->price ))
-		if (!( category->price = occi_resolve_category_price( category->id, url, agent, Publisher.tls ) ))
+	{
+		if ( category->access & _OCCI_PRICING )
+		{
 			if (!( category->price = allocate_string("") ))
 				return(27);
+		}
+		else if (!( category->price = occi_resolve_category_price( category->id, url, agent, Publisher.tls ) ))
+		{	
+			if (!( category->price = allocate_string("") ))
+				return(27);
+		}
+	}
 
 	/* ------------------------------------- */
 	/* generate a user identification string */

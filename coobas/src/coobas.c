@@ -155,6 +155,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_transaction_builder( CooBas.domain, "transaction" ) ))
 		return( 27 );
@@ -163,6 +164,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_price_builder( CooBas.domain, "price" ) ))
 		return( 27 );
@@ -171,6 +173,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_invoice_builder( CooBas.domain, "invoice" ) ))
 		return( 27 );
@@ -179,6 +182,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_PRICING;
 
 	rest_initialise_log(CooBas.monitor );
 

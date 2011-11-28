@@ -119,14 +119,14 @@ echo "bin/comons --config " $target " CO-MONS/1.0"    > ./run-comons
 chmod ug+x ./run-comons
 echo "./run-comons& sleep 1;" >> co-start
 
+echo "echo starting accords accounting services" >> co-start
+echo "bin/coobas --config " $target " CO-BAS/1.0"     > ./run-coobas
+chmod ug+x ./run-coobas
+
 echo "echo starting accords networking services" >> co-start
 echo "bin/conets --config " $target " CO-NETS/1.0"    > ./run-conets
 chmod ug+x ./run-conets
 echo "./run-conets& sleep 1;" >> co-start
-
-echo "echo starting accords accounting services" >> co-start
-echo "bin/coobas --config " $target " CO-BAS/1.0"     > ./run-coobas
-chmod ug+x ./run-coobas
 
 echo "./run-coobas& sleep 1;" >> co-start
 echo "echo starting accords elasticity services" >> co-start
@@ -190,9 +190,9 @@ echo "killall parser" >> co-stop
 echo "sleep 1" >> co-stop
 echo "killall coes" >> co-stop
 echo "sleep 1" >> co-stop
-echo "killall coobas" >> co-stop
-echo "sleep 1" >> co-stop
 echo "killall conets" >> co-stop
+echo "sleep 1" >> co-stop
+echo "killall coobas" >> co-stop
 echo "sleep 1" >> co-stop
 echo "killall comons" >> co-stop
 echo "sleep 1" >> co-stop
