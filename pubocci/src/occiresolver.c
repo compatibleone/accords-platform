@@ -18,6 +18,7 @@
 #define	_occiresolver_c
 
 #include "occiresolver.h"
+#include "cp.h"
 
 private	struct	occi_publisher Resolver = {
 	(char *) 0,
@@ -368,14 +369,14 @@ public	char *	occi_resolve_category_provider( char * category, char * agent, cha
 	struct	occi_element  * eptr;
 	char *	hptr;
 
-	/* ------------------------------------------------------ */
-	/* attempt to resolve agencys of the "provider" category */
-	/* ------------------------------------------------------ */
+	/* ---------------------------------------------------- */
+	/* attempt to resolve agency of the "provider" category */
+	/* ---------------------------------------------------- */
 	if (!( zptr = occi_resolver( category, agent ) ))
 		return((char *) 0);
 
 	/* ------------------------------------------------------ */
-	/*  scan the list to find their list of providers offered  */
+	/*  scan the list to find their list of providers offered */
 	/* ------------------------------------------------------ */
 	for (	eptr = zptr->first;
 		eptr != (struct occi_element*) 0;
@@ -404,6 +405,247 @@ public	char *	occi_resolve_category_provider( char * category, char * agent, cha
 	}
 }
 
+
+/*	---------------------------------------------------------	*/
+/*			o c c i _ p r i c i n g  			*/
+/*	---------------------------------------------------------	*/
+/*	takes a category id/name or other naming string and sends	*/
+/*	an equiry to the publication service manager to retrieve	*/
+/*	list of current potential candidate targets.			*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_pricing( char * category, char * agent )
+{
+	struct	occi_resolved_agency *pptr=(struct occi_resolved_agency*) 0;
+	struct	occi_element 	*	tptr=(struct occi_element*) 0;
+	struct	occi_element 	*	eptr=(struct occi_element*) 0;
+	struct	occi_element 	*	eeptr=(struct occi_element*) 0;
+	struct	occi_client  	*	cptr=(struct occi_client*) 0;
+	struct	occi_client  	*	ccptr=(struct occi_client*) 0;
+	struct	occi_request	*	rptr=(struct occi_request*) 0;
+	struct	occi_request	*	rrptr=(struct occi_request*) 0;
+	struct	occi_response	*	aptr=(struct occi_response*) 0;
+	struct	occi_response	*	zptr=(struct occi_response*) 0;
+	struct	occi_response	*	aaptr=(struct occi_response*) 0;
+	char			*	vptr;
+	char				buffer[4096];
+
+	if ( check_debug() )
+		printf("   OCCI Pricing( %s, %s )\n",category,agent);
+
+	if ( occi_resolver_default() != 0 )
+		return((struct occi_response * )0);
+
+	else if (!( cptr = occi_create_client( Resolver.uri, agent, Resolver.tls ) ))
+		return((struct occi_response * )0);
+
+	else if (!(rptr = occi_create_request( cptr, Resolver.publication, _OCCI_NORMAL )))
+	{
+		cptr = occi_remove_client( cptr );
+		return((struct occi_response * )0);
+	}
+	else if ((!( eptr = occi_request_element( rptr, "occi.publication.where",Resolver.room	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category 	))))
+	{
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return((struct occi_response * )0);
+	}
+	else if (!( aptr = occi_client_get( cptr, rptr ) ))
+	{
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return((struct occi_response * )0);
+	}
+	else if (!( zptr = allocate_occi_response() ))
+	{
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return((struct occi_response * )0);
+	}
+	else
+	{
+		/* scan the list of responses and retrieve provide addresses */
+		/* --------------------------------------------------------- */
+		for (	eptr = aptr->first;
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
+		{
+			if (!( vptr = eptr->name ))
+				continue;
+			else if ( strcmp(vptr, Resolver.publication ) != 0 )
+				continue;
+			else if (!( vptr = occi_category_id( eptr->value ) ))
+				continue;
+			if ( ResManager.optimised )
+			{
+				if (!( pptr = occi_add_resolved_agency( category, vptr ) ))
+				{
+					liberate( vptr );
+					continue;
+				}
+				else if (( pptr->host != (char *) 0 )	
+				     &&  ( pptr->ttl > time((long *) 0) ))
+				{
+					liberate( vptr );
+					if (!( eeptr = occi_response_element( zptr, category, pptr->host ) ))
+						break;
+					else	continue;
+				}
+			}
+			sprintf(buffer,"%s%s",Resolver.uri,vptr);
+			liberate( vptr );
+
+			if (!( ccptr = occi_redirect_client( cptr, buffer ) ))
+				break;
+			else if (!(rrptr = occi_create_request( cptr, Resolver.publication, _OCCI_NORMAL)))
+				break;
+			else if (!( aaptr = occi_client_get( cptr, rptr ) ))
+			{
+				rrptr = occi_remove_request( rrptr );
+				break;
+			}
+			else if (!( tptr = occi_locate_element( aaptr->first, "occi.publication.why" ) ))
+			{
+				aaptr = occi_remove_response( aaptr );
+				rrptr = occi_remove_request( rrptr );
+				continue;
+			}
+			if ( ResManager.optimised )
+			{
+				if (!( pptr->host = allocate_string( tptr->value ) ))
+				{
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					break;
+				}
+				else if (!( eeptr = occi_response_element( zptr, category, pptr->host ) ))
+				{
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					break;
+				}
+				else
+				{
+					pptr->ttl = ( time((long *) 0) + ResManager.ttl );
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					continue;
+				}
+			}
+			else
+			{
+				if (!( tptr->value ))
+				{
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					break;
+				}
+				else if (!( eeptr = occi_response_element( zptr, category, tptr->value ) ))
+				{
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					break;
+				}
+				else
+				{
+					aaptr = occi_remove_response( aaptr );
+					rrptr = occi_remove_request( rrptr );
+					continue;
+				}
+			}
+
+		}
+		aptr = occi_remove_response( aptr );
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return(zptr);
+	}
+}
+
+/*	-------------------------------------------------------------		*/
+/*	    o c c i _ r e s o l v e _ c a t e g o r y _ p r i c e 		*/
+/*	-------------------------------------------------------------		*/
+public	char *	occi_resolve_category_price( char * category, char * operator, char * agent, char * tls )
+{
+	struct	occi_response 	* aptr;
+	struct	occi_element  	* eptr;
+	char 			* host=(char *) 0;
+	struct	occi_client	* cptr;
+	struct	occi_request	* rptr;
+	struct	occi_response 	* zptr;
+	struct	occi_element  	* fptr;
+	char 			* result=(char *) 0;
+
+	if (!( aptr = cords_retrieve_named_instance_list( _CORDS_PRICE, "occi.price.name", category, agent, tls ) ))
+		return( (char *) 0 );
+
+	for (	eptr = aptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		/* ------------------------------------- */
+		/* ensure valid element list information */
+		/* ------------------------------------- */
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+
+		/* ------------------------------------- */
+		/* build the price category instance ID  */
+		/* ------------------------------------- */
+		else if (!( host = cords_build_host( aptr, eptr->value) ))
+			continue;
+
+		/* ------------------------------------- */
+		/* a null or wild operator selects this  */
+		/* ------------------------------------- */
+		else if (!( operator ))
+			return( host );
+		else if ( *operator == '*' )
+			return( host );
+
+		/* ------------------------------------- */
+		/* attempt to locate the category price  */
+		/* ------------------------------------- */
+		else if (!( cptr = occi_create_client( host, agent, tls ) ))
+			continue;
+		else if (!( rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+			continue;
+		else if (!( zptr = occi_client_get( cptr, rptr ) ))
+			continue;
+		else
+		{
+			/* ------------------------------------------------- */
+			/* scan the list of elements and verify the password */
+			/* ------------------------------------------------- */
+			for (	fptr = zptr->first;
+				fptr != (struct occi_element *) 0;
+				fptr = fptr->next )
+			{
+				if (!( fptr->name ))
+					continue;
+				else if ( strcmp( fptr->name, "occi.price.operator"  ) )
+					continue;
+				else
+				{
+					if (!( strcmp( fptr->value, operator) ))
+						result = allocate_string( host );
+					break;
+				}
+			}
+			zptr = occi_remove_response( zptr );
+			rptr = occi_remove_request( rptr );
+			cptr = occi_remove_client( cptr );
+			host = liberate( host );
+			if ( result ) break;
+		}
+
+	}
+	aptr = occi_remove_response( aptr );
+	return( result );
+}
 
 
 	/* --------------- */

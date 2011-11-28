@@ -37,7 +37,22 @@ private	struct	occi_publisher Publisher = {
 	};
 
 /*	---------------------------------------------------------	*/
+/*		d e f a u l t _ o p e r a t o r				*/
+/*	---------------------------------------------------------	*/
+/*	this is a temporary measure and will be provided by the		*/
+/*	configuration of a service provider module.			*/
+/*	---------------------------------------------------------	*/
+private	char *	default_operator()
+{
+	return("accords");
+}
+
+/*	---------------------------------------------------------	*/
 /*	     o c c i _ l o c a t e _ p u b l i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+/*	this function attempts to locate a publication record for	*/
+/*	use by the unpublish operation. These records are created	*/
+/*	during the publication of categories phase.			*/
 /*	---------------------------------------------------------	*/
 private	struct	occi_publication * occi_locate_publication( struct occi_category * cptr )
 {
@@ -215,11 +230,30 @@ public	int	publish_occi_category(
 	struct	occi_publication * pptr;
 	char 	*	uri;
 	char	username[256];
+	
+	/* ------------------------------------------------------------------------ */
+	/* resolve an eventual price for the provision of instances of the category */
+	/* ------------------------------------------------------------------------ */
+	if (!( category->price ))
+		if (!( category->price = occi_resolve_category_price( category->id, url, agent, Publisher.tls ) ))
+			if (!( category->price = allocate_string("") ))
+				return(27);
+
+	/* ------------------------------------- */
+	/* generate a user identification string */
+	/* ------------------------------------- */
 	sprintf(username,"%s%u",user,item);
+
+	/* --------------------------------------- */
+	/* create the provider uri for publication */
+	/* --------------------------------------- */
 	if (!( uri = allocate( strlen( Publisher.host ) + strlen( Publisher.publication ) + 16 ) ))
 		return( 27 );
 	else	sprintf(uri,"%s/%s/",Publisher.host,Publisher.publication);
 
+	/* -------------------------------------------------------------- */
+	/* create an OCCI client request with the appropriate information */
+	/* -------------------------------------------------------------- */
 	if (!( cptr = occi_create_client( uri, agent, Publisher.tls ) ))
 	{
 		liberate( uri );	
@@ -235,6 +269,8 @@ public	int	publish_occi_category(
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.pass",password 	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",Publisher.room	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category->id 	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.operator",default_operator() )))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.price",category->price)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.why",url 		))))
 	{
 		liberate( uri );	
@@ -242,6 +278,9 @@ public	int	publish_occi_category(
 		cptr = occi_remove_client( cptr );
 		return( 27 );
 	}
+	/* ----------------------------------------------------------- */
+	/* issue the publication POST request to the Accords Publisher */
+	/* ----------------------------------------------------------- */
 	else if (!( aptr = occi_client_post( cptr, rptr ) )) 
 	{
 		liberate( uri );	
@@ -262,6 +301,10 @@ public	int	publish_occi_category(
 		cptr = occi_remove_client( cptr );
 		return( 27 );
 	}
+
+	/* -------------------------------------------------------------- */
+	/* store the publication record for removal at shutdown of server */
+	/* -------------------------------------------------------------- */
 	else if ((!( pptr = add_occi_publication( &Publisher ) ))
 	     ||  (!( pptr->category = allocate_string( category->id ) )))
 	{

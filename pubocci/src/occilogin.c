@@ -18,13 +18,16 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 	struct	occi_response * uptr;
 	char *	tptr=(char *) 0;
 	char *	vptr=(char *) 0;
-	char *	category = "authorisation";
-	if (!( yptr = cords_retrieve_named_instance_list( "user", "occi.user.name", user, agent,tls ) ))
+	char *	category = _CORDS_AUTHORISATION;
+	if (!( yptr = cords_retrieve_named_instance_list( _CORDS_USER, "occi.user.name", user, agent,tls ) ))
 		return( (char *) 0 );
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent,tls )))
 		return( (char *) 0 );
 	else
 	{
+		/* ------------------------------------------------- */
+		/* scan the list of elements and verify the password */
+		/* ------------------------------------------------- */
 		for (	eptr = uptr->first;
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
@@ -40,6 +43,9 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 			uptr = occi_remove_response( uptr );
 			return((char *) 0);
 		}
+		/* ----------------------------------------------- */
+		/* create authorization for the authenticated user */
+		/* ----------------------------------------------- */
 		sprintf(buffer,"%s%s",uptr->host,uptr->name);
 		if (!( header = occi_create_element( "occi.authorisation.user", buffer ) ))
 		{
@@ -79,7 +85,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 public	char  *	logout_occi_user( char * user,	char * password, char * agent, char * token, char * tls )
 {
 	struct	occi_client * cptr;
-	char *	category = "authorisation";
+	char *	category = _CORDS_AUTHORISATION;
 
 	if ( token )
 	{

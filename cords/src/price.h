@@ -6,6 +6,8 @@ struct	cords_price
 {
 	char	*	id;
 	char	*	name;
+	char 	*	operator;
+	char 	*	description;
 	char	*	currency;
 	char	*	fixed;
 	char	*	rate;

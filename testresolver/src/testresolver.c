@@ -20,6 +20,7 @@
 
 private	int	verbose=0;
 private	int	debug=0;
+private	int	price=0;
 private	char *	tls=(char *) 0;
 private	char *	publisher=_CORDS_DEFAULT_PUBLISHER;
 private	char *	agent="CO-TEST-RESOLVER";
@@ -43,6 +44,42 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+/*	------------------------------------------------------------	*/
+/*		 r e s o l v e r _ s h o w _ r e s p o n s e 		*/
+/*	------------------------------------------------------------	*/
+private	void	resolver_show_response( struct occi_response * rptr, char * agent )
+{
+	struct	occi_element * 	eptr;
+	char *			urlprice;
+	if ( rptr->response )
+	{
+		printf("   OCCI Client : %s %u %s \n",
+			rptr->response->version,
+			rptr->response->status,
+			rptr->response->message );
+	}
+	for (	eptr = rptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if (!( price ))
+			printf("   %s = %s \n",eptr->name,eptr->value );
+		else if (!( urlprice = occi_resolve_category_price( eptr->name, eptr->value, agent, tls ) ))
+			printf("   %s = %s \n",eptr->name,eptr->value );
+		else
+		{
+			printf("   %s = %s \n\t[ %s ] \n",eptr->name,eptr->value, urlprice );
+			urlprice = liberate( urlprice );
+		}
+	}
+	return;
+}
+
+
 
 private	int	test_resolver_operation( char * host, char * agent, char * object )
 {
@@ -64,7 +101,7 @@ private	int	test_resolver_operation( char * host, char * agent, char * object )
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 		if (( aptr = occi_resolver( object, agent )) != (struct occi_response *) 0)
 		{
-			occi_show_response( aptr );
+			resolver_show_response( aptr, agent );
 			aptr=occi_remove_response( aptr );
 		}
 	}
@@ -95,6 +132,8 @@ private	int	test_resolver_command( int argc, char * argv[] )
 				aptr++;
 				if (!( strcmp( aptr, "verbose" ) ))
 				{	verbose=1; continue;	}
+				if (!( strcmp( aptr, "price" ) ))
+				{	price=1; continue;	}
 				else if (!( strcmp( aptr, "debug" ) ))
 				{	debug=1; continue;	}
 				else if (!( strcmp( aptr, "publisher" ) ))

@@ -1320,7 +1320,11 @@ private	int	cords_terminate_account( struct xml_element * dptr, char * agent,cha
 /*	---------------------------------------------------	*/
 private	int	cords_terminate_security( struct xml_element * dptr, char * agent,char * tls )
 {
-	return(0);
+	int	status;
+	struct	xml_atribut * aptr;
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else	return( 0 );
 }
 
 /*	---------------------------------------------------	*/
@@ -1362,7 +1366,82 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 /*	---------------------------------------------------	*/
 private	int	cords_terminate_plan( struct xml_element * dptr, char * agent,char * tls )
 {
-	return(0);
+	int	status;
+	struct	xml_atribut * aptr;
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------	*/
+/*	 c o r d s _ t e r m i n a t e _ e x t e n s i o n	*/
+/*	---------------------------------------------------	*/
+/*	this function will provide the default behaviour of	*/
+/*	legal CORDS model extensions. 				*/
+/*	This currently requires the verification of the ID	*/
+/*	element which indicates that a service provider has	*/
+/*	been resolved for the processing of the element.	*/
+/*	---------------------------------------------------	*/
+private	int	cords_terminate_extension( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------	*/
+/*	     c o r d s _ t e r m i n a t e _ e l e m e n t	*/
+/*	---------------------------------------------------	*/
+/*	this function filters out the simple elements of 	*/
+/*	the cords model for no further processing and then	*/
+/*	applies a default and general algorithm approach to 	*/
+/*	the handling of eventual un foreseen extensions.	*/
+/*	---------------------------------------------------	*/
+public	int	cords_terminate_element( struct xml_element * dptr, char * agent,char * tls )
+{
+
+	/* ------------------------------ */
+	/* manifest element leaf elements */
+	/* ------------------------------ */
+	if (!( strcmp( dptr->name, _CORDS_DESCRIPTION ) ))
+		return( 0 );
+
+	/* ------------------------------------ */
+	/* infrastructure element leaf elements */
+	/* ------------------------------------ */
+	if (!( strcmp( dptr->name, _CORDS_COMPUTE ) ))
+		return( 0 );
+	else if (!( strcmp( dptr->name, _CORDS_NETWORK ) ))
+		return( 0 );
+	else if (!( strcmp( dptr->name, _CORDS_STORAGE ) ))
+		return( 0 );
+
+	/* --------------------------- */
+	/* image element leaf elements */
+	/* --------------------------- */
+	else if (!( strcmp( dptr->name, _CORDS_SYSTEM ) ))
+		return( 0 );
+	else if (!( strcmp( dptr->name, _CORDS_PACKAGE ) ))
+		return( 0 );
+
+	/* ----------------------------------- */
+	/* configuration element leaf elements */
+	/* ----------------------------------- */
+	else if (!( strcmp( dptr->name, _CORDS_ACTION ) ))
+		return( 0 );
+
+	/* ----------------------------- */
+	/* account element leaf elements */
+	/* ----------------------------- */
+	else if (!( strcmp( dptr->name, _CORDS_USER ) ))
+		return( 0 );
+
+	/* ------------------------------------ */
+	/* legal extension elements termination */
+	/* ------------------------------------ */
+	else 	return( cords_terminate_extension( dptr, agent, tls ) );
 }
 
 /*	---------------------------------------------------	*/
@@ -1373,6 +1452,13 @@ private	int	cords_terminate_plan( struct xml_element * dptr, char * agent,char *
 /*	---------------------------------------------------	*/
 public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char * tls )
 {
+	if ( check_debug() )
+	{
+		if ( dptr )
+			if ( dptr->name )
+				printf("terminate level( %s )\n",dptr->name);
+	}
+
 	if (!( strcmp( dptr->name, _CORDS_MANIFEST ) ))
 		return( cords_terminate_request( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_SERVICE ) ))
@@ -1391,7 +1477,7 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 		return( cords_terminate_account( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_SECURITY ) ))
 		return( cords_terminate_security( dptr, agent,tls ) );
-	else	return( 0 );
+	else	return( cords_terminate_element( dptr, agent, tls) );
 }
 
 /*	---------------------------------------------------	*/

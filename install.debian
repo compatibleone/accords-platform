@@ -45,6 +45,7 @@ export threads=1
 export verbose=0
 export debug=0
 export domain=occi
+export operator=accords
 export password=co-system
 
 if [ -z "$target" ]
@@ -387,6 +388,7 @@ function	mkmon
 	export restport=$(($restport+1))
 	echo "<"$1 >> $target
 	echo "    publisher='"$publisher"'"           >> $target
+	echo "    operator='"$operator"'"           >> $target
 	echo "    identity='"$resthost":"$restport"'" >> $target
 	echo "    verbose='"$verbose"'"   >> $target
 	echo "    debug='"$debug"'"       >> $target
@@ -406,6 +408,7 @@ function	mkcfg
 	export restport=$(($restport+1))
 	echo "<"$1 >> $target
 	echo "    publisher='"$publisher"'"           >> $target
+	echo "    operator='"$operator"'"           >> $target
 	echo "    identity='"$resthost":"$restport"'" >> $target
 	echo "    verbose='"$verbose"'"   >> $target
 	echo "    debug='"$debug"'"       >> $target

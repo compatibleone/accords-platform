@@ -5,6 +5,7 @@
 #include "occiclient.h"
 #include "occipublisher.h"
 #include "occipub.h"
+#include "cordslang.h"
 
 struct	occi_resolver_manager;
 struct	occi_resolved_category;
@@ -29,6 +30,7 @@ public	int	terminate_occi_resolver();
 public	int	occi_resolver_default();
 public	struct	occi_response * occi_resolver( char * category, char * agent );
 public	char *	occi_resolve_category_provider( char * category, char * agent, char * tls );
+public	char *	occi_resolve_category_price( char * category, char * operator, char * agent, char * tls );
 
 
 	/* ---------------- */

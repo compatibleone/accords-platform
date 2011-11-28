@@ -72,6 +72,8 @@
 /*	------------------------	*/
 #define	_CORDS_CONTRACT		"contract"
 #define	_CORDS_TARIFICATION	"tarification"
+#define	_CORDS_PRICE		"price"
+#define	_CORDS_AUTHORISATION	"authorisation"
 #define	_CORDS_HOSTNAME		"hostname"
 #define	_CORDS_ROOTPASS		"rootpass"
 #define	_CORDS_REFERENCE	"reference"
