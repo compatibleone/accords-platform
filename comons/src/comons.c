@@ -76,7 +76,7 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	---------------------------------------------	*/  
 private	void	comons_load()
 {
-	load_accords_configuration( &Comons, "comon" );
+	load_accords_configuration( &Comons, "comons" );
 	return;
 }
 
