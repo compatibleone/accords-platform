@@ -3,7 +3,7 @@
 
 	<description>The Accords platform description manifest</description>
 
-	<node name="publisher" provider="any" >
+	<node name="publisher" access="public" scope="normal" provider="any" >
 		<infrastructure name="large">
 			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
 			<storage name="large" size="500G"/>
@@ -17,7 +17,7 @@
 		</image>
 	</node>
 
-	<node name="coss" provider="any" >
+	<node name="coss" access="public" scope="normal" provider="any" >
 		<infrastructure name="large">
 			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
 			<storage name="large" size="500G"/>
@@ -31,7 +31,7 @@
 		</image>
 	</node>
 
-	<node name="coobas" provider="any" >
+	<node name="coobas" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -45,7 +45,7 @@
 		</image>
 	</node>
 
-	<node name="comons" provider="any" >
+	<node name="comons" access="public" scope="normal" provider="any" >
 		<infrastructure name="large">
 			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
 			<storage name="large" size="500G"/>
@@ -59,7 +59,7 @@
 		</image>
 	</node>
 
-	<node name="coes" provider="any" >
+	<node name="coes" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -73,7 +73,7 @@
 		</image>
 	</node>
 
-	<node name="coees" provider="any" >
+	<node name="coees" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -86,7 +86,7 @@
 		</image>
 	</node>
 
-	<node name="parser" provider="any" >
+	<node name="parser" access="public" scope="normal" provider="any" >
 		<infrastructure name="small">
 			<compute name="small" architecture="x86" cores="1" memory="1G" speed="1G"/>
 			<storage name="small" size="100G"/>
@@ -100,7 +100,7 @@
 		</image>
 	</node>
 
-	<node name="broker" provider="any" >
+	<node name="broker" access="public" scope="normal" provider="any" >
 		<infrastructure name="small">
 			<compute name="small" architecture="x86" cores="1" memory="1G" speed="1G"/>
 			<storage name="small" size="100G"/>
@@ -115,7 +115,7 @@
 		</image>
 	</node>
 
-	<node name="procci" provider="any" >
+	<node name="procci" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -129,7 +129,7 @@
 		</image>
 	</node>
 
-	<node name="osprocci" provider="openstack" >
+	<node name="osprocci" access="public" scope="normal" provider="openstack" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -143,7 +143,7 @@
 		</image>
 	</node>
 
-	<node name="onprocci" provider="opennebula" >
+	<node name="onprocci" access="public" scope="normal" provider="opennebula" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -157,7 +157,7 @@
 		</image>
 	</node>
 
-	<node name="azprocci" provider="any" >
+	<node name="azprocci" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -171,7 +171,7 @@
 		</image>
 	</node>
 
-	<node name="paprocci" provider="any" >
+	<node name="paprocci" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
@@ -185,7 +185,7 @@
 		</image>
 	</node>
 
-	<node name="sgprocci" provider="any" >
+	<node name="sgprocci" access="public" scope="normal" provider="any" >
 		<infrastructure name="medium">
 			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
 			<storage name="medium" size="200G"/>
