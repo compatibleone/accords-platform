@@ -12,6 +12,7 @@ struct	cords_node
 	char *				image;
 	char *				access;
 	char *				scope;
+	char *				type;
 	int	state;
 };
 
