@@ -285,8 +285,8 @@ function mksect
 export calist=Certificates.crt
 export pass=Accords
 export auth=0
-export options=5
-export options=5
+export options=13
+export options=13
 
 if [ -d security ]
 then

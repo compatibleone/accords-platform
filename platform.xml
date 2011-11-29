@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="InfraTest" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+	<description>The Accords platform description manifest</description>
+
+	<node name="publisher" provider="any" >
+		<infrastructure name="large">
+			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
+			<storage name="large" size="500G"/>
+			<network name="large" label="ethernet" vlan="100M"/1>
+		</infrastructure>
+		<image name="publisher">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="publisher"/>
+			<package name="resolver"/>
+		</image>
+	</node>
+
+	<node name="coss" provider="any" >
+		<infrastructure name="large">
+			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
+			<storage name="large" size="500G"/>
+			<network name="large" label="ethernet" vlan="100M"/1>
+		</infrastructure>
+		<image name="coss">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="coss"/>
+			<package name="users"/>
+		</image>
+	</node>
+
+	<node name="coobas" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="coobas">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="coobas"/>
+			<package name="prices"/>
+		</image>
+	</node>
+
+	<node name="comons" provider="any" >
+		<infrastructure name="large">
+			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
+			<storage name="large" size="500G"/>
+			<network name="large" label="ethernet" vlan="100M"/1>
+		</infrastructure>
+		<image name="comons">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="comons"/>
+			<package name="probes"/>
+		</image>
+	</node>
+
+	<node name="coes" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="coes">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="coes"/>
+			<package name="operators"/>
+		</image>
+	</node>
+
+	<node name="coees" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="coees">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="coees"/>
+		</image>
+	</node>
+
+	<node name="parser" provider="any" >
+		<infrastructure name="small">
+			<compute name="small" architecture="x86" cores="1" memory="1G" speed="1G"/>
+			<storage name="small" size="100G"/>
+			<network name="small" label="ethernet" vlan="1M"/1>
+		</infrastructure>
+		<image name="parser">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="parser"/>
+			<package name="testcp"/>
+		</image>
+	</node>
+
+	<node name="broker" provider="any" >
+		<infrastructure name="small">
+			<compute name="small" architecture="x86" cores="1" memory="1G" speed="1G"/>
+			<storage name="small" size="100G"/>
+			<network name="small" label="ethernet" vlan="1M"/1>
+		</infrastructure>
+		<image name="broker">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="broker"/>
+			<package name="testcb"/>
+			<package name="command"/>
+		</image>
+	</node>
+
+	<node name="procci" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="procci">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="procci"/>
+			<package name="providers"/>
+		</image>
+	</node>
+
+	<node name="osprocci" provider="openstack" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="osprocci">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="osprocci"/>
+			<package name="novaprofiles"/>
+		</image>
+	</node>
+
+	<node name="onprocci" provider="opennebula" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="onprocci">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="onprocci"/>
+			<package name="oneprofiles"/>
+		</image>
+	</node>
+
+	<node name="azprocci" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="azprocci">
+			<system name="windows 2007"/>
+			<package name="accords_libraries"/>
+			<package name="azprocci"/>
+			<package name="subscriptions"/>
+		</image>
+	</node>
+
+	<node name="paprocci" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="paprocci">
+			<system name="debian natty"/>
+			<package name="accords_libraries"/>
+			<package name="proactive"/>
+			<package name="actionscripts"/>
+		</image>
+	</node>
+
+	<node name="sgprocci" provider="any" >
+		<infrastructure name="medium">
+			<compute name="medium" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="medium" size="200G"/>
+			<network name="medium" label="ethernet" vlan="10M"/1>
+		</infrastructure>
+		<image name="sgprocci">
+			<system name="debian natty"/>
+			<package name="accords_libraries"/>
+			<package name="slapos"/>
+			<package name="slapgrid"/>
+		</image>
+	</node>
+
+	<configuration name="accords_platform">
+		<action name="coss"
+			type="cordscript" 
+			expression="coss.configure(publisher.hostname);"/>
+		<action name="comons"
+			type="cordscript" 
+			expression="comons.configure(publisher.hostname);"/>
+		<action name="coobas"
+			type="cordscript" 
+			expression="coobas.configure(publisher.hostname);"/>
+		<action name="coes"
+			type="cordscript" 
+			expression="coes.configure(publisher.hostname);"/>
+		<action name="coees"
+			type="cordscript" 
+			expression="coees.configure(publisher.hostname);"/>
+		<action name="parser"
+			type="cordscript" 
+			expression="parser.configure(publisher.hostname);"/>
+		<action name="broker"
+			type="cordscript" 
+			expression="broker.configure(publisher.hostname);"/>
+		<action name="procci"
+			type="cordscript" 
+			expression="procci.configure(publisher.hostname);"/>
+		<action name="osprocci"
+			type="cordscript" 
+			expression="osprocci.configure(publisher.hostname);"/>
+		<action name="onprocci"
+			type="cordscript" 
+			expression="onprocci.configure(publisher.hostname);"/>
+		<action name="azprocci"
+			type="cordscript" 
+			expression="azprocci.configure(publisher.hostname);"/>
+		<action name="paprocci"
+			type="cordscript" 
+			expression="paprocci.configure(publisher.hostname);"/>
+		<action name="sgprocci"
+			type="cordscript" 
+			expression="sgprocci.configure(publisher.hostname);"/>
+
+	</configuration>
+
+	<account name="accords_platform">
+		<user name="co-publisher"/>
+		<user name="co-resolver"/>
+		<user name="co-command"/>
+		<user name="co-parser"/>
+		<user name="co-broker"/>
+		<user name="co-ss"/>
+		<user name="co-mons"/>
+		<user name="co-obas"/>
+		<user name="co-es"/>
+		<user name="co-ees"/>
+		<user name="co-procci"/>
+		<user name="co-osprocci"/>
+		<user name="co-onprocci"/>
+		<user name="co-azprocci"/>
+		<user name="co-paprocci"/>
+		<user name="co-sgprocci"/>
+	</account>
+	<security name="public" level="public"/>
+
+</manifest>
+
+
+
+
+
+
+
+
+
+
+

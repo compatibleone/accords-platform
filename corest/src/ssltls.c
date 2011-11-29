@@ -26,6 +26,7 @@
 #define	_DER_KEY		32
 #define	_DER_CERTIFICATE	64
 #define	_SSL_COMPATIBLE		128
+#define	_SSL_INTERNAL		256
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
@@ -569,6 +570,38 @@ CONNECTIONPTR	set_ssl_certificate_and_key( CONNECTIONPTR cptr, int mode )
 	return( cptr );
 }
 
+/*	-----------------------------------------------------------	*/
+/*		t l s _ v e r i f y _ c a l l b a c k			*/
+/*	-----------------------------------------------------------	*/
+/*	this function will be called back at each certificate to be	*/
+/*	informed as to how to proceed incase of failure and to have	*/
+/*	application certificate verification performed as well.		*/
+/*	-----------------------------------------------------------	*/
+private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certificate )
+{
+	if ( check_verbose() )
+		printf("tls_client_verify_callback(%u)\n",preverify);
+	return(1);	/* never fail : for now */
+}
+
+private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certificate )
+{
+	if ( check_verbose() )
+		printf("tls_server_verify_callback(%u)\n",preverify);
+	return(1);	/* never fail : for now */
+}
+
+/*	-----------------------------------------------------------	*/
+/*		t l s _ c h e c k _ c e r t i f i c a t e		*/
+/*	-----------------------------------------------------------	*/
+private	int	tls_check_certificate( X509_STORE_CTX * certificate, void * arg )
+{
+	if ( check_verbose() )
+		printf("tls_check_certificate()\n");
+
+	return(1);	/* never fail : for now */
+}
+
 /*	------------------------------------------------	*/
 /*	b u i l d _ s s l _ c o n t e x t ( cptr, mode )	*/
 /*	------------------------------------------------	*/
@@ -652,6 +685,14 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		return( 0 );
 	}
 
+	if (!( mode & _SSL_INTERNAL ))
+	{
+		/* ----------------------------------------------- */
+		/* set the custom certificat check callback method */
+		/* ----------------------------------------------- */
+		SSL_CTX_set_cert_verify_callback( cptr->context, tls_check_certificate, cptr );
+	}
+
 	if ( mode )
 	{
 
@@ -715,10 +756,10 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		return( 0 );
 	}
 	if ( mode & _REQUIRE_PEER )
-		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,NULL);
+		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_client_verify_callback);
 	else if ( mode & _REQUEST_PEER )
-		SSL_set_verify( cptr->object,SSL_VERIFY_PEER,NULL);
-	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,NULL);
+		SSL_set_verify( cptr->object,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_client_verify_callback);
+	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,tls_client_verify_callback);
 	return( 1 );
 }
 
@@ -823,10 +864,10 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 	{
 		security_lock( 0, "server_set_verify" );
 		if ( mode & _REQUIRE_PEER )
-			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,NULL);
+			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_server_verify_callback);
 		else if ( mode & _REQUEST_PEER )
-			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER,NULL);
-		else	SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,NULL);
+			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_server_verify_callback);
+		else	SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,tls_server_verify_callback);
 		security_unlock( 0, "server_set_verify" );
 
 		security_lock( 0, "server_set_fd" );
