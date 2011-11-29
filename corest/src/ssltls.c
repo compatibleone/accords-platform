@@ -18,6 +18,7 @@
 /*		32	private key is DER not PEM		*/
 /*		64	certificate is DER not PEM		*/
 /*		128	SSL v23 compatible mode			*/
+/*		256	Inhibit Internal Certificate Check	*/
 /*	-------------------------------------------------	*/
 
 #define	_USE_SSL		4
@@ -579,14 +580,14 @@ CONNECTIONPTR	set_ssl_certificate_and_key( CONNECTIONPTR cptr, int mode )
 /*	-----------------------------------------------------------	*/
 private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certificate )
 {
-	if ( check_verbose() )
+	if ( check_debug() )
 		printf("tls_client_verify_callback(%u)\n",preverify);
 	return(1);	/* never fail : for now */
 }
 
 private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certificate )
 {
-	if ( check_verbose() )
+	if ( check_debug() )
 		printf("tls_server_verify_callback(%u)\n",preverify);
 	return(1);	/* never fail : for now */
 }
@@ -596,7 +597,7 @@ private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certific
 /*	-----------------------------------------------------------	*/
 private	int	tls_check_certificate( X509_STORE_CTX * certificate, void * arg )
 {
-	if ( check_verbose() )
+	if ( check_debug() )
 		printf("tls_check_certificate()\n");
 
 	return(1);	/* never fail : for now */
@@ -692,13 +693,21 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		/* ----------------------------------------------- */
 		SSL_CTX_set_cert_verify_callback( cptr->context, tls_check_certificate, cptr );
 	}
+	else
+	{
+		/* ------------------------------------------- */
+		/* set the standard certificate check callback */
+		/* ------------------------------------------- */
+		SSL_CTX_set_cert_verify_callback( cptr->context, NULL, cptr );
+	}
 
 	if ( mode )
 	{
 
 		if ( mode & _DER_CERTIFICATE )
 		{
-			if (!(oof=SSL_CTX_use_certificate_file(cptr->context,SslCertFile,SSL_FILETYPE_ASN1))) 
+			if (!(oof=SSL_CTX_use_certificate_file(
+				cptr->context,SslCertFile,SSL_FILETYPE_ASN1))) 
 			{
 				tls_show_errors( "SSL_use_certificate_chain_file" );
 				close_connection( cptr );
