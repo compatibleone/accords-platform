@@ -10,6 +10,8 @@ struct	cords_node
 	char *				profile;
 	char *				infrastructure;
 	char *				image;
+	char *				access;
+	char *				scope;
 	int	state;
 };
 

@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _node_c_
 #define _node_c_
 
@@ -20,9 +27,9 @@
 
 #include "node.h"
 
-/*	------------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ a p p l i a n c e 	*/
-/*	------------------------------------------------	*/
+/*	--------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ n o d e 	*/
+/*	--------------------------------------	*/
 public struct cords_node * liberate_cords_node(struct cords_node * sptr)
 {
 	if ( sptr )
@@ -39,15 +46,19 @@ public struct cords_node * liberate_cords_node(struct cords_node * sptr)
 			 sptr->infrastructure = liberate(sptr->infrastructure);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
+		if ( sptr->scope )
+			 sptr->scope = liberate(sptr->scope);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_node *) 0);
 
 }
 
-/*	------------------------------------------	*/
-/*	r e s e t _ c o r d s _ a p p l i a n c e 	*/
-/*	------------------------------------------	*/
+/*	--------------------------------	*/
+/*	r e s e t _ c o r d s _ n o d e 	*/
+/*	--------------------------------	*/
 public struct cords_node * reset_cords_node(struct cords_node * sptr)
 {
 	if ( sptr )
@@ -58,15 +69,17 @@ public struct cords_node * reset_cords_node(struct cords_node * sptr)
 		sptr->profile = (char*) 0;
 		sptr->infrastructure = (char*) 0;
 		sptr->image = (char*) 0;
+		sptr->access = (char*) 0;
+		sptr->scope = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
 
 }
 
-/*	------------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ a p p l i a n c e 	*/
-/*	------------------------------------------------	*/
+/*	--------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ n o d e 	*/
+/*	--------------------------------------	*/
 public struct cords_node * allocate_cords_node()
 {
 	struct cords_node * sptr;
@@ -75,9 +88,9 @@ public struct cords_node * allocate_cords_node()
 	else	return( reset_cords_node(sptr) );
 }
 
-/*	------------------------------------------	*/
-/*	x m l i n _ c o r d s _ a p p l i a n c e 	*/
-/*	------------------------------------------	*/
+/*	--------------------------------	*/
+/*	x m l i n _ c o r d s _ n o d e 	*/
+/*	--------------------------------	*/
 public int xmlin_cords_node(struct cords_node * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -109,6 +122,14 @@ public int xmlin_cords_node(struct cords_node * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"access") ))
+		{
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"scope") ))
+		{
+			if ( wptr->value ) { sptr->scope = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -118,9 +139,9 @@ public int xmlin_cords_node(struct cords_node * sptr,struct xml_element * eptr)
 
 }
 
-/*	--------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ a p p l i a n c e 	*/
-/*	--------------------------------------------------	*/
+/*	----------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ n o d e 	*/
+/*	----------------------------------------	*/
 public int rest_occi_cords_node(FILE * fh,struct cords_node * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
@@ -133,6 +154,8 @@ public int rest_occi_cords_node(FILE * fh,struct cords_node * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.infrastructure='%s'\r\n",prefix,nptr,(sptr->infrastructure?sptr->infrastructure:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

@@ -2,7 +2,7 @@
 
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
-			Compatible One Resource and Request Description Schema
+			Compatible One Resource and Request Description Schema Version 2
 		</xsd:documentation>
 	</xsd:annotation>
 
@@ -35,7 +35,7 @@
 			<xsd:element name="node" type="cordsNode" minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:sequence>
-			<xsd:element name="instruction" type="cordsInstruction" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="instruction" type="cordsInstruction" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -132,6 +132,8 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="access" type="xsd:string"/>
+		<xsd:attribute name="scope" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
