@@ -11,6 +11,8 @@ cleandir product
 cp install.$1 product/install
 cp openssl.cnf product
 cp Certificates.crt product
+cp cords.xsd product
+cp platform.xml product
 
 cleandir product/lib
 cp */lib/*.so product/lib
