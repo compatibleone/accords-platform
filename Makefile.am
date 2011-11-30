@@ -69,6 +69,9 @@ endif
 if ENABLE_AZPROCCI
 SUBDIRS += azprocci
 endif
+if ENABLE_COMMAND
+SUBDIRS += command
+endif
 if ENABLE_TESTOS
 SUBDIRS += testos
 endif

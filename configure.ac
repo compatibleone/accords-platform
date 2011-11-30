@@ -225,6 +225,13 @@ AC_ARG_ENABLE([azprocci],
 AM_CONDITIONAL([ENABLE_AZPROCCI], [test "$enable_azprocci" = "yes"])
 AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci/src])
 
+AC_ARG_ENABLE([command],
+      [AS_HELP_STRING([--disable-command],
+		      [Disable command @<:@default=enable@:>@])],
+      [],
+      [enable_command=yes])
+AM_CONDITIONAL([ENABLE_COMMAND], [test "$enable_command" = "yes"])
+
 AC_ARG_ENABLE([testos],
       [AS_HELP_STRING([--disable-testos],
 		      [Disable testos @<:@default=enable@:>@])],
@@ -297,6 +304,7 @@ AC_CONFIG_FILES([procci/Makefile procci/src/Makefile])
 AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
+AC_CONFIG_FILES([command/Makefile command/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
 AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
 AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
@@ -336,6 +344,7 @@ echo "    - procci                   : $enable_procci"
 echo "    - osprocci                 : $enable_osprocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"
+echo "    - command                  : $enable_command"
 echo "    - testos                   : $enable_testos"
 echo "    - teston                   : $enable_teston"
 echo "    - testcp                   : $enable_testcp"
