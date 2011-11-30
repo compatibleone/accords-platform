@@ -13,6 +13,6 @@ AM_CPPFLAGS = -DUNIX -Dunix
 
 libcoxml_la_SOURCES = html.c \
                       document.c document.h \
-                      element.c element.h \ 
+                      element.c element.h \
                       xmlparse.c xmlparse.h \
                       allocate.c allocate.h
