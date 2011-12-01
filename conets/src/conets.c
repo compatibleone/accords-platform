@@ -22,6 +22,7 @@
 #ifndef	_conets_c
 #define	_conets_c
 
+#include <time.h>
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -30,6 +31,8 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "occiresolver.h"
+#include "conetsengine.h"
 
 struct	accords_configuration Conets = {
 	0,0,
@@ -48,11 +51,16 @@ struct	accords_configuration Conets = {
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(Conets.debug);		}
-public	int	check_verbose()		{	return(Conets.verbose);		}
-public	char *	default_publisher()	{	return(Conets.publisher);	}
-public	char *	default_tls()		{	return(Conets.tls);		}
+static char * conets_agent;
 
+public	int	check_debug()			{	return(Conets.debug);			}
+public	int	check_verbose()			{	return(Conets.verbose);			}
+public	char *	default_publisher()		{	return(Conets.publisher);		}
+public	char *	default_tls()			{	return(Conets.tls);			}
+
+/*	-----------------------------------------------------------------	*/
+/* 	 i p a d d r e s s  O C C I  i n t e r f a c e  f u n c t i o n s	*/
+/*	-----------------------------------------------------------------	*/
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -68,7 +76,7 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		  c o n e t s _ l o a d 		*/
+/*		c o n e t s _ l o a d 		*/
 /*	---------------------------------------------	*/
 /*	this function loads conets  configuration	*/
 /*	from the xml configuration file.		*/
@@ -83,8 +91,8 @@ private	void	conets_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Networking Services : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
+	printf("\n   CompatibleOne Networking Services : Version 1.0a.0.02");
+	printf("\n   Beta Version : 01/12/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -135,7 +143,8 @@ private	struct rest_extension * conets_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the conets instance category		*/
 /*	------------------------------------------------------------------	*/
-/* none for now */
+#include "conetsdomain.c"
+#include "conetsip.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o n e t s _ o p e r a t i o n				*/
@@ -148,16 +157,26 @@ private	int	conets_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_conets.xml");
 
-
+        conets_agent = allocate_string(nptr);    
+   
 	if (!( optr = occi_cords_ipaddress_builder( Conets.domain, "ipaddress" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &ipaddress_interface;
 
 	if (!( optr = occi_cords_domain_builder( Conets.domain, "domain" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_iprange_builder( Conets.domain, "iprange" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -220,6 +239,7 @@ private	int	conets(int argc, char * argv[] )
 	return(status);
 }
 
+	
 /*	------------------------------------------------------------------	*/
 /*					m a i n 				*/
 /*	------------------------------------------------------------------	*/

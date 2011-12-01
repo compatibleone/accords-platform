@@ -5,7 +5,7 @@ struct cords_domain
 {
 	char * id;
 	char * name;
-        int    timestamp;
+        char * timestamp;
 	char * owner;
 };
 

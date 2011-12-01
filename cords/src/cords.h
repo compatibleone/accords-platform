@@ -66,6 +66,7 @@
 
 #include "ipaddress.h"
 #include "domain.h"
+#include "iprange.h"
 
 #include "xlink.h"
 

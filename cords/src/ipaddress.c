@@ -29,12 +29,16 @@ public struct cords_ipaddress * liberate_cords_ipaddress(struct cords_ipaddress 
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->version )
+			 sptr->version = liberate(sptr->version);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->value )
 			 sptr->value = liberate(sptr->value);
 		if ( sptr->domain )
 			 sptr->domain = liberate(sptr->domain);
+		if ( sptr->timestamp )
+			 sptr->timestamp = liberate(sptr->timestamp);
 		if ( sptr->owner )
 			 sptr->owner = liberate(sptr->owner);
 		sptr = liberate( sptr );
@@ -51,10 +55,11 @@ public struct cords_ipaddress * reset_cords_ipaddress(struct cords_ipaddress * s
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->version = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->value = (char*) 0;
 		sptr->domain = (char*) 0;
-		sptr->timestamp =  0;
+		sptr->timestamp = (char*) 0;
 		sptr->owner = (char*) 0;
 	}
 	return(sptr);
@@ -86,6 +91,10 @@ public int xmlin_cords_ipaddress(struct cords_ipaddress * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"version") ))
+		{
+			if ( wptr->value ) { sptr->version = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"type") ))
 		{
 			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
@@ -100,7 +109,7 @@ public int xmlin_cords_ipaddress(struct cords_ipaddress * sptr,struct xml_elemen
 		}
 		else if (!( strcmp(wptr->name,"timestamp") ))
 		{
-			if ( wptr->value ) { sptr->timestamp = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->timestamp = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"owner") ))
 		{
@@ -121,10 +130,11 @@ public int rest_occi_cords_ipaddress(FILE * fh,struct cords_ipaddress * sptr,cha
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.version='%s'\r\n",prefix,nptr,(sptr->version?sptr->version:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.domain='%s'\r\n",prefix,nptr,(sptr->domain?sptr->domain:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.timestamp='%u'\r\n",prefix,nptr,sptr->timestamp);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.timestamp='%s'\r\n",prefix,nptr,(sptr->timestamp?sptr->timestamp:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.owner='%s'\r\n",prefix,nptr,(sptr->owner?sptr->owner:""));
 	return(0);
 

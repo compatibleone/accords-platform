@@ -72,6 +72,7 @@
 
 #include "ipaddress.c"
 #include "domain.c"
+#include "iprange.c"
 
 #endif
 

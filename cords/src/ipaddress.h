@@ -5,10 +5,11 @@
 struct cords_ipaddress
 {
 	char * id;
+	char * version;
 	char * type;
 	char * value;
         char * domain;
-        int    timestamp;
+        char * timestamp;
 	char * owner;
 };
 

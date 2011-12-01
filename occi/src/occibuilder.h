@@ -55,6 +55,7 @@ public struct occi_category * occi_az_config_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_ipaddress_builder(char *a,char * b);
 public struct occi_category * occi_cords_domain_builder(char *a,char * b);
+public struct occi_category * occi_cords_iprange_builder(char *a,char * b);
 
 #endif
 

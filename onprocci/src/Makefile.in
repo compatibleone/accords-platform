@@ -67,7 +67,7 @@ clean:
 	-rm *.o ../bin/onprocci
 
 install:
-	cp ../bin/onprocci $(PATHLIB)
+	cp ../bin/onprocci $(PATHBIN)
 	
 .c.o:
 	gcc -c $(DEBUG) $(OPTIONS) $(INCLUDE) $*.c

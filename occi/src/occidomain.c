@@ -133,7 +133,7 @@ private void autoload_cords_domain_nodes() {
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "timestamp" )) != (struct xml_atribut *) 0)
-				pptr->timestamp = document_atribut_value(aptr);
+				pptr->timestamp = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "owner" )) != (struct xml_atribut *) 0)
 				pptr->owner = document_atribut_string(aptr);
 			}
@@ -167,7 +167,7 @@ public  void autosave_cords_domain_nodes() {
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," timestamp=%c",0x0022);
-		fprintf(h,"%u",pptr->timestamp);
+		fprintf(h,"%s",(pptr->timestamp?pptr->timestamp:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," owner=%c",0x0022);
 		fprintf(h,"%s",(pptr->owner?pptr->owner:""));
@@ -196,7 +196,7 @@ private void set_cords_domain_field(
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "timestamp" ) ))
-			pptr->timestamp = atoi(vptr);
+			pptr->timestamp = allocate_string(vptr);
 		if (!( strcmp( nptr, "owner" ) ))
 			pptr->owner = allocate_string(vptr);
 		}
@@ -224,27 +224,36 @@ private struct cords_domain * filter_cords_domain_info(
 private int pass_cords_domain_filter(
 	struct cords_domain * pptr,struct cords_domain * fptr) {
 	if (( fptr->id )
-	&&  (strlen( fptr->id ) != 0)) {
+	&&  (strlen( fptr->id ) != 0)) 
+	{
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
-		}
+	}
 	if (( fptr->name )
-	&&  (strlen( fptr->name ) != 0)) {
+	&&  (strlen( fptr->name ) != 0)) 
+	{
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
-		}
-	if (( fptr->timestamp ) && ( pptr->timestamp != fptr->timestamp )) return(0);
+	}
+	if ( fptr->timestamp )
+	{
+		if (!( pptr->timestamp ))
+			return(0);
+		else if ( pptr->timestamp != fptr->timestamp)
+			return(0);
+	}
 	if (( fptr->owner )
-	&&  (strlen( fptr->owner ) != 0)) {
+	&&  (strlen( fptr->owner ) != 0)) 
+	{
 		if (!( pptr->owner ))
 			return(0);
 		else if ( strcmp(pptr->owner,fptr->owner) != 0)
 			return(0);
-		}
+	}
 	return(1);
 }
 
@@ -263,7 +272,7 @@ private struct rest_response * cords_domain_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.timestamp=%u",optr->domain,optr->id,pptr->timestamp);
+	sprintf(cptr->buffer,"%s.%s.timestamp=%s",optr->domain,optr->id,pptr->timestamp);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.owner=%s",optr->domain,optr->id,pptr->owner);
@@ -721,13 +730,13 @@ public struct rest_header *  cords_domain_occi_headers(struct cords_domain * spt
 		return(first);
 	if (!( hptr = allocate_rest_header()))
 		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
+	else	if (!( hptr->previous = last))
+		first = hptr;
+	else	hptr->previous->next = hptr;
+	last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_domain.timestamp='%u'\r\n",sptr->timestamp);
+	sprintf(buffer,"occi.cords_domain.timestamp='%u'\r\n",(sptr->timestamp?sptr->timestamp:0));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

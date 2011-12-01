@@ -77,8 +77,9 @@ install:
 
 
 conets.o: conets.c
+conetsengine.o: conetsengine.c
 
-../bin/conets: conets.o 
+../bin/conets: conets.o conetsengine.o
 	gcc $(DEBUG) -o $@ $? $(LIBCOPABR)
 
 
