@@ -886,15 +886,15 @@ public	struct	occi_category * build_openstack( char * domain )
 	{
 		optr->callback  = &openstack_interface;
 
-		if (!( optr = occi_add_action( optr,"start","",start_openstack)))
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_openstack)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"save","",save_openstack)))
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_openstack)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"stop","",stop_openstack)))
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_openstack)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"suspend","",suspend_openstack)))
+		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_openstack)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"restart","",restart_openstack)))
+		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"softboot","",softboot_openstack)))
 			return( optr );

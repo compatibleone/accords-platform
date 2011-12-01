@@ -198,10 +198,18 @@ private	struct	rest_response * start_contract(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
-			sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
-			contract_instructions( fullid, pptr->provider );
-			cords_invoke_action( pptr->provider, "start", _CORDS_CONTRACT_AGENT, default_tls() );
-			retrieve_provider_information( pptr );
+			if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
+				contract_instructions( fullid, pptr->provider );
+				cords_invoke_action( pptr->provider, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() );
+				retrieve_provider_information( pptr );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_contract_nodes();
@@ -228,7 +236,15 @@ private	struct	rest_response * restart_contract(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			cords_invoke_action( pptr->provider, "restart", _CORDS_CONTRACT_AGENT, default_tls() );
+			if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				cords_invoke_action( pptr->provider, _CORDS_RESTART, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_RESTART, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_contract_nodes();
@@ -256,7 +272,15 @@ private	struct	rest_response * suspend_contract(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			cords_invoke_action( pptr->provider, "suspend", _CORDS_CONTRACT_AGENT, default_tls() );
+			if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				cords_invoke_action( pptr->provider, _CORDS_SUSPEND, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_SUSPEND, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
 			autosave_cords_contract_nodes();
@@ -281,7 +305,15 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			cords_invoke_action( pptr->provider, "stop", _CORDS_CONTRACT_AGENT, default_tls() );
+			if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				cords_invoke_action( pptr->provider, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			if (pptr->reference) pptr->reference = liberate( pptr->reference );
 			if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
 			if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
@@ -313,7 +345,15 @@ private	struct	rest_response * save_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT, default_tls() );
+			if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				cords_invoke_action( pptr->provider, _CORDS_SAVE, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_SAVE, _CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			pptr->when  = time((long*) 0);
 			autosave_cords_contract_nodes();
 		}
@@ -330,15 +370,15 @@ private	struct	occi_category *	procci_contract_builder( char * domain, char * ca
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( optr = occi_cords_contract_builder( domain ,category ) ))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"start","",start_contract)))
+	else if (!( optr = occi_add_action( optr,_CORDS_START,"",start_contract)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"suspend","",suspend_contract)))
+	else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_contract)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"restart","",restart_contract)))
+	else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_contract)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"save","",save_contract)))
+	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_contract)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"stop","",stop_contract)))
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
 		return( optr );
 	else	return( optr );
 }

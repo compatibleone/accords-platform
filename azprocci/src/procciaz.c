@@ -18,7 +18,7 @@
 #define	_proccios_c
 
 #include "azclient.h"
-
+#include "cordslang.h"
 
 /* ---------------------------------------------------------------------------------- */
 /* if ((status = az_initialise_client( user, pass, host, agent, version, tls )) != 0) */
@@ -608,15 +608,15 @@ public	struct	occi_category * build_windowsazure( char * domain )
 	{
 		optr->callback  = &windowsazure_interface;
 
-		if (!( optr = occi_add_action( optr,"start","",start_windowsazure)))
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_windowsazure)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"save","",save_windowsazure)))
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_windowsazure)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"stop","",stop_windowsazure)))
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_windowsazure)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"suspend","",suspend_windowsazure)))
+		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_windowsazure)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"restart","",restart_windowsazure)))
+		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_windowsazure)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"softboot","",softboot_windowsazure)))
 			return( optr );

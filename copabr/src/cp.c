@@ -1,19 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
-
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_cords_parser_c
 #define	_cords_parser_c
 
@@ -1357,6 +1362,14 @@ private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char *
 		}
 	}			
 
+	/* ------------------------------ */
+	/* update TYPE atribut if missing */
+	/* ------------------------------ */
+	if (!( aptr ))
+		if (!( aptr = document_add_atribut( dptr, _CORDS_TYPE, nodetype ) ))
+			return(cords_append_error(dptr,701,"cannot append type"));
+
+
 	/* -------------------------------------------------- */
 	/* standard category instance identifier verification */
 	/* -------------------------------------------------- */
@@ -1434,11 +1447,32 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 {
 	int	status;
 	struct	xml_atribut * aptr;
-	if ((status = cords_instance_identifier( dptr, _CORDS_PROVIDER )) != 0)
-		return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
-	else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
-		return(cords_append_error(dptr,status,_CORDS_PROFILE));
-	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+	char 		    * nodetype="simple";
+
+	/* ----------------------------------------------------------------------- */
+	/* attempt to retrieve an eventual node type which may be more than simple */
+	/* ----------------------------------------------------------------------- */
+	if (( aptr = document_atribut( dptr, _CORDS_TYPE )) != (struct xml_atribut *) 0)
+		if (!( nodetype = aptr->value ))
+			nodetype = "simple";
+
+	if (!( strcmp(nodetype,"simple") ))
+	{
+		if ((status = cords_instance_identifier( dptr, _CORDS_PROVIDER )) != 0)
+			return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
+		else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
+			return(cords_append_error(dptr,status,_CORDS_PROFILE));
+	}
+
+	/* ------------------------------ */
+	/* update TYPE atribut if missing */
+	/* ------------------------------ */
+	if (!( aptr ))
+		if (!( aptr = document_add_atribut( dptr, _CORDS_TYPE, nodetype ) ))
+			return(cords_append_error(dptr,701,"cannot append type"));
+
+
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));

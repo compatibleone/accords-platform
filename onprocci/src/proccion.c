@@ -611,11 +611,11 @@ public	struct	occi_category * build_opennebula( char * domain )
 	{
 		optr->callback  = &opennebula_interface;
 
-		if (!( optr = occi_add_action( optr,"start","",start_opennebula)))
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_opennebula)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"stop","",stop_opennebula)))
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_opennebula)))
 			return( optr );
-		else if (!( optr = occi_add_action( optr,"save","",save_opennebula)))
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_opennebula)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"softboot","",softboot_opennebula)))
 			return( optr );

@@ -18,6 +18,7 @@
 #define	_broker_service_c
 
 #include "occiresolver.h"
+#include "cp.h"
 #include "cordslang.h"
 
 #ifdef	_DO_SERVICE_CONFIGURATION
@@ -222,7 +223,7 @@ private	int	service_action( char * id, char * action )
 	if (!( h = fopen(buffer,"w")))
 		return(46);
 
-	fprintf(h,"{ service: %c%s%c, contracts: [\n",0x0022,id,0x0022 );
+	fprintf(h,"{ %s: %c%s%c, contracts: [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
 
 	for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
@@ -247,7 +248,7 @@ private	int	service_action( char * id, char * action )
 
 		if ( contracts++ ) fprintf(h,",\n" );
 
-		fprintf(h,"{ contract: %c%s%c, attributs: { ",0x0022,lptr->target,0x0022);
+		fprintf(h,"{ %s: %c%s%c, attributs: { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
 
 		if ((zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, "" )) 
 			!= (struct occi_response *) 0)
@@ -304,7 +305,7 @@ private	struct	rest_response * start_service(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
-			service_action( pptr->id, "start" );
+			service_action( pptr->id, _CORDS_START );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
@@ -334,7 +335,7 @@ private	struct	rest_response * suspend_service(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			service_action( pptr->id, "suspend" );
+			service_action( pptr->id, _CORDS_SUSPEND );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
 			autosave_cords_service_nodes();
@@ -364,7 +365,7 @@ private	struct	rest_response * restart_service(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			service_action( pptr->id, "restart" );
+			service_action( pptr->id, _CORDS_RESTART );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
@@ -393,7 +394,7 @@ private	struct	rest_response * save_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			service_action( pptr->id, "save" );
+			service_action( pptr->id, _CORDS_SAVE );
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 		}
@@ -421,7 +422,7 @@ private	struct	rest_response * stop_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			service_action( pptr->id, "stop" );
+			service_action( pptr->id, _CORDS_STOP );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
 			autosave_cords_service_nodes();
@@ -439,15 +440,15 @@ private	struct	occi_category *	broker_service_builder( char * domain, char * cat
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( optr = occi_cords_service_builder( domain ,category ) ))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"start","",start_service)))
+	else if (!( optr = occi_add_action( optr,_CORDS_START,"",start_service)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"suspend","",suspend_service)))
+	else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_service)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"restart","",restart_service)))
+	else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_service)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"save","",save_service)))
+	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_service)))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,"stop","",stop_service)))
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_service)))
 		return( optr );
 	else	return( optr );
 }
