@@ -75,7 +75,7 @@ allocate.o: allocate.c
 xmlparse.o: xmlparse.c
 
 ../lib/libcoxml.so: html.o document.o element.o xmlparse.o allocate.o
-	gcc -g --gdb --shared -o $@ html.o document.o element.o xmlparse.o allocate.o
+	gcc -g -ggdb --shared -o $@ html.o document.o element.o xmlparse.o allocate.o
 
 .PHONY: all clean install
 
