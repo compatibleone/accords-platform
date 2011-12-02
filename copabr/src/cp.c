@@ -1,19 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
-
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_cords_parser_c
 #define	_cords_parser_c
 
@@ -1188,6 +1193,44 @@ private	int	cords_build_plan( struct xml_element * document, char * agent, char 
 	}
 }
 
+/*	--------------------------------------------------------	*/
+/*	 c o r d s _ r e s o l v e _ m a n i f e s t _ p l a n		*/
+/*	--------------------------------------------------------	*/
+/*				CORDS V2				*/
+/*	--------------------------------------------------------	*/
+/*	when a node is encountered for which the type is defined	*/
+/*	as something other than "simple" then the type value is		*/
+/*	a manifest or plan identifier which must be resolved		*/
+/*	to obtain the fully qualified plan category instance ID		*/
+/*	to be used to formally define the complex type of the 		*/
+/*	resulting node of the manifest.					*/
+/*	--------------------------------------------------------	*/
+private	char *	cords_resolve_manifest_plan( char * manifestname, char * agent, char * tls )
+{
+	struct	xml_element * document;
+	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
+	char *	result=(char *) 0;
+
+	if (!( document = allocate_element()))
+		result = (char *) 0;
+	else if (!( document->name = allocate_string( _CORDS_PLAN )))
+		result = (char *) 0;
+	else if (!( aptr = document_add_atribut( document, _CORDS_NAME, manifestname )))
+		result = (char *) 0;
+	else if (!( zptr = cords_resolve_category( document, aptr, agent,tls ) ))
+		result = (char *) 0;
+	else if ( cords_resolve_location( zptr, document ) != 0)
+		result = (char *) 0 ;
+	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
+		result = (char * ) 0;
+	else	result = allocate_string( aptr->value );
+
+	document = cords_drop_document( document );
+
+	return( result );
+}
+
 /*	---------------------------------------------------	*/
 /*	   c o r d s _ t e r m i n a t e _ r e q u e s t	*/
 /*	---------------------------------------------------	*/
@@ -1267,16 +1310,70 @@ private	int	cords_terminate_infrastructure( struct xml_element * dptr, char * ag
 /*	---------------------------------------------------	*/
 /*	      c o r d s _ t e r m i n a t e _ n o d e 		*/
 /*	---------------------------------------------------	*/
+/* 	this function handles the termination of a manifest 	*/
+/*	node parsing operation. Two cases are possible that	*/
+/*	depend on the value of the type attribute defined	*/
+/*	for the node. The "simple" type will require that 	*/
+/*	infrastructure and image references have been found	*/
+/*	for the qualification of the node description. 		*/
+/*	Complex cases exist where the node type defines the	*/
+/*	manifest which is to be used to describe the node.	*/
+/*	The provisioning plan of the manifest must be found	*/
+/*	and its category instance identifier used to define	*/
+/*	the fully qualified complex type of the node.		*/
+/*	---------------------------------------------------	*/
 private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char * tls )
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	char 		    * nodetype="simple";
 
-	if ((status = cords_instance_identifier( dptr, _CORDS_INFRASTRUCTURE )) != 0)
-		return(cords_append_error(dptr,status,_CORDS_INFRASTRUCTURE));
-	else if ((status = cords_instance_identifier( dptr, _CORDS_IMAGE )) != 0)
-		return(cords_append_error(dptr,status, _CORDS_IMAGE ));
-	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+	/* ----------------------------------------------------------------------- */
+	/* attempt to retrieve an eventual node type which may be more than simple */
+	/* ----------------------------------------------------------------------- */
+	if (( aptr = document_atribut( dptr, _CORDS_TYPE )) != (struct xml_atribut *) 0)
+		if (!( nodetype = aptr->value ))
+			nodetype = "simple";
+
+	if (!( strcmp(nodetype,"simple") ))
+	{
+		/* ------------------------------------------------------------------- */
+		/* simple nodes are defined by their required infrastructure and image */
+		/* ------------------------------------------------------------------- */
+		if ((status = cords_instance_identifier( dptr, _CORDS_INFRASTRUCTURE )) != 0)
+			return(cords_append_error(dptr,status,_CORDS_INFRASTRUCTURE));
+		else if ((status = cords_instance_identifier( dptr, _CORDS_IMAGE )) != 0)
+			return(cords_append_error(dptr,status, _CORDS_IMAGE ));
+	}
+	else
+	{
+		/* --------------------------------------------------------------- */
+		/* complex nodes are defined by their named target manifest / plan */
+		/* --------------------------------------------------------------- */
+		if (!( nodetype = cords_resolve_manifest_plan( nodetype, agent, tls ) ))
+			return(cords_append_error(dptr,status, _CORDS_MANIFEST ));
+		else
+		{
+			/* ---------------------- */
+			/* substitute name for ID */
+			/* ---------------------- */
+			aptr->value = liberate( aptr->value );
+			aptr->value = nodetype;
+		}
+	}			
+
+	/* ------------------------------ */
+	/* update TYPE atribut if missing */
+	/* ------------------------------ */
+	if (!( aptr ))
+		if (!( aptr = document_add_atribut( dptr, _CORDS_TYPE, nodetype ) ))
+			return(cords_append_error(dptr,701,"cannot append type"));
+
+
+	/* -------------------------------------------------- */
+	/* standard category instance identifier verification */
+	/* -------------------------------------------------- */
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
@@ -1350,11 +1447,32 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 {
 	int	status;
 	struct	xml_atribut * aptr;
-	if ((status = cords_instance_identifier( dptr, _CORDS_PROVIDER )) != 0)
-		return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
-	else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
-		return(cords_append_error(dptr,status,_CORDS_PROFILE));
-	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+	char 		    * nodetype="simple";
+
+	/* ----------------------------------------------------------------------- */
+	/* attempt to retrieve an eventual node type which may be more than simple */
+	/* ----------------------------------------------------------------------- */
+	if (( aptr = document_atribut( dptr, _CORDS_TYPE )) != (struct xml_atribut *) 0)
+		if (!( nodetype = aptr->value ))
+			nodetype = "simple";
+
+	if (!( strcmp(nodetype,"simple") ))
+	{
+		if ((status = cords_instance_identifier( dptr, _CORDS_PROVIDER )) != 0)
+			return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
+		else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
+			return(cords_append_error(dptr,status,_CORDS_PROFILE));
+	}
+
+	/* ------------------------------ */
+	/* update TYPE atribut if missing */
+	/* ------------------------------ */
+	if (!( aptr ))
+		if (!( aptr = document_add_atribut( dptr, _CORDS_TYPE, nodetype ) ))
+			return(cords_append_error(dptr,701,"cannot append type"));
+
+
+	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
@@ -1539,20 +1657,40 @@ private	int 	ll_cords_parse_element( struct xml_element * document, char * agent
 	}
 	else
 	{
-		/* ---------------------------------------- */
-		/* attempt to resolve for atributs in order */
-		/* ---------------------------------------- */
-		for (	zptr=(struct occi_response *) 0,
-			aptr=document->firstatb;
-			aptr != (struct xml_atribut *) 0;
-			aptr = aptr->next )
+		/* ------------------------------------------ */
+		/* check for and use name attribut if present */
+		/* ------------------------------------------ */
+		if (( aptr = document_atribut( document, _CORDS_NAME )) != (struct xml_atribut *) 0)
 		{
-			/* ---------------------------------------------------------- */
-			/* attempt to resolve the element for the specified attribute */
-			/* ---------------------------------------------------------- */
+			/* ------------------------------- */
+			/* attempt to retrieve the element */
+			/* ------------------------------- */
 			if (!( zptr = cords_resolve_category( document, aptr, agent,tls ) ))
-				continue;
-			else	break;
+				return(cords_append_error(document,705,"resolving category by name"));
+		}
+		else
+		{
+			/* ---------------------------------------------- */
+			/* attempt to resolve for other atributs in order */
+			/* ---------------------------------------------- */
+			for (	zptr=(struct occi_response *) 0,
+				aptr=document->firstatb;
+				aptr != (struct xml_atribut *) 0;
+				aptr = aptr->next )
+			{
+				if (!( aptr->name ))
+					continue;
+				else if (!( strcmp( aptr->name, _CORDS_NAME ) ))
+					continue;
+				/* ----------------------------------------------------------- */
+				/* attempt to resolve the element for the particular attribute */
+				/* ----------------------------------------------------------- */
+				/* this may turn out to be a little heavy handed: we shall see */
+				/* ----------------------------------------------------------- */
+				else if (!( zptr = cords_resolve_category( document, aptr, agent,tls ) ))
+					continue;
+				else	break;
+			}
 		}
 
 		if ((!( zptr ))

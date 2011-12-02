@@ -13,6 +13,8 @@ struct	cords_contract
 	char *	hostname;
 	char *	rootpass;
 	char *	tarification;
+	char *	type;
+	char *	service;
 	int	when;
 	int	state;
 };

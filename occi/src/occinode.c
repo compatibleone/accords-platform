@@ -1,27 +1,33 @@
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
 #ifndef _node_c_
 #define _node_c_
 
 #include "node.h"
 
-/*	----------------------------------------	*/
-/*	o c c i _ c o r d s _ c o r e  	*/
-/*	----------------------------------------	*/
+/*	------------------------------	*/
+/*	o c c i _ c o r d s _ n o d e 	*/
+/*	------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
@@ -141,6 +147,12 @@ private void autoload_cords_node_nodes() {
 				pptr->infrastructure = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
+				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "scope" )) != (struct xml_atribut *) 0)
+				pptr->scope = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
+				pptr->type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -185,6 +197,15 @@ public  void autosave_cords_node_nodes() {
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," access=%c",0x0022);
+		fprintf(h,"%s",(pptr->access?pptr->access:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," scope=%c",0x0022);
+		fprintf(h,"%s",(pptr->scope?pptr->scope:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," type=%c",0x0022);
+		fprintf(h,"%s",(pptr->type?pptr->type:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -219,6 +240,12 @@ private void set_cords_node_field(
 			pptr->infrastructure = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "access" ) ))
+			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "scope" ) ))
+			pptr->scope = allocate_string(vptr);
+		if (!( strcmp( nptr, "type" ) ))
+			pptr->type = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -287,6 +314,27 @@ private int pass_cords_node_filter(
 		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
+	if (( fptr->access )
+	&&  (strlen( fptr->access ) != 0)) {
+		if (!( pptr->access ))
+			return(0);
+		else if ( strcmp(pptr->access,fptr->access) != 0)
+			return(0);
+		}
+	if (( fptr->scope )
+	&&  (strlen( fptr->scope ) != 0)) {
+		if (!( pptr->scope ))
+			return(0);
+		else if ( strcmp(pptr->scope,fptr->scope) != 0)
+			return(0);
+		}
+	if (( fptr->type )
+	&&  (strlen( fptr->type ) != 0)) {
+		if (!( pptr->type ))
+			return(0);
+		else if ( strcmp(pptr->type,fptr->type) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -300,7 +348,7 @@ private struct rest_response * cords_node_occi_response(
 	struct cords_node * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.node.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
@@ -316,6 +364,15 @@ private struct rest_response * cords_node_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -737,6 +794,12 @@ public struct occi_category * occi_cords_node_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "scope",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		autoload_cords_node_nodes();
@@ -745,9 +808,9 @@ public struct occi_category * occi_cords_node_builder(char * a,char * b) {
 
 }
 
-/*	--------------------------------------------------------	*/
-/*	c o r d s _ c o r e  _ o c c i _ h e a d e r s 	*/
-/*	--------------------------------------------------------	*/
+/*	----------------------------------------------	*/
+/*	c o r d s _ n o d e _ o c c i _ h e a d e r s 	*/
+/*	----------------------------------------------	*/
 public struct rest_header *  cords_node_occi_headers(struct cords_node * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
@@ -819,6 +882,39 @@ public struct rest_header *  cords_node_occi_headers(struct cords_node * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_node.image='%s'\r\n",(sptr->image?sptr->image:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_node.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_node.scope='%s'\r\n",(sptr->scope?sptr->scope:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_node.type='%s'\r\n",(sptr->type?sptr->type:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

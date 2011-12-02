@@ -1,4 +1,24 @@
-
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_cb_h
 #define	_cb_h
 
@@ -26,6 +46,7 @@ struct	cords_provisioning
 struct	cords_node_descriptor
 {
 	char			* nameApp;
+	char 			* typeApp;
 	char			* hid;
 	char			* sid;
 	char			* provider;	/* the provisioner, supplier or "provider"		*/
@@ -43,17 +64,23 @@ struct	cords_node_descriptor
 };
 
 public 	struct	occi_element * cords_first_link( struct occi_response * zptr );
-public 	struct occi_element * cords_next_link( struct occi_element * eptr );
+public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
 
-#ifndef	_STAND_ALONE_BROKER
-public	int cords_manifest_broker(
-	char * host, char * plan, char * nameplan, char * manifest, char * agent, char * tls );
-#else
-public	int cords_manifest_broker(
-	char * host, char * plan, char * agent, char * tls, char * result );
-#endif
+public	struct	xml_element  * cords_build_service( 
+	char * 	name, char * plan, char * manifest, char * account, char * tarification );
+
+public	struct	xml_element * 	cords_build_contract( 
+	char * 	node, 	char * name, char * provider );
+
+public	char *	cords_create_service( char * plan, char * agent, char * tls );
+
+public	char *	cords_manifest_broker(
+	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls );
+
+public	int	get_provisioning_status();
 
 	/* ----- */
 #endif	/* _cb_h */
 	/* ----- */
+
 
