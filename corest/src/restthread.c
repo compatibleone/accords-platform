@@ -21,18 +21,11 @@
 private	struct	rest_thread * firstThread=(struct rest_thread *) 0;
 private	struct	rest_thread * lastThread=(struct rest_thread *) 0;
 
-#undef	_DEBUG_REST_THREAD
-
 /*	-----------------------------------------------------------	*/
 /*		   l o c k _ t h r e a d _ c o n t r o l		*/
 /*	-----------------------------------------------------------	*/
 private	void	lock_rest_thread(struct rest_thread * tptr)
 {
-#ifdef	_DEBUG_REST_THREAD
-	char	buffer[1024];
-	sprintf(buffer,"lock_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 	pthread_mutex_lock( &tptr->lock );
 	return;
 }
@@ -42,14 +35,7 @@ private	void	lock_rest_thread(struct rest_thread * tptr)
 /*	-----------------------------------------------------------	*/
 private	void	unlock_rest_thread(struct rest_thread * tptr)
 {
-#ifdef	_DEBUG_REST_THREAD
-	char	buffer[1024];
-#endif
 	pthread_mutex_unlock( &tptr->lock );
-#ifdef	_DEBUG_REST_THREAD
-	sprintf(buffer,"unlock_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 	return;
 }
 
@@ -63,22 +49,10 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 
 private	void	wait_rest_thread(struct rest_thread * tptr)
 {
-#ifdef	_DEBUG_REST_THREAD
-	char	buffer[1024];
-	sprintf(buffer,"enter_wait_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 
 	pthread_mutex_lock( &tptr->control );
-	//lock_rest_thread(tptr);
 	tptr->started=1;
-	//unlock_rest_thread(tptr);
 	pthread_mutex_unlock( &tptr->control );
-
-#ifdef	_DEBUG_REST_THREAD
-	sprintf(buffer,"leave_wait_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 	return;
 }
 
@@ -91,28 +65,16 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 private	void	start_rest_thread(struct rest_thread * tptr)
 {
 	int	started;
-#ifdef	_DEBUG_REST_THREAD
-	char	buffer[1024];
-	sprintf(buffer,"enter_start_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 	lock_rest_thread(tptr);
 	tptr->started=0;
 	unlock_rest_thread(tptr);
 	pthread_mutex_unlock( &tptr->control );
 	do	{
-		//lock_rest_thread(tptr);
 		if (!( started = tptr->started ))
 			usleep(1);
-		//unlock_rest_thread(tptr);
 		}
 	while (!( started ));
 	pthread_mutex_lock( &tptr->control );
-
-#ifdef	_DEBUG_REST_THREAD
-	sprintf(buffer,"leave_start_rest_thread(%u)",getpid());
-	rest_log_message( buffer );
-#endif
 	return;
 }
 
