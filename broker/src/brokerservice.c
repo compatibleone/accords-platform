@@ -183,16 +183,7 @@ private	int	update_instruction_values(
 /*	result of the operation and will reflect the	*/
 /*	current state of the service and contracts.	*/
 /*	--------------------------------------------	*/
-/*	TODO: IJM 4/12/2011				*/
-/*	--------------------------------------------	*/
-/*	This algorithm is sub-optimal.			*/
-/*	For OCCI Properties				*/
-/*		For Instructions			*/
-/*			Set Value			*/
-/*	Must be replaced by 				*/
-/*	For Instructions				*/
-/*		Locate OCCI Property			*/
-/*			Set Value			*/
+/*	Optimised Configuration Instruction Proccess	*/
 /*	--------------------------------------------	*/
 private	int	service_action( char * id, char * action )
 {
