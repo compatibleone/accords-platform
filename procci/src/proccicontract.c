@@ -34,7 +34,11 @@ private	char *	occi_providers[_MAX_PROVIDERS] = {
 
 
 /*	---------------------------------------------------------	*/
-/*	 r e t r i e v e _ c a r r i e r _ i n f o r m a t i o n	*/
+/*	r e t r i e v e _ p r o v i d e r _ i n f o r m a t i o n	*/
+/*	---------------------------------------------------------	*/
+/*	retrieve the provider specific contract instance details	*/
+/*	the hostname, password and instance reference to be used	*/
+/*	to access and configure the provisioned instance.		*/
 /*	---------------------------------------------------------	*/
 private	int	retrieve_provider_information( struct cords_contract * pptr )
 {
@@ -108,9 +112,15 @@ private	int	contract_instructions( char * contract, char * provision )
 	char	tempname[4096];
 	int	length=0;
 
+	/* ---------------------------------------------------------------- */
+	/* select / retrieve instruction category service provider identity */
+	/* ---------------------------------------------------------------- */
 	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	 	return( 401 );
 
+	/* ---------------------------------------------------------------- */
+	/* retrieve the collection of instructions for the current contract */
+	/* ---------------------------------------------------------------- */
 	sprintf(buffer,"%s/%s/",ihost,_CORDS_INSTRUCTION);
 	liberate( ihost );
 	length = strlen(buffer);
@@ -138,6 +148,9 @@ private	int	contract_instructions( char * contract, char * provision )
 
 	qptr = occi_remove_request ( qptr );
 
+	/* ---------------------------------------------------- */
+	/* for each of the instructions of the current contract */
+	/* ---------------------------------------------------- */
 	for (	eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
@@ -156,12 +169,18 @@ private	int	contract_instructions( char * contract, char * provision )
 			liberate( vptr );
 		}
 
+		/* ----------------------------------------- */
+		/* retrieve the current instruction instance */
+		/* ----------------------------------------- */
 		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		{
 			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.provision" )))
 				zptr = occi_remove_response ( zptr );
 			else
 			{
+				/* ---------------------------------------------------------------------- */
+				/* update this instruction instance with the provider contract identifier */
+				/* ---------------------------------------------------------------------- */
 				if ( fptr->value ) fptr->value = liberate( fptr->value );
 				fptr->value = allocate_string( provision );
 				zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() );
@@ -170,6 +189,7 @@ private	int	contract_instructions( char * contract, char * provision )
 			}
 		}
 
+		/* ----------------------- */
 		/* quick reset of base url */
 		/* ----------------------- */
 		buffer[length] = 0;

@@ -83,7 +83,7 @@ private	void	procci_load()
 private	int	banner()
 {
 	printf("\n   CompatibleOne Request Procci : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
+	printf("\n   Beta Version : 03/12/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -163,13 +163,6 @@ private	int	procci_operation( char * nptr )
 	last = optr;
 
 	if (!( optr = occi_cords_parameter_builder( Procci.domain,"parameter" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	if (!( optr = occi_cords_instruction_builder( Procci.domain,"instruction" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

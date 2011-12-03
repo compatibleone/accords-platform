@@ -55,9 +55,17 @@ private	char *	resolve_openstack_version( char * sptr )
 	else	return( ( pptr->version ? pptr->version : "" ) );
 }
 
-/*	-------------------------------------------	*/
-/* 	o p e n s t a c k _ i n s t r u c t i o n s
-/*	-------------------------------------------	*/
+/*	-----------------------------------------------------------	*/
+/* 		o p e n s t a c k _ i n s t r u c t i o n s		*/
+/*	-----------------------------------------------------------	*/
+/*	Collect the instruction values which apply to this provider	*/
+/*	contract. These values will be the result of configuration	*/
+/*	actions complied to instructions during instance creation	*/
+/*	and the values will have been collected and prepared by the 	*/
+/*	from the corresponding provisioned contracts.			*/
+/*	The values collected will be used to build the META DATA to	*/
+/*	be made available as the provisioned instance personality	*/
+/*	-----------------------------------------------------------	*/
 private	char *	openstack_instructions( char * contract, char * result )
 {
 
@@ -77,6 +85,9 @@ private	char *	openstack_instructions( char * contract, char * result )
 	char	tempname[4096];
 	int	length=0;
 
+	/* ------------------------------------------------------------------------- */
+	/* select / resolve the instruction category service provider identification */
+	/* ------------------------------------------------------------------------- */
 	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, OsProcci.tls ) ))
 	 	return( result );
 
@@ -84,6 +95,9 @@ private	char *	openstack_instructions( char * contract, char * result )
 	liberate( ihost );
 	length = strlen(buffer);
 
+	/* --------------------------------------------------------------------------- */
+	/* retrieve the collection of instruction category instances for this contract */
+	/* --------------------------------------------------------------------------- */
 	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, OsProcci.tls ) ))
 		return( result );
 
@@ -107,6 +121,9 @@ private	char *	openstack_instructions( char * contract, char * result )
 
 	qptr = occi_remove_request ( qptr );
 
+	/* -------------------------------------------------- */
+	/* for each instruction category instance in the list */
+	/* -------------------------------------------------- */
 	for (	eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
@@ -125,6 +142,9 @@ private	char *	openstack_instructions( char * contract, char * result )
 			liberate( vptr );
 		}
 
+		/* -------------------------------------------------- */
+		/* retrieve the current instruction category instance */
+		/* -------------------------------------------------- */
 		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, OsProcci.tls )) != (struct occi_response *) 0)
 		{
 			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
@@ -135,6 +155,9 @@ private	char *	openstack_instructions( char * contract, char * result )
 				zptr = occi_remove_response ( zptr );
 			else
 			{
+				/* ------------------------------------------------------- */
+				/* create the corresponding META DATA type NAME=VALUE pair */
+				/* ------------------------------------------------------- */
 				sprintf(tempname,"%s_%s=%s\n",fptr->value,gptr->value,jptr->value);
 				zzptr = occi_remove_response ( zzptr );
 				zptr = occi_remove_response ( zptr );
@@ -149,6 +172,7 @@ private	char *	openstack_instructions( char * contract, char * result )
 			}
 		}
 
+		/* ----------------------- */
 		/* quick reset of base url */
 		/* ----------------------- */
 		buffer[length] = 0;

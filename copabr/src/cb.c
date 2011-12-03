@@ -1249,7 +1249,7 @@ public	char *	cords_manifest_broker(
 	/* ----------------------------------------- */
 	/* retrieve the account information instance */
 	/* ----------------------------------------- */
-	else if (( CbC.accID  = cords_extract_atribut( CbC.manifest, "occi", _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
+	if (( CbC.accID  = cords_extract_atribut( CbC.manifest, "occi", _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
 			!= (char *) 0)
 	{
 		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent,tls )))
@@ -1259,7 +1259,7 @@ public	char *	cords_manifest_broker(
 	/* ---------------------------------------- */
 	/* retrieve the security procedure instance */
 	/* ---------------------------------------- */
-	else if (( CbC.secID  = cords_extract_atribut( CbC.manifest, "occi", _CORDS_MANIFEST, _CORDS_SECURITY )) 
+	if (( CbC.secID  = cords_extract_atribut( CbC.manifest, "occi", _CORDS_MANIFEST, _CORDS_SECURITY )) 
 		!= (char *) 0)
 	{
 		if (!( CbC.security = cords_retrieve_instance( host, CbC.secID, agent,tls )))
@@ -1269,7 +1269,7 @@ public	char *	cords_manifest_broker(
 	/* ----------------------------------- */
 	/* retrieve the configuration instance */
 	/* ----------------------------------- */
-	else if (!( CbC.confID = cords_extract_atribut( CbC.manifest,"occi",_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
+	if (!( CbC.confID = cords_extract_atribut( CbC.manifest,"occi",_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
 		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent,tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
