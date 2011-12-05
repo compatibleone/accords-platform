@@ -328,7 +328,7 @@ private	int	cords_affectation_instruction(
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, "configure" 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, lptr->prefix  ) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, "self"        ) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.source" 	, aptr->value 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, lptr->value	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"   	, avalue       	) )))

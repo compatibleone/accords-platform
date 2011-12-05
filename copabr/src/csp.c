@@ -328,14 +328,18 @@ public	char *	cordscript_method( int	symbol )
 public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 {
 	int	c;
+	char *	wptr;
 	struct	cordscript_element * lvalue=(struct cordscript_element *) 0;
 	struct	cordscript_element * rvalue=(struct cordscript_element *) 0;
 	struct	cordscript_action * aptr=(struct cordscript_action *) 0;
 	struct	cordscript_action * root=(struct cordscript_action *) 0;
 	struct	cordscript_action * foot=(struct cordscript_action *) 0;
+
 	initialise_token_parser( statement );
+
 	while ( cordscript_token() )
 	{
+		/* ----------------------------- */
 		/* allocate an action controller */
 		/* ----------------------------- */
 		if (!( aptr = allocate_cordscript_action()))
@@ -345,64 +349,90 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 		else 	foot->next = aptr;
 		foot = aptr;
 
+		/* --------------------------- */
 		/* allocate the lvalue element */
 		/* --------------------------- */
 		if (!( aptr->lvalue = allocate_cordscript_element() ))
 			return( liberate_cordscript_actions( root ) );
+
+		/* -------------------------- */
+		/* detect the member operator */
+		/* -------------------------- */
 		else if ((c = cordscript_punctuation()) != '.')
 			return( liberate_cordscript_actions( root ) );
 		else if (!( aptr->lvalue->prefix = allocate_string( Csp.token ) ))
 			return( liberate_cordscript_actions( root ) );
-		else if (!( cordscript_token() ))
-			return( liberate_cordscript_actions( root ) );
-		else if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
-			return( liberate_cordscript_actions( root ) );
 
-		/* seperate between configuration method and affectation */
-		/* ----------------------------------------------------- */
-		if (( aptr->type = cordscript_parse_method( Csp.token )) != 0)
+		while (1)
 		{
-			/* its a configure or monitor statement */
-			/* ------------------------------------ */
-			aptr->lvalue->type = _CORDSCRIPT_METHOD;
-			if ( cordscript_punctuation() != '(' )
+			/* ------------------------- */
+			/* retrieve the member token */
+			/* ------------------------- */
+			if (!( cordscript_token() ))
 				return( liberate_cordscript_actions( root ) );
-			while (1)
+
+			/* ----------------------------------------------------- */
+			/* seperate between configuration method and affectation */
+			/* ----------------------------------------------------- */
+			else if (( aptr->type = cordscript_parse_method( Csp.token )) != 0)
 			{
-				if (!( rvalue = cordscript_term() ))
+				/* ------------------------------------ */
+				/* its a configure or monitor statement */
+				/* ------------------------------------ */
+				aptr->lvalue->type = _CORDSCRIPT_METHOD;
+				if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
 					return( liberate_cordscript_actions( root ) );
-				else if (!( rvalue->previous = lvalue ))
-					aptr->rvalue = rvalue;
-				else	lvalue->next = rvalue;
-				lvalue = rvalue;
-				if ((c = cordscript_punctuation()) == ',' )
-					continue;
-				else
+				else if ( cordscript_punctuation() != '(' )
+					return( liberate_cordscript_actions( root ) );
+				while (1)
 				{
-					if ( c ) cordscript_ungetch( c );
-					break;
+					if (!( rvalue = cordscript_term() ))
+						return( liberate_cordscript_actions( root ) );
+					else if (!( rvalue->previous = lvalue ))
+						aptr->rvalue = rvalue;
+					else	lvalue->next = rvalue;
+					lvalue = rvalue;
+					if ((c = cordscript_punctuation()) == ',' )
+						continue;
+					else
+					{
+						if ( c ) cordscript_ungetch( c );
+						break;
+					}
 				}
+				if ( cordscript_punctuation() != ')' )
+					return( liberate_cordscript_actions( root ) );
+				else if ( cordscript_punctuation() != ';' )
+					return( liberate_cordscript_actions( root ) );
+				else	break;
 			}
-			if ( cordscript_punctuation() != ')' )
+			else if ((c = cordscript_punctuation()) == '=' )
+			{
+				/* ------------------------------ */
+				/* it is an affectation statement */
+				/* ------------------------------ */
+				aptr->lvalue->type = _CORDSCRIPT_PROPERTY;
+				if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
+					return( liberate_cordscript_actions( root ) );
+				else if (!( aptr->rvalue = cordscript_term() ))
+					return( liberate_cordscript_actions( root ) );
+				else if ( cordscript_punctuation() != ';' )
+					return( liberate_cordscript_actions( root ) );
+				else	break;
+			}
+			else if ( c != '.' )
 				return( liberate_cordscript_actions( root ) );
-			if ( cordscript_punctuation() != ';' )
+			else if (!( wptr = allocate( strlen( aptr->lvalue->prefix ) + strlen( Csp.token ) + 2 ) ))
 				return( liberate_cordscript_actions( root ) );
-			else	continue;
-		}
-		else
-		{
-			/* is an affectation statement */
-			/* --------------------------- */
-			aptr->lvalue->type = _CORDSCRIPT_PROPERTY;
-			if ( cordscript_punctuation() != '=' )
-				return( liberate_cordscript_actions( root ) );
-
-			else if (!( aptr->rvalue = cordscript_term() ))
-				return( liberate_cordscript_actions( root ) );
-
-			else if ( cordscript_punctuation() != ';' )
-				return( liberate_cordscript_actions( root ) );
-			else	continue;
+			else
+			{
+				/* ---------------------------------- */
+				/* it is an extended member statement */
+				/* ---------------------------------- */
+				sprintf(wptr,"%s.%s",aptr->lvalue->prefix,Csp.token);
+				liberate( aptr->lvalue->prefix );
+				aptr->lvalue->prefix = wptr;
+			}
 		}
 	}
 	return( aptr );
