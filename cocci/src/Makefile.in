@@ -73,7 +73,7 @@ accords.o: accords.c accords.h
 occiclient.o: occiclient.c occic.c occim.c occiclient.h
 occiserver.o: occiserver.c 
 
-../lib/libcocci.so: occiserver.o occiclient.o accords.o $(LIBCOREST) $(LIBOCCI) $(LIBCORDS)
+../lib/libcocci.so: occiserver.o occiclient.o accords.o $(LIBCOREST) $(LIBOCCI) $(LIBCORDS) $(LIBCOPABR)
 	gcc $(DEBUG) $(SHARED) -o $@ $?
 
 .PHONY: all clean install

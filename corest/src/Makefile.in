@@ -82,7 +82,7 @@ restserver.o: restserver.c
 restclient.o: restclient.c url.c
 
 ../lib/libcorest.so: restserver.o restclient.o restlog.o tlsrest.o tlsload.o socket.o base64.o encode64.o
-	gcc $(DEBUG) $(SHARED) -o $@ $? $(LIBUUID) $(LIBTHREAD) $(LIBSSL)
+	gcc $(DEBUG) $(SHARED) -o $@ $? $(LIBUUID) $(LIBTHREAD) $(LIBSSL) $(LIBCOCCI)
 
 .PHONY: all clean install
 

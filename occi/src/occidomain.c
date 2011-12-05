@@ -736,7 +736,7 @@ public struct rest_header *  cords_domain_occi_headers(struct cords_domain * spt
 	last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_domain.timestamp='%u'\r\n",(sptr->timestamp?sptr->timestamp:0));
+	sprintf(buffer,"occi.cords_domain.timestamp='%s'\r\n",(sptr->timestamp?sptr->timestamp:0));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
