@@ -146,16 +146,17 @@ public	struct	occi_category *	occi_parse_actions( struct occi_category * optr, c
 /*	---------------------------------------------------	*/
 public 	char *	occi_unquoted_value( char * sptr )
 {
+	int	c;
 	int	l;
 	if (!( sptr ))
 		return( sptr );
-	else if ( *sptr != '"' )
+	else if (( *sptr != '"' ) && ( *sptr != 0x0027 ))
 		return( allocate_string( sptr ) );
 	else
 	{
-		sptr++;
+		c = *(sptr++);
 		if ((l = strlen(sptr)) > 0)
-			if ( *(sptr+(l-1)) == '"' )
+			if ( *(sptr+(l-1)) == c )
 				*(sptr+(l-1)) = 0;
 		return( allocate_string( sptr ) );
 	}

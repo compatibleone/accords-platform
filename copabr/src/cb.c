@@ -254,6 +254,133 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ a f f e c t a t i o n _ i n s t r u c t i o n	*/
+/*	---------------------------------------------------------	*/
+/*	here postscript configuration actions are transformed		*/
+/*	to produce the configuration and monitoring instruction		*/
+/*	set used by the combined broker, procci and providers  		*/
+/*	during the actual provisioning for meta data and probe		*/
+/*	channel communication and delivery.				*/
+/*	---------------------------------------------------------	*/
+private	int	cords_affectation_instruction( 
+		char * host,
+		struct xml_element * document,
+		struct cordscript_action * action,
+		char * agent,
+		char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * lptr;
+	struct	cordscript_element * rvalue;
+	char *	avalue=(char *) 0;
+	char	buffer[2048];
+
+	if (!( lptr = action->lvalue ))
+		return( 78 );
+
+	else if (!( lptr->prefix ))
+		return( 30 );
+
+	else if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
+		return( 78 );
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, agent, tls ) ))
+	{
+		liberate_cordscript_action( action );
+		return(46);
+	}
+
+	sprintf(buffer,"%s/%s/",ihost,_CORDS_INSTRUCTION);
+
+	liberate( ihost );
+
+	for (	rvalue=action->rvalue;
+		rvalue != (struct cordscript_element *) 0;
+		rvalue = rvalue->next )
+	{
+		if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		{
+			liberate_cordscript_action( action );
+			return(46);
+		}
+		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+		{
+			kptr = occi_remove_client( kptr );
+			liberate_cordscript_action( action );
+			return(50);
+		}
+		else if (!( avalue = occi_unquoted_value( rvalue->value ) ))
+		{
+			kptr = occi_remove_client( kptr );
+			liberate_cordscript_action( action );
+			return(27);
+		}
+		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, "configure" 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, lptr->prefix  ) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.source" 	, aptr->value 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, lptr->value	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"   	, avalue       	) )))
+		{
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			liberate( avalue );
+			liberate_cordscript_action( action );
+			return(51);
+		}
+		else if (!( yptr = occi_client_post( kptr, qptr ) ))
+		{
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			liberate( avalue );
+			liberate_cordscript_action( action );
+			return(52);
+		}
+		else if (!( ihost = cords_extract_location( yptr ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			liberate( avalue );
+			liberate_cordscript_action( action );
+			return(53);
+		}
+		else if (!( zptr =  cords_create_link( aptr->value,  ihost, agent,tls ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			liberate( avalue );
+			liberate_cordscript_action( action );
+			return(54);
+		}
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			yptr = occi_remove_response( yptr );
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			liberate( avalue );
+		}
+
+
+	}
+	liberate_cordscript_action( action );
+	return( 0 );
+
+}
+
 /*	-------------------------------------------------------		*/
 /*	  c o r d s _ a c t i o n _ i n s t r u c t i o n		*/
 /*	-------------------------------------------------------		*/
@@ -293,7 +420,10 @@ private	int	cords_action_instruction(
 	else if (!( mname = cordscript_method( action->type ) ))
 		return(30);
 
-	if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
+	else if (!( strcasecmp( mname, "none" ) ))
+		return( cords_affectation_instruction( host, document, action, agent, tls ) );
+
+	else if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
 		return( 78 );
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, agent, tls ) ))
