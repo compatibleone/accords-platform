@@ -1,18 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_cordscript_parser_c
 #define	_cordscript_parser_c
 
@@ -73,6 +79,9 @@ private	struct	cords_token_parser
 	0
 	};
 
+/*	---------------------------------------------------------	*/
+/*	      i n i t i a l i s e _ t o k e n _ p a r s e r		*/
+/*	---------------------------------------------------------	*/
 private	void	initialise_token_parser( char * vptr )
 {
 	Csp.value = vptr;
@@ -81,6 +90,9 @@ private	void	initialise_token_parser( char * vptr )
 	return;
 }
 
+/*	---------------------------------------------------------	*/
+/*		c o r d s c r i p t _ g e t c h				*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_getch()
 {
 	int	c;
@@ -103,12 +115,18 @@ private	int	cordscript_getch()
 	return( c );
 }
 
+/*	---------------------------------------------------------	*/
+/*		c o r d s c r i p t _ u n g e t c h			*/
+/*	---------------------------------------------------------	*/
 private	void	cordscript_ungetch(int c)
 {
 	Csp.ungotc = c;
 	return;
 }
 
+/*	---------------------------------------------------------	*/
+/*		c o r d s c r i p t _ i s _ w h i t e			*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_is_white( int c )
 {
 	switch( c )
@@ -123,6 +141,9 @@ private	int	cordscript_is_white( int c )
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*	    c o r d s c r i p t _ i s _ p u n c t u a t i o n		*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_is_punctuation( int c )
 {
 	switch( c )
@@ -139,7 +160,9 @@ private	int	cordscript_is_punctuation( int c )
 	}
 }
 
-
+/*	---------------------------------------------------------	*/
+/*	     c o r d s c r i p t _ r e m o v e _ w h i t e		*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_remove_white()
 {
 	int	c;
@@ -159,6 +182,9 @@ private	int	cordscript_remove_white()
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*		c o r d s c r i p t _ p u n c t u a t i o n		*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_punctuation()
 {
 	int	c;
@@ -169,6 +195,9 @@ private	int	cordscript_punctuation()
 	else	return( cordscript_getch() );
 }
 
+/*	---------------------------------------------------------	*/
+/*			c o r d s c r i p t _ t o k e n			*/
+/*	---------------------------------------------------------	*/
 private	int	cordscript_token()
 {
 	int	quoting=0;
@@ -266,9 +295,37 @@ public	struct	cordscript_element *	cordscript_term()
 }
 
 /*	---------------------------------------------------------	*/
+/*	     c o r d s c r i p t _ p a r s e _ m e t h o d		*/
+/*	---------------------------------------------------------	*/
+/*	determine the nature of the cordscript method if any.		*/
+/*	---------------------------------------------------------	*/
+public	int	cordscript_parse_method( char * token )
+{
+	if (!( strcasecmp( Csp.token, "configure" )))
+		return( _CORDSCRIPT_CONFIGURE );
+	else if (!( strcasecmp( Csp.token, "monitor" )))
+		return( _CORDSCRIPT_MONITOR );
+	else	return( _CORDSCRIPT_AFFECT  );
+}
+
+/*	---------------------------------------------------------	*/
+/*	     	c o r d s c r i p t _ m e t h o d			*/
+/*	---------------------------------------------------------	*/
+/*	returns the method name of a parsed method symbol.		*/
+/*	---------------------------------------------------------	*/
+public	char *	cordscript_method( int	symbol )
+{
+	if ( symbol == _CORDSCRIPT_CONFIGURE )
+		return( "configure" );
+	else if ( symbol == _CORDSCRIPT_MONITOR )
+		return( "monitor" );
+	else	return( "none" );
+}
+
+/*	---------------------------------------------------------	*/
 /*	 c o r d s _ s c r i p t _ p a r s e _ s t a t e m e n t	*/
 /*	---------------------------------------------------------	*/
-public	struct	cordscript_action *	cordscript_parse_statement( char * statement )
+public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 {
 	int	c;
 	struct	cordscript_element * lvalue=(struct cordscript_element *) 0;
@@ -303,10 +360,11 @@ public	struct	cordscript_action *	cordscript_parse_statement( char * statement )
 
 		/* seperate between configuration method and affectation */
 		/* ----------------------------------------------------- */
-		if (!( strcmp( Csp.token, "configure" )))
+		if (( aptr->type = cordscript_parse_method( Csp.token )) != 0)
 		{
+			/* its a configure or monitor statement */
+			/* ------------------------------------ */
 			aptr->lvalue->type = _CORDSCRIPT_METHOD;
-			aptr->type = _CORDSCRIPT_CONFIGURE;
 			if ( cordscript_punctuation() != '(' )
 				return( liberate_cordscript_actions( root ) );
 			while (1)
@@ -333,8 +391,9 @@ public	struct	cordscript_action *	cordscript_parse_statement( char * statement )
 		}
 		else
 		{
+			/* is an affectation statement */
+			/* --------------------------- */
 			aptr->lvalue->type = _CORDSCRIPT_PROPERTY;
-			aptr->type = _CORDSCRIPT_AFFECT;
 			if ( cordscript_punctuation() != '=' )
 				return( liberate_cordscript_actions( root ) );
 
@@ -349,6 +408,9 @@ public	struct	cordscript_action *	cordscript_parse_statement( char * statement )
 	return( aptr );
 }
 
+/*	---------------------------------------------------------	*/
+/*	     c o r d s c r i p t _ s h o w _ e l e m e n t		*/
+/*	---------------------------------------------------------	*/
 private	void	cordscript_show_element( struct cordscript_element * eptr )
 {
 	if ( eptr->type == _CORDSCRIPT_LITERAL )
@@ -361,6 +423,9 @@ private	void	cordscript_show_element( struct cordscript_element * eptr )
 	return;
 }
 
+/*	---------------------------------------------------------	*/
+/*	    c o r d s c r i p t _ s h o w _ c o n f i g u r e		*/
+/*	---------------------------------------------------------	*/
 private	void	cordscript_show_configure( struct cordscript_action * aptr )
 {
 	int	punctuation='(';
@@ -378,6 +443,29 @@ private	void	cordscript_show_configure( struct cordscript_action * aptr )
 	return;
 }
 	
+/*	---------------------------------------------------------	*/
+/*	    c o r d s c r i p t _ s h o w _ m o n i t o r 		*/
+/*	---------------------------------------------------------	*/
+private	void	cordscript_show_monitor( struct cordscript_action * aptr )
+{
+	int	punctuation='(';
+	struct	cordscript_element * eptr;
+	cordscript_show_element( aptr->lvalue );
+	for ( 	eptr=aptr->rvalue;
+		eptr != (struct cordscript_element *) 0;
+		eptr = eptr->next )
+	{
+		printf(" %c ",punctuation);
+		cordscript_show_element( eptr );
+		punctuation = ',';
+	}
+	printf(" );\n");
+	return;
+}
+	
+/*	---------------------------------------------------------	*/
+/*	    c o r d s c r i p t _ s h o w _ a f f e c t			*/
+/*	---------------------------------------------------------	*/
 private	void	cordscript_show_affect( struct cordscript_action * aptr )
 {
 	cordscript_show_element( aptr->lvalue );
@@ -387,6 +475,9 @@ private	void	cordscript_show_affect( struct cordscript_action * aptr )
 	return;
 }
 
+/*	---------------------------------------------------------	*/
+/*		     c o r d s c r i p t _ s h o w			*/
+/*	---------------------------------------------------------	*/
 public	void	cordscript_show( struct cordscript_action * aptr )
 {
 	struct	cordscript_element * eptr;
@@ -397,6 +488,8 @@ public	void	cordscript_show( struct cordscript_action * aptr )
 	{
 		if ( aptr->type == _CORDSCRIPT_CONFIGURE )
 			cordscript_show_configure( aptr );
+		else if ( aptr->type == _CORDSCRIPT_MONITOR )
+			cordscript_show_monitor( aptr );
 		else if ( aptr->type == _CORDSCRIPT_AFFECT )
 			cordscript_show_affect( aptr );
 		else	printf("unknown cordscript action type\n");

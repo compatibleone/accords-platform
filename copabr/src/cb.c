@@ -257,6 +257,12 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 /*	-------------------------------------------------------		*/
 /*	  c o r d s _ a c t i o n _ i n s t r u c t i o n		*/
 /*	-------------------------------------------------------		*/
+/*	here postscript configuration actions are transformed		*/
+/*	to produce the configuration and monitoring instruction		*/
+/*	set used by the combined broker, procci and providers  		*/
+/*	during the actual provisioning for meta data and probe		*/
+/*	channel communication and delivery.				*/
+/*	-------------------------------------------------------		*/
 private	int	cords_action_instruction( 
 		char * host,
 		struct xml_element * document,
@@ -275,13 +281,17 @@ private	int	cords_action_instruction(
 	struct	xml_atribut * bptr;
 	struct	cordscript_element * lptr;
 	struct	cordscript_element * rvalue;
+	char *	mname;
 	char	buffer[2048];
 
 	if (!( lptr = action->lvalue ))
 		return( 78 );
+
 	else if (!( lptr->prefix ))
 		return( 30 );
 
+	else if (!( mname = cordscript_method( action->type ) ))
+		return(30);
 
 	if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
 		return( 78 );
@@ -315,8 +325,8 @@ private	int	cords_action_instruction(
 			return(50);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, "configure" 	) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method" 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, mname 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"  	, "" 		) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, rvalue->prefix) ))
@@ -400,10 +410,20 @@ private	int	cords_configuration_action(
 /*	this function is called from the service instance build		*/
 /*	once the contract instances have been created and their		*/
 /*	details are resolved and established. 				*/
-/*	Here we will parse the collection of action statements		*/
+/*									*/
+/*	Here two things will happen:					*/
+/*									*/
+/*	1) we will parse the collection of action statements		*/
 /*	to produce the corresponding concrete configuration 		*/
 /*	actions required to communicate the run time parameter		*/
 /*	values to the provider instantiation mechanisms.		*/
+/*									*/
+/*	2) we will parse the collection of action statements to		*/
+/*	produce the collection of monitoring channels that are 		*/
+/*	to be set up for the control of the service.			*/
+/*									*/
+/*	These two will occur at the same, differentiated by the		*/
+/*	cordscript keywords "configure" and "monitor".			*/
 /*	-------------------------------------------------------		*/
 
 private	int	cords_broker_configuration( 

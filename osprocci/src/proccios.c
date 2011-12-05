@@ -147,7 +147,20 @@ private	char *	openstack_instructions( char * contract, char * result )
 		/* -------------------------------------------------- */
 		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, OsProcci.tls )) != (struct occi_response *) 0)
 		{
-			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
+			/* ensure its a configuration method */
+			/* --------------------------------- */
+			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.type" )))
+				zptr = occi_remove_response ( zptr );
+			else if ( strcasecmp( fptr->value, "method" ) )
+				zptr = occi_remove_response ( zptr );
+			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.member" )))
+				zptr = occi_remove_response ( zptr );
+			else if ( strcasecmp( fptr->value, "configure" ) )
+				zptr = occi_remove_response ( zptr );
+
+			/* collect the configuration details */
+			/* --------------------------------- */
+			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
 				zptr = occi_remove_response ( zptr );
 			else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
 				zptr = occi_remove_response ( zptr );
