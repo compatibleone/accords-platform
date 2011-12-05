@@ -173,6 +173,7 @@ private	struct xml_atribut *	cords_resolve_contract_id( struct xml_element * doc
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * bptr;
+	int	l;
 
 	/* --------------------------------------------------- */ 
 	/* resolve the contract id of the target of the action */
@@ -185,10 +186,31 @@ private	struct xml_atribut *	cords_resolve_contract_id( struct xml_element * doc
 			continue;
 		else if (!( bptr->value ))
 			continue;
+		/* ---------------------------------------------------- */
+		/* an exact match is easy so we have found the contract */
+		/* ---------------------------------------------------- */
 		else if (!( strcmp( bptr->value , coreappname  ) ))
 			break;
+		else if (!( l = strlen( bptr->value ) ))
+			continue;
+		else if (!( strncmp( bptr->value, coreappname, l )))
+		{
+			/* ------------------------------------------- */
+			/* perhaps we have found a complex node prefix */
+			/* ------------------------------------------- */
+			if (!( bptr = document_atribut( eptr, _CORDS_TYPE ) ))
+				continue;
+			else if (!( bptr->value ))
+				continue;
+			else if (!( strcmp( bptr->value , _CORDS_SIMPLE ) ))
+				continue;
+			else if ( *(coreappname+l) != '.' )
+				continue;
+			else if (!( eptr->first ))
+				continue;
+			else	return( cords_resolve_contract_id( eptr->first, (coreappname+l+1) ) );
+		}
 		else	continue;
-
 	}
 	if (!( eptr ))
 		return((struct xml_atribut *) 0);
@@ -957,7 +979,7 @@ public	struct	xml_element * 	cords_build_contract(
 /*	----------------------------------------------------------	*/
 /*	builds a nested service instance graph for complex nodes	*/
 /*	----------------------------------------------------------	*/
-private	char *	cords_instance_service( char * host, char * planid, char * agent, char * tls )
+private	char *	cords_instance_service( char * host, char * planid, char * agent, char * tls, struct xml_element ** root )
 {
 	struct	occi_response * zptr=(struct occi_response *) 0;
 	char *	service=(char *) 0;
@@ -977,7 +999,7 @@ private	char *	cords_instance_service( char * host, char * planid, char * agent,
 		service = (char *) 0;
 	else if (!( manifest = cords_extract_atribut( zptr, "occi", _CORDS_PLAN, _CORDS_MANIFEST ) ))
 		service = (char *) 0;
-	else	service = cords_manifest_broker( host, plan, name, manifest, agent, tls );
+	else	service = cords_manifest_broker( host, plan, name, manifest, agent, tls, root );
 
 	/* ----------------------------- */
 	/* liberate response and strings */
@@ -1004,6 +1026,7 @@ private	struct	xml_element * cords_instance_node(
 		char * namePlan )
 {
 	int	status;
+	struct	xml_element 	*	xroot=(struct xml_element *) 0;
 	struct	xml_element 	*	xptr;
 	struct	xml_element 	* 	document=(struct xml_element *) 0;
 	struct	xml_atribut	*	aptr;
@@ -1184,7 +1207,7 @@ private	struct	xml_element * cords_instance_node(
 	/* ----------------------------------------------------------- */
 	/* not a simple type node so instance a service graph for node */
 	/* ----------------------------------------------------------- */
-	else if (!( service = cords_instance_service( host, App.typeApp, agent, tls ) ))
+	else if (!( service = cords_instance_service( host, App.typeApp, agent, tls, &xroot ) ))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -1205,6 +1228,7 @@ private	struct	xml_element * cords_instance_node(
 		cords_terminate_instance_node( &App );
 		return(document_drop(document));
 	}
+	else 	document->first = document->last = xroot;
 
 	/* -------------------------------------------------- */
 	/* Join the common trunk for Simple and Complex Nodes */
@@ -1359,7 +1383,7 @@ private	int	cords_recover_results(struct xml_element * document, char * agent, c
 /*		c o r d s _ r e q u e s t _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
 public	char *	cords_manifest_broker(
-	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls )
+	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls, struct xml_element ** root )
 {
 	int	status;
 	char	*	id;
@@ -1465,6 +1489,9 @@ public	char *	cords_manifest_broker(
 		}
 	}
 
+	/* ----------------------------------- */
+	/* terminate the service element level */
+	/* ----------------------------------- */
 	(void) cords_terminate_level( CbC.document, agent,tls );
 
 	if ( check_verbose() )
@@ -1473,10 +1500,22 @@ public	char *	cords_manifest_broker(
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);
 
+	/* -------------------------------------------- */
+	/* perform configuration instruction processing */
+	/* -------------------------------------------- */
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent,tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
+	
+	/* ------------------------------------ */
+	/* check if document return is required */
+	/* ------------------------------------ */
+	if ( root )
+	{
+		*root = CbC.document;
+		CbC.document = (struct xml_element *) 0;
+	}
 
-	else 	return( cords_terminate_provisioning( 0, &CbC ) );
+	return( cords_terminate_provisioning( 0, &CbC ) );
 }
 
 	/* --------------- */

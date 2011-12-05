@@ -75,7 +75,8 @@ public	struct	xml_element * 	cords_build_contract(
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 
 public	char *	cords_manifest_broker(
-	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls );
+	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls,
+	struct xml_element ** root );
 
 public	int	get_provisioning_status();
 
