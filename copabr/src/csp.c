@@ -268,6 +268,8 @@ private	int	cordscript_token()
 /*	---------------------------------------------------------	*/
 public	struct	cordscript_element *	cordscript_term()
 {
+	char *	wptr;
+	int	c;
 	struct	cordscript_element * eptr=(struct cordscript_element *) 0;
 	if (!( cordscript_token() ))
 		return( eptr );
@@ -286,10 +288,32 @@ public	struct	cordscript_element *	cordscript_term()
 		eptr->type = _CORDSCRIPT_PROPERTY;
 		if ( cordscript_punctuation() != '.' )
 			return( liberate_cordscript_element( eptr ) );
-		else if (!( cordscript_token() ))
-			return( liberate_cordscript_element( eptr ) );
-		else if (!( eptr->value = allocate_string( Csp.token ) ))
-			return( liberate_cordscript_element( eptr ) );
+		while (1)
+		{
+			if (!( cordscript_token() ))
+				return( liberate_cordscript_element( eptr ) );
+			else if ((c = cordscript_punctuation()) == '.' )
+			{
+				if (!( wptr = allocate( strlen( eptr->prefix ) + strlen( Csp.token ) + 2 ) ))
+					return( liberate_cordscript_element( eptr ) );
+				else
+				{
+					/* ---------------------------------- */
+					/* it is an extended member statement */
+					/* ---------------------------------- */
+					sprintf(wptr,"%s.%s",eptr->prefix,Csp.token);
+					liberate( eptr->prefix );
+					eptr->prefix = wptr;
+				}
+			}
+			else
+			{
+				if ( c ) cordscript_ungetch( c );
+				if (!( eptr->value = allocate_string( Csp.token ) ))
+					return( liberate_cordscript_element( eptr ) );
+				else	break;
+			}
+		}
 	}
 	return( eptr );
 }
