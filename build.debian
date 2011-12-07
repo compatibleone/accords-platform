@@ -32,9 +32,9 @@ cd ../osprocci;   autoscan; autoconf; ./configure; make  all
 cd ../onprocci;   autoscan; autoconf; ./configure; make  all
 cd ../azprocci;   autoscan; autoconf; ./configure; make  all
 cd ../fileserver; autoscan; autoconf; ./configure; make  all
-# ---------------------------------
-# Production of Executable Commands
-# ---------------------------------
+# -------------------------------------
+# Production of ALL Executable Commands
+# -------------------------------------
 cd ../testos;     autoscan; autoconf; ./configure; make  all
 cd ../teston;     autoscan; autoconf; ./configure; make  all
 cd ../testcp;     autoscan; autoconf; ./configure; make  all

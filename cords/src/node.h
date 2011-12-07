@@ -11,7 +11,7 @@ struct	cords_node
 	char *				infrastructure;
 	char *				image;
 	char *				access;
-	char *				service;
+	char *				common;
 	char *				scope;
 	char *				type;
 	int	state;

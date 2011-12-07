@@ -1199,6 +1199,54 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	return( document );
 }
 
+/*	--------------------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ s i m p l e _ c o m m o n  _ c o n t r a c t	*/
+/*	--------------------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_simple_common_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	char *	common;
+	/* ------------------------------------------ */
+	/* retrieve the common instance from the node */
+	/* ------------------------------------------ */
+	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
+		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+	else
+	{
+		liberate( common );
+		return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
+	}
+}
+
+/*	----------------------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ c o m p l e x _ c o m m o n  _ c o n t r a c t	*/
+/*	----------------------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_complex_common_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	char *	common;
+	/* ------------------------------------------ */
+	/* retrieve the common instance from the node */
+	/* ------------------------------------------ */
+	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
+		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+	else
+	{
+		liberate( common );
+		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*		c o r d s _ i n s t a n c e _ c o n t r a c t		*/
 /*	------------------------------------------------------------	*/
@@ -1214,24 +1262,17 @@ private	struct	xml_element * 	cords_instance_contract(
 	/* detect and handle simple type nodes and build a provider contract */
 	/* ----------------------------------------------------------------- */
 	if (!( strcmp( App->typeApp, _CORDS_SIMPLE ) ))
-		return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
-	else	return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
-
-
-}
-
-/*	------------------------------------------------------------	*/
-/*	c o r d s _ i n s t a n c e _ c o m m o n  _ c o n t r a c t	*/
-/*	------------------------------------------------------------	*/
-private	struct	xml_element * 	cords_instance_common_contract(
-	struct cords_node_descriptor * App,
-	char *	host,
-	char *	id,
-	char *	agent,
-	char *	tls,
-	char * namePlan )
-{
-	return( cords_instance_contract( App, host, id, agent, tls, namePlan ) );
+	{
+		if ( App->scope & _SCOPE_COMMON )
+			return( cords_instance_simple_common_contract( App, host, id, agent, tls, namePlan ) );
+		else	return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
+	}
+	else
+	{
+		if ( App->scope & _SCOPE_COMMON )
+			return( cords_instance_complex_common_contract( App, host, id, agent, tls, namePlan ) );
+		else	return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+	}
 }
 
 /*	-------------------------------------------------------		*/
@@ -1276,8 +1317,7 @@ private	struct	xml_element * cords_instance_node(
 		(struct	occi_response *) 0
 	};
 
-	if ( check_verbose() )
-		printf("   CORDS Node \n");
+	if ( check_verbose() )	printf("   CORDS Node \n");
 
 	/* ------------------------------- */
 	/* retrieve the node instance */
@@ -1333,48 +1373,55 @@ private	struct	xml_element * cords_instance_node(
 		else	App.scope |= _ACCESS_PRIVATE;
 	}
 
-
-	/* ------------------------------------------------------------ */
-	/* create the contract, simple or complex and retrieve document */
-	/* ------------------------------------------------------------ */
-	if ( App.scope & _SCOPE_COMMON )
-	{
-		if (!( document = cords_instance_common_contract( &App, host, id, agent, tls, namePlan ) ))
-			return( document );
-	}
-	else if (!( document = cords_instance_contract( &App, host, id, agent, tls, namePlan ) ))
+	/* ---------------------------------------------------- */
+	/* instance or share the service contract for this node */
+	/* ---------------------------------------------------- */
+	if (!( document = cords_instance_contract( &App, host, id, agent, tls, namePlan ) ))
 		return( document );
 
 	/* -------------------------------------------------- */
 	/* Join the common trunk for Simple and Complex Nodes */
 	/* -------------------------------------------------- */
-	if (!( document_add_atribut( document, _CORDS_TYPE, App.typeApp ) ))
+	else if (!( document_add_atribut( document, _CORDS_TYPE, App.typeApp ) ))
 	{
 		cords_terminate_instance_node( &App );
 		return(document_drop(document));
 	}
 
-	if (!( App.contract = cords_create_category( document, agent,tls ) ))
+	/* -------------------------------- */
+	/* build the OCCI contract instance */
+	/* -------------------------------- */
+	else if (!( App.contract = cords_create_category( document, agent,tls ) ))
 	{
 		cords_terminate_instance_node( &App );
 		return(document_drop(document));
 	}
 
+	/* ----------------------------------------- */
+	/* recover the resulting contract identifier */
+	/* ----------------------------------------- */
 	else if ((status = cords_resolve_location( App.contract, document )) != 0)
 	{
 		cords_terminate_instance_node( &App );
 		return(document_drop(document));
 	}
 
+	/* ----------------------------------------- */
+	/* terminate the service contract processing */
+	/* ----------------------------------------- */
 	else if ((status = cords_terminate_level( document, agent,tls )) != 0)
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
 	}
-
-	cords_terminate_instance_node( &App );
-
-	return( document );
+	/* ------------------------------------------- */
+	/* successful completion returnes the document */
+	/* ------------------------------------------- */
+	else
+	{
+		cords_terminate_instance_node( &App );
+		return( document );
+	}
 }
 
 /*	-------------------------------------------------------		*/
