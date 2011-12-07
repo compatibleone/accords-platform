@@ -1245,7 +1245,7 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( aptr = document_add_atribut( xptr, _CORDS_COMMON, common ) ))
+	else if (!( aptr = document_add_atribut( document, _CORDS_COMMON, common ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1296,7 +1296,7 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( aptr = document_add_atribut( xptr, _CORDS_COMMON, common ) ))
+	else if (!( aptr = document_add_atribut( document, _CORDS_COMMON, common ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
