@@ -52,6 +52,12 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->rootpass = liberate(sptr->rootpass);
 		if ( sptr->tarification )
 			 sptr->tarification = liberate(sptr->tarification);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
+		if ( sptr->common )
+			 sptr->common = liberate(sptr->common);
+		if ( sptr->scope )
+			 sptr->scope = liberate(sptr->scope);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->service )
@@ -78,6 +84,9 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->hostname = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->tarification = (char*) 0;
+		sptr->access = (char*) 0;
+		sptr->common = (char*) 0;
+		sptr->scope = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->service = (char*) 0;
 		sptr->when =  0;
@@ -144,6 +153,18 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->tarification = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"access") ))
+		{
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"common") ))
+		{
+			if ( wptr->value ) { sptr->common = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"scope") ))
+		{
+			if ( wptr->value ) { sptr->scope = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"type") ))
 		{
 			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
@@ -183,6 +204,9 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.tarification='%s'\r\n",prefix,nptr,(sptr->tarification?sptr->tarification:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.common='%s'\r\n",prefix,nptr,(sptr->common?sptr->common:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);

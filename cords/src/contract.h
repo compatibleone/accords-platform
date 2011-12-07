@@ -13,6 +13,9 @@ struct	cords_contract
 	char *	hostname;
 	char *	rootpass;
 	char *	tarification;
+	char *	access;
+	char *	common;
+	char *	scope;
 	char *	type;
 	char *	service;
 	int	when;

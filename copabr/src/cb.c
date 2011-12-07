@@ -1210,17 +1210,47 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 	char *	tls,
 	char * namePlan )
 {
+	struct	xml_element * document;
+	struct	xml_atribut * aptr;
 	char *	common;
+
 	/* ------------------------------------------ */
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
 	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
-		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
-	else
 	{
-		liberate( common );
-		return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
+		/* ----------------------------------- */
+		/* build a new simple service contract */
+		/* ----------------------------------- */
+		if (!( document = cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) ))
+			return( document );
+
+		/* ------------------ */
+		/* recover identifier */
+		/* ------------------ */
+		else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
+		{
+			cords_terminate_instance_node( App );
+			return((struct xml_element *) 0);
+		}
+
+		/* ------------------------------------------------------ */
+		/* TODO							  */
+		/* update the common field of the parent node description */
+		/* ------------------------------------------------------ */
+		else	return( document );
 	}
+	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( aptr = document_add_atribut( xptr, _CORDS_COMMON, common ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else	return( document );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -1234,17 +1264,44 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 	char *	tls,
 	char * namePlan )
 {
+	struct	xml_element * document;
+	struct	xml_atribut * aptr;
 	char *	common;
 	/* ------------------------------------------ */
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
 	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
-		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
-	else
-	{
-		liberate( common );
-		return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+
+		/* ------------------------------------ */
+		/* build a new complex service contract */
+		/* ------------------------------------ */
+		if (!( document = cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) ))
+			return( document );
+		/* ------------------ */
+		/* recover identifier */
+		/* ------------------ */
+		else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
+		{
+			cords_terminate_instance_node( App );
+			return((struct xml_element *) 0);
+		}
+		/* ------------------------------------------------------ */
+		/* TODO							  */
+		/* update the common field of the parent node description */
+		/* ------------------------------------------------------ */
+		else	return( document );
 	}
+	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( aptr = document_add_atribut( xptr, _CORDS_COMMON, common ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else	return( document );
 }
 
 /*	------------------------------------------------------------	*/
@@ -1383,6 +1440,26 @@ private	struct	xml_element * cords_instance_node(
 	/* Join the common trunk for Simple and Complex Nodes */
 	/* -------------------------------------------------- */
 	else if (!( document_add_atribut( document, _CORDS_TYPE, App.typeApp ) ))
+	{
+		cords_terminate_instance_node( &App );
+		return(document_drop(document));
+	}
+
+	/* -------------------------------------- */
+	/* Ensure the Access Atribute is in place */
+	/* -------------------------------------- */
+	else if (!( document_add_atribut( document, _CORDS_ACCESS,
+		 ( App.scope & _ACCESS_PUBLIC ? _CORDS_PUBLIC : _CORDS_PRIVATE ) ) ))
+	{
+		cords_terminate_instance_node( &App );
+		return(document_drop(document));
+	}
+
+	/* ------------------------------------- */
+	/* Ensure the Scope Atribute is in place */
+	/* ------------------------------------- */
+	else if (!( document_add_atribut( document, _CORDS_SCOPE, 
+		 ( App.scope & _SCOPE_COMMON ? _CORDS_COMMON : _CORDS_NORMAL ) ) ))
 	{
 		cords_terminate_instance_node( &App );
 		return(document_drop(document));

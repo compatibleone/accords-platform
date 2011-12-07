@@ -153,6 +153,12 @@ private void autoload_cords_contract_nodes() {
 				pptr->rootpass = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "tarification" )) != (struct xml_atribut *) 0)
 				pptr->tarification = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
+				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "common" )) != (struct xml_atribut *) 0)
+				pptr->common = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "scope" )) != (struct xml_atribut *) 0)
+				pptr->scope = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
 				pptr->type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
@@ -212,6 +218,15 @@ public  void autosave_cords_contract_nodes() {
 		fprintf(h," tarification=%c",0x0022);
 		fprintf(h,"%s",(pptr->tarification?pptr->tarification:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," access=%c",0x0022);
+		fprintf(h,"%s",(pptr->access?pptr->access:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," common=%c",0x0022);
+		fprintf(h,"%s",(pptr->common?pptr->common:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," scope=%c",0x0022);
+		fprintf(h,"%s",(pptr->scope?pptr->scope:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," type=%c",0x0022);
 		fprintf(h,"%s",(pptr->type?pptr->type:""));
 		fprintf(h,"%c",0x0022);
@@ -261,6 +276,12 @@ private void set_cords_contract_field(
 			pptr->rootpass = allocate_string(vptr);
 		if (!( strcmp( nptr, "tarification" ) ))
 			pptr->tarification = allocate_string(vptr);
+		if (!( strcmp( nptr, "access" ) ))
+			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "common" ) ))
+			pptr->common = allocate_string(vptr);
+		if (!( strcmp( nptr, "scope" ) ))
+			pptr->scope = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
 			pptr->type = allocate_string(vptr);
 		if (!( strcmp( nptr, "service" ) ))
@@ -356,6 +377,27 @@ private int pass_cords_contract_filter(
 		else if ( strcmp(pptr->tarification,fptr->tarification) != 0)
 			return(0);
 		}
+	if (( fptr->access )
+	&&  (strlen( fptr->access ) != 0)) {
+		if (!( pptr->access ))
+			return(0);
+		else if ( strcmp(pptr->access,fptr->access) != 0)
+			return(0);
+		}
+	if (( fptr->common )
+	&&  (strlen( fptr->common ) != 0)) {
+		if (!( pptr->common ))
+			return(0);
+		else if ( strcmp(pptr->common,fptr->common) != 0)
+			return(0);
+		}
+	if (( fptr->scope )
+	&&  (strlen( fptr->scope ) != 0)) {
+		if (!( pptr->scope ))
+			return(0);
+		else if ( strcmp(pptr->scope,fptr->scope) != 0)
+			return(0);
+		}
 	if (( fptr->type )
 	&&  (strlen( fptr->type ) != 0)) {
 		if (!( pptr->type ))
@@ -409,6 +451,15 @@ private struct rest_response * cords_contract_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.tarification=%s",optr->domain,optr->id,pptr->tarification);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.common=%s",optr->domain,optr->id,pptr->common);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
@@ -845,6 +896,12 @@ public struct occi_category * occi_cords_contract_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "tarification",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "common",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "scope",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
@@ -966,6 +1023,39 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_contract.tarification='%s'\r\n",(sptr->tarification?sptr->tarification:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.common='%s'\r\n",(sptr->common?sptr->common:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.scope='%s'\r\n",(sptr->scope?sptr->scope:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
