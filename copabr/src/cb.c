@@ -761,6 +761,9 @@ private	struct	xml_element * 	cords_add_provider(
 private	void 	cords_terminate_instance_node( struct cords_node_descriptor * dptr )
 {
 	if ( dptr->nameApp )	dptr->nameApp = liberate( dptr->nameApp );
+	if ( dptr->typeApp )	dptr->typeApp = liberate( dptr->typeApp );
+	if ( dptr->accessApp )	dptr->accessApp = liberate( dptr->accessApp );
+	if ( dptr->scopeApp )	dptr->scopeApp = liberate( dptr->scopeApp );
 	if ( dptr->hid )	dptr->hid = liberate( dptr->hid );
 	if ( dptr->sid )	dptr->sid = liberate( dptr->sid );
 	if ( dptr->provider )	dptr->provider = liberate( dptr->provider );
@@ -1012,6 +1015,225 @@ private	char *	cords_instance_service( char * host, char * planid, char * agent,
 	return( service );
 }
 
+/*	------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ c o m p l e x _c o n t r a c t	*/
+/*	------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_complex_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	int	status;
+	struct	xml_element 	*	xroot=(struct xml_element *) 0;
+	struct	xml_element 	*	xptr;
+	struct	xml_element 	* 	document=(struct xml_element *) 0;
+	struct	xml_atribut	*	aptr;
+	char 			*	service;
+
+	/* ----------------------------------------------------------- */
+	/* not a simple type node so instance a service graph for node */
+	/* ----------------------------------------------------------- */
+	if (!( service = cords_instance_service( host, App->typeApp, agent, tls, &xroot ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	/* --------------------------------------------------- */
+	/* then create the contract document for the node here */
+	/* --------------------------------------------------- */
+	else if (!( document = cords_build_contract( id, App->nameApp, _CORDS_ANY ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	/* --------------------------------------------------- */
+	/* now add the service instance identifier to contract */
+	/* --------------------------------------------------- */
+	else if (!( document_add_atribut( document, _CORDS_SERVICE, service ) ))
+	{
+		cords_terminate_instance_node( App );
+		return(document_drop(document));
+	}
+	else 	document->first = document->last = xroot;
+
+	return( document );
+
+}
+
+/*	------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ s i m p l e _ c o n t r a c t	*/
+/*	------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_simple_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	int	status;
+	struct	xml_element 	*	xroot=(struct xml_element *) 0;
+	struct	xml_element 	*	xptr;
+	struct	xml_element 	* 	document=(struct xml_element *) 0;
+	struct	xml_atribut	*	aptr;
+	char 			*	service;
+
+	if (!( App->provider = cords_resolve_provider( App->node, Operator.provider, agent,tls )))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( App->profile = cords_resolve_profile( App->node, namePlan )))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( xptr = cords_add_provider( document, App->provider, App->nameApp, App->profile ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( App->providerid = cords_create_provider( xptr, agent,tls ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( aptr = document_add_atribut( xptr, _CORDS_ID, App->providerid ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	
+	/* ------------------------------------ */
+	/* retrieve the infrastructure instance */
+	/* ------------------------------------ */
+	if (( App->hid  = cords_extract_atribut( App->node, "occi", 
+			_CORDS_NODE, _CORDS_INFRASTRUCTURE )) != (char *) 0)
+	{
+		if (!( App->hardware = cords_retrieve_instance( host, App->hid, agent,tls )))
+		{
+			cords_terminate_instance_node( App );
+			return(document_drop(document));
+		}
+		else	App->hid = liberate( App->hid );
+
+		/* retrieve the compute instance */
+		/* ----------------------------- */
+		if (( App->hid  = cords_extract_atribut( App->hardware, "occi", 
+				_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE )) != (char *) 0)
+		{
+			if (!( App->compute = cords_retrieve_instance( host, App->hid, agent,tls )))
+			{
+				cords_terminate_instance_node( App );
+				return(document_drop(document));
+			}
+			else	App->hid = liberate( App->hid );
+		}
+		else	App->compute = (struct occi_response *) 0;
+
+		/* retrieve the storage instance */
+		/* ----------------------------- */
+		if (( App->hid  = cords_extract_atribut( App->hardware, "occi", 
+				_CORDS_INFRASTRUCTURE, _CORDS_STORAGE )) != (char *) 0)
+		{
+			if (!( App->storage = cords_retrieve_instance( host, App->hid, agent,tls )))
+			{
+				cords_terminate_instance_node( App );
+				return(document_drop(document));
+			}
+			else	App->hid = liberate( App->hid );
+		}
+		else	App->storage = (struct occi_response *) 0;
+
+		/* retrieve the network instance */
+		/* ----------------------------- */
+		if (( App->hid  = cords_extract_atribut( App->hardware, "occi", 
+				_CORDS_INFRASTRUCTURE, _CORDS_NETWORK )) != (char *) 0)
+		{
+			if (!( App->network = cords_retrieve_instance( host, App->hid, agent,tls )))
+			{
+				cords_terminate_instance_node( App );
+				return(document_drop(document));
+			}
+			else	App->hid = liberate( App->hid );
+		}
+		else	App->network = (struct occi_response *) 0;
+	}
+	else	App->hardware = (struct occi_response *) 0;
+
+	/* ------------------------------------ */
+	/* retrieve the infrastructure instance */
+	/* ------------------------------------ */
+	if (( App->sid  = cords_extract_atribut( App->node, "occi", 
+			_CORDS_NODE, _CORDS_IMAGE )) != (char *) 0)
+	{
+		if (!( App->software = cords_retrieve_instance( host, App->sid, agent,tls )))
+		{
+			cords_terminate_instance_node( App );
+			return(document_drop(document));
+		}
+		else	App->sid = liberate( App->sid );
+
+		if (( App->sid  = cords_extract_atribut( App->software, "occi", 
+				_CORDS_IMAGE, _CORDS_SYSTEM )) != (char *) 0)
+		{
+			if (!( App->system = cords_retrieve_instance( host, App->sid, agent,tls )))
+			{
+				cords_terminate_instance_node( App );
+				return(document_drop(document));
+			}
+			else	App->sid = liberate( App->sid );
+		}
+		else	App->system = (struct occi_response *) 0;
+	}
+	else	App->software = (struct occi_response *) 0;
+
+	return( document );
+}
+
+/*	------------------------------------------------------------	*/
+/*		c o r d s _ i n s t a n c e _ c o n t r a c t		*/
+/*	------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	/* ----------------------------------------------------------------- */
+	/* detect and handle simple type nodes and build a provider contract */
+	/* ----------------------------------------------------------------- */
+	if (!( strcmp( App->typeApp, _CORDS_SIMPLE ) ))
+		return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
+	else	return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+
+
+}
+
+/*	------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ c o m m o n  _ c o n t r a c t	*/
+/*	------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_common_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan )
+{
+	return( cords_instance_contract( App, host, id, agent, tls, namePlan ) );
+}
+
 /*	-------------------------------------------------------		*/
 /*	   c o r d s _ i n s t a n c e _ a p p l i a n c e		*/
 /*	-------------------------------------------------------		*/
@@ -1033,6 +1255,9 @@ private	struct	xml_element * cords_instance_node(
 	char 			*	service;
 
 	struct	cords_node_descriptor App = {
+		_SCOPE_NORMAL | _ACCESS_PRIVATE,
+		(char *) 0,
+		(char *) 0,
 		(char *) 0,
 		(char *) 0,
 		(char *) 0,
@@ -1060,6 +1285,9 @@ private	struct	xml_element * cords_instance_node(
 	if (!( App.node = cords_retrieve_instance( host, id, agent,tls)))
 		return((struct xml_element *) 0);
 
+	/* ------------------------------------------ */
+	/* retrieve the node name and type attributes */
+	/* ------------------------------------------ */
 	else if (!(App.nameApp = cords_extract_atribut(App.node,"occi",_CORDS_NODE,_CORDS_NAME)))
 	{
 		cords_terminate_instance_node( &App );
@@ -1073,6 +1301,9 @@ private	struct	xml_element * cords_instance_node(
 			return((struct xml_element *) 0);
 		}
 	}
+	/* --------------------------------------------- */
+	/* ensure default simple type if no type present */
+	/* --------------------------------------------- */
 	else if (!( strcmp(App.typeApp, _CORDS_NULL )))
 	{
 		if (!(App.typeApp = allocate_string(_CORDS_SIMPLE)))
@@ -1082,153 +1313,37 @@ private	struct	xml_element * cords_instance_node(
 		}
 	}
 
-	/* ----------------------------------------------------------------- */
-	/* detect and handle simple type nodes and build a provider contract */
-	/* ----------------------------------------------------------------- */
-	if (!( strcmp( App.typeApp, _CORDS_SIMPLE ) ))
+	/* ----------------------------------------------------- */
+	/* check for scope COMMON and then access PUBLIC/PRIVATE */
+	/* ----------------------------------------------------- */
+	if ((App.scopeApp = cords_extract_atribut(App.node,"occi",_CORDS_NODE,_CORDS_SCOPE)) != (char *) 0)
 	{
-
-		if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent,tls )))
+		if (!( strcasecmp( App.scopeApp, _CORDS_COMMON )))
+			App.scope = _SCOPE_COMMON;
+		else if (!( strcasecmp( App.scopeApp, _CORDS_NORMAL )))
+			App.scope = _SCOPE_NORMAL;
+		else	App.scope = _SCOPE_NORMAL;
+		
+		if ((App.accessApp = cords_extract_atribut(App.node,"occi",_CORDS_NODE,_CORDS_ACCESS)) != (char *) 0)
 		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
+			if (!( strcasecmp( App.scopeApp, _CORDS_PUBLIC )))
+				App.scope |= _ACCESS_PUBLIC;
+			else	App.scope |= _ACCESS_PRIVATE;
 		}
-		else if (!( App.profile = cords_resolve_profile( App.node, namePlan )))
-		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
-		}
-		else if (!( document = cords_build_contract( id, App.nameApp, App.provider )))
-		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
-		}
-		else if (!( xptr = cords_add_provider( document, App.provider, App.nameApp, App.profile ) ))
-		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
-		}
-		else if (!( App.providerid = cords_create_provider( xptr, agent,tls ) ))
-		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
-		}
-		else if (!( aptr = document_add_atribut( xptr, _CORDS_ID, App.providerid ) ))
-		{
-			cords_terminate_instance_node( &App );
-			return((struct xml_element *) 0);
-		}
-	
-		/* ------------------------------------ */
-		/* retrieve the infrastructure instance */
-		/* ------------------------------------ */
-		if (( App.hid  = cords_extract_atribut( App.node, "occi", 
-				_CORDS_NODE, _CORDS_INFRASTRUCTURE )) != (char *) 0)
-		{
-			if (!( App.hardware = cords_retrieve_instance( host, App.hid, agent,tls )))
-			{
-				cords_terminate_instance_node( &App );
-				return(document_drop(document));
-			}
-			else	App.hid = liberate( App.hid );
-
-			/* retrieve the compute instance */
-			/* ----------------------------- */
-			if (( App.hid  = cords_extract_atribut( App.hardware, "occi", 
-					_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE )) != (char *) 0)
-			{
-				if (!( App.compute = cords_retrieve_instance( host, App.hid, agent,tls )))
-				{
-					cords_terminate_instance_node( &App );
-					return(document_drop(document));
-				}
-				else	App.hid = liberate( App.hid );
-			}
-			else	App.compute = (struct occi_response *) 0;
-
-			/* retrieve the storage instance */
-			/* ----------------------------- */
-			if (( App.hid  = cords_extract_atribut( App.hardware, "occi", 
-					_CORDS_INFRASTRUCTURE, _CORDS_STORAGE )) != (char *) 0)
-			{
-				if (!( App.storage = cords_retrieve_instance( host, App.hid, agent,tls )))
-				{
-					cords_terminate_instance_node( &App );
-					return(document_drop(document));
-				}
-				else	App.hid = liberate( App.hid );
-			}
-			else	App.storage = (struct occi_response *) 0;
-
-			/* retrieve the network instance */
-			/* ----------------------------- */
-			if (( App.hid  = cords_extract_atribut( App.hardware, "occi", 
-					_CORDS_INFRASTRUCTURE, _CORDS_NETWORK )) != (char *) 0)
-			{
-				if (!( App.network = cords_retrieve_instance( host, App.hid, agent,tls )))
-				{
-					cords_terminate_instance_node( &App );
-					return(document_drop(document));
-				}
-				else	App.hid = liberate( App.hid );
-			}
-			else	App.network = (struct occi_response *) 0;
-		}
-		else	App.hardware = (struct occi_response *) 0;
-
-		/* ------------------------------------ */
-		/* retrieve the infrastructure instance */
-		/* ------------------------------------ */
-		if (( App.sid  = cords_extract_atribut( App.node, "occi", 
-				_CORDS_NODE, _CORDS_IMAGE )) != (char *) 0)
-		{
-			if (!( App.software = cords_retrieve_instance( host, App.sid, agent,tls )))
-			{
-				cords_terminate_instance_node( &App );
-				return(document_drop(document));
-			}
-			else	App.sid = liberate( App.sid );
-	
-			if (( App.sid  = cords_extract_atribut( App.software, "occi", 
-					_CORDS_IMAGE, _CORDS_SYSTEM )) != (char *) 0)
-			{
-				if (!( App.system = cords_retrieve_instance( host, App.sid, agent,tls )))
-				{
-					cords_terminate_instance_node( &App );
-					return(document_drop(document));
-				}
-				else	App.sid = liberate( App.sid );
-			}
-			else	App.system = (struct occi_response *) 0;
-		}
-		else	App.software = (struct occi_response *) 0;
-	}	
-
-	/* ----------------------------------------------------------- */
-	/* not a simple type node so instance a service graph for node */
-	/* ----------------------------------------------------------- */
-	else if (!( service = cords_instance_service( host, App.typeApp, agent, tls, &xroot ) ))
-	{
-		cords_terminate_instance_node( &App );
-		return((struct xml_element *) 0);
+		else	App.scope |= _ACCESS_PRIVATE;
 	}
-	/* --------------------------------------------------- */
-	/* then create the contract document for the node here */
-	/* --------------------------------------------------- */
-	else if (!( document = cords_build_contract( id, App.nameApp, _CORDS_ANY ) ))
+
+
+	/* ------------------------------------------------------------ */
+	/* create the contract, simple or complex and retrieve document */
+	/* ------------------------------------------------------------ */
+	if ( App.scope & _SCOPE_COMMON )
 	{
-		cords_terminate_instance_node( &App );
-		return((struct xml_element *) 0);
+		if (!( document = cords_instance_common_contract( &App, host, id, agent, tls, namePlan ) ))
+			return( document );
 	}
-	/* --------------------------------------------------- */
-	/* now add the service instance identifier to contract */
-	/* --------------------------------------------------- */
-	else if (!( document_add_atribut( document, _CORDS_SERVICE, service ) ))
-	{
-		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-	else 	document->first = document->last = xroot;
+	else if (!( document = cords_instance_contract( &App, host, id, agent, tls, namePlan ) ))
+		return( document );
 
 	/* -------------------------------------------------- */
 	/* Join the common trunk for Simple and Complex Nodes */

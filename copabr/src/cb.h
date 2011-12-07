@@ -43,10 +43,18 @@ struct	cords_provisioning
 	int			nodes;
 };
 
+#define	_SCOPE_COMMON	2
+#define	_SCOPE_NORMAL	~_SCOPE_COMMON
+#define	_ACCESS_PUBLIC	1
+#define	_ACCESS_PRIVATE	~_ACCESS_PUBLIC
+
 struct	cords_node_descriptor
 {
+	int			scope;
 	char			* nameApp;
 	char 			* typeApp;
+	char			* scopeApp;	/* the node scope : normal/common 			*/
+	char			* accessApp;	/* the node access: public/private 			*/
 	char			* hid;
 	char			* sid;
 	char			* provider;	/* the provisioner, supplier or "provider"		*/
