@@ -556,6 +556,43 @@ private	int	cords_configuration_action(
 	return(0);
 }
 
+/*	-----------------------------------------------		*/
+/*	c o r d s _ u p d a t e _ c o m m o n _ n o d e 	*/
+/*	-----------------------------------------------		*/
+/*	updates the common field of a node instance		*/
+/*	-----------------------------------------------		*/
+private	struct occi_response * cords_update_common_node( 
+		char * id, 
+		struct occi_response * zptr, 
+		char * common, 
+		char * agent, 
+		char * tls )
+{
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_element * fptr;
+	struct	occi_response * yptr;
+
+	/* ----------------------------------------------------- */
+	/* build a client and request, the ncopy response fields */
+	/* ----------------------------------------------------- */
+	if (!( kptr = occi_create_client( id, agent, tls ) ))
+		return((struct occi_response *) 0);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+		return((struct occi_response *) 0);
+	else if (!( fptr = occi_request_from_response( qptr, zptr )))
+		return((struct occi_response *) 0);
+	else if (!( fptr = occi_request_element( qptr, "occi.node.common", common )))
+		return((struct occi_response *) 0);
+
+	/* ---------------------------- */
+	/* put the node data collection */
+	/* ---------------------------- */
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+		return((struct occi_response *) 0);
+	else	return( yptr );
+}
+
 /*	-------------------------------------------------------		*/
 /*	  c o r d s _ b r o k e r _ c o n f i g u r a t i o n		*/
 /*	-------------------------------------------------------		*/
@@ -1210,6 +1247,7 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 	char *	tls,
 	char * namePlan )
 {
+	struct	occi_response * yptr;
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 	char *	common;
@@ -1250,7 +1288,16 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
-	else	return( document );
+	else if (!( yptr = cords_update_common_node( id, App->node, common, agent, tls ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		return( document );
+	}
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -1264,6 +1311,7 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 	char *	tls,
 	char * namePlan )
 {
+	struct	occi_response * yptr;
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 	char *	common;
@@ -1271,7 +1319,7 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
 	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
-
+	{
 		/* ------------------------------------ */
 		/* build a new complex service contract */
 		/* ------------------------------------ */
@@ -1301,7 +1349,16 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
-	else	return( document );
+	else if (!( yptr = cords_update_common_node( id, App->node, common, agent, tls ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		return( document );
+	}
 }
 
 /*	------------------------------------------------------------	*/
