@@ -59,6 +59,12 @@ AC_DEFINE([UNIX])
 AC_DEFINE([unix])
 AC_DEFINE([CONE])
 
+# Variables missing from some versions of autoconf
+abs_top_srcdir=$(pwd)/${top_srcdir}
+AC_SUBST([abs_top_srcdir])
+abs_top_builddir=$(pwd)/${top_buildir}
+AC_SUBST([abs_top_builddir])
+
 ###
 ### Modules configuration
 ###
