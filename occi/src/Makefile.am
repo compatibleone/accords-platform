@@ -21,7 +21,7 @@ dist_data_DATA = occiatb.h occienquiry.c occimachine.c occiparameter.c \
 	occiopenstack.c occireport.c occixlink.c occialgorithm.c occiconstraint.c \
 	occijson.c occioptimise.c occirequest.c occixml.c occiappliance.c \
 	occicontract.c occilink.c occiosconfig.c occirequirement.c \
-	occiatb.c occidomain.c occilink.h occipackage.c occisecurity.c
+	occiatb.c occidomain.c occilink.h occipackage.c occisecurity.c occiiprange.c
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
