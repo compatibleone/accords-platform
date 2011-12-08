@@ -17,5 +17,5 @@ dist_data_DATA = occic.c occic.h \
 libcocci_la_SOURCES = occiclient.c occiclient.h \
     occiserver.c accords.c accords.h
 
-libcocci_la_CFLAGS = $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_CORDS)
+libcocci_la_CFLAGS = $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_PUBOCCI)
 libcocci_la_LDFLAGS = $(LD_COREST) $(LD_OCCI) $(LD_CORDS) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)

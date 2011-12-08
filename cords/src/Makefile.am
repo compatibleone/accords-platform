@@ -27,8 +27,8 @@ dist_data_DATA = account.c azconfig.h cordselements.h instruction.c \
 	contract.h image.h monitor.h optimise.h provider.c storage.h xlink.c \
 	authorise.h infrastructure.c network.c osconfig.c provider.h system.c \
 	xlink.h azconfig.c infrastructure.h network.h osconfig.h publication.c \
-	system.h
+	system.h iprange.c iprange.h
 
-libcords_la_SOURCES = cords2occi.c cordsbase.c iprange.c iprange.h
+libcords_la_SOURCES = cords2occi.c cordsbase.c
 libcords_la_CFLAGS = $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI)
 libcords_la_LDFLAGS = $(LD_COXML)

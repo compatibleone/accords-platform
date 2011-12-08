@@ -10,8 +10,6 @@
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct cords_iprange * allocate_cords_iprange();
-struct cords_iprange * liberate_cords_iprange(struct cords_iprange * optr);
 private pthread_mutex_t list_cords_iprange_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_iprange_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_iprange_last  = (struct occi_kind_node *) 0;
