@@ -42,7 +42,7 @@ fi
 
 AC_CHECK_SSL
 
-AC_CHECK_HEADERS_ONCE([uuid/uuid.h uuid.h],
+AC_CHECK_HEADERS([uuid/uuid.h uuid.h],
                 [break],
 		[AC_MSG_ERROR([You are missing uuid development files])])
 AC_SUBST([CFLAGS_UUID], ["`pkg-config --cflags uuid`"])
