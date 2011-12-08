@@ -1607,11 +1607,11 @@ private	int	cords_instance_plan(
 	struct	xml_atribut *	aptr;
 	struct	occi_response * zptr;
 	if (!( zptr =  cords_create_link( plan, instance, agent,tls ) ))
-		return(911);
+		return(914);
 	else if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent,tls ) ))
-		return(912);
+		return(915);
 	else if (!( aptr = document_add_atribut( document, "instance", instance )))
-		return(913);
+		return(916);
 	else	return(0);
 }
 

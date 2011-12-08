@@ -44,9 +44,9 @@ struct	cords_provisioning
 };
 
 #define	_SCOPE_COMMON	2
-#define	_SCOPE_NORMAL	~_SCOPE_COMMON
+#define	_SCOPE_NORMAL	0
 #define	_ACCESS_PUBLIC	1
-#define	_ACCESS_PRIVATE	~_ACCESS_PUBLIC
+#define	_ACCESS_PRIVATE	0
 
 struct	cords_node_descriptor
 {
