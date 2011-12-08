@@ -8,7 +8,7 @@
 /*	--------------------------------------------	*/
 /*	l i b e r a t e _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------------	*/
-public struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr)
+struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr)
 {
 	if ( sptr )
 	{
@@ -29,7 +29,7 @@ public struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr
 /*	--------------------------------------	*/
 /*	r e s e t _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------	*/
-public struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
+struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
 {
 	if ( sptr )
 	{
@@ -45,7 +45,7 @@ public struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
 /*	--------------------------------------------	*/
 /*	a l l o c a t e _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------------	*/
-public struct cords_iprange * allocate_cords_iprange()
+struct cords_iprange * allocate_cords_iprange()
 {
 	struct cords_iprange * sptr;
 	if (!( sptr = allocate( sizeof( struct cords_iprange ) ) ))
@@ -56,7 +56,7 @@ public struct cords_iprange * allocate_cords_iprange()
 /*	--------------------------------------	*/
 /*	x m l i n _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------	*/
-public int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * eptr)
+int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -87,7 +87,7 @@ public int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * 
 /*	----------------------------------------------	*/
 /*	r e s t _ o c c i _ c o r d s _ i p r a n g e 	*/
 /*	----------------------------------------------	*/
-public int rest_occi_cords_iprange(FILE * fh,struct cords_iprange * sptr,char * prefix, char * nptr)
+int rest_occi_cords_iprange(FILE * fh,struct cords_iprange * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
