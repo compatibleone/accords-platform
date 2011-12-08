@@ -365,9 +365,9 @@ private	int 	occi_auto_publish(
 	struct	auto_publication * pptr;
 	int	status;
 	if (!( optr = vptr ))
-		return;
+	  return(118);
 	else if (!( pptr = optr->payload ))
-		return;
+	  return(118);
 	else 	return( publish_occi_category( 
 				pptr->item, pptr->user, pptr->password, 
 				pptr->url, pptr->agent, optr ));
@@ -386,9 +386,9 @@ private	int 	occi_auto_unpublish(
 	struct	auto_publication * pptr;
 	int	status;
 	if (!( optr = vptr ))
-		return;
+	  return(118);
 	else if (!( pptr = optr->payload ))
-		return;
+	  return(118);
 	else 	return( unpublish_occi_category( 
 				pptr->item, pptr->user, pptr->password, 
 				pptr->url, pptr->agent, optr ));

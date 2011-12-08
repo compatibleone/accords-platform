@@ -1,6 +1,7 @@
 #ifndef _iprange_c_
 #define _iprange_c_
 
+#include <stdio.h>
 #include "element.h"
 
 #include "iprange.h"
