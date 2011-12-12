@@ -8,7 +8,7 @@
 #
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS =
+SUBDIRS = scripts
 if ENABLE_COXML
 SUBDIRS += coxml
 endif
@@ -95,3 +95,4 @@ SUBDIRS += testresolver
 endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog
+

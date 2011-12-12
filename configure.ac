@@ -147,6 +147,7 @@ AC_ARG_ENABLE([coss],
       [enable_coss=yes])
 AM_CONDITIONAL([ENABLE_COSS], [test "$enable_coss" = "yes"])
 AC_SUBST([CFLAGS_COSS], [-I\${abs_top_srcdir}/coss/src])
+AC_SUBST([PATH_COSS], [${abs_top_srcdir}/coss/src])
 
 AC_ARG_ENABLE([coes],
       [AS_HELP_STRING([--disable-coes],
@@ -154,6 +155,7 @@ AC_ARG_ENABLE([coes],
       [],
       [enable_coes=yes])
 AM_CONDITIONAL([ENABLE_COES], [test "$enable_coes" = "yes"])
+AC_SUBST([PATH_COES], [${abs_top_srcdir}/coes/src])
 
 AC_ARG_ENABLE([coobas],
       [AS_HELP_STRING([--disable-coobas],
@@ -161,6 +163,7 @@ AC_ARG_ENABLE([coobas],
       [],
       [enable_coobas=yes])
 AM_CONDITIONAL([ENABLE_COOBAS], [test "$enable_coobas" = "yes"])
+AC_SUBST([PATH_COOBAS], [${abs_top_srcdir}/coobas/src])
 
 AC_ARG_ENABLE([comons],
       [AS_HELP_STRING([--disable-comons],
@@ -168,6 +171,7 @@ AC_ARG_ENABLE([comons],
       [],
       [enable_comons=yes])
 AM_CONDITIONAL([ENABLE_COMONS], [test "$enable_comons" = "yes"])
+AC_SUBST([PATH_COMONS], [${abs_top_srcdir}/comons/src])
 
 AC_ARG_ENABLE([conets],
       [AS_HELP_STRING([--disable-conets],
@@ -175,6 +179,7 @@ AC_ARG_ENABLE([conets],
       [],
       [enable_conets=yes])
 AM_CONDITIONAL([ENABLE_CONETS], [test "$enable_conets" = "yes"])
+AC_SUBST([PATH_CONETS], [${abs_top_srcdir}/conets/src])
 
 AC_ARG_ENABLE([publisher],
       [AS_HELP_STRING([--disable-publisher],
@@ -182,6 +187,7 @@ AC_ARG_ENABLE([publisher],
       [],
       [enable_publisher=yes])
 AM_CONDITIONAL([ENABLE_PUBLISHER], [test "$enable_publisher" = "yes"])
+AC_SUBST([PATH_PUBLISHER], [${abs_top_srcdir}/publisher/src])
 
 AC_ARG_ENABLE([parser],
       [AS_HELP_STRING([--disable-parser],
@@ -190,6 +196,7 @@ AC_ARG_ENABLE([parser],
       [enable_parser=yes])
 AM_CONDITIONAL([ENABLE_PARSER], [test "$enable_parser" = "yes"])
 AC_SUBST([CFLAGS_PARSER], [-I\${abs_top_srcdir}/parser/src])
+AC_SUBST([PATH_PARSER], [${abs_top_srcdir}/parser/src])
 
 AC_ARG_ENABLE([broker],
       [AS_HELP_STRING([--disable-broker],
@@ -198,6 +205,7 @@ AC_ARG_ENABLE([broker],
       [enable_broker=yes])
 AM_CONDITIONAL([ENABLE_BROKER], [test "$enable_broker" = "yes"])
 AC_SUBST([CFLAGS_BROKER], [-I\${abs_top_srcdir}/broker/src])
+AC_SUBST([PATH_BROKER], [${abs_top_srcdir}/broker/src])
 
 AC_ARG_ENABLE([procci],
       [AS_HELP_STRING([--disable-procci],
@@ -206,6 +214,7 @@ AC_ARG_ENABLE([procci],
       [enable_procci=yes])
 AM_CONDITIONAL([ENABLE_PROCCI], [test "$enable_procci" = "yes"])
 AC_SUBST([CFLAGS_PROCCI], [-I\${abs_top_srcdir}/procci/src])
+AC_SUBST([PATH_PROCCI], [${abs_top_srcdir}/procci/src])
 
 AC_ARG_ENABLE([osprocci],
       [AS_HELP_STRING([--disable-osprocci],
@@ -214,6 +223,7 @@ AC_ARG_ENABLE([osprocci],
       [enable_osprocci=yes])
 AM_CONDITIONAL([ENABLE_OSPROCCI], [test "$enable_osprocci" = "yes"])
 AC_SUBST([CFLAGS_OSPROCCI], [-I\${abs_top_srcdir}/osprocci/src])
+AC_SUBST([PATH_OSPROCCI], [${abs_top_srcdir}/osprocci/src])
 
 AC_ARG_ENABLE([onprocci],
       [AS_HELP_STRING([--disable-onprocci],
@@ -222,6 +232,7 @@ AC_ARG_ENABLE([onprocci],
       [enable_onprocci=yes])
 AM_CONDITIONAL([ENABLE_ONPROCCI], [test "$enable_onprocci" = "yes"])
 AC_SUBST([CFLAGS_ONPROCCI], [-I\${abs_top_srcdir}/onprocci/src])
+AC_SUBST([PATH_ONPROCCI], [${abs_top_srcdir}/onprocci/src])
 
 AC_ARG_ENABLE([azprocci],
       [AS_HELP_STRING([--disable-azprocci],
@@ -230,6 +241,7 @@ AC_ARG_ENABLE([azprocci],
       [enable_azprocci=yes])
 AM_CONDITIONAL([ENABLE_AZPROCCI], [test "$enable_azprocci" = "yes"])
 AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci/src])
+AC_SUBST([PATH_AZPROCCI], [${abs_top_srcdir}/azprocci/src])
 
 AC_ARG_ENABLE([command],
       [AS_HELP_STRING([--disable-command],
@@ -280,6 +292,7 @@ AC_ARG_ENABLE([fileserver],
       [],
       [enable_fileserver=yes])
 AM_CONDITIONAL([ENABLE_FILESERVER], [test "$enable_fileserver" = "yes"])
+AC_SUBST([PATH_FILESERVER], [${abs_top_srcdir}/fileserver/src])
 
 AC_ARG_ENABLE([testresolver],
       [AS_HELP_STRING([--disable-testresolver],

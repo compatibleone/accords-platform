@@ -1,0 +1,463 @@
+#!/bin/sh
+#
+# Wrapper for accords commands
+#
+# Copyright: 
+#   Prologue 2011
+#   Mandriva 2011
+#
+# Author: 
+#   Jean Parpaillon
+#   Jamie Marshall
+#
+
+set -e
+
+export PATH=@sitepath@:$PATH
+
+confdir=@pkgsysconfdir@
+if test -e ./accords.ini; then
+    . ./accords.ini
+elif test -e $confdir/accords.ini; then
+    . $confdir/accords.ini
+fi
+
+trace=1
+threads=1
+verbose=0
+debug=0
+domain=occi
+operator=accords
+password=co-system
+
+if [ -z "$target" ]; then
+    target=accords.xml
+fi
+
+if [ -z "$resthost" ]; then
+    resthost=127.0.0.1
+fi
+
+if [ -z "$restport" ]; then
+    restport=8086
+fi
+
+if [ -z "$publisher" ]; then
+    publisher=http://$resthost:$restport
+fi
+
+if [ -z "$monitor" ]; then
+    monitor=$trace
+fi
+
+###
+### Aliases
+###
+### The script must be called through one of the following aliases.
+###
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
+
+_co-start() {
+    echo "Starting ACCORDS"
+
+    echo "Starting accords publication services"
+    run-publisher &
+    sleep 1
+
+    echo "Starting accords file services"
+    run-fileserver & 
+    sleep 1
+    
+    echo "Starting accords security services"
+    run-coss &
+    sleep 1
+
+    echo "Starting accords monitoring services"
+    run-comons &
+    sleep 1
+    
+    echo "Starting accords accounting services"
+    run-coobas &
+    sleep 1
+    
+    echo "Starting accords networking services"
+    run-conets &
+    sleep 1
+
+    echo "Starting accords elasticity services"
+    run-coes &
+    sleep 1
+    
+    echo "Starting accords parser services"
+    run-parser &
+    sleep 1
+
+    echo "Starting accords broker services"
+    run-broker &
+    sleep 1
+
+    echo "Starting accords procci services"
+    run-procci &
+    sleep 1
+
+    echo "Starting accords open stack services"
+    run-osprocci &
+    sleep 1
+
+    echo "Starting accords open nebula services"
+    run-onprocci &
+    sleep 1
+    
+    echo "Starting accords windows azure services"
+    run-azprocci &
+    sleep 1
+
+    echo "ACCORDS ready"
+    co-status
+}
+
+_co-broker() {
+    if [ -z "$tls" ]; then
+	testcb --publisher "$publisher" --verbose plan_$1.xml
+    else
+	testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+    fi
+} 
+
+_co-command() {
+    if [ -z "$tls" ]; then
+	command --publisher "$publisher" $*
+    else
+	command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+    fi
+}
+
+_co-parser() {
+    if [ -z "$tls" ]; then
+	testcp --publisher "$publisher" --verbose $1.xml
+    else
+	testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $1.xml
+    fi
+}
+
+_co-resolver() {
+    if [ -z "$tls" ]; then
+	testresolver --publisher "$publisher" $*
+    else
+	testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+    fi
+}
+
+_co-status() {
+    echo "-----------------------------"
+    echo " Accords Platform Components "
+    echo "-----------------------------"
+    netstat -a -p | grep LISTEN | grep publisher
+    netstat -a -p | grep LISTEN | grep fileserver
+    netstat -a -p | grep LISTEN | grep coss
+    netstat -a -p | grep LISTEN | grep comons
+    netstat -a -p | grep LISTEN | grep conets
+    netstat -a -p | grep LISTEN | grep coobas
+    netstat -a -p | grep LISTEN | grep coes
+    netstat -a -p | grep LISTEN | grep parser
+    netstat -a -p | grep LISTEN | grep broker
+    netstat -a -p | grep LISTEN | grep procci
+}
+
+co-stop() {
+    killall onprocci
+    sleep 1
+    killall osprocci
+    sleep 1
+    killall azprocci
+    sleep 1
+    killall procci
+    sleep 1
+    killall broker
+    sleep 1
+    killall parser
+    sleep 1
+    killall coes
+    sleep 1
+    killall conets
+    sleep 1
+    killall coobas
+    sleep 1
+    killall comons
+    sleep 1
+    killall coss
+    sleep 1
+    killall fileserver
+    sleep 1
+    killall publisher
+}
+
+_run-azprocci() {
+    azprocci --config $target CO-AZPROCCI/1.0
+} 
+
+_run-broker() {
+    broker --config $target CO-BROKER/1.0
+} 
+
+_run-coes() {
+    coes --config $target CO-ES/1.0
+} 
+
+_run-comons() {
+    comons --config $target CO-MONS/1.0
+}
+
+_run-conets() {
+    conets --config $target CO-NETS/1.0
+}
+
+_run-coobas() {
+    coobas --config $target CO-BAS/1.0
+}
+
+_run-coss() {
+    coss --config $target CO-SS/1.0
+}
+
+_run-fileserver() {
+    fileserver --config $target CO-FS/1.0
+}
+
+_run-onprocci() {
+    onprocci --config $target CO-ONPROCCI/1.0
+}
+
+_run-osprocci() {
+    osprocci --config $target CO-OSPROCCI/1.0
+}
+
+_run-parser() {
+    parser --config $target CO-PARSER/1.0
+}
+
+_run-procci() {
+    procci --config $target CO-PROCCI/1.0
+}
+ 
+_run-publisher() {
+    publisher --config $target CO-PUB/1.0
+}
+
+_run-fileserver() {
+
+}
+
+_accords-config() {
+    if test `id -u` -eq 0; then
+	export secdir=$confdir/security
+    else
+	export secdir=$HOME/.accords/security
+    fi
+
+    if [ -z "$tls" ]; then
+	echo "Accords Security Not Required"
+	exit 1
+    fi
+
+    echo "Creating Accords Security Files"
+    
+    export calist=Certificates.crt
+    export pass=Accords
+    export options=13
+    
+    if test -d $secdir; then
+	echo "ACCORDS security dir exists ($secdir): please remove it first !"
+	exit 1
+    else
+	mkdir -p $secdir
+    fi
+
+    _mksecs publisher 0
+    _mksecs fileserver 0
+    _mksecs coss 0
+    _mksecs comons 1
+    _mksecs coes 1
+    _mksecs coobas 1
+    _mksecs conets 1
+    _mksecs broker 1
+    _mksecs parser 1
+    _mksecs procci 1
+    _mksecs osprocci 1
+    _mksecs onprocci 1
+    _mksecs azprocci 1
+    
+    _mksect testcp 1
+    _mksect testcb 1
+    _mksect teston 1
+    _mksect testos 1
+    _mksect testresolver 1
+    _mksect command 1
+
+    echo "Creating Accords Certificats"
+
+    export bits=2048
+    export days=365
+    export sslconfig=./openssl.cnf
+
+    _mkcert coss
+    _mkcert coes
+    _mkcert coobas
+    _mkcert comons
+    _mkcert conets
+    _mkcert broker
+    _mkcert parser
+    _mkcert publisher
+    _mkcert fileserver
+    _mkcert procci
+    _mkcert osprocci
+    _mkcert onprocci
+    _mkcert azprocci
+
+    _mkcert testcp
+    _mkcert testcb
+    _mkcert testos
+    _mkcert teston
+    _mkcert testresolver
+    _mkcert command
+
+    echo "Creating Accords Global Configuration File"
+    echo "<accords>" > $target
+
+    mkpub 
+    mkmon coss 
+    mkmon comons 
+    mkcfg coes 
+    mkcfg conets 
+    mkcfg coobas 
+    mkcfg parser 
+    mkcfg broker 
+    mkcfg procci 
+    mkcfg osprocci  
+    mkcfg onprocci
+    mkcfg azprocci
+    mkcfg fileserver
+
+    echo "</accords>" >> $target
+}
+
+###
+### Helper functions
+###
+_usage() {
+    echo "Usage: this script must be called through one of the following name:"
+    for alias in $aliases; do
+	echo " * $alias"
+    done
+}
+
+_mksecs() {
+    module=$1
+    auth=$2
+    echo "<tls key='$secdir/"${module}"PrivateKey.pem'" > $secdir/${module}Tls.xml
+    echo "     certificate='$secdir/"${module}"Certificate.pem'" >> $secdir/${module}Tls.xml
+    echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
+    echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
+    echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
+    chmod 0640 $secdir/${module}Tls.xml
+}
+
+_mksect() {
+    module=$1
+    auth=$2
+    echo "<tls key='$secdir/"${module}"PrivateKey.pem'" > $secdir/${module}Tls.xml
+    echo "     certificate='$secdir/"${module}"Certificate.pem'" >> $secdir/${module}Tls.xml
+    echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
+    echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
+    echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     option='"$optiont"' />" >> $secdir/${module}Tls.xml
+    chmod 0640 $secdir/${module}Tls.xml
+}
+
+_mkcert() {
+    module=$1
+    if test ! -e $sslconfig; then
+	echo "Can not find openSSL config file: $sslconfig"
+	exit 1
+    fi
+    openssl req -config $sslconfig \
+	-newkey $bits -x509 -days $days -sha1 \
+	-keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem 2> /dev/null
+    chmod 0400 ${secdir}/${module}PrivateKey.pem
+    chmod 0444 ${secdir}/${module}Certificate.pem
+}
+
+_mktls() {
+    module=$1
+    if test -z "$tls"; then
+	echo "         tls=''/>" >> $target
+    else
+	echo "         tls='"$tls"/"${module}"Tls.xml'/>" >> $target
+    fi
+}
+
+_mkpub() {
+    echo "<publisher>" >> $target
+    echo "<rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "<security admin='admin' pass='admin' authorise='0' monitor='"$trace"' " >> $target
+    mktls publisher
+    echo "<memory file='publications.xml' autosave='1'/>" >> $target
+    echo "<domain name='"$domain"'/>" >> $target
+    echo "</publisher>" >> $target
+}
+
+_mkmon() {
+    export restport=$(($restport+1))
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":"$restport"'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    mktls ${module}
+    echo "    <domain name='"$domain"'/>" >> $target
+    echo "</"${module}">" >> $target
+}
+
+_mkcfg() {
+    export restport=$(($restport+1))
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":"$restport"'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$monitor"'" >> $target
+    mktls ${module}
+    echo "    <domain name='"$domain"'/>" >> $target
+    echo "</"${module}">" >> $target
+}
+
+command=
+for alias in $aliases; do
+    if test "$alias" = "$0"; then
+	command=$0
+	break
+    fi
+done
+
+if test -z "$command"; then
+    _usage
+    exit 1
+fi
+
+_$command
+
+exit 0
