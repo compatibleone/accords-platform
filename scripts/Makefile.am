@@ -39,7 +39,7 @@ all-local: $(scripts)
 	done
 
 install-exec-local: accords.in Makefile
-	$(MKDIR_P) $(DESTDIR)$(bindir)
+	mkdir -p $(DESTDIR)$(bindir)
 	srcdir=''; \
 	  test -f ./accords.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}accords.in >$(DESTDIR)$(bindir)/accords
