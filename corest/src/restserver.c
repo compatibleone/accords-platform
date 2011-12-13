@@ -73,6 +73,7 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 {
 	struct rest_server *  sptr;
  
+	printf("Starting server on port %i", port);
 	rest_debug_message( "rest_open_server", _DEBUG_SERVER);
 
 	if (!( port ))
@@ -84,12 +85,12 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 	}
 	else if (!(sptr->net.socket = socket_create(AF_INET, SOCK_STREAM, 0  )))
 	{
-		failure(errno,"socket_create","errno");
+ 	        failure(errno,"socket_create",strerror(errno));
 		return( rest_liberate_server( sptr ) );
 	}
 	else if (!( socket_listen( sptr->net.socket, port, tcpmax ) ))
 	{
-		failure(errno,"socket_listen","errno");
+	        failure(errno,"socket_listen",strerror(errno));
 		return( rest_liberate_server( sptr ) );
 	}
 	else

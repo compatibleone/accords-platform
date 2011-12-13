@@ -263,7 +263,7 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 	else if (!( socket_connect( cptr->net.socket, host, port  ) ))
 	{
-		failure(errno,"socket_listen","errno");
+	        failure(errno,"socket_connect",strerror(errno));
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( tls ))
