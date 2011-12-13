@@ -7,7 +7,7 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libcocci.la
-dist_data_DATA = occic.c occic.h \
+EXTRA_DIST = occic.c occic.h \
 	occim.c occim.h \
 	occipublisher.h \
 	occirescat.h occiresolver.h \

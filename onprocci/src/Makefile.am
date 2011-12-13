@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = onprocci
-dist_data_DATA = proccion.c
+EXTRA_DIST = proccion.c
 
 onprocci_SOURCES = onprocci.c
 

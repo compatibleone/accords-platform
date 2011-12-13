@@ -7,7 +7,7 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libpubocci.la
-dist_data_DATA = autopub.c cordslang.h occirescat.c occirespro.h \
+EXTRA_DIST = autopub.c cordslang.h occirescat.c occirespro.h \
 	autopub.h occipub.c occirescat.h occirespro.c
 
 libpubocci_la_SOURCES = occilogin.c occilogin.h \

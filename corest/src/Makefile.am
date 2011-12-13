@@ -7,7 +7,7 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libcorest.la
-dist_data_DATA = global.h rest.h restpublic.h rests.c \
+EXTRA_DIST = global.h rest.h restpublic.h rests.c \
 	restworker.c tlsconfig.h url.h \
 	restc.c restheader.c restrequest.c restworker.h ssltls.c \
 	connection.h restc.h restheader.h restrequest.h rests.h restworkers.c \

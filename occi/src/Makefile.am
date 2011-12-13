@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libocci.la
-dist_data_DATA = occiatb.h occienquiry.c occimachine.c occiparameter.c \
+EXTRA_DIST = occiatb.h occienquiry.c occimachine.c occiparameter.c \
 	occiservice.c kindnode.c occiauthorise.c occievent.c occimanifest.c \
 	occipar.c occistorage.c kindnode.h occiazconfig.c occi.h \
 	occimixin.c occipar.h occisystem.c linknode.c occibuilder.h occihttp.c \

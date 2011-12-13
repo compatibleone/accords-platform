@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = procci
-dist_data_DATA = proccicontract.c
+EXTRA_DIST = proccicontract.c
 
 procci_SOURCES = procci.c procci.h
 

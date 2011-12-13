@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libcoxml.la
-dist_data_DATA = standard.h types.h
+EXTRA_DIST = standard.h types.h
 
 AM_CPPFLAGS = -DUNIX -Dunix
 

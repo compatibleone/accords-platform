@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = conets
-dist_data_DATA = conetsdomain.c conetsip.c
+EXTRA_DIST = conetsdomain.c conetsip.c
 
 conets_SOURCES = conets.c conetsengine.c conetsengine.h
 

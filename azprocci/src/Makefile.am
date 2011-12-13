@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = azprocci
-dist_data_DATA = certificate.c certificate.h \
+EXTRA_DIST = certificate.c certificate.h \
 	procciaz.c
 
 azprocci_SOURCES = azprocci.c

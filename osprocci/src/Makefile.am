@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = osprocci
-dist_data_DATA = proccios.c
+EXTRA_DIST = proccios.c
 
 osprocci_SOURCES = osprocci.c
 

@@ -7,7 +7,7 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libcopabr.la
-dist_data_DATA = csa.c csa.h \
+EXTRA_DIST = csa.c csa.h \
 	cse.c cse.h \
 	csp.c csp.h
 

@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = broker
-dist_data_DATA = brokerplan.c brokerservice.c
+EXTRA_DIST = brokerplan.c brokerservice.c
 
 broker_SOURCES = broker.c broker.h
 

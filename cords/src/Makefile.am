@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libcords.la
-dist_data_DATA = account.c azconfig.h cordselements.h instruction.c \
+EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
 	node.c package.c publication.h tarif.c \
 	account.h carrier.c cords.h instruction.h \
 	node.h package.h report.c tarif.h \
