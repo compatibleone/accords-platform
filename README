@@ -32,7 +32,6 @@ installed on your platform before launching your build script.
 	AUTOCONF
 	AUTOMAKE
 	AUTOTOOLS
-	pkg-config
 
 	MAKE
 
