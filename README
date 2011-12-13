@@ -32,6 +32,7 @@ installed on your platform before launching your build script.
 	AUTOCONF
 	AUTOMAKE
 	AUTOTOOLS
+	pkg-config
 
 	MAKE
 
@@ -41,25 +42,27 @@ installed on your platform before launching your build script.
 
 	UUID
 
-When the build script has completed it will leave a binary tarball named after the build type
+If you get this package from git repository, you must run:
+# ./autogen.sh
 
-	prodball.debian.tgz is produced by the build.debian
-
-	prodball.linux.tgz is produced by the build.linux
+To build this package, you can run:
+# ./configure [options] (see ./configure --help for options)
+# make
 
 INSTALLATION
 ------------
-To install the Accords Platform you must create a directory into which you wish to install it,
-unzip the corresponding tar ball into the directory then launch the install script. The install
-script is a bash script and may need to be launched using 
 
-	bash install
+To install all files, run (as root):
+# make install
 
-on certain debian based systems. Otherwise just run it as follows :
+OPERATION
+---------
 
-	./install
+If you have not installed files, you must run the following commands from 'scripts' dir.
 
-The installation script may take several parameters which will influence the way in which the
+ACCORDS package provides a configuration script called 'accords-config'.
+
+The configuration script may take several parameters which will influence the way in which the
 installation will be performed.
 
 1) 	configuration file name
@@ -72,17 +75,14 @@ installation will be performed.
 
 When no parameters are passed the installation will be performed as if it had been launched as:
 
-	./install accords.xml http://127.0.0.1 8086 http://127.0.0.1:8086
+	accords-config accords.xml http://127.0.0.1 8086 http://127.0.0.1:8086
 
-The installation procedure will create the master configuration file for all of the components 
+The configuration procedure will create the master configuration file for all of the components 
 of the Accords platform and when security is active will generate the security configurations,
 certificates and private keys for all the OCCI server modules comprising the system. In addition
 a collection of command scripts will be generated that are configured facilitating the use of 
 the different components of the platform.
 
-
-OPERATION
----------
 The following collection of command scripts are to be used for the operation of the platform. 
 
 1)	co-start
@@ -91,7 +91,7 @@ The following collection of command scripts are to be used for the operation of 
 	each of the accords platform component servers. Each server will be launched in background
 	operation mode as a daemon process.
 
-		./co-start
+		co-start
 
 2)	co-status
 	This script may be launched to inspect the status of the Accords Platform. The status inspection 
@@ -99,7 +99,7 @@ The following collection of command scripts are to be used for the operation of 
 	which use the the accords.xml configuration file. It may also be perfomed using netstat to detect
 	the individual server's listening socket.
 
-		./co-status
+		co-status
 
 3)	co-parser
 	This script allows a manifest to be submitted for parsing and results in the creation
@@ -107,7 +107,7 @@ The following collection of command scripts are to be used for the operation of 
 	manifest file without the xml file extension. The script launchs the executable bin/testcp
 	and defines the required publisher and security information as described during installation.
 
-		./co-parser platform
+		co-parser platform
 
 4)	co-broker
 	This script allows the resources described by a plan to be provisioning as a service and started.
@@ -115,7 +115,7 @@ The following collection of command scripts are to be used for the operation of 
 	extension. The script launchs the executable bin/testcb and defines the required publisher 
 	and security information as described during installation.
 
-		./co-broker platform
+		co-broker platform
 
 5)	co-resolver
 	This script allows the publisher to be queried for category service provider information.
@@ -124,9 +124,9 @@ The following collection of command scripts are to be used for the operation of 
 	The recent version of the executable bin/testresolver allows a command line option --price
 	allowing activation of resolution of price information for each category processed.
 
-		./co-resolver compute storage network system package
+		co-resolver compute storage network system package
 
-		./co-resolver --price manifest service contract openstack opennebula
+		co-resolver --price manifest service contract openstack opennebula
 
 6)	co-command
 	This script allows a provisioned service to be started, stopped or saved. The script expects
@@ -135,9 +135,9 @@ The following collection of command scripts are to be used for the operation of 
 	filenames in the service directory. The corresponding command will be performed on each of the 
 	service instance descriptions bringing all contracts of the service up or down as required.
 
-		./co-command start service/uuid-of-service-instance
+		co-command start service/uuid-of-service-instance
 
-		./co-command stop service/uuid-of-service-instance
+		co-command stop service/uuid-of-service-instance
 
 7)	co-stop
 	This script must be launched to stop the Accords Platform and bring the servers offline.
@@ -145,7 +145,7 @@ The following collection of command scripts are to be used for the operation of 
 	each of the service components of the accords platform. Service components intercept this
 	signal and perform a garceful exit after releasing all ressources and saving any data.
 
-		./co-stop
+		co-stop
 
 Several addition binary executable test programs are offered by the package allowing access to the 
 different cloud provider platforms currently supported for use by the Accords Platform. These tools 

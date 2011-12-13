@@ -57,7 +57,7 @@ fi
 ###
 aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
 
-_co-start() {
+_co_start() {
     echo "Starting ACCORDS"
 
     echo "Starting accords publication services"
@@ -116,7 +116,7 @@ _co-start() {
     co-status
 }
 
-_co-broker() {
+_co_broker() {
     if [ -z "$tls" ]; then
 	testcb --publisher "$publisher" --verbose plan_$1.xml
     else
@@ -124,7 +124,7 @@ _co-broker() {
     fi
 } 
 
-_co-command() {
+_co_command() {
     if [ -z "$tls" ]; then
 	command --publisher "$publisher" $*
     else
@@ -132,7 +132,7 @@ _co-command() {
     fi
 }
 
-_co-parser() {
+_co_parser() {
     if [ -z "$tls" ]; then
 	testcp --publisher "$publisher" --verbose $1.xml
     else
@@ -140,7 +140,7 @@ _co-parser() {
     fi
 }
 
-_co-resolver() {
+_co_resolver() {
     if [ -z "$tls" ]; then
 	testresolver --publisher "$publisher" $*
     else
@@ -148,7 +148,7 @@ _co-resolver() {
     fi
 }
 
-_co-status() {
+_co_status() {
     echo "-----------------------------"
     echo " Accords Platform Components "
     echo "-----------------------------"
@@ -164,91 +164,91 @@ _co-status() {
     netstat -a -p | grep LISTEN | grep procci
 }
 
-co-stop() {
-    killall onprocci
+_co_stop() {
+    killall -q onprocci || true
     sleep 1
-    killall osprocci
+    killall -q osprocci || true
     sleep 1
-    killall azprocci
+    killall -q azprocci || true
     sleep 1
-    killall procci
+    killall -q procci || true
     sleep 1
-    killall broker
+    killall -q broker || true
     sleep 1
-    killall parser
+    killall -q parser || true
     sleep 1
-    killall coes
+    killall -q coes || true
     sleep 1
-    killall conets
+    killall -q conets || true
     sleep 1
-    killall coobas
+    killall -q coobas || true
     sleep 1
-    killall comons
+    killall -q comons || true
     sleep 1
-    killall coss
+    killall -q coss || true
     sleep 1
-    killall fileserver
+    killall -q fileserver || true
     sleep 1
-    killall publisher
+    killall -q publisher || true
 }
 
-_run-azprocci() {
+_run_azprocci() {
     azprocci --config $target CO-AZPROCCI/1.0
 } 
 
-_run-broker() {
+_run_broker() {
     broker --config $target CO-BROKER/1.0
 } 
 
-_run-coes() {
+_run_coes() {
     coes --config $target CO-ES/1.0
 } 
 
-_run-comons() {
+_run_comons() {
     comons --config $target CO-MONS/1.0
 }
 
-_run-conets() {
+_run_conets() {
     conets --config $target CO-NETS/1.0
 }
 
-_run-coobas() {
+_run_coobas() {
     coobas --config $target CO-BAS/1.0
 }
 
-_run-coss() {
+_run_coss() {
     coss --config $target CO-SS/1.0
 }
 
-_run-fileserver() {
+_run_fileserver() {
     fileserver --config $target CO-FS/1.0
 }
 
-_run-onprocci() {
+_run_onprocci() {
     onprocci --config $target CO-ONPROCCI/1.0
 }
 
-_run-osprocci() {
+_run_osprocci() {
     osprocci --config $target CO-OSPROCCI/1.0
 }
 
-_run-parser() {
+_run_parser() {
     parser --config $target CO-PARSER/1.0
 }
 
-_run-procci() {
+_run_procci() {
     procci --config $target CO-PROCCI/1.0
 }
  
-_run-publisher() {
+_run_publisher() {
     publisher --config $target CO-PUB/1.0
 }
 
-_run-fileserver() {
-
+_run_fileserver() {
+    fileserver --config $target CO-FS/1.0
 }
 
-_accords-config() {
+_accords_config() {
     if test `id -u` -eq 0; then
 	export secdir=$confdir/security
     else
@@ -257,86 +257,85 @@ _accords-config() {
 
     if [ -z "$tls" ]; then
 	echo "Accords Security Not Required"
-	exit 1
-    fi
-
-    echo "Creating Accords Security Files"
-    
-    export calist=Certificates.crt
-    export pass=Accords
-    export options=13
-    
-    if test -d $secdir; then
-	echo "ACCORDS security dir exists ($secdir): please remove it first !"
-	exit 1
     else
-	mkdir -p $secdir
+	echo "Creating Accords Security Files"
+    
+	export calist=Certificates.crt
+	export pass=Accords
+	export options=13
+    
+	if test -d $secdir; then
+	    echo "ACCORDS security dir exists ($secdir): please remove it first !"
+	    exit 1
+	else
+	    mkdir -p $secdir
+	fi
+
+	_mksecs publisher 0
+	_mksecs fileserver 0
+	_mksecs coss 0
+	_mksecs comons 1
+	_mksecs coes 1
+	_mksecs coobas 1
+	_mksecs conets 1
+	_mksecs broker 1
+	_mksecs parser 1
+	_mksecs procci 1
+	_mksecs osprocci 1
+	_mksecs onprocci 1
+	_mksecs azprocci 1
+    
+	_mksect testcp 1
+	_mksect testcb 1
+	_mksect teston 1
+	_mksect testos 1
+	_mksect testresolver 1
+	_mksect command 1
+
+	echo "Creating Accords Certificats"
+	
+	export bits=2048
+	export days=365
+	export sslconfig=./openssl.cnf
+
+	_mkcert coss
+	_mkcert coes
+	_mkcert coobas
+	_mkcert comons
+	_mkcert conets
+	_mkcert broker
+	_mkcert parser
+	_mkcert publisher
+	_mkcert fileserver
+	_mkcert procci
+	_mkcert osprocci
+	_mkcert onprocci
+	_mkcert azprocci
+	
+	_mkcert testcp
+	_mkcert testcb
+	_mkcert testos
+	_mkcert teston
+	_mkcert testresolver
+	_mkcert command
     fi
 
-    _mksecs publisher 0
-    _mksecs fileserver 0
-    _mksecs coss 0
-    _mksecs comons 1
-    _mksecs coes 1
-    _mksecs coobas 1
-    _mksecs conets 1
-    _mksecs broker 1
-    _mksecs parser 1
-    _mksecs procci 1
-    _mksecs osprocci 1
-    _mksecs onprocci 1
-    _mksecs azprocci 1
-    
-    _mksect testcp 1
-    _mksect testcb 1
-    _mksect teston 1
-    _mksect testos 1
-    _mksect testresolver 1
-    _mksect command 1
-
-    echo "Creating Accords Certificats"
-
-    export bits=2048
-    export days=365
-    export sslconfig=./openssl.cnf
-
-    _mkcert coss
-    _mkcert coes
-    _mkcert coobas
-    _mkcert comons
-    _mkcert conets
-    _mkcert broker
-    _mkcert parser
-    _mkcert publisher
-    _mkcert fileserver
-    _mkcert procci
-    _mkcert osprocci
-    _mkcert onprocci
-    _mkcert azprocci
-
-    _mkcert testcp
-    _mkcert testcb
-    _mkcert testos
-    _mkcert teston
-    _mkcert testresolver
-    _mkcert command
-
-    echo "Creating Accords Global Configuration File"
+    echo "Creating Accords Global Configuration File: $target"
     echo "<accords>" > $target
 
-    mkpub 
-    mkmon coss 
-    mkmon comons 
-    mkcfg coes 
-    mkcfg conets 
-    mkcfg coobas 
-    mkcfg parser 
-    mkcfg broker 
-    mkcfg procci 
-    mkcfg osprocci  
-    mkcfg onprocci
-    mkcfg azprocci
-    mkcfg fileserver
+    _mkpub 
+    _mkmon coss 
+    _mkmon comons 
+    _mkcfg coes 
+    _mkcfg conets 
+    _mkcfg coobas 
+    _mkcfg parser 
+    _mkcfg broker 
+    _mkcfg procci 
+    _mkcfg osprocci  
+    _mkcfg onprocci
+    _mkcfg azprocci
+    _mkcfg fileserver
 
     echo "</accords>" >> $target
 }
@@ -401,13 +400,14 @@ _mkpub() {
     echo "<publisher>" >> $target
     echo "<rest host='"$resthost"' port='"$restport"'/>" >> $target
     echo "<security admin='admin' pass='admin' authorise='0' monitor='"$trace"' " >> $target
-    mktls publisher
+    _mktls publisher
     echo "<memory file='publications.xml' autosave='1'/>" >> $target
     echo "<domain name='"$domain"'/>" >> $target
     echo "</publisher>" >> $target
 }
 
 _mkmon() {
+    module=$1
     export restport=$(($restport+1))
     echo "<"${module} >> $target
     echo "    publisher='"$publisher"'"           >> $target
@@ -421,12 +421,13 @@ _mkmon() {
     echo "         user='service-"${module}"'" >> $target
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$trace"'" >> $target
-    mktls ${module}
+    _mktls ${module}
     echo "    <domain name='"$domain"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 
 _mkcfg() {
+    module=$1
     export restport=$(($restport+1))
     echo "<"${module} >> $target
     echo "    publisher='"$publisher"'"           >> $target
@@ -440,24 +441,86 @@ _mkcfg() {
     echo "         user='service-"${module}"'" >> $target
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$monitor"'" >> $target
-    mktls ${module}
+    _mktls ${module}
     echo "    <domain name='"$domain"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 
-command=
-for alias in $aliases; do
-    if test "$alias" = "$0"; then
-	command=$0
-	break
+if test "`basename $0`" != "accords-config"; then
+    if test ! -e $target; then
+	echo "Can not find target file: $target."
+	echo "Please run accords-config first !"
+	exit 1
     fi
-done
-
-if test -z "$command"; then
-    _usage
-    exit 1
 fi
 
-_$command
+case `basename $0` in
+    co-start) 
+	_co_start 
+	;;
+    co-broker) 
+	_co_broker 
+	;;
+    co-command) 
+	_co_command 
+	;;
+    co-parser) 
+	_co_parser 
+	;;
+    co-resolver)
+	_co_resolver 
+	;;
+    co-status)
+	_co_status 
+	;;
+    co-stop)
+	_co_stop 
+	;;
+    run-azprocci) 
+	_run_azprocci 
+	;;
+    run-broker)
+	_run_broker
+	;;
+    run-coes)
+	_run_coes
+	;;
+    run-comons)
+	_run_comons
+	;;
+    run-conets)
+	_run_conets
+	;;
+    run-coobas)
+	_run_coobas ;;
+    run-coss)
+	_run_coss
+	;;
+    run-fileserver)
+	_run_fileserver
+	;;
+    run-onprocci)
+	_run_onprocci
+	;;
+    run-osprocci)
+	_run_osprocci
+	;;
+    run-parser)
+	_run_parser
+	;;
+    run-procci)
+	_run_procci
+	;;
+    run-publisher)
+	_run_publisher
+	;;
+    accords-config)
+	_accords_config
+	;;
+    *)
+	_usage
+	exit 1
+	;;
+esac
 
 exit 0
