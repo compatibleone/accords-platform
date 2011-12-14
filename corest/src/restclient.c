@@ -35,6 +35,49 @@ public struct rest_header 	* add_rest_header( struct rest_request * rptr );
 public struct rest_response 	* rest_accept_response( struct rest_client * cptr );
 
 /*	-------------------------------------------------	*/
+/*		s e r v i c e _ p r e f i x _ u r l		*/
+/*	-------------------------------------------------	*/
+/*	called to check the presence of a service prefix	*/
+/*	for the provided url or to prepend the default		*/
+/*	prefix as provided.					*/
+/*	-------------------------------------------------	*/
+public	char *	service_prefix_url( char * url, char * prefix )
+{
+	char *	sptr;
+	char *	result=(char *) 0;
+
+	if (!( url )) 
+		return( url );
+	else if (!( prefix ))
+		return( url );
+	else	sptr = url;
+
+	/* ------------------------------------ */
+	/* step over an eventual service prefix */
+	/* ------------------------------------ */
+	while (( *sptr ) && ( *sptr != ':' ) && ( *sptr != '.') && ( *sptr != '/')) sptr++;
+
+
+	/* ---------------------------------------- */
+	/* check for and detect host name or number */
+	/* ---------------------------------------- */
+	if (( *sptr == ':' ) && ( *(sptr+1) == '/' ))
+		return( url );
+
+	/* ---------------------------------------- */
+	/* reallocate memory for prefix url storage */
+	/* ---------------------------------------- */
+	else if (!( result = allocate( strlen( url ) + strlen( prefix ) + 4 ) ))
+		return( liberate( url ) );
+	else
+	{
+		sprintf( result, "%s://%s",prefix,url);
+		liberate( url );
+		return( result );
+	}
+}
+
+/*	-------------------------------------------------	*/
 /*			a n a l y s e _ u r l			*/
 /*	-------------------------------------------------	*/
 public	struct	url *	analyse_url( char * target )

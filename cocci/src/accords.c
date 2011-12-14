@@ -113,6 +113,7 @@ public	void	accords_configuration_options()
 
 public	void	load_accords_configuration( struct accords_configuration * cptr, char * sptr )
 {
+	int	security=0;
 	struct	xml_element * document;
 	struct	xml_element * eptr;
 	struct	xml_element * vptr;
@@ -172,6 +173,37 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 			}
 		}
 		document = document_drop( document );
+
+		/* ---------------------------------------- */
+		/* detect presence and validity of security */
+		/* ---------------------------------------- */
+		if (!( configuration->tls ))
+			security = 0;
+		else if (!( strlen( configuration->tls ) ))
+			security = 0;
+		else	security = 1;
+
+		/* --------------------------------------- */
+		/* ensure service prefixed identity string */
+		/* --------------------------------------- */
+		if ( configuration->identity )
+		{
+			configuration->identity = service_prefix_url( 
+				configuration->identity,
+				( security ? "https" : "http" )
+				);
+		}
+
+		/* ---------------------------------------- */
+		/* ensure service prefixed publisher string */
+		/* ---------------------------------------- */
+		if ( configuration->publisher )
+		{
+			configuration->publisher = service_prefix_url( 
+				configuration->publisher,
+				( security ? "https" : "http" )
+				);
+		}
 	}
 	else if ( configuration->verbose )
 		printf("   Failed to load configuration section : %s, from : %s \n",section,configuration->config);

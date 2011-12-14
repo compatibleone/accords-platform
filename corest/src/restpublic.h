@@ -1,6 +1,9 @@
 #ifndef	_restpublic_h
 #define	_restpublic_h
 
+public	char *	
+	service_prefix_url( char * url, char * prefix );
+
 public	struct	url *	
 	analyse_url( char * target );
 
