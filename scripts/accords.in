@@ -165,31 +165,19 @@ _co_status() {
 }
 
 _co_stop() {
-    killall -q onprocci || true
-    sleep 1
-    killall -q osprocci || true
-    sleep 1
-    killall -q azprocci || true
-    sleep 1
-    killall -q procci || true
-    sleep 1
-    killall -q broker || true
-    sleep 1
-    killall -q parser || true
-    sleep 1
-    killall -q coes || true
-    sleep 1
-    killall -q conets || true
-    sleep 1
-    killall -q coobas || true
-    sleep 1
-    killall -q comons || true
-    sleep 1
-    killall -q coss || true
-    sleep 1
-    killall -q fileserver || true
-    sleep 1
-    killall -q publisher || true
+    _stop_service onprocci
+    _stop_service osprocci
+    _stop_service azprocci
+    _stop_service procci
+    _stop_service broker
+    _stop_service parser
+    _stop_service coes
+    _stop_service conets
+    _stop_service coobas
+    _stop_service comons
+    _stop_service coss
+    _stop_service fileserver
+    _stop_service publisher
 }
 
 _run_azprocci() {
@@ -348,6 +336,14 @@ _usage() {
     for alias in $aliases; do
 	echo " * $alias"
     done
+}
+
+_stop_service() {
+    service=$1
+    echo "Stopping service: $service"
+    killall -q $service || true
+    killall -q lt-$service || true
+    sleep 1
 }
 
 _mksecs() {
