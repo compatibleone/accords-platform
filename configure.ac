@@ -37,7 +37,7 @@ AC_ARG_ENABLE([debug],
       [],
       [enable_debug=no])
 if test "x$enable_debug" = "xyes"; then
-   AC_SUBST([CFLAGS], [-g -ggdb])
+   AC_SUBST([CFLAGS], [-g -ggdb -O0])
 fi
 
 AC_CHECK_SSL
