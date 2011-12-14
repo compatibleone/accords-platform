@@ -452,66 +452,67 @@ fi
 
 case `basename $0` in
     co-start) 
-	_co_start 
+	_co_start $*
 	;;
     co-broker) 
-	_co_broker 
+	_co_broker $*
 	;;
     co-command) 
-	_co_command 
+	_co_command $*
 	;;
     co-parser) 
-	_co_parser 
+	_co_parser $*
 	;;
     co-resolver)
-	_co_resolver 
+	_co_resolver $*
 	;;
     co-status)
-	_co_status 
+	_co_status $*
 	;;
     co-stop)
-	_co_stop 
+	_co_stop $*
 	;;
     run-azprocci) 
-	_run_azprocci 
+	_run_azprocci $*
 	;;
     run-broker)
-	_run_broker
+	_run_broker $*
 	;;
     run-coes)
-	_run_coes
+	_run_coes $*
 	;;
     run-comons)
-	_run_comons
+	_run_comons $*
 	;;
     run-conets)
-	_run_conets
+	_run_conets $*
 	;;
     run-coobas)
-	_run_coobas ;;
+	_run_coobas $*
+	;;
     run-coss)
-	_run_coss
+	_run_coss $*
 	;;
     run-fileserver)
-	_run_fileserver
+	_run_fileserver $*
 	;;
     run-onprocci)
-	_run_onprocci
+	_run_onprocci $*
 	;;
     run-osprocci)
-	_run_osprocci
+	_run_osprocci $*
 	;;
     run-parser)
-	_run_parser
+	_run_parser $*
 	;;
     run-procci)
-	_run_procci
+	_run_procci $*
 	;;
     run-publisher)
-	_run_publisher
+	_run_publisher $*
 	;;
     accords-config)
-	_accords_config
+	_accords_config $*
 	;;
     *)
 	_usage
