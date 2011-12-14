@@ -1332,8 +1332,12 @@ private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char *
 	/* attempt to retrieve an eventual node type which may be more than simple */
 	/* ----------------------------------------------------------------------- */
 	if (( aptr = document_atribut( dptr, _CORDS_TYPE )) != (struct xml_atribut *) 0)
+	{
 		if (!( nodetype = aptr->value ))
 			nodetype = "simple";
+		else if (!( nodetype = occi_unquoted_value( nodetype ) ))
+			nodetype = "simple";
+	}
 
 	if (!( strcmp(nodetype,"simple") ))
 	{
