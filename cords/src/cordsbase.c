@@ -31,6 +31,7 @@
 #include "service.c"
 #include "tarif.c"
 #include "price.c"
+#include "operator.c"
 
 #include "system.c"
 #include "image.c"

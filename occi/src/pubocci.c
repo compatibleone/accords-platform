@@ -25,6 +25,7 @@
 
 #include "occipublication.c"
 #include "occienquiry.c"
+#include "occioperator.c"
 #include "occiagency.c"
 
 	/* ------------- */

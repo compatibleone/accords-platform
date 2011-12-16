@@ -9,7 +9,7 @@ struct	cords_service
 	char *	manifest;
 	char *	plan;
 	char *	account;
-	char *	tarification;
+	char *	price;
 	int	when;
 	int	contracts;
 	int	state;

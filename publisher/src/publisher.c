@@ -634,6 +634,13 @@ private	int	publisher_operation( char * nptr )
 	optr->callback  = &enquiry_interface;
 	optr->access |= _OCCI_PRICING;
 
+	if (!( optr = occi_cords_operator_builder( Publisher.domain, "operator" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_agency_builder( Publisher.domain, "agency" ) ))
 		return( 27 );

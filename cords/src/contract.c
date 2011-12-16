@@ -50,8 +50,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->rootpass )
 			 sptr->rootpass = liberate(sptr->rootpass);
-		if ( sptr->tarification )
-			 sptr->tarification = liberate(sptr->tarification);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
 		if ( sptr->access )
 			 sptr->access = liberate(sptr->access);
 		if ( sptr->common )
@@ -83,7 +83,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->reference = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->rootpass = (char*) 0;
-		sptr->tarification = (char*) 0;
+		sptr->price = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->common = (char*) 0;
 		sptr->scope = (char*) 0;
@@ -149,9 +149,9 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->rootpass = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"tarification") ))
+		else if (!( strcmp(wptr->name,"price") ))
 		{
-			if ( wptr->value ) { sptr->tarification = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"access") ))
 		{
@@ -203,7 +203,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.tarification='%s'\r\n",prefix,nptr,(sptr->tarification?sptr->tarification:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.common='%s'\r\n",prefix,nptr,(sptr->common?sptr->common:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));

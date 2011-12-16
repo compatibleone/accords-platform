@@ -14,6 +14,7 @@ struct	cords_manifest
 	char *				account;
 	char *				security;
 	char *				zone;
+	char *				description;
 	int				state;
 };
 

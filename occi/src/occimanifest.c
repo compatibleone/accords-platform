@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _manifest_c_
 #define _manifest_c_
 
@@ -142,6 +149,10 @@ private void autoload_cords_manifest_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "security" )) != (struct xml_atribut *) 0)
 				pptr->security = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
+				pptr->zone = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -189,6 +200,12 @@ public  void autosave_cords_manifest_nodes() {
 		fprintf(h," security=%c",0x0022);
 		fprintf(h,"%s",(pptr->security?pptr->security:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," zone=%c",0x0022);
+		fprintf(h,"%s",(pptr->zone?pptr->zone:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -225,6 +242,10 @@ private void set_cords_manifest_field(
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "security" ) ))
 			pptr->security = allocate_string(vptr);
+		if (!( strcmp( nptr, "zone" ) ))
+			pptr->zone = allocate_string(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -300,6 +321,20 @@ private int pass_cords_manifest_filter(
 		else if ( strcmp(pptr->security,fptr->security) != 0)
 			return(0);
 		}
+	if (( fptr->zone )
+	&&  (strlen( fptr->zone ) != 0)) {
+		if (!( pptr->zone ))
+			return(0);
+		else if ( strcmp(pptr->zone,fptr->zone) != 0)
+			return(0);
+		}
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
+			return(0);
+		else if ( strcmp(pptr->description,fptr->description) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -332,6 +367,12 @@ private struct rest_response * cords_manifest_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.security=%s",optr->domain,optr->id,pptr->security);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.zone=%s",optr->domain,optr->id,pptr->zone);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -755,6 +796,10 @@ public struct occi_category * occi_cords_manifest_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "security",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "zone",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		autoload_cords_manifest_nodes();
@@ -848,6 +893,28 @@ public struct rest_header *  cords_manifest_occi_headers(struct cords_manifest *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_manifest.security='%s'\r\n",(sptr->security?sptr->security:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_manifest.zone='%s'\r\n",(sptr->zone?sptr->zone:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_manifest.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

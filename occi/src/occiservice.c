@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _service_c_
 #define _service_c_
 
@@ -138,8 +145,8 @@ private void autoload_cords_service_nodes() {
 				pptr->plan = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "tarification" )) != (struct xml_atribut *) 0)
-				pptr->tarification = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "contracts" )) != (struct xml_atribut *) 0)
@@ -185,8 +192,8 @@ public  void autosave_cords_service_nodes() {
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," tarification=%c",0x0022);
-		fprintf(h,"%s",(pptr->tarification?pptr->tarification:""));
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
@@ -226,8 +233,8 @@ private void set_cords_service_field(
 			pptr->plan = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
-		if (!( strcmp( nptr, "tarification" ) ))
-			pptr->tarification = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "contracts" ) ))
@@ -293,11 +300,11 @@ private int pass_cords_service_filter(
 		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
-	if (( fptr->tarification )
-	&&  (strlen( fptr->tarification ) != 0)) {
-		if (!( pptr->tarification ))
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
 			return(0);
-		else if ( strcmp(pptr->tarification,fptr->tarification) != 0)
+		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
@@ -330,7 +337,7 @@ private struct rest_response * cords_service_occi_response(
 	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.tarification=%s",optr->domain,optr->id,pptr->tarification);
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -756,7 +763,7 @@ public struct occi_category * occi_cords_service_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "tarification",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
@@ -843,7 +850,7 @@ public struct rest_header *  cords_service_occi_headers(struct cords_service * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_service.tarification='%s'\r\n",(sptr->tarification?sptr->tarification:""));
+	sprintf(buffer,"occi.cords_service.price='%s'\r\n",(sptr->price?sptr->price:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

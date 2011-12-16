@@ -56,6 +56,7 @@
 #include "publication.h"
 #include "enquiry.h"
 #include "agency.h"
+#include "operator.h"
 
 #include "openstack.h"
 #include "osconfig.h"

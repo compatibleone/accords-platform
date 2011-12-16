@@ -7,6 +7,7 @@
 public struct occi_category * occi_cords_instruction_builder(char *a,char * b);
 public struct occi_category * occi_cords_value_builder(char *a,char * b);
 
+public struct occi_category * occi_cords_operator_builder(char *a,char * b);
 public struct occi_category * occi_cords_optimise_builder(char *a,char * b);
 public struct occi_category * occi_cords_parameter_builder(char *a,char * b);
 public struct occi_category * occi_cords_algorithm_builder(char *a,char * b);
