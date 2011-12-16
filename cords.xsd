@@ -3,12 +3,36 @@
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			Compatible One Resource and Request Description Schema Version 2
+			Provisionary Version 16th December 2011
+			Aligned with the CORDS Reference Manual
 		</xsd:documentation>
 	</xsd:annotation>
 
 	<xsd:element name="manifest" type="cordsManifest"/>
 	<xsd:element name="plan" type="cordsPlan"/>
 	<xsd:element name="service" type="cordsService"/>
+
+	<xsd:complexType name="cordsManifest">
+		<xsd:sequence>
+			<xsd:element name="security" type="cordsSecurity" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="account" type="cordsAccount" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="node" type="cordsNode" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="error" type="cordsError" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="warning" type="cordsWarning" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="choice" type="cordsChoice" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="configuration" type="xsd:string"/>
+		<xsd:attribute name="security" type="xsd:string"/>
+		<xsd:attribute name="account" type="xsd:string"/>
+		<xsd:attribute name="nodes" type="xsd:integer"/>
+		<xsd:attribute name="plan" type="xsd:string"/>
+		<xsd:attribute name="zone" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
 
 	<xsd:complexType name="cordsPlan">
 		<xsd:sequence>
@@ -26,53 +50,39 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="account" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
 		<xsd:attribute name="manifest" type="xsd:string"/>
+		<xsd:attribute name="plan" type="xsd:string"/>
 		<xsd:attribute name="contracts" type="xsd:integer"/>
 	</xsd:complexType>
 	
 	<xsd:complexType name="cordsContract">
 		<xsd:sequence>
-			<xsd:element name="node" type="cordsNode" minOccurs="1" maxOccurs="1"/>
-		</xsd:sequence>
-		<xsd:sequence>
 			<xsd:element name="instruction" type="cordsInstruction" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="profile" type="xsd:string"/>
+		<xsd:attribute name="node" type="xsd:string"/>
 		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="profile" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
+		<xsd:attribute name="scope" type="xsd:string"/>
+		<xsd:attribute name="access" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="common" type="xsd:string"/>
+		<xsd:attribute name="service" type="xsd:string"/>
+		<xsd:attribute name="reference" type="xsd:string"/>
 		<xsd:attribute name="hostname" type="xsd:string"/>
 		<xsd:attribute name="rootpass" type="xsd:string"/>
-		<xsd:attribute name="reference" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
-	</xsd:complexType>
-
-	<xsd:complexType name="cordsManifest">
-		<xsd:sequence>
-			<xsd:element name="security" type="cordsSecurity" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="account" type="cordsAccount" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="node" type="cordsNode" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="error" type="cordsError" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="warning" type="cordsWarning" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="choice" type="cordsChoice" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:string"/>
-		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="configuration" type="xsd:string"/>
-		<xsd:attribute name="security" type="xsd:string"/>
-		<xsd:attribute name="account" type="xsd:string"/>
-		<xsd:attribute name="nodes" type="xsd:integer"/>
-		<xsd:attribute name="plan" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsSecurity">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="level" type="xsd:string"/>
+		<xsd:attribute name="scheme" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -82,6 +92,9 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="number" type="xsd:string"/>
+		<xsd:attribute name="security" type="xsd:string"/>
+		<xsd:attribute name="legal" type="xsd:string"/>
 		<xsd:attribute name="users" type="xsd:integer"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
@@ -90,6 +103,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="password" type="xsd:string"/>
+		<xsd:attribute name="authorization" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -113,7 +127,7 @@
 
 	<xsd:complexType name="cordsInstruction">
 		<xsd:attribute name="id" type="xsd:string"/>
-		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="provision" type="xsd:string"/>
 		<xsd:attribute name="target" type="xsd:string"/>
 		<xsd:attribute name="member" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
@@ -126,15 +140,17 @@
 
 	<xsd:complexType name="cordsNode">
 		<xsd:sequence>
-			<xsd:element name="infrastructure" type="cordsInfrastructure" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="image" type="cordsImage" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="infrastructure" type="cordsInfrastructure" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="image" type="cordsImage" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="profile" type="xsd:string"/>
 		<xsd:attribute name="access" type="xsd:string"/>
 		<xsd:attribute name="scope" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="common" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -189,22 +205,26 @@
 	<xsd:complexType name="cordsSystem">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="nature" type="xsd:string"/>
+		<xsd:attribute name="version" type="xsd:string"/>
 		<xsd:attribute name="distribution" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="constraint" type="xsd:string"/>
 		<xsd:attribute name="requirement" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
+		<xsd:attribute name="license" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsPackage">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="nature" type="xsd:string"/>
+		<xsd:attribute name="version" type="xsd:string"/>
 		<xsd:attribute name="distribution" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="constraint" type="xsd:string"/>
 		<xsd:attribute name="requirement" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
+		<xsd:attribute name="license" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 
