@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _authorise_c_
 #define _authorise_c_
 
@@ -21,9 +28,9 @@
 #include "authorise.h"
 
 /*	--------------------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ a u t h o r i s a t i o n 	*/
+/*	l i b e r a t e _ c o r d s _ a u t h o r i z a t i o n 	*/
 /*	--------------------------------------------------------	*/
-public struct cords_authorisation * liberate_cords_authorisation(struct cords_authorisation * sptr)
+public struct cords_authorization * liberate_cords_authorization(struct cords_authorization * sptr)
 {
 	if ( sptr )
 	{
@@ -37,14 +44,14 @@ public struct cords_authorisation * liberate_cords_authorisation(struct cords_au
 			 sptr->pass = liberate(sptr->pass);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_authorisation *) 0);
+	return((struct cords_authorization *) 0);
 
 }
 
 /*	--------------------------------------------------	*/
-/*	r e s e t _ c o r d s _ a u t h o r i s a t i o n 	*/
+/*	r e s e t _ c o r d s _ a u t h o r i z a t i o n 	*/
 /*	--------------------------------------------------	*/
-public struct cords_authorisation * reset_cords_authorisation(struct cords_authorisation * sptr)
+public struct cords_authorization * reset_cords_authorization(struct cords_authorization * sptr)
 {
 	if ( sptr )
 	{
@@ -62,20 +69,20 @@ public struct cords_authorisation * reset_cords_authorisation(struct cords_autho
 }
 
 /*	--------------------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ a u t h o r i s a t i o n 	*/
+/*	a l l o c a t e _ c o r d s _ a u t h o r i z a t i o n 	*/
 /*	--------------------------------------------------------	*/
-public struct cords_authorisation * allocate_cords_authorisation()
+public struct cords_authorization * allocate_cords_authorization()
 {
-	struct cords_authorisation * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_authorisation ) ) ))
+	struct cords_authorization * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_authorization ) ) ))
 		return( sptr );
-	else	return( reset_cords_authorisation(sptr) );
+	else	return( reset_cords_authorization(sptr) );
 }
 
 /*	--------------------------------------------------	*/
-/*	x m l i n _ c o r d s _ a u t h o r i s a t i o n 	*/
+/*	x m l i n _ c o r d s _ a u t h o r i z a t i o n 	*/
 /*	--------------------------------------------------	*/
-public int xmlin_cords_authorisation(struct cords_authorisation * sptr,struct xml_element * eptr)
+public int xmlin_cords_authorization(struct cords_authorization * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -120,9 +127,9 @@ public int xmlin_cords_authorisation(struct cords_authorisation * sptr,struct xm
 }
 
 /*	----------------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ a u t h o r i s a t i o n 	*/
+/*	r e s t _ o c c i _ c o r d s _ a u t h o r i z a t i o n 	*/
 /*	----------------------------------------------------------	*/
-public int rest_occi_cords_authorisation(FILE * fh,struct cords_authorisation * sptr,char * prefix, char * nptr)
+public int rest_occi_cords_authorization(FILE * fh,struct cords_authorization * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);

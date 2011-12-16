@@ -13,6 +13,8 @@ struct	cords_package
 	char *	description;
 	char *	constraint;
 	char *	requirement;
+	char *	price;
+	char *	license;
 	int	state;
 };
 

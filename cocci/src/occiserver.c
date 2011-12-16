@@ -86,7 +86,7 @@ public	char *	occi_allocate_uuid()
 /*	this function handles the initialisation call from the		*/
 /*	rest server prior to going online and processing messages	*/
 /*	---------------------------------------------------------	*/
-private	char *	occi_authorisation=(char *) 0;
+private	char *	occi_athorization=(char *) 0;
 private	struct rest_server * occi_initialise( void * vptr, struct rest_server * sptr )
 {
 	struct	occi_category * optr;
@@ -96,9 +96,9 @@ private	struct rest_server * occi_initialise( void * vptr, struct rest_server * 
 	if ( check_debug() )
 		printf("   OCCI Server Initialisation \n");
 
-	if ( occi_authorisation )
+	if ( occi_athorization )
 	{
-		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, occi_authorisation ) ))
+		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, occi_athorization ) ))
 			return( sptr );
 		else	sptr->headers = hptr;
 	}
@@ -720,7 +720,7 @@ public	int	occi_process_atributs(
 /*	processing functions needed for each HTTP method.		*/
 /*	---------------------------------------------------------	*/
 public	int	occi_server( char * nptr, int port, char * tls, int max, 
-		struct occi_category * category, char * authorisation )
+		struct occi_category * category, char * athorization )
 {
 	int	status=0;
 	struct	rest_interface  Osi = 
@@ -744,7 +744,7 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		if (!( strlen(tls) ))
 			tls = (char *) 0;
 
-	occi_authorisation = authorisation;
+	occi_athorization = athorization;
 	Osi.authorise = (void *) 0;
 	Osi.instance  = category;
 

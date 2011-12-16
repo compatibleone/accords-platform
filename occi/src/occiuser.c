@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _user_c_
 #define _user_c_
 
@@ -134,8 +141,8 @@ private void autoload_cords_user_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "password" )) != (struct xml_atribut *) 0)
 				pptr->password = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "authorisation" )) != (struct xml_atribut *) 0)
-				pptr->authorisation = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "authorization" )) != (struct xml_atribut *) 0)
+				pptr->authorization = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -173,8 +180,8 @@ public  void autosave_cords_user_nodes() {
 		fprintf(h," password=%c",0x0022);
 		fprintf(h,"%s",(pptr->password?pptr->password:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," authorisation=%c",0x0022);
-		fprintf(h,"%s",(pptr->authorisation?pptr->authorisation:""));
+		fprintf(h," authorization=%c",0x0022);
+		fprintf(h,"%s",(pptr->authorization?pptr->authorization:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
@@ -207,8 +214,8 @@ private void set_cords_user_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "password" ) ))
 			pptr->password = allocate_string(vptr);
-		if (!( strcmp( nptr, "authorisation" ) ))
-			pptr->authorisation = allocate_string(vptr);
+		if (!( strcmp( nptr, "authorization" ) ))
+			pptr->authorization = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -258,11 +265,11 @@ private int pass_cords_user_filter(
 		else if ( strcmp(pptr->password,fptr->password) != 0)
 			return(0);
 		}
-	if (( fptr->authorisation )
-	&&  (strlen( fptr->authorisation ) != 0)) {
-		if (!( pptr->authorisation ))
+	if (( fptr->authorization )
+	&&  (strlen( fptr->authorization ) != 0)) {
+		if (!( pptr->authorization ))
 			return(0);
-		else if ( strcmp(pptr->authorisation,fptr->authorisation) != 0)
+		else if ( strcmp(pptr->authorization,fptr->authorization) != 0)
 			return(0);
 		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
@@ -288,7 +295,7 @@ private struct rest_response * cords_user_occi_response(
 	sprintf(cptr->buffer,"%s.%s.password=%s",optr->domain,optr->id,pptr->password);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.authorisation=%s",optr->domain,optr->id,pptr->authorisation);
+	sprintf(cptr->buffer,"%s.%s.authorization=%s",optr->domain,optr->id,pptr->authorization);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -707,7 +714,7 @@ public struct occi_category * occi_cords_user_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "password",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "authorisation",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "authorization",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
@@ -770,7 +777,7 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_user.authorisation='%s'\r\n",(sptr->authorisation?sptr->authorisation:""));
+	sprintf(buffer,"occi.cords_user.authorization='%s'\r\n",(sptr->authorization?sptr->authorization:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

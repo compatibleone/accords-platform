@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _package_c_
 #define _package_c_
 
@@ -43,6 +50,10 @@ public struct cords_package * liberate_cords_package(struct cords_package * sptr
 			 sptr->constraint = liberate(sptr->constraint);
 		if ( sptr->requirement )
 			 sptr->requirement = liberate(sptr->requirement);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->license )
+			 sptr->license = liberate(sptr->license);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_package *) 0);
@@ -66,6 +77,8 @@ public struct cords_package * reset_cords_package(struct cords_package * sptr)
 		sptr->description = (char*) 0;
 		sptr->constraint = (char*) 0;
 		sptr->requirement = (char*) 0;
+		sptr->price = (char*) 0;
+		sptr->license = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -125,6 +138,14 @@ public int xmlin_cords_package(struct cords_package * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->requirement = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"price") ))
+		{
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"license") ))
+		{
+			if ( wptr->value ) { sptr->license = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -151,6 +172,8 @@ public int rest_occi_cords_package(FILE * fh,struct cords_package * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.constraint='%s'\r\n",prefix,nptr,(sptr->constraint?sptr->constraint:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.requirement='%s'\r\n",prefix,nptr,(sptr->requirement?sptr->requirement:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.license='%s'\r\n",prefix,nptr,(sptr->license?sptr->license:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

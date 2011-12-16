@@ -18,7 +18,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 	struct	occi_response * uptr;
 	char *	tptr=(char *) 0;
 	char *	vptr=(char *) 0;
-	char *	category = _CORDS_AUTHORISATION;
+	char *	category = _CORDS_AUTHORIZATION;
 	if (!( yptr = cords_retrieve_named_instance_list( _CORDS_USER, "occi.user.name", user, agent,tls ) ))
 		return( (char *) 0 );
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent,tls )))
@@ -47,7 +47,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 		/* create authorization for the authenticated user */
 		/* ----------------------------------------------- */
 		sprintf(buffer,"%s%s",uptr->host,uptr->name);
-		if (!( header = occi_create_element( "occi.authorisation.user", buffer ) ))
+		if (!( header = occi_create_element( "occi.authorization.user", buffer ) ))
 		{
 			uptr = occi_remove_response( uptr );
 			return((char *) 0);
@@ -85,7 +85,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 public	char  *	logout_occi_user( char * user,	char * password, char * agent, char * token, char * tls )
 {
 	struct	occi_client * cptr;
-	char *	category = _CORDS_AUTHORISATION;
+	char *	category = _CORDS_AUTHORIZATION;
 
 	if ( token )
 	{

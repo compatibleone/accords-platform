@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _user_c_
 #define _user_c_
 
@@ -33,8 +40,8 @@ public struct cords_user * liberate_cords_user(struct cords_user * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->password )
 			 sptr->password = liberate(sptr->password);
-		if ( sptr->authorisation )
-			 sptr->authorisation = liberate(sptr->authorisation);
+		if ( sptr->authorization )
+			 sptr->authorization = liberate(sptr->authorization);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_user *) 0);
@@ -53,7 +60,7 @@ public struct cords_user * reset_cords_user(struct cords_user * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->password = (char*) 0;
-		sptr->authorisation = (char*) 0;
+		sptr->authorization = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -94,9 +101,9 @@ public int xmlin_cords_user(struct cords_user * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->password = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"authorisation") ))
+		else if (!( strcmp(wptr->name,"authorization") ))
 		{
-			if ( wptr->value ) { sptr->authorisation = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->authorization = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
@@ -123,7 +130,7 @@ public int rest_occi_cords_user(FILE * fh,struct cords_user * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.password='%s'\r\n",prefix,nptr,(sptr->password?sptr->password:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorisation='%s'\r\n",prefix,nptr,(sptr->authorisation?sptr->authorisation:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

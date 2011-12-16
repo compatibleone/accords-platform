@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _image_c_
 #define _image_c_
 
@@ -134,6 +141,8 @@ private void autoload_cords_image_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "system" )) != (struct xml_atribut *) 0)
 				pptr->system = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "packages" )) != (struct xml_atribut *) 0)
 				pptr->packages = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
@@ -175,6 +184,9 @@ public  void autosave_cords_image_nodes() {
 		fprintf(h," system=%c",0x0022);
 		fprintf(h,"%s",(pptr->system?pptr->system:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," packages=%c",0x0022);
 		fprintf(h,"%u",pptr->packages);
 		fprintf(h,"%c",0x0022);
@@ -212,6 +224,8 @@ private void set_cords_image_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "system" ) ))
 			pptr->system = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "packages" ) ))
 			pptr->packages = atoi(vptr);
 		if (!( strcmp( nptr, "created" ) ))
@@ -265,6 +279,13 @@ private int pass_cords_image_filter(
 		else if ( strcmp(pptr->system,fptr->system) != 0)
 			return(0);
 		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
 	if (( fptr->packages ) && ( pptr->packages != fptr->packages )) return(0);
 	if (( fptr->created )
 	&&  (strlen( fptr->created ) != 0)) {
@@ -300,6 +321,9 @@ private struct rest_response * cords_image_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.system=%s",optr->domain,optr->id,pptr->system);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.packages=%u",optr->domain,optr->id,pptr->packages);
@@ -724,6 +748,8 @@ public struct occi_category * occi_cords_image_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "system",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "packages",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
@@ -779,6 +805,17 @@ public struct rest_header *  cords_image_occi_headers(struct cords_image * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_image.system='%s'\r\n",(sptr->system?sptr->system:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_image.price='%s'\r\n",(sptr->price?sptr->price:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

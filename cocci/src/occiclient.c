@@ -726,7 +726,7 @@ public	struct	occi_element  * occi_append_headers(
 /*		    o c c i _ a p p e n d _ d e f a u l t 		*/
 /*	------------------------------------------------------------	*/
 /*	this function appends the list of default headers that are	*/
-/*	needed to transmit security and authorisation information.	*/
+/*	needed to transmit security and athorization information.	*/
 /*	The headers have to be duplicated to be	sure that no cross 	*/	
 /*	memory allocations occur !					*/
 /*	------------------------------------------------------------	*/

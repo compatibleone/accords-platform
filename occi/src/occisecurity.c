@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _security_c_
 #define _security_c_
 
@@ -130,16 +137,14 @@ private void autoload_cords_security_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "identity" )) != (struct xml_atribut *) 0)
-				pptr->identity = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
-				pptr->nature = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "level" )) != (struct xml_atribut *) 0)
+				pptr->level = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "scheme" )) != (struct xml_atribut *) 0)
 				pptr->scheme = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "privatekey" )) != (struct xml_atribut *) 0)
-				pptr->privatekey = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "publickey" )) != (struct xml_atribut *) 0)
-				pptr->publickey = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
+				pptr->state = document_atribut_value(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -167,20 +172,17 @@ public  void autosave_cords_security_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," identity=%c",0x0022);
-		fprintf(h,"%s",(pptr->identity?pptr->identity:""));
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," nature=%c",0x0022);
-		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
+		fprintf(h," level=%c",0x0022);
+		fprintf(h,"%s",(pptr->level?pptr->level:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," scheme=%c",0x0022);
 		fprintf(h,"%s",(pptr->scheme?pptr->scheme:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," privatekey=%c",0x0022);
-		fprintf(h,"%s",(pptr->privatekey?pptr->privatekey:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," publickey=%c",0x0022);
-		fprintf(h,"%s",(pptr->publickey?pptr->publickey:""));
+		fprintf(h," state=%c",0x0022);
+		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
@@ -203,16 +205,14 @@ private void set_cords_security_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
-		if (!( strcmp( nptr, "identity" ) ))
-			pptr->identity = allocate_string(vptr);
-		if (!( strcmp( nptr, "nature" ) ))
-			pptr->nature = allocate_string(vptr);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "level" ) ))
+			pptr->level = allocate_string(vptr);
 		if (!( strcmp( nptr, "scheme" ) ))
 			pptr->scheme = allocate_string(vptr);
-		if (!( strcmp( nptr, "privatekey" ) ))
-			pptr->privatekey = allocate_string(vptr);
-		if (!( strcmp( nptr, "publickey" ) ))
-			pptr->publickey = allocate_string(vptr);
+		if (!( strcmp( nptr, "state" ) ))
+			pptr->state = atoi(vptr);
 		}
 	return;
 }
@@ -244,18 +244,18 @@ private int pass_cords_security_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
-	if (( fptr->identity )
-	&&  (strlen( fptr->identity ) != 0)) {
-		if (!( pptr->identity ))
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
 			return(0);
-		else if ( strcmp(pptr->identity,fptr->identity) != 0)
+		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->nature )
-	&&  (strlen( fptr->nature ) != 0)) {
-		if (!( pptr->nature ))
+	if (( fptr->level )
+	&&  (strlen( fptr->level ) != 0)) {
+		if (!( pptr->level ))
 			return(0);
-		else if ( strcmp(pptr->nature,fptr->nature) != 0)
+		else if ( strcmp(pptr->level,fptr->level) != 0)
 			return(0);
 		}
 	if (( fptr->scheme )
@@ -265,20 +265,7 @@ private int pass_cords_security_filter(
 		else if ( strcmp(pptr->scheme,fptr->scheme) != 0)
 			return(0);
 		}
-	if (( fptr->privatekey )
-	&&  (strlen( fptr->privatekey ) != 0)) {
-		if (!( pptr->privatekey ))
-			return(0);
-		else if ( strcmp(pptr->privatekey,fptr->privatekey) != 0)
-			return(0);
-		}
-	if (( fptr->publickey )
-	&&  (strlen( fptr->publickey ) != 0)) {
-		if (!( pptr->publickey ))
-			return(0);
-		else if ( strcmp(pptr->publickey,fptr->publickey) != 0)
-			return(0);
-		}
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
 
@@ -294,19 +281,16 @@ private struct rest_response * cords_security_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.identity=%s",optr->domain,optr->id,pptr->identity);
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
+	sprintf(cptr->buffer,"%s.%s.level=%s",optr->domain,optr->id,pptr->level);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.scheme=%s",optr->domain,optr->id,pptr->scheme);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.privatekey=%s",optr->domain,optr->id,pptr->privatekey);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.publickey=%s",optr->domain,optr->id,pptr->publickey);
+	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -715,15 +699,13 @@ public struct occi_category * occi_cords_security_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		optr->interface = &occi_cords_security_mt;
-		if (!( optr = occi_add_attribute(optr, "identity",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "level",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "scheme",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "privatekey",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "publickey",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		autoload_cords_security_nodes();
 		return(optr);
@@ -760,7 +742,7 @@ public struct rest_header *  cords_security_occi_headers(struct cords_security *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_security.identity='%s'\r\n",(sptr->identity?sptr->identity:""));
+	sprintf(buffer,"occi.cords_security.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -771,7 +753,7 @@ public struct rest_header *  cords_security_occi_headers(struct cords_security *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_security.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
+	sprintf(buffer,"occi.cords_security.level='%s'\r\n",(sptr->level?sptr->level:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -793,18 +775,7 @@ public struct rest_header *  cords_security_occi_headers(struct cords_security *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_security.privatekey='%s'\r\n",(sptr->privatekey?sptr->privatekey:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_security.publickey='%s'\r\n",(sptr->publickey?sptr->publickey:""));
+	sprintf(buffer,"occi.cords_security.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);

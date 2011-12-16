@@ -522,9 +522,9 @@ public	int	publishing_occi_server(
 		{
 			if ((user) && (password))
 			{
-				if (!(Publisher.authorisation = login_occi_user( user, password, agent, tls )))
+				if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
 					return( 403 );
-				else 	(void) occi_client_authentication( Publisher.authorisation );
+				else 	(void) occi_client_authentication( Publisher.authorization );
 			}
 		}
 	}
@@ -534,7 +534,7 @@ public	int	publishing_occi_server(
 			if ((status = publish_occi_categories( user, password, url, agent, category )) != 0)
 				return( status );
 
-	result = occi_server( agent, port, tls, max, category, Publisher.authorisation );
+	result = occi_server( agent, port, tls, max, category, Publisher.authorization );
 
 	if (( Publisher.host ) && ( Publisher.publication ))
 		if (( url ) && ( category ))
@@ -543,9 +543,9 @@ public	int	publishing_occi_server(
 
 	if (( tls ) && ( tlsconf ))
 	{
-		if ( Publisher.authorisation )
-			Publisher.authorisation = logout_occi_user( 
-				user, password, agent, Publisher.authorisation, tls );
+		if ( Publisher.authorization )
+			Publisher.authorization = logout_occi_user( 
+				user, password, agent, Publisher.authorization, tls );
 		if ( tlsconf )
 			tlsconf = release_tls_configuration(tlsconf );
 	}

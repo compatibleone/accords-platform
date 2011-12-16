@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _invoice_c_
 #define _invoice_c_
 
@@ -35,8 +42,8 @@ public struct cords_invoice * liberate_cords_invoice(struct cords_invoice * sptr
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->date )
 			 sptr->date = liberate(sptr->date);
-		if ( sptr->authorisation )
-			 sptr->authorisation = liberate(sptr->authorisation);
+		if ( sptr->authorization )
+			 sptr->authorization = liberate(sptr->authorization);
 		if ( sptr->total )
 			 sptr->total = liberate(sptr->total);
 		if ( sptr->taxe )
@@ -62,7 +69,7 @@ public struct cords_invoice * reset_cords_invoice(struct cords_invoice * sptr)
 		sptr->number = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->date = (char*) 0;
-		sptr->authorisation = (char*) 0;
+		sptr->authorization = (char*) 0;
 		sptr->total = (char*) 0;
 		sptr->taxe = (char*) 0;
 		sptr->reduction = (char*) 0;
@@ -111,9 +118,9 @@ public int xmlin_cords_invoice(struct cords_invoice * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->date = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"authorisation") ))
+		else if (!( strcmp(wptr->name,"authorization") ))
 		{
-			if ( wptr->value ) { sptr->authorisation = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->authorization = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"total") ))
 		{
@@ -157,7 +164,7 @@ public int rest_occi_cords_invoice(FILE * fh,struct cords_invoice * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorisation='%s'\r\n",prefix,nptr,(sptr->authorisation?sptr->authorisation:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.total='%s'\r\n",prefix,nptr,(sptr->total?sptr->total:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.taxe='%s'\r\n",prefix,nptr,(sptr->taxe?sptr->taxe:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reduction='%s'\r\n",prefix,nptr,(sptr->reduction?sptr->reduction:""));

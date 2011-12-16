@@ -7,7 +7,7 @@ struct	cords_invoice
 	char *	number;
 	char *	account;
 	char *	date;
-	char *	authorisation;
+	char *	authorization;
 	char *	total;
 	char *	taxe;
 	char *	reduction;

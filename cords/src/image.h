@@ -7,6 +7,7 @@ struct	cords_image
 	char *	id;
 	char *	name;
 	char *	system;
+	char *	price;
 	int	packages;
 	char *	created;
 	char *	updated;

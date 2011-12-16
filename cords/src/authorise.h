@@ -1,8 +1,8 @@
 
-#ifndef	_cords_authorisation_h
-#define	_cords_authorisation_h
+#ifndef	_cords_authorization_h
+#define	_cords_authorization_h
 
-struct	cords_authorisation
+struct	cords_authorization
 {
 	char	*	id;
 	char	*	account;	

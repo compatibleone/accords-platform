@@ -8,7 +8,8 @@ struct	cords_provider
 	char *	name;
 	char *	category;
 	char *	profile;
-	char *	tarification;
+	char *	operator;
+	char *	price;
 };
 
 #endif

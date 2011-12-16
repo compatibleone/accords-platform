@@ -5,7 +5,7 @@
 struct	cords_transaction
 {
 	char	*	id;
-	char	*	authorisation;
+	char	*	authorization;
 	char	*	source;
 	char	*	target;
 	char	*	description;

@@ -133,7 +133,7 @@ private	int	banner()
 	printf("\n   --verbose                activates info  messages");
 	printf("\n   --threads                activate thread control ");
 	printf("\n   --config   <file>        load configuration");
-	printf("\n   --authorise <value>      set authorisation state");            
+	printf("\n   --authorise <value>      set authorization state");            
 	printf("\n   --tls      <name>        specify tls configuration");
 	printf("\n   --publisher <name>       specify publisher url ");
 	printf("\n   --resthost <name>        specify rest server host name or address");

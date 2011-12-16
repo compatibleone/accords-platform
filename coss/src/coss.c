@@ -167,7 +167,7 @@ private	int	coss_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_PRICING;
 
-	if (!( optr = occi_cords_authorisation_builder( Coss.domain, "authorisation" ) ))
+	if (!( optr = occi_cords_authorization_builder( Coss.domain, "authorization" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

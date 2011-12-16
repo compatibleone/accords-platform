@@ -8,7 +8,6 @@ struct	cords_account
 	char *	name;
 	char *	date;
 	char *	security;
-	char *	tarification;
 	char *	legal;
 	int	users;
 	int	state;

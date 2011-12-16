@@ -5,11 +5,10 @@
 struct	cords_security
 {
 	char	*	id;
-	char	*	identity;
-	char	*	nature;
+	char	*	name;
+	char	*	level;
 	char	*	scheme;
-	char	*	privatekey;
-	char	*	publickey;
+	int		state;
 };
 
 #endif

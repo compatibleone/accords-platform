@@ -117,7 +117,7 @@ private	int	help()
 
 	printf("\n   --debug                  toggle debug messages   ");
 	printf("\n   --verbose                toggle info  messages   ");
-	printf("\n   --authorise              toggle authorisation    ");
+	printf("\n   --authorize              toggle authorization    ");
 	printf("\n   --autosave               toggle autosave flag    ");
 	printf("\n   --help                   this help screen        ");
 

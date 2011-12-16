@@ -23,7 +23,7 @@ struct	occi_publisher
 	char *	publication;
 	char *	enquiry;
 	char *	uri;
-	char *	authorisation;
+	char *	authorization;
 	struct	occi_publication * first;
 	struct	occi_publication * last;
 };
