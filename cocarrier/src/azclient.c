@@ -185,12 +185,6 @@ public	struct	az_response *
 public	struct	rest_header   *	az_authenticate	( )
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	struct	az_response	*	rptr;
-	struct	url		*	uptr;
-	char 			*	nptr;
-	int				status;
-	char	buffer[256];
-
 	if (!( Waz.user ))
 		return( hptr );
 	else if (!( Waz.password ))
@@ -198,11 +192,10 @@ public	struct	rest_header   *	az_authenticate	( )
 	else if (!( Waz.version ))
 		return( hptr );
 	else if (!( hptr = rest_create_header( "x-ms-version", Waz.version ) ))
-	{
-		liberate( nptr );
 		return( hptr );
-	}
-	else	return( hptr );
+	else if (!( hptr->next = rest_create_header( _HTTP_CONTENT_TYPE, "text/xml" ) ))
+		return( hptr );
+	else	return((hptr->next->previous = hptr));
 }
 
 /*	------------------------------------------------------------	*/
