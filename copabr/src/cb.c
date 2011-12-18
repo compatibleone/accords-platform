@@ -1369,26 +1369,34 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 	/* ------------------------------------------ */
 	if (!( common = cords_extract_atribut(App->node,"occi",_CORDS_NODE,_CORDS_COMMON)))
 	{
-		/* ------------------------------------ */
-		/* build a new complex service contract */
-		/* ------------------------------------ */
+		/* ----------------------------------- */
+		/* build a new simple service contract */
+		/* ----------------------------------- */
 		if (!( document = cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) ))
 			return( document );
+
+		else if (!( document = cords_complete_contract( App, document, agent, tls ) ))
+		{
+			cords_terminate_instance_node( App );
+			return(document);
+		}
 		/* ------------------ */
 		/* recover identifier */
 		/* ------------------ */
 		else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 		{
 			cords_terminate_instance_node( App );
-			return((struct xml_element *) 0);
+			return(document_drop(document));
 		}
-		/* ------------------------------------------------------ */
-		/* TODO							  */
-		/* update the common field of the parent node description */
-		/* ------------------------------------------------------ */
-		else	return( document );
+		else if (!( common = allocate_string( aptr->value ) ))
+		{
+			cords_terminate_instance_node( App );
+			return(document_drop(document));
+		}
+		else	document = document_drop( document );
 	}
-	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+
+	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1396,12 +1404,12 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 	else if (!( aptr = document_add_atribut( document, _CORDS_COMMON, common ) ))
 	{
 		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
+		return(document_drop(document));
 	}
 	else if (!( yptr = cords_update_common_node( id, App->node, common, agent, tls ) ))
 	{
 		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
+		return(document_drop(document));
 	}
 	else
 	{
