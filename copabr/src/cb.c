@@ -37,6 +37,20 @@ struct	operator_preferences
 	"standard"
 	};
 
+private	struct	xml_element * 	cords_instance_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char * namePlan );
+
+private	struct	xml_element * 	cords_complete_contract(
+	struct 	cords_node_descriptor * App,
+	struct	xml_element * document,
+	char *	agent,
+	char *	tls );
+
 private	int	provisioning_status=0;
 
 /*	--------------------------------------------------------	*/
@@ -127,8 +141,13 @@ private	char *	cords_extract_atribut(
 	{
 		if (!( eptr->name ))
 			continue;
-		else if (!( strcmp( eptr->name, buffer ) ))
-			return( occi_unquoted_value( eptr->value ) );
+		else if ( strcmp( eptr->name, buffer ) )
+			continue;
+		else if (!( eptr->value ))
+			break;
+		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+			break;
+		else	return( occi_unquoted_value( eptr->value ) );
 	}
 	return((char*) 0);
 }
@@ -571,6 +590,7 @@ private	struct occi_response * cords_update_common_node(
 	struct	occi_client * kptr;
 	struct	occi_request * qptr;
 	struct	occi_element * fptr;
+	struct	occi_element * eptr;
 	struct	occi_response * yptr;
 
 	/* ----------------------------------------------------- */
@@ -582,13 +602,28 @@ private	struct occi_response * cords_update_common_node(
 		return((struct occi_response *) 0);
 	else if (!( fptr = occi_request_from_response( qptr, zptr )))
 		return((struct occi_response *) 0);
-	else if (!( fptr = occi_request_element( qptr, "occi.node.common", common )))
-		return((struct occi_response *) 0);
+	else
+	{
+		for ( 	eptr=fptr;
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
+			if (!( strcmp( eptr->name, "occi.node.common" ) ))
+				break;
+		if ( eptr )
+		{
+			if ( eptr->value )
+				eptr->value = liberate( eptr->value );
+			if (!( eptr->value = allocate_string( common )))
+				return((struct occi_response *) 0);
+		}
+		else if (!( fptr = occi_request_element( qptr, "occi.node.common", common )))
+			return((struct occi_response *) 0);
+	}
 
 	/* ---------------------------- */
 	/* put the node data collection */
 	/* ---------------------------- */
-	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	if (!( yptr = occi_client_put( kptr, qptr ) ))
 		return((struct occi_response *) 0);
 	else	return( yptr );
 }
@@ -1101,6 +1136,23 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 }
 
 /*	------------------------------------------------------------	*/
+/*		c o r d s _ n e g o c i a t e _ p r o v i d e r		*/
+/*	------------------------------------------------------------	*/
+private	char *	cords_negociate_provider( 
+		struct cords_node_descriptor * App,
+		struct xml_element * xptr,
+		char *	agent,
+		char * tls )
+{
+	/* ---------------------------------------------------- */
+	/* this will use an algorithm to negociate the contract */
+	/* ---------------------------------------------------- */
+	/* TODO : But  for now ....				*/
+	/* ---------------------------------------------------- */
+	return( cords_create_provider( xptr, agent,tls ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*	c o r d s _ i n s t a n c e _ s i m p l e _ c o n t r a c t	*/
 /*	------------------------------------------------------------	*/
 private	struct	xml_element * 	cords_instance_simple_contract(
@@ -1118,17 +1170,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	if (!( App->provider = cords_resolve_provider( App->node, Operator.provider, agent,tls )))
-	{
-		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
-	}
-	else if (!( App->profile = cords_resolve_profile( App->node, namePlan )))
-	{
-		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
-	}
-	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1138,7 +1180,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( App->providerid = cords_create_provider( xptr, agent,tls ) ))
+	else if (!( App->providerid = cords_negociate_provider( App, xptr, agent,tls ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1250,6 +1292,7 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 	struct	occi_response * yptr;
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
+	char *	holder;
 	char *	common;
 
 	/* ------------------------------------------ */
@@ -1263,22 +1306,28 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 		if (!( document = cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) ))
 			return( document );
 
+		else if (!( document = cords_complete_contract( App, document, agent, tls ) ))
+		{
+			cords_terminate_instance_node( App );
+			return(document);
+		}
 		/* ------------------ */
 		/* recover identifier */
 		/* ------------------ */
 		else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 		{
 			cords_terminate_instance_node( App );
-			return((struct xml_element *) 0);
+			return(document_drop(document));
 		}
-
-		/* ------------------------------------------------------ */
-		/* TODO							  */
-		/* update the common field of the parent node description */
-		/* ------------------------------------------------------ */
-		else	return( document );
+		else if (!( common = allocate_string( aptr->value ) ))
+		{
+			cords_terminate_instance_node( App );
+			return(document_drop(document));
+		}
+		else	document = document_drop( document );
 	}
-	else if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+
+	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1286,12 +1335,12 @@ private	struct	xml_element * 	cords_instance_simple_common_contract(
 	else if (!( aptr = document_add_atribut( document, _CORDS_COMMON, common ) ))
 	{
 		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
+		return(document_drop(document));
 	}
 	else if (!( yptr = cords_update_common_node( id, App->node, common, agent, tls ) ))
 	{
 		cords_terminate_instance_node( App );
-		return((struct xml_element *) 0);
+		return(document_drop(document));
 	}
 	else
 	{
@@ -1359,6 +1408,60 @@ private	struct	xml_element * 	cords_instance_complex_common_contract(
 		yptr = occi_remove_response( yptr );
 		return( document );
 	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		c o r d s _ c o m p l e t e _ c o n t r a c t		*/
+/*	------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_complete_contract(
+	struct 	cords_node_descriptor * App,
+	struct	xml_element * document,
+	char *	agent,
+	char *	tls )
+{
+	int	status;
+	/* -------------------------------------------------- */
+	/* Join the common trunk for Simple and Complex Nodes */
+	/* -------------------------------------------------- */
+	if (!( document_add_atribut( document, _CORDS_TYPE, App->typeApp ) ))
+		return(document_drop(document));
+
+	/* -------------------------------------- */
+	/* Ensure the Access Atribute is in place */
+	/* -------------------------------------- */
+	else if (!( document_add_atribut( document, _CORDS_ACCESS,
+		 ( App->scope & _ACCESS_PUBLIC ? _CORDS_PUBLIC : _CORDS_PRIVATE ) ) ))
+		return(document_drop(document));
+
+	/* ------------------------------------- */
+	/* Ensure the Scope Atribute is in place */
+	/* ------------------------------------- */
+	else if (!( document_add_atribut( document, _CORDS_SCOPE, 
+		 ( App->scope & _SCOPE_COMMON ? _CORDS_COMMON : _CORDS_NORMAL ) ) ))
+		return(document_drop(document));
+
+	/* -------------------------------- */
+	/* build the OCCI contract instance */
+	/* -------------------------------- */
+	else if (!( App->contract = cords_create_category( document, agent,tls ) ))
+		return(document_drop(document));
+
+	/* ----------------------------------------- */
+	/* recover the resulting contract identifier */
+	/* ----------------------------------------- */
+	else if ((status = cords_resolve_location( App->contract, document )) != 0)
+		return(document_drop(document));
+
+	/* ----------------------------------------- */
+	/* terminate the service contract processing */
+	/* ----------------------------------------- */
+	else if ((status = cords_terminate_level( document, agent,tls )) != 0)
+		return(document_drop(document));
+
+	/* ------------------------------------------- */
+	/* successful completion returnes the document */
+	/* ------------------------------------------- */
+	else	return( document );
 }
 
 /*	------------------------------------------------------------	*/
@@ -1466,6 +1569,19 @@ private	struct	xml_element * cords_instance_node(
 			return((struct xml_element *) 0);
 		}
 	}
+	/* -------------------------------- */
+	/* recover provider information now */
+	/* -------------------------------- */
+	else if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent,tls )))
+	{
+		cords_terminate_instance_node( &App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( App.profile = cords_resolve_profile( App.node, namePlan )))
+	{
+		cords_terminate_instance_node( &App );
+		return((struct xml_element *) 0);
+	}
 
 	/* ----------------------------------------------------- */
 	/* check for scope COMMON and then access PUBLIC/PRIVATE */
@@ -1480,7 +1596,7 @@ private	struct	xml_element * cords_instance_node(
 		
 		if ((App.accessApp = cords_extract_atribut(App.node,"occi",_CORDS_NODE,_CORDS_ACCESS)) != (char *) 0)
 		{
-			if (!( strcasecmp( App.scopeApp, _CORDS_PUBLIC )))
+			if (!( strcasecmp( App.accessApp, _CORDS_PUBLIC )))
 				App.scope |= _ACCESS_PUBLIC;
 			else	App.scope |= _ACCESS_PRIVATE;
 		}
@@ -1492,71 +1608,14 @@ private	struct	xml_element * cords_instance_node(
 	/* ---------------------------------------------------- */
 	if (!( document = cords_instance_contract( &App, host, id, agent, tls, namePlan ) ))
 		return( document );
-
-	/* -------------------------------------------------- */
-	/* Join the common trunk for Simple and Complex Nodes */
-	/* -------------------------------------------------- */
-	else if (!( document_add_atribut( document, _CORDS_TYPE, App.typeApp ) ))
+	else 
 	{
+		document = cords_complete_contract( &App, document, agent, tls );
 		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-
-	/* -------------------------------------- */
-	/* Ensure the Access Atribute is in place */
-	/* -------------------------------------- */
-	else if (!( document_add_atribut( document, _CORDS_ACCESS,
-		 ( App.scope & _ACCESS_PUBLIC ? _CORDS_PUBLIC : _CORDS_PRIVATE ) ) ))
-	{
-		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-
-	/* ------------------------------------- */
-	/* Ensure the Scope Atribute is in place */
-	/* ------------------------------------- */
-	else if (!( document_add_atribut( document, _CORDS_SCOPE, 
-		 ( App.scope & _SCOPE_COMMON ? _CORDS_COMMON : _CORDS_NORMAL ) ) ))
-	{
-		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-
-	/* -------------------------------- */
-	/* build the OCCI contract instance */
-	/* -------------------------------- */
-	else if (!( App.contract = cords_create_category( document, agent,tls ) ))
-	{
-		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-
-	/* ----------------------------------------- */
-	/* recover the resulting contract identifier */
-	/* ----------------------------------------- */
-	else if ((status = cords_resolve_location( App.contract, document )) != 0)
-	{
-		cords_terminate_instance_node( &App );
-		return(document_drop(document));
-	}
-
-	/* ----------------------------------------- */
-	/* terminate the service contract processing */
-	/* ----------------------------------------- */
-	else if ((status = cords_terminate_level( document, agent,tls )) != 0)
-	{
-		cords_terminate_instance_node( &App );
-		return((struct xml_element *) 0);
-	}
-	/* ------------------------------------------- */
-	/* successful completion returnes the document */
-	/* ------------------------------------------- */
-	else
-	{
-		cords_terminate_instance_node( &App );
-		return( document );
-	}
+		return(document);
+	}		
 }
+
 
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ b u i l d _ s e r v i c e 			*/

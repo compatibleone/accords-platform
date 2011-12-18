@@ -200,6 +200,22 @@ private	int	contract_instructions( char * contract, char * provision )
 	return(0);
 }
 
+/*	--------------------------------------------	*/
+/*	     i s _ c o m m o n _ c o n t r a c t	*/
+/*	--------------------------------------------	*/
+private	int	is_common_contract( struct cords_contract * pptr )
+{
+	if (!( pptr ))
+		return( 0 );
+	else if (!( pptr->common ))
+		return( 0 );
+	else if (!( strlen( pptr->common ) ))
+		return( 0 );
+	else if (!( strcmp( pptr->common, _CORDS_NULL ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
 /*	-------------------------------------------	*/
 /* 	       s t a r t _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
@@ -218,17 +234,24 @@ private	struct	rest_response * start_contract(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
-			if ((!( pptr->type ))
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
 				contract_instructions( fullid, pptr->provider );
-				cords_invoke_action( pptr->provider, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->provider, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 				retrieve_provider_information( pptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->service, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
@@ -256,14 +279,21 @@ private	struct	rest_response * restart_contract(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			if ((!( pptr->type ))
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_RESTART, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->provider, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_RESTART, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->service, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
@@ -292,14 +322,21 @@ private	struct	rest_response * suspend_contract(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			if ((!( pptr->type ))
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_SUSPEND,
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_SUSPEND, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->provider, _CORDS_SUSPEND, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_SUSPEND, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->service, _CORDS_SUSPEND, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
@@ -325,14 +362,21 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			if ((!( pptr->type ))
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_STOP,
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->provider, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->service, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			if (pptr->reference) pptr->reference = liberate( pptr->reference );
 			if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
@@ -365,14 +409,21 @@ private	struct	rest_response * save_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			if ((!( pptr->type ))
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_SAVE, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->provider, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_SAVE, _CORDS_CONTRACT_AGENT, default_tls() );
+				cords_invoke_action( pptr->service, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			pptr->when  = time((long*) 0);
 			autosave_cords_contract_nodes();
