@@ -44,6 +44,7 @@
 #include "occiplan.c"
 #include "occiprofile.c"
 #include "occiprice.c"
+#include "occiinstance.c"
 #include "occimanifest.c"
 #include "occirequirement.c"
 #include "occisecurity.c"

@@ -84,8 +84,8 @@ private	void	broker_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Broker : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
+	printf("\n   CompatibleOne Request Broker : Version 1.0a.0.04");
+	printf("\n   Beta Version : 19/12/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -183,6 +183,14 @@ private	int	broker_operation( char * nptr )
 	optr->callback  = (void *) 0;
 
 	if (!( optr = broker_service_builder( Broker.domain,"service" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_instance_builder( Broker.domain,"instance" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

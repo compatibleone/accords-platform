@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _instance_c_
 #define _instance_c_
 
@@ -27,6 +34,7 @@
 /*	--------------------------------------------------------------------	*/
 struct cords_instance * allocate_cords_instance();
 struct cords_instance * liberate_cords_instance(struct cords_instance * optr);
+private pthread_mutex_t list_cords_instance_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_instance_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_instance_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_instance_node() { return( cords_instance_first ); }
@@ -34,7 +42,7 @@ public struct  occi_kind_node * occi_first_cords_instance_node() { return( cords
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * drop_cords_instance_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_instance_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		cords_instance_first = nptr->next;
@@ -44,12 +52,19 @@ private struct occi_kind_node * drop_cords_instance_node(struct occi_kind_node *
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
+	return((struct occi_kind_node *)0);
+}
+private struct occi_kind_node * drop_cords_instance_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_instance_control );
+	nptr = ll_drop_cords_instance_node( nptr );
+	pthread_mutex_unlock( &list_cords_instance_control );
+	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * locate_cords_instance_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_instance_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct cords_instance * pptr;
 	for ( nptr = cords_instance_first;
@@ -61,11 +76,18 @@ private struct occi_kind_node * locate_cords_instance_node(char * id) {
 		}
 	return( nptr );
 }
+private struct occi_kind_node * locate_cords_instance_node(char * id) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_cords_instance_control );
+	nptr = ll_locate_cords_instance_node(id);
+	pthread_mutex_unlock( &list_cords_instance_control );
+	return( nptr );
+}
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * add_cords_instance_node(int mode) {
+private struct occi_kind_node * ll_add_cords_instance_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct cords_instance * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -86,6 +108,13 @@ private struct occi_kind_node * add_cords_instance_node(int mode) {
 			}
 		}
 }
+private struct occi_kind_node * add_cords_instance_node(int mode) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_cords_instance_control );
+	nptr = ll_add_cords_instance_node( mode );
+	pthread_mutex_unlock( &list_cords_instance_control );
+	return(nptr);
+}
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
@@ -98,9 +127,9 @@ private void autoload_cords_instance_nodes() {
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
-	if (!( document = document_parse_file(fn) ))
+	if (!( document = document_parse_file(fn)))
 		return;
-	else if ((eptr = document_element(document,"cords_instances")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_instances")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "cords_instance" ) ) continue;
@@ -110,20 +139,12 @@ private void autoload_cords_instance_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "request" )) != (struct xml_atribut *) 0)
-				pptr->request = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "plan" )) != (struct xml_atribut *) 0)
-				pptr->plan = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
-				pptr->account = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "tarification" )) != (struct xml_atribut *) 0)
-				pptr->tarification = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
-				pptr->when = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "machines" )) != (struct xml_atribut *) 0)
-				pptr->machines = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
-				pptr->state = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "common" )) != (struct xml_atribut *) 0)
+				pptr->common = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
+				pptr->status = document_atribut_value(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -140,7 +161,8 @@ public  void autosave_cords_instance_nodes() {
 	char * fn=autosave_cords_instance_name;	struct occi_kind_node * nptr;
 	struct cords_instance * pptr;
 	FILE * h;
-	if (!( h = fopen(fn,"w") )) return;
+	pthread_mutex_lock( &list_cords_instance_control );
+	if (( h = fopen(fn,"w")) != (FILE *) 0) {
 	fprintf(h,"<cords_instances>\n");
 	for ( nptr = cords_instance_first;
 		nptr != (struct occi_kind_node *) 0;
@@ -153,31 +175,21 @@ public  void autosave_cords_instance_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," request=%c",0x0022);
-		fprintf(h,"%s",(pptr->request?pptr->request:""));
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," plan=%c",0x0022);
-		fprintf(h,"%s",(pptr->plan?pptr->plan:""));
+		fprintf(h," common=%c",0x0022);
+		fprintf(h,"%s",(pptr->common?pptr->common:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," account=%c",0x0022);
-		fprintf(h,"%s",(pptr->account?pptr->account:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," tarification=%c",0x0022);
-		fprintf(h,"%s",(pptr->tarification?pptr->tarification:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," when=%c",0x0022);
-		fprintf(h,"%u",pptr->when);
-		fprintf(h,"%c",0x0022);
-		fprintf(h," machines=%c",0x0022);
-		fprintf(h,"%u",pptr->machines);
-		fprintf(h,"%c",0x0022);
-		fprintf(h," state=%c",0x0022);
-		fprintf(h,"%u",pptr->state);
+		fprintf(h," status=%c",0x0022);
+		fprintf(h,"%u",pptr->status);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
 	fprintf(h,"</cords_instances>\n");
 	fclose(h);
+	}
+	pthread_mutex_unlock( &list_cords_instance_control );
 	return;
 }
 
@@ -195,20 +207,12 @@ private void set_cords_instance_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "request" ) ))
-			pptr->request = allocate_string(vptr);
-		if (!( strcmp( nptr, "plan" ) ))
-			pptr->plan = allocate_string(vptr);
-		if (!( strcmp( nptr, "account" ) ))
-			pptr->account = allocate_string(vptr);
-		if (!( strcmp( nptr, "tarification" ) ))
-			pptr->tarification = allocate_string(vptr);
-		if (!( strcmp( nptr, "when" ) ))
-			pptr->when = atoi(vptr);
-		if (!( strcmp( nptr, "machines" ) ))
-			pptr->machines = atoi(vptr);
-		if (!( strcmp( nptr, "state" ) ))
-			pptr->state = atoi(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "common" ) ))
+			pptr->common = allocate_string(vptr);
+		if (!( strcmp( nptr, "status" ) ))
+			pptr->status = atoi(vptr);
 		}
 	return;
 }
@@ -247,37 +251,21 @@ private int pass_cords_instance_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->request )
-	&&  (strlen( fptr->request ) != 0)) {
-		if (!( pptr->request ))
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
 			return(0);
-		else if ( strcmp(pptr->request,fptr->request) != 0)
-			return(0);
-		}
-	if (( fptr->plan )
-	&&  (strlen( fptr->plan ) != 0)) {
-		if (!( pptr->plan ))
-			return(0);
-		else if ( strcmp(pptr->plan,fptr->plan) != 0)
+		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
-	if (( fptr->account )
-	&&  (strlen( fptr->account ) != 0)) {
-		if (!( pptr->account ))
+	if (( fptr->common )
+	&&  (strlen( fptr->common ) != 0)) {
+		if (!( pptr->common ))
 			return(0);
-		else if ( strcmp(pptr->account,fptr->account) != 0)
-			return(0);
-		}
-	if (( fptr->tarification )
-	&&  (strlen( fptr->tarification ) != 0)) {
-		if (!( pptr->tarification ))
-			return(0);
-		else if ( strcmp(pptr->tarification,fptr->tarification) != 0)
+		else if ( strcmp(pptr->common,fptr->common) != 0)
 			return(0);
 		}
-	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
-	if (( fptr->machines ) && ( pptr->machines != fptr->machines )) return(0);
-	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
+	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
 
@@ -296,25 +284,13 @@ private struct rest_response * cords_instance_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.request=%s",optr->domain,optr->id,pptr->request);
+	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.plan=%s",optr->domain,optr->id,pptr->plan);
+	sprintf(cptr->buffer,"%s.%s.common=%s",optr->domain,optr->id,pptr->common);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.tarification=%s",optr->domain,optr->id,pptr->tarification);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.machines=%u",optr->domain,optr->id,pptr->machines);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -725,19 +701,11 @@ public struct occi_category * occi_cords_instance_builder(char * a,char * b) {
 		optr->interface = &occi_cords_instance_mt;
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "request",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "plan",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "common",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "tarification",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "machines",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
 		autoload_cords_instance_nodes();
 		return(optr);
@@ -785,7 +753,7 @@ public struct rest_header *  cords_instance_occi_headers(struct cords_instance *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_instance.request='%s'\r\n",(sptr->request?sptr->request:""));
+	sprintf(buffer,"occi.cords_instance.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -796,7 +764,7 @@ public struct rest_header *  cords_instance_occi_headers(struct cords_instance *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_instance.plan='%s'\r\n",(sptr->plan?sptr->plan:""));
+	sprintf(buffer,"occi.cords_instance.common='%s'\r\n",(sptr->common?sptr->common:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -807,51 +775,7 @@ public struct rest_header *  cords_instance_occi_headers(struct cords_instance *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_instance.account='%s'\r\n",(sptr->account?sptr->account:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_instance.tarification='%s'\r\n",(sptr->tarification?sptr->tarification:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_instance.when='%u'\r\n",sptr->when);
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_instance.machines='%u'\r\n",sptr->machines);
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_instance.state='%u'\r\n",sptr->state);
+	sprintf(buffer,"occi.cords_instance.status='%u'\r\n",sptr->status);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);

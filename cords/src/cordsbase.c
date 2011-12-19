@@ -27,6 +27,7 @@
 
 #include "provider.c"
 #include "profile.c"
+#include "instance.c"
 #include "contract.c"
 #include "service.c"
 #include "tarif.c"
