@@ -1350,8 +1350,8 @@ private	struct	occi_response * cords_update_public_common(
 		kptr = occi_remove_client( kptr );
 		return((struct occi_response *) 0);
 	}
-	else if ((!(dptr=occi_request_element(qptr,"occi.instruction.name"        , App->nameApp) ))
-	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.common"      , common      ) )))
+	else if ((!(dptr=occi_request_element(qptr,"occi.instance.name"        , App->nameApp) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instance.common"      , common      ) )))
 	{
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
@@ -1729,7 +1729,7 @@ private	struct	xml_element * 	cords_instance_contract(
 	{
 		if (!( App->scope & _SCOPE_COMMON ))
 			return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
-		else if (!( App->scope & _ACCESS_PRIVATE ))
+		else if ( App->scope & _ACCESS_PRIVATE )
 			return( cords_simple_private_common_contract( App, host, id, agent, tls, namePlan ) );
 		else	return( cords_simple_public_common_contract( App, host, id, agent, tls, namePlan ) );
 	}
@@ -1737,7 +1737,7 @@ private	struct	xml_element * 	cords_instance_contract(
 	{
 		if (!( App->scope & _SCOPE_COMMON ))
 			return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
-		else if (!( App->scope & _ACCESS_PRIVATE ))
+		else if ( App->scope & _ACCESS_PRIVATE )
 			return( cords_complex_private_common_contract( App, host, id, agent, tls, namePlan ) );
 		else	return( cords_complex_public_common_contract( App, host, id, agent, tls, namePlan ) );
 	}
