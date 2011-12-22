@@ -44,6 +44,8 @@ struct	cords_oscontract
 	struct	cords_vector	image;
 	struct	cords_vector	system;
 	struct	cords_vector	package;
+	struct	os_response *	flavors;
+	struct	os_response *	images;
 };
 
 /*	-----------------------------------------------------------------	*/
@@ -67,7 +69,53 @@ private	int	terminate_openstack_contract( int status, struct cords_oscontract * 
 		cptr->system.message = occi_remove_response( cptr->system.message );
 	if ( cptr->package.message )
 		cptr->package.message = occi_remove_response( cptr->package.message );
+	if ( cptr->flavors )
+		cptr->flavors = liberate_os_response( cptr->flavors );
+	if ( cptr->images  )
+		cptr->images  = liberate_os_response( cptr->images  );
 	return( status );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ f l a v o r 			*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_flavor( struct cords_oscontract * cptr )
+{
+	char *	vcpus=(char*) 0;
+	char *	disk=(char*) 0;
+	char *	memory=(char*) 0;
+
+	/* -------------------------------------------------------------- */
+	/* retrieve appropriate parameters from infrastructure components */
+	/* -------------------------------------------------------------- */
+	if (!( memory = cords_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
+		return((char *) 0);
+	else if (!( vcpus = cords_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_CORES ) ))
+		return((char *) 0);
+	else if (!( disk = cords_extract_atribut( cptr->storage.message, "occi", 
+		_CORDS_STORAGE, _CORDS_SIZE ) ))
+		return((char *) 0);
+
+	else	return(allocate_string( memory ) );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_image( struct cords_oscontract * cptr )
+{
+	char *	osname=(char*) 0;
+
+	/* ---------------------------------------------------------- */
+	/* retrieve appropriate parameters from node image components */
+	/* ---------------------------------------------------------- */
+	if (!( osname = cords_extract_atribut( cptr->system.message, "occi", 
+		_CORDS_SYSTEM, _CORDS_NAME ) ))
+		return((char *) 0);
+
+	else	return(allocate_string( osname ) );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -80,14 +128,22 @@ public	int	create_openstack_contract(
 		char * tls )
 {
 	struct	cords_oscontract contract;
+	struct	os_response * flavors=(struct os_response *) 0;
+	struct	os_response * images =(struct os_response *) 0;
 
 	memset( &contract, 0, sizeof( struct cords_oscontract ));
 
+	/* ---------------------------- */
+	/* recover the node description */
+	/* ---------------------------- */
 	if (!( contract.node.id = pptr->node ))
 		return( 0 );
 	else if (!( contract.node.message = occi_simple_get( contract.node.id, agent, tls ) ))
 		return( terminate_openstack_contract( 570, &contract ) );
 
+	/* -------------------------------------- */
+	/* recover the infrastructure description */
+	/* -------------------------------------- */
 	else if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_openstack_contract( 571, &contract ) );
@@ -112,18 +168,38 @@ public	int	create_openstack_contract(
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
 		return( terminate_openstack_contract( 578, &contract ) );
 
-	else if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
-		_CORDS_NODE, _CORDS_IMAGE ) ))
+	/* --------------------------------------------------------- */
+	/* recover detailled list of OS Flavors and resolve contract */
+	/* --------------------------------------------------------- */
+	else if (!( contract.flavors = os_list_flavor_details() ))
 		return( terminate_openstack_contract( 579, &contract ) );
-	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
+	else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
 		return( terminate_openstack_contract( 580, &contract ) );
+		
+
+	/* ---------------------------------- */
+	/* recover the node image description */
+	/* ---------------------------------- */
+	if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_IMAGE ) ))
+		return( terminate_openstack_contract( 581, &contract ) );
+	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
+		return( terminate_openstack_contract( 582, &contract ) );
 
 	else if (!( contract.system.id = cords_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
-		return( terminate_openstack_contract( 581, &contract ) );
+		return( terminate_openstack_contract( 583, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
-		return( terminate_openstack_contract( 582, &contract ) );
+		return( terminate_openstack_contract( 584, &contract ) );
 
+	/* ------------------------------------------------------ */
+	/* retrieve detailled list of images and resolve contract */
+	/* ------------------------------------------------------ */
+	else if (!( contract.images = os_list_image_details() ))
+		return( terminate_openstack_contract( 585, &contract ) );
+	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+		return( terminate_openstack_contract( 586, &contract ) );
+		
 	else	return( terminate_openstack_contract( 0, &contract ) );
 
 }

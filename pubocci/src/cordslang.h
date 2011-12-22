@@ -52,6 +52,10 @@
 /*	-------------------------	*/
 #define	_CORDS_ID		"id"
 #define	_CORDS_NAME		"name"
+#define	_CORDS_MEMORY		"memory"
+#define	_CORDS_SPEED		"speed"
+#define	_CORDS_CORES		"cores"
+#define	_CORDS_SIZE		"size"
 #define	_CORDS_TYPE		"type"
 #define	_CORDS_ACCESS		"access"
 #define	_CORDS_SCOPE		"scope"
