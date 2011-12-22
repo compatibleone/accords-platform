@@ -14,5 +14,5 @@ libpubocci_la_SOURCES = occilogin.c occilogin.h \
     occipublisher.c occipublisher.h \
     occiresolver.c
 
-libpubocci_la_CFLAGS = $(CFLAGS_COCCI) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_COPABR)
+libpubocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COCCI) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_COPABR)
 libpubocci_la_LDFLAGS = $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COXML) $(LD_COREST) $(LD_COPABR) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)

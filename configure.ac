@@ -27,18 +27,18 @@ AC_HEADER_STDC
 
 # Some global compilation flags
 # http://www.gnu.org/software/autoconf/manual/automake.html#Flag-Variables-Ordering
-AC_SUBST([CFLAGS])
-AC_SUBST([CPPFLAGS])
-AC_SUBST([LDFLAGS])
-
+AM_CFLAGS=
 AC_ARG_ENABLE([debug],
       [AS_HELP_STRING([--enable-debug],
 		      [Enable debug @<:@default=disable@:>@])],
       [],
       [enable_debug=no])
 if test "x$enable_debug" = "xyes"; then
-   AC_SUBST([CFLAGS], [-g -ggdb -O0])
+   AM_CFLAGS="$AM_CFLAGS -g -ggdb -O0"
 fi
+AC_SUBST([AM_CFLAGS])
+AC_SUBST([AM_CPPFLAGS])
+AC_SUBST([AM_LDFLAGS])
 
 AC_CHECK_SSL
 
