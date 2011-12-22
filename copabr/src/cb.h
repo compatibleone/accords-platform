@@ -88,6 +88,10 @@ public	char *	cords_manifest_broker(
 
 public	int	get_provisioning_status();
 
+public	char *	cords_extract_atribut( 
+	struct occi_response * zptr, char * domain,
+	char * category, char * nptr );
+
 	/* ----- */
 #endif	/* _cb_h */
 	/* ----- */

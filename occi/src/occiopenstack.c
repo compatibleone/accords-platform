@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _openstack_c_
 #define _openstack_c_
 
@@ -138,6 +145,8 @@ private void autoload_openstack_nodes() {
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rootpass" )) != (struct xml_atribut *) 0)
@@ -193,6 +202,9 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
 		fprintf(h,"%c",0x0022);
@@ -246,6 +258,8 @@ private void set_openstack_field(
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "rootpass" ) ))
@@ -321,6 +335,13 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->profile,fptr->profile) != 0)
 			return(0);
 		}
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
+			return(0);
+		else if ( strcmp(pptr->node,fptr->node) != 0)
+			return(0);
+		}
 	if (( fptr->number )
 	&&  (strlen( fptr->number ) != 0)) {
 		if (!( pptr->number ))
@@ -390,6 +411,9 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
@@ -830,6 +854,8 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "rootpass",0,0) ))
@@ -915,6 +941,17 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.profile='%s'\r\n",(sptr->profile?sptr->profile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.node='%s'\r\n",(sptr->node?sptr->node:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

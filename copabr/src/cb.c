@@ -126,7 +126,7 @@ private	struct	occi_response * cords_retrieve_instance(
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ e x t r a c t _ a t r i b u t		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_extract_atribut( 
+public	char *	cords_extract_atribut( 
 		struct occi_response * zptr, 
 		char * domain,
 		char * category,

@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _openstack_c_
 #define _openstack_c_
 
@@ -37,6 +44,8 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
 		if ( sptr->rootpass )
@@ -67,6 +76,7 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
+		sptr->node = (char*) 0;
 		sptr->number = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->reference = (char*) 0;
@@ -121,6 +131,10 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"node") ))
+		{
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"number") ))
 		{
 			if ( wptr->value ) { sptr->number = allocate_string(wptr->value); }
@@ -172,6 +186,7 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));

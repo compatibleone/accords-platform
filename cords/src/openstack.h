@@ -11,6 +11,8 @@ struct	openstack
 	char *	image;
 	char *	profile;
 
+	char *	node;
+
 	char *	number;
 	char *	rootpass;
 	char *	reference;
