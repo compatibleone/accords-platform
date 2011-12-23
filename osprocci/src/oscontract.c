@@ -48,6 +48,23 @@ struct	cords_oscontract
 	struct	os_response *	images;
 };
 
+struct	os_compute_infos
+{
+	int	cores;
+	int	speed;
+	int	memory;
+	int	storage;
+	char *	id;
+};
+
+struct	os_image_infos
+{
+	char *	id;
+	char *	other;
+	char *	name;
+	char *	updated;
+};
+
 /*	-----------------------------------------------------------------	*/
 /*	     t e r m i n a t e _ o p e n s t a c k _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
@@ -81,24 +98,100 @@ private	int	terminate_openstack_contract( int status, struct cords_oscontract * 
 /*	-----------------------------------------------------------------	*/
 private	char *	resolve_contract_flavor( struct cords_oscontract * cptr )
 {
-	char *	vcpus=(char*) 0;
-	char *	disk=(char*) 0;
-	char *	memory=(char*) 0;
+	struct	os_compute_infos	request;
+	struct	os_compute_infos	flavor;
+	struct	os_compute_infos	best;
+	char *			vptr;
+
+	struct	data_element * eptr=(struct data_element *) 0;
+	struct	data_element * dptr=(struct data_element *) 0;
+
+	if (!( eptr = json_element( cptr->flavors->jsonroot, "flavours" )))
+		return((char *) 0);
 
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
 	/* -------------------------------------------------------------- */
-	if (!( memory = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
-		return((char *) 0);
-	else if (!( vcpus = cords_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_CORES ) ))
-		return((char *) 0);
-	else if (!( disk = cords_extract_atribut( cptr->storage.message, "occi", 
-		_CORDS_STORAGE, _CORDS_SIZE ) ))
-		return((char *) 0);
+		request.memory = 0;
+	else	request.memory = atoi( vptr );
 
-	else	return(allocate_string( memory ) );
+	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_CORES ) ))
+		request.cores = 0;
+	else	request.cores = atoi( vptr );
+
+	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_SPEED ) ))
+		request.speed = 0;
+	else	request.speed = atoi(vptr);
+	
+	if (!( vptr = cords_extract_atribut( cptr->storage.message, "occi", 
+		_CORDS_STORAGE, _CORDS_SIZE ) ))
+		request.storage = 0;
+	else	request.storage = atoi(vptr);
+	
+	/* ----------------------------------------- */
+	/* for structures in flavor message response */
+	/* ----------------------------------------- */
+	memset( &best, 0, sizeof( struct os_compute_infos ));
+	for ( 	dptr=eptr->first;
+		dptr != (struct data_element *) 0;
+		dptr = dptr->next )
+	{
+		/* ----------------------------------------------- */
+		/* collect the information from the flavor element */
+		/* ----------------------------------------------- */
+		if (!( vptr = json_atribut( dptr, "id" ) ))
+			continue;
+		else	flavor.id = vptr;
+		if (!( vptr = json_atribut( dptr, "disk" ) ))
+			flavor.storage = 0;
+		else	flavor.storage = atoi(vptr);
+		if (!( vptr = json_atribut( dptr, "ram" ) ))
+			flavor.memory = 0;
+		else	flavor.memory = atoi(vptr);
+		if (!( vptr = json_atribut( dptr, "vcpus" ) ))
+			flavor.cores = 0;
+		else	flavor.cores = atoi(vptr);
+		if (!( vptr = json_atribut( dptr, "speed" ) ))
+			flavor.speed = 0;
+		else	flavor.speed = atoi(vptr);
+		/* ------------------------------------ */
+		/* compare the request and the response */
+		/* ------------------------------------ */
+		if (( request.storage ) && ( flavor.storage < request.storage ))
+			continue;
+		else if (( request.memory  ) && ( flavor.memory < request.memory ))
+			continue;
+		else if (( request.cores ) && ( flavor.cores ) && ( flavor.cores < request.cores ))
+			continue;
+		else if (( request.speed ) && ( flavor.speed ) && ( flavor.speed < request.speed ))
+			continue;
+		/* --------------------- */
+		/* ok so its good enough */
+		/* --------------------- */
+		if (( best.cores ) && ( flavor.cores ) && ( best.cores < flavor.cores ))
+			continue;
+		if (( best.speed ) && ( flavor.speed ) && ( best.speed < flavor.speed ))
+			continue;
+		if (( best.memory ) && ( best.memory < flavor.memory ))
+			continue;
+		if (( best.storage ) && ( best.storage < flavor.storage ))
+			continue;
+		/* -------------------- */
+		/* in fact it is better */
+		/* -------------------- */
+		best.cores = flavor.cores;
+		best.speed = flavor.speed;
+		best.memory = flavor.memory;
+		best.storage = flavor.storage;
+		best.id = flavor.id;
+	}
+	if (!( best.id ))
+		return( best.id );
+	else	return(allocate_string( best.id ) );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -106,16 +199,60 @@ private	char *	resolve_contract_flavor( struct cords_oscontract * cptr )
 /*	-----------------------------------------------------------------	*/
 private	char *	resolve_contract_image( struct cords_oscontract * cptr )
 {
-	char *	osname=(char*) 0;
+	struct	os_image_infos	request;
+	struct	os_image_infos	image;
+	struct	os_image_infos	best;
+	char *			vptr;
+
+	struct	data_element * eptr=(struct data_element *) 0;
+	struct	data_element * dptr=(struct data_element *) 0;
+
+	if (!( eptr = json_element( cptr->images->jsonroot, "images" )))
+		return((char *) 0);
 
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
 	/* ---------------------------------------------------------- */
-	if (!( osname = cords_extract_atribut( cptr->system.message, "occi", 
+	if (!( vptr = cords_extract_atribut( cptr->system.message, "occi", 
 		_CORDS_SYSTEM, _CORDS_NAME ) ))
 		return((char *) 0);
+	else	request.name = vptr;
 
-	else	return(allocate_string( osname ) );
+	if (!( vptr = cords_extract_atribut( cptr->image.message, "occi", 
+		_CORDS_IMAGE, _CORDS_NAME ) ))
+		return((char *) 0);
+	else	request.other = vptr;
+
+	memset( &best, 0, sizeof( struct os_image_infos ));
+	for ( 	dptr=eptr->first;
+		dptr != (struct data_element *) 0;
+		dptr = dptr->next )
+	{
+		/* ----------------------------------------------- */
+		/* collect the information from the flavor element */
+		/* ----------------------------------------------- */
+		if (!( vptr = json_atribut( dptr, "id" ) ))
+			continue;
+		else	image.id = vptr;
+		if (!( vptr = json_atribut( dptr, "name" ) ))
+			continue;
+		else	image.name = vptr;
+
+		if ( strncasecmp( request.name, image.name, strlen( request.name ) ) )
+			continue;
+		else if ( strncasecmp( request.other, image.name, strlen( request.other ) ) )
+			continue;
+
+		else
+		{
+			best.id = image.id;
+			best.name = image.name;
+			break;
+		}		
+	}
+	if (!( best.id ))
+		return( best.id );
+	else 	return(allocate_string( best.id ));
 }
 
 /*	-----------------------------------------------------------------	*/

@@ -330,7 +330,7 @@ public	struct	os_response *	os_list_server_details	( )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	sprintf(buffer,"/servers/details");
+	sprintf(buffer,"/servers/detail");
 
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
@@ -396,7 +396,7 @@ public	struct	os_response *	os_list_flavor_details( )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	sprintf(buffer,"/flavors/details");
+	sprintf(buffer,"/flavors/detail");
 
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
@@ -460,7 +460,7 @@ public	struct	os_response *	os_list_image_details( )
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images/details");
+	sprintf(buffer,"/images/detail");
 
 	if (!( hptr = os_authenticate() ))
 		return( rptr );

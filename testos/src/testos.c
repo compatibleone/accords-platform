@@ -1,23 +1,30 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_testos_c
 #define	_testos_c
 
 #include "osclient.h"
 
+private	int	detail=0;
 private	int	debug=0;
 private	int	verbose=0;
 private	char *	tls=(char *) 0;
@@ -97,11 +104,11 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVERS" ) ))
-			os_result( os_list_servers() );
+			os_result( ( detail ? os_list_server_details() : os_list_servers()) );
 		else if (!( strcasecmp( p2, "FLAVORS" ) ))
-			os_result( os_list_flavors() );
+			os_result( ( detail ? os_list_flavor_details() : os_list_flavors()) );
 		else if (!( strcasecmp( p2, "IMAGES" ) ))
-			os_result( os_list_images() );
+			os_result( ( detail ? os_list_image_details() : os_list_images()) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -227,6 +234,8 @@ private	int	os_command(int argc, char * argv[] )
 				pass = argv[argi++];
 			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
+			else if (!( strcasecmp( aptr,"detail" ) ))
+				detail = 1;
 			else if (!( strcasecmp( aptr,"host" ) ))
 				host = argv[argi++];
 			else if (!( strcasecmp( aptr,"agent" ) ))
@@ -258,8 +267,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.03");
-	printf("\n   Beta Version 19/11/2011");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.04");
+	printf("\n   Beta Version 23/12/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -285,6 +294,7 @@ private	int	os_banner()
 	printf("\n     --version <value>     set host version      ");
 	printf("\n     --agent   <name>      set test agent name   ");
 	printf("\n     --tls <config>        set tls config        ");
+	printf("\n     --detail              display detailed lists ");
 	printf("\n     --verbose             activate verbose messages ");
 	printf("\n     --debug               activate debug messages ");
 	printf("\n\n");
