@@ -24,6 +24,8 @@
 
 #include "cp.h"
 
+#define	_BROKER_PROVIDER_CONTRACT	1
+
 struct	cords_provisioning
 {
 	char			* planID;
@@ -70,6 +72,10 @@ struct	cords_node_descriptor
 	struct	occi_response 	* package;	/* the package from the image				*/
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/
 };
+
+public	int	cords_initialise_broker_operator( 
+		int mode, char * provider, char * account, 
+		char * pricelist, char * domain );
 
 public 	struct	occi_element * cords_first_link( struct occi_response * zptr );
 public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
