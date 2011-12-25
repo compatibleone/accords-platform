@@ -148,7 +148,7 @@ private	char *	resolve_contract_flavor( struct cords_oscontract * cptr )
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
-	if (!( eptr = json_element( cptr->flavors->jsonroot, "flavours" )))
+	if (!( eptr = json_element( cptr->flavors->jsonroot, "flavors" )))
 		return((char *) 0);
 
 	/* -------------------------------------------------------------- */
@@ -280,17 +280,14 @@ private	char *	resolve_contract_image( struct cords_oscontract * cptr )
 			continue;
 		else	image.name = vptr;
 
-		if ( strncasecmp( request.name, image.name, strlen( request.name ) ) )
-			continue;
-		else if ( strncasecmp( request.other, image.name, strlen( request.other ) ) )
-			continue;
-
-		else
+		if ( (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
+		||   (!( strncasecmp( request.other, image.name, strlen( request.other ) ))))
 		{
 			best.id = image.id;
 			best.name = image.name;
 			break;
 		}		
+		else	continue;
 	}
 	if (!( best.id ))
 		return( best.id );

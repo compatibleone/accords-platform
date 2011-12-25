@@ -848,6 +848,36 @@ private	struct	occi_request  * cords_add_provider_attribute(
 	else	return( qptr );		
 }
 		
+/*	----------------------------------------------------------	*/
+/*		c o r d s _ s e l e c t _ p r o v i d e r		*/
+/*	----------------------------------------------------------	*/
+private	char *	cords_select_provider( char * provider, char * agent, char * tls )
+{
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	struct	occi_element * eptr;
+
+	/* ------------------------------------------------------ */
+	/* attempt to resolve agencys of the "provider" category */
+	/* ------------------------------------------------------ */
+	if (!( zptr = occi_resolver( provider, agent ) ))
+		return( (char *) 0 );
+
+	/* ------------------------------------------------------ */
+	/*  scan the list to find their list of providers offered  */
+	/* ------------------------------------------------------ */
+	for (	eptr = zptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else 	return( allocate_string( eptr->value ) );
+	}
+	return((char *) 0);
+}
 
 /*	--------------------------------------------------------	*/
 /*		c o r d s _ c r e a t e _ p r o v i d e r 		*/
@@ -860,7 +890,6 @@ private	char * 	cords_contract_provider(
 {
 	struct	occi_client   * kptr;
 	struct	occi_response * yptr;
-	struct	occi_response * zptr;
 	struct	occi_request  * qptr;
 	struct	occi_element  * fptr;
 
@@ -870,6 +899,7 @@ private	char * 	cords_contract_provider(
 	char *	sptr;
 	char *	host;
 	char 	buffer[2048];
+	char *	zptr;
 
 	/* --------------------------------------------- */
 	/* retrieve the provider identification category */
@@ -889,10 +919,16 @@ private	char * 	cords_contract_provider(
 	else if (!( pptr = document_atribut( dptr, _CORDS_PROFILE ) ))
 		return((char *) 0);
 
+	/* ----------------------------------- */
+	/* select a provider for this category */
+	/* ----------------------------------- */
+	else if (!( zptr = cords_select_provider( cptr->value, agent, tls ) ))
+		return( zptr );
+
 	/* --------------------------------- */
 	/* create the client and the request */
 	/* --------------------------------- */
-	sprintf(buffer,"%s/%s/",zptr->host,cptr->value);
+	sprintf(buffer,"%s/%s/",zptr,cptr->value);
 
 	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 		return((char *) 0);
@@ -924,7 +960,7 @@ private	char * 	cords_contract_provider(
 		return( host );
 	else
 	{
-		sprintf(buffer,"%s/%s/%s",zptr->host,cptr->value,host);
+		sprintf(buffer,"%s/%s/%s",zptr,cptr->value,host);
 		return(allocate_string(buffer) );
 	}
 }
