@@ -847,20 +847,112 @@ private	struct	occi_request  * cords_add_provider_attribute(
 
 	else	return( qptr );		
 }
-		
+
+
+/*	---------------------------------------------------------	*/
+/*		c o r d s _ c o e s _ o p e r a t i o n			*/
+/*	---------------------------------------------------------	*/
+/*	this function provides linkage to COES placement engine		*/
+/*	for the selection of the provider to be used by broker		*/		
+/*	---------------------------------------------------------	*/
+private	char *	cords_coes_operation( char * provider, char * node, char * agent, char * tls )
+{
+	struct	occi_client 	* kptr;
+	struct	occi_request	* qptr;
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	struct	occi_element 	* eptr;
+	struct	occi_element 	* dptr;
+	char 			* result;
+	char 			* id;
+
+	if (!( zptr = occi_resolver( _CORDS_PLACEMENT, agent )))
+		return( (char *) 0 );
+	else
+	{
+		/* ------------------------------------------------------ */
+		/*  scan the list to find their list of providers offered  */
+		/* ------------------------------------------------------ */
+		for (	eptr = zptr->first;
+			eptr != (struct occi_element*) 0;
+			eptr = eptr->next )
+		{
+			if (!( eptr->name ))
+				continue;
+			else if (!( eptr->value ))
+				continue;
+			else if (!( kptr = occi_create_client( eptr->value, agent, tls ) ))
+				continue;
+			else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+			{
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , provider ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , node     ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			else if (!( yptr = occi_client_post( kptr, qptr ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			else if (!( id = cords_extract_location( yptr ) ))
+			{
+				yptr = occi_remove_response( yptr );
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			else
+			{
+				yptr = occi_remove_response( yptr );
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				if (!( yptr = occi_simple_get( id, agent, tls ) ))
+					continue;
+				else if (!( result = cords_extract_atribut( 
+					yptr, Operator.domain, 
+					_CORDS_PLACEMENT, _CORDS_SOLUTION ))) 
+				{
+					yptr = occi_remove_response( yptr );
+					continue;
+				}
+				else 
+				{
+					yptr = occi_remove_response( yptr );
+					return( allocate_string( result ) );
+				}
+			}
+		}
+		return((char *) 0);
+	}
+}
+
 /*	----------------------------------------------------------	*/
 /*		c o r d s _ s e l e c t _ p r o v i d e r		*/
 /*	----------------------------------------------------------	*/
-private	char *	cords_select_provider( char * provider, char * agent, char * tls )
+private	char *	cords_select_provider( char * provider, char * node, char * agent, char * tls )
 {
-	struct	occi_response * zptr;
-	struct	occi_response * yptr;
-	struct	occi_element * eptr;
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	struct	occi_element 	* eptr;
+	char			* solution;
 
+	/* ------------------------------------------------------ */
+	/* allow the COES elastic placement engine to do its work */
+	/* ------------------------------------------------------ */
+	if (( solution = cords_coes_operation( provider, node, agent, tls )) != (char *) 0)
+		return( solution );
+	
 	/* ------------------------------------------------------ */
 	/* attempt to resolve agencys of the "provider" category */
 	/* ------------------------------------------------------ */
-	if (!( zptr = occi_resolver( provider, agent ) ))
+	else if (!( zptr = occi_resolver( provider, agent ) ))
 		return( (char *) 0 );
 
 	/* ------------------------------------------------------ */
@@ -922,7 +1014,7 @@ private	char * 	cords_contract_provider(
 	/* ----------------------------------- */
 	/* select a provider for this category */
 	/* ----------------------------------- */
-	else if (!( zptr = cords_select_provider( cptr->value, agent, tls ) ))
+	else if (!( zptr = cords_select_provider( cptr->value, id, agent, tls ) ))
 		return( zptr );
 
 	/* --------------------------------- */

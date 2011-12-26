@@ -92,6 +92,8 @@
 #define	_CORDS_VALUE		"value"
 #define	_CORDS_EXPRESSION	"expression"
 
+#define	_CORDS_PLACEMENT	"placement"
+#define	_CORDS_SOLUTION 	"solution"
 #define	_CORDS_PLAN		"plan"
 #define	_CORDS_SERVICE		"service"
 
