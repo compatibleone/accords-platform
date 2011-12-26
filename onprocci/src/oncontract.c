@@ -141,15 +141,7 @@ private	int	on_normalise_value( char * sptr, int normal )
 private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 {
 	struct	on_compute_infos	request;
-	struct	on_compute_infos	flavor;
-	struct	on_compute_infos	best;
-	char *			vptr;
-
-	struct	data_element * eptr=(struct data_element *) 0;
-	struct	data_element * dptr=(struct data_element *) 0;
-
-	if (!( eptr = json_element( cptr->flavors->jsonroot, "flavors" )))
-		return((char *) 0);
+	char *	vptr;
 
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
@@ -173,67 +165,16 @@ private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
 	else	request.storage = on_normalise_value(vptr,'G');
-	
-	/* ----------------------------------------- */
-	/* for structures in flavor message response */
-	/* ----------------------------------------- */
-	memset( &best, 0, sizeof( struct on_compute_infos ));
-	for ( 	dptr=eptr->first;
-		dptr != (struct data_element *) 0;
-		dptr = dptr->next )
-	{
-		/* ----------------------------------------------- */
-		/* collect the information from the flavor element */
-		/* ----------------------------------------------- */
-		if (!( vptr = json_atribut( dptr, "id" ) ))
-			continue;
-		else	flavor.id = vptr;
-		if (!( vptr = json_atribut( dptr, "disk" ) ))
-			flavor.storage = 0;
-		else	flavor.storage = on_normalise_value(vptr,'G');
-		if (!( vptr = json_atribut( dptr, "ram" ) ))
-			flavor.memory = 0;
-		else	flavor.memory = on_normalise_value(vptr,'M');
-		if (!( vptr = json_atribut( dptr, "vcpus" ) ))
-			flavor.cores = 0;
-		else	flavor.cores = on_normalise_value(vptr,'U');
-		if (!( vptr = json_atribut( dptr, "speed" ) ))
-			flavor.speed = 0;
-		else	flavor.speed = on_normalise_value(vptr,'G');
-		/* ------------------------------------ */
-		/* compare the request and the response */
-		/* ------------------------------------ */
-		if (( request.storage ) && ( flavor.storage < request.storage ))
-			continue;
-		else if (( request.memory  ) && ( flavor.memory < request.memory ))
-			continue;
-		else if (( request.cores ) && ( flavor.cores ) && ( flavor.cores < request.cores ))
-			continue;
-		else if (( request.speed ) && ( flavor.speed ) && ( flavor.speed < request.speed ))
-			continue;
-		/* --------------------- */
-		/* ok so its good enough */
-		/* --------------------- */
-		if (( best.cores ) && ( flavor.cores ) && ( best.cores < flavor.cores ))
-			continue;
-		if (( best.speed ) && ( flavor.speed ) && ( best.speed < flavor.speed ))
-			continue;
-		if (( best.memory ) && ( best.memory < flavor.memory ))
-			continue;
-		if (( best.storage ) && ( best.storage < flavor.storage ))
-			continue;
-		/* -------------------- */
-		/* in fact it is better */
-		/* -------------------- */
-		best.cores = flavor.cores;
-		best.speed = flavor.speed;
-		best.memory = flavor.memory;
-		best.storage = flavor.storage;
-		best.id = flavor.id;
-	}
-	if (!( best.id ))
-		return( best.id );
-	else	return(allocate_string( best.id ) );
+
+	if (( request.storage <= 40000000 )
+	&& ( request.memory  <= 2048000 ))
+		return( allocate_string( "small" ) );
+	else if (( request.storage > 80000000 )
+	     && ( request.memory  > 4096000 ))
+		return( allocate_string( "large" ) );
+	else	return( allocate_string( "medium" ) );
+
+
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -246,10 +187,12 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	struct	on_image_infos	best;
 	char *			vptr;
 
-	struct	data_element * eptr=(struct data_element *) 0;
-	struct	data_element * dptr=(struct data_element *) 0;
 
-	if (!( eptr = json_element( cptr->images->jsonroot, "images" )))
+	struct	xml_element * eptr;
+	struct	xml_element * dptr;
+	struct	xml_atribut * aptr;
+
+	if (!( eptr = document_element( cptr->images->xmlroot, "STORAGE_COLLECTION" )))
 		return((char *) 0);
 
 	/* ---------------------------------------------------------- */
@@ -266,19 +209,20 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	else	request.other = vptr;
 
 	memset( &best, 0, sizeof( struct on_image_infos ));
+
 	for ( 	dptr=eptr->first;
-		dptr != (struct data_element *) 0;
+		dptr != (struct xml_element *) 0;
 		dptr = dptr->next )
 	{
 		/* ----------------------------------------------- */
 		/* collect the information from the flavor element */
 		/* ----------------------------------------------- */
-		if (!( vptr = json_atribut( dptr, "id" ) ))
+		if (!( aptr = document_atribut( dptr, "href" ) ))
 			continue;
-		else	image.id = vptr;
-		if (!( vptr = json_atribut( dptr, "name" ) ))
+		else	image.id = aptr->value;
+		if (!( aptr = document_atribut( dptr, "name" ) ))
 			continue;
-		else	image.name = vptr;
+		else	image.name = aptr->value;
 
 		if ( (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
 		||   (!( strncasecmp( request.other, image.name, strlen( request.other ) ))))
