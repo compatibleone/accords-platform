@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _opennebula_c_
 #define _opennebula_c_
 
@@ -39,6 +46,8 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
@@ -74,6 +83,7 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->hostname = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
+		sptr->node = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->profile = (char*) 0;
@@ -133,6 +143,10 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"image") ))
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"node") ))
+		{
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"publicaddr") ))
 		{
@@ -194,6 +208,7 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));

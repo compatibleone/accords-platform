@@ -19,8 +19,8 @@
 /* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
 /*										*/
 /* ---------------------------------------------------------------------------- */
-#ifndef	_oscontract_c
-#define	_oscontract_c
+#ifndef	_oncontract_c
+#define	_oncontract_c
 
 #include "occiclient.h"
 
@@ -34,7 +34,7 @@ struct	cords_vector
 	struct occi_response * message;
 };
 
-struct	cords_os_contract
+struct	cords_on_contract
 {
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
@@ -44,11 +44,11 @@ struct	cords_os_contract
 	struct	cords_vector	image;
 	struct	cords_vector	system;
 	struct	cords_vector	package;
-	struct	os_response *	flavors;
-	struct	os_response *	images;
+	struct	on_response *	flavors;
+	struct	on_response *	images;
 };
 
-struct	os_compute_infos
+struct	on_compute_infos
 {
 	int	cores;
 	int	speed;
@@ -57,7 +57,7 @@ struct	os_compute_infos
 	char *	id;
 };
 
-struct	os_image_infos
+struct	on_image_infos
 {
 	char *	id;
 	char *	other;
@@ -65,10 +65,11 @@ struct	os_image_infos
 	char *	updated;
 };
 
+
 /*	-----------------------------------------------------------------	*/
-/*	     t e r m i n a t e _ o p e n s t a c k _ c o n t r a c t		*/
+/*	     t e r m i n a t e _ o p e n n e b u l a _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
-private	int	terminate_openstack_contract( int status, struct cords_os_contract * cptr )
+private	int	terminate_opennebula_contract( int status, struct cords_on_contract * cptr )
 {
 	if ( cptr->node.message )
 		cptr->node.message = occi_remove_response( cptr->node.message );
@@ -87,12 +88,11 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 	if ( cptr->package.message )
 		cptr->package.message = occi_remove_response( cptr->package.message );
 	if ( cptr->flavors )
-		cptr->flavors = liberate_os_response( cptr->flavors );
+		cptr->flavors = liberate_on_response( cptr->flavors );
 	if ( cptr->images  )
-		cptr->images  = liberate_os_response( cptr->images  );
+		cptr->images  = liberate_on_response( cptr->images  );
 	return( status );
 }
-
 
 /*	---------------------------------------------------	*/
 /*		o s _ n o r m a l i s e _ v a l u e 		*/
@@ -104,7 +104,7 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 /*	in case no explicite value is present.			*/
 /*	The function returns the normalisation of the value	*/
 /*	---------------------------------------------------	*/
-private	int	os_normalise_value( char * sptr, int normal )
+private	int	on_normalise_value( char * sptr, int normal )
 {
 	int	factor=1;
 	int	value=0;
@@ -136,13 +136,13 @@ private	int	os_normalise_value( char * sptr, int normal )
 
 
 /*	-----------------------------------------------------------------	*/
-/*		r e s o l v e _ c o n t r a c t _ f l a v o r 			*/
+/*		r e s o l v e _ o p e n n e b u l a _ f l a v o r 		*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
+private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 {
-	struct	os_compute_infos	request;
-	struct	os_compute_infos	flavor;
-	struct	os_compute_infos	best;
+	struct	on_compute_infos	request;
+	struct	on_compute_infos	flavor;
+	struct	on_compute_infos	best;
 	char *			vptr;
 
 	struct	data_element * eptr=(struct data_element *) 0;
@@ -157,27 +157,27 @@ private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
 	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
-	else	request.memory = os_normalise_value( vptr,'G' );
+	else	request.memory = on_normalise_value( vptr,'G' );
 
 	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_CORES ) ))
 		request.cores = 0;
-	else	request.cores = os_normalise_value( vptr,'U' );
+	else	request.cores = on_normalise_value( vptr,'U' );
 
 	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_SPEED ) ))
 		request.speed = 0;
-	else	request.speed = os_normalise_value(vptr,'G');
+	else	request.speed = on_normalise_value(vptr,'G');
 	
 	if (!( vptr = cords_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
-	else	request.storage = os_normalise_value(vptr,'G');
+	else	request.storage = on_normalise_value(vptr,'G');
 	
 	/* ----------------------------------------- */
 	/* for structures in flavor message response */
 	/* ----------------------------------------- */
-	memset( &best, 0, sizeof( struct os_compute_infos ));
+	memset( &best, 0, sizeof( struct on_compute_infos ));
 	for ( 	dptr=eptr->first;
 		dptr != (struct data_element *) 0;
 		dptr = dptr->next )
@@ -190,16 +190,16 @@ private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
 		else	flavor.id = vptr;
 		if (!( vptr = json_atribut( dptr, "disk" ) ))
 			flavor.storage = 0;
-		else	flavor.storage = os_normalise_value(vptr,'G');
+		else	flavor.storage = on_normalise_value(vptr,'G');
 		if (!( vptr = json_atribut( dptr, "ram" ) ))
 			flavor.memory = 0;
-		else	flavor.memory = os_normalise_value(vptr,'M');
+		else	flavor.memory = on_normalise_value(vptr,'M');
 		if (!( vptr = json_atribut( dptr, "vcpus" ) ))
 			flavor.cores = 0;
-		else	flavor.cores = os_normalise_value(vptr,'U');
+		else	flavor.cores = on_normalise_value(vptr,'U');
 		if (!( vptr = json_atribut( dptr, "speed" ) ))
 			flavor.speed = 0;
-		else	flavor.speed = os_normalise_value(vptr,'G');
+		else	flavor.speed = on_normalise_value(vptr,'G');
 		/* ------------------------------------ */
 		/* compare the request and the response */
 		/* ------------------------------------ */
@@ -237,13 +237,13 @@ private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
 }
 
 /*	-----------------------------------------------------------------	*/
-/*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
+/*		r e s o l v e _ o p e n n e b u l a _ i m a g e   		*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_image( struct cords_os_contract * cptr )
+private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 {
-	struct	os_image_infos	request;
-	struct	os_image_infos	image;
-	struct	os_image_infos	best;
+	struct	on_image_infos	request;
+	struct	on_image_infos	image;
+	struct	on_image_infos	best;
 	char *			vptr;
 
 	struct	data_element * eptr=(struct data_element *) 0;
@@ -265,7 +265,7 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 		return((char *) 0);
 	else	request.other = vptr;
 
-	memset( &best, 0, sizeof( struct os_image_infos ));
+	memset( &best, 0, sizeof( struct on_image_infos ));
 	for ( 	dptr=eptr->first;
 		dptr != (struct data_element *) 0;
 		dptr = dptr->next )
@@ -295,19 +295,19 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 }
 
 /*	-----------------------------------------------------------------	*/
-/*		c r e a t e _ o p e n s t a c k _ c o n t r a c t		*/
+/*		c r e a t e _ o p e n n e b u l a _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
-public	int	create_openstack_contract(
+public	int	create_opennebula_contract(
 		struct occi_category * optr,
-		struct openstack * pptr,
+		struct opennebula * pptr,
 		char * agent,
 		char * tls )
 {
-	struct	cords_os_contract contract;
+	struct	cords_on_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
 
-	memset( &contract, 0, sizeof( struct cords_os_contract ));
+	memset( &contract, 0, sizeof( struct cords_on_contract ));
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -315,73 +315,71 @@ public	int	create_openstack_contract(
 	if (!( contract.node.id = pptr->node ))
 		return( 0 );
 	else if (!( contract.node.message = occi_simple_get( contract.node.id, agent, tls ) ))
-		return( terminate_openstack_contract( 570, &contract ) );
+		return( terminate_opennebula_contract( 570, &contract ) );
 
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
 	else if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
-		return( terminate_openstack_contract( 571, &contract ) );
+		return( terminate_opennebula_contract( 571, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
-		return( terminate_openstack_contract( 572, &contract ) );
+		return( terminate_opennebula_contract( 572, &contract ) );
 
 	else if (!( contract.compute.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
-		return( terminate_openstack_contract( 573, &contract ) );
+		return( terminate_opennebula_contract( 573, &contract ) );
 	else if (!( contract.compute.message = occi_simple_get( contract.compute.id, agent, tls ) ))
-		return( terminate_openstack_contract( 574, &contract ) );
+		return( terminate_opennebula_contract( 574, &contract ) );
 
 	else if (!( contract.network.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
-		return( terminate_openstack_contract( 575, &contract ) );
+		return( terminate_opennebula_contract( 575, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
-		return( terminate_openstack_contract( 576, &contract ) );
+		return( terminate_opennebula_contract( 576, &contract ) );
 
 	else if (!( contract.storage.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
-		return( terminate_openstack_contract( 577, &contract ) );
+		return( terminate_opennebula_contract( 577, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
-		return( terminate_openstack_contract( 578, &contract ) );
+		return( terminate_opennebula_contract( 578, &contract ) );
 
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-	else if (!( contract.flavors = os_list_flavor_details() ))
-		return( terminate_openstack_contract( 579, &contract ) );
-	else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
-		return( terminate_openstack_contract( 580, &contract ) );
+	else if (!( contract.flavors = on_list_flavors() ))
+		return( terminate_opennebula_contract( 579, &contract ) );
+	else if (!( pptr->flavor = resolve_opennebula_flavor( &contract ) ))
+		return( terminate_opennebula_contract( 580, &contract ) );
 		
-
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
 	if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
-		return( terminate_openstack_contract( 581, &contract ) );
+		return( terminate_opennebula_contract( 581, &contract ) );
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
-		return( terminate_openstack_contract( 582, &contract ) );
+		return( terminate_opennebula_contract( 582, &contract ) );
 
 	else if (!( contract.system.id = cords_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
-		return( terminate_openstack_contract( 583, &contract ) );
+		return( terminate_opennebula_contract( 583, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
-		return( terminate_openstack_contract( 584, &contract ) );
+		return( terminate_opennebula_contract( 584, &contract ) );
 
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = os_list_image_details() ))
-		return( terminate_openstack_contract( 585, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( &contract ) ))
-		return( terminate_openstack_contract( 586, &contract ) );
+	else if (!( contract.images = on_list_images() ))
+		return( terminate_opennebula_contract( 585, &contract ) );
+	else if (!( pptr->image = resolve_opennebula_image( &contract ) ))
+		return( terminate_opennebula_contract( 586, &contract ) );
 		
-	else	return( terminate_openstack_contract( 0, &contract ) );
+	else	return( terminate_opennebula_contract( 0, &contract ) );
 
 }
 
-
 	/* ------------- */
-#endif	/* _oscontract_c */
+#endif	/* _oncontract_c */
 	/* ------------- */
 

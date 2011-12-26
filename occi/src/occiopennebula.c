@@ -1,18 +1,25 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
 #ifndef _opennebula_c_
 #define _opennebula_c_
 
@@ -27,6 +34,7 @@
 /*	--------------------------------------------------------------------	*/
 struct opennebula * allocate_opennebula();
 struct opennebula * liberate_opennebula(struct opennebula * optr);
+private pthread_mutex_t list_opennebula_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * opennebula_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * opennebula_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_opennebula_node() { return( opennebula_first ); }
@@ -34,7 +42,7 @@ public struct  occi_kind_node * occi_first_opennebula_node() { return( opennebul
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * drop_opennebula_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_opennebula_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		opennebula_first = nptr->next;
@@ -44,12 +52,19 @@ private struct occi_kind_node * drop_opennebula_node(struct occi_kind_node * npt
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
+	return((struct occi_kind_node *)0);
+}
+private struct occi_kind_node * drop_opennebula_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_opennebula_control );
+	nptr = ll_drop_opennebula_node( nptr );
+	pthread_mutex_unlock( &list_opennebula_control );
+	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * locate_opennebula_node(char * id) {
+private struct occi_kind_node * ll_locate_opennebula_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	for ( nptr = opennebula_first;
@@ -61,11 +76,18 @@ private struct occi_kind_node * locate_opennebula_node(char * id) {
 		}
 	return( nptr );
 }
+private struct occi_kind_node * locate_opennebula_node(char * id) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_opennebula_control );
+	nptr = ll_locate_opennebula_node(id);
+	pthread_mutex_unlock( &list_opennebula_control );
+	return( nptr );
+}
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * add_opennebula_node(int mode) {
+private struct occi_kind_node * ll_add_opennebula_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -86,6 +108,13 @@ private struct occi_kind_node * add_opennebula_node(int mode) {
 			}
 		}
 }
+private struct occi_kind_node * add_opennebula_node(int mode) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_opennebula_control );
+	nptr = ll_add_opennebula_node( mode );
+	pthread_mutex_unlock( &list_opennebula_control );
+	return(nptr);
+}
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
@@ -98,9 +127,9 @@ private void autoload_opennebula_nodes() {
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
-	if (!( document = document_parse_file(fn) ))
+	if (!( document = document_parse_file(fn)))
 		return;
-	else if ((eptr = document_element(document,"opennebulas")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"opennebulas")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "opennebula" ) ) continue;
@@ -118,6 +147,8 @@ private void autoload_opennebula_nodes() {
 				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicaddr" )) != (struct xml_atribut *) 0)
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
@@ -154,7 +185,8 @@ public  void autosave_opennebula_nodes() {
 	char * fn=autosave_opennebula_name;	struct occi_kind_node * nptr;
 	struct opennebula * pptr;
 	FILE * h;
-	if (!( h = fopen(fn,"w") )) return;
+	pthread_mutex_lock( &list_opennebula_control );
+	if (( h = fopen(fn,"w")) != (FILE *) 0) {
 	fprintf(h,"<opennebulas>\n");
 	for ( nptr = opennebula_first;
 		nptr != (struct occi_kind_node *) 0;
@@ -178,6 +210,9 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," publicaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->publicaddr?pptr->publicaddr:""));
@@ -213,6 +248,8 @@ public  void autosave_opennebula_nodes() {
 		}
 	fprintf(h,"</opennebulas>\n");
 	fclose(h);
+	}
+	pthread_mutex_unlock( &list_opennebula_control );
 	return;
 }
 
@@ -238,6 +275,8 @@ private void set_opennebula_field(
 			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicaddr" ) ))
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
@@ -322,6 +361,13 @@ private int pass_opennebula_filter(
 		if (!( pptr->image ))
 			return(0);
 		else if ( strcmp(pptr->image,fptr->image) != 0)
+			return(0);
+		}
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
+			return(0);
+		else if ( strcmp(pptr->node,fptr->node) != 0)
 			return(0);
 		}
 	if (( fptr->publicaddr )
@@ -410,6 +456,9 @@ private struct rest_response * opennebula_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
@@ -858,6 +907,8 @@ public struct occi_category * occi_opennebula_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "publicaddr",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
@@ -958,6 +1009,17 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.opennebula.image='%s'\r\n",(sptr->image?sptr->image:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.node='%s'\r\n",(sptr->node?sptr->node:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

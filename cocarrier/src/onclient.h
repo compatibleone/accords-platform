@@ -67,7 +67,7 @@ public	struct	on_response *	on_list_storage_pool();
 public	struct	on_response *	on_list_network_pool();
 public	struct	on_response *	on_list_servers	();
 
-public	struct	on_response *	on_list_flavours();
+public	struct	on_response *	on_list_flavors();
 public	struct	on_response *	on_list_images  ();
 
 public	struct	on_response *	on_get_request( char * buffer );

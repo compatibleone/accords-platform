@@ -529,6 +529,7 @@ private	struct	rest_response * revert_opennebula(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+#include "oncontract.c"
 
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ o p e n n e b u l a  	*/
@@ -541,7 +542,9 @@ private	int	create_opennebula(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else if (!( pptr->node ))
+		return( 0 ); 
+	else	return(create_opennebula_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OnProcci.tls));
 }
 
 /*	-------------------------------------------	*/
