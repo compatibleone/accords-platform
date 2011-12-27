@@ -306,8 +306,11 @@ public	int	create_openstack_contract(
 	struct	cords_os_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	int	status;
 
-	memset( &contract, 0, sizeof( struct cords_os_contract ));
+	if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( status );
+	else	memset( &contract, 0, sizeof( struct cords_os_contract ));
 
 	/* ---------------------------- */
 	/* recover the node description */
