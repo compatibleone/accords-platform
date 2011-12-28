@@ -205,13 +205,13 @@ public	int	occi_resolver_default()
 }
 
 /*	---------------------------------------------------------	*/
-/*			o c c i _ r e s o l v e r			*/
+/*	     o c c i _ r e s o l v e r _ o p e r a t i o n		*/
 /*	---------------------------------------------------------	*/
 /*	takes a category id/name or other naming string and sends	*/
 /*	an equiry to the publication service manager to retrieve	*/
 /*	list of current potential candidate targets.			*/
 /*	---------------------------------------------------------	*/
-public	struct	occi_response * occi_resolver( char * category, char * agent )
+private	struct	occi_response * occi_resolver_operation( char * category, char * zone, char * agent )
 {
 	struct	occi_resolved_agency *pptr=(struct occi_resolved_agency*) 0;
 	struct	occi_element 	*	tptr=(struct occi_element*) 0;
@@ -242,6 +242,12 @@ public	struct	occi_response * occi_resolver( char * category, char * agent )
 	}
 	else if ((!( eptr = occi_request_element( rptr, "occi.publication.where",Resolver.room	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category 	))))
+	{
+		rptr = occi_remove_request( rptr );
+		cptr = occi_remove_client( cptr );
+		return((struct occi_response * )0);
+	}
+	else if ((zone) && (!( eptr = occi_request_element( rptr, "occi.publication.zone",zone ))))
 	{
 		rptr = occi_remove_request( rptr );
 		cptr = occi_remove_client( cptr );
@@ -358,6 +364,33 @@ public	struct	occi_response * occi_resolver( char * category, char * agent )
 		cptr = occi_remove_client( cptr );
 		return(zptr);
 	}
+}
+
+/*	---------------------------------------------------------	*/
+/*			o c c i _ r e s o l v e r			*/
+/*	---------------------------------------------------------	*/
+/*	takes a category id/name or other naming string and sends	*/
+/*	an equiry to the publication service manager to retrieve	*/
+/*	list of current potential candidate targets.			*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolver( char * category, char * agent )
+{
+	return( occi_resolver_operation( category, (char *) 0, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ z o n e 		*/
+/*	---------------------------------------------------------	*/
+/*	takes a category id/name or other naming string and sends	*/
+/*	an equiry to the publication service manager to retrieve	*/
+/*	list of current potential candidate targets and selects 	*/
+/*	those that match the required zone				*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_zone( char * category, char * zone, char * agent )
+{
+	if (!( zone ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, zone, agent ) );
 }
 
 /*	-------------------------------------------------------------		*/

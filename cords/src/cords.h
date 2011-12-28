@@ -46,6 +46,7 @@
 #include "report.h"
 #include "optimise.h"
 #include "algorithm.h"
+#include "placement.h"
 #include "instance.h"
 
 #include "provider.h"

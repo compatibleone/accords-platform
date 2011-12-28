@@ -71,6 +71,7 @@
 #include "report.c"
 #include "optimise.c"
 #include "algorithm.c"
+#include "placement.c"
 
 #include "ipaddress.c"
 #include "domain.c"

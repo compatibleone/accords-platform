@@ -61,6 +61,7 @@
 
 #include "occioptimise.c"
 #include "occialgorithm.c"
+#include "occiplacement.c"
 
 #include "occiipaddress.c"
 #include "occidomain.c"

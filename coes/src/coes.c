@@ -29,6 +29,7 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
+#include "occiresolver.h"
 #include "occibuilder.h"
 
 struct	accords_configuration Coes = {
@@ -84,8 +85,8 @@ private	void	coes_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
+	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.04");
+	printf("\n   Beta Version : 28/12/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -126,16 +127,143 @@ private	int	coes_authorise(  void * v,struct rest_client * cptr, char * username
 }
 
 /*	------------------------------------------------------------------	*/
-/*			c o e s _ e x t e n s i o n 			*/
+/*			c o e s _ e x t e n s i o n 				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_extension * coes_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
 
+/*	-------------------------------------------------------------------	*/
+/*			r e s o l v e _ p l a c e m e n t			*/
+/*	-------------------------------------------------------------------	*/
+/*	this is the rudimentary placement algorithm on the first come basis	*/
+/*	and will be extended to take into consideration zone and price info	*/
+/*	-------------------------------------------------------------------	*/
+private	char *	resolve_placement( char * provider, char * zone, char * agent, char * tls )
+{
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the coes instance category		*/
 /*	------------------------------------------------------------------	*/
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	struct	occi_element 	* eptr;
+	char			* solution;
+
+	/* ------------------------------------------------------ */
+	/* attempt to resolve agencys of the "provider" category */
+	/* ------------------------------------------------------ */
+	if ( zone )
+	{
+		if (!( zptr = occi_resolve_by_zone( provider, zone, agent ) ))
+			return( (char *) 0 );
+	}
+	else if (!( zptr = occi_resolver( provider, agent ) ))
+		return( (char *) 0 );
+	
+	/* ------------------------------------------------------ */
+	/*  scan the list to find their list of providers offered  */
+	/* ------------------------------------------------------ */
+	for (	eptr = zptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else 	return( allocate_string( eptr->value ) );
+	}
+	return((char *) 0);
+}
+
+/*	--------------------------------------------------	*/
+/*	c r e a t e _ p l a c e m e n t _ s o l u t i o n	*/
+/*	--------------------------------------------------	*/
+/*	this will analyse the placement request and choose	*/
+/*	an appropriate placement based on the node, zone &	*/
+/*	provider information.					*/
+/*	--------------------------------------------------	*/
+private	int	create_placement_solution(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	if ( pptr->solution )
+	{
+		liberate( pptr->solution );
+		pptr->solution = (char *) 0;
+	}
+	pptr->solution = resolve_placement( pptr->provider, pptr->zone, agent, tls );
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ p l a c e m e n t  		*/
+/*	-------------------------------------------	*/
+private	int	create_placement(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_placement * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( pptr->node ))
+		return( 0 ); 
+	else	return(create_placement_solution(optr,pptr, _CORDS_CONTRACT_AGENT, Coes.tls));
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ p l a c e m e n t  	*/
+/*	-------------------------------------------	*/
+private	int	retrieve_placement(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_placement * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ p l a c e m e n t 	 	*/
+/*	-------------------------------------------	*/
+private	int	update_placement(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_placement * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ p l a c e m e n t  		*/
+/*	-------------------------------------------	*/
+private	int	delete_placement(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_placement * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	placement_interface = {
+	create_placement,
+	retrieve_placement,
+	update_placement,
+	delete_placement
+	};
+
 
 /*	------------------------------------------------------------------	*/
 /*			c o e s _ o p e r a t i o n				*/
@@ -155,6 +283,14 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_optimise_builder( Coes.domain, "placement" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = &placement_interface;
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );

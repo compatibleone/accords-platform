@@ -12,6 +12,7 @@ public struct occi_category * occi_cords_operator_builder(char *a,char * b);
 public struct occi_category * occi_cords_optimise_builder(char *a,char * b);
 public struct occi_category * occi_cords_parameter_builder(char *a,char * b);
 public struct occi_category * occi_cords_algorithm_builder(char *a,char * b);
+public struct occi_category * occi_cords_placement_builder(char *a,char * b);
 public struct occi_category * occi_cords_monitor_builder(char *a,char * b);
 public struct occi_category * occi_cords_event_builder(char *a,char * b);
 public struct occi_category * occi_cords_report_builder(char *a,char * b);
