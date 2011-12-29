@@ -284,7 +284,7 @@ private	int	coes_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_optimise_builder( Coes.domain, "placement" ) ))
+	if (!( optr = occi_cords_placement_builder( Coes.domain, "placement" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

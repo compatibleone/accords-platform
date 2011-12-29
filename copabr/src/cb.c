@@ -865,6 +865,7 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 	struct	occi_element 	* dptr;
 	char 			* result;
 	char 			* id;
+	char 			buffer[1024];
 
 	if (!( zptr = occi_resolver( _CORDS_PLACEMENT, agent )))
 		return( (char *) 0 );
@@ -877,11 +878,13 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 			eptr != (struct occi_element*) 0;
 			eptr = eptr->next )
 		{
+
 			if (!( eptr->name ))
 				continue;
 			else if (!( eptr->value ))
 				continue;
-			else if (!( kptr = occi_create_client( eptr->value, agent, tls ) ))
+			else	sprintf(buffer,"%s/%s/",eptr->value,_CORDS_PLACEMENT);
+			if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 				continue;
 			else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
 			{
