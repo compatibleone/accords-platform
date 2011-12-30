@@ -1,18 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_occi_c
 #define _occi_c
 
@@ -33,6 +39,21 @@
 public	struct	occi_category * occi_remove_category( struct occi_category * cptr )
 {
 	return( liberate_occi_category( cptr ) );
+}
+
+/*	---------------------------------------------------	*/
+/*	   a l l o c a t e _ o c c i _ i n t e r f a c e	*/
+/*	---------------------------------------------------	*/
+private	struct	rest_interface * allocate_occi_interface()
+{
+	struct	rest_interface * iptr;
+	if (!( iptr = allocate( sizeof( struct rest_interface ) ) ))
+		return( iptr );
+	else
+	{
+		memset( iptr, 0, sizeof( struct rest_interface );
+		return( iptr );
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -57,7 +78,8 @@ public	struct	occi_category * occi_create_category( char * domain, char * name, 
 		return( occi_remove_category( cptr ) );
 	else if (!( cptr->location = allocate( strlen( name ) + 8 ) ))
 		return( occi_remove_category( cptr ) );
-	else
+	else if (!( cptr->interface = allocate_occi_interface() ))
+		return( occi_remove_category( cptr ) );
 	{
 		sprintf(cptr->location,"/%s/",cptr->id);
 		return( cptr );

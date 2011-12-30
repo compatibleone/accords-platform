@@ -1,18 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_occipublisher_c
 #define	_occipublisher_c
 
@@ -215,6 +221,52 @@ public	int	unpublish_occi_category(
 }
 
 /*	---------------------------------------------------------	*/
+/*	    	n u l l _ o c c i _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------------	*/
+private	int	null_occi_transaction(
+		struct	occi_category * optr,
+		struct	occi_client * cptr,
+		struct  occi_request * rptr,
+		struct 	occi_reponse * aptr
+		)
+{
+	return( aptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*	    p r o c e s s _ o c c i _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------------	*/
+/*	this relay interface method is called back after the post	*/
+/*	method invocation allowing for priced transaction events	*/
+/*	to be generated for priced categories.				*/
+/*	---------------------------------------------------------	*/
+private	int	process_occi_transaction(
+		struct	occi_category * optr,
+		struct	occi_client * cptr,
+		struct  occi_request * rptr,
+		struct 	occi_reponse * aptr
+		)
+{
+	/* ---------------------------------------------------- */
+	/* TODO							*/
+	/* ---------------------------------------------------- */
+	/* 							*/
+	/* this method needs to be implemented and must: 	*/
+	/* 							*/
+	/* resolve the price information from the category	*/
+	/* resolve the account information from the request	*/
+	/* the method from the request				*/
+	/* 							*/
+	/* resolve a transaction service provider via publisher	*/
+	/* send a transaction message to provider		*/
+	/* 							*/
+	/* ---------------------------------------------------- */
+	/* currently it only performs a NULL transaction	*/
+	/* ---------------------------------------------------- */
+	return( null_occi_transaction( optr, cptr, rptr, aptr ) );
+}
+
+/*	---------------------------------------------------------	*/
 /*	      p u b l i s h _ o c c i _ c a t e g o r y 		*/
 /*	---------------------------------------------------------	*/
 public	int	publish_occi_category( 
@@ -246,7 +298,9 @@ public	int	publish_occi_category(
 			if (!( category->price = allocate_string("") ))
 				return(27);
 		}
+		else	category->interface.transaction = process_occi_transaction;
 	}
+	else	category->interface.transaction = null_transaction;
 
 	/* ------------------------------------- */
 	/* generate a user identification string */
@@ -507,11 +561,18 @@ public	int	publishing_occi_server(
 	int	status;
 	int	result;
 	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
+
+	/* --------------------------------------------- */
+	/* initialise the resolver and publisher default */
+	/* --------------------------------------------- */
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
+	/* -------------------------------------------- */
+	/* handle transport layer security, if required */
+	/* -------------------------------------------- */
 	if ( tls )
 	{
 		if (!( strlen(tls) ))
@@ -529,18 +590,30 @@ public	int	publishing_occi_server(
 		}
 	}
 
+	/* ----------------------------------------- */
+	/* publish the collection of OCCI categories */
+	/* ----------------------------------------- */
 	if (( Publisher.host ) && ( Publisher.publication ))
 		if (( url ) && ( category ))
 			if ((status = publish_occi_categories( user, password, url, agent, category )) != 0)
 				return( status );
 
+	/* ---------------------------------------------------------- */
+	/* activate the OCCI server layer for the required categories */
+	/* ---------------------------------------------------------- */
 	result = occi_server( agent, port, tls, max, category, Publisher.authorization );
 
+	/* --------------------------------------------------------- */
+	/* withdraw publication of the collection of OCCI categories */
+	/* --------------------------------------------------------- */
 	if (( Publisher.host ) && ( Publisher.publication ))
 		if (( url ) && ( category ))
 			if ((status = unpublish_occi_categories(user, password, url, agent, category)) != 0)
 				return( status );
 
+	/* -------------------------------------------- */
+	/* terminate security session, if one is active */
+	/* -------------------------------------------- */
 	if (( tls ) && ( tlsconf ))
 	{
 		if ( Publisher.authorization )

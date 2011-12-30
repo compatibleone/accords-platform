@@ -328,7 +328,10 @@ private	int	fileserver_operation( char * nptr )
 		fileserver_head,
 		fileserver_extension,
 		(void *) 0,
+		(void *) 0,
+		(void *) 0,
 		(void *) 0
+
 	};
 
 	if (!( Fs.authorise ))

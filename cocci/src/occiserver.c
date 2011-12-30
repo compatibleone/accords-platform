@@ -1,18 +1,24 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_occiserver_c
 #define _occiserver_c
 
@@ -492,6 +498,31 @@ private	struct rest_response * occi_invoke_head(
 }
 
 /*	---------------------------------------------------------	*/
+/*		o c c i _ i n v o k e _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------------	*/
+/*	this function launches financial transaction processing		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_response *	occi_invoke_transaction( 
+	struct occi_category * optr,
+	struct rest_client   * cptr, 
+	struct rest_request  * rptr,
+	struct rest_response * aptr )
+{
+	struct	rest_interface * iptr;
+
+	/* --------------------------------------- */
+	/* check if price handling is not required */
+	/* --------------------------------------- */
+	if ( optr->access & _OCCI_PRICING )
+		return( aptr );
+	else if (!( iptr = optr->interface ))
+		return( aptr );
+	else if (!( iptr->transaction ))
+		return( aptr );
+	else 	return( (*iptr->transaction) ( optr, cptr, rptr, aptr ) );
+}
+
+/*	---------------------------------------------------------	*/
 /*				o c c i _ g e t				*/
 /*	---------------------------------------------------------	*/
 /*	this function is called by the rest server to handle http	*/
@@ -529,15 +560,20 @@ private	struct rest_response * occi_get(
 /*			     o c c i _ p o s t 				*/
 /*	---------------------------------------------------------	*/
 /*	this function is called by the rest server to handle http	*/
-/*	post request processing.					*/
+/*	post request processing by the OCCI server layers. This 	*/
+/*	involves three types of possible operation:			*/
+/*		Category Instance Creation				*/
+/*		LINK processing						*/
+/*		Action invocation					*/
 /*	---------------------------------------------------------	*/
 private	struct rest_response * occi_post( 
 		void * vptr,
 		struct rest_client * cptr, 
 		struct rest_request * rptr )
 {
-	struct	occi_category * optr;
-	struct	rest_interface * iptr;
+	struct	occi_category 	* optr;
+	struct	rest_interface 	* iptr;
+	struct	rest_response 	* aptr;
 
 	occi_show_request( rptr );
 
@@ -550,12 +586,28 @@ private	struct rest_response * occi_post(
 		return( occi_invoke_post( optr, cptr, rptr ) );
 	else
 	{
+		/* -------------------------------------- */
+		/* scan the list of associated categories */
+		/* -------------------------------------- */
 		for ( 	optr = vptr;
 			optr != (struct occi_category *) 0;
 			optr = optr->next )
-			if (!( strncmp( rptr->object, optr->location, strlen(optr->location)) )) 
-				return( occi_invoke_post( optr, cptr, rptr ) );
-
+		{
+			/* ------------------------------------ */
+			/* localise the requested category name */
+			/* ------------------------------------ */
+			if (!( strncmp( rptr->object, optr->location, strlen(optr->location)) ))
+			{
+				/* --------------------------------- */
+				/* process the OCCI Category Request */
+				/* --------------------------------- */
+				if (!( aptr = occi_invoke_post( optr, cptr, rptr ) ))
+					return( aptr );
+				else if ( aptr->status >= 300 )
+					return( aptr );
+				else	return( occi_invoke_transaction( optr, cptr, rptr, aptr ) );
+			}
+		}
 		return( occi_failure(cptr,  404, "Category Not Found" ) );
 	}
 }
@@ -736,8 +788,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		occi_extension,
 		(void *) 0,
 		(void *) 0,
-		occi_security
-
+		occi_security,
+		(void *) 0
 	};
 
 	if ( tls )
@@ -748,17 +800,22 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 	Osi.authorise = (void *) 0;
 	Osi.instance  = category;
 
+	/* --------------------------------------------------------------- */
 	/* all compatible one servers have a default external link handler */
 	/* --------------------------------------------------------------- */
 	if (!(OcciServerLinkManager = occi_cords_xlink_builder( "occi", "link" ) ))
 		return( 27 );
 	else	OcciServerLinkManager->access |= _OCCI_PRIVATE;
 
+	/* ------------------------------------------ */
 	/* this parameter now controls thread workers */
 	/* ------------------------------------------ */
 	if ( max )	rest_thread_control(1);
 	else		rest_thread_control(0);
 
+	/* --------------------------------- */
+	/* launch the REST HTTP Server layer */
+	/* --------------------------------- */
 	return( rest_server(  nptr, port, tls, 0, &Osi ) );
 }
 
