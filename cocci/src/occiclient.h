@@ -60,8 +60,9 @@ struct	occi_request
 	struct	occi_element * first;
 	struct	occi_element * last;
 	int	type;	
-	char *	name;
+	char 	* name;
 	char 	* host;
+	char 	* account;
 	struct	occi_category * category;
 };
 
@@ -81,6 +82,7 @@ public	struct	occi_client   *	occi_create_client( char * host, char * agent, cha
 public	struct	occi_client   *	occi_redirect_client( struct occi_client * cptr, char * uri );
 public	struct	occi_request  *	occi_create_request( struct occi_client * cptr, char * category, int type );
 public	struct	occi_request  *	occi_remove_request( struct occi_request * rptr );
+public	struct	occi_request  *	occi_set_request_account( struct occi_request * rptr, char * account );
 public	struct	occi_response *	occi_simple_get( char * reference, char * agent, char * tls );
 public	struct	occi_response *	occi_simple_put(char * reference, struct occi_element * eptr, char * agent, char * tls );
 public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct occi_request * rptr );

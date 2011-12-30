@@ -279,6 +279,25 @@ public	struct	occi_request  *	occi_remove_request( struct occi_request * rptr )
 }
 
 /*	------------------------------------------------------------	*/
+/*	     o c c i _ s e t _ r e q u e s t _ a c c o u n t		*/
+/*	------------------------------------------------------------	*/
+/*	set the transaction account field of an OCCI request for use	*/
+/*	as an X-OCCI-ACCOUNT field for the emission of transactions	*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_request  *	occi_set_request_account( struct occi_request * rptr, char * account )
+{
+	if (!( rptr ))
+		return( rptr );
+	if ( rptr->account )
+		rptr->account = liberate( rptr->account );
+	if (!( account ))
+		return( rptr );
+	else if (!( rptr->account = allocate_string( account ) ))
+		return( occi_remove_request( rptr ) );
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*		 o c c i _ c r e a t e _ r e q u e s t 			*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_request  *	occi_create_request( struct occi_client * cptr, char * category, int type )
@@ -290,6 +309,7 @@ public	struct	occi_request  *	occi_create_request( struct occi_client * cptr, ch
 		rptr->host = rptr->name = (char *) 0;
 		rptr->first = rptr->last = (struct occi_element *) 0;
 		rptr->category = (struct occi_category *) 0;
+		rptr->account = (char *) 0;
 		rptr->type = type;
 		if (!( rptr->host = allocate_string( cptr->host )))
 			return( occi_remove_request( rptr ) );
@@ -723,6 +743,31 @@ public	struct	occi_element  * occi_append_headers(
 }
 
 /*	------------------------------------------------------------	*/
+/*		    o c c i _ a p p e n d _ a c c o u n t		*/
+/*	------------------------------------------------------------	*/
+private	struct	rest_header * occi_append_account( 
+		struct occi_client * cptr, 
+		struct rest_header * root, 
+		char * account )
+{
+	struct	rest_header * wptr;
+	struct	rest_header * last;
+
+	if ((last = root) != (struct rest_header *) 0)
+		while ( last->next ) 
+			last = last->next;
+
+	if (!( wptr = rest_create_header( _OCCI_ACCOUNT, account ) ))
+		return( wptr );
+	else if (!( wptr->previous = last ))
+		root = wptr;
+	else 	wptr->previous->next = wptr;
+	last = wptr;
+
+	return( root );
+}
+	
+/*	------------------------------------------------------------	*/
 /*		    o c c i _ a p p e n d _ d e f a u l t 		*/
 /*	------------------------------------------------------------	*/
 /*	this function appends the list of default headers that are	*/
@@ -845,6 +890,9 @@ public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
 		return((struct occi_response *) 0);
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_get_request(uri,cptr->tls,cptr->agent, hptr) ))
 		return((struct occi_response *) 0);
 	else if (!( aptr = occi_create_response( rptr, zptr ) ))
@@ -931,6 +979,9 @@ public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
 		return((struct occi_response *) 0);
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+		return((struct occi_response *) 0);
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_put_request(uri,cptr->tls,cptr->agent,body,hptr) ))
@@ -959,6 +1010,9 @@ public	struct	occi_response *	occi_client_delete( struct occi_client * cptr, str
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
 		return((struct occi_response *) 0);
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_delete_request(uri,cptr->tls,cptr->agent,hptr) ))
 		return((struct occi_response *) 0);
 	else if (!( aptr = occi_create_response( rptr, zptr ) ))
@@ -985,6 +1039,9 @@ public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+		return((struct occi_response *) 0);
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
 		return((struct occi_response *) 0);
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
 		return((struct occi_response *) 0);
@@ -1013,6 +1070,9 @@ public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+		return((struct occi_response *) 0);
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_head_request(uri,cptr->tls,cptr->agent,hptr) ))
 		return((struct occi_response *) 0);
