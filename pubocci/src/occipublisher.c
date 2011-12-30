@@ -256,10 +256,9 @@ private	struct 	rest_response * process_occi_transaction(
 	char *	price;
 	char *	host;
 	char 	buffer[1024];
-	/* ---------------------------------------------------- */
-	/* TODO							*/
+
 	/* ------------------------------------------------------- */
-	/* this method must resolve the category price information */
+	/* This method must resolve the category price information */
 	/* ------------------------------------------------------- */
 	if (!( optr = vptr ))
 		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );

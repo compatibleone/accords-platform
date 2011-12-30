@@ -1931,7 +1931,9 @@ private	struct	xml_element * 	cords_complete_contract(
 	/* -------------------------------------------------- */
 	/* Join the common trunk for Simple and Complex Nodes */
 	/* -------------------------------------------------- */
-	if (!( document_add_atribut( document, _CORDS_TYPE, App->typeApp ) ))
+	if (!( document_add_atribut( document, _CORDS_ACCOUNT, App->account) ))
+		return(document_drop(document));
+	else if (!( document_add_atribut( document, _CORDS_TYPE, App->typeApp ) ))
 		return(document_drop(document));
 
 	/* -------------------------------------- */
@@ -2015,7 +2017,8 @@ private	struct	xml_element * cords_instance_node(
 		char * id,
 		char * agent,
 		char * tls,
-		char * namePlan )
+		char * namePlan,
+		char * account )
 {
 	int	status;
 	struct	xml_element 	*	xroot=(struct xml_element *) 0;
@@ -2026,6 +2029,7 @@ private	struct	xml_element * cords_instance_node(
 
 	struct	cords_node_descriptor App = {
 		_SCOPE_NORMAL | _ACCESS_PRIVATE,
+		(char *) 0,
 		(char *) 0,
 		(char *) 0,
 		(char *) 0,
@@ -2053,7 +2057,12 @@ private	struct	xml_element * cords_instance_node(
 	/* ------------------------------- */
 	if (!( App.node = cords_retrieve_instance( host, id, agent, tls)))
 		return((struct xml_element *) 0);
-
+	else if (!( App.account = allocate_string( account ) ))
+	{
+		cords_terminate_instance_node( &App );
+		return((struct xml_element *) 0);
+	}
+		
 	/* ------------------------------------------ */
 	/* retrieve the node name and type attributes */
 	/* ------------------------------------------ */
@@ -2339,7 +2348,7 @@ public	char *	cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( host, id, agent, tls, CbC.namePlan ) ))
+		else if (!( mptr = cords_instance_node( host, id, agent, tls, CbC.namePlan, CbC.accID ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else	
 		{

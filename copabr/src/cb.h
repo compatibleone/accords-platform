@@ -53,6 +53,7 @@ struct	cords_provisioning
 struct	cords_node_descriptor
 {
 	int			scope;
+	char 			* account;	/* account for which service is engaged			*/
 	char			* nameApp;
 	char 			* typeApp;
 	char			* scopeApp;	/* the node scope : normal/common 			*/
