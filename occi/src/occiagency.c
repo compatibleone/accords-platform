@@ -1,27 +1,34 @@
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _agency_c_
 #define _agency_c_
 
 #include "agency.h"
 
-/*	--------------------------	*/
+/*	----------------------	*/
 /*	o c c i _ a g e n c y 	*/
-/*	--------------------------	*/
+/*	----------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
@@ -783,20 +790,18 @@ private struct rest_response * occi_agency_delete(void * vptr, struct rest_clien
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   t a b l e 	*/
-/*	--------------------------------------------------------------------	*/
-private struct rest_interface occi_agency_mt = {
-	(void*) 0,
-	(void*) 0,
-	(void*) 0,
-	occi_agency_get,
-	occi_agency_post,
-	occi_agency_put,
-	occi_agency_delete,
-	occi_agency_head,
-	(void*) 0
-	};
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
+private void	redirect_occi_agency_mt( struct rest_interface * iptr )
+{
+	iptr->get = occi_agency_get;
+	iptr->post = occi_agency_post;
+	iptr->put = occi_agency_put;
+	iptr->delete = occi_agency_delete;
+	iptr->head = occi_agency_head;
+	return;
+}
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -810,7 +815,7 @@ public struct occi_category * occi_agency_builder(char * a,char * b) {
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		optr->interface = &occi_agency_mt;
+		redirect_occi_agency_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "servicename",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
@@ -841,9 +846,9 @@ public struct occi_category * occi_agency_builder(char * a,char * b) {
 
 }
 
-/*	------------------------------------------	*/
+/*	--------------------------------------	*/
 /*	a g e n c y _ o c c i _ h e a d e r s 	*/
-/*	------------------------------------------	*/
+/*	--------------------------------------	*/
 public struct rest_header *  agency_occi_headers(struct agency * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;

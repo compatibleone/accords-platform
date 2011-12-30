@@ -223,11 +223,11 @@ public	int	unpublish_occi_category(
 /*	---------------------------------------------------------	*/
 /*	    	n u l l _ o c c i _ t r a n s a c t i o n		*/
 /*	---------------------------------------------------------	*/
-private	int	null_occi_transaction(
-		struct	occi_category * optr,
-		struct	occi_client * cptr,
-		struct  occi_request * rptr,
-		struct 	occi_reponse * aptr
+private	struct	rest_response * null_occi_transaction(
+		void *	vptr,
+		struct	rest_client * cptr,
+		struct  rest_request * rptr,
+		struct 	rest_response * aptr
 		)
 {
 	return( aptr );
@@ -240,13 +240,14 @@ private	int	null_occi_transaction(
 /*	method invocation allowing for priced transaction events	*/
 /*	to be generated for priced categories.				*/
 /*	---------------------------------------------------------	*/
-private	int	process_occi_transaction(
-		struct	occi_category * optr,
-		struct	occi_client * cptr,
-		struct  occi_request * rptr,
-		struct 	occi_reponse * aptr
+private	struct 	rest_response * process_occi_transaction(
+		void *	vptr,
+		struct	rest_client * cptr,
+		struct  rest_request * rptr,
+		struct 	rest_response * aptr
 		)
 {
+	struct	occi_category * optr=vptr;
 	/* ---------------------------------------------------- */
 	/* TODO							*/
 	/* ---------------------------------------------------- */
@@ -263,7 +264,7 @@ private	int	process_occi_transaction(
 	/* ---------------------------------------------------- */
 	/* currently it only performs a NULL transaction	*/
 	/* ---------------------------------------------------- */
-	return( null_occi_transaction( optr, cptr, rptr, aptr ) );
+	return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -275,6 +276,7 @@ public	int	publish_occi_category(
 		char * url,	char * agent, 
 		struct occi_category * category )
 {
+	struct	rest_interface * iptr;
 	struct	occi_element  *	eptr;
 	struct	occi_client   *	cptr;
 	struct	occi_request  *	rptr;
@@ -298,9 +300,11 @@ public	int	publish_occi_category(
 			if (!( category->price = allocate_string("") ))
 				return(27);
 		}
-		else	category->interface.transaction = process_occi_transaction;
+		else if ((iptr = category->interface) != (struct rest_interface *) 0)
+			iptr->transaction = process_occi_transaction;
 	}
-	else	category->interface.transaction = null_transaction;
+	else if ((iptr = category->interface) != (struct rest_interface *) 0)
+		iptr->transaction = null_occi_transaction;
 
 	/* ------------------------------------- */
 	/* generate a user identification string */

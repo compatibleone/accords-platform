@@ -71,7 +71,7 @@ struct	rest_interface
 	int 			(*before)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	int 			(*after)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	int 			(*security)(void * i,struct rest_client * cptr, struct rest_request * rptr);
-	int 			(*transaction)(void * i,struct rest_client * cptr, struct rest_request * rptr, struct rest_response * aptr);
+	struct rest_response * 	(*transaction)(void * i,struct rest_client * cptr, struct rest_request * rptr, struct rest_response * aptr);
 };
 
 struct	rest_client

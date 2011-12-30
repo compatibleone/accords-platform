@@ -20,6 +20,7 @@
 /*										*/
 /* ---------------------------------------------------------------------------- */
 
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _node_c_
 #define _node_c_
 

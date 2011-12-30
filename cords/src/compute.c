@@ -20,6 +20,7 @@
 /*										*/
 /* ---------------------------------------------------------------------------- */
 
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _compute_c_
 #define _compute_c_
 

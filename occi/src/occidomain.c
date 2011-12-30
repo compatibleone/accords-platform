@@ -1,18 +1,26 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _domain_c_
 #define _domain_c_
 
@@ -224,36 +232,33 @@ private struct cords_domain * filter_cords_domain_info(
 private int pass_cords_domain_filter(
 	struct cords_domain * pptr,struct cords_domain * fptr) {
 	if (( fptr->id )
-	&&  (strlen( fptr->id ) != 0)) 
-	{
+	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
-	}
+		}
 	if (( fptr->name )
-	&&  (strlen( fptr->name ) != 0)) 
-	{
+	&&  (strlen( fptr->name ) != 0)) {
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
-	}
-	if ( fptr->timestamp )
-	{
+		}
+	if (( fptr->timestamp )
+	&&  (strlen( fptr->timestamp ) != 0)) {
 		if (!( pptr->timestamp ))
 			return(0);
-		else if ( pptr->timestamp != fptr->timestamp)
+		else if ( strcmp(pptr->timestamp,fptr->timestamp) != 0)
 			return(0);
-	}
+		}
 	if (( fptr->owner )
-	&&  (strlen( fptr->owner ) != 0)) 
-	{
+	&&  (strlen( fptr->owner ) != 0)) {
 		if (!( pptr->owner ))
 			return(0);
 		else if ( strcmp(pptr->owner,fptr->owner) != 0)
 			return(0);
-	}
+		}
 	return(1);
 }
 
@@ -656,20 +661,18 @@ private struct rest_response * occi_cords_domain_delete(void * vptr, struct rest
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   t a b l e 	*/
-/*	--------------------------------------------------------------------	*/
-private struct rest_interface occi_cords_domain_mt = {
-	(void*) 0,
-	(void*) 0,
-	(void*) 0,
-	occi_cords_domain_get,
-	occi_cords_domain_post,
-	occi_cords_domain_put,
-	occi_cords_domain_delete,
-	occi_cords_domain_head,
-	(void*) 0
-	};
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
+private void	redirect_occi_cords_domain_mt( struct rest_interface * iptr )
+{
+	iptr->get = occi_cords_domain_get;
+	iptr->post = occi_cords_domain_post;
+	iptr->put = occi_cords_domain_put;
+	iptr->delete = occi_cords_domain_delete;
+	iptr->head = occi_cords_domain_head;
+	return;
+}
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -683,7 +686,7 @@ public struct occi_category * occi_cords_domain_builder(char * a,char * b) {
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		optr->interface = &occi_cords_domain_mt;
+		redirect_occi_cords_domain_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "timestamp",0,0) ))
@@ -730,13 +733,13 @@ public struct rest_header *  cords_domain_occi_headers(struct cords_domain * spt
 		return(first);
 	if (!( hptr = allocate_rest_header()))
 		return(first);
-	else	if (!( hptr->previous = last))
-		first = hptr;
-	else	hptr->previous->next = hptr;
-	last = hptr;
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_domain.timestamp='%s'\r\n",(sptr->timestamp?sptr->timestamp:0));
+	sprintf(buffer,"occi.cords_domain.timestamp='%s'\r\n",(sptr->timestamp?sptr->timestamp:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

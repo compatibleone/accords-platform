@@ -1,18 +1,26 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _onconfig_c_
 #define _onconfig_c_
 
@@ -27,6 +35,7 @@
 /*	--------------------------------------------------------------------	*/
 struct on_config * allocate_on_config();
 struct on_config * liberate_on_config(struct on_config * optr);
+private pthread_mutex_t list_on_config_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * on_config_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * on_config_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_on_config_node() { return( on_config_first ); }
@@ -34,7 +43,7 @@ public struct  occi_kind_node * occi_first_on_config_node() { return( on_config_
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * drop_on_config_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_on_config_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		on_config_first = nptr->next;
@@ -44,12 +53,19 @@ private struct occi_kind_node * drop_on_config_node(struct occi_kind_node * nptr
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
+	return((struct occi_kind_node *)0);
+}
+private struct occi_kind_node * drop_on_config_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_on_config_control );
+	nptr = ll_drop_on_config_node( nptr );
+	pthread_mutex_unlock( &list_on_config_control );
+	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * locate_on_config_node(char * id) {
+private struct occi_kind_node * ll_locate_on_config_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	for ( nptr = on_config_first;
@@ -61,11 +77,18 @@ private struct occi_kind_node * locate_on_config_node(char * id) {
 		}
 	return( nptr );
 }
+private struct occi_kind_node * locate_on_config_node(char * id) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_on_config_control );
+	nptr = ll_locate_on_config_node(id);
+	pthread_mutex_unlock( &list_on_config_control );
+	return( nptr );
+}
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * add_on_config_node(int mode) {
+private struct occi_kind_node * ll_add_on_config_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -86,6 +109,13 @@ private struct occi_kind_node * add_on_config_node(int mode) {
 			}
 		}
 }
+private struct occi_kind_node * add_on_config_node(int mode) {
+	struct occi_kind_node * nptr;
+	pthread_mutex_lock( &list_on_config_control );
+	nptr = ll_add_on_config_node( mode );
+	pthread_mutex_unlock( &list_on_config_control );
+	return(nptr);
+}
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
@@ -98,9 +128,9 @@ private void autoload_on_config_nodes() {
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
-	if (!( document = document_parse_file(fn) ))
+	if (!( document = document_parse_file(fn)))
 		return;
-	else if ((eptr = document_element(document,"on_configs")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"on_configs")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "on_config" ) ) continue;
@@ -148,7 +178,8 @@ public  void autosave_on_config_nodes() {
 	char * fn=autosave_on_config_name;	struct occi_kind_node * nptr;
 	struct on_config * pptr;
 	FILE * h;
-	if (!( h = fopen(fn,"w") )) return;
+	pthread_mutex_lock( &list_on_config_control );
+	if (( h = fopen(fn,"w")) != (FILE *) 0) {
 	fprintf(h,"<on_configs>\n");
 	for ( nptr = on_config_first;
 		nptr != (struct occi_kind_node *) 0;
@@ -198,6 +229,8 @@ public  void autosave_on_config_nodes() {
 		}
 	fprintf(h,"</on_configs>\n");
 	fclose(h);
+	}
+	pthread_mutex_unlock( &list_on_config_control );
 	return;
 }
 
@@ -775,20 +808,18 @@ private struct rest_response * occi_on_config_delete(void * vptr, struct rest_cl
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   t a b l e 	*/
-/*	--------------------------------------------------------------------	*/
-private struct rest_interface occi_on_config_mt = {
-	(void*) 0,
-	(void*) 0,
-	(void*) 0,
-	occi_on_config_get,
-	occi_on_config_post,
-	occi_on_config_put,
-	occi_on_config_delete,
-	occi_on_config_head,
-	(void*) 0
-	};
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
+private void	redirect_occi_on_config_mt( struct rest_interface * iptr )
+{
+	iptr->get = occi_on_config_get;
+	iptr->post = occi_on_config_post;
+	iptr->put = occi_on_config_put;
+	iptr->delete = occi_on_config_delete;
+	iptr->head = occi_on_config_head;
+	return;
+}
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -802,7 +833,7 @@ public struct occi_category * occi_on_config_builder(char * a,char * b) {
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		optr->interface = &occi_on_config_mt;
+		redirect_occi_on_config_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))

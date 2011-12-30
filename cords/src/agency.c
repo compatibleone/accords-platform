@@ -1,18 +1,26 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _agency_c_
 #define _agency_c_
 
@@ -20,9 +28,9 @@
 
 #include "agency.h"
 
-/*	----------------------------------	*/
+/*	------------------------------	*/
 /*	l i b e r a t e _ a g e n c y 	*/
-/*	----------------------------------	*/
+/*	------------------------------	*/
 public struct agency * liberate_agency(struct agency * sptr)
 {
 	if ( sptr )
@@ -51,9 +59,9 @@ public struct agency * liberate_agency(struct agency * sptr)
 
 }
 
-/*	----------------------------	*/
+/*	------------------------	*/
 /*	r e s e t _ a g e n c y 	*/
-/*	----------------------------	*/
+/*	------------------------	*/
 public struct agency * reset_agency(struct agency * sptr)
 {
 	if ( sptr )
@@ -76,9 +84,9 @@ public struct agency * reset_agency(struct agency * sptr)
 
 }
 
-/*	----------------------------------	*/
+/*	------------------------------	*/
 /*	a l l o c a t e _ a g e n c y 	*/
-/*	----------------------------------	*/
+/*	------------------------------	*/
 public struct agency * allocate_agency()
 {
 	struct agency * sptr;
@@ -87,9 +95,9 @@ public struct agency * allocate_agency()
 	else	return( reset_agency(sptr) );
 }
 
-/*	----------------------------	*/
+/*	------------------------	*/
 /*	x m l i n _ a g e n c y 	*/
-/*	----------------------------	*/
+/*	------------------------	*/
 public int xmlin_agency(struct agency * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -154,9 +162,9 @@ public int xmlin_agency(struct agency * sptr,struct xml_element * eptr)
 
 }
 
-/*	------------------------------------	*/
+/*	--------------------------------	*/
 /*	r e s t _ o c c i _ a g e n c y 	*/
-/*	------------------------------------	*/
+/*	--------------------------------	*/
 public int rest_occi_agency(FILE * fh,struct agency * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;

@@ -38,6 +38,8 @@
 /*	---------------------------------------------------	*/
 public	struct	occi_category * occi_remove_category( struct occi_category * cptr )
 {
+	if ( cptr->interface )
+		cptr->interface = liberate( cptr->interface );
 	return( liberate_occi_category( cptr ) );
 }
 
@@ -51,7 +53,7 @@ private	struct	rest_interface * allocate_occi_interface()
 		return( iptr );
 	else
 	{
-		memset( iptr, 0, sizeof( struct rest_interface );
+		memset( iptr, 0, sizeof( struct rest_interface ));
 		return( iptr );
 	}
 }

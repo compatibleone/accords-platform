@@ -20,6 +20,7 @@
 /*										*/
 /* ---------------------------------------------------------------------------- */
 
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _account_c_
 #define _account_c_
 
@@ -716,20 +717,18 @@ private struct rest_response * occi_cords_account_delete(void * vptr, struct res
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   t a b l e 	*/
-/*	--------------------------------------------------------------------	*/
-private struct rest_interface occi_cords_account_mt = {
-	(void*) 0,
-	(void*) 0,
-	(void*) 0,
-	occi_cords_account_get,
-	occi_cords_account_post,
-	occi_cords_account_put,
-	occi_cords_account_delete,
-	occi_cords_account_head,
-	(void*) 0
-	};
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
+private void	redirect_occi_cords_account_mt( struct rest_interface * iptr )
+{
+	iptr->get = occi_cords_account_get;
+	iptr->post = occi_cords_account_post;
+	iptr->put = occi_cords_account_put;
+	iptr->delete = occi_cords_account_delete;
+	iptr->head = occi_cords_account_head;
+	return;
+}
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -743,7 +742,7 @@ public struct occi_category * occi_cords_account_builder(char * a,char * b) {
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		optr->interface = &occi_cords_account_mt;
+		redirect_occi_cords_account_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))

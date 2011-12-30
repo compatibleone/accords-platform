@@ -1,7 +1,29 @@
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _iprange_c_
 #define _iprange_c_
 
-#include <stdio.h>
 #include "element.h"
 
 #include "iprange.h"
@@ -9,7 +31,7 @@
 /*	--------------------------------------------	*/
 /*	l i b e r a t e _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------------	*/
-struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr)
+public struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr)
 {
 	if ( sptr )
 	{
@@ -30,7 +52,7 @@ struct cords_iprange * liberate_cords_iprange(struct cords_iprange * sptr)
 /*	--------------------------------------	*/
 /*	r e s e t _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------	*/
-struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
+public struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
 {
 	if ( sptr )
 	{
@@ -46,7 +68,7 @@ struct cords_iprange * reset_cords_iprange(struct cords_iprange * sptr)
 /*	--------------------------------------------	*/
 /*	a l l o c a t e _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------------	*/
-struct cords_iprange * allocate_cords_iprange()
+public struct cords_iprange * allocate_cords_iprange()
 {
 	struct cords_iprange * sptr;
 	if (!( sptr = allocate( sizeof( struct cords_iprange ) ) ))
@@ -57,7 +79,7 @@ struct cords_iprange * allocate_cords_iprange()
 /*	--------------------------------------	*/
 /*	x m l i n _ c o r d s _ i p r a n g e 	*/
 /*	--------------------------------------	*/
-int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * eptr)
+public int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -88,7 +110,7 @@ int xmlin_cords_iprange(struct cords_iprange * sptr,struct xml_element * eptr)
 /*	----------------------------------------------	*/
 /*	r e s t _ o c c i _ c o r d s _ i p r a n g e 	*/
 /*	----------------------------------------------	*/
-int rest_occi_cords_iprange(FILE * fh,struct cords_iprange * sptr,char * prefix, char * nptr)
+public int rest_occi_cords_iprange(FILE * fh,struct cords_iprange * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
