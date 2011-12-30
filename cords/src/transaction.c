@@ -41,14 +41,12 @@ public struct cords_transaction * liberate_cords_transaction(struct cords_transa
 			 sptr->authorization = liberate(sptr->authorization);
 		if ( sptr->source )
 			 sptr->source = liberate(sptr->source);
-		if ( sptr->target )
-			 sptr->target = liberate(sptr->target);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
-		if ( sptr->value )
-			 sptr->value = liberate(sptr->value);
-		if ( sptr->currency )
-			 sptr->currency = liberate(sptr->currency);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_transaction *) 0);
@@ -65,10 +63,9 @@ public struct cords_transaction * reset_cords_transaction(struct cords_transacti
 		sptr->id = (char*) 0;
 		sptr->authorization = (char*) 0;
 		sptr->source = (char*) 0;
-		sptr->target = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->description = (char*) 0;
-		sptr->value = (char*) 0;
-		sptr->currency = (char*) 0;
+		sptr->price = (char*) 0;
 		sptr->when =  0;
 		sptr->validity =  0;
 		sptr->type =  0;
@@ -111,21 +108,17 @@ public int xmlin_cords_transaction(struct cords_transaction * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->source = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"target") ))
+		else if (!( strcmp(wptr->name,"account") ))
 		{
-			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"description") ))
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"value") ))
+		else if (!( strcmp(wptr->name,"price") ))
 		{
-			if ( wptr->value ) { sptr->value = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"currency") ))
-		{
-			if ( wptr->value ) { sptr->currency = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
@@ -160,10 +153,9 @@ public int rest_occi_cords_transaction(FILE * fh,struct cords_transaction * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.source='%s'\r\n",prefix,nptr,(sptr->source?sptr->source:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.currency='%s'\r\n",prefix,nptr,(sptr->currency?sptr->currency:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.validity='%u'\r\n",prefix,nptr,sptr->validity);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%u'\r\n",prefix,nptr,sptr->type);

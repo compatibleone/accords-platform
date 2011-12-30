@@ -247,24 +247,80 @@ private	struct 	rest_response * process_occi_transaction(
 		struct 	rest_response * aptr
 		)
 {
-	struct	occi_category * optr=vptr;
+	struct	rest_header	*	hptr;
+	struct	occi_category 	*	optr;
+	struct	occi_element 	*	eptr;
+	struct	occi_client	*	kptr;
+	struct	occi_request	*	qptr;
+	struct	occi_response	*	zptr;
+	char *	price;
+	char *	host;
+	char 	buffer[1024];
 	/* ---------------------------------------------------- */
 	/* TODO							*/
+	/* ------------------------------------------------------- */
+	/* this method must resolve the category price information */
+	/* ------------------------------------------------------- */
+	if (!( optr = vptr ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else if (!( price = optr->price ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else if (!( strlen( price ) ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+
+	/* -------------------------------------------------*/
+	/* resolve the account information from the request */
+	/* the method from the request			    */
+	/* ------------------------------------------------ */
+	else if (!( rptr ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else if (!( hptr = rest_resolve_header( rptr->first, _OCCI_ACCOUNT ) ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else if (!( hptr->value ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+
 	/* ---------------------------------------------------- */
-	/* 							*/
-	/* this method needs to be implemented and must: 	*/
-	/* 							*/
-	/* resolve the price information from the category	*/
-	/* resolve the account information from the request	*/
-	/* the method from the request				*/
-	/* 							*/
 	/* resolve a transaction service provider via publisher	*/
-	/* send a transaction message to provider		*/
-	/* 							*/
 	/* ---------------------------------------------------- */
-	/* currently it only performs a NULL transaction	*/
-	/* ---------------------------------------------------- */
-	return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else if (!( host = occi_resolve_category_provider( _CORDS_TRANSACTION, _CORDS_CONTRACT_AGENT,  Publisher.tls ) ))
+		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+	else
+	{
+		/* ------------------------------------------------------ */
+		/* build a transaction category instance creation request */
+		/* ------------------------------------------------------ */
+		sprintf(buffer,"%s/%s/",host,_CORDS_TRANSACTION);
+		host = liberate( host );
+		if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT,  Publisher.tls )))
+			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL ) ))
+			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+		else if ((!( eptr = occi_request_element( qptr, "occi.transaction.source", optr->id )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.price", price )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.description", "occi instance" )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.account", hptr->value ))))
+		{
+			qptr = occi_remove_request( qptr );
+			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+		}
+		/* ---------------------------------------------------- */
+		/* post the request to the transaction category manager */
+		/* ---------------------------------------------------- */
+		else if (!( zptr = occi_client_post( kptr, qptr ) ))
+		{
+			qptr = occi_remove_request( qptr );
+			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
+		}
+		else
+		{
+			/* ------- */
+			/* success */
+			/* ------- */
+			zptr = occi_remove_response( zptr );
+			qptr = occi_remove_request( qptr );
+			return( aptr );
+		}
+	}
 }
 
 /*	---------------------------------------------------------	*/

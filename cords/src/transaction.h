@@ -7,10 +7,9 @@ struct	cords_transaction
 	char	*	id;
 	char	*	authorization;
 	char	*	source;
-	char	*	target;
+	char	*	account;
 	char	*	description;
-	char	*	value;
-	char	*	currency;
+	char	*	price;
 	int		when;
 	int		validity;
 	int		type;

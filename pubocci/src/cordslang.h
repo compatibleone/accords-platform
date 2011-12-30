@@ -106,6 +106,7 @@
 #define	_CORDS_EVENT		"event"
 #define	_CORDS_MONITOR		"monitor"
 #define	_CORDS_REPORT		"report"
+#define	_CORDS_TRANSACTION	"transaction"
 
 /*	------------------------	*/
 /*	cords  parser  feed back	*/

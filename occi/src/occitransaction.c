@@ -142,14 +142,12 @@ private void autoload_cords_transaction_nodes() {
 				pptr->authorization = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "source" )) != (struct xml_atribut *) 0)
 				pptr->source = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
-				pptr->target = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "value" )) != (struct xml_atribut *) 0)
-				pptr->value = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "currency" )) != (struct xml_atribut *) 0)
-				pptr->currency = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "validity" )) != (struct xml_atribut *) 0)
@@ -191,17 +189,14 @@ public  void autosave_cords_transaction_nodes() {
 		fprintf(h," source=%c",0x0022);
 		fprintf(h,"%s",(pptr->source?pptr->source:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," target=%c",0x0022);
-		fprintf(h,"%s",(pptr->target?pptr->target:""));
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," value=%c",0x0022);
-		fprintf(h,"%s",(pptr->value?pptr->value:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," currency=%c",0x0022);
-		fprintf(h,"%s",(pptr->currency?pptr->currency:""));
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
@@ -240,14 +235,12 @@ private void set_cords_transaction_field(
 			pptr->authorization = allocate_string(vptr);
 		if (!( strcmp( nptr, "source" ) ))
 			pptr->source = allocate_string(vptr);
-		if (!( strcmp( nptr, "target" ) ))
-			pptr->target = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
-		if (!( strcmp( nptr, "value" ) ))
-			pptr->value = allocate_string(vptr);
-		if (!( strcmp( nptr, "currency" ) ))
-			pptr->currency = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "validity" ) ))
@@ -301,11 +294,11 @@ private int pass_cords_transaction_filter(
 		else if ( strcmp(pptr->source,fptr->source) != 0)
 			return(0);
 		}
-	if (( fptr->target )
-	&&  (strlen( fptr->target ) != 0)) {
-		if (!( pptr->target ))
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
 			return(0);
-		else if ( strcmp(pptr->target,fptr->target) != 0)
+		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
 	if (( fptr->description )
@@ -315,18 +308,11 @@ private int pass_cords_transaction_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
-	if (( fptr->value )
-	&&  (strlen( fptr->value ) != 0)) {
-		if (!( pptr->value ))
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
 			return(0);
-		else if ( strcmp(pptr->value,fptr->value) != 0)
-			return(0);
-		}
-	if (( fptr->currency )
-	&&  (strlen( fptr->currency ) != 0)) {
-		if (!( pptr->currency ))
-			return(0);
-		else if ( strcmp(pptr->currency,fptr->currency) != 0)
+		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
@@ -354,16 +340,13 @@ private struct rest_response * cords_transaction_occi_response(
 	sprintf(cptr->buffer,"%s.%s.source=%s",optr->domain,optr->id,pptr->source);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.target=%s",optr->domain,optr->id,pptr->target);
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.value=%s",optr->domain,optr->id,pptr->value);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.currency=%s",optr->domain,optr->id,pptr->currency);
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -786,13 +769,11 @@ public struct occi_category * occi_cords_transaction_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "source",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "value",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "currency",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
@@ -859,7 +840,7 @@ public struct rest_header *  cords_transaction_occi_headers(struct cords_transac
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_transaction.target='%s'\r\n",(sptr->target?sptr->target:""));
+	sprintf(buffer,"occi.cords_transaction.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -881,18 +862,7 @@ public struct rest_header *  cords_transaction_occi_headers(struct cords_transac
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_transaction.value='%s'\r\n",(sptr->value?sptr->value:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_transaction.currency='%s'\r\n",(sptr->currency?sptr->currency:""));
+	sprintf(buffer,"occi.cords_transaction.price='%s'\r\n",(sptr->price?sptr->price:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
