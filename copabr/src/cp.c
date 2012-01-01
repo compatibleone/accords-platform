@@ -829,12 +829,13 @@ public	struct	occi_response 	* cords_create_category( struct xml_element * docum
 	struct	occi_response 	* zptr;
 	struct	occi_request 	* rptr;
 	struct	occi_client	* cptr;
-
+	struct	xml_atribut	* account;
 	if ( check_debug() )
 		printf("cords_create_category(%s,%s)\n",document->name,agent);
 
 	if (!( aptr = occi_resolver( document->name, agent ) ))
 		return((struct occi_response *) 0);
+	else	account = document_atribut( document, _CORDS_ACCOUNT );
 
 	for (	eptr = aptr->first;
 		eptr != (struct occi_element*) 0;
@@ -856,8 +857,13 @@ public	struct	occi_response 	* cords_create_category( struct xml_element * docum
 			continue;
 		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
+
 		else if (( document->firstatb ) 
 		     && (!(fptr = cords_request_header( rptr, document ))))
+			continue;
+		else if (( account ) 
+		     && ( account->value )
+		     && (!( rptr = occi_set_request_account( rptr, account->value ) )))
 			continue;
 		else if (!( zptr = occi_client_post( cptr, rptr ) ))
 			continue;
