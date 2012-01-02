@@ -30,6 +30,9 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
+#include "cp.h"
+#include "cb.h"
 
 struct	accords_configuration CooBas = {
 	0,0,
@@ -84,9 +87,9 @@ private	void	coobas_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.04");
+	printf("\n   Beta Version : 02/01/2012");
+	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -134,8 +137,315 @@ private	struct rest_extension * coobas_extension( void * v,struct rest_server * 
 }
 
 /*	------------------------------------------------------------------	*/
-/* 	  actions and methods required for the coobas instance category		*/
+/* 	 actions and methods required for the coobas instance categories	*/
 /*	------------------------------------------------------------------	*/
+
+/*	------------------------------------------------------------------	*/
+/*		s t a r t _ i n v o i c e _ d o c u m e n t			*/
+/*	------------------------------------------------------------------	*/
+private	FILE * start_invoice_document( char * filename, struct cords_invoice * pptr )
+{
+	char 	buffer[256];
+	FILE * h=(FILE *) 0;
+
+	if ( pptr->document ) 
+		liberate( pptr->document );
+
+	if (!( pptr->document = allocate_string( filename ) ))
+		return((FILE *) 0);
+
+	else if (!( h = fopen( pptr->document, "w" )))
+	{
+		pptr->document = liberate( pptr->document );
+		return( (FILE *) 0);
+	}
+
+	if ( pptr->date ) 
+		liberate( pptr->date );
+
+	sprintf(buffer,"%u",time((long*)0));
+
+	if (!( pptr->date = allocate_string( buffer ) ))
+	{
+		fclose(h);
+		return((FILE *) 0);
+	}
+	
+	fprintf(h,"<html><head><title>COOBAS:INVOICE:%s</title></head>\n",pptr->id);
+	fprintf(h,"<body><div align=center><p><table width='95%c' border=1>\n",0x0025);
+	fprintf(h,"<tr><th>Document</th><th>%s</th></tr>\n",pptr->document);
+	fprintf(h,"<tr><th>Date    </th><th>%s</th></tr>\n",pptr->date);
+	fprintf(h,"<tr><th>Invoice </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<tr><th>Number  </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<tr><th>Account </th><th>%s</th></tr>\n",pptr->account);
+	fprintf(h,"</table><p>\n");
+	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
+	return( h );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c l o s e _ i n v o i c e _ d o c u m e n t			*/
+/*	------------------------------------------------------------------	*/
+private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
+{
+	if ( h )
+	{
+		fprintf(h,"</table><p>\n");
+		fprintf(h,"<table width='95%c' border=1>\n",0x0025);
+		fprintf(h,"<tr><th>Total      </th><th>%u</th></tr>\n",0);
+		fprintf(h,"<tr><th>Taxe       </th><th>%u</th></tr>\n",0);
+		fprintf(h,"<tr><th>Grand Total</th><th>%u</th></tr>\n",0);
+		fprintf(h,"</table><p></div></body></html>\n");
+		fclose(h);
+	}
+	return;
+}
+
+/*	------------------------------------------------------------------	*/
+/*	     i n v o i c e _ d o c u m e n t _ t r a n s a c t i o n		*/
+/*	------------------------------------------------------------------	*/
+private	void	invoice_document_transaction(
+		FILE * h,
+		struct cords_invoice * pptr,		/* the invoice structure 	*/
+		char * transaction,		/* the transaction reference 	*/
+		struct occi_response * yptr,	/* the transaction record	*/
+		char * price,			/* the price reference		*/
+		struct occi_response * zptr	/* the price information	*/
+		)
+{
+	fprintf(h,"<tr><th>Transaction ID <th>%s</tr>\n",transaction);
+	fprintf(h,"<tr><th>Price Reference<th>%s</tr>\n",price);
+	return;
+}
+
+/*	------------------------------------------------------------------	*/
+/*	     p r o c e s s _ i n v o i c e _ t r a n s a c t i o n s		*/
+/*	------------------------------------------------------------------	*/
+private	int	process_invoice_transactions( struct cords_invoice * pptr )
+{
+	char *	tempname;
+	char *	host;
+	char *	price;
+	FILE *	h;
+	struct	occi_response * xptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	struct	occi_element  * fptr;
+
+	/* -------------------------------------- */
+	/* allocate the invoice document filename */
+	/* -------------------------------------- */
+	if (!( tempname = rest_temporary_filename("htm")))
+		return(0);
+
+	/* --------------------------------- */
+	/* retrieve the list of transactions */
+	/* --------------------------------- */
+	else if (!( xptr = cords_retrieve_named_instance_list( 
+		_CORDS_TRANSACTION, 
+		"occi.transaction.account", 
+		pptr->account, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		liberate( tempname );
+		return( 0 );
+	}
+
+	/* -------------------------- */
+	/* create the output document */
+	/* -------------------------- */
+	else if (!( h = start_invoice_document( tempname, pptr ) ))
+	{
+		xptr = occi_remove_response( xptr );
+		liberate( tempname );
+		return( 0 );
+	}
+	else	liberate( tempname );
+
+	/* ---------------------------- */
+	/* for each of the transactions */
+	/* ---------------------------- */
+	for (	eptr=xptr->first;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		/* ----------------------------------- */
+		/* recover the transaction information */
+		/* ----------------------------------- */
+		if (!( eptr->value ))
+			continue;
+		else if (!( host = cords_build_host( xptr, eptr->value) ))
+			continue;
+		else if (!( yptr = occi_simple_get( host, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			liberate(host);
+			continue;
+		}
+		/* ------------------------------ */
+		/* retrieve the price information */
+		/* ------------------------------ */
+		else if (!( price = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,_CORDS_PRICE)))
+		{
+			yptr = occi_remove_response( yptr );
+			liberate(host);
+			continue;
+		}
+		else if (!( zptr = occi_simple_get(price, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			liberate(host);
+			continue;
+		}
+		else	
+		{
+			invoice_document_transaction( h, pptr, host, yptr, price, zptr );
+			yptr = occi_remove_response( yptr );
+			zptr = occi_remove_response( zptr );
+			continue;
+		}
+	}
+
+	/* -------------------------------------------- */
+	/* collect transactions for the invoice account */
+	/* -------------------------------------------- */
+	xptr = occi_remove_response( xptr );
+	close_invoice_document( h, pptr );
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ i n v o i c e  		*/
+/*	-------------------------------------------	*/
+private	int	create_invoice(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_invoice * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( pptr->account ))
+		return( 0 ); 
+	else 	return( process_invoice_transactions( pptr ) );
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ i n v o i c e  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_invoice(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_invoice * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ i n v o i c e 	 	*/
+/*	-------------------------------------------	*/
+private	int	update_invoice(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_invoice * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ i n v o i c e		*/
+/*	-------------------------------------------	*/
+private	int	delete_invoice(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_invoice * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	invoice_interface = {
+	create_invoice,
+	retrieve_invoice,
+	update_invoice,
+	delete_invoice
+	};
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ t r a n s a c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	create_transaction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_transaction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( pptr->account ))
+		return( 0 ); 
+	else
+	{
+		pptr->when = time((long *) 0);
+		return( 0 );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ t r a n s a c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	retrieve_transaction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_transaction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ t r a n s a c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	update_transaction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_transaction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ t r a n s a c t i o n	*/
+/*	-------------------------------------------	*/
+private	int	delete_transaction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct cords_transaction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	transaction_interface = {
+	create_transaction,
+	retrieve_transaction,
+	update_transaction,
+	delete_transaction
+	};
 
 /*	------------------------------------------------------------------	*/
 /*			c o o b a s _ o p e r a t i o n				*/
@@ -163,7 +473,8 @@ private	int	coobas_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+
+	optr->callback  = &transaction_interface;
 	optr->access |= _OCCI_PRICING;
 
 	if (!( optr = occi_cords_price_builder( CooBas.domain, "price" ) ))
@@ -181,7 +492,7 @@ private	int	coobas_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &invoice_interface;
 	optr->access |= _OCCI_PRICING;
 
 	rest_initialise_log(CooBas.monitor );

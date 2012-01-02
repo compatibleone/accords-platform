@@ -1,25 +1,44 @@
-/* ------------------------------------------------------------------------------------	*/
-/*				 CompatibleOne Cloudware				*/
-/* ------------------------------------------------------------------------------------ */
-/*											*/
-/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a 	*/
-/* disposition selon les termes de la licence Creative Commons Paternit‚ : 		*/
-/*											*/
-/*			 	Pas d'Utilisation Commerciale 				*/
-/*				Pas de Modification 					*/
-/*				3.0 non transcrit.					*/
-/*											*/
-/* ------------------------------------------------------------------------------------ */
-/* 			Copyright (c) 2011 Iain James Marshall for Prologue 		*/
-/*				   All rights reserved					*/
-/* ------------------------------------------------------------------------------------ */
-
+/* ---------------------------------------------------------------------------- */
+/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
+/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
+/* ---------------------------------------------------------------------------- */
+/*										*/
+/* This is free software; you can redistribute it and/or modify it		*/
+/* under the terms of the GNU Lesser General Public License as			*/
+/* published by the Free Software Foundation; either version 2.1 of		*/
+/* the License, or (at your option) any later version.				*/
+/*										*/
+/* This software is distributed in the hope that it will be useful,		*/
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
+/* Lesser General Public License for more details.				*/
+/*										*/
+/* You should have received a copy of the GNU Lesser General Public		*/
+/* License along with this software; if not, write to the Free			*/
+/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
+/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
+/*										*/
+/* ---------------------------------------------------------------------------- */
 #ifndef	_proccion_c
 #define	_proccion_c
 
 #include "onclient.h"
 #include "cordslang.h"
 #include "occiresolver.h"
+
+/*	------------------------------------------	*/
+/*		o n _ v a l i d _ p r i c e		*/
+/*	------------------------------------------	*/
+private	int	on_valid_price( char * price )
+{
+	if (!( price ))
+		return(0);
+	else if (!( strlen( price )))
+		return( 0 );
+	else if (!( strcmp( price, _CORDS_NULL ) ))
+		return( 0 );
+	else	return( 1 );
+}	
 
 /* ---------------------------------------------------------------------------- */
 /*			x m l _ a t r i b u t _ v a l u e			*/
@@ -293,6 +312,7 @@ private	struct	rest_response * start_opennebula(
 	char	*	filename;
 	char	*	metafilename;
 	char		buffer[512];
+	char		reference[512];
 	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
 	if (!( pptr = vptr ))
@@ -302,6 +322,8 @@ private	struct	rest_response * start_opennebula(
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
 
+	sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+
 #ifdef	_ON_PERSONALITY
 
 	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
@@ -310,9 +332,7 @@ private	struct	rest_response * start_opennebula(
 	if (!( personality = allocate_string(buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Personality" ) );
 
-	sprintf(buffer,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-
-	if (!( personality = opennebula_instructions( buffer, personality ) ))
+	if (!( personality = opennebula_instructions( reference, personality ) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
 #endif
@@ -352,7 +372,14 @@ private	struct	rest_response * start_opennebula(
 #endif
 		osptr = liberate_on_response( osptr );
 		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
+		if (!( status ))
+		{
+			if (!( on_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
 		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
 	}
 
@@ -368,6 +395,7 @@ private	struct	rest_response * save_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char		reference[512];
 	struct	on_response * osptr;
 	int		status;
 	struct	opennebula * pptr;
@@ -394,7 +422,14 @@ private	struct	rest_response * save_opennebula(
 		status = connect_opennebula_image( osptr, pptr );
 		osptr = liberate_on_response( osptr );
 		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
+		{
+			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+			if (!( on_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
 		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	}
 #endif
@@ -410,6 +445,7 @@ private	struct	rest_response * stop_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char		reference[512];
 	struct	on_response * osptr;
 	int		status;
 	struct	opennebula * pptr;
@@ -423,13 +459,19 @@ private	struct	rest_response * stop_opennebula(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		if ( pptr->status != _OCCI_IDLE )
+		if ( pptr->status == _OCCI_IDLE )
+			return( rest_html_response( aptr, 200, "OK" ) );
 		{
 			reset_opennebula_server( pptr );
 			pptr->when = time((long *) 0);
 			osptr = liberate_on_response( osptr );
+			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+			if (!( on_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 

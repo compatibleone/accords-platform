@@ -148,6 +148,10 @@ private void autoload_openstack_nodes() {
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
 				pptr->node = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rootpass" )) != (struct xml_atribut *) 0)
@@ -206,6 +210,12 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," node=%c",0x0022);
 		fprintf(h,"%s",(pptr->node?pptr->node:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
 		fprintf(h,"%c",0x0022);
@@ -261,6 +271,10 @@ private void set_openstack_field(
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
 			pptr->node = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "rootpass" ) ))
@@ -343,6 +357,20 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->node,fptr->node) != 0)
 			return(0);
 		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
 	if (( fptr->number )
 	&&  (strlen( fptr->number ) != 0)) {
 		if (!( pptr->number ))
@@ -415,6 +443,12 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
@@ -855,6 +889,10 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "rootpass",0,0) ))
@@ -951,6 +989,28 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.node='%s'\r\n",(sptr->node?sptr->node:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.price='%s'\r\n",(sptr->price?sptr->price:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

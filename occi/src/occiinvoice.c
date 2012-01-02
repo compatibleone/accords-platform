@@ -154,8 +154,10 @@ private void autoload_cords_invoice_nodes() {
 				pptr->reduction = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rate" )) != (struct xml_atribut *) 0)
 				pptr->rate = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "lines" )) != (struct xml_atribut *) 0)
-				pptr->lines = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "document" )) != (struct xml_atribut *) 0)
+				pptr->document = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "transactions" )) != (struct xml_atribut *) 0)
+				pptr->transactions = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
 				pptr->status = document_atribut_value(aptr);
 			}
@@ -209,8 +211,11 @@ public  void autosave_cords_invoice_nodes() {
 		fprintf(h," rate=%c",0x0022);
 		fprintf(h,"%s",(pptr->rate?pptr->rate:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," lines=%c",0x0022);
-		fprintf(h,"%u",pptr->lines);
+		fprintf(h," document=%c",0x0022);
+		fprintf(h,"%s",(pptr->document?pptr->document:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," transactions=%c",0x0022);
+		fprintf(h,"%u",pptr->transactions);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," status=%c",0x0022);
 		fprintf(h,"%u",pptr->status);
@@ -252,8 +257,10 @@ private void set_cords_invoice_field(
 			pptr->reduction = allocate_string(vptr);
 		if (!( strcmp( nptr, "rate" ) ))
 			pptr->rate = allocate_string(vptr);
-		if (!( strcmp( nptr, "lines" ) ))
-			pptr->lines = atoi(vptr);
+		if (!( strcmp( nptr, "document" ) ))
+			pptr->document = allocate_string(vptr);
+		if (!( strcmp( nptr, "transactions" ) ))
+			pptr->transactions = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
 			pptr->status = atoi(vptr);
 		}
@@ -343,7 +350,14 @@ private int pass_cords_invoice_filter(
 		else if ( strcmp(pptr->rate,fptr->rate) != 0)
 			return(0);
 		}
-	if (( fptr->lines ) && ( pptr->lines != fptr->lines )) return(0);
+	if (( fptr->document )
+	&&  (strlen( fptr->document ) != 0)) {
+		if (!( pptr->document ))
+			return(0);
+		else if ( strcmp(pptr->document,fptr->document) != 0)
+			return(0);
+		}
+	if (( fptr->transactions ) && ( pptr->transactions != fptr->transactions )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
@@ -384,7 +398,10 @@ private struct rest_response * cords_invoice_occi_response(
 	sprintf(cptr->buffer,"%s.%s.rate=%s",optr->domain,optr->id,pptr->rate);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.lines=%u",optr->domain,optr->id,pptr->lines);
+	sprintf(cptr->buffer,"%s.%s.document=%s",optr->domain,optr->id,pptr->document);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.transactions=%u",optr->domain,optr->id,pptr->transactions);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
@@ -810,7 +827,9 @@ public struct occi_category * occi_cords_invoice_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "rate",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "lines",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "document",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "transactions",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
@@ -937,7 +956,18 @@ public struct rest_header *  cords_invoice_occi_headers(struct cords_invoice * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_invoice.lines='%u'\r\n",sptr->lines);
+	sprintf(buffer,"occi.cords_invoice.document='%s'\r\n",(sptr->document?sptr->document:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_invoice.transactions='%u'\r\n",sptr->transactions);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

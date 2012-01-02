@@ -319,7 +319,15 @@ public	int	create_opennebula_contract(
 	else if (!( pptr->image = resolve_opennebula_image( &contract ) ))
 		return( terminate_opennebula_contract( 586, &contract ) );
 		
-	else	return( terminate_opennebula_contract( 0, &contract ) );
+	else 
+	{
+		/* ----------------------------------------------- */
+		/* resolve any price informatino for this category */
+		/* ----------------------------------------------- */
+		pptr->price = occi_resolve_category_price( _CORDS_OPENNEBULA, default_operator(), agent, tls );
+	
+		return( terminate_opennebula_contract( 0, &contract ) );
+	}
 
 }
 

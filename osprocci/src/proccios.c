@@ -26,6 +26,20 @@
 #include "cordslang.h"
 #include "occiresolver.h"
 
+/*	------------------------------------------	*/
+/*		o s _ v a l i d _ p r i c e		*/
+/*	------------------------------------------	*/
+private	int	os_valid_price( char * price )
+{
+	if (!( price ))
+		return(0);
+	else if (!( strlen( price )))
+		return( 0 );
+	else if (!( strcmp( price, _CORDS_NULL ) ))
+		return( 0 );
+	else	return( 1 );
+}	
+
 /* ---------------------------------------------------------------------------- */
 /* 		r e s o l v e _ o s _ c o n f i g u r a t i o n			*/
 /* ---------------------------------------------------------------------------- */
@@ -568,6 +582,7 @@ private	struct	rest_response * start_openstack(
 	char	*	filename;
 	char	*	metafilename;
 	char		buffer[512];
+	char		reference[512];
 	char 	*	personality;
 	char 	*	resource=_CORDS_LAUNCH_CFG;
 	if (!( pptr = vptr ))
@@ -583,9 +598,9 @@ private	struct	rest_response * start_openstack(
 	if (!( personality = allocate_string(buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Personality" ) );
 
-	sprintf(buffer,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-	if (!( personality = openstack_instructions( buffer, personality ) ))
+	if (!( personality = openstack_instructions( reference, personality ) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
 
@@ -621,7 +636,13 @@ private	struct	rest_response * start_openstack(
 		}
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
+		{
+			if (!( os_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
 		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
 	}
 
@@ -637,6 +658,7 @@ private	struct	rest_response * save_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char	reference[512];
 	struct	os_response * osptr;
 	int		status;
 	struct	openstack * pptr;
@@ -659,7 +681,14 @@ private	struct	rest_response * save_openstack(
 		status = connect_openstack_image( osptr, pptr );
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
+		{
+			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+			if (!( os_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
 		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	}
 }
@@ -674,6 +703,7 @@ private	struct	rest_response * stop_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char	reference[512];
 	struct	os_response * osptr;
 	int		status;
 	struct	openstack * pptr;
@@ -687,13 +717,20 @@ private	struct	rest_response * stop_openstack(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		if ( pptr->status != _OCCI_IDLE )
+		if ( pptr->status == _OCCI_IDLE )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else
 		{
 			reset_openstack_server( pptr );
 			pptr->when = time((long *) 0);
 			osptr = liberate_os_response( osptr );
+			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+			if (!( os_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 

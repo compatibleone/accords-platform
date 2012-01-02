@@ -11,6 +11,8 @@ struct	opennebula
 	char *	flavor;
 	char *	image;
 	char *	node;
+	char *	price;
+	char *	account;
 	char *	publicaddr;
 	char *	privateaddr;
 	char *	profile;

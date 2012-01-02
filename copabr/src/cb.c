@@ -744,7 +744,7 @@ private	char * 	cords_create_provider( struct xml_element * dptr , char * agent,
 
 	/* --------------------------------- */
 	/* select a list of provider records */
-		/* --------------------------------- */
+	/* --------------------------------- */
 	sprintf(filter,"%s.%s.name",Operator.domain,cptr->value);
 
 	if (!( yptr = cords_retrieve_named_instance_list( 
@@ -1036,6 +1036,8 @@ private	char * 	cords_contract_provider(
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "name", nptr->value ) ))
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "node", id ) ))
+		return((char *) 0);
+	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "account", App->account ) ))
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "profile", pptr->value ) ))
 		return((char *) 0);

@@ -233,6 +233,63 @@ private	struct	rest_response * null_occi_transaction(
 	return( aptr );
 }
 
+/*	--------------------------------------------------------	*/
+/*		o c c i _ s e n d _ t r a n s a c t i o n 		*/
+/*	--------------------------------------------------------	*/
+public	int	occi_send_transaction( char * source, char * price, char * description, char * account, char * reference )
+{
+	char 	buffer[1024];
+	char *	host;
+	struct	occi_element 	*	eptr;
+	struct	occi_client	*	kptr;
+	struct	occi_request	*	qptr;
+	struct	occi_response	*	zptr;
+	
+	/* ---------------------------------------------------- */
+	/* resolve a transaction service provider via publisher	*/
+	/* ---------------------------------------------------- */
+	if (!( host = occi_resolve_category_provider( _CORDS_TRANSACTION, _CORDS_CONTRACT_AGENT,  Publisher.tls ) ))
+		return(0);
+	else
+	{
+		/* ------------------------------------------------------ */
+		/* build a transaction category instance creation request */
+		/* ------------------------------------------------------ */
+		sprintf(buffer,"%s/%s/",host,_CORDS_TRANSACTION);
+		host = liberate( host );
+		if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT,  Publisher.tls )))
+			return( 0 );
+		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL ) ))
+			return( 0 );
+		else if ((!( eptr = occi_request_element( qptr, "occi.transaction.source", source )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.price", price )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.description", description )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.reference", reference )))
+		||       (!( eptr = occi_request_element( qptr, "occi.transaction.account", account ))))
+		{
+			qptr = occi_remove_request( qptr );
+			return( 0 );
+		}
+		/* ---------------------------------------------------- */
+		/* post the request to the transaction category manager */
+		/* ---------------------------------------------------- */
+		else if (!( zptr = occi_client_post( kptr, qptr ) ))
+		{
+			qptr = occi_remove_request( qptr );
+			return( 0 );
+		}
+		else
+		{
+			/* ------- */
+			/* success */
+			/* ------- */
+			zptr = occi_remove_response( zptr );
+			qptr = occi_remove_request( qptr );
+			return( 1 );
+		}
+	}
+}
+
 /*	---------------------------------------------------------	*/
 /*	    p r o c e s s _ o c c i _ t r a n s a c t i o n		*/
 /*	---------------------------------------------------------	*/
@@ -249,13 +306,8 @@ private	struct 	rest_response * process_occi_transaction(
 {
 	struct	rest_header	*	hptr;
 	struct	occi_category 	*	optr;
-	struct	occi_element 	*	eptr;
-	struct	occi_client	*	kptr;
-	struct	occi_request	*	qptr;
-	struct	occi_response	*	zptr;
 	char *	price;
 	char *	host;
-	char 	buffer[1024];
 
 	/* ------------------------------------------------------- */
 	/* This method must resolve the category price information */
@@ -277,49 +329,9 @@ private	struct 	rest_response * process_occi_transaction(
 		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
 	else if (!( hptr->value ))
 		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-
-	/* ---------------------------------------------------- */
-	/* resolve a transaction service provider via publisher	*/
-	/* ---------------------------------------------------- */
-	else if (!( host = occi_resolve_category_provider( _CORDS_TRANSACTION, _CORDS_CONTRACT_AGENT,  Publisher.tls ) ))
+	else if (!( occi_send_transaction( optr->id, price, "method=create", hptr->value, _CORDS_NULL ) ))
 		return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-	else
-	{
-		/* ------------------------------------------------------ */
-		/* build a transaction category instance creation request */
-		/* ------------------------------------------------------ */
-		sprintf(buffer,"%s/%s/",host,_CORDS_TRANSACTION);
-		host = liberate( host );
-		if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT,  Publisher.tls )))
-			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL ) ))
-			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-		else if ((!( eptr = occi_request_element( qptr, "occi.transaction.source", optr->id )))
-		||       (!( eptr = occi_request_element( qptr, "occi.transaction.price", price )))
-		||       (!( eptr = occi_request_element( qptr, "occi.transaction.description", "occi instance" )))
-		||       (!( eptr = occi_request_element( qptr, "occi.transaction.account", hptr->value ))))
-		{
-			qptr = occi_remove_request( qptr );
-			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-		}
-		/* ---------------------------------------------------- */
-		/* post the request to the transaction category manager */
-		/* ---------------------------------------------------- */
-		else if (!( zptr = occi_client_post( kptr, qptr ) ))
-		{
-			qptr = occi_remove_request( qptr );
-			return( null_occi_transaction( vptr, cptr, rptr, aptr ) );
-		}
-		else
-		{
-			/* ------- */
-			/* success */
-			/* ------- */
-			zptr = occi_remove_response( zptr );
-			qptr = occi_remove_request( qptr );
-			return( aptr );
-		}
-	}
+	else	return( aptr );
 }
 
 /*	---------------------------------------------------------	*/
@@ -329,7 +341,8 @@ public	int	publish_occi_category(
 		int item,
 		char * user,	char * password,
 		char * url,	char * agent, 
-		struct occi_category * category )
+		struct occi_category * category
+		)
 {
 	struct	rest_interface * iptr;
 	struct	occi_element  *	eptr;
@@ -350,7 +363,7 @@ public	int	publish_occi_category(
 			if (!( category->price = allocate_string("") ))
 				return(27);
 		}
-		else if (!( category->price = occi_resolve_category_price( category->id, url, agent, Publisher.tls ) ))
+		else if (!( category->price = occi_resolve_category_price( category->id, default_operator(), agent, Publisher.tls ) ))
 		{	
 			if (!( category->price = allocate_string("") ))
 				return(27);

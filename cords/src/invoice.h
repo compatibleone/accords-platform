@@ -12,7 +12,8 @@ struct	cords_invoice
 	char *	taxe;
 	char *	reduction;
 	char *	rate;
-	int	lines;
+	char *	document;
+	int	transactions;
 	int	status;
 };
 

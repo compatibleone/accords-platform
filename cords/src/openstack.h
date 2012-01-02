@@ -12,6 +12,8 @@ struct	openstack
 	char *	profile;
 
 	char *	node;
+	char *	price;
+	char *	account;
 
 	char *	number;
 	char *	rootpass;
