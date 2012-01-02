@@ -143,22 +143,13 @@ private	struct rest_extension * coobas_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /*		s t a r t _ i n v o i c e _ d o c u m e n t			*/
 /*	------------------------------------------------------------------	*/
-private	FILE * start_invoice_document( char * filename, struct cords_invoice * pptr )
+private	FILE * start_invoice_document( struct cords_invoice * pptr )
 {
 	char 	buffer[256];
 	FILE * h=(FILE *) 0;
 
-	if ( pptr->document ) 
-		liberate( pptr->document );
-
-	if (!( pptr->document = allocate_string( filename ) ))
-		return((FILE *) 0);
-
-	else if (!( h = fopen( pptr->document, "w" )))
-	{
-		pptr->document = liberate( pptr->document );
+	if (!( h = fopen( pptr->document, "w" )))
 		return( (FILE *) 0);
-	}
 
 	if ( pptr->date ) 
 		liberate( pptr->date );
@@ -171,15 +162,23 @@ private	FILE * start_invoice_document( char * filename, struct cords_invoice * p
 		return((FILE *) 0);
 	}
 	
-	fprintf(h,"<html><head><title>COOBAS:INVOICE:%s</title></head>\n",pptr->id);
+	fprintf(h,"<html><head><title>COOBAS:INVOICE:%s</title>\n",pptr->id);
+	fprintf(h,"<style type='text/css' media='SCREEN'>\n");
+	fprintf(h,".oddrow { background-color: white; }\n");
+	fprintf(h,".evenrow { background-color: silver; }\n");
+	fprintf(h,".headrow { background-color: grey; color: yellow; }\n");
+	fprintf(h,"tr       { border-style: none; }\n");
+	fprintf(h,"th       { border-style: none; }\n");
+	fprintf(h,"</style></head>\n");
 	fprintf(h,"<body><div align=center><p><table width='95%c' border=1>\n",0x0025);
-	fprintf(h,"<tr><th>Document</th><th>%s</th></tr>\n",pptr->document);
-	fprintf(h,"<tr><th>Date    </th><th>%s</th></tr>\n",pptr->date);
-	fprintf(h,"<tr><th>Invoice </th><th>%s</th></tr>\n",pptr->id);
-	fprintf(h,"<tr><th>Number  </th><th>%s</th></tr>\n",pptr->id);
-	fprintf(h,"<tr><th>Account </th><th>%s</th></tr>\n",pptr->account);
+	fprintf(h,"<tr class=headrow><th width='20%c'>Document</th><th>%s</th></tr>\n",0x0025,pptr->document);
+	fprintf(h,"<tr class=evenrow><th>Date    </th><th>%s</th></tr>\n",pptr->date);
+	fprintf(h,"<tr class=oddrow> <th>Invoice </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<tr class=evenrow><th>Number  </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<tr class=oddrow> <th>Account </th><th>%s</th></tr>\n",pptr->account);
 	fprintf(h,"</table><p>\n");
 	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
+	fprintf(h,"<tr class=headrow><th width='20%c'>Transaction<th>Date<th>Description<th width='20%c'>Price</tr>\n",0x0025,0x0025);
 	return( h );
 }
 
@@ -192,29 +191,74 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 	{
 		fprintf(h,"</table><p>\n");
 		fprintf(h,"<table width='95%c' border=1>\n",0x0025);
-		fprintf(h,"<tr><th>Total      </th><th>%u</th></tr>\n",0);
-		fprintf(h,"<tr><th>Taxe       </th><th>%u</th></tr>\n",0);
-		fprintf(h,"<tr><th>Grand Total</th><th>%u</th></tr>\n",0);
+		fprintf(h,"<tr class=headrow><th>Transactions</th><th width='20%c'>%u</th></tr>\n",0x0025,pptr->transactions);
+		fprintf(h,"<tr class=evenrow><th>Total      </th><th>%s</th></tr>\n",pptr->total);
+		fprintf(h,"<tr class=oddrow> <th>Taxe       </th><th>%u</th></tr>\n",0);
+		fprintf(h,"<tr class=evenrow><th>Grand Total</th><th>%s</th></tr>\n",pptr->total);
 		fprintf(h,"</table><p></div></body></html>\n");
 		fclose(h);
 	}
 	return;
 }
 
+/*	--------------------------------------------------------	*/
+/*		u p d a t e _ i n v o i c e _ t o t a l			*/
+/*	--------------------------------------------------------	*/
+private	void	update_invoice_total( struct cords_invoice * pptr, char * price )
+{
+	int	v=0;
+	char 	work[64];
+	if (!( price ))
+		return;
+	else	v = atoi( price );
+	if ( pptr->total )
+	{
+		v += atoi( pptr->total );
+		liberate( pptr->total );
+	}
+	sprintf(work,"%u",v);
+	pptr->total = allocate_string( work );
+	return;
+}
+			
+
 /*	------------------------------------------------------------------	*/
 /*	     i n v o i c e _ d o c u m e n t _ t r a n s a c t i o n		*/
 /*	------------------------------------------------------------------	*/
 private	void	invoice_document_transaction(
 		FILE * h,
-		struct cords_invoice * pptr,		/* the invoice structure 	*/
+		struct cords_invoice * pptr,	/* the invoice structure 	*/
 		char * transaction,		/* the transaction reference 	*/
 		struct occi_response * yptr,	/* the transaction record	*/
 		char * price,			/* the price reference		*/
 		struct occi_response * zptr	/* the price information	*/
 		)
 {
-	fprintf(h,"<tr><th>Transaction ID <th>%s</tr>\n",transaction);
-	fprintf(h,"<tr><th>Price Reference<th>%s</tr>\n",price);
+	char *	vptr;
+	char *	klass;
+	pptr->transactions++;
+	if (!( pptr->transactions & 1 ))
+		klass = "oddrow";
+	else	klass = "evenrow";
+	fprintf(h,"<tr class='%s'>",klass);
+	fprintf(h,"<th><a href='%s'>%u</a><th> \n",transaction,pptr->transactions);
+	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"when")))
+		fprintf(h,"%s",vptr);
+	fprintf(h,"<th><a href='%s'>",transaction);
+	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"source")))
+		fprintf(h,"%s",vptr);
+	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"description")))
+		fprintf(h," %s",vptr);
+	fprintf(h,"</a></th>\n");
+	fprintf(h,"<th><a href='%s'>\n",price);
+	if (( vptr = cords_extract_atribut( zptr, "occi", _CORDS_PRICE,"rate")))
+	{
+		fprintf(h,"%s ",vptr);
+		update_invoice_total( pptr, vptr );
+	}
+	if (( vptr = cords_extract_atribut( zptr, "occi", _CORDS_PRICE,"currency")))
+		fprintf(h," %s",vptr);
+	fprintf(h,"</a></th></tr>\n");
 	return;
 }
 
@@ -223,7 +267,6 @@ private	void	invoice_document_transaction(
 /*	------------------------------------------------------------------	*/
 private	int	process_invoice_transactions( struct cords_invoice * pptr )
 {
-	char *	tempname;
 	char *	host;
 	char *	price;
 	FILE *	h;
@@ -232,39 +275,45 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_element  * fptr;
+	char	buffer[1024];
 
 	/* -------------------------------------- */
 	/* allocate the invoice document filename */
 	/* -------------------------------------- */
-	if (!( tempname = rest_temporary_filename("htm")))
+	if ( pptr->document )
+		pptr->document = liberate( pptr->document );
+
+	if ( pptr->total )
+		pptr->total = liberate( pptr->total );
+
+	sprintf(buffer,"rest/%s.htm",pptr->id);
+
+	if (!( pptr->document = allocate_string( buffer ) ))
 		return(0);
 
 	/* --------------------------------- */
 	/* retrieve the list of transactions */
 	/* --------------------------------- */
-	else if (!( xptr = cords_retrieve_named_instance_list( 
+	if (!( xptr = cords_retrieve_named_instance_list( 
 		_CORDS_TRANSACTION, 
 		"occi.transaction.account", 
 		pptr->account, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-	{
-		liberate( tempname );
 		return( 0 );
-	}
 
 	/* -------------------------- */
 	/* create the output document */
 	/* -------------------------- */
-	else if (!( h = start_invoice_document( tempname, pptr ) ))
+	else if (!( h = start_invoice_document( pptr ) ))
 	{
 		xptr = occi_remove_response( xptr );
-		liberate( tempname );
 		return( 0 );
 	}
-	else	liberate( tempname );
 
 	/* ---------------------------- */
 	/* for each of the transactions */
 	/* ---------------------------- */
+	pptr->transactions=0;
+
 	for (	eptr=xptr->first;
 		eptr != (struct occi_element *) 0;
 		eptr = eptr->next )
@@ -354,7 +403,9 @@ private	int	update_invoice(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else if (!( pptr->account ))
+		return( 0 ); 
+	else 	return( process_invoice_transactions( pptr ) );
 }
 
 /*	-------------------------------------------	*/
