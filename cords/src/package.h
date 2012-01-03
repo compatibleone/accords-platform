@@ -13,6 +13,9 @@ struct	cords_package
 	char *	description;
 	char *	constraint;
 	char *	requirement;
+	char *	mirrors;
+	char *	installation;
+	char *	configuration;
 	char *	price;
 	char *	license;
 	int	state;

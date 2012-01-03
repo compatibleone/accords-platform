@@ -49,6 +49,12 @@ public struct cords_package * liberate_cords_package(struct cords_package * sptr
 			 sptr->constraint = liberate(sptr->constraint);
 		if ( sptr->requirement )
 			 sptr->requirement = liberate(sptr->requirement);
+		if ( sptr->mirrors )
+			 sptr->mirrors = liberate(sptr->mirrors);
+		if ( sptr->installation )
+			 sptr->installation = liberate(sptr->installation);
+		if ( sptr->configuration )
+			 sptr->configuration = liberate(sptr->configuration);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->license )
@@ -76,6 +82,9 @@ public struct cords_package * reset_cords_package(struct cords_package * sptr)
 		sptr->description = (char*) 0;
 		sptr->constraint = (char*) 0;
 		sptr->requirement = (char*) 0;
+		sptr->mirrors = (char*) 0;
+		sptr->installation = (char*) 0;
+		sptr->configuration = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->license = (char*) 0;
 		sptr->state =  0;
@@ -137,6 +146,18 @@ public int xmlin_cords_package(struct cords_package * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->requirement = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"mirrors") ))
+		{
+			if ( wptr->value ) { sptr->mirrors = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"installation") ))
+		{
+			if ( wptr->value ) { sptr->installation = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"configuration") ))
+		{
+			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
@@ -171,6 +192,9 @@ public int rest_occi_cords_package(FILE * fh,struct cords_package * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.constraint='%s'\r\n",prefix,nptr,(sptr->constraint?sptr->constraint:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.requirement='%s'\r\n",prefix,nptr,(sptr->requirement?sptr->requirement:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.mirrors='%s'\r\n",prefix,nptr,(sptr->mirrors?sptr->mirrors:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.installation='%s'\r\n",prefix,nptr,(sptr->installation?sptr->installation:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.license='%s'\r\n",prefix,nptr,(sptr->license?sptr->license:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);

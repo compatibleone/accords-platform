@@ -150,6 +150,12 @@ private void autoload_cords_package_nodes() {
 				pptr->constraint = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "requirement" )) != (struct xml_atribut *) 0)
 				pptr->requirement = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "mirrors" )) != (struct xml_atribut *) 0)
+				pptr->mirrors = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "installation" )) != (struct xml_atribut *) 0)
+				pptr->installation = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
+				pptr->configuration = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "license" )) != (struct xml_atribut *) 0)
@@ -204,6 +210,15 @@ public  void autosave_cords_package_nodes() {
 		fprintf(h," requirement=%c",0x0022);
 		fprintf(h,"%s",(pptr->requirement?pptr->requirement:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," mirrors=%c",0x0022);
+		fprintf(h,"%s",(pptr->mirrors?pptr->mirrors:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," installation=%c",0x0022);
+		fprintf(h,"%s",(pptr->installation?pptr->installation:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," configuration=%c",0x0022);
+		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
@@ -248,6 +263,12 @@ private void set_cords_package_field(
 			pptr->constraint = allocate_string(vptr);
 		if (!( strcmp( nptr, "requirement" ) ))
 			pptr->requirement = allocate_string(vptr);
+		if (!( strcmp( nptr, "mirrors" ) ))
+			pptr->mirrors = allocate_string(vptr);
+		if (!( strcmp( nptr, "installation" ) ))
+			pptr->installation = allocate_string(vptr);
+		if (!( strcmp( nptr, "configuration" ) ))
+			pptr->configuration = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "license" ) ))
@@ -334,6 +355,27 @@ private int pass_cords_package_filter(
 		else if ( strcmp(pptr->requirement,fptr->requirement) != 0)
 			return(0);
 		}
+	if (( fptr->mirrors )
+	&&  (strlen( fptr->mirrors ) != 0)) {
+		if (!( pptr->mirrors ))
+			return(0);
+		else if ( strcmp(pptr->mirrors,fptr->mirrors) != 0)
+			return(0);
+		}
+	if (( fptr->installation )
+	&&  (strlen( fptr->installation ) != 0)) {
+		if (!( pptr->installation ))
+			return(0);
+		else if ( strcmp(pptr->installation,fptr->installation) != 0)
+			return(0);
+		}
+	if (( fptr->configuration )
+	&&  (strlen( fptr->configuration ) != 0)) {
+		if (!( pptr->configuration ))
+			return(0);
+		else if ( strcmp(pptr->configuration,fptr->configuration) != 0)
+			return(0);
+		}
 	if (( fptr->price )
 	&&  (strlen( fptr->price ) != 0)) {
 		if (!( pptr->price ))
@@ -383,6 +425,15 @@ private struct rest_response * cords_package_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.requirement=%s",optr->domain,optr->id,pptr->requirement);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.mirrors=%s",optr->domain,optr->id,pptr->mirrors);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.installation=%s",optr->domain,optr->id,pptr->installation);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
@@ -812,6 +863,12 @@ public struct occi_category * occi_cords_package_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "requirement",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "mirrors",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "installation",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "license",0,0) ))
@@ -920,6 +977,39 @@ public struct rest_header *  cords_package_occi_headers(struct cords_package * s
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_package.requirement='%s'\r\n",(sptr->requirement?sptr->requirement:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_package.mirrors='%s'\r\n",(sptr->mirrors?sptr->mirrors:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_package.installation='%s'\r\n",(sptr->installation?sptr->installation:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_package.configuration='%s'\r\n",(sptr->configuration?sptr->configuration:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

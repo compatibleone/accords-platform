@@ -136,6 +136,10 @@ private void autoload_cords_placement_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "algorithm" )) != (struct xml_atribut *) 0)
+				pptr->algorithm = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
 				pptr->node = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
@@ -176,6 +180,12 @@ public  void autosave_cords_placement_nodes() {
 		fprintf(h,"<cords_placement\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," algorithm=%c",0x0022);
+		fprintf(h,"%s",(pptr->algorithm?pptr->algorithm:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," node=%c",0x0022);
 		fprintf(h,"%s",(pptr->node?pptr->node:""));
@@ -219,6 +229,10 @@ private void set_cords_placement_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "algorithm" ) ))
+			pptr->algorithm = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
 			pptr->node = allocate_string(vptr);
 		if (!( strcmp( nptr, "provider" ) ))
@@ -262,6 +276,20 @@ private int pass_cords_placement_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
+			return(0);
+		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
+	if (( fptr->algorithm )
+	&&  (strlen( fptr->algorithm ) != 0)) {
+		if (!( pptr->algorithm ))
+			return(0);
+		else if ( strcmp(pptr->algorithm,fptr->algorithm) != 0)
 			return(0);
 		}
 	if (( fptr->node )
@@ -320,6 +348,12 @@ private struct rest_response * cords_placement_occi_response(
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.algorithm=%s",optr->domain,optr->id,pptr->algorithm);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
@@ -747,6 +781,10 @@ public struct occi_category * occi_cords_placement_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_cords_placement_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "algorithm",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
@@ -786,6 +824,28 @@ public struct rest_header *  cords_placement_occi_headers(struct cords_placement
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"cords_placement; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_placement.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_placement.algorithm='%s'\r\n",(sptr->algorithm?sptr->algorithm:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

@@ -3,6 +3,8 @@
 struct	cords_placement
 {
 	char	*	id;
+	char	*	name;
+	char	*	algorithm;
 	char 	*	node;
 	char 	*	provider;
 	char	*	price;
