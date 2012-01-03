@@ -1,24 +1,22 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _transaction_c_
@@ -146,6 +144,8 @@ private void autoload_cords_transaction_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "reference" )) != (struct xml_atribut *) 0)
+				pptr->reference = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -195,6 +195,9 @@ public  void autosave_cords_transaction_nodes() {
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," reference=%c",0x0022);
+		fprintf(h,"%s",(pptr->reference?pptr->reference:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
@@ -239,6 +242,8 @@ private void set_cords_transaction_field(
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "reference" ) ))
+			pptr->reference = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -308,6 +313,13 @@ private int pass_cords_transaction_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
+	if (( fptr->reference )
+	&&  (strlen( fptr->reference ) != 0)) {
+		if (!( pptr->reference ))
+			return(0);
+		else if ( strcmp(pptr->reference,fptr->reference) != 0)
+			return(0);
+		}
 	if (( fptr->price )
 	&&  (strlen( fptr->price ) != 0)) {
 		if (!( pptr->price ))
@@ -344,6 +356,9 @@ private struct rest_response * cords_transaction_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.reference=%s",optr->domain,optr->id,pptr->reference);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
@@ -773,6 +788,8 @@ public struct occi_category * occi_cords_transaction_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "reference",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
@@ -852,6 +869,17 @@ public struct rest_header *  cords_transaction_occi_headers(struct cords_transac
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_transaction.description='%s'\r\n",(sptr->description?sptr->description:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_transaction.reference='%s'\r\n",(sptr->reference?sptr->reference:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

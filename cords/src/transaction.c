@@ -1,24 +1,22 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _transaction_c_
@@ -45,6 +43,8 @@ public struct cords_transaction * liberate_cords_transaction(struct cords_transa
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
+		if ( sptr->reference )
+			 sptr->reference = liberate(sptr->reference);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		sptr = liberate( sptr );
@@ -65,6 +65,7 @@ public struct cords_transaction * reset_cords_transaction(struct cords_transacti
 		sptr->source = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->description = (char*) 0;
+		sptr->reference = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->when =  0;
 		sptr->validity =  0;
@@ -116,6 +117,10 @@ public int xmlin_cords_transaction(struct cords_transaction * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"reference") ))
+		{
+			if ( wptr->value ) { sptr->reference = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
@@ -155,6 +160,7 @@ public int rest_occi_cords_transaction(FILE * fh,struct cords_transaction * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.source='%s'\r\n",prefix,nptr,(sptr->source?sptr->source:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.validity='%u'\r\n",prefix,nptr,sptr->validity);

@@ -9,6 +9,7 @@ struct	cords_transaction
 	char	*	source;
 	char	*	account;
 	char	*	description;
+	char	*	reference;
 	char	*	price;
 	int		when;
 	int		validity;
