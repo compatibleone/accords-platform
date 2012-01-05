@@ -6,7 +6,7 @@ struct	cords_instruction
 	char *	id;
 	char *	provision;
 	char *	target;
-	char *	member;
+	char *	method;
 	char *	type;
 	char *	symbol;
 	char *	source;

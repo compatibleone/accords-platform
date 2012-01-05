@@ -39,8 +39,8 @@ public struct cords_instruction * liberate_cords_instruction(struct cords_instru
 			 sptr->provision = liberate(sptr->provision);
 		if ( sptr->target )
 			 sptr->target = liberate(sptr->target);
-		if ( sptr->member )
-			 sptr->member = liberate(sptr->member);
+		if ( sptr->method )
+			 sptr->method = liberate(sptr->method);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->symbol )
@@ -67,7 +67,7 @@ public struct cords_instruction * reset_cords_instruction(struct cords_instructi
 		sptr->id = (char*) 0;
 		sptr->provision = (char*) 0;
 		sptr->target = (char*) 0;
-		sptr->member = (char*) 0;
+		sptr->method = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->symbol = (char*) 0;
 		sptr->source = (char*) 0;
@@ -112,9 +112,9 @@ public int xmlin_cords_instruction(struct cords_instruction * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"member") ))
+		else if (!( strcmp(wptr->name,"method") ))
 		{
-			if ( wptr->value ) { sptr->member = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->method = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"type") ))
 		{
@@ -157,7 +157,7 @@ public int rest_occi_cords_instruction(FILE * fh,struct cords_instruction * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provision='%s'\r\n",prefix,nptr,(sptr->provision?sptr->provision:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.member='%s'\r\n",prefix,nptr,(sptr->member?sptr->member:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.method='%s'\r\n",prefix,nptr,(sptr->method?sptr->method:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.symbol='%s'\r\n",prefix,nptr,(sptr->symbol?sptr->symbol:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.source='%s'\r\n",prefix,nptr,(sptr->source?sptr->source:""));

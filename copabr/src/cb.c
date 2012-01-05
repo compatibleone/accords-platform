@@ -386,7 +386,7 @@ private	int	cords_affectation_instruction(
 			return(27);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, "configure" 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, "configure" 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, "self"        ) ))
@@ -516,7 +516,7 @@ private	int	cords_action_instruction(
 			return(50);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.member"  	, mname 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, mname 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"  	, "" 		) ))

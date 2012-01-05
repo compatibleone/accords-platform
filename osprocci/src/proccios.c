@@ -170,7 +170,7 @@ private	char *	openstack_instructions( char * contract, char * result )
 				zptr = occi_remove_response ( zptr );
 			else if ( strcasecmp( fptr->value, "method" ) )
 				zptr = occi_remove_response ( zptr );
-			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.member" )))
+			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.method" )))
 				zptr = occi_remove_response ( zptr );
 			else if ( strcasecmp( fptr->value, "configure" ) )
 				zptr = occi_remove_response ( zptr );

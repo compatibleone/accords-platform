@@ -140,8 +140,8 @@ private void autoload_cords_instruction_nodes() {
 				pptr->provision = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
 				pptr->target = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "member" )) != (struct xml_atribut *) 0)
-				pptr->member = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "method" )) != (struct xml_atribut *) 0)
+				pptr->method = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
 				pptr->type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "symbol" )) != (struct xml_atribut *) 0)
@@ -187,8 +187,8 @@ public  void autosave_cords_instruction_nodes() {
 		fprintf(h," target=%c",0x0022);
 		fprintf(h,"%s",(pptr->target?pptr->target:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," member=%c",0x0022);
-		fprintf(h,"%s",(pptr->member?pptr->member:""));
+		fprintf(h," method=%c",0x0022);
+		fprintf(h,"%s",(pptr->method?pptr->method:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," type=%c",0x0022);
 		fprintf(h,"%s",(pptr->type?pptr->type:""));
@@ -233,8 +233,8 @@ private void set_cords_instruction_field(
 			pptr->provision = allocate_string(vptr);
 		if (!( strcmp( nptr, "target" ) ))
 			pptr->target = allocate_string(vptr);
-		if (!( strcmp( nptr, "member" ) ))
-			pptr->member = allocate_string(vptr);
+		if (!( strcmp( nptr, "method" ) ))
+			pptr->method = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
 			pptr->type = allocate_string(vptr);
 		if (!( strcmp( nptr, "symbol" ) ))
@@ -292,11 +292,11 @@ private int pass_cords_instruction_filter(
 		else if ( strcmp(pptr->target,fptr->target) != 0)
 			return(0);
 		}
-	if (( fptr->member )
-	&&  (strlen( fptr->member ) != 0)) {
-		if (!( pptr->member ))
+	if (( fptr->method )
+	&&  (strlen( fptr->method ) != 0)) {
+		if (!( pptr->method ))
 			return(0);
-		else if ( strcmp(pptr->member,fptr->member) != 0)
+		else if ( strcmp(pptr->method,fptr->method) != 0)
 			return(0);
 		}
 	if (( fptr->type )
@@ -356,7 +356,7 @@ private struct rest_response * cords_instruction_occi_response(
 	sprintf(cptr->buffer,"%s.%s.target=%s",optr->domain,optr->id,pptr->target);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.member=%s",optr->domain,optr->id,pptr->member);
+	sprintf(cptr->buffer,"%s.%s.method=%s",optr->domain,optr->id,pptr->method);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
@@ -785,7 +785,7 @@ public struct occi_category * occi_cords_instruction_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "member",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "method",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
@@ -856,7 +856,7 @@ public struct rest_header *  cords_instruction_occi_headers(struct cords_instruc
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_instruction.member='%s'\r\n",(sptr->member?sptr->member:""));
+	sprintf(buffer,"occi.cords_instruction.method='%s'\r\n",(sptr->method?sptr->method:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
