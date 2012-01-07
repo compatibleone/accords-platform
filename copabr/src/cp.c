@@ -428,6 +428,38 @@ public	int	cords_resolve_location( struct occi_response * zptr, struct xml_eleme
 	}
 }
 
+/*	-----------------------------------------------------	*/
+/*	c o r d s _ r e s o l v e _ l a s t _ l o c a t i o n	*/
+/*	-----------------------------------------------------	*/
+/*	special case for the plan category instance where new	*/
+/*	plans resulting from a parsed manifest will repalce 	*/
+/*	a previous version.					*/
+/*	-----------------------------------------------------	*/
+private	int	cords_resolve_last_location( struct occi_response * zptr, struct xml_element * document )
+{
+	char			* vptr;
+	struct	xml_atribut	* aptr;
+	char	buffer[8192];
+	if ( cords_count_locations( zptr ) > 1 )
+		vptr = allocate_string( zptr->last->value );
+	else if (!( vptr = cords_extract_location( zptr ) ))
+		return(713);
+
+	if (!( vptr = occi_category_id( vptr ) ))
+		return(714);
+	else
+	{
+		sprintf(buffer,"%s/%s/%s",zptr->host,document->name,vptr);
+		if (!( aptr = document_add_atribut( document, _CORDS_ID, buffer ) ))
+			return(715);
+		else
+		{
+			liberate( vptr );
+			return(0);
+		}
+	}
+}
+
 /*	---------------------------------------------------	*/
 /*	    c o r d s _ p e r f o r m _ s t i t c h u p 	*/
 /*	---------------------------------------------------	*/
@@ -1224,7 +1256,7 @@ private	char *	cords_resolve_manifest_plan( char * manifestname, char * agent, c
 		result = (char *) 0;
 	else if (!( zptr = cords_resolve_category( document, aptr, agent,tls ) ))
 		result = (char *) 0;
-	else if ( cords_resolve_location( zptr, document ) != 0)
+	else if ( cords_resolve_last_location( zptr, document ) != 0)
 		result = (char *) 0 ;
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 		result = (char * ) 0;
