@@ -116,8 +116,9 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 	}
 	if (!( rptr = allocate_on_response() ))
 		return( rptr );
+	else 	rptr->response = aptr;
 	
-	else if (!( aptr->body ))
+	if (!( aptr->body ))
 		return(rptr);
 	else if (!( hptr = rest_resolve_header( aptr->first, "Content-Type" ) ))
 		return(rptr);

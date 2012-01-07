@@ -65,8 +65,11 @@ private	int	on_result( struct on_response * rptr )
 			break;
 		case	_TEXT_XML	:
 		default			:
-			if (( rptr->response->status != 204 )
-			&&  ( rptr->response->body ))
+			if (!( rptr->response ))
+				break;
+			else if (!( rptr->response->body ))
+				break;
+			else if ( rptr->response->status != 204 )
 			{
 				sprintf(buffer,"cat %s",rptr->response->body);
 				system( buffer );
@@ -90,18 +93,27 @@ private	struct	on_response * on_list_object(
 {
 	if (!( keyword ))
 		return((struct on_response *) 0);
-	else if (!( strcasecmp( keyword, "server" ) ))
+
+	else if (!( strcasecmp( keyword, "flavors" ) ))
+	{
+		printf("\nAccords OpenNebula Flavors:\n");
+		printf("\nsmall  : Storage <= 40G,       Memory <= 2G      ");
+		printf("\nmedium : Storage >  40G < 80G, Memory >  2G < 4G ");
+		printf("\nlarge  : Storage >= 80G,       Memory >= 4G      \n");
+		return((struct on_response *) 0);
+	}
+	else if ((!( strcasecmp( keyword, "compute" ) ))
+	     ||  (!( strcasecmp( keyword, "servers" ) )))
 	{
 		return( on_get_request( "/compute" ) );
 	}
-	else if (!( strcasecmp( keyword, "compute" ) ))
-	{
-		return( on_get_request( "/compute" ) );
-	}
-	else if (!( strcasecmp( keyword, "storage" ) ))
+
+	else if ((!( strcasecmp( keyword, "storage" ) ))
+	     ||  (!( strcasecmp( keyword, "images"  ) )))
 	{
 		return( on_get_request( "/storage" ) );
 	}
+
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
 		return( on_get_request( "/network" ) );
@@ -366,8 +378,8 @@ private	int	on_command(int argc, char * argv[] )
 /* ------------------------------------------------------------------------------------ */
 private	int	on_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.01");
-	printf("\n   Beta Version 02/11/2011");
+	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.02");
+	printf("\n   Beta Version 07/01/2012");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue" );
 	printf("\n");
 	printf("\n   CRUD Operations ");

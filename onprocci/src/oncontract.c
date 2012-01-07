@@ -175,6 +175,35 @@ private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 
 }
 
+/*	---------------------------------------------------	*/
+/*		o p e n n e b u l a _ i m a g e _ i d		*/
+/*	---------------------------------------------------	*/
+private	char *	opennebula_image_id( char * href )
+{
+	struct	url * uptr;
+	char *	result;
+	if (!( href ))
+		return( href );
+	else if (!( uptr = analyse_url( href ) ))
+		return( liberate( href ) );
+	else if (!( uptr->object ))
+	{
+		uptr = liberate_url( uptr );
+		return( liberate( href ) );
+	}
+	else if (!( result = allocate_string( uptr->object ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( liberate( href ) );
+	}
+	else
+	{
+		uptr = liberate_url( uptr );
+		href = liberate( href );
+		return( result );
+	}
+}
+
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ o p e n n e b u l a _ i m a g e   		*/
 /*	-----------------------------------------------------------------	*/
@@ -184,7 +213,6 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	struct	on_image_infos	image;
 	struct	on_image_infos	best;
 	char *			vptr;
-
 
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
@@ -215,12 +243,16 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 		/* ----------------------------------------------- */
 		/* collect the information from the flavor element */
 		/* ----------------------------------------------- */
+		memset( &image, 0, sizeof( struct on_image_infos ));
 		if (!( aptr = document_atribut( dptr, "href" ) ))
 			continue;
-		else	image.id = aptr->value;
+		else	image.id = occi_unquoted_value(aptr->value);
 		if (!( aptr = document_atribut( dptr, "name" ) ))
+		{
+			image.id = liberate( image.id );
 			continue;
-		else	image.name = aptr->value;
+		}
+		else	image.name = occi_unquoted_value(aptr->value);
 
 		if ( (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
 		||   (!( strncasecmp( request.other, image.name, strlen( request.other ) ))))
@@ -229,11 +261,18 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 			best.name = image.name;
 			break;
 		}		
-		else	continue;
+		else
+		{
+			image.id = liberate( image.id );
+			image.name = liberate( image.name );
+			continue;
+		}
 	}
+	if ( best.name )
+		best.name = liberate( best.name );
 	if (!( best.id ))
 		return( best.id );
-	else 	return(allocate_string( best.id ));
+	else 	return( opennebula_image_id( best.id ) );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -248,8 +287,11 @@ public	int	create_opennebula_contract(
 	struct	cords_on_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	int	status;
 
-	memset( &contract, 0, sizeof( struct cords_on_contract ));
+	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+		return( status );
+	else	memset( &contract, 0, sizeof( struct cords_on_contract ));
 
 	/* ---------------------------- */
 	/* recover the node description */

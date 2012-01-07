@@ -241,6 +241,8 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 			}
 			else if (!( strcmp( vptr, "ACTIVE" )))
 				break;
+			else if (!( strcmp( vptr, "FAILED" )))
+				return( 666 );
 		}
 
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
