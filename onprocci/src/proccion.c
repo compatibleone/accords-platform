@@ -435,6 +435,18 @@ private	struct	rest_response * save_opennebula(
 #endif
 }
 
+/*	--------------------------------------------------------	*/
+/* 	s t o p  _ o p e n n e b u l a _ p r o v i s i o n i n g  	*/
+/*	--------------------------------------------------------	*/
+private	struct on_response * stop_opennebula_provisioning( struct opennebula * pptr )
+{
+	int	status;
+	struct	on_response * osptr;
+	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+		return((struct on_response *) 0);
+	else 	return( on_delete_server( pptr->number ) );
+}
+
 /*	-------------------------------------------	*/
 /* 	      s t o p  _ o p e n n e b u l a	  	*/
 /*	-------------------------------------------	*/
@@ -453,10 +465,8 @@ private	struct	rest_response * stop_opennebula(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	else if (!(osptr = stop_opennebula_provisioning( pptr )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = on_delete_server( pptr->number )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
 		if ( pptr->status == _OCCI_IDLE )
@@ -628,7 +638,7 @@ private	int	delete_opennebula(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return(delete_opennebula_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OnProcci.tls));
 }
 
 private	struct	occi_interface	opennebula_interface = {

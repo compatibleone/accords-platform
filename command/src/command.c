@@ -1,3 +1,25 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+#ifndef	_command_c
+#define	_command_c
+
 #include "command.h"
 #include "cordslang.h"
 #include "occiresolver.h"
@@ -16,6 +38,9 @@ public	char *	default_tls()		{	return( tls );		}
 public	int	check_verbose()		{	return( verbose );	}
 public	int	check_debug()		{	return( debug );	}
 
+/*	-----------------------------------	*/
+/*		f a i l u r e			*/
+/*	-----------------------------------	*/
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -31,7 +56,7 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	-----------------------------------------------------	*/
-/*		c o r d s _ s e r v i c e _ a c t i o n		*/
+/*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
 /*	-----------------------------------------------------	*/
 private	int	ll_cords_service_action( char * id, char * action )
 {
@@ -56,7 +81,7 @@ private	int	ll_cords_service_action( char * id, char * action )
 }
 
 /*	-----------------------------------------------------	*/
-/*	t e s t _ c o r d s _ b r o k e r _ o p e r a t i o n	*/
+/*		c o r d s _ s e r v i c e _ a c t i o n		*/
 /*	-----------------------------------------------------	*/
 private	int	cords_service_action( char * id, char * action )
 {
@@ -76,6 +101,55 @@ private	int	cords_service_action( char * id, char * action )
 	return( status );
 }
 
+/*	-----------------------------------------------------	*/
+/*	   l l _ c o r d s _ s e r v i c e _ d e l e t e	*/
+/*	-----------------------------------------------------	*/
+private	int	ll_cords_service_delete( char * id )
+{
+	struct	occi_response * zptr;
+	char 	buffer[2048];
+	char *	result;
+	char *	sptr;
+
+	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, tls ) ))
+		return( 500 );
+	else	sprintf(buffer,"%s/%s/%s",sptr,_CORDS_SERVICE,id );
+
+	if (!( zptr =  occi_simple_delete( buffer, agent, tls ) ))
+		return(501);
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*		c o r d s _ s e r v i c e _ d e l e t e		*/
+/*	-----------------------------------------------------	*/
+private	int	cords_service_delete( char * id )
+{
+	int	status;
+	char *	auth;
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	status = ll_cords_service_delete( id );
+
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+
+	return( status );
+}
+
+/*	-----------------------------------------------------	*/
+/*		  s e r v i c e _ o p e r a t i o n		*/
+/*	-----------------------------------------------------	*/
 private	int	service_operation( char * command, char * service )
 {
 	char *	id;
@@ -107,11 +181,15 @@ private	int	service_operation( char * command, char * service )
 			return( cords_service_action( id, "stop" ) );
 		else if (!( strcasecmp( command, "SAVE" ) ))
 			return( cords_service_action( id, "save" ) );
+		else if (!( strcasecmp( command, "DELETE" ) ))
+			return( cords_service_delete( id ) );
 		else	return( failure( 30,"incorrect command", command ) );
 	}	
 }
 
-
+/*	-----------------------------------	*/
+/*		o p e r a t i o n		*/
+/*	-----------------------------------	*/
 private	int	operation( int argc, char * argv[] )
 {
 	int	argi=1;
@@ -159,14 +237,19 @@ private	int	operation( int argc, char * argv[] )
 	return( 0 );
 }
 
+/*	-----------------------------------	*/
+/*		b a n n e r 			*/
+/*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.01");
-	printf("\n   Copyright (c) Iain James Marshall ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.02");
+	printf("\n   Beta Version : 07/01/2012 ");
+	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
-	printf("\n         command <options> START <service_file> ");
-	printf("\n         command <options> STOP  <service_file> ");
-	printf("\n         command <options> SAVE  <service_file> ");
+	printf("\n         command <options> START  <service_file> ");
+	printf("\n         command <options> STOP   <service_file> ");
+	printf("\n         command <options> SAVE   <service_file> ");
+	printf("\n         command <options> DELETE <service_file> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");
@@ -176,11 +259,17 @@ private	int	banner()
 	return( 0 );
 }
 
-
+/*	-----------------------------------	*/
+/*			m a i n			*/
+/*	-----------------------------------	*/
 public	int	main( int argc, char * argv[] )
 {
 	if ( argc == 1 )
 		return( banner() );
 	else	return( operation( argc, argv ) );
 }
+
+	/* ---------- */
+#endif	/* _command_c */
+	/* ---------- */
 

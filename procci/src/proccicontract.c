@@ -435,6 +435,121 @@ private	struct	rest_response * save_contract(
 	}
 }
 
+/*	-----------------------------------------------------------	*/
+/*		d e l e t e _ g e n e r i c _ c o n t r a c t		*/
+/*	-----------------------------------------------------------	*/
+private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char 			* wptr;
+
+	/* ------------------------------------------------------- */
+	/* delete the contract if simple or complex but not common */
+	/* ------------------------------------------------------- */
+	if (!( is_common_contract( pptr ) ))
+	{
+		if ((!( pptr->type ))
+		||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			occi_simple_delete( pptr->provider, _CORDS_SERVICE_AGENT, default_tls() );
+		else if ( pptr->service )
+			occi_simple_delete( pptr->service, _CORDS_SERVICE_AGENT, default_tls() );
+	}
+
+	/* ----------------------------------------------------- */
+	/* for all defined instructions of the current contract  */
+	/* ----------------------------------------------------- */
+	for (	nptr=occi_first_link_node(); 
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else
+		{
+			liberate( wptr );
+			occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() );
+		}
+	}
+
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	create_contract(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_contract * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return( 0 ); 
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_contract(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_contract * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	update_contract(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_contract * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n t r a c t	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_contract(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_contract * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(delete_generic_contract(optr, pptr));
+}
+
+private	struct	occi_interface	contract_interface = {
+	create_contract,
+	retrieve_contract,
+	update_contract,
+	delete_contract
+	};
+
+
 /*	------------------------------------------------------------------	*/
 /*		p r o c c i _ c o n t r a c t _ b u i l d e r			*/
 /*	------------------------------------------------------------------	*/
@@ -444,17 +559,22 @@ private	struct	occi_category *	procci_contract_builder( char * domain, char * ca
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( optr = occi_cords_contract_builder( domain ,category ) ))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_START,"",start_contract)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_contract)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_contract)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_contract)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
-		return( optr );
-	else	return( optr );
+	else 
+	{
+		optr->callback  = &contract_interface;
+
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
+			return( optr );
+		else	return( optr );
+	}
 }
 
 #endif	/* _procci_contract_c */

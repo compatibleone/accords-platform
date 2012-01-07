@@ -153,6 +153,13 @@ public	struct	rest_response * occi_invoke_action(
 		void * pptr );
 
 public	struct	occi_link_node*	occi_first_link_node();
+public	struct  occi_link_node * occi_first_category_link( 
+		char * category, 
+		char * id );
+public	struct  occi_link_node * occi_next_category_link( 
+		struct occi_link_node * nptr, 
+		char * category, 
+		char * id );
 
 #endif	/* _occi_h */
 	/* ------- */

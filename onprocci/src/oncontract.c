@@ -371,6 +371,22 @@ public	int	create_opennebula_contract(
 
 }
 
+/*	-----------------------------------------------------------------	*/
+/*		d e l e t e _ o p e n n e b u l a _ c o n t r a c t		*/
+/*	-----------------------------------------------------------------	*/
+public	int	delete_opennebula_contract(
+		struct occi_category * optr,
+		struct opennebula * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	on_response * osptr;
+	if ((osptr = stop_opennebula_provisioning( pptr )) != (struct on_response *) 0)
+		osptr = liberate_on_response( osptr );
+	return(0);
+}
+
+
 	/* ------------- */
 #endif	/* _oncontract_c */
 	/* ------------- */

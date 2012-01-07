@@ -691,6 +691,18 @@ private	struct	rest_response * save_openstack(
 	}
 }
 
+/*	--------------------------------------------------------	*/
+/* 	 s t o p  _ o p e n s t a c k _ p r o v i s i o n i n g  	*/
+/*	--------------------------------------------------------	*/
+private	struct os_response *	stop_openstack_provisioning( struct openstack * pptr )
+{
+	int	status;
+	struct	os_response * osptr;
+	if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return((struct os_response *) 0);
+	else 	return( os_delete_server( pptr->number ) );
+}
+
 /*	-------------------------------------------	*/
 /* 	      s t o p  _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
@@ -709,10 +721,8 @@ private	struct	rest_response * stop_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!(osptr = stop_openstack_provisioning( pptr )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = os_delete_server( pptr->number )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
 		if ( pptr->status == _OCCI_IDLE )
@@ -938,7 +948,7 @@ private	int	delete_openstack(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OsProcci.tls));
 }
 
 private	struct	occi_interface	openstack_interface = {

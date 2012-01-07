@@ -445,6 +445,118 @@ private	struct	rest_response * stop_service(
 	}
 }
 
+/*	-----------------------------------------------------------	*/
+/*		d e l e t e _ s e r v i c e _ c o n t r a c t		*/
+/*	-----------------------------------------------------------	*/
+private	int	delete_service_contract( struct occi_category * optr, struct cords_service * pptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char 	buffer[1024];
+	char 			* wptr;
+	/* ----------------------------------------------------- */
+	/* for all defined contract nodes of the current service */
+	/* ----------------------------------------------------- */
+	for (	nptr=occi_first_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else
+		{
+			liberate( wptr );
+			occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() );
+		}
+	}
+
+	/* ------------------------------- */
+	/* remove service description file */
+	/* ------------------------------- */
+	if ( generate_service_report )
+	{
+		sprintf(buffer,"rm -f service/%s",pptr->id);
+		system(buffer);
+	}
+
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ s e r v i c e  		*/
+/*	-------------------------------------------	*/
+private	int	create_service(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_service * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return( 0 ); 
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ s e r v i c e  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_service(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_service * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ s e r v i c e  		*/
+/*	-------------------------------------------	*/
+private	int	update_service(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_service * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ s e r v i c e	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_service(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_service * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(delete_service_contract(optr, pptr));
+}
+
+private	struct	occi_interface	service_interface = {
+	create_service,
+	retrieve_service,
+	update_service,
+	delete_service
+	};
+
+
 /*	------------------------------------------------------------------	*/
 /*		b r o k e r _ s e r v i c e _ b u i l d e r			*/
 /*	------------------------------------------------------------------	*/
@@ -454,17 +566,22 @@ private	struct	occi_category *	broker_service_builder( char * domain, char * cat
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( optr = occi_cords_service_builder( domain ,category ) ))
 		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_START,"",start_service)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_service)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_service)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_service)))
-		return( optr );
-	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_service)))
-		return( optr );
-	else	return( optr );
+	else
+	{
+		optr->callback  = &service_interface;
+
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_service)))
+			return( optr );
+		else	return( optr );
+	}
 }
 
 #endif	/* _broker_service_c */
