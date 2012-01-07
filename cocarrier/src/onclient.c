@@ -65,6 +65,25 @@ public	struct on_response * liberate_on_response( struct on_response * rptr )
 	return((struct on_response *) 0);
 }
 
+/*	----------------------------------------------------------	*/
+/*		a l l o c a t e _ o n _ r e s p o n s e			*/
+/*	----------------------------------------------------------	*/
+private	struct	on_response * allocate_on_response()
+{
+	struct	on_response * rptr=(struct on_response *) 0;
+	if (!( rptr = allocate( sizeof( struct on_response ) ) ))
+		return( rptr );
+	else
+	{
+		rptr->nature = _TEXT_NONE;
+		rptr->content= (char *) 0;
+		rptr->xmlroot = (struct xml_element *) 0;
+		rptr->jsonroot = (struct data_element *) 0;
+		rptr->response = (struct rest_response *) 0;
+		return( rptr );
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*		 		o n _ c h e c k 			*/
 /*	------------------------------------------------------------	*/
@@ -95,15 +114,8 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 			}
 		}
 	}
-	if (!( rptr = allocate( sizeof( struct on_response ) ) ))
+	if (!( rptr = allocate_on_response() ))
 		return( rptr );
-	else
-	{
-		rptr->nature = _TEXT_NONE;
-		rptr->content= (char *) 0;
-		rptr->xmlroot = (struct xml_element *) 0;
-		rptr->jsonroot = (struct data_element *) 0;
-		rptr->response = aptr;
 		if (!( aptr->body ))
 			return(rptr);
 		if (!( hptr = rest_resolve_header( aptr->first, "Content-Type" ) ))
@@ -553,7 +565,7 @@ public	struct	on_response *	on_list_servers	( )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_list_flavors ( )
 { 
-	return( 0 );
+	return( return( allocate_on_response() ) );
 }
 
 /*	----------------------------------------------------------------	*/
@@ -561,7 +573,7 @@ public	struct	on_response *	on_list_flavors ( )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_list_images  ( ) 
 {
-	return(0); 
+	return(on_list_storage_pool()); 
 }
 
 /*	----------------------------------------------------------------	*/
