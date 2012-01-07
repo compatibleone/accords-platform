@@ -116,35 +116,34 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 	}
 	if (!( rptr = allocate_on_response() ))
 		return( rptr );
-		if (!( aptr->body ))
-			return(rptr);
-		if (!( hptr = rest_resolve_header( aptr->first, "Content-Type" ) ))
-			return(rptr);
-		else if (!( rptr->content = allocate_string( hptr->value ) ))
-			return( rptr );
-		else if ((!( strcmp( rptr->content, "text/json" 	)))
-		     ||  (!( strcmp( rptr->content, "application/json" 	)))
-		     ||  (!( strcmp( rptr->content, "x-application/json"))))
-		{
-			rptr->nature = _TEXT_JSON;
-			rptr->jsonroot = json_parse_file( aptr->body );
-			return( rptr );
-		}
-		else if ((!( strcmp( rptr->content, "text/xml" 		)))
-		     ||  (!( strcmp( rptr->content, "application/xml" 	)))
-		     ||  (!( strcmp( rptr->content, "x-application/xml"))))
-		{
-			rptr->nature = _TEXT_XML;
-			rptr->xmlroot = document_parse_file( aptr->body );
-			return( rptr );
-		}
-		else
-		{
-			rptr->nature = _TEXT_XML;
-			rptr->xmlroot = document_parse_file( aptr->body );
-			return( rptr );
-		}
-		
+	
+	else if (!( aptr->body ))
+		return(rptr);
+	else if (!( hptr = rest_resolve_header( aptr->first, "Content-Type" ) ))
+		return(rptr);
+	else if (!( rptr->content = allocate_string( hptr->value ) ))
+		return( rptr );
+	else if ((!( strcmp( rptr->content, "text/json" 	)))
+	     ||  (!( strcmp( rptr->content, "application/json" 	)))
+	     ||  (!( strcmp( rptr->content, "x-application/json"))))
+	{
+		rptr->nature = _TEXT_JSON;
+		rptr->jsonroot = json_parse_file( aptr->body );
+		return( rptr );
+	}
+	else if ((!( strcmp( rptr->content, "text/xml" 		)))
+	     ||  (!( strcmp( rptr->content, "application/xml" 	)))
+	     ||  (!( strcmp( rptr->content, "x-application/xml"))))
+	{
+		rptr->nature = _TEXT_XML;
+		rptr->xmlroot = document_parse_file( aptr->body );
+		return( rptr );
+	}
+	else
+	{
+		rptr->nature = _TEXT_XML;
+		rptr->xmlroot = document_parse_file( aptr->body );
+		return( rptr );
 	}
 }
 
@@ -565,7 +564,7 @@ public	struct	on_response *	on_list_servers	( )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_list_flavors ( )
 { 
-	return( return( allocate_on_response() ) );
+	return( allocate_on_response() );
 }
 
 /*	----------------------------------------------------------------	*/
@@ -657,7 +656,7 @@ public	struct	on_response *	on_get_server	( char * id )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_get_flavour  ( char * id ) 
 {
-	return(0); 
+	return( allocate_on_response() ); 
 }
 
 /*	----------------------------------------------------------------	*/
@@ -665,7 +664,7 @@ public	struct	on_response *	on_get_flavour  ( char * id )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_get_image    ( char * id ) 
 {
-	return(0);
+	return( on_get_storage( id ) );
 }
 
 /*	----------------------------------------------------------------	*/
@@ -749,7 +748,7 @@ public	struct	on_response *	on_delete_server( char * id )
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_delete_image ( char * id ) 
 {
-	return(0);
+	return( on_delete_storage( id ));
 }
 
 /*	------------------------------------------------------------	*/
