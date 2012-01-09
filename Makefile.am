@@ -36,6 +36,9 @@ endif
 if ENABLE_COSS
 SUBDIRS += coss
 endif
+if ENABLE_EZVM
+SUBDIRS += ezvm
+endif
 if ENABLE_COES
 SUBDIRS += coes
 endif

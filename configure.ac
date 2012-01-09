@@ -149,6 +149,15 @@ AM_CONDITIONAL([ENABLE_COSS], [test "$enable_coss" = "yes"])
 AC_SUBST([CFLAGS_COSS], [-I\${abs_top_srcdir}/coss/src])
 AC_SUBST([PATH_COSS], [${abs_top_srcdir}/coss/src])
 
+AC_ARG_ENABLE([ezvm],
+      [AS_HELP_STRING([--disable-ezvm],
+		      [Disable ezvm @<:@default=enable@:>@])],
+      [],
+      [enable_ezvm=yes])
+AM_CONDITIONAL([ENABLE_EZVM], [test "$enable_ezvm" = "yes"])
+AC_SUBST([CFLAGS_EZVM], [-I\${abs_top_srcdir}/ezvm/src])
+AC_SUBST([PATH_EZVM], [${abs_top_srcdir}/ezvm/src])
+
 AC_ARG_ENABLE([coes],
       [AS_HELP_STRING([--disable-coes],
 		      [Disable coes @<:@default=enable@:>@])],
@@ -313,6 +322,7 @@ AC_CONFIG_FILES([cocarrier/Makefile cocarrier/src/Makefile])
 AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
 AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
+AC_CONFIG_FILES([ezvm/Makefile ezvm/src/Makefile])
 AC_CONFIG_FILES([coes/Makefile coes/src/Makefile])
 AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])
 AC_CONFIG_FILES([comons/Makefile comons/src/Makefile])
@@ -353,6 +363,7 @@ echo "    - cocarrier                : $enable_cocarrier"
 echo "    - pubocci                  : $enable_pubocci"
 echo "    - copabr                   : $enable_copabr"
 echo "    - coss                     : $enable_coss"
+echo "    - ezvm                     : $enable_ezvm"
 echo "    - coes                     : $enable_coes"
 echo "    - coobas                   : $enable_coobas"
 echo "    - comons                   : $enable_comons"

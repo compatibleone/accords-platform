@@ -86,6 +86,20 @@
 		</image>
 	</node>
 
+	<node name="ezvm" type="simple" access="public" scope="normal" provider="any" >
+		<infrastructure name="large">
+			<compute name="large" architecture="x86" cores="4" memory="4G" speed="4G"/>
+			<storage name="large" size="500G"/>
+			<network name="large" label="ethernet" vlan="100M"/1>
+		</infrastructure>
+		<image name="ezvm">
+			<system name="debian squeeze"/>
+			<package name="accords_libraries"/>
+			<package name="ezvm"/>
+			<package name="users"/>
+		</image>
+	</node>
+
 	<node name="parser" type="simple" access="public" scope="normal" provider="any" >
 		<infrastructure name="small">
 			<compute name="small" architecture="x86" cores="1" memory="1G" speed="1G"/>
@@ -224,6 +238,9 @@
 		<action name="procci"
 			type="cordscript" 
 			expression="procci.configure(publisher.hostname);"/>
+		<action name="ezvm"
+			type="cordscript" 
+			expression="ezvm.configure(publisher.hostname);"/>
 		<action name="osprocci"
 			type="cordscript" 
 			expression="osprocci.configure(publisher.hostname);"/>

@@ -17,11 +17,11 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_procci_c
-#define	_procci_c
+#ifndef	_ezvm_c
+#define	_ezvm_c
 
 #include "standard.h"
-#include "procci.h"
+#include "ezvm.h"
 #include "rest.h"
 #include "occi.h"
 #include "document.h"
@@ -29,7 +29,7 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
-struct	accords_configuration Procci = {
+struct	accords_configuration Ezvm = {
 	0,0, 
 	0,0,0,
 	(char *) 0,
@@ -41,16 +41,16 @@ struct	accords_configuration Procci = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"procci.xml",
+	"ezvm.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(Procci.debug);		}
-public	int	check_verbose()		{	return(Procci.verbose);		}
-public	char *	default_publisher()	{	return(Procci.publisher);	}
-public	char *	default_operator()	{	return(Procci.operator);	}
-public	char *	default_tls()		{	return(Procci.tls);		}
+public	int	check_debug()		{	return(Ezvm.debug);		}
+public	int	check_verbose()		{	return(Ezvm.verbose);		}
+public	char *	default_publisher()	{	return(Ezvm.publisher);	}
+public	char *	default_operator()	{	return(Ezvm.operator);	}
+public	char *	default_tls()		{	return(Ezvm.tls);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -67,22 +67,22 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*			p r o c c i _ l o a d 		*/
+/*			e z v m _ l o a d 		*/
 /*	---------------------------------------------	*/
-/*	this function loads procci    configuration	*/
+/*	this function loads ezvm    configuration	*/
 /*	from the xml configuration file.		*/
 /*	---------------------------------------------	*/  
-private	void	procci_load()
+private	void	ezvm_load()
 {
-	load_accords_configuration( &Procci, "procci" );
+	load_accords_configuration( &Ezvm, "ezvm" );
 	return;
 }
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Procci : Version 1.0a.0.03");
-	printf("\n   Beta Version : 03/12/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Ezvm : Version 1.0a.0.01");
+	printf("\n   Beta Version : 07/01/2012");
+	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -91,9 +91,9 @@ private	int	banner()
 }
 
 /*	------------------------------------------------------------------	*/
-/*			p r o c c i _ i n i t i a l i s e			*/
+/*			e z v m _ i n i t i a l i s e			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_server * procci_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * ezvm_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -106,13 +106,13 @@ private	struct rest_server * procci_initialise(  void * v,struct rest_server * s
 }
 
 /*	------------------------------------------------------------------	*/
-/*			p r o c c i _ a u t h o r i s e 			*/
+/*			e z v m _ a u t h o r i s e 			*/
 /*	------------------------------------------------------------------	*/
-private	int	procci_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	ezvm_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, Procci.user ) )
+	if ( strcmp( username, Ezvm.user ) )
 		return(0);
-	else if ( strcmp( password, Procci.password ) )
+	else if ( strcmp( password, Ezvm.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -122,9 +122,9 @@ private	int	procci_authorise(  void * v,struct rest_client * cptr, char * userna
 }
 
 /*	------------------------------------------------------------------	*/
-/*			p r o c c i _ e x t e n s i o n 			*/
+/*			e z v m _ e x t e n s i o n 			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_extension * procci_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * ezvm_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
@@ -132,101 +132,71 @@ private	struct rest_extension * procci_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /*	inclusion of the actions and methods required for contract handling	*/
 /*	------------------------------------------------------------------	*/
-#include "proccicontract.c"
 
 /*	------------------------------------------------------------------	*/
-/*			p r o c c i _ o p e r a t i o n				*/
+/*			e z v m _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
-private	int	procci_operation( char * nptr )
+private	int	ezvm_operation( char * nptr )
 {
 
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_procci.xml");
+	set_autosave_cords_xlink_name("links_ezvm.xml");
 
-	if (!( optr = occi_cords_node_builder( Procci.domain,"node" ) ))
+	if (!( optr = occi_cords_vm_builder( Ezvm.domain,"vm" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = procci_contract_builder( Procci.domain,"contract" ) ))
+	if (!( optr = occi_cords_image_builder( Ezvm.domain,"image" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_parameter_builder( Procci.domain,"parameter" ) ))
+	if (!( optr = occi_cords_system_builder( Ezvm.domain,"system" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	if (!( optr = occi_cords_package_builder( Ezvm.domain,"package" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_value_builder( Procci.domain,"value" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
+	rest_initialise_log( Ezvm.monitor );
 
-	if (!( optr = occi_cords_infrastructure_builder( Procci.domain,"infrastructure" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	if (!( optr = occi_cords_compute_builder( Procci.domain,"compute" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	if (!( optr = occi_cords_storage_builder( Procci.domain,"storage" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	if (!( optr = occi_cords_network_builder( Procci.domain,"network" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	rest_initialise_log( Procci.monitor );
-
-	if (!( Procci.identity ))
-		return( occi_server(  nptr, Procci.restport, Procci.tls, Procci.threads, first, (char *) 0 ) );
+	if (!( Ezvm.identity ))
+		return( occi_server(  nptr, Ezvm.restport, Ezvm.tls, Ezvm.threads, first, (char *) 0 ) );
 	else
 	{
-		initialise_occi_publisher( Procci.publisher, (char*) 0, (char *) 0, (char *) 0);
+		initialise_occi_publisher( Ezvm.publisher, (char*) 0, (char *) 0, (char *) 0);
 		return( publishing_occi_server(
-			Procci.user, Procci.password,
-			Procci.identity,  nptr, 
-			Procci.restport, Procci.tls, 
-			Procci.threads, first ) );
+			Ezvm.user, Ezvm.password,
+			Ezvm.identity,  nptr, 
+			Ezvm.restport, Ezvm.tls, 
+			Ezvm.threads, first ) );
 	}
 }
 
 
 /*	------------------------------------------------------------------	*/
-/*				p r o c c i 					*/
+/*				e z v m 					*/
 /*	------------------------------------------------------------------	*/
-private	int	procci(int argc, char * argv[] )
+private	int	ezvm(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	procci_load();
+	ezvm_load();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -237,10 +207,10 @@ private	int	procci(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				Procci.verbose=1;
+				Ezvm.verbose=1;
 				continue;
 			case	'd'	:
-				Procci.debug = 0xFFFF;
+				Ezvm.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -250,7 +220,7 @@ private	int	procci(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = procci_operation(aptr) ))
+		else if (!( status = ezvm_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -264,11 +234,11 @@ public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
 		return( banner() );
-	else	return( procci( argc, argv ) );
+	else	return( ezvm( argc, argv ) );
 }
 
 
 	/* --------- */
-#endif	/* _procci_c */
+#endif	/* _ezvm_c */
 	/* --------- */
 

@@ -3,6 +3,7 @@
 <description>This manifest describes the CompatibleOne ACCORDS provisioning platform and the collection of service components of which it is composed.</description>
 <node name="publisher" access="public" scope="common"/>
 <node name="coss" access="public" scope="common"/>
+<node name="ezvm" access="public" scope="common"/>
 <node name="comons" access="public" scope="common"/>
 <node name="conets" access="public" scope="normal"/> 
 <node name="coes" access="public" scope="normal"/>
@@ -20,7 +21,7 @@
 <action name="parser" type="cordscript" 
  expression="parser.configure(publisher.hostname);parser.configure(coss.hostname);parser.configure(comons.hostname);"/>
 <action name="broker" type="cordscript" 
- expression="broker.configure(publisher.hostname);broker.configure(coss.hostname);c broker.configure(omons.hostname);"/>
+ expression="broker.configure(publisher.hostname);broker.configure(coss.hostname);broker.configure(omons.hostname);"/>
 <action name="procci" type="cordscript" 
  expression="procci.configure(publisher.hostname);procci.configure(coss.hostname);procci.configure(comons.hostname);"/>
 </configuration>

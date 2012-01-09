@@ -56,6 +56,7 @@
 #include "occitarif.c"
 #include "occitransaction.c"
 #include "occiuser.c"
+#include "occivm.c"
 #include "occixlink.c"
 
 #include "occireport.c"

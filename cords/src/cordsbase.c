@@ -53,6 +53,7 @@
 #include "account.c"
 #include "transaction.c"
 #include "invoice.c"
+#include "vm.c"
 #include "manifest.c"
 #include "plan.c"
 #include "xlink.c"

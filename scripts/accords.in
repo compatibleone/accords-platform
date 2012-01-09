@@ -55,7 +55,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
 
 _co_start() {
     echo "Starting ACCORDS"
@@ -88,6 +88,10 @@ _co_start() {
     run-coes &
     sleep 1
     
+    echo "Starting accords image services"
+    run-ezvm &
+    sleep 1
+
     echo "Starting accords parser services"
     run-parser &
     sleep 1
@@ -162,6 +166,7 @@ _co_status() {
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
+    netstat -a -p | grep LISTEN | grep ezvm
 }
 
 _co_stop() {
@@ -171,6 +176,7 @@ _co_stop() {
     _stop_service procci
     _stop_service broker
     _stop_service parser
+    _stop_service ezvm
     _stop_service coes
     _stop_service conets
     _stop_service coobas
@@ -206,6 +212,10 @@ _run_coobas() {
 
 _run_coss() {
     coss --config $target CO-SS/1.0
+}
+
+_run_ezvm() {
+    ezvm --config $target CO-SS/1.0
 }
 
 _run_fileserver() {
@@ -267,6 +277,7 @@ _accords_config() {
 	_mksecs coobas 1
 	_mksecs conets 1
 	_mksecs broker 1
+	_mksecs ezvm 1
 	_mksecs parser 1
 	_mksecs procci 1
 	_mksecs osprocci 1
@@ -293,6 +304,7 @@ _accords_config() {
 	_mkcert conets
 	_mkcert broker
 	_mkcert parser
+	_mkcert ezvm
 	_mkcert publisher
 	_mkcert fileserver
 	_mkcert procci
@@ -324,6 +336,7 @@ _accords_config() {
     _mkcfg onprocci
     _mkcfg azprocci
     _mkcfg fileserver
+    _mkcfg ezvm
 
     echo "</accords>" >> $target
 }
@@ -492,6 +505,9 @@ case `basename $0` in
 	;;
     run-coss)
 	_run_coss $*
+	;;
+    run-ezvm)
+	_run_ezvm $*
 	;;
     run-fileserver)
 	_run_fileserver $*
