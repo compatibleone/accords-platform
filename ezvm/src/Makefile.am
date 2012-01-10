@@ -8,7 +8,6 @@
 #
 
 bin_PROGRAMS = ezvm
-EXTRA_DIST = ezvmcontract.c
 
 ezvm_SOURCES = ezvm.c ezvm.h
 

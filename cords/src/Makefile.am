@@ -8,7 +8,7 @@
 #
 lib_LTLIBRARIES = libcords.la
 EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
-	node.c package.c publication.h tarif.c \
+	node.c package.c publication.h placement.c placement.h tarif.c \
 	account.h carrier.c cords.h instruction.h \
 	node.h package.h report.c tarif.h \
 	action.c carrier.h cordspublic.h invoice.c \
@@ -27,7 +27,8 @@ EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
 	contract.h image.h monitor.h optimise.h provider.c storage.h xlink.c \
 	authorise.h infrastructure.c network.c osconfig.c provider.h system.c \
 	xlink.h azconfig.c infrastructure.h network.h osconfig.h publication.c \
-	system.h iprange.c iprange.h instance.c instance.h operator.h operator.c
+	system.h iprange.c iprange.h instance.c instance.h operator.h operator.c \
+	vm.c vm.h
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c
 libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI)

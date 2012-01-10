@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = onprocci
-EXTRA_DIST = proccion.c
+EXTRA_DIST = proccion.c oncontract.c
 
 onprocci_SOURCES = onprocci.c
 
