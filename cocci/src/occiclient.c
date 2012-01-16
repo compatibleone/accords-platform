@@ -23,6 +23,7 @@
 #include "occiclient.h"
 #include "occic.c"
 #include "occim.c"
+#include "occiauth.h"
 
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
@@ -37,6 +38,8 @@ private	struct	occi_manager OcciManager =
 		0,
 		1	/* optimised */
 	};
+
+#include "occiauth.c"
 
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a d d _ d e f a u l t _ h e a d e r	*/
