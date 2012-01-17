@@ -22,7 +22,6 @@
 
 #include "authcache.h"
 #include "authitem.h"
-#include "authitem.c"
 
 public	void	occi_authorization_set_ttl( int value );
 public	void	occi_release_authorization_cache();

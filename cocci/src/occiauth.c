@@ -21,6 +21,7 @@
 #define	_occiauth_c
 
 #include "occiauth.h"
+#include "authitem.c"
 
 /*	----------------------------------------------------	*/
 /*	This file provides an OCCI authorization token cache	*/

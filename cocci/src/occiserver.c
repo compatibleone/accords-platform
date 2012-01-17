@@ -36,10 +36,12 @@
 #include "xlink.h"
 #include "url.h"
 #include "urlpublic.h"
+#include "occiauth.h"
 
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
+private	char *	occi_authorization=(char *) 0;
 
 /*	---------------------------------------------------------	*/
 /*			o c c i _ f a i l u r e				*/
@@ -92,7 +94,6 @@ public	char *	occi_allocate_uuid()
 /*	this function handles the initialisation call from the		*/
 /*	rest server prior to going online and processing messages	*/
 /*	---------------------------------------------------------	*/
-private	char *	occi_athorization=(char *) 0;
 private	struct rest_server * occi_initialise( void * vptr, struct rest_server * sptr )
 {
 	struct	occi_category * optr;
@@ -102,9 +103,9 @@ private	struct rest_server * occi_initialise( void * vptr, struct rest_server * 
 	if ( check_debug() )
 		printf("   OCCI Server Initialisation \n");
 
-	if ( occi_athorization )
+	if ( occi_authorization )
 	{
-		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, occi_athorization ) ))
+		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, occi_authorization ) ))
 			return( sptr );
 		else	sptr->headers = hptr;
 	}
@@ -361,7 +362,6 @@ private	struct rest_response * occi_get_capacities(
 	char 	* ctptr;
 	char	  clbuff[64];
 	struct	rest_header * hptr;
-	
 
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -584,6 +584,19 @@ private	struct	rest_response *	occi_invoke_transaction(
 	else 	return( (*iptr->transaction) ( optr, cptr, rptr, aptr ) );
 }
 
+/*	----------------------------------------------------------------	*/
+/*	o c c i _ c h e c k _ r e q u e s t _ a u t h o r i z a t i o n		*/
+/*	----------------------------------------------------------------	*/
+private	int	occi_check_request_authorization( struct rest_request * rptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )))
+		return( 1 );
+	else if (!( hptr->value ))
+		return( 1 );
+	else 	return( occi_validate_authorization( hptr->value ) );
+}
+
 /*	---------------------------------------------------------	*/
 /*				o c c i _ g e t				*/
 /*	---------------------------------------------------------	*/
@@ -599,7 +612,9 @@ private	struct rest_response * occi_get(
 	struct	rest_interface * iptr;
 
 	occi_show_request( rptr );
-	if (!( optr = vptr ))
+	if (!( occi_check_request_authorization( rptr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_get_capacities( optr, cptr, rptr ) );
@@ -639,7 +654,9 @@ private	struct rest_response * occi_post(
 
 	occi_show_request( rptr );
 
-	if (!( optr = vptr ))
+	if (!( occi_check_request_authorization( rptr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Creation" ) );
@@ -691,7 +708,9 @@ private	struct rest_response * occi_put(
 
 	occi_show_request( rptr );
 
-	if (!( optr = vptr ))
+	if (!( occi_check_request_authorization( rptr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if ((hptr = rest_resolve_header( rptr->first, "Link" )))
 		return( occi_failure(cptr,  400, "Bad Request : MUST not PUT Link" ) );
@@ -727,7 +746,9 @@ private	struct rest_response * occi_delete(
 
 	occi_show_request( rptr );
 
-	if (!( optr = vptr ))
+	if (!( occi_check_request_authorization( rptr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 
 	else if (!( strcmp( rptr->object, "/-/" ) ))
@@ -763,7 +784,9 @@ private	struct rest_response * occi_head(
 
 	occi_show_request( rptr );
 
-	if (!( optr = vptr ))
+	if (!( occi_check_request_authorization( rptr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
@@ -834,7 +857,7 @@ public	int	occi_process_atributs(
 /*	processing functions needed for each HTTP method.		*/
 /*	---------------------------------------------------------	*/
 public	int	occi_server( char * nptr, int port, char * tls, int max, 
-		struct occi_category * category, char * athorization )
+		struct occi_category * category, char * authorization )
 {
 	int	status=0;
 	struct	rest_interface  Osi = 
@@ -858,7 +881,7 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		if (!( strlen(tls) ))
 			tls = (char *) 0;
 
-	occi_athorization = athorization;
+	occi_authorization = authorization;
 	Osi.authorise = (void *) 0;
 	Osi.instance  = category;
 

@@ -41,6 +41,19 @@ private	struct	occi_manager OcciManager =
 
 #include "occiauth.c"
 
+/*	-----------------------------------------------------------------	*/
+/*	o c c i _ c h e c k _ r e s p o n s e _ a u t h o r i z a t i o n	*/
+/*	-----------------------------------------------------------------	*/
+private	int	occi_check_response_authorization( struct rest_response * rptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )))
+		return( 1 );
+	else if (!( hptr->value ))
+		return( 1 );
+	else 	return( occi_validate_authorization( hptr->value ) );
+}
+
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a d d _ d e f a u l t _ h e a d e r	*/
 /*	------------------------------------------------------------	*/
@@ -387,7 +400,8 @@ public	struct	occi_response *	occi_create_response(
 
 	if ((!( zptr )) || (!( rptr )))
 		return((struct occi_response *) 0);
-
+	else if (!( occi_check_response_authorization( zptr ) ))
+		return((struct occi_response *) 0);
 	else if (!( aptr = allocate_occi_response() ))
 		return( aptr );
 	else if (!( aptr->name = allocate_string( rptr->name ) ))
