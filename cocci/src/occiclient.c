@@ -51,7 +51,7 @@ private	int	occi_check_response_authorization( struct rest_response * rptr )
 		return( 1 );
 	else if (!( hptr->value ))
 		return( 1 );
-	else 	return( occi_validate_authorization( hptr->value ) );
+	else 	return( occi_resolve_authorization( hptr->value ) );
 }
 
 /*	------------------------------------------------------------	*/
