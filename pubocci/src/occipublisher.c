@@ -356,7 +356,7 @@ public	int	publish_occi_category(
 	/* ------------------------------------------------------------------------ */
 	if (!( category->price ))
 	{
-		if ( category->access & _OCCI_PRICING )
+		if ( category->access & _OCCI_NO_PRICING )
 		{
 			if (!( category->price = allocate_string("") ))
 				return(27);

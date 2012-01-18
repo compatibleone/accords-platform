@@ -89,7 +89,10 @@ public	int	occi_resolve_authorization( char * xauth )
 		else if ( strcmp( aptr->token, xauth ) )
 			continue;
 		else if ( aptr->ttl > time((long *) 0) )
+		{
+			aptr->ttl = ( time((long *) 0) + Heap.ttl);
 			return( 1 );
+		}
 		else
 		{
 			aptr = drop_occi_authorization_item( aptr );
@@ -134,7 +137,7 @@ public	int	occi_resolve_authorization( char * xauth )
 		else 
 		{
 			printf("succes\n");
-			aptr->ttl = Heap.ttl;
+			aptr->ttl = ( time((long *) 0) + Heap.ttl);
 			return(1);
 		}
 	}

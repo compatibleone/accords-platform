@@ -575,7 +575,7 @@ private	struct	rest_response *	occi_invoke_transaction(
 	/* --------------------------------------- */
 	/* check if price handling is not required */
 	/* --------------------------------------- */
-	if ( optr->access & _OCCI_PRICING )
+	if ( optr->access & _OCCI_NO_PRICING )
 		return( aptr );
 	else if (!( iptr = optr->interface ))
 		return( aptr );
@@ -587,13 +587,26 @@ private	struct	rest_response *	occi_invoke_transaction(
 /*	----------------------------------------------------------------	*/
 /*	o c c i _ c h e c k _ r e q u e s t _ a u t h o r i z a t i o n		*/
 /*	----------------------------------------------------------------	*/
-private	int	occi_check_request_authorization( struct rest_request * rptr )
+/*	Here we check the request authorization header value in respect		*/
+/*	with the current authorization status of the server connection.		*/
+/*	If the server provides, and consequently requires authorization		*/
+/*	then this function will fail if authorization is not provided.		*/
+/*	otherwise the function will only fail if the provided token is		*/
+/*	not a valid authorization credential. Authorization is always		*/
+/*	required when security has been activated, otherwise it is not		*/
+/*	expected to be provided. The provision of authorization when it		*/
+/*	is not needed is not aproblem, but, provision of an illicite		*/
+/*	authorization credential is indicative of something doubtful.		*/
+/*	----------------------------------------------------------------	*/
+private	int	occi_check_request_authorization( 
+		struct rest_request * rptr,
+		struct occi_category * optr )
 {
 	struct	rest_header * hptr;
 	if (!( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )))
-		return( 1 );
+		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
 	else if (!( hptr->value ))
-		return( 1 );
+		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
 	else 	return( occi_resolve_authorization( hptr->value ) );
 }
 
@@ -612,10 +625,10 @@ private	struct rest_response * occi_get(
 	struct	rest_interface * iptr;
 
 	occi_show_request( rptr );
-	if (!( occi_check_request_authorization( rptr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
-	else if (!( optr = vptr ))
+	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_get_capacities( optr, cptr, rptr ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -654,10 +667,10 @@ private	struct rest_response * occi_post(
 
 	occi_show_request( rptr );
 
-	if (!( occi_check_request_authorization( rptr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
-	else if (!( optr = vptr ))
+	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Creation" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -708,10 +721,10 @@ private	struct rest_response * occi_put(
 
 	occi_show_request( rptr );
 
-	if (!( occi_check_request_authorization( rptr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
-	else if (!( optr = vptr ))
+	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if ((hptr = rest_resolve_header( rptr->first, "Link" )))
 		return( occi_failure(cptr,  400, "Bad Request : MUST not PUT Link" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
@@ -746,11 +759,10 @@ private	struct rest_response * occi_delete(
 
 	occi_show_request( rptr );
 
-	if (!( occi_check_request_authorization( rptr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
-	else if (!( optr = vptr ))
+	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
-
+	else if (!( occi_check_request_authorization( rptr, optr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Removal" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -784,10 +796,10 @@ private	struct rest_response * occi_head(
 
 	occi_show_request( rptr );
 
-	if (!( occi_check_request_authorization( rptr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
-	else if (!( optr = vptr ))
+	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))	
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_head( optr, cptr, rptr ) );
