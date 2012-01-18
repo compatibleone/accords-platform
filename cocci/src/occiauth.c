@@ -21,6 +21,8 @@
 #define	_occiauth_c
 
 #include "occiauth.h"
+#include "cordslang.h"
+#include "occiresolver.h"
 #include "authitem.c"
 
 /*	----------------------------------------------------	*/
@@ -66,8 +68,14 @@ public	int	occi_resolve_authorization( char * xauth )
 	struct	occi_authorization_item * aptr;
 	struct	rest_response * rptr;
 	struct	occi_response * zptr;
+	char 	buffer[1024];
+	char *	host;
+
 	if (!( xauth ))
-		return( 1 );
+		return(1);
+	else	return(1);
+
+	printf("occi_resolve_authorization( %s )\n",xauth);
 
 	/* --------------------------------------------------- */
 	/* scan the list of TTL controlled authorization items */
@@ -93,14 +101,19 @@ public	int	occi_resolve_authorization( char * xauth )
 	/* arrival here requires the authorization to be resolved */
 	/* ------------------------------------------------------ */
 	if (!( zptr = occi_simple_get( xauth, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		printf("occi get failure\n");
 		return( 0 );
+	}
 	else if (!( rptr = zptr->response ))
 	{
+		printf("no http response\n");
 		zptr = occi_remove_response( zptr );
 		return(0);
 	}
 	else if ( rptr->status >= 400 )
 	{
+		printf("incorrect status : %s\n",rptr->status);
 		zptr = occi_remove_response( zptr );
 		return(0);
 	}
@@ -108,14 +121,19 @@ public	int	occi_resolve_authorization( char * xauth )
 	{
 		zptr = occi_remove_response( zptr );
 		if (!( aptr = add_occi_authorization_item( &Heap ) ))
+		{
+			printf("failure to allocate authiorization cache item\n");
 			return(0);
+		}
 		else if (!( aptr->token = allocate_string( xauth ) ))
 		{
+			printf("allocation failure\n");
 			aptr = drop_occi_authorization_item( aptr );
 			return( 0 );
 		}
 		else 
 		{
+			printf("succes\n");
 			aptr->ttl = Heap.ttl;
 			return(1);
 		}
