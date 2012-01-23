@@ -49,7 +49,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -89,8 +89,12 @@ _co-start() {
     run-coes &
     sleep 1
     
-    echo "Starting accords image services"
+    echo "Starting accords image storage services"
     run-ezvm &
+    sleep 1
+
+    echo "Starting accords image production services"
+    run-coips &
     sleep 1
 
     echo "Starting accords parser services"
@@ -152,6 +156,7 @@ _co-status() {
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
     netstat -a -p | grep LISTEN | grep ezvm
+    netstat -a -p | grep LISTEN | grep coips
 }
 
 co-stop() {
@@ -166,6 +171,8 @@ co-stop() {
     killall broker
     sleep 1
     killall parser
+    sleep 1
+    killall coips
     sleep 1
     killall ezvm
     sleep 1
@@ -213,7 +220,11 @@ _run-coss() {
 }
 
 _run-ezvm() {
-    ezvm --config $target CO-SS/1.0
+    ezvm --config $target CO-EZVM/1.0
+}
+
+_run-coips() {
+    coips --config $target CO-IPS/1.0
 }
 
 _run-fileserver() {

@@ -8,6 +8,12 @@
 <cords_user 
  id='3d960eb3-coes-4bdd-a6a7-20e9fe0b85f7' name='service-coes' password='co-system' />
 <cords_user 
+ id='3d960eb3-ezvm-4bdd-a6a7-20e9fe0b85f7' name='service-ezvm' password='co-system' />
+<cords_user 
+ id='3d960eb3-cosa-4bdd-a6a7-20e9fe0b85f7' name='service-cosacs' password='co-system' />
+<cords_user 
+ id='3d960eb3-coip-4bdd-a6a7-20e9fe0b85f7' name='service-coips' password='co-system' />
+<cords_user 
  id='fa77ed3c-coob-407c-9cd2-40cee4749af2' name='service-coobas' password='co-system' />
 <cords_user 
  id='eba7ff7b-cofs-4bd6-bb06-c7e0a942e3bf' name='service-fileserver' password='co-system' />
