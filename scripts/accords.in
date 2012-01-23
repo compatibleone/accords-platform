@@ -55,7 +55,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
 
 _co_start() {
     echo "Starting ACCORDS"
@@ -88,8 +88,12 @@ _co_start() {
     run-coes &
     sleep 1
     
-    echo "Starting accords image services"
+    echo "Starting accords image storage services"
     run-ezvm &
+    sleep 1
+
+    echo "Starting accords image production services"
+    run-coips &
     sleep 1
 
     echo "Starting accords parser services"
@@ -167,6 +171,7 @@ _co_status() {
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
     netstat -a -p | grep LISTEN | grep ezvm
+    netstat -a -p | grep LISTEN | grep coips
 }
 
 _co_stop() {
@@ -177,6 +182,7 @@ _co_stop() {
     _stop_service broker
     _stop_service parser
     _stop_service ezvm
+    _stop_service coips
     _stop_service coes
     _stop_service conets
     _stop_service coobas
@@ -215,7 +221,11 @@ _run_coss() {
 }
 
 _run_ezvm() {
-    ezvm --config $target CO-SS/1.0
+    ezvm --config $target CO-EZVM/1.0
+}
+
+_run_coips() {
+    coips --config $target CO-IPS/1.0
 }
 
 _run_fileserver() {
@@ -278,6 +288,7 @@ _accords_config() {
 	_mksecs conets 1
 	_mksecs broker 1
 	_mksecs ezvm 1
+	_mksecs coips 1
 	_mksecs parser 1
 	_mksecs procci 1
 	_mksecs osprocci 1
@@ -305,6 +316,7 @@ _accords_config() {
 	_mkcert broker
 	_mkcert parser
 	_mkcert ezvm
+	_mkcert coips
 	_mkcert publisher
 	_mkcert fileserver
 	_mkcert procci
@@ -337,6 +349,7 @@ _accords_config() {
     _mkcfg azprocci
     _mkcfg fileserver
     _mkcfg ezvm
+    _mkcfg coips
 
     echo "</accords>" >> $target
 }
@@ -508,6 +521,9 @@ case `basename $0` in
 	;;
     run-ezvm)
 	_run_ezvm $*
+	;;
+    run-coips)
+	_run_coips $*
 	;;
     run-fileserver)
 	_run_fileserver $*
