@@ -158,6 +158,15 @@ AM_CONDITIONAL([ENABLE_EZVM], [test "$enable_ezvm" = "yes"])
 AC_SUBST([CFLAGS_EZVM], [-I\${abs_top_srcdir}/ezvm/src])
 AC_SUBST([PATH_EZVM], [${abs_top_srcdir}/ezvm/src])
 
+AC_ARG_ENABLE([cosacs],
+      [AS_HELP_STRING([--disable-cosacs],
+		      [Disable cosacs @<:@default=enable@:>@])],
+      [],
+      [enable_cosacs=yes])
+AM_CONDITIONAL([ENABLE_COSACS], [test "$enable_cosacs" = "yes"])
+AC_SUBST([CFLAGS_COSACS], [-I\${abs_top_srcdir}/cosacs/src])
+AC_SUBST([PATH_COSACS], [${abs_top_srcdir}/cosacs/src])
+
 AC_ARG_ENABLE([coes],
       [AS_HELP_STRING([--disable-coes],
 		      [Disable coes @<:@default=enable@:>@])],
@@ -331,6 +340,7 @@ AC_CONFIG_FILES([publisher/Makefile publisher/src/Makefile])
 AC_CONFIG_FILES([parser/Makefile parser/src/Makefile])
 AC_CONFIG_FILES([broker/Makefile broker/src/Makefile])
 AC_CONFIG_FILES([procci/Makefile procci/src/Makefile])
+AC_CONFIG_FILES([cosacs/Makefile cosacs/src/Makefile])
 AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
@@ -372,6 +382,7 @@ echo "    - publisher                : $enable_publisher"
 echo "    - parser                   : $enable_parser"
 echo "    - broker                   : $enable_broker"
 echo "    - procci                   : $enable_procci"
+echo "    - cosacs                   : $enable_cosacs"
 echo "    - osprocci                 : $enable_osprocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"

@@ -45,6 +45,9 @@
 #include "authorise.h"
 #include "manifest.h"
 #include "price.h"
+#include "metadata.h"
+#include "file.h"
+#include "script.h"
 
 #include "monitor.h"
 #include "event.h"

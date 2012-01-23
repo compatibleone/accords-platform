@@ -29,6 +29,10 @@
 #include "authorise.c"
 #include "package.c"
 
+#include "script.c"
+#include "file.c"
+#include "metadata.c"
+
 #include "provider.c"
 #include "profile.c"
 #include "instance.c"
