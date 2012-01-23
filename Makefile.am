@@ -42,6 +42,9 @@ endif
 if ENABLE_COSACS
 SUBDIRS += cosacs
 endif
+if ENABLE_COIPS
+SUBDIRS += coips
+endif
 if ENABLE_COES
 SUBDIRS += coes
 endif

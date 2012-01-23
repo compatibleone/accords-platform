@@ -32,6 +32,7 @@
 #include "occiauthorise.c"
 #include "occicompute.c"
 #include "occiprovider.c"
+#include "occiapplication.c"
 #include "occiconfiguration.c"
 #include "occiinstruction.c"
 #include "occivalue.c"

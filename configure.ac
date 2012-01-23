@@ -167,6 +167,15 @@ AM_CONDITIONAL([ENABLE_COSACS], [test "$enable_cosacs" = "yes"])
 AC_SUBST([CFLAGS_COSACS], [-I\${abs_top_srcdir}/cosacs/src])
 AC_SUBST([PATH_COSACS], [${abs_top_srcdir}/cosacs/src])
 
+AC_ARG_ENABLE([coips],
+      [AS_HELP_STRING([--disable-coips],
+		      [Disable coips @<:@default=enable@:>@])],
+      [],
+      [enable_coips=yes])
+AM_CONDITIONAL([ENABLE_COIPS], [test "$enable_coips" = "yes"])
+AC_SUBST([CFLAGS_COIPS], [-I\${abs_top_srcdir}/coips/src])
+AC_SUBST([PATH_COIPS], [${abs_top_srcdir}/coips/src])
+
 AC_ARG_ENABLE([coes],
       [AS_HELP_STRING([--disable-coes],
 		      [Disable coes @<:@default=enable@:>@])],
@@ -341,6 +350,7 @@ AC_CONFIG_FILES([parser/Makefile parser/src/Makefile])
 AC_CONFIG_FILES([broker/Makefile broker/src/Makefile])
 AC_CONFIG_FILES([procci/Makefile procci/src/Makefile])
 AC_CONFIG_FILES([cosacs/Makefile cosacs/src/Makefile])
+AC_CONFIG_FILES([coips/Makefile coips/src/Makefile])
 AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
@@ -383,6 +393,7 @@ echo "    - parser                   : $enable_parser"
 echo "    - broker                   : $enable_broker"
 echo "    - procci                   : $enable_procci"
 echo "    - cosacs                   : $enable_cosacs"
+echo "    - coips                    : $enable_coips"
 echo "    - osprocci                 : $enable_osprocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"

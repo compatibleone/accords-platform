@@ -64,6 +64,7 @@
 #include "plan.h"
 
 #include "publication.h"
+#include "application.h"
 #include "enquiry.h"
 #include "agency.h"
 #include "operator.h"
