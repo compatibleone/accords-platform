@@ -23,6 +23,8 @@
 #include "osclient.h"
 #include "cordslang.h"
 #include "occiresolver.h"
+#include "cosacsctrl.h"
+#include "cosacsctrl.c"
 
 /*	------------------------------------------	*/
 /*		o s _ v a l i d _ p r i c e		*/
@@ -212,6 +214,7 @@ private	char *	openstack_instructions( char * contract, char * result )
 
 	return(result);
 }
+
 
 
 /*	--------------------------------------------------------	*/
@@ -601,7 +604,6 @@ private	struct	rest_response * start_openstack(
 	if (!( personality = openstack_instructions( reference, personality ) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
-
 	if (!( filename = os_create_server_request( 
 		pptr->name, pptr->image, pptr->flavor, personality, resource ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
@@ -616,6 +618,11 @@ private	struct	rest_response * start_openstack(
 		/* --------------------------------- */
 		if (!( status = connect_openstack_server( osptr, pptr ) ))
 		{
+			/* ---------------------------- */
+			/* launch the COSACS operations */
+			/* ---------------------------- */
+			cosacs_metadata_instructions( pptr->hostname, reference );
+
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */

@@ -1,3 +1,23 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _file_c_
 #define _file_c_
@@ -122,6 +142,10 @@ private void autoload_cords_file_nodes() {
 				pptr->length = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
+				pptr->type = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "permissions" )) != (struct xml_atribut *) 0)
+				pptr->permissions = document_atribut_string(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -158,6 +182,12 @@ public  void autosave_cords_file_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," type=%c",0x0022);
+		fprintf(h,"%s",(pptr->type?pptr->type:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," permissions=%c",0x0022);
+		fprintf(h,"%s",(pptr->permissions?pptr->permissions:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
 	fprintf(h,"</cords_files>\n");
@@ -185,6 +215,10 @@ private void set_cords_file_field(
 			pptr->length = atoi(vptr);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "type" ) ))
+			pptr->type = allocate_string(vptr);
+		if (!( strcmp( nptr, "permissions" ) ))
+			pptr->permissions = allocate_string(vptr);
 		}
 	return;
 }
@@ -225,6 +259,20 @@ private int pass_cords_file_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
+	if (( fptr->type )
+	&&  (strlen( fptr->type ) != 0)) {
+		if (!( pptr->type ))
+			return(0);
+		else if ( strcmp(pptr->type,fptr->type) != 0)
+			return(0);
+		}
+	if (( fptr->permissions )
+	&&  (strlen( fptr->permissions ) != 0)) {
+		if (!( pptr->permissions ))
+			return(0);
+		else if ( strcmp(pptr->permissions,fptr->permissions) != 0)
+			return(0);
+		}
 	return(1);
 }
 
@@ -247,6 +295,12 @@ private struct rest_response * cords_file_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.permissions=%s",optr->domain,optr->id,pptr->permissions);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -659,6 +713,10 @@ public struct occi_category * occi_cords_file_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "permissions",0,0) ))
+			return(optr);
 		autoload_cords_file_nodes();
 		return(optr);
 	}
@@ -717,6 +775,28 @@ public struct rest_header *  cords_file_occi_headers(struct cords_file * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_file.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_file.type='%s'\r\n",(sptr->type?sptr->type:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_file.permissions='%s'\r\n",(sptr->permissions?sptr->permissions:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);

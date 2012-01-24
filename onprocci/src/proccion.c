@@ -23,6 +23,8 @@
 #include "onclient.h"
 #include "cordslang.h"
 #include "occiresolver.h"
+#include "cosacsctrl.h"
+#include "cosacsctrl.c"
 
 /*	------------------------------------------	*/
 /*		o n _ v a l i d _ p r i c e		*/
@@ -324,19 +326,6 @@ private	struct	rest_response * start_opennebula(
 
 	sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 
-#ifdef	_ON_PERSONALITY
-
-	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
-		OnProcci.identity,_CORDS_OPENNEBULA,pptr->id,OnProcci.publisher);
-	
-	if (!( personality = allocate_string(buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure : Personality" ) );
-
-	if (!( personality = opennebula_instructions( reference, personality ) ))
-		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
-
-#endif
-
 	if (!( filename = on_create_compute_request( 
 		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, personality, resource ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
@@ -350,26 +339,14 @@ private	struct	rest_response * start_opennebula(
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
 		status = connect_opennebula_server( osptr, pptr );
-#ifdef	_ON_PERSONALITY
 		if (!( status ))
 		{
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			if (!( idptr = xml_element_value( osptr->xmlroot, "ID") ))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Missing Meta Data Server ID" ) );
+			cosacs_metadata_instructions( pptr->hostname, reference );
 
-			else if (!( metafilename = on_create_metadata_request( personality ) ))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Message" ) );
-			else if (!( metaptr = on_create_metadata( idptr, metafilename )))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Request" ) );
-			else
-			{
-				metaptr = liberate_on_response( metaptr );
-				liberate( metafilename );
-			}
 		}
-#endif
 		osptr = liberate_on_response( osptr );
 		if (!( status ))
 		if (!( status ))

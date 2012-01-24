@@ -1,3 +1,23 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _file_c_
 #define _file_c_
@@ -17,6 +37,10 @@ public struct cords_file * liberate_cords_file(struct cords_file * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->type )
+			 sptr->type = liberate(sptr->type);
+		if ( sptr->permissions )
+			 sptr->permissions = liberate(sptr->permissions);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_file *) 0);
@@ -34,6 +58,8 @@ public struct cords_file * reset_cords_file(struct cords_file * sptr)
 		sptr->status =  0;
 		sptr->length =  0;
 		sptr->name = (char*) 0;
+		sptr->type = (char*) 0;
+		sptr->permissions = (char*) 0;
 	}
 	return(sptr);
 
@@ -76,6 +102,14 @@ public int xmlin_cords_file(struct cords_file * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"type") ))
+		{
+			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"permissions") ))
+		{
+			if ( wptr->value ) { sptr->permissions = allocate_string(wptr->value); }
+		}
 	}
 	return(0);
 
@@ -94,6 +128,8 @@ public int rest_occi_cords_file(FILE * fh,struct cords_file * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.length='%u'\r\n",prefix,nptr,sptr->length);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.permissions='%s'\r\n",prefix,nptr,(sptr->permissions?sptr->permissions:""));
 	return(0);
 
 }

@@ -7,6 +7,8 @@ struct	cords_file
 	int	status;
 	int	length;
 	char *	name;
+	char *	type;
+	char *	permissions;
 };
 
 #endif
