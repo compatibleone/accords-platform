@@ -352,7 +352,10 @@ public	struct	occi_response * cords_retrieve_named_instance(
 		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else if (!( zptr = occi_client_get( kptr, qptr ) ))
+		{
+			qptr = occi_remove_request( qptr );
 			continue;
+		}
 		else 	break;
 	}
 	return( zptr );
@@ -1299,6 +1302,122 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 	else	return(0);
 }
 
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ b u i l d _ a p p l i c a t i o n _ i m a g e	*/
+/*	---------------------------------------------------------	*/
+private	int	cords_build_application_image( char * iptr, char * pptr, char * agent,char * tls )
+{
+	char *	host;
+	char 	buffer[1024];
+	struct	occi_client * cptr;
+	struct	occi_request * rptr;
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	struct	occi_element * dptr;
+	/* ---------------------------------------------------------------------- */
+	/* locate and application category service provider which should be COIPS */
+	/* ---------------------------------------------------------------------- */
+	if (!( host = occi_resolve_category_provider( _CORDS_APPLICATION, agent, tls ) ))
+	{
+		liberate( pptr );
+		return(0);
+	}
+	else
+	{
+		sprintf(buffer,"%s/%s/",host,_CORDS_APPLICATION);
+
+		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
+		{
+			liberate( pptr );
+			return(0);
+		}
+		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		{
+			liberate( pptr );
+			return(0);
+		}
+		else if ((!(dptr=occi_request_element(rptr,"occi.application.image"   , iptr ) ))
+		     ||  (!(dptr=occi_request_element(rptr,"occi.application.provider", pptr ) )))
+		{
+			liberate( pptr );
+			rptr = occi_remove_request( rptr );
+			return(0);
+		}
+		/* -------------------------------------------------- */
+		/* attempt to retrieve the application image instance */
+		/* -------------------------------------------------- */
+		else if (( yptr = occi_client_get( cptr, rptr )) != (struct occi_response *) 0)
+		{
+			if (( yptr->response )
+			&&  ( yptr->response->status == 200 )
+			&&  ( yptr->first != (struct occi_element *) 0))
+			{
+				yptr = occi_remove_response( yptr );
+				return(0);
+			}
+			else yptr = occi_remove_response( yptr );
+		}
+		
+		/* -------------------- */
+		/* build a new instance */
+		/* -------------------- */
+		zptr = occi_client_post( cptr, rptr );
+		zptr = occi_remove_response( zptr );
+		rptr = occi_remove_request( rptr );
+		liberate( pptr );
+		return( 0 );
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	    c o r d s _ i m a g e _ p r o d u c t i o n		*/
+/*	---------------------------------------------------	*/
+/*	the parser will attempt to schedule the application	*/
+/*	image production for a valid image element with ID	*/
+/*	for a valid node with a specific provider type.		*/
+/*	otherwise image production will be delayed till the	*/
+/*	provider type has been resolved.			*/
+/*	---------------------------------------------------	*/
+private	int	cords_image_production( struct xml_element * dptr, char * agent,char * tls )
+{
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * iptr;
+	char *	pptr;
+	/* ----------------------------------------------- */	
+	/* ensure valid image and parent is a NODE element */
+	/* ----------------------------------------------- */
+	if (!( dptr ))
+		return(0);
+	else if (!( eptr = dptr->parent ))
+		return(0);
+	else if (!( eptr->name ))
+		return(0);
+	else if ( strcmp( eptr->name, _CORDS_NODE ) )
+		return(0);
+	else if (!( iptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(0);
+	else if (!( iptr->value ))
+		return(0);
+
+	/* ------------------------------------------------ */
+	/* detect and control valid node provider attribute *
+	/* ------------------------------------------------ */
+	else if (!( aptr = document_atribut( eptr, _CORDS_PROVIDER ) ))
+		return(0);
+	else if (!( aptr->value ))
+		return(0);
+	else if (!( pptr = occi_unquoted_value( aptr->value ) ))
+		return(0);
+	else if (!( strcmp( pptr, _CORDS_ANY ) ))
+		return(0);
+
+	/* ------------------------------------------------ */
+	/* attempt to locate an aleady produced application */
+	/* ------------------------------------------------ */
+	else	return(cords_build_application_image( iptr->value, pptr, agent, tls ));
+}
+
 /*	---------------------------------------------------	*/
 /*	      c o r d s _ t e r m i n a t e _ i m a g e		*/
 /*	---------------------------------------------------	*/
@@ -1318,7 +1437,7 @@ private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char 
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
 
-	else	return(0);
+	else	return( cords_image_production( dptr, agent, tls ) );
 }
 
 /*	-----------------------------------------------------------------	*/

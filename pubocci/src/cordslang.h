@@ -107,6 +107,11 @@
 #define	_CORDS_MONITOR		"monitor"
 #define	_CORDS_REPORT		"report"
 #define	_CORDS_TRANSACTION	"transaction"
+#define	_CORDS_APPLICATION	"application"
+#define	_CORDS_METADATA		"metadata"
+#define	_CORDS_FILE		"file"
+#define	_CORDS_SCRIPT		"script"
+#define	_CORDS_VM		"vm"
 
 /*	------------------------	*/
 /*	cords  parser  feed back	*/
