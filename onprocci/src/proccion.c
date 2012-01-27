@@ -637,7 +637,7 @@ private	struct	occi_interface	opennebula_interface = {
 public	struct	occi_category * build_opennebula( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_opennebula_builder( domain,"opennebula" ) ))
+	if (!( optr = occi_cords_opennebula_builder( domain,"opennebula" ) ))
 		return( optr );
 	else
 	{
@@ -702,7 +702,7 @@ private	int	set_default_opennebula(struct occi_category * optr, void * vptr)
 public	struct	occi_category * build_opennebula_configuration( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_on_config_builder( domain, "opennebula_configuration" ) ))
+	if (!( optr = occi_cords_onconfig_builder( domain, "opennebula_configuration" ) ))
 		return( optr );
 	else if (!( optr = occi_add_action( optr,"current","",set_default_opennebula)))
 		return( optr );

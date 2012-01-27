@@ -615,7 +615,7 @@ private	int	publisher_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_publisher.xml");
 
-	if (!( optr = occi_publication_builder( Publisher.domain,"publication" ) ))
+	if (!( optr = occi_cords_publication_builder( Publisher.domain,"publication" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -629,7 +629,7 @@ private	int	publisher_operation( char * nptr )
 	else if (!( optr = occi_add_action( optr,"restart","",restart_publication)))
 		return( 27 );
 
-	if (!( optr = occi_enquiry_builder( Publisher.domain, "enquiry" ) ))
+	if (!( optr = occi_cords_enquiry_builder( Publisher.domain, "enquiry" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -646,7 +646,7 @@ private	int	publisher_operation( char * nptr )
 	last = optr;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_agency_builder( Publisher.domain, "agency" ) ))
+	if (!( optr = occi_cords_agency_builder( Publisher.domain, "agency" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

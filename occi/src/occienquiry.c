@@ -710,7 +710,7 @@ private void	redirect_occi_enquiry_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_enquiry */
-public struct occi_category * occi_enquiry_builder(char * a,char * b) {
+public struct occi_category * occi_cords_enquiry_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";

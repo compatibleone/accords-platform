@@ -605,7 +605,7 @@ private	struct	occi_interface	windowsazure_interface = {
 public	struct	occi_category * build_windowsazure( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_windowsazure_builder( domain,"windowsazure" ) ))
+	if (!( optr = occi_cords_windowsazure_builder( domain,"windowsazure" ) ))
 		return( optr );
 	else
 	{
@@ -674,7 +674,7 @@ private	int	set_default_windowsazure(struct occi_category * optr, void * vptr)
 public	struct	occi_category * build_windowsazure_configuration( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_az_config_builder( domain, "windowsazure_configuration" ) ))
+	if (!( optr = occi_cords_azconfig_builder( domain, "windowsazure_configuration" ) ))
 		return( optr );
 	else if (!( optr = occi_add_action( optr,"current","",set_default_windowsazure)))
 		return( optr );

@@ -50,17 +50,17 @@ public struct occi_category * occi_cords_tarif_builder(char *a,char * b);
 public struct occi_category * occi_cords_user_builder(char *a,char * b);
 public struct occi_category * occi_cords_xlink_builder(char *a,char * b);
 
-public struct occi_category * occi_publication_builder(char *a,char * b);
-public struct occi_category * occi_enquiry_builder(char *a,char * b);
-public struct occi_category * occi_agency_builder(char *a,char * b);
+public struct occi_category * occi_cords_publication_builder(char *a,char * b);
+public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
+public struct occi_category * occi_cords_agency_builder(char *a,char * b);
 
-public struct occi_category * occi_openstack_builder(char *a,char * b);
-public struct occi_category * occi_os_config_builder(char *a,char * b);
-public struct occi_category * occi_opennebula_builder(char *a,char * b);
-public struct occi_category * occi_on_config_builder(char *a,char * b);
+public struct occi_category * occi_cords_openstack_builder(char *a,char * b);
+public struct occi_category * occi_cords_osconfig_builder(char *a,char * b);
+public struct occi_category * occi_cords_opennebula_builder(char *a,char * b);
+public struct occi_category * occi_cords_onconfig_builder(char *a,char * b);
 
-public struct occi_category * occi_windowsazure_builder(char *a,char * b);
-public struct occi_category * occi_az_config_builder(char *a,char * b);
+public struct occi_category * occi_cords_windowsazure_builder(char *a,char * b);
+public struct occi_category * occi_cords_azconfig_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_ipaddress_builder(char *a,char * b);
 public struct occi_category * occi_cords_domain_builder(char *a,char * b);
