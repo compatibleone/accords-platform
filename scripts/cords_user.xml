@@ -33,4 +33,6 @@
  id='b949011b-pars-400c-b6a7-c3f8a17f0ee6' name='test-parser' password='co-system' />
 <cords_user 
  id='b949011b-brok-400c-b6a7-c3f8a17f0ee6' name='test-broker' password='co-system' />
+<cords_user 
+ id='b949011b-comp-400c-b6a7-c3f8a17f0ee6' name='service-compo' password='co-system' />
 </cords_users>

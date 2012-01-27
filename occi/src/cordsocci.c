@@ -76,7 +76,4 @@
 #include "occiiprange.c"
 
 	/* ------------- */
-#endif	/* _cords_occi_c */
-	/* ------------- */
-
-
+#endif
