@@ -28,8 +28,9 @@ struct	rest_thread
 	struct 	rest_request *	request;
 	int			status;
 	int			started;
-	pthread_mutex_t 	controlChild;
-	pthread_mutex_t 	controlParent;
+	int			item;
+	pthread_mutex_t 	controlOne;
+	pthread_mutex_t 	controlZero;
 	pthread_mutex_t 	lock;
 	pthread_t		id;
 	pthread_attr_t		attributes;

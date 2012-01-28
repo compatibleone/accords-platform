@@ -44,24 +44,6 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 }
 
 /*	-----------------------------------------------------------	*/
-/*		w a i t _ r e s t _ t h r e a d 			*/
-/*	-----------------------------------------------------------	*/
-/*	called from the starting thread to await its order to start	*/
-/*	the thread will try to lock the control mutex and when this	*/
-/*	is not possible will sleep till it regains control.		*/
-/*	-----------------------------------------------------------	*/
-
-private	void	wait_rest_thread(struct rest_thread * tptr)
-{
-	pthread_mutex_lock( &tptr->controlParent );
-	pthread_mutex_lock( &tptr->controlChild );
-	tptr->started=1;
-	pthread_mutex_unlock( &tptr->controlChild );
-	pthread_mutex_unlock( &tptr->controlParent );
-	return;
-}
-
-/*	-----------------------------------------------------------	*/
 /*		s t a r t _ r e s t _ t h r e a d			*/
 /*	-----------------------------------------------------------	*/
 /*	called from the thread launcher to allow the target thread	*/
@@ -69,21 +51,47 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 /*	-----------------------------------------------------------	*/
 private	void	start_rest_thread(struct rest_thread * tptr)
 {
-	int	started;
+	int	item;
 	lock_rest_thread(tptr);
-	tptr->started=0;
+	item = tptr->item;
+	tptr->item = ((item + 1) & 1);
 	unlock_rest_thread(tptr);
-	pthread_mutex_unlock( &tptr->controlChild );
-	pthread_mutex_lock( &tptr->controlParent );
-#ifdef	PLASE_USLEEP
-	do	{
-		if (!( started = tptr->started ))
-			usleep(1);
-		}
-	while (!( started ));
-#endif
-	pthread_mutex_unlock( &tptr->controlParent );
-	pthread_mutex_lock( &tptr->controlChild );
+	if ( item )
+	{
+		pthread_mutex_lock( &tptr->controlZero );
+		pthread_mutex_unlock( &tptr->controlOne );
+	}
+	else
+	{
+		pthread_mutex_lock( &tptr->controlOne );
+		pthread_mutex_unlock( &tptr->controlZero );
+	}
+	return;
+}
+
+/*	-----------------------------------------------------------	*/
+/*		w a i t _ r e s t _ t h r e a d 			*/
+/*	-----------------------------------------------------------	*/
+/*	called from the starting thread to await its order to start	*/
+/*	the thread will try to lock the control mutex and when this	*/
+/*	is not possible will sleep till it regains control.		*/
+/*	-----------------------------------------------------------	*/
+private	void	wait_rest_thread(struct rest_thread * tptr)
+{
+	int	item;
+	lock_rest_thread(tptr);
+	item = tptr->item;
+	unlock_rest_thread(tptr);
+	if ( item )
+	{
+		pthread_mutex_lock( &tptr->controlOne );
+		pthread_mutex_unlock( &tptr->controlOne );
+	}
+	else
+	{
+		pthread_mutex_lock( &tptr->controlZero );
+		pthread_mutex_unlock( &tptr->controlZero );
+	}
 	return;
 }
 
@@ -96,8 +104,8 @@ public struct rest_thread * liberate_rest_thread(struct rest_thread * sptr)
 	{
 		sptr = liberate( sptr );
 		pthread_mutex_unlock( &sptr->lock );
-		pthread_mutex_unlock( &sptr->controlChild );
-		pthread_mutex_unlock( &sptr->controlParent );
+		pthread_mutex_unlock( &sptr->controlOne );
+		pthread_mutex_unlock( &sptr->controlZero );
 	}
 	return((struct rest_thread *) 0);
 }
@@ -115,10 +123,10 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		memset(&sptr->lock,0,sizeof( sptr->lock));
 		sptr->client = (struct rest_client *) 0;
 		sptr->request = (struct rest_request *) 0;
+		sptr->item   = 1;
 		sptr->status = 1;
 		sptr->started = 0;
-		pthread_mutex_lock( &sptr->controlChild );
-		pthread_mutex_unlock( &sptr->controlParent );
+		pthread_mutex_lock( &sptr->controlOne );
 	}
 	return(sptr);
 
