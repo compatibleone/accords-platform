@@ -53,10 +53,11 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 
 private	void	wait_rest_thread(struct rest_thread * tptr)
 {
-
-	pthread_mutex_lock( &tptr->control );
+	pthread_mutex_lock( &tptr->controlParent );
+	pthread_mutex_lock( &tptr->controlChild );
 	tptr->started=1;
-	pthread_mutex_unlock( &tptr->control );
+	pthread_mutex_unlock( &tptr->controlChild );
+	pthread_mutex_unlock( &tptr->controlParent );
 	return;
 }
 
@@ -72,13 +73,17 @@ private	void	start_rest_thread(struct rest_thread * tptr)
 	lock_rest_thread(tptr);
 	tptr->started=0;
 	unlock_rest_thread(tptr);
-	pthread_mutex_unlock( &tptr->control );
+	pthread_mutex_unlock( &tptr->controlChild );
+	pthread_mutex_lock( &tptr->controlParent );
+#ifdef	PLASE_USLEEP
 	do	{
 		if (!( started = tptr->started ))
 			usleep(1);
 		}
 	while (!( started ));
-	pthread_mutex_lock( &tptr->control );
+#endif
+	pthread_mutex_unlock( &tptr->controlParent );
+	pthread_mutex_lock( &tptr->controlChild );
 	return;
 }
 
@@ -91,7 +96,8 @@ public struct rest_thread * liberate_rest_thread(struct rest_thread * sptr)
 	{
 		sptr = liberate( sptr );
 		pthread_mutex_unlock( &sptr->lock );
-		pthread_mutex_unlock( &sptr->control );
+		pthread_mutex_unlock( &sptr->controlChild );
+		pthread_mutex_unlock( &sptr->controlParent );
 	}
 	return((struct rest_thread *) 0);
 }
@@ -111,7 +117,8 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		sptr->request = (struct rest_request *) 0;
 		sptr->status = 1;
 		sptr->started = 0;
-		pthread_mutex_lock( &sptr->control );
+		pthread_mutex_lock( &sptr->controlChild );
+		pthread_mutex_unlock( &sptr->controlParent );
 	}
 	return(sptr);
 

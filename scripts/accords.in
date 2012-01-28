@@ -120,6 +120,10 @@ _co_start() {
     run-azprocci &
     sleep 1
 
+    echo "Starting accords software configuration services"
+    run-cosacs &
+    sleep 1
+
     echo "ACCORDS ready"
     co-status
 }
@@ -172,9 +176,11 @@ _co_status() {
     netstat -a -p | grep LISTEN | grep procci
     netstat -a -p | grep LISTEN | grep ezvm
     netstat -a -p | grep LISTEN | grep coips
+    netstat -a -p | grep LISTEN | grep cosacs
 }
 
 _co_stop() {
+    _stop_service cosacs
     _stop_service onprocci
     _stop_service osprocci
     _stop_service azprocci
@@ -214,6 +220,10 @@ _run_conets() {
 
 _run_coobas() {
     coobas --config $target CO-BAS/1.0
+}
+
+_run_cosacs() {
+    cosacs --config $target CO-SACS/1.0
 }
 
 _run_coss() {
@@ -294,6 +304,7 @@ _accords_config() {
 	_mksecs osprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
+	_mksecs command
     
 	_mksect testcp 1
 	_mksect testcb 1
@@ -323,6 +334,7 @@ _accords_config() {
 	_mkcert osprocci
 	_mkcert onprocci
 	_mkcert azprocci
+	_mkcert cosacs
 	
 	_mkcert testcp
 	_mkcert testcb
@@ -350,6 +362,7 @@ _accords_config() {
     _mkcfg fileserver
     _mkcfg ezvm
     _mkcfg coips
+    _mkcosacs cosacs
 
     echo "</accords>" >> $target
 }
@@ -439,6 +452,25 @@ _mkmon() {
     echo "    debug='"$debug"'"       >> $target
     echo "    threads='"$threads"'>"  >> $target
     echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"'/>" >> $target
+    echo "</"${module}">" >> $target
+}
+
+_mkcosacs() {
+    module=$1
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":8286'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='8286'/>" >> $target
     echo "    <security" >> $target
     echo "         user='service-"${module}"'" >> $target
     echo "         password='"$password"'" >> $target
@@ -539,6 +571,9 @@ case `basename $0` in
 	;;
     run-procci)
 	_run_procci $*
+	;;
+    run-cosacs)
+	_run_cosacs $*
 	;;
     run-publisher)
 	_run_publisher $*
