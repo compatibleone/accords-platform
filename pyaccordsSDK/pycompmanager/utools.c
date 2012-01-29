@@ -45,21 +45,21 @@ int insertCategory(char pathf[], char categoryName[])
  char pyListcategname[TAILLE];
 
  sprintf(pyListcategname,"#include \"%s.h\"",categoryName);
- sprintf(pyListcateg,"%s%s",pathf,LISTCATEG_FILE);
+ sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
 
- sprintf(cordsh,"%s%s",pathf,INCLUDE_CORDS_H);
- sprintf(occibuilder,"%s%s",pathf,INCLUDE_OCCI_BUILDER);
+ sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
+ sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
  
  sprintf(cordshname,"#include \"%s.h\"",categoryName);
  sprintf(occibuildername,"public struct occi_category * occi_cords_%s_builder(char * a,char *b);",categoryName);
  
- sprintf(cordsbase,"%s%s",pathf,INCLUDE_CORDS_BASE);
+ sprintf(cordsbase,"%s/%s",pathf,INCLUDE_CORDS_BASE);
  sprintf(cordsbasename,"#include \"%s.c\"",categoryName);
 
- sprintf(occicords,"%s%s",pathf,OCCI_CORDS);
+ sprintf(occicords,"%s/%s",pathf,OCCI_CORDS);
  sprintf(occicordsname,"#include \"occi%s.c\"",categoryName);
  
- sprintf(pyint,"%s%s",pathf,PY_CRUD_INCLUDE);
+ sprintf(pyint,"%s/%s",pathf,PY_CRUD_INCLUDE);
  sprintf(pyintname,"#include \"%sInterface.c\"",categoryName);
  
  insertInFile(cordsh,cordshname,categoryName,0);
@@ -162,6 +162,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
      fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
      pelem = pelem->next;
    }
+   free(pelem);
    fprintf(fOut,"};\n");
   }
  
