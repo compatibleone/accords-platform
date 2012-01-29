@@ -34,6 +34,7 @@ struct	cords_provisioning
 	char			* reqID;
 	struct	occi_response 	* manifest;
 	char			* accID;
+	char			* accName;
 	struct	occi_response 	* account;
 	char			* secID;
 	struct	occi_response 	* security;

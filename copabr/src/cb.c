@@ -105,6 +105,8 @@ private	char * 	cords_terminate_provisioning(
 		pptr->security = occi_remove_response( pptr->security );
 	if ( pptr->accID )
 		pptr->accID = liberate( pptr->accID );
+	if ( pptr->accName )
+		pptr->accName = liberate( pptr->accName );
 	if ( pptr->account )
 		pptr->account = occi_remove_response( pptr->account );
 	if ( pptr->reqID )
@@ -2018,7 +2020,8 @@ private	struct	xml_element * cords_instance_node(
 		char * agent,
 		char * tls,
 		char * namePlan,
-		char * account )
+		char * account,
+		char * accountName )
 {
 	int	status;
 	struct	xml_element 	*	xroot=(struct xml_element *) 0;
@@ -2098,7 +2101,7 @@ private	struct	xml_element * cords_instance_node(
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( App.profile = cords_resolve_profile( App.node, namePlan )))
+	else if (!( App.profile = cords_resolve_profile( App.node, ( accountName ? accountName : namePlan ) )))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -2273,6 +2276,7 @@ public	char *	cords_manifest_broker(
 		(char *) 0,
 		(struct occi_response *) 0,
 		(char *) 0,
+		(char *) 0,
 		(struct occi_response *) 0,
 		(char *) 0,
 		(struct occi_response *) 0,
@@ -2296,13 +2300,15 @@ public	char *	cords_manifest_broker(
 	else if (!( CbC.manifest = cords_retrieve_instance( host, CbC.reqID, agent, tls )))
 		return( cords_terminate_provisioning( 904, &CbC ) );
 
-	/* ----------------------------------------- */
-	/* retrieve the account information instance */
-	/* ----------------------------------------- */
+	/* -------------------------------------------------- */
+	/* retrieve the account information instance and name */
+	/* -------------------------------------------------- */
 	if (( CbC.accID  = cords_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
 			!= (char *) 0)
 	{
 		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent, tls )))
+			return( cords_terminate_provisioning( 905, &CbC ) );
+		else if (!( CbC.accName  = cords_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 			return( cords_terminate_provisioning( 905, &CbC ) );
 	}
 
@@ -2348,7 +2354,7 @@ public	char *	cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( host, id, agent, tls, CbC.namePlan, CbC.accID ) ))
+		else if (!( mptr = cords_instance_node( host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else	
 		{
