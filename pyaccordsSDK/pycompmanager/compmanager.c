@@ -305,6 +305,8 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
         pelem=pelem->next;
         i++;
       }
+      i++;
+      free(pelem);
       fprintf(f,"\t//           python interface\n");
       fprintf(f,"\texp_file = fopen(\"%s/%s/%s/%s.py\", \"r\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
       fprintf(f,"\tif(!exp_file) printf(\"error in %sInterface.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
@@ -333,12 +335,14 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       while(pelemm)
       {
         fprintf(f,"\tif(pelem){\n");
-        fprintf(f,"\t\tpptr->%s = pelem->value;\n",pelemm->value);
+        fprintf(f,"\t\tstrcpy(pptr->%s , pelem->value);\n",pelemm->value);
         if(k<i)fprintf(f,"\t\tpelem = pelem->next;\n");
         fprintf(f,"\t}\n");
         pelemm=pelemm->next;
 	k++;
       }
+     free(pelemm);
+     fprintf(f,"\tfree(pelem);\n");
      fprintf(f,"\treturn 1;\n");
      fprintf(f,"}\n\n\n"); 
      k=0;
@@ -420,6 +424,7 @@ int generateCategoryInterfceStructFile(char pathf[])
      fprintf(h,"\t{ \"%s\" , %s_interface_Func },\n",pelem->value,pelem->value);
      pelem = pelem->next;  
   }
+  free(pelem);
   fprintf(h,"};\n");
   fprintf(h,"#endif\n");
   fclose(f);
@@ -468,6 +473,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
     pelem=pelem->next;
     i++;
    }
+   free(pelem);
    strConcat(classAtr,")",' ');
    fprintf(f,"\t%s:\n",classAtr);
    fprintf(f,"\t\t\"\"\"Constructor of the class\"\"\"\n");
@@ -516,6 +522,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
      strConcat(listResult,listr,',');
      pelemmm=pelemmm->next;
    }
+   free(pelemmm);
    strConcat(listResult,"]",' ');
 
    for(i=0;i<4;i++)
@@ -554,6 +561,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
         fprintf(f,"\t\t- %s \n",pelemm1->value);
         pelemm1=pelemm1->next;
    }
+   free(pelemm1);
    fprintf(f,"\"\"\"\n\n");
   
    for(i=0;i<4;i++)
@@ -611,6 +619,7 @@ int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,c
      pelem = pelem->next; 
      i++;   
     }
+    free(pelem);
     fprintf(f,"#ifndef _%s_c_\n",categoryName);
     fprintf(f,"#define _%s_c_\n\n",categoryName);
     fprintf(f,"#include \"%s.h\"\n\n",categoryName);
@@ -1355,6 +1364,7 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
    pelem = pelem->next; 
    i++;   
  }
+ free(pelem);
 
  if((f=fopen(pathfcc,"a"))==NULL)
  {
@@ -1526,6 +1536,9 @@ int generateModuleFile(char * moduleName, char * categoryNameList, char * pathf)
      }
      else
      {
+      fprintf(f,"#!/usr/bin/env python\n");
+      fprintf(f,"# -*- coding: latin-1 -*-\n");
+      fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n\n");
       fprintf(f,"import sys\n");
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
