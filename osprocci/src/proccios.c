@@ -648,7 +648,7 @@ private	struct	rest_response * start_openstack(
 			/* ---------------------------- */
 			/* launch the COSACS operations */
 			/* ---------------------------- */
-			cosacs_metadata_instructions( pptr->hostname, reference );
+			cosacs_metadata_instructions( pptr->hostname, reference, OsProcci.publisher );
 
 			/* ----------------------- */
 			/* create server meta data */

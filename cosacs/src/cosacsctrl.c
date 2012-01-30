@@ -28,6 +28,7 @@
 /*	------------------------------------	*/
 #define	_COSACS_HOST "http://127.0.0.1"
 #define	_COSACS_PORT 8286
+#define	_COSACS_START "cosacs:start"
 
 /*	-----------------------------------------------------------	*/
 /*		c o s a c s _ c r e a t e _ m e t a d a t a		*/
@@ -49,7 +50,9 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* prepare COSACS identity */
 	/* ----------------------- */
 	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_METADATA);
-	sprintf(work,"%s_%s",prefix,symbol);
+	if ( prefix )
+		sprintf(work,"%s_%s",prefix,symbol);
+	else	strcpy(work,symbol);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */
@@ -163,7 +166,7 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 /*	specific contract basis. The meta data ensuing will be sent	*/
 /*	to the provisioned instance through the COSACS interface.	*/
 /*	-----------------------------------------------------------	*/
-public	int	cosacs_metadata_instructions( char * cosacs, char * contract )
+public	int	cosacs_metadata_instructions( char * cosacs, char * contract, char * publisher )
 {
 
 	char	*	ihost;
@@ -221,6 +224,9 @@ public	int	cosacs_metadata_instructions( char * cosacs, char * contract )
 	/* -------------------------------------------------- */
 	/* for each instruction category instance in the list */
 	/* -------------------------------------------------- */
+	cosacs_create_metadata( cosacs, (char *) 0, "publisher", publisher );
+	cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  );
+	cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    );
 	for (	eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
@@ -281,7 +287,7 @@ public	int	cosacs_metadata_instructions( char * cosacs, char * contract )
 	}
 
 	yptr = occi_remove_response ( yptr );
-	cosacs_create_script( cosacs, "cosacs:start", contract, "process" );
+	cosacs_create_script( cosacs,_COSACS_START, contract, "process" );
 
 	return(0);
 }
