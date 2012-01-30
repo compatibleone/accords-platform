@@ -321,7 +321,6 @@ private	int	resolve_os_v10_addresses( struct os_response * yptr, struct openstac
 	char *	vptr;
 	if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
 	{
-	if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
 		if (!( pptr->privateaddr  = allocate_string(vptr)))
 		{
 			reset_openstack_server( pptr );
@@ -356,39 +355,67 @@ private	int	resolve_os_v10_addresses( struct os_response * yptr, struct openstac
 private	int	resolve_os_v11_addresses( struct os_response * yptr, struct openstack * pptr )
 {
 	struct	data_element * eptr;
+	struct	data_element * aptr;
 	char *	vptr;
-	if (( eptr = json_element( yptr->jsonroot, "private" )) != (struct data_element *) 0)
-	{
-		if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
-		{
-			if (!( pptr->privateaddr  = allocate_string(vptr)))
-			{
-				reset_openstack_server( pptr );
-				return( 27 );
-			}
-			if ( check_debug() )
-			{
-				rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
-				rest_log_message( pptr->privateaddr );
-			}
-		}
-	}
+	int	addresses=0;
+	if (!( aptr = json_element( yptr->jsonroot, "addresses" )))
+		return(0);
 
-	if (( eptr = json_element( yptr->jsonroot, "public" )) != (struct data_element *) 0)
+	else 
 	{
-		if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
+		if (( eptr = json_element( aptr, "private" )) != (struct data_element *) 0)
 		{
-			if (!( pptr->publicaddr  = allocate_string(vptr)))
+			if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
 			{
-				reset_openstack_server( pptr );
-				return( 27 );
-			}
-			if ( check_debug() )
-			{
-				rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
-				rest_log_message( pptr->publicaddr );
+				if (!( pptr->privateaddr  = allocate_string(vptr)))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
+				if ( check_debug() )
+				{
+					rest_log_message("*** OS PROCCI Instance PRIVATE IP ***");
+					rest_log_message( pptr->privateaddr );
+				}
+				addresses |= 1;
 			}
 		}
+
+		if (( eptr = json_element( aptr, "public" )) != (struct data_element *) 0)
+		{
+			if (( vptr = json_atribut( eptr, "addr" )) != (char *) 0)
+			{
+				if (!( pptr->publicaddr  = allocate_string(vptr)))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
+				if ( check_debug() )
+				{
+					rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
+					rest_log_message( pptr->publicaddr );
+				}
+				addresses |= 2;
+			}
+		}
+		if (!( addresses ))
+		{
+			if (( vptr = json_atribut( aptr, "addr" )) != (char *) 0)
+			{
+				if (!( pptr->publicaddr  = allocate_string(vptr)))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
+				if ( check_debug() )
+				{
+					rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
+					rest_log_message( pptr->publicaddr );
+				}
+				addresses |= 2;
+			}
+		}
+
 	}
 	return(0);
 }
