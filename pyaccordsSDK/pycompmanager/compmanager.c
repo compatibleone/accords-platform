@@ -335,7 +335,7 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       while(pelemm)
       {
         fprintf(f,"\tif(pelem){\n");
-        fprintf(f,"\t\tpptr->%s = pelem->value;\n",pelemm->value);
+        fprintf(f,"\t\tstrcpy(pptr->%s , pelem->value);\n",pelemm->value);
         if(k<i)fprintf(f,"\t\tpelem = pelem->next;\n");
         fprintf(f,"\t}\n");
         pelemm=pelemm->next;
