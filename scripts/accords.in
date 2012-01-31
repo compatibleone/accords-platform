@@ -55,7 +55,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
 
 _co_start() {
     echo "Starting ACCORDS"
@@ -86,6 +86,10 @@ _co_start() {
 
     echo "Starting accords elasticity services"
     run-coes &
+    sleep 1
+    
+    echo "Starting accords energy efficiency services"
+    run-coees &
     sleep 1
     
     echo "Starting accords image storage services"
@@ -171,6 +175,7 @@ _co_status() {
     netstat -a -p | grep LISTEN | grep conets
     netstat -a -p | grep LISTEN | grep coobas
     netstat -a -p | grep LISTEN | grep coes
+    netstat -a -p | grep LISTEN | grep coees
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
@@ -189,6 +194,7 @@ _co_stop() {
     _stop_service parser
     _stop_service ezvm
     _stop_service coips
+    _stop_service coees
     _stop_service coes
     _stop_service conets
     _stop_service coobas
@@ -208,6 +214,10 @@ _run_broker() {
 
 _run_coes() {
     coes --config $target CO-ES/1.0
+} 
+
+_run_coees() {
+    coees --config $target CO-EES/1.0
 } 
 
 _run_comons() {
@@ -294,6 +304,7 @@ _accords_config() {
 	_mksecs coss 0
 	_mksecs comons 1
 	_mksecs coes 1
+	_mksecs coees 1
 	_mksecs coobas 1
 	_mksecs conets 1
 	_mksecs broker 1
@@ -321,6 +332,7 @@ _accords_config() {
 
 	_mkcert coss
 	_mkcert coes
+	_mkcert coees
 	_mkcert coobas
 	_mkcert comons
 	_mkcert conets
@@ -362,6 +374,7 @@ _accords_config() {
     _mkcfg fileserver
     _mkcfg ezvm
     _mkcfg coips
+    _mkcfg coees 
     _mkcosacs cosacs
 
     echo "</accords>" >> $target
@@ -538,6 +551,9 @@ case `basename $0` in
 	;;
     run-coes)
 	_run_coes $*
+	;;
+    run-coees)
+	_run_coees $*
 	;;
     run-comons)
 	_run_comons $*

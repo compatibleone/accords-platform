@@ -184,6 +184,14 @@ AC_ARG_ENABLE([coes],
 AM_CONDITIONAL([ENABLE_COES], [test "$enable_coes" = "yes"])
 AC_SUBST([PATH_COES], [${abs_top_srcdir}/coes/src])
 
+AC_ARG_ENABLE([coees],
+      [AS_HELP_STRING([--disable-coees],
+		      [Disable coees @<:@default=enable@:>@])],
+      [],
+      [enable_coees=yes])
+AM_CONDITIONAL([ENABLE_COEES], [test "$enable_coees" = "yes"])
+AC_SUBST([PATH_COEES], [${abs_top_srcdir}/coees/src])
+
 AC_ARG_ENABLE([coobas],
       [AS_HELP_STRING([--disable-coobas],
 		      [Disable coobas @<:@default=enable@:>@])],
@@ -342,6 +350,7 @@ AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
 AC_CONFIG_FILES([ezvm/Makefile ezvm/src/Makefile])
 AC_CONFIG_FILES([coes/Makefile coes/src/Makefile])
+AC_CONFIG_FILES([coees/Makefile coees/src/Makefile])
 AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])
 AC_CONFIG_FILES([comons/Makefile comons/src/Makefile])
 AC_CONFIG_FILES([conets/Makefile conets/src/Makefile])
@@ -385,6 +394,7 @@ echo "    - copabr                   : $enable_copabr"
 echo "    - coss                     : $enable_coss"
 echo "    - ezvm                     : $enable_ezvm"
 echo "    - coes                     : $enable_coes"
+echo "    - coees                    : $enable_coees"
 echo "    - coobas                   : $enable_coobas"
 echo "    - comons                   : $enable_comons"
 echo "    - conets                   : $enable_conets"

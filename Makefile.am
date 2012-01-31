@@ -48,6 +48,9 @@ endif
 if ENABLE_COES
 SUBDIRS += coes
 endif
+if ENABLE_COEES
+SUBDIRS += coees
+endif
 if ENABLE_COOBAS
 SUBDIRS += coobas
 endif

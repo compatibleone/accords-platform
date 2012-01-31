@@ -49,7 +49,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -87,6 +87,10 @@ _co-start() {
 
     echo "Starting accords elasticity services"
     run-coes &
+    sleep 1
+    
+    echo "Starting accords energy efficiency services"
+    run-coees &
     sleep 1
     
     echo "Starting accords image storage services"
@@ -152,6 +156,7 @@ _co-status() {
     netstat -a -p | grep LISTEN | grep conets
     netstat -a -p | grep LISTEN | grep coobas
     netstat -a -p | grep LISTEN | grep coes
+    netstat -a -p | grep LISTEN | grep coees
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
@@ -175,6 +180,8 @@ co-stop() {
     killall coips
     sleep 1
     killall ezvm
+    sleep 1
+    killall coees
     sleep 1
     killall coes
     sleep 1
@@ -201,6 +208,10 @@ _run-broker() {
 
 _run-coes() {
     coes --config $target CO-ES/1.0
+} 
+
+_run-coees() {
+    coees --config $target CO-EES/1.0
 } 
 
 _run-comons() {
