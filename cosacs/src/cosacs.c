@@ -228,10 +228,14 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 			/* ------------------------ */
 			if (!( sptr->nature ))
 				execmode = 0;
+			else if (!( strcmp( "run", sptr->nature ) ))
+				execmode = 0;
+			else if (!( strcmp( "system", sptr->nature ) ))
+				execmode = 0;
+			else if (!( strcmp( "fork", sptr->nature ) ))
+				execmode = 1;
 			else if (!( strcmp( "process", sptr->nature ) ))
 				execmode = 1;
-			else if (!( strcmp( "thread", sptr->nature ) ))
-				execmode = 2;
 			else	execmode = 0;
 			if ( execmode )
 				fprintf(h,"%s&\n",sptr->syntax);
@@ -257,10 +261,14 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 		/* -------------------- */
 		if (!( pptr->nature ))
 			execmode = 0;
-		else if (!( strcmp( "process", pptr->nature ) ))
+		else if (!( strcmp( "run", sptr->nature ) ))
+			execmode = 0;
+		else if (!( strcmp( "system", sptr->nature ) ))
+			execmode = 0;
+		else if (!( strcmp( "fork", sptr->nature ) ))
 			execmode = 1;
-		else if (!( strcmp( "thread", pptr->nature ) ))
-			execmode = 2;
+		else if (!( strcmp( "process", sptr->nature ) ))
+			execmode = 1;
 		else	execmode = 0;
 
 		/* ----------------------------- */
@@ -273,7 +281,6 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 			pptr->result = errno;
 			break;
 		case 	1 :
-		case	2 :
 			if (!( pptr->result = fork() ))
 			{
 				system( tempname );

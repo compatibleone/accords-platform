@@ -36,6 +36,8 @@
 #define	_CORDSCRIPT_AFFECT	0
 #define	_CORDSCRIPT_CONFIGURE	1
 #define	_CORDSCRIPT_MONITOR	2
+#define	_CORDSCRIPT_SYSTEM 	3
+#define	_CORDSCRIPT_FORK   	4
 
 public	struct	cordscript_action *	cordscript_parse_statement( char * statement );
 public	int				cordscript_parse_method( char * token );

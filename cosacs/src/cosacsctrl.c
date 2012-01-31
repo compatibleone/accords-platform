@@ -258,7 +258,23 @@ public	int	cosacs_metadata_instructions( char * cosacs, char * contract, char * 
 				zptr = occi_remove_response ( zptr );
 			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.method" )))
 				zptr = occi_remove_response ( zptr );
-			else if ( strcasecmp( fptr->value, "configure" ) )
+			else if ((!( strcasecmp( fptr->value, "system" ) ))
+			     ||  (!( strcasecmp( fptr->value, "fork" ) )))
+			{
+				if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
+					zptr = occi_remove_response ( zptr );
+
+				else
+				{
+					/* ------------------------------------------------------------ */
+					/* Create a COSACS Meta Data instance using the name value pair */
+					/* ------------------------------------------------------------ */
+					cosacs_create_script( cosacs, "cosacs:run", jptr->value, fptr->value );
+					zzptr = occi_remove_response ( zzptr );
+					zptr = occi_remove_response ( zptr );
+				}
+			}
+			else if (  strcasecmp( fptr->value, "configure" ) )
 				zptr = occi_remove_response ( zptr );
 
 			/* collect the configuration details */
