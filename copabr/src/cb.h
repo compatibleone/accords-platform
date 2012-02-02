@@ -40,6 +40,8 @@ struct	cords_provisioning
 	struct	occi_response 	* security;
 	char			* confID;
 	struct	occi_response 	* configuration;
+	char			* interID;
+	struct	occi_response 	* interface;
 	char			* instID;
 	struct	occi_response 	* instance;
 	struct	xml_element 	* document;

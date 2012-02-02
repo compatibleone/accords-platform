@@ -99,6 +99,10 @@ private	char * 	cords_terminate_provisioning(
 		pptr->confID = liberate( pptr->confID );
 	if ( pptr->configuration )
 		pptr->configuration = occi_remove_response( pptr->configuration );
+	if ( pptr->interID )
+		pptr->interID = liberate( pptr->interID );
+	if ( pptr->interface )
+		pptr->interface = occi_remove_response( pptr->interface );
 	if ( pptr->secID )
 		pptr->secID = liberate( pptr->secID );
 	if ( pptr->security )
@@ -2418,6 +2422,8 @@ public	char *	cords_manifest_broker(
 		(struct occi_response *) 0,
 		(char *) 0,
 		(struct occi_response *) 0,
+		(char *) 0,
+		(struct occi_response *) 0,
 		(struct xml_element *) 0,
 		0
 		};
@@ -2463,6 +2469,14 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
+
+	/* ------------------------------- */
+	/* retrieve the interface instance */
+	/* ------------------------------- */
+	if (( CbC.interID = cords_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_INTERFACE)) != (char *) 0)
+		if (!( CbC.interface = cords_retrieve_instance( host, CbC.interID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 2 : Provisioning \n",agent);
