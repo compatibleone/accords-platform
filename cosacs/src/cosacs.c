@@ -82,8 +82,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.01");
-	printf("\n   Beta Version : 23/01/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.02");
+	printf("\n   Beta Version : 02/02/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -400,6 +400,14 @@ private	int	cosacs_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &cords_script_interface;
+
+	if (!( optr = occi_cords_probe_builder( Cosacs.domain, "probe" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
 
 	rest_initialise_log(Cosacs.monitor);
 

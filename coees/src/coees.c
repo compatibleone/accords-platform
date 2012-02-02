@@ -83,8 +83,8 @@ private	void	coees_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Energy Efficiency Services COEES : Version 1.0a.0.01");
-	printf("\n   Beta Version : 31/01/2012");
+	printf("\n   CompatibleOne Energy Efficiency Services COEES : Version 1.0a.0.02");
+	printf("\n   Beta Version : 02/02/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -151,7 +151,7 @@ private	int	coees_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_configuration_builder( Coees.domain, "configuration" ) ))
+	if (!( optr = occi_cords_optimise_builder( Coees.domain, "optimise" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

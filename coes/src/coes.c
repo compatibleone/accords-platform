@@ -83,9 +83,9 @@ private	void	coes_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.04");
-	printf("\n   Beta Version : 28/12/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.05");
+	printf("\n   Beta Version : 02/02/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -274,14 +274,6 @@ private	int	coes_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_coes.xml");
 
-	if (!( optr = occi_cords_optimise_builder( Coes.domain, "optimise" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
-
 	if (!( optr = occi_cords_placement_builder( Coes.domain, "placement" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -289,14 +281,6 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &placement_interface;
-
-	if (!( optr = occi_cords_configuration_builder( Coes.domain, "configuration" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );

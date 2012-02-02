@@ -144,6 +144,8 @@ private void autoload_cords_manifest_nodes() {
 				pptr->nodes = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "interface" )) != (struct xml_atribut *) 0)
+				pptr->interface = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "security" )) != (struct xml_atribut *) 0)
@@ -193,6 +195,9 @@ public  void autosave_cords_manifest_nodes() {
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," interface=%c",0x0022);
+		fprintf(h,"%s",(pptr->interface?pptr->interface:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
@@ -237,6 +242,8 @@ private void set_cords_manifest_field(
 			pptr->nodes = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
+		if (!( strcmp( nptr, "interface" ) ))
+			pptr->interface = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "security" ) ))
@@ -306,6 +313,13 @@ private int pass_cords_manifest_filter(
 		else if ( strcmp(pptr->configuration,fptr->configuration) != 0)
 			return(0);
 		}
+	if (( fptr->interface )
+	&&  (strlen( fptr->interface ) != 0)) {
+		if (!( pptr->interface ))
+			return(0);
+		else if ( strcmp(pptr->interface,fptr->interface) != 0)
+			return(0);
+		}
 	if (( fptr->account )
 	&&  (strlen( fptr->account ) != 0)) {
 		if (!( pptr->account ))
@@ -360,6 +374,9 @@ private struct rest_response * cords_manifest_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.interface=%s",optr->domain,optr->id,pptr->interface);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
@@ -789,6 +806,8 @@ public struct occi_category * occi_cords_manifest_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "interface",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "security",0,0) ))
@@ -868,6 +887,17 @@ public struct rest_header *  cords_manifest_occi_headers(struct cords_manifest *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_manifest.configuration='%s'\r\n",(sptr->configuration?sptr->configuration:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_manifest.interface='%s'\r\n",(sptr->interface?sptr->interface:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

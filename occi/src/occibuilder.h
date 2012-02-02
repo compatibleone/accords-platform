@@ -4,6 +4,14 @@
 
 #include "cords.h"
 
+public struct occi_category * occi_cords_interface_builder(char *a,char * b);
+public struct occi_category * occi_cords_session_builder(char *a,char * b);
+public struct occi_category * occi_cords_consumer_builder(char *a,char * b);
+public struct occi_category * occi_cords_stream_builder(char *a,char * b);
+public struct occi_category * occi_cords_probe_builder(char *a,char * b);
+public struct occi_category * occi_cords_metric_builder(char *a,char * b);
+public struct occi_category * occi_cords_alert_builder(char *a,char * b);
+
 public struct occi_category * occi_cords_application_builder(char *a,char * b);
 public struct occi_category * occi_cords_instruction_builder(char *a,char * b);
 public struct occi_category * occi_cords_instance_builder(char *a,char * b);

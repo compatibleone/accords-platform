@@ -65,7 +65,15 @@
 
 #include "occireport.c"
 #include "occievent.c"
+#include "occialert.c"
 #include "occimonitor.c"
+
+#include "occiinterface.c"
+#include "occisession.c"
+#include "occiconsumer.c"
+#include "occistream.c"
+#include "occiprobe.c"
+#include "occimetric.c"
 
 #include "occioptimise.c"
 #include "occialgorithm.c"

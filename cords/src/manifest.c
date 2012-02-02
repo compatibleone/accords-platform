@@ -47,6 +47,8 @@ public struct cords_manifest * liberate_cords_manifest(struct cords_manifest * s
 			 sptr->lastapp = liberate_cords_node(sptr->lastapp);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
+		if ( sptr->interface )
+			 sptr->interface = liberate(sptr->interface);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->security )
@@ -75,6 +77,7 @@ public struct cords_manifest * reset_cords_manifest(struct cords_manifest * sptr
 		sptr->firstapp = (struct cords_node*) 0;
 		sptr->lastapp = (struct cords_node*) 0;
 		sptr->configuration = (char*) 0;
+		sptr->interface = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->security = (char*) 0;
 		sptr->zone = (char*) 0;
@@ -126,6 +129,10 @@ public int xmlin_cords_manifest(struct cords_manifest * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"interface") ))
+		{
+			if ( wptr->value ) { sptr->interface = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"account") ))
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
@@ -165,6 +172,7 @@ public int rest_occi_cords_manifest(FILE * fh,struct cords_manifest * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.plan='%s'\r\n",prefix,nptr,(sptr->plan?sptr->plan:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nodes='%s'\r\n",prefix,nptr,(sptr->nodes?sptr->nodes:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.interface='%s'\r\n",prefix,nptr,(sptr->interface?sptr->interface:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));

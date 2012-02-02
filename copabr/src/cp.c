@@ -1281,6 +1281,9 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 	if ((status = cords_instance_identifier( dptr, _CORDS_CONFIGURATION )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_CONFIGURATION));
 
+	else if ((status = cords_instance_identifier( dptr, _CORDS_INTERFACE )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_INTERFACE));
+
 	else if ((status = cords_instance_identifier( dptr, _CORDS_ACCOUNT )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_ACCOUNT));
 
@@ -1288,16 +1291,16 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 		return(cords_append_error(dptr,status,_CORDS_SECURITY));
 
 	else if ((status = cords_append_links(dptr,_CORDS_NODE,agent,tls)) != 0)
-		return(cords_append_error(dptr,status,"linkage failure"));
+		return(cords_append_error(dptr,status,"node linkage failure"));
 
 	else if ((status = cords_build_plan( dptr, agent,tls )) != 0)
-		return(cords_append_error(dptr,status,"plan failure"));
+		return(cords_append_error(dptr,status,"plan creation failure"));
 
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
-		return(cords_append_error(dptr,701,"unresolved element"));
+		return(cords_append_error(dptr,701,"unresolved manifest ID element"));
 
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
-		return(cords_append_error(dptr,704,"updating category"));
+		return(cords_append_error(dptr,704,"updating manifest category"));
 
 	else	return(0);
 }
@@ -1552,6 +1555,22 @@ private	int	cords_terminate_configuration( struct xml_element * dptr, char * age
 		return(cords_append_error(dptr,701,"unresolved element"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
+	else	return(0);
+}
+
+/*	-----------------------------------------------------	*/
+/*	  c o r d s _ t e r m i n a t e _ i n t e r f a c e 	*/
+ /*	-----------------------------------------------------	*/
+private	int	cords_terminate_interface( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+	if ((status = cords_append_links(dptr,_CORDS_ACTION,agent,tls)) != 0)
+		return(cords_append_error(dptr,status,"interface action linkage failure"));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved interface ID element"));
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating interface category"));
 	else	return(0);
 }
 

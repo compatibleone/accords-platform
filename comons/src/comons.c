@@ -82,9 +82,9 @@ private	void	comons_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.04");
+	printf("\n   Beta Version : 02/02/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -158,6 +158,51 @@ private	int	comons_operation( char * nptr )
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_cords_event_builder( Comons.domain, "event" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_session_builder( Comons.domain, "session" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_consumer_builder( Comons.domain, "consumer" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_stream_builder( Comons.domain, "stream" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_metric_builder( Comons.domain, "metric" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_alert_builder( Comons.domain, "alert" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

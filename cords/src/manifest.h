@@ -11,6 +11,7 @@ struct	cords_manifest
 	struct	cords_node	 	* firstapp;
 	struct	cords_node	 	* lastapp;
 	char *				configuration;
+	char *				interface;
 	char *				account;
 	char *				security;
 	char *				zone;

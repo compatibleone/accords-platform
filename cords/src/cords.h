@@ -52,6 +52,15 @@
 #include "monitor.h"
 #include "event.h"
 #include "report.h"
+
+#include "interface.h"
+#include "session.h"
+#include "consumer.h"
+#include "stream.h"
+#include "probe.h"
+#include "metric.h"
+#include "alert.h"
+
 #include "optimise.h"
 #include "algorithm.h"
 #include "placement.h"

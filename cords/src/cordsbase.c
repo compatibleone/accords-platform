@@ -42,6 +42,14 @@
 #include "price.c"
 #include "operator.c"
 
+#include "interface.c"
+#include "session.c"
+#include "consumer.c"
+#include "stream.c"
+#include "probe.c"
+#include "metric.c"
+#include "alert.c"
+
 #include "system.c"
 #include "image.c"
 #include "infrastructure.c"

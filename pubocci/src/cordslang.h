@@ -86,6 +86,7 @@
 #define	_CORDS_PACKAGE		"package"
 
 #define	_CORDS_CONFIGURATION	"configuration"
+#define	_CORDS_INTERFACE	"interface"
 #define	_CORDS_ACTION		"action"
 #define	_CORDS_PARAMETER	"parameter"
 #define	_CORDS_INSTRUCTION	"instruction"
@@ -106,8 +107,16 @@
 #define	_CORDS_EVENT		"event"
 #define	_CORDS_MONITOR		"monitor"
 #define	_CORDS_REPORT		"report"
+#define	_CORDS_SESSION		"session"
+#define	_CORDS_CONSUMER		"consumer"
+#define	_CORDS_STREAM		"stream"
+#define	_CORDS_PROBE		"probe"
+#define	_CORDS_METRIC		"metric"
+#define	_CORDS_ALERT		"alert"
+
 #define	_CORDS_TRANSACTION	"transaction"
 #define	_CORDS_APPLICATION	"application"
+
 #define	_CORDS_METADATA		"metadata"
 #define	_CORDS_FILE		"file"
 #define	_CORDS_SCRIPT		"script"
