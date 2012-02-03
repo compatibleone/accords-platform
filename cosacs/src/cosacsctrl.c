@@ -166,7 +166,11 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 /*	specific contract basis. The meta data ensuing will be sent	*/
 /*	to the provisioned instance through the COSACS interface.	*/
 /*	-----------------------------------------------------------	*/
-public	int	cosacs_metadata_instructions( char * cosacs, char * contract, char * publisher )
+public	int	cosacs_metadata_instructions( 
+		char * cosacs, 
+		char * nature,
+		char * contract, 
+		char * publisher )
 {
 
 	char	*	ihost;
@@ -252,14 +256,20 @@ public	int	cosacs_metadata_instructions( char * cosacs, char * contract, char * 
 		{
 			/* ensure its a configuration method */
 			/* --------------------------------- */
-			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.type" )))
+			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.nature" )))
+				zptr = occi_remove_response ( zptr );
+			else if ( strcasecmp( fptr->value, nature ) )
+				zptr = occi_remove_response ( zptr );
+			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.type" )))
 				zptr = occi_remove_response ( zptr );
 			else if ( strcasecmp( fptr->value, "method" ) )
 				zptr = occi_remove_response ( zptr );
 			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.method" )))
 				zptr = occi_remove_response ( zptr );
 			else if ((!( strcasecmp( fptr->value, "system" ) ))
-			     ||  (!( strcasecmp( fptr->value, "fork" ) )))
+			     ||  (!( strcasecmp( fptr->value, "fork"   ) ))
+			     ||  (!( strcasecmp( fptr->value, "process") ))
+			     ||  (!( strcasecmp( fptr->value, "command") )))
 			{
 				if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
 					zptr = occi_remove_response ( zptr );

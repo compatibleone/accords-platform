@@ -331,7 +331,7 @@ public	int	cordscript_parse_method( char * token )
 		return( _CORDSCRIPT_SYSTEM  );
 	else if (!( strcasecmp( Csp.token, "fork" )))
 		return( _CORDSCRIPT_FORK );
-	else	return( _CORDSCRIPT_AFFECT  );
+	else	return( _CORDSCRIPT_INVOKE );
 }
 
 /*	---------------------------------------------------------	*/
@@ -341,7 +341,9 @@ public	int	cordscript_parse_method( char * token )
 /*	---------------------------------------------------------	*/
 public	char *	cordscript_method( int	symbol )
 {
-	if ( symbol == _CORDSCRIPT_CONFIGURE )
+	if ( symbol == _CORDSCRIPT_INVOKE )
+		return( "invoke" );
+	else if ( symbol == _CORDSCRIPT_CONFIGURE )
 		return( "configure" );
 	else if ( symbol == _CORDSCRIPT_MONITOR )
 		return( "monitor" );
@@ -402,17 +404,17 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 				return( liberate_cordscript_actions( root ) );
 
 			/* ----------------------------------------------------- */
-			/* seperate between configuration method and affectation */
+			/* seperate between method invocation    and affectation */
 			/* ----------------------------------------------------- */
-			else if (( aptr->type = cordscript_parse_method( Csp.token )) != 0)
+			else if (( c = cordscript_punctuation()) == '(' )
 			{
+
 				/* ------------------------------------ */
-				/* its a configure or monitor statement */
+				/* its a method invocation or statement */
 				/* ------------------------------------ */
+				aptr->type = cordscript_parse_method( Csp.token );
 				aptr->lvalue->type = _CORDSCRIPT_METHOD;
 				if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
-					return( liberate_cordscript_actions( root ) );
-				else if ( cordscript_punctuation() != '(' )
 					return( liberate_cordscript_actions( root ) );
 				else if (( aptr->type == _CORDSCRIPT_SYSTEM )
 				     ||  ( aptr->type == _CORDSCRIPT_FORK   )) 
@@ -423,7 +425,13 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 				else while (1)
 				{
 					if (!( rvalue = cordscript_term() ))
-						return( liberate_cordscript_actions( root ) );
+					{
+						if ( aptr->type != _CORDSCRIPT_INVOKE )
+							return( liberate_cordscript_actions( root ) );
+						else if (!( lvalue ))
+							break;
+						else	return( liberate_cordscript_actions( root ) );
+					}
 					else if (!( rvalue->previous = lvalue ))
 						aptr->rvalue = rvalue;
 					else	lvalue->next = rvalue;
@@ -442,11 +450,12 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 					return( liberate_cordscript_actions( root ) );
 				else	break;
 			}
-			else if ((c = cordscript_punctuation()) == '=' )
+			else if (c == '=' )
 			{
 				/* ------------------------------ */
 				/* it is an affectation statement */
 				/* ------------------------------ */
+				aptr->type = _CORDSCRIPT_AFFECT;
 				aptr->lvalue->type = _CORDSCRIPT_PROPERTY;
 				if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
 					return( liberate_cordscript_actions( root ) );

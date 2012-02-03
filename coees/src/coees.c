@@ -151,13 +151,14 @@ private	int	coees_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_optimise_builder( Coees.domain, "optimise" ) ))
+	if (!( optr = occi_cords_connection_builder( Coees.domain, "connection" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback = (void *) 0;
+	optr->access |= _OCCI_PRIVATE;
 
 	rest_initialise_log( Coees.monitor );
 

@@ -85,7 +85,7 @@ private	char *	resolve_openstack_version( char * sptr )
 /*	The values collected will be used to build the META DATA to	*/
 /*	be made available as the provisioned instance personality	*/
 /*	-----------------------------------------------------------	*/
-private	char *	openstack_instructions( char * contract, char * result )
+private	char *	openstack_instructions( char * contract, char * result, char * nature )
 {
 
 	char	*	ihost;
@@ -168,7 +168,11 @@ private	char *	openstack_instructions( char * contract, char * result )
 		{
 			/* ensure its a configuration method */
 			/* --------------------------------- */
-			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.type" )))
+			if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.nature" )))
+				zptr = occi_remove_response ( zptr );
+			else if ( strcasecmp( fptr->value, nature ) )
+				zptr = occi_remove_response ( zptr );
+			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.type" )))
 				zptr = occi_remove_response ( zptr );
 			else if ( strcasecmp( fptr->value, "method" ) )
 				zptr = occi_remove_response ( zptr );
@@ -628,7 +632,7 @@ private	struct	rest_response * start_openstack(
 
 	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-	if (!( personality = openstack_instructions( reference, personality ) ))
+	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
 	if (!( filename = os_create_server_request( 
@@ -648,7 +652,9 @@ private	struct	rest_response * start_openstack(
 			/* ---------------------------- */
 			/* launch the COSACS operations */
 			/* ---------------------------- */
-			cosacs_metadata_instructions( pptr->hostname, reference, OsProcci.publisher );
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_CONFIGURATION,
+				reference, OsProcci.publisher );
 
 			/* ----------------------- */
 			/* create server meta data */

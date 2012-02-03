@@ -8,7 +8,7 @@ struct	cords_consumer
 	char *	name;
 	char *	identity;
 	char *	nature;
-	int	streams;
+	int	connections;
 	int	state;
 };
 

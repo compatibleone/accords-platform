@@ -7,6 +7,7 @@
 public struct occi_category * occi_cords_interface_builder(char *a,char * b);
 public struct occi_category * occi_cords_session_builder(char *a,char * b);
 public struct occi_category * occi_cords_consumer_builder(char *a,char * b);
+public struct occi_category * occi_cords_connection_builder(char *a,char * b);
 public struct occi_category * occi_cords_stream_builder(char *a,char * b);
 public struct occi_category * occi_cords_probe_builder(char *a,char * b);
 public struct occi_category * occi_cords_metric_builder(char *a,char * b);

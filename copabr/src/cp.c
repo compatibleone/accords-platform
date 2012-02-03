@@ -1769,6 +1769,8 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 		return( cords_terminate_image( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_CONFIGURATION ) ))
 		return( cords_terminate_configuration( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_INTERFACE ) ))
+		return( cords_terminate_interface( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_ACCOUNT ) ))
 		return( cords_terminate_account( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_SECURITY ) ))

@@ -184,6 +184,15 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
+	if (!( optr = occi_cords_connection_builder( Comons.domain, "connection" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback = (void *) 0;
+	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+
 	if (!( optr = occi_cords_stream_builder( Comons.domain, "stream" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

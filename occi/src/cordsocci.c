@@ -71,6 +71,7 @@
 #include "occiinterface.c"
 #include "occisession.c"
 #include "occiconsumer.c"
+#include "occiconnection.c"
 #include "occistream.c"
 #include "occiprobe.c"
 #include "occimetric.c"

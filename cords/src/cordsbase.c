@@ -45,6 +45,7 @@
 #include "interface.c"
 #include "session.c"
 #include "consumer.c"
+#include "connection.c"
 #include "stream.c"
 #include "probe.c"
 #include "metric.c"

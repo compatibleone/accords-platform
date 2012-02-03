@@ -38,6 +38,7 @@
 #define	_CORDSCRIPT_MONITOR	2
 #define	_CORDSCRIPT_SYSTEM 	3
 #define	_CORDSCRIPT_FORK   	4
+#define	_CORDSCRIPT_INVOKE   	5
 
 public	struct	cordscript_action *	cordscript_parse_statement( char * statement );
 public	int				cordscript_parse_method( char * token );

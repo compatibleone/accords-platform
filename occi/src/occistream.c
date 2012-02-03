@@ -140,8 +140,12 @@ private void autoload_cords_stream_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
 				pptr->service = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "session" )) != (struct xml_atribut *) 0)
+				pptr->session = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "consumer" )) != (struct xml_atribut *) 0)
 				pptr->consumer = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "connection" )) != (struct xml_atribut *) 0)
+				pptr->connection = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
 				pptr->nature = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "date" )) != (struct xml_atribut *) 0)
@@ -183,8 +187,14 @@ public  void autosave_cords_stream_nodes() {
 		fprintf(h," service=%c",0x0022);
 		fprintf(h,"%s",(pptr->service?pptr->service:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," session=%c",0x0022);
+		fprintf(h,"%s",(pptr->session?pptr->session:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," consumer=%c",0x0022);
 		fprintf(h,"%s",(pptr->consumer?pptr->consumer:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," connection=%c",0x0022);
+		fprintf(h,"%s",(pptr->connection?pptr->connection:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," nature=%c",0x0022);
 		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
@@ -223,8 +233,12 @@ private void set_cords_stream_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "service" ) ))
 			pptr->service = allocate_string(vptr);
+		if (!( strcmp( nptr, "session" ) ))
+			pptr->session = allocate_string(vptr);
 		if (!( strcmp( nptr, "consumer" ) ))
 			pptr->consumer = allocate_string(vptr);
+		if (!( strcmp( nptr, "connection" ) ))
+			pptr->connection = allocate_string(vptr);
 		if (!( strcmp( nptr, "nature" ) ))
 			pptr->nature = allocate_string(vptr);
 		if (!( strcmp( nptr, "date" ) ))
@@ -278,11 +292,25 @@ private int pass_cords_stream_filter(
 		else if ( strcmp(pptr->service,fptr->service) != 0)
 			return(0);
 		}
+	if (( fptr->session )
+	&&  (strlen( fptr->session ) != 0)) {
+		if (!( pptr->session ))
+			return(0);
+		else if ( strcmp(pptr->session,fptr->session) != 0)
+			return(0);
+		}
 	if (( fptr->consumer )
 	&&  (strlen( fptr->consumer ) != 0)) {
 		if (!( pptr->consumer ))
 			return(0);
 		else if ( strcmp(pptr->consumer,fptr->consumer) != 0)
+			return(0);
+		}
+	if (( fptr->connection )
+	&&  (strlen( fptr->connection ) != 0)) {
+		if (!( pptr->connection ))
+			return(0);
+		else if ( strcmp(pptr->connection,fptr->connection) != 0)
 			return(0);
 		}
 	if (( fptr->nature )
@@ -322,7 +350,13 @@ private struct rest_response * cords_stream_occi_response(
 	sprintf(cptr->buffer,"%s.%s.service=%s",optr->domain,optr->id,pptr->service);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.session=%s",optr->domain,optr->id,pptr->session);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.consumer=%s",optr->domain,optr->id,pptr->consumer);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.connection=%s",optr->domain,optr->id,pptr->connection);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
@@ -745,7 +779,11 @@ public struct occi_category * occi_cords_stream_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "session",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "consumer",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "connection",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
 			return(optr);
@@ -812,7 +850,29 @@ public struct rest_header *  cords_stream_occi_headers(struct cords_stream * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_stream.session='%s'\r\n",(sptr->session?sptr->session:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_stream.consumer='%s'\r\n",(sptr->consumer?sptr->consumer:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_stream.connection='%s'\r\n",(sptr->connection?sptr->connection:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

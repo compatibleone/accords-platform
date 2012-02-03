@@ -56,6 +56,7 @@
 #include "interface.h"
 #include "session.h"
 #include "consumer.h"
+#include "connection.h"
 #include "stream.h"
 #include "probe.h"
 #include "metric.h"

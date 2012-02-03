@@ -344,7 +344,11 @@ private	struct	rest_response * start_opennebula(
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			cosacs_metadata_instructions( pptr->hostname, reference, OnProcci.publisher );
+			cosacs_metadata_instructions( 
+				pptr->hostname, 
+				_CORDS_CONFIGURATION,
+				reference, 
+				OnProcci.publisher );
 
 		}
 		osptr = liberate_on_response( osptr );

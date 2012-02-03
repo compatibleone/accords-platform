@@ -19,17 +19,17 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _consumer_c_
-#define _consumer_c_
+#ifndef _connection_c_
+#define _connection_c_
 
 #include "element.h"
 
-#include "consumer.h"
+#include "connection.h"
 
-/*	----------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ c o n s u m e r 	*/
-/*	----------------------------------------------	*/
-public struct cords_consumer * liberate_cords_consumer(struct cords_consumer * sptr)
+/*	--------------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ c o n n e c t i o n 	*/
+/*	--------------------------------------------------	*/
+public struct cords_connection * liberate_cords_connection(struct cords_connection * sptr)
 {
 	if ( sptr )
 	{
@@ -37,49 +37,54 @@ public struct cords_consumer * liberate_cords_consumer(struct cords_consumer * s
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->identity )
-			 sptr->identity = liberate(sptr->identity);
-		if ( sptr->nature )
-			 sptr->nature = liberate(sptr->nature);
+		if ( sptr->date )
+			 sptr->date = liberate(sptr->date);
+		if ( sptr->service )
+			 sptr->service = liberate(sptr->service);
+		if ( sptr->session )
+			 sptr->session = liberate(sptr->session);
+		if ( sptr->stream )
+			 sptr->stream = liberate(sptr->stream);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_consumer *) 0);
+	return((struct cords_connection *) 0);
 
 }
 
-/*	----------------------------------------	*/
-/*	r e s e t _ c o r d s _ c o n s u m e r 	*/
-/*	----------------------------------------	*/
-public struct cords_consumer * reset_cords_consumer(struct cords_consumer * sptr)
+/*	--------------------------------------------	*/
+/*	r e s e t _ c o r d s _ c o n n e c t i o n 	*/
+/*	--------------------------------------------	*/
+public struct cords_connection * reset_cords_connection(struct cords_connection * sptr)
 {
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->identity = (char*) 0;
-		sptr->nature = (char*) 0;
-		sptr->connections =  0;
+		sptr->date = (char*) 0;
+		sptr->service = (char*) 0;
+		sptr->session = (char*) 0;
+		sptr->stream = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
 
 }
 
-/*	----------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ c o n s u m e r 	*/
-/*	----------------------------------------------	*/
-public struct cords_consumer * allocate_cords_consumer()
+/*	--------------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ c o n n e c t i o n 	*/
+/*	--------------------------------------------------	*/
+public struct cords_connection * allocate_cords_connection()
 {
-	struct cords_consumer * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_consumer ) ) ))
+	struct cords_connection * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_connection ) ) ))
 		return( sptr );
-	else	return( reset_cords_consumer(sptr) );
+	else	return( reset_cords_connection(sptr) );
 }
 
-/*	----------------------------------------	*/
-/*	x m l i n _ c o r d s _ c o n s u m e r 	*/
-/*	----------------------------------------	*/
-public int xmlin_cords_consumer(struct cords_consumer * sptr,struct xml_element * eptr)
+/*	--------------------------------------------	*/
+/*	x m l i n _ c o r d s _ c o n n e c t i o n 	*/
+/*	--------------------------------------------	*/
+public int xmlin_cords_connection(struct cords_connection * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -94,17 +99,21 @@ public int xmlin_cords_consumer(struct cords_consumer * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"identity") ))
+		else if (!( strcmp(wptr->name,"date") ))
 		{
-			if ( wptr->value ) { sptr->identity = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->date = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"nature") ))
+		else if (!( strcmp(wptr->name,"service") ))
 		{
-			if ( wptr->value ) { sptr->nature = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"connections") ))
+		else if (!( strcmp(wptr->name,"session") ))
 		{
-			if ( wptr->value ) { sptr->connections = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"stream") ))
+		{
+			if ( wptr->value ) { sptr->stream = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -115,10 +124,10 @@ public int xmlin_cords_consumer(struct cords_consumer * sptr,struct xml_element 
 
 }
 
-/*	------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ c o n s u m e r 	*/
-/*	------------------------------------------------	*/
-public int rest_occi_cords_consumer(FILE * fh,struct cords_consumer * sptr,char * prefix, char * nptr)
+/*	----------------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ c o n n e c t i o n 	*/
+/*	----------------------------------------------------	*/
+public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -126,12 +135,13 @@ public int rest_occi_cords_consumer(FILE * fh,struct cords_consumer * sptr,char 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.connections='%u'\r\n",prefix,nptr,sptr->connections);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.stream='%s'\r\n",prefix,nptr,(sptr->stream?sptr->stream:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _consumer_c_ */
+#endif	/* _connection_c_ */

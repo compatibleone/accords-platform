@@ -544,6 +544,15 @@ private	int	coobas_operation( char * nptr )
 	optr->callback  = &invoice_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
+	if (!( optr = occi_cords_connection_builder( CooBas.domain, "connection" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback = (void *) 0;
+	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+
 	rest_initialise_log(CooBas.monitor );
 
 	if (!( CooBas.identity ))

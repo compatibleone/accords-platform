@@ -580,6 +580,128 @@ private	int	cords_invocation_instruction(
 
 }
 
+/*	---------------------------------------------------------	*/
+/*	   c o r d s _ i n te r f a c e _ i n s t r u c t i o n		*/
+/*	---------------------------------------------------------	*/
+/*	here post script configuration actions are transformed		*/
+/*	to produce an interface method instruction			*/
+/*	---------------------------------------------------------	*/
+private	int	cords_interface_instruction( 
+		char * host,
+		struct xml_element * document,
+		struct cordscript_action * action,
+		char * command,
+		char * nature,
+		char * agent,
+		char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * lptr;
+	struct	cordscript_element * rvalue;
+	char *	avalue=(char *) 0;
+	char	buffer[2048];
+
+	if (!( lptr = action->lvalue ))
+		return( 78 );
+
+	else if (!( lptr->prefix ))
+		return( 30 );
+
+	else if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
+		return( 78 );
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, agent, tls ) ))
+	{
+		liberate_cordscript_action( action );
+		return(46);
+	}
+
+	sprintf(buffer,"%s/%s/",ihost,_CORDS_INSTRUCTION);
+
+	liberate( ihost );
+
+	if (!( rvalue=action->rvalue ))
+		avalue=allocate_string("");
+	else if (!( avalue = occi_unquoted_value( rvalue->value ) ))
+	{
+		liberate_cordscript_action( action );
+		return(27);
+	}
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+	{
+		liberate_cordscript_action( action );
+		return(46);
+	}
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		liberate_cordscript_action( action );
+		return(50);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.nature"   	, nature 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, command 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, "self"        ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.source" 	, aptr->value 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, lptr->value	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"   	, avalue       	) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		liberate( avalue );
+		liberate_cordscript_action( action );
+		return(51);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		liberate( avalue );
+		liberate_cordscript_action( action );
+		return(52);
+	}
+	else if (!( ihost = cords_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		liberate( avalue );
+		liberate_cordscript_action( action );
+		return(53);
+	}
+	else if (!( zptr =  cords_create_link( aptr->value,  ihost, agent, tls ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		liberate( avalue );
+		liberate_cordscript_action( action );
+		return(54);
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		liberate( avalue );
+	}
+
+	liberate_cordscript_action( action );
+	return( 0 );
+
+}
+
 /*	-------------------------------------------------------		*/
 /*	  c o r d s _ a c t i o n _ i n s t r u c t i o n		*/
 /*	-------------------------------------------------------		*/
@@ -628,6 +750,9 @@ private	int	cords_action_instruction(
 
 	else if (!( strcasecmp( mname, "fork" ) ))
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
+
+	else if (!( strcasecmp( mname, "invoke" ) ))
+		return( cords_interface_instruction( host, document, action, lptr->value,nature, agent, tls ) );
 
 	else if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
 		return( 78 );
@@ -875,6 +1000,60 @@ private	int	cords_broker_configuration(
 		else
 		{
 			cords_configuration_action( host, document, aptr, agent, tls );
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+			continue;
+		}
+	}
+	return( 0 );
+}
+
+/*	-------------------------------------------------------		*/
+/*	  c o r d s _ b r o k e r _ i n t e r f a c e			*/
+/*	-------------------------------------------------------		*/
+/*	this function is called from the service instance build		*/
+/*	once the contract instances have been created and their		*/
+/*	details are resolved and established. 				*/
+/*									*/
+/*	Here two things will happen:					*/
+/*									*/
+/*	1) we will parse the collection of action statements		*/
+/*	to produce the corresponding concrete interface methods		*/
+/*									*/
+/*	2) we will parse the collection of action statements to		*/
+/*	produce the collection of monitoring channels that are 		*/
+/*	to be set up for the control of the service.			*/
+/*									*/
+/*	These two will occur at the same, differentiated by the		*/
+/*	cordscript keywords "configure" and "monitor".			*/
+/*	-------------------------------------------------------		*/
+
+private	int	cords_broker_interface(
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent, char * tls )
+{
+	struct	occi_element *	eptr;
+	struct	occi_response * aptr;
+	char	*	id;
+	int		status;
+	if (!( zptr )) return(0);
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+		{
+			return( 908 );
+		}
+		else
+		{
+			cords_interface_action( host, document, aptr, agent, tls );
 			aptr = occi_remove_response( aptr );
 			id = liberate( id );
 			continue;
@@ -2575,6 +2754,13 @@ public	char *	cords_manifest_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
+	/* -------------------------------------------- */
+	/* perform interface methods action  processing */
+	/* -------------------------------------------- */
+	if (( CbC.interface )
+	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+
 	/* ------------------------------------ */
 	/* check if document return is required */
 	/* ------------------------------------ */

@@ -282,6 +282,15 @@ private	int	coes_operation( char * nptr )
 	last = optr;
 	optr->callback  = &placement_interface;
 
+	if (!( optr = occi_cords_connection_builder( Coes.domain, "connection" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback = (void *) 0;
+	optr->access |= _OCCI_PRIVATE;
+
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

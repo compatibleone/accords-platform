@@ -39,8 +39,12 @@ public struct cords_stream * liberate_cords_stream(struct cords_stream * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->service )
 			 sptr->service = liberate(sptr->service);
+		if ( sptr->session )
+			 sptr->session = liberate(sptr->session);
 		if ( sptr->consumer )
 			 sptr->consumer = liberate(sptr->consumer);
+		if ( sptr->connection )
+			 sptr->connection = liberate(sptr->connection);
 		if ( sptr->nature )
 			 sptr->nature = liberate(sptr->nature);
 		if ( sptr->date )
@@ -61,7 +65,9 @@ public struct cords_stream * reset_cords_stream(struct cords_stream * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->service = (char*) 0;
+		sptr->session = (char*) 0;
 		sptr->consumer = (char*) 0;
+		sptr->connection = (char*) 0;
 		sptr->nature = (char*) 0;
 		sptr->date = (char*) 0;
 		sptr->probes =  0;
@@ -104,9 +110,17 @@ public int xmlin_cords_stream(struct cords_stream * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"session") ))
+		{
+			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"consumer") ))
 		{
 			if ( wptr->value ) { sptr->consumer = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"connection") ))
+		{
+			if ( wptr->value ) { sptr->connection = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"nature") ))
 		{
@@ -141,7 +155,9 @@ public int rest_occi_cords_stream(FILE * fh,struct cords_stream * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.consumer='%s'\r\n",prefix,nptr,(sptr->consumer?sptr->consumer:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
