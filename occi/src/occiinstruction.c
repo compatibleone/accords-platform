@@ -136,6 +136,8 @@ private void autoload_cords_instruction_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
+				pptr->nature = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "provision" )) != (struct xml_atribut *) 0)
 				pptr->provision = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
@@ -180,6 +182,9 @@ public  void autosave_cords_instruction_nodes() {
 		fprintf(h,"<cords_instruction\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," nature=%c",0x0022);
+		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," provision=%c",0x0022);
 		fprintf(h,"%s",(pptr->provision?pptr->provision:""));
@@ -229,6 +234,8 @@ private void set_cords_instruction_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "nature" ) ))
+			pptr->nature = allocate_string(vptr);
 		if (!( strcmp( nptr, "provision" ) ))
 			pptr->provision = allocate_string(vptr);
 		if (!( strcmp( nptr, "target" ) ))
@@ -276,6 +283,13 @@ private int pass_cords_instruction_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
+			return(0);
+		}
+	if (( fptr->nature )
+	&&  (strlen( fptr->nature ) != 0)) {
+		if (!( pptr->nature ))
+			return(0);
+		else if ( strcmp(pptr->nature,fptr->nature) != 0)
 			return(0);
 		}
 	if (( fptr->provision )
@@ -348,6 +362,9 @@ private struct rest_response * cords_instruction_occi_response(
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.provision=%s",optr->domain,optr->id,pptr->provision);
@@ -781,6 +798,8 @@ public struct occi_category * occi_cords_instruction_builder(char * a,char * b) 
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_cords_instruction_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "provision",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
@@ -824,6 +843,17 @@ public struct rest_header *  cords_instruction_occi_headers(struct cords_instruc
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"cords_instruction; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_instruction.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

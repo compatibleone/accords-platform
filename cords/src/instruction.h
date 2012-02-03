@@ -4,6 +4,7 @@
 struct	cords_instruction
 {
 	char *	id;
+	char *	nature;
 	char *	provision;
 	char *	target;
 	char *	method;

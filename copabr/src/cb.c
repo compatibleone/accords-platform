@@ -334,6 +334,7 @@ private	int	cords_affectation_instruction(
 		char * host,
 		struct xml_element * document,
 		struct cordscript_action * action,
+		char * nature,
 		char * agent,
 		char * tls )
 {
@@ -392,6 +393,7 @@ private	int	cords_affectation_instruction(
 			return(27);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.nature"   	, nature 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, "configure" 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
@@ -462,6 +464,7 @@ private	int	cords_invocation_instruction(
 		struct xml_element * document,
 		struct cordscript_action * action,
 		char * command,
+		char * nature,
 		char * agent,
 		char * tls )
 {
@@ -520,6 +523,7 @@ private	int	cords_invocation_instruction(
 			return(27);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.nature"   	, nature 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, command 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
@@ -589,6 +593,7 @@ private	int	cords_action_instruction(
 		char * host,
 		struct xml_element * document,
 		struct cordscript_action * action,
+		char * nature,
 		char * agent,
 		char * tls )
 {
@@ -616,13 +621,13 @@ private	int	cords_action_instruction(
 		return(30);
 
 	else if (!( strcasecmp( mname, "none" ) ))
-		return( cords_affectation_instruction( host, document, action, agent, tls ) );
+		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
 
 	else if (!( strcasecmp( mname, "system" ) ))
-		return( cords_invocation_instruction( host, document, action, mname, agent, tls ) );
+		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( strcasecmp( mname, "fork" ) ))
-		return( cords_invocation_instruction( host, document, action, mname, agent, tls ) );
+		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( aptr = cords_resolve_contract_id( document, lptr->prefix ) ))
 		return( 78 );
@@ -656,6 +661,7 @@ private	int	cords_action_instruction(
 			return(50);
 		}
 		else if ((!(dptr=occi_request_element(qptr,"occi.instruction.target"  	, aptr->value 	) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.nature"   	, nature 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, mname 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
@@ -727,9 +733,42 @@ private	int	cords_configuration_action(
 
 	if (!( strcmp( type, "cordscript" )))
 		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
-			cords_action_instruction( host, document, aptr, agent, tls );
+			cords_action_instruction( host, document, aptr,"configuration", agent, tls );
 
 	type = liberate( type );
+	statement = liberate( statement );	 
+
+	return(0);
+}
+
+/*	-------------------------------------------------------		*/
+/*	  	c o r d s _ i n t e r f a c e _ a c t i o n		*/
+/*	-------------------------------------------------------		*/
+private	int	cords_interface_action( 
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent,
+		char * tls )
+{
+	char *	type=(char *) 0;
+	char *	name=(char *) 0;
+	char *	statement=(char *) 0;
+	struct	cordscript_action * aptr=(struct cordscript_action*) 0;
+
+	if (!( statement = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
+		return( 78 );
+	if (!( type = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
+		type = allocate_string("cordscript");
+	if (!( name = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_NAME ) ))
+		name = allocate_string("method");
+
+	if (!( strcmp( type, "cordscript" )))
+		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+			cords_action_instruction( host, document, aptr,name, agent, tls );
+
+	type = liberate( type );
+	name = liberate( name );
 	statement = liberate( statement );	 
 
 	return(0);

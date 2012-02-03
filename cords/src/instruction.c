@@ -35,6 +35,8 @@ public struct cords_instruction * liberate_cords_instruction(struct cords_instru
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->nature )
+			 sptr->nature = liberate(sptr->nature);
 		if ( sptr->provision )
 			 sptr->provision = liberate(sptr->provision);
 		if ( sptr->target )
@@ -65,6 +67,7 @@ public struct cords_instruction * reset_cords_instruction(struct cords_instructi
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->nature = (char*) 0;
 		sptr->provision = (char*) 0;
 		sptr->target = (char*) 0;
 		sptr->method = (char*) 0;
@@ -103,6 +106,10 @@ public int xmlin_cords_instruction(struct cords_instruction * sptr,struct xml_el
 		if (!( strcmp(wptr->name,"id") ))
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"nature") ))
+		{
+			if ( wptr->value ) { sptr->nature = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"provision") ))
 		{
@@ -155,6 +162,7 @@ public int rest_occi_cords_instruction(FILE * fh,struct cords_instruction * sptr
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provision='%s'\r\n",prefix,nptr,(sptr->provision?sptr->provision:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.method='%s'\r\n",prefix,nptr,(sptr->method?sptr->method:""));
