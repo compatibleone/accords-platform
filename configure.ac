@@ -182,6 +182,7 @@ AC_ARG_ENABLE([coes],
       [],
       [enable_coes=yes])
 AM_CONDITIONAL([ENABLE_COES], [test "$enable_coes" = "yes"])
+AC_SUBST([CFLAGS_COES], [-I\${abs_top_srcdir}/coes/src])
 AC_SUBST([PATH_COES], [${abs_top_srcdir}/coes/src])
 
 AC_ARG_ENABLE([coees],
@@ -190,6 +191,7 @@ AC_ARG_ENABLE([coees],
       [],
       [enable_coees=yes])
 AM_CONDITIONAL([ENABLE_COEES], [test "$enable_coees" = "yes"])
+AC_SUBST([CFLAGS_COEES], [-I\${abs_top_srcdir}/coees/src])
 AC_SUBST([PATH_COEES], [${abs_top_srcdir}/coees/src])
 
 AC_ARG_ENABLE([coobas],
@@ -198,6 +200,7 @@ AC_ARG_ENABLE([coobas],
       [],
       [enable_coobas=yes])
 AM_CONDITIONAL([ENABLE_COOBAS], [test "$enable_coobas" = "yes"])
+AC_SUBST([CFLAGS_COOBAS], [-I\${abs_top_srcdir}/coobas/src])
 AC_SUBST([PATH_COOBAS], [${abs_top_srcdir}/coobas/src])
 
 AC_ARG_ENABLE([comons],
@@ -206,6 +209,7 @@ AC_ARG_ENABLE([comons],
       [],
       [enable_comons=yes])
 AM_CONDITIONAL([ENABLE_COMONS], [test "$enable_comons" = "yes"])
+AC_SUBST([CFLAGS_COMONS], [-I\${abs_top_srcdir}/comons/src])
 AC_SUBST([PATH_COMONS], [${abs_top_srcdir}/comons/src])
 
 AC_ARG_ENABLE([conets],
@@ -214,6 +218,7 @@ AC_ARG_ENABLE([conets],
       [],
       [enable_conets=yes])
 AM_CONDITIONAL([ENABLE_CONETS], [test "$enable_conets" = "yes"])
+AC_SUBST([CFLAGS_CONETS], [-I\${abs_top_srcdir}/conets/src])
 AC_SUBST([PATH_CONETS], [${abs_top_srcdir}/conets/src])
 
 AC_ARG_ENABLE([publisher],

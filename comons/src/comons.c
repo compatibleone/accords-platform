@@ -28,6 +28,8 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "occiresolver.h"
+#include "cordslang.h"
 
 struct	accords_configuration Comons = {
 	0,0,
@@ -134,7 +136,246 @@ private	struct rest_extension * comons_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the comons instance category		*/
 /*	------------------------------------------------------------------	*/
-/* none for now */
+/*	-------------------------------------------------------		*/
+/*		    c o r d s _ p o s t _ e v e n t			*/
+/*	-------------------------------------------------------		*/
+public	int	comons_create_session( char * service, char * account, char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * lptr;
+	struct	cordscript_element * rvalue;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider(_CORDS_SESSION,agent, tls) ))
+		return(46);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_SESSION);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return(46);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return(50);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.session.service" , service ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.session.account" , account ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(51);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(52);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ s e s s i o n  		*/
+/*	-------------------------------------------	*/
+private	int	create_cords_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( pptr->name ))
+		return( 0 ); 
+	else	return( 0 );
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ s e s s i o n  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_cords_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ s e s s i o n 	 	*/
+/*	-------------------------------------------	*/
+private	int	update_cords_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ s e s s i o n  		*/
+/*	-------------------------------------------	*/
+private	int	delete_cords_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	cords_session_interface = {
+	create_cords_session,
+	retrieve_cords_session,
+	update_cords_session,
+	delete_cords_session
+	};
+
+
+/*	-------------------------------------------------------		*/
+/*		    c o r d s _ c r e a t e _ s t r e a m		*/
+/*	-------------------------------------------------------		*/
+public	int	comons_create_stream( char * service, char * consumer, char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * lptr;
+	struct	cordscript_element * rvalue;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider(_CORDS_STREAM,agent, tls) ))
+		return(46);
+	else 
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_STREAM);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return(46);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return(50);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.stream.service" , service  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.stream.consumer" , consumer) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(51);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(52);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ s t r e a m  		*/
+/*	-------------------------------------------	*/
+private	int	create_cords_stream(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_stream * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( pptr->name ))
+		return( 0 ); 
+	else	return( 0 );
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ s t r e a m  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_cords_stream(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_stream * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ s t r e a m 	 	*/
+/*	-------------------------------------------	*/
+private	int	update_cords_stream(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_stream * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ s t r e a m  		*/
+/*	-------------------------------------------	*/
+private	int	delete_cords_stream(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_stream * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	cords_stream_interface = {
+	create_cords_stream,
+	retrieve_cords_stream,
+	update_cords_stream,
+	delete_cords_stream
+	};
 
 /*	------------------------------------------------------------------	*/
 /*			c o m o n s _ o p e r a t i o n				*/
@@ -172,7 +413,7 @@ private	int	comons_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &cords_session_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_cords_consumer_builder( Comons.domain, "consumer" ) ))
@@ -199,7 +440,7 @@ private	int	comons_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &cords_stream_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_cords_metric_builder( Comons.domain, "metric" ) ))
