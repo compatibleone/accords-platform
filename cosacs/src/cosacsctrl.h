@@ -23,6 +23,7 @@
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value );
 public	int	cosacs_create_script( char * cosacs, char * action, char * parameters, char * type );
 public	int	cosacs_create_file( char * cosacs, char * remotename, char * localname, char * type );
+public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * stream, char * metric);
 public	int	cosacs_metadata_instructions( char * cosacs, char * nature, char * contract, char * publisher );
 
 	/* ------------- */

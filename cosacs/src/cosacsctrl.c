@@ -31,6 +31,54 @@
 #define	_COSACS_START "cosacs:start"
 
 /*	-----------------------------------------------------------	*/
+/*		c o s a c s _ c r e a t e _ p r o b e 			*/
+/*	-----------------------------------------------------------	*/
+public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * stream, char * metric)
+{
+	char	buffer[1024];
+	char 	work[1024];
+	char *	agent=_CORDS_CONTRACT_AGENT;
+
+	char *	host=_COSACS_HOST; /* TODO will be cosacs parameter when ready */
+
+	struct	occi_client * cptr;
+	struct	occi_request * rptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+
+	/* ----------------------- */
+	/* prepare COSACS identity */
+	/* ----------------------- */
+	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_PROBE);
+
+	if ( prefix )
+		sprintf(work,"%s_%s",prefix,symbol);
+	else	strcpy(work,symbol);
+
+	/* ----------------------------------- */
+	/* create client and request then POST */
+	/* ----------------------------------- */
+	if (!( cptr = occi_create_client( buffer, agent, default_tls() ) ))
+		return(0);
+	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		return(0);
+	else if ((!(dptr=occi_request_element(rptr,"occi.probe.name"  , work   ) ))
+	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.metric", metric ) ))
+	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.stream", stream ) )))
+	{
+		rptr = occi_remove_request( rptr );
+		return(0);
+	}
+	else
+	{
+		zptr = occi_client_post( cptr, rptr );
+		zptr = occi_remove_response( zptr );
+		rptr = occi_remove_request( rptr );
+		return(0);
+	}
+}
+
+/*	-----------------------------------------------------------	*/
 /*		c o s a c s _ c r e a t e _ m e t a d a t a		*/
 /*	-----------------------------------------------------------	*/
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value )
@@ -176,6 +224,9 @@ public	int	cosacs_metadata_instructions(
 	char	*	ihost;
 	char 	*	vptr;
 
+	char 	*	stream="streamid";
+	char 	*	metric="samples";
+
 	struct	occi_response * zptr=(struct occi_response *) 0;
 	struct	occi_response * zzptr=(struct occi_response *) 0;
 	struct	occi_response * yptr=(struct occi_response *) 0;
@@ -284,28 +335,53 @@ public	int	cosacs_metadata_instructions(
 					zptr = occi_remove_response ( zptr );
 				}
 			}
-			else if (  strcasecmp( fptr->value, "configure" ) )
-				zptr = occi_remove_response ( zptr );
-
-			/* collect the configuration details */
-			/* --------------------------------- */
-			else if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
-				zptr = occi_remove_response ( zptr );
-			else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
-				zptr = occi_remove_response ( zptr );
-			else if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
-				zptr = occi_remove_response ( zptr );
-			else
+			else if (!(  strcasecmp( fptr->value, "configure" ) ))
 			{
-				/* ------------------------------------------------------------ */
-				/* Create a COSACS Meta Data instance using the name value pair */
-				/* ------------------------------------------------------------ */
-				cosacs_create_metadata( cosacs, fptr->value, gptr->value, jptr->value );
-				zzptr = occi_remove_response ( zzptr );
-				zptr = occi_remove_response ( zptr );
+				/* collect the configuration details */
+				/* --------------------------------- */
+				if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
+					zptr = occi_remove_response ( zptr );
+				else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
+					zptr = occi_remove_response ( zptr );
+				else if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
+					zptr = occi_remove_response ( zptr );
+				else
+				{
+					/* ------------------------------------------------------------ */
+					/* Create a COSACS Meta Data instance using the name value pair */
+					/* ------------------------------------------------------------ */
+					cosacs_create_metadata( cosacs, fptr->value, gptr->value, jptr->value );
+					zzptr = occi_remove_response ( zzptr );
+					zptr = occi_remove_response ( zptr );
+				}
 			}
-		}
 
+			else if (!(  strcasecmp( fptr->value, "monitor" ) ))
+			{
+				/* collect the configuration details */
+				/* --------------------------------- */
+				if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
+					zptr = occi_remove_response ( zptr );
+				else if (!( stream = occi_resolve_consumer( fptr->value, _CORDS_CONTRACT_AGENT, default_tls() )))
+					zptr = occi_remove_response ( zptr );
+				else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
+					zptr = occi_remove_response ( zptr );
+				else if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
+					zptr = occi_remove_response ( zptr );
+				else
+				{
+					/* ------------------------------------------------------------ */
+					/* Create a COSACS Probe instance for the stream and metric ids */
+					/* ------------------------------------------------------------ */
+					cosacs_create_probe( cosacs, fptr->value, gptr->value, stream, metric );
+					zzptr = occi_remove_response ( zzptr );
+					zptr = occi_remove_response ( zptr );
+					stream = liberate( stream );
+				}
+			}
+
+			else	zptr = occi_remove_response ( zptr );
+		}
 		/* ----------------------- */
 		/* quick reset of base url */
 		/* ----------------------- */
