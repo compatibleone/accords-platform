@@ -140,6 +140,10 @@ private void autoload_cords_consumer_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "identity" )) != (struct xml_atribut *) 0)
 				pptr->identity = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "operator" )) != (struct xml_atribut *) 0)
+				pptr->operator = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
 				pptr->nature = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "connections" )) != (struct xml_atribut *) 0)
@@ -179,6 +183,12 @@ public  void autosave_cords_consumer_nodes() {
 		fprintf(h," identity=%c",0x0022);
 		fprintf(h,"%s",(pptr->identity?pptr->identity:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," operator=%c",0x0022);
+		fprintf(h,"%s",(pptr->operator?pptr->operator:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," nature=%c",0x0022);
 		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
 		fprintf(h,"%c",0x0022);
@@ -213,6 +223,10 @@ private void set_cords_consumer_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "identity" ) ))
 			pptr->identity = allocate_string(vptr);
+		if (!( strcmp( nptr, "operator" ) ))
+			pptr->operator = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "nature" ) ))
 			pptr->nature = allocate_string(vptr);
 		if (!( strcmp( nptr, "connections" ) ))
@@ -264,6 +278,20 @@ private int pass_cords_consumer_filter(
 		else if ( strcmp(pptr->identity,fptr->identity) != 0)
 			return(0);
 		}
+	if (( fptr->operator )
+	&&  (strlen( fptr->operator ) != 0)) {
+		if (!( pptr->operator ))
+			return(0);
+		else if ( strcmp(pptr->operator,fptr->operator) != 0)
+			return(0);
+		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
 	if (( fptr->nature )
 	&&  (strlen( fptr->nature ) != 0)) {
 		if (!( pptr->nature ))
@@ -292,6 +320,12 @@ private struct rest_response * cords_consumer_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.identity=%s",optr->domain,optr->id,pptr->identity);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.operator=%s",optr->domain,optr->id,pptr->operator);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
@@ -711,6 +745,10 @@ public struct occi_category * occi_cords_consumer_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "identity",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "operator",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "connections",0,0) ))
@@ -764,6 +802,28 @@ public struct rest_header *  cords_consumer_occi_headers(struct cords_consumer *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_consumer.identity='%s'\r\n",(sptr->identity?sptr->identity:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_consumer.operator='%s'\r\n",(sptr->operator?sptr->operator:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_consumer.price='%s'\r\n",(sptr->price?sptr->price:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

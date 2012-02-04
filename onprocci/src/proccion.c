@@ -646,6 +646,7 @@ public	struct	occi_category * build_opennebula( char * domain )
 	else
 	{
 		optr->callback  = &opennebula_interface;
+		optr->access |= _OCCI_PROVIDER;
 
 		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_opennebula)))
 			return( optr );

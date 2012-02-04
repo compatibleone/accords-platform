@@ -1015,7 +1015,7 @@ public	struct	occi_category * build_openstack( char * domain )
 	else
 	{
 		optr->callback  = &openstack_interface;
-
+		optr->access |= _OCCI_PROVIDER;
 		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_openstack)))

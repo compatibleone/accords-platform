@@ -36,6 +36,8 @@ private	struct	occi_publisher Publisher = {
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
+	(char *) 0,
+	(char *) 0,
 	(struct occi_publication *) 0,
 	(struct occi_publication *) 0
 	};
@@ -49,6 +51,159 @@ private	struct	occi_publisher Publisher = {
 private	char *	default_operator()
 {
 	return("accords");
+}
+
+/*	---------------------------------------------------------	*/
+/*		d e f a u l t _ c o n n e c t i o n			*/
+/*	---------------------------------------------------------	*/
+/*	this is a temporary measure and will be provided by the		*/
+/*	configuration of a service provider module.			*/
+/*	---------------------------------------------------------	*/
+private	char *	default_connection()
+{
+	return("normal");
+}
+
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ c o n s u m e r _ p u b l i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+private	char * 	cords_consumer_publication( 
+		char * name,
+		char * price,
+		char * nature,
+		char * operator,
+		char * identity, 
+		char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_CONSUMER, agent, tls ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_CONSUMER);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.consumer.name"  	, ( name ? name : name )       ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.consumer.price" 	, ( price ? price : "" )       ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.consumer.nature" 	, ( nature ? nature : "" )     ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.consumer.operator" 	, ( operator ? operator : "" ) ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.consumer.identity"	, ( identity ? identity : "" ) ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = cords_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		sprintf(buffer,"http://%s",ihost);
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( allocate_string( buffer ) );
+	}
+
+}
+
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ p r o v i d e r _ p u b l i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+private	char * 	cords_provider_publication( 
+		char * name,
+		char * category,
+		char * price,
+		char * operator,
+		char * identity, 
+		char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_PROVIDER, agent, tls ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_PROVIDER);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.provider.name"  	, ( name ? name : name )       ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.provider.price" 	, ( price ? price : "" )       ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.provider.category" 	, ( category ? category : "" )     ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.provider.operator" 	, ( operator ? operator : "" ) ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.provider.identity"	, ( identity ? identity : "" ) ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = cords_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		sprintf(buffer,"http://%s",ihost);
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( allocate_string( buffer ) );
+	}
+
 }
 
 /*	---------------------------------------------------------	*/
@@ -563,6 +718,7 @@ public	int	occi_auto_publication(
 	}
 }
 
+
 /*	---------------------------------------------------------	*/
 /*	      p u b l i s h _ o c c i _ c a t e g o r i e s		*/
 /*	---------------------------------------------------------	*/
@@ -571,6 +727,7 @@ public	int	publish_occi_categories(
 		char * url,	char * agent, 
 		struct occi_category * category )
 {
+	char *	vptr;
 	int	items=0;
 	struct	occi_category *	optr;
 	int	status=0;
@@ -578,6 +735,36 @@ public	int	publish_occi_categories(
 		optr != (struct occi_category *) 0;
 		optr = optr->next )
 	{
+		if ( optr->access & _OCCI_CONSUMER )
+		{
+			if (!( vptr = cords_consumer_publication( 
+				user,
+				category->price,
+				default_connection(),
+				default_operator(),
+				url,
+				agent,
+				default_tls() ) ))
+				return(27);
+			else if (!( Publisher.consumer = vptr ))
+				return(27);
+		}
+
+		if ( optr->access & _OCCI_PROVIDER )
+		{
+			if (!( vptr =cords_provider_publication( 
+				user,
+				optr->id,
+				category->price,
+				default_operator(),
+				url,
+				agent,
+				default_tls() ) ))
+				return(27);
+			else if (!( Publisher.provider = vptr ))
+				return(27);
+		}
+
 		if ( optr->access & _OCCI_PRIVATE )
 			continue;
 		else if ((status = publish_occi_category( ++items, user, password, url, agent, optr )) != 0)
@@ -672,6 +859,24 @@ public	int	publishing_occi_server(
 	/* activate the OCCI server layer for the required categories */
 	/* ---------------------------------------------------------- */
 	result = occi_server( agent, port, tls, max, category, Publisher.authorization );
+
+	/* ------------------------------------------------- */
+	/* check for and remove monitoring consumer identity */
+	/* ------------------------------------------------- */
+	if ( Publisher.consumer )
+	{
+		occi_simple_delete( Publisher.consumer, agent, default_tls() );
+		Publisher.consumer = liberate( Publisher.consumer );
+	}
+
+	/* ------------------------------------------------- */
+	/* check for and remove monitoring provider identity */
+	/* ------------------------------------------------- */
+	if ( Publisher.provider )
+	{
+		occi_simple_delete( Publisher.provider, agent, default_tls() );
+		Publisher.provider = liberate( Publisher.provider );
+	}
 
 	/* --------------------------------------------------------- */
 	/* withdraw publication of the collection of OCCI categories */

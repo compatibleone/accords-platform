@@ -171,8 +171,16 @@ private	int	conets_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
 	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_connection_builder( Conets.domain, "connection" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback = (void *) 0;
+	optr->access |= ( _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 	if (!( optr = occi_cords_iprange_builder( Conets.domain, "iprange" ) ))
 		return( 27 );
@@ -180,7 +188,6 @@ private	int	conets_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
 	optr->callback  = (void *) 0;
 
 	rest_initialise_log( Conets.monitor );

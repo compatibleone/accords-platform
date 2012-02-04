@@ -289,7 +289,7 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback = (void *) 0;
-	optr->access |= _OCCI_PRIVATE;
+	optr->access |= (_OCCI_PRIVATE | _OCCI_CONSUMER);
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );

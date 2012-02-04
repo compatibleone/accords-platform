@@ -551,7 +551,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 	rest_initialise_log(CooBas.monitor );
 

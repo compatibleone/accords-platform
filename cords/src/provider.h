@@ -6,6 +6,7 @@ struct	cords_provider
 {
 	char *	id;
 	char *	name;
+	char *	identity;
 	char *	category;
 	char *	profile;
 	char *	operator;

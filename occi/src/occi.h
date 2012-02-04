@@ -67,6 +67,8 @@ public	char *	default_tls();
 #define	_OCCI_SECURE 		16	/* each access must be secure		*/
 #define	_OCCI_NO_PRICING	32	/* inhibit category pricing 		*/
 #define	_OCCI_NO_AUTHORIZE	64	/* inhibit category authorize failure	*/
+#define	_OCCI_CONSUMER	 	128	/* publish monitoring consumer		*/
+#define	_OCCI_PROVIDER	 	256	/* publish resources provider 		*/
 
 #define	_OCCI_IDLE		0	/* the resource is idle			*/
 #define	_OCCI_ACTIVE		1	/* the resource is active		*/

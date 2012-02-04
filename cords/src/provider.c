@@ -37,6 +37,8 @@ public struct cords_provider * liberate_cords_provider(struct cords_provider * s
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->identity )
+			 sptr->identity = liberate(sptr->identity);
 		if ( sptr->category )
 			 sptr->category = liberate(sptr->category);
 		if ( sptr->profile )
@@ -60,6 +62,7 @@ public struct cords_provider * reset_cords_provider(struct cords_provider * sptr
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->identity = (char*) 0;
 		sptr->category = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->operator = (char*) 0;
@@ -98,6 +101,10 @@ public int xmlin_cords_provider(struct cords_provider * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"identity") ))
+		{
+			if ( wptr->value ) { sptr->identity = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"category") ))
 		{
 			if ( wptr->value ) { sptr->category = allocate_string(wptr->value); }
@@ -130,6 +137,7 @@ public int rest_occi_cords_provider(FILE * fh,struct cords_provider * sptr,char 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.category='%s'\r\n",prefix,nptr,(sptr->category?sptr->category:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));

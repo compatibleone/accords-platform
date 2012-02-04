@@ -39,6 +39,10 @@ public struct cords_consumer * liberate_cords_consumer(struct cords_consumer * s
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->identity )
 			 sptr->identity = liberate(sptr->identity);
+		if ( sptr->operator )
+			 sptr->operator = liberate(sptr->operator);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
 		if ( sptr->nature )
 			 sptr->nature = liberate(sptr->nature);
 		sptr = liberate( sptr );
@@ -57,6 +61,8 @@ public struct cords_consumer * reset_cords_consumer(struct cords_consumer * sptr
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->identity = (char*) 0;
+		sptr->operator = (char*) 0;
+		sptr->price = (char*) 0;
 		sptr->nature = (char*) 0;
 		sptr->connections =  0;
 		sptr->state =  0;
@@ -98,6 +104,14 @@ public int xmlin_cords_consumer(struct cords_consumer * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->identity = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"operator") ))
+		{
+			if ( wptr->value ) { sptr->operator = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"price") ))
+		{
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"nature") ))
 		{
 			if ( wptr->value ) { sptr->nature = allocate_string(wptr->value); }
@@ -127,6 +141,8 @@ public int rest_occi_cords_consumer(FILE * fh,struct cords_consumer * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.connections='%u'\r\n",prefix,nptr,sptr->connections);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);

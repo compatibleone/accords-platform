@@ -24,6 +24,8 @@ struct	occi_publisher
 	char *	enquiry;
 	char *	uri;
 	char *	authorization;
+	char *	consumer;
+	char *	provider;
 	struct	occi_publication * first;
 	struct	occi_publication * last;
 };

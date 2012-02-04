@@ -610,6 +610,7 @@ public	struct	occi_category * build_windowsazure( char * domain )
 	else
 	{
 		optr->callback  = &windowsazure_interface;
+		optr->access |= _OCCI_PROVIDER;
 
 		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_windowsazure)))
 			return( optr );
