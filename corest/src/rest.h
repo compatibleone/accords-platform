@@ -52,6 +52,7 @@
 #define	_HTTP_HOST		"Host"
 #define	_HTTP_CONTENT_TYPE	"Content-Type"
 #define	_HTTP_CONTENT_LENGTH	"Content-Length"
+#define	_HTTP_LOCATION		"Location"
 
 struct	rest_server;
 struct	rest_client;
@@ -72,6 +73,13 @@ struct	rest_interface
 	int 			(*after)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	int 			(*security)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_response * 	(*transaction)(void * i,struct rest_client * cptr, struct rest_request * rptr, struct rest_response * aptr);
+	struct rest_response *  (*alert)(void * i, 
+					struct rest_client * cptr, 
+					struct rest_response * rptr, 
+					int status, char * message, 
+					char * nature, 
+					char * agent, char * tls);
+
 };
 
 struct	rest_client

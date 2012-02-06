@@ -655,6 +655,27 @@ private	struct	rest_response *	rest_client_accept_response( struct rest_client *
 	return( aptr );
 }
 
+
+/*	--------------------------------------------------------	*/
+/*		r e s t _ c h e c k _ r e d i r e c t i o n		*/
+/*	--------------------------------------------------------	*/
+private char * rest_check_redirection( struct rest_response * rptr, char * target, struct rest_request * qptr )
+{
+	struct	rest_header * hptr;
+	if (!( rptr ))
+		return((char *) 0);
+	else if ( rptr->status < 301 )
+		return((char *) 0);
+	else if ( rptr->status >= 302 )
+		return((char *) 0);
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_LOCATION ) ))
+		return((char *) 0);
+	else if (!( target = allocate_string( hptr->value ) ))
+		return( target );
+	else	return( target );
+}
+
+
 /*	------------------------------------------------	*/
 /*	 r e s t _ c l i e n t _ g e t _ r e q u e s t 		*/
 /*	------------------------------------------------	*/
@@ -666,8 +687,11 @@ public	struct	rest_response * rest_client_get_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	
+	while (1)
+	{
 	if ( check_debug() )
 		printf("REST Client Request : GET %s \n",target );
+
 
 	if (!( uptr = analyse_url( target ) ))
 		return( rest_client_response( 600, "Url Anaysis", agent ) );
@@ -692,7 +716,9 @@ public	struct	rest_response * rest_client_get_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else	return( aptr );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
 
 }
 
@@ -707,6 +733,8 @@ public	struct	rest_response * rest_client_delete_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	
+	while(1)
+	{
 	if ( check_debug() )
 		printf("REST Client Request : DELETE %s \n",target );
 
@@ -728,7 +756,9 @@ public	struct	rest_response * rest_client_delete_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else	return( aptr );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -742,6 +772,8 @@ public	struct	rest_response * rest_client_head_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	
+	while(1)
+	{
 	if ( check_debug() )
 		printf("REST Client Request : HEAD %s \n",target );
 
@@ -763,7 +795,9 @@ public	struct	rest_response * rest_client_head_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else	return( aptr );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -777,6 +811,8 @@ public	struct	rest_response * rest_client_post_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	
+	while(1)
+	{
 	if ( check_debug() )
 		printf("REST Client Request : POST %s \n",target );
 
@@ -800,7 +836,9 @@ public	struct	rest_response * rest_client_post_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else	return( aptr );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
 
 }
 
@@ -815,6 +853,8 @@ public	struct	rest_response * rest_client_put_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	
+	while(1)
+	{
 	if ( check_debug() )
 		printf("REST Client Request : PUT %s \n",target );
 
@@ -838,7 +878,9 @@ public	struct	rest_response * rest_client_put_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else	return( aptr );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
 
 }
 

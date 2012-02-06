@@ -900,6 +900,7 @@ public	int	publishing_occi_server(
 	return( result );
 }
 
+
 	/* ---------------- */
 #endif	/* _occipublisher_c */
 	/* ---------------- */

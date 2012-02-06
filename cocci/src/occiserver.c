@@ -37,6 +37,9 @@
 #include "url.h"
 #include "urlpublic.h"
 #include "occiauth.h"
+#include "cordslang.h"
+#include "occiclient.h"
+#include "occiresolver.h"
 
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
@@ -861,6 +864,77 @@ public	int	occi_process_atributs(
 	return(1);
 }
 
+/*	-------------------------------------------------------		*/
+/*		    	o c c i _ a l e r t			*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * occi_alert(
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_response * rptr,
+		int status, 
+		char * message, char * nature, 
+		char * agent, char * tls )
+{
+	struct	occi_category 	* optr;
+
+	char	ecode[32];
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * lptr;
+	struct	cordscript_element * rvalue;
+	char	buffer[2048];
+
+	if (!( optr = vptr ))
+		return(rptr);
+	else	sprintf(ecode,"%u",status);
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_ALERT, agent, tls ) ))
+		return(rptr);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_ALERT);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return(rptr);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return(rptr);
+	}
+
+	else if ((!(dptr=occi_request_element(qptr,"occi.alert.source"      , agent   ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.nature"      , nature  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.status"      , ecode   ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.message"     , message ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(rptr);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(rptr);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(rptr);
+	}
+}
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ s e r v e r				*/
 /*	---------------------------------------------------------	*/
@@ -886,7 +960,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		(void *) 0,
 		(void *) 0,
 		occi_security,
-		(void *) 0
+		(void *) 0,
+		occi_alert
 	};
 
 	if ( tls )

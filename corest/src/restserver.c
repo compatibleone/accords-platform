@@ -148,6 +148,9 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 		if ( iptr->after )
 			sptr->method.after = iptr->after;
 		else	sptr->method.after = 0;
+		if ( iptr->alert )
+			sptr->method.alert = iptr->alert;
+		else	sptr->method.alert = 0;
 		return( sptr );
 		}
 }
@@ -340,9 +343,18 @@ private	struct rest_response * rest_transmit_response(
 {
 	struct	rest_header * hptr;
 
-
 	if (!( cptr ))	return( aptr );
 	if (!( aptr ))	return( aptr );
+
+	/* launch an alert if required and possible */
+	/* ---------------------------------------- */
+	if ( aptr->status >= 500 )
+		if ( cptr->server != (struct rest_server *) 0)
+			if ( cptr->server->method.alert )
+				(void) (*cptr->server->method.alert )
+				( cptr->server->method.instance, cptr, aptr,
+				aptr->status, aptr->message, "ALERT","REST",default_tls());
+
 
 	rest_log_send_response( cptr->server->name, aptr );
 	rest_show_response( aptr );
