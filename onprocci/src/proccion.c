@@ -24,7 +24,6 @@
 #include "cordslang.h"
 #include "occiresolver.h"
 #include "cosacsctrl.h"
-#include "cosacsctrl.c"
 
 /*	------------------------------------------	*/
 /*		o n _ v a l i d _ p r i c e		*/

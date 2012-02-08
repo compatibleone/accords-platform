@@ -19,6 +19,11 @@
 /* --------------------------------------------------------------------*/
 #ifndef	_cosacsctrl_c
 #define	_cosacsctrl_c
+#include "standard.h"
+#include "rest.h"
+#include "occi.h"
+#include "cosacsctrl.h"
+#include "cordslang.h"
 
 /*	------------------------------------	*/
 /*	the COSACS host is currently forced 	*/

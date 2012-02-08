@@ -84,32 +84,36 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 		return( failure( 30,"p2", "required") );
 	if (!( p1))
 		return( failure( 30,"p1", "required") );
-	if (!( strcmp(p1,"GET" ) ))
+	if (!( strcasecmp(p1,"GET" ) ))
 		return( az_result( az_client_get_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"POST" ) ))
+	else if (!( strcasecmp(p1,"POST" ) ))
 		return( az_result( az_client_post_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcmp(p1,"DELETE" ) ))
+	else if (!( strcasecmp(p1,"DELETE" ) ))
 		return( az_result( az_client_delete_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"PUT" ) ))
+	else if (!( strcasecmp(p1,"PUT" ) ))
 		return( az_result( az_client_put_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcmp(p1,"HEAD" ) ))
+	else if (!( strcasecmp(p1,"HEAD" ) ))
 		return( az_result( az_client_head_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcmp(p1,"LIST" ) ))
+	else if (!( strcasecmp(p1,"LIST" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVERS" ) ))
+		else if (!( strcasecmp( p2, "SERVERS" ) ))
 			az_result( az_list_servers() );
-		else if (!( strcmp( p2, "CERTIFICATES" ) ))
-			az_result( az_list_certificates() );
-		else if (!( strcmp( p2, "GROUPS" ) ))
+		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
+			az_result( az_list_certificates(p3) );
+		else if (!( strcasecmp( p2, "GROUPS" ) ))
 			az_result( az_list_affinity_groups() );
-		else if (!( strcmp( p2, "LOCATIONS" ) ))
+		else if (!( strcasecmp( p2, "PROFILES" ) ))
+			az_result( az_list_WATM_profiles() );
+		else if (!( strcasecmp( p2, "DEFINITIONS" ) ))
+			az_result( az_list_WATM_definitions(p3) );
+		else if (!( strcasecmp( p2, "LOCATIONS" ) ))
 			az_result( az_list_locations() );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
-	else if (!( strcmp(p1,"CREATE" ) ))
+	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
 		if (!( nomfic = az_create_server_request( p2, p3, p4,personality, resource ) ))
 			return( failure(27,"cannot create","request" ) );
@@ -119,24 +123,24 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 			return( 0 );
 		}
 	}
-	else if (!( strcmp(p1,"RETRIEVE" ) ))
+	else if (!( strcasecmp(p1,"RETRIEVE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 			az_result( az_get_server( p3 ) );
-		else if (!( strcmp( p2, "FLAVOR" ) ))
+		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			az_result( az_get_flavor( p3 ) );
-		else if (!( strcmp( p2, "IMAGE" ) ))
+		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_get_image( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
-	else if (!( strcmp(p1,"UPDATE" ) ))
+	else if (!( strcasecmp(p1,"UPDATE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 		{
 			if (!( nomfic = az_create_server_request( p2, p3, p4, personality, resource ) ))
 				az_result( az_update_server( p4, nomfic ) );
@@ -144,13 +148,13 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
 	}
-	else if (!( strcmp(p1,"REMOVE" ) ))
+	else if (!( strcasecmp(p1,"REMOVE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "SERVER" ) ))
 			az_result( az_delete_server( p3 ) );
-		else if (!( strcmp( p2, "IMAGE" ) ))
+		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
@@ -190,21 +194,21 @@ private	int	az_command(int argc, char * argv[] )
 		{
 			aptr++;
 
-			if (!( strcmp( aptr,"user" ) ))
+			if (!( strcasecmp( aptr,"user" ) ))
 				user = argv[argi++];
-			else if (!( strcmp( aptr,"password" ) ))
+			else if (!( strcasecmp( aptr,"password" ) ))
 				pass = argv[argi++];
-			else if (!( strcmp( aptr,"version" ) ))
+			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
-			else if (!( strcmp( aptr,"host" ) ))
+			else if (!( strcasecmp( aptr,"host" ) ))
 				host = argv[argi++];
-			else if (!( strcmp( aptr,"agent" ) ))
+			else if (!( strcasecmp( aptr,"agent" ) ))
 				agent = argv[argi++];
-			else if (!( strcmp( aptr,"tls" ) ))
+			else if (!( strcasecmp( aptr,"tls" ) ))
 				tls = argv[argi++];
-			else if (!( strcmp( aptr,"verbose" ) ))
+			else if (!( strcasecmp( aptr,"verbose" ) ))
 				verbose = 1;
-			else if (!( strcmp( aptr,"debug" ) ))
+			else if (!( strcasecmp( aptr,"debug" ) ))
 				debug=1;
 			else	return(failure(30,"incorrect","option"));
 			continue;
@@ -227,9 +231,9 @@ private	int	az_command(int argc, char * argv[] )
 
 private	int	az_banner()
 {
-	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0a.0.01");
-	printf("\n   Beta Version 14/08/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
+	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0a.0.02");
+	printf("\n   Beta Version 08/02/2012");
+	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   General Options ");
 	printf("\n");
@@ -243,7 +247,7 @@ private	int	az_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | GROUPS | CERTIFICATES | LOCATIONS ] ");
+	printf("\n   LIST [ SERVERS | GROUPS | PROFILES | DEFINITIONS | CERTIFICATES | LOCATIONS ] ");
 	printf("\n   CREATE <name> <image> <flavor> ");
 	printf("\n   RETRIEVE [ SERVER | GROUP | CERTIFICATE ] <id> ");
 	printf("\n   UPDATE SERVER <id> ");

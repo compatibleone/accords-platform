@@ -102,6 +102,16 @@ public	char *	cords_extract_atribut(
 	struct occi_response * zptr, char * domain,
 	char * category, char * nptr );
 
+public	struct	xml_element * cords_instance_node( 
+		char * host,
+		char * id,
+		char * agent,
+		char * tls,
+		char * namePlan,
+		char * account,
+		char * accountName );
+
+
 	/* ----- */
 #endif	/* _cb_h */
 	/* ----- */

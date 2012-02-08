@@ -23,7 +23,7 @@
 #include "cb.h"
 #include "csp.c"
 #include "restlog.h"
-
+#include "cosacsctrl.c"
 struct	operator_preferences
 {
 	int	negotiate;
@@ -2403,12 +2403,12 @@ private	struct	xml_element * 	cords_instance_contract(
 }
 
 /*	-------------------------------------------------------		*/
-/*	   c o r d s _ i n s t a n c e _ a p p l i a n c e		*/
+/*	   	c o r d s _ i n s t a n c e _ n o d e 			*/
 /*	-------------------------------------------------------		*/
 /*	here we instance a node and create a contract instance		*/
 /*	that will ne added to the service of the parent manifest	*/
 /*	-------------------------------------------------------		*/
-private	struct	xml_element * cords_instance_node( 
+public	struct	xml_element * cords_instance_node( 
 		char * host,
 		char * id,
 		char * agent,
@@ -2449,9 +2449,9 @@ private	struct	xml_element * cords_instance_node(
 
 	if ( check_verbose() )	printf("   CORDS Node \n");
 
-	/* ------------------------------- */
-	/* retrieve the node instance */
-	/* ------------------------------- */
+	/* ---------------------------- */
+	/* retrieve the node instance 	*/
+	/* ---------------------------- */
 	if (!( App.node = cords_retrieve_instance( host, id, agent, tls)))
 		return((struct xml_element *) 0);
 	else if (!( App.account = allocate_string( account ) ))

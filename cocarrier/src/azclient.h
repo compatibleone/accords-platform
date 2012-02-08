@@ -81,7 +81,7 @@ public	struct	az_response *	az_list_affinity_groups();
 public	struct	az_response *	az_create_certificate( char * filename );
 public	struct	az_response *	az_retrieve_certificate( char * filename );
 public	struct	az_response *	az_delete_certificate( char * filename );
-public	struct	az_response *	az_list_certificates();
+public	struct	az_response *	az_list_certificates(char * server);
 public	struct	az_response *	az_list_locations();
 public	struct	az_response *	az_list_servers	();
 public	struct	az_response *	az_list_flavors();
@@ -101,6 +101,8 @@ public	struct	az_response *	az_delete_image ( char * id );
 
 public	struct az_response * liberate_az_response( struct az_response * rptr );	
 
+public	struct	az_response *	az_list_WATM_profiles();
+public	struct	az_response *	az_list_WATM_definitions(char * profile );
 
 #endif	/* _az_client_h */
 	/* ------------ */

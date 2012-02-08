@@ -21,6 +21,10 @@
 #define _az_client_c
 
 #include "azclient.h"
+#include "tlsconfig.h"
+#include "tlsload.h"
+
+#define	USE_WGET
 
 private	struct az_config Waz = {
 	(char *) 0,
@@ -46,6 +50,51 @@ private	struct az_config Waz = {
 	0
 
 	};
+
+
+#ifdef	USE_WGET
+private	int	cleanup=0;
+private	int	launch_wget_request( char * method, char * url, char * file )
+{
+	FILE * h;
+	char *	tempname;
+	struct	tls_configuration * tlsconf;
+
+	if (!( tlsconf = tls_configuration_load( Waz.tls ) ))
+		return( 403 );
+	else if (!( tempname = rest_temporary_filename("sh")))
+		return( 30 );
+	else if (!( h = fopen( tempname,"w" ) ))
+	{
+		liberate( tempname );
+		return( 46 );
+	}
+	else
+	{
+		fprintf(h,"#!/bin/sh\n");
+		fprintf(h,"export az_url=%c%s%c\n",0x0022,url,0x0022);
+		fprintf(h,"export az_key=%c%s%c\n",0x0022,tlsconf->key,0x0022);
+		fprintf(h,"export az_crt=%c%s%c\n",0x0022,tlsconf->certificate,0x0022);
+		fprintf(h,"export az_caf=%c%s%c\n",0x0022,tlsconf->authority,0x0022);
+		fprintf(h,"wget --ca-certificate=$az_caf");
+		if ( file )
+			fprintf(h," --post-file=%c%s%c",0x0022,file,0x0022);
+		fprintf(h," --private-key=$az_key");
+		fprintf(h," --certificate=$az_crt");
+		fprintf(h," --header=%c%s : %s%c",0x0022,"Content-Type","text/xml");
+		fprintf(h," --header=%c%s : %s%c",0x0022,"x-ms-version",Waz.version);
+		fprintf(h," $-azurl > /dev/null 2> /dev/null\n");
+		fclose(h);
+		chmod( tempname , 0770 );
+		system( tempname );
+		if ( cleanup )	
+			unlink( tempname );
+		liberate( tempname );
+		return( 0 );
+	}
+}
+
+#endif
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ a z _ r e s p o n s e			*/
@@ -269,7 +318,25 @@ public	struct	az_response *	az_delete_affinity_group( char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_list_affinity_groups()
 {
-	return( azure_list_operation( "/services/affinitygroups" ) );
+	return( azure_list_operation( "/affinitygroups" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z _ l i s t _ W A T M _ p r o f i l e s		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_list_WATM_profiles()
+{
+	return( azure_list_operation( "/services/WATM/profiles" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z _ l i s t _ W A T M _ definitions			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_list_WATM_definitions(char * profile )
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/services/WATM/profiles/%s/definitions",profile );
+	return( azure_list_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -339,9 +406,11 @@ public	struct	az_response *	az_delete_certificate( char * filename )
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ c e r t i f i c a t e s			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_certificates()
+public	struct	az_response *	az_list_certificates(char * server)
 {
-	return( azure_list_operation( "/services/certificates" ) );
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/certificates" , server ); 
+	return( azure_list_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -358,7 +427,7 @@ public	struct	az_response *	az_list_locations()
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_list_servers	( )
 {
-	return( azure_list_operation( "/hostedservices" ) );
+	return( azure_list_operation( "/services/hostedservices" ) );
 }
 
 

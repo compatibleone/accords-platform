@@ -70,7 +70,7 @@ private	void	tls_show_errors( char * message)
 	char SSL_ErrorBuf[1024];
 	int	sslerr;
 	while ((sslerr = ERR_get_error())) 
-		if ( ERR_error_string( sslerr, SSL_ErrorBuf ) != (char *) 0) 
+		if ( ERR_error_string( sslerr, SSL_ErrorBuf ) ) 
 			printf("SSL ERR(%s) : %lu : %s \n",message,sslerr,SSL_ErrorBuf );
 	return;
 }
@@ -153,8 +153,7 @@ public	int	socketwriter( int handle, char * buffer, int length )
 /*	Returns zero to indicate success or other error.	*/
 /*	------------------------------------------------	*/
 
-public	int	https_use_encryption(aptr)
-	char *	aptr;
+public	int	https_use_encryption(	char *	aptr	)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
@@ -182,8 +181,7 @@ public	int	https_use_encryption(aptr)
 /*	Returns zero to indicate success or other error.	*/
 /*	--------------------------------------------------	*/
 
-public	int	https_use_certificate(aptr)
-	char *	aptr;
+public	int	https_use_certificate(	char *	aptr	)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
@@ -209,8 +207,7 @@ public	int	https_use_certificate(aptr)
 /*	Authority Chain File.					*/
 /*	--------------------------------------------------	*/
 
-public	int	https_use_CA_list(aptr)
-	char *	aptr;
+public	int	https_use_CA_list(	char *	aptr	)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
@@ -236,8 +233,7 @@ public	int	https_use_CA_list(aptr)
 /*	Returns zero to indicate success or other error.	*/
 /*	------------------------------------------------	*/
 
-public	int	https_use_password(aptr)
-	char *	aptr;
+public	int	https_use_password(	char *	aptr	)
 {
 	if ((!( aptr )) || (!( *aptr )))
 		return(0);
@@ -265,20 +261,20 @@ public	int	https_use_password(aptr)
 /*	secure socket layer connections.			*/
 /*	------------------------------------------------	*/
 
-public	int	sslsocketreader( handle, buffer, length )
-	SSL * handle;
-	char * buffer;
-	int length;
+public	int	sslsocketreader( 
+	SSL * handle,
+	char * buffer,
+	int length )
 {
 	int	status;
-	start_socket_catcher(handle,"ssl read");
+	start_socket_catcher(0,"ssl read");
 	if ((status = SSL_read( handle, buffer, length )) >= 0)
 		*(buffer+status) = 0;
 	else if ( status == -1 )
 		printf("socket reader failure at %lu : %s : %u \r\n",
 			time((long) 0),"sslread",
 			SSL_get_error( handle,status ) );
-	close_socket_catcher(handle,"ssl read",SSL_get_error(handle,status));
+	close_socket_catcher(0,"ssl read",SSL_get_error(handle,status));
 	return( status );
 }
 
@@ -289,15 +285,15 @@ public	int	sslsocketreader( handle, buffer, length )
 /*	secure socket layer connections.			*/
 /*	------------------------------------------------	*/
 
-public	int	sslsocketwriter( handle, buffer, length )
-	SSL * handle;
-	char * buffer;
-	int length;
+public	int	sslsocketwriter( 
+	SSL * handle,
+	char * buffer,
+	int length )
 {
 	int	status;
-	start_socket_catcher(handle,"ssl write");
+	start_socket_catcher(0,"ssl write");
 	status = SSL_write( handle, buffer, length );
-	close_socket_catcher(handle,"ssl write",SSL_get_error(handle,status));
+	close_socket_catcher(0,"ssl write",SSL_get_error(handle,status));
 	return( status );
 }
 
@@ -308,8 +304,7 @@ public	int	sslsocketwriter( handle, buffer, length )
 /*	secure socket layer connection.				*/
 /*	------------------------------------------------	*/
 
-public	int	ssl_tcp_readb( handle )
-	SSL * 	handle;
+public	int	ssl_tcp_readb( 	SSL * 	handle )
 {
 	char	c;
 	if ( sslsocketreader( handle, ( char *) & c, 1 ) == 1 ) {
@@ -326,8 +321,7 @@ public	int	ssl_tcp_readb( handle )
 /*	secure socket layer connection.				*/
 /*	------------------------------------------------	*/
 
-public	int	ssl_tcp_readw( handle )
-	SSL * 	handle;
+public	int	ssl_tcp_readw( 	SSL * 	handle )
 {
 	 int	v;
 	v = ssl_tcp_readb( handle );
@@ -343,10 +337,10 @@ public	int	ssl_tcp_readw( handle )
 /*	a secure socket layer connection.				*/
 /*	------------------------------------------------	*/
 
-public 	int 	ssl_tcp_write( handle, bptr, blen )
-	SSL *	handle;
-	char *	bptr;
-	int	blen;
+public 	int 	ssl_tcp_write( 
+	SSL *	handle,
+	char *	bptr,
+	int	blen )
 {
 	blen = sslsocketwriter( handle, bptr, blen );
 	return( blen );
@@ -359,10 +353,10 @@ public 	int 	ssl_tcp_write( handle, bptr, blen )
 /*	a secure socket layer connection.				*/
 /*	------------------------------------------------	*/
 
-public	int	ssl_tcp_read( handle, bptr, blen )
-	SSL *	handle;
-	char *	bptr;
-	int	blen;
+public	int	ssl_tcp_read( 
+	SSL *	handle,
+	char *	bptr,
+	int	blen )
 {
 #define	_OPTIMISED_HTTP
 #ifdef	_OPTIMISED_HTTP
@@ -377,13 +371,12 @@ public	int	ssl_tcp_read( handle, bptr, blen )
 #endif
 }
 
-public	int	ssl_tcp_accept( handle )
-	SSL *	handle;
+public	int	ssl_tcp_accept( SSL *	handle )
 {
 	int	status;
-	start_socket_catcher(handle,"ssl accept");
+	start_socket_catcher(0,"ssl accept");
 	status = SSL_accept( handle );
-	close_socket_catcher(handle,"ssl accept",errno);
+	close_socket_catcher(0,"ssl accept",errno);
 	if ( SSL_debug ) 
 	{
 		printf("SSL_accept(pid=%u,h=%x) => %d \r\n",getpid(),handle,status);
@@ -391,23 +384,21 @@ public	int	ssl_tcp_accept( handle )
 	return( status );
 }
 
-public	int	ssl_tcp_connect( handle )
-	SSL *	handle;
+public	int	ssl_tcp_connect( SSL *	handle )
 {
 	int	status;
 	if ( SSL_debug ) 
 	{
 		printf("SSL_connect(pid=%u,h=%x)\r\n",getpid(),handle);
 	}
-	start_socket_catcher(handle,"ssl connect");
+	start_socket_catcher(0,"ssl connect");
 	status = SSL_connect( handle );
-	close_socket_catcher(handle,"ssl connect",errno);
+	close_socket_catcher(0,"ssl connect",errno);
 	return( status );
 }
 
 private	int	do_ssl_shutdown=0;
-public	int	ssl_tcp_shutdown( handle )
-	SSL *	handle;
+public	int	ssl_tcp_shutdown( SSL *	handle )
 {
 	int	status=0;
 	if ( SSL_debug ) 
@@ -444,9 +435,9 @@ public	int	connection_shutdown( CONNECTIONPTR cptr )
 /*	the correct closure of a secure socket connection.	*/
 /*	------------------------------------------------	*/
 
-void		close_ssl_connection( cptr, mode )
-CONNECTIONPTR	cptr;
-int		mode;
+void		close_ssl_connection( 
+	CONNECTIONPTR	cptr,
+	int		mode)
 {
 	/* Check for an SSL object */
 	/* ----------------------- */
@@ -685,6 +676,9 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
+
+	SSL_CTX_set_mode (cptr->context, SSL_MODE_ENABLE_PARTIAL_WRITE);
+	SSL_CTX_set_mode (cptr->context, SSL_MODE_AUTO_RETRY);
 
 	if (!( mode & _SSL_INTERNAL ))
 	{
