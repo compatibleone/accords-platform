@@ -57,15 +57,18 @@ private	int	az_result( struct az_response * rptr )
 				json_show( rptr->jsonroot );
 				break;
 			case	_TEXT_XML	:
-			default			:
-				if ( rptr->response->type == _FILE_BODY )
+				if (( rptr->response->status != 204 )
+				&&  ( rptr->response->body ))
 				{
-					sprintf(buffer,"cat %s",rptr->response->body);
-					system( buffer );
+					if ( rptr->response->type == _FILE_BODY )
+					{
+						sprintf(buffer,"cat %s",rptr->response->body);
+						system( buffer );
+					}
+					else 	printf("\n%s\n",rptr->response->body);
+					printf("\n");
 				}
-				else 	printf("\n%s\n",rptr->response->body);
 			}
-			printf("\n");
 		}
 		liberate_az_response( rptr );
 		return(0);
@@ -73,27 +76,20 @@ private	int	az_result( struct az_response * rptr )
 	else	return( failure(99,"no","result") );
 }
 
-private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
+private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "CO-AZCLIENT/1.0";
 	char	*	nomfic;
 	char	*	personality="";
 	char	*	resource=_CORDS_LAUNCH_CFG;
+
 	if (!( p2 ))
 		return( failure( 30,"p2", "required") );
-	if (!( p1))
+
+	else if (!( p1))
 		return( failure( 30,"p1", "required") );
-	if (!( strcasecmp(p1,"GET" ) ))
-		return( az_result( az_client_get_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcasecmp(p1,"POST" ) ))
-		return( az_result( az_client_post_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcasecmp(p1,"DELETE" ) ))
-		return( az_result( az_client_delete_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcasecmp(p1,"PUT" ) ))
-		return( az_result( az_client_put_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcasecmp(p1,"HEAD" ) ))
-		return( az_result( az_client_head_request( p2, 0, agent, hptr ) ) );
+
 	else if (!( strcasecmp(p1,"LIST" ) ))
 	{
 		if (!( p2 ))
@@ -104,6 +100,10 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 			az_result( az_list_certificates(p3) );
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
 			az_result( az_list_affinity_groups() );
+		else if (!( strcasecmp( p2, "STORAGE" ) ))
+			az_result( az_list_storage_services() );
+		else if (!( strcasecmp( p2, "OPERATIONS" ) ))
+			az_result( az_list_operations(p3,p4) );
 		else if (!( strcasecmp( p2, "PROFILES" ) ))
 			az_result( az_list_WATM_profiles() );
 		else if (!( strcasecmp( p2, "DEFINITIONS" ) ))
@@ -115,24 +115,55 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 	}
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if (!( nomfic = az_create_server_request( p2, p3, p4,personality, resource ) ))
-			return( failure(27,"cannot create","request" ) );
-		else
-		{ 	
-			az_result( az_create_server( nomfic ) );
-			return( 0 );
+		if  (!( strcasecmp( p2, "SERVER" ) ))
+		{
+			if (!( nomfic = az_create_server_request( p3, p4, p5,personality, resource ) ))
+				return( failure(27,"cannot create","request" ) );
+			else
+			{ 	
+				az_result( az_create_server( nomfic ) );
+				return( 0 );
+			}
 		}
+		else if  (!( strcasecmp( p2, "GROUP" ) ))
+		{
+			if (!( nomfic = az_create_affinity_group_request( p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot create","affinity group request" ) );
+			else
+			{ 	
+				az_result( az_create_affinity_group( nomfic ) );
+				return( 0 );
+			}
+		}
+
+		else if  (!( strcasecmp( p2, "STORAGE" ) ))
+		{
+			if (!( nomfic = az_create_storage_service_request( p3, p4, p5, p6, p7 ) ))
+				return( failure(27,"cannot create","storage service request" ) );
+			else
+			{ 	
+				az_result( az_create_storage_service( nomfic ) );
+				return( 0 );
+			}
+		}
+
 	}
-	else if (!( strcasecmp(p1,"RETRIEVE" ) ))
+	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "SUBSCRIPTION" ) ))
+			az_result( az_get_subscription() );
 		else if (!( strcasecmp( p2, "SERVER" ) ))
 			az_result( az_get_server( p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			az_result( az_get_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_get_image( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			az_result( az_retrieve_affinity_group( p3 ) );
+		else if (!( strcasecmp( p2, "STORAGE") ))
+			az_result( az_retrieve_storage_service( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -148,7 +179,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
 	}
-	else if (!( strcasecmp(p1,"REMOVE" ) ))
+	else if (!( strcasecmp(p1,"DELETE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
@@ -156,6 +187,10 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4 )
 			az_result( az_delete_server( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			az_result( az_delete_affinity_group( p3 ) );
+		else if (!( strcasecmp( p2, "STORAGE" ) ))
+			az_result( az_delete_storage_service( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -173,7 +208,7 @@ private	int	az_command(int argc, char * argv[] )
 	char *	thost="https://127.0.0.1:8080/";
 	char *  other="https://windows.azure.com/";
 	char *	agent="CO-AZCLIENT/1.0";
-	char *	version="2010-10-28";
+	char *	version="2011-10-01";
 	char * 	subscription="f346740d-e45e-42e9-80b8-4865f3a855d1";
 	char *	namespace="http://schemas.microsoft.com/windowsazure";
 	while ( argi < argc )
@@ -188,7 +223,11 @@ private	int	az_command(int argc, char * argv[] )
 			return( az_operation( aptr, 
 				( argi < argc ? argv[argi] : (char *) 0 ),
 				( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
-				( (argi+2) < argc ? argv[argi+2] : (char *) 0 ) ) );
+				( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),
+				( (argi+3) < argc ? argv[argi+3] : (char *) 0 ),
+				( (argi+4) < argc ? argv[argi+4] : (char *) 0 ),
+				( (argi+5) < argc ? argv[argi+5] : (char *) 0 ) ) );
+
 		}
 		else if (  *(++aptr) == '-' )
 		{
@@ -247,16 +286,14 @@ private	int	az_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | GROUPS | PROFILES | DEFINITIONS | CERTIFICATES | LOCATIONS ] ");
-	printf("\n   CREATE <name> <image> <flavor> ");
-	printf("\n   RETRIEVE [ SERVER | GROUP | CERTIFICATE ] <id> ");
+	printf("\n   LIST [ SERVERS | STORAGE  | OPERATIONS  | LOCATIONS ");
+	printf("\n          GROUPS  | PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   CREATE [ SERVER  <name> <image> <flavor> ] ");
+	printf("\n   CREATE [ GROUP   <name> <label> <description> <location> ] ");
+	printf("\n   CREATE [ STORAGE <name> <label> <description> <location <group> ] ");
+	printf("\n   GET    [ SUBSCRIPTION | SERVER | GROUP | CERTIFICATE | STORAGE ] <id> ");
 	printf("\n   UPDATE SERVER <id> ");
-	printf("\n   REMOVE [ SERVER | GROUP | CERTIFICATE | LOCATION ] <id> ");
-	printf("\n");
-	printf("\n   REST Methods");
-	printf("\n");
-	printf("\n   [ GET | DELETE | HEAD ] <url> ");
-	printf("\n   [ PUT | POST ] <url> <filename> ");
+	printf("\n   DELETE [ SERVER | GROUP | STORAGE | CERTIFICATE | LOCATION ] <id> ");
 	printf("\n\n");
 	return( 0 );
 }

@@ -86,6 +86,8 @@ public	struct	az_response *	az_list_locations();
 public	struct	az_response *	az_list_servers	();
 public	struct	az_response *	az_list_flavors();
 public	struct	az_response *	az_list_images  ();
+public	struct	az_response *	az_list_storage_services();
+public	struct	az_response *	az_list_operations();
 
 public	struct	az_response *	az_create_server( char * filename );
 public	struct	az_response *	az_create_image( char * filename );
@@ -93,16 +95,35 @@ public	struct	az_response *	az_create_image( char * filename );
 public	struct	az_response *	az_get_server	( char * id );
 public	struct	az_response *	az_get_flavor  ( char * id );
 public	struct	az_response *	az_get_image    ( char * id );
+public	struct	az_response *	az_get_subscription();
 
 public	struct	az_response *	az_update_server( char * id, char * filename );
 
 public	struct	az_response *	az_delete_server( char * id );
 public	struct	az_response *	az_delete_image ( char * id );
 
-public	struct az_response * liberate_az_response( struct az_response * rptr );	
+public	struct 	az_response * 	liberate_az_response( struct az_response * rptr );	
 
 public	struct	az_response *	az_list_WATM_profiles();
 public	struct	az_response *	az_list_WATM_definitions(char * profile );
+
+public	struct	az_response *	az_create_storage_service( char * filename );
+public	struct	az_response *	az_retrieve_storage_service( char * filename );
+public	struct	az_response *	az_update_storage_service( char * filename );
+public	struct	az_response *	az_delete_storage_service( char * filename );
+
+public	char * az_create_storage_service_request(
+	char * name,
+	char * label, 
+	char * description,
+	char * group,
+	char * location );
+
+public	char * az_create_affinity_group_request(
+	char * name,
+	char * label, 
+	char * description,
+	char * location );
 
 #endif	/* _az_client_h */
 	/* ------------ */
