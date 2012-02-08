@@ -555,15 +555,17 @@ public	struct	az_response *	az_list_images( )
 /*		a z _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 public	char * az_create_server_request(
-	char * identity, 
-	char * image, 
-	char * flavor, 
-	char * personality, 
-	char * resource )
+	char * name,
+	char * label,
+	char * description,
+	char * location,
+	char * group )
 {
 	char *	filename;
 	FILE *	h;
-
+	char 	buffer[1024];
+	int	n;
+	n = EncodeBase64( buffer, label,strlen(label));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	if (!( h = fopen( filename,"wa" ) ))
@@ -571,14 +573,15 @@ public	char * az_create_server_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateDeployment xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
-		fprintf(h,"\t<Name>%s</Name>\n",identity);
-		fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",image);
-		fprintf(h,"\t<Label>%s</Label>\n","BASE64:LABEL");
-		fprintf(h,"\t<Configuration>%s</Configuration>\n","BASE64:CONFIGURATION");
-		fprintf(h,"\t<StartDeployment>true</StartDeployment>\n");
-		fprintf(h,"\t<TreatWarningsAsError>true</TreatWarningsAsError>\n");
-		fprintf(h,"</CreateDeployment>\n");
+		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		fprintf(h,"\t<Description>%s</Description>\n",description);
+		if ( group )
+			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
+		else if ( location )
+			fprintf(h,"\t<Location>%s</Location>\n",location);
+		fprintf(h,"</CreateHostedService>\n");
 		fclose(h);
 		return( filename );
 	}
@@ -589,7 +592,7 @@ public	char * az_create_server_request(
 /*	------------------------------------------------------------------	*/
 public	char * az_create_affinity_group_request(
 	char * name,
-	char * label, 
+	char * label,
 	char * description,
 	char * location )
 {
@@ -622,7 +625,7 @@ public	char * az_create_affinity_group_request(
 /*	------------------------------------------------------------------	*/
 public	char * az_create_storage_service_request(
 	char * name,
-	char * label, 
+	char * label,
 	char * description,
 	char * location,
 	char * group )
@@ -853,36 +856,14 @@ public	struct	az_response *	az_update_server(  char * id, char * filename )
 	else	return( rptr );
 }
 
-
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_delete_server(  char * id )
 {
-	struct	az_response	*	rptr=(struct az_response *) 0;
-	struct	url		*	uptr;
 	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/services/hostedservices/%s",id);
-	if (!( hptr = az_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = az_client_delete_request( nptr, Waz.tls, Waz.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( azure_delete_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/

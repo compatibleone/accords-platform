@@ -56,6 +56,7 @@ private	int	az_result( struct az_response * rptr )
 			case	_TEXT_JSON	:
 				json_show( rptr->jsonroot );
 				break;
+			default			:
 			case	_TEXT_XML	:
 				if (( rptr->response->status != 204 )
 				&&  ( rptr->response->body ))
@@ -94,7 +95,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcasecmp( p2, "SERVERS" ) ))
+		else if (!( strcasecmp( p2, "HOSTS" ) ))
 			az_result( az_list_servers() );
 		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
 			az_result( az_list_certificates(p3) );
@@ -115,9 +116,9 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	}
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if  (!( strcasecmp( p2, "SERVER" ) ))
+		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = az_create_server_request( p3, p4, p5,personality, resource ) ))
+			if (!( nomfic = az_create_server_request( p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","request" ) );
 			else
 			{ 	
@@ -127,7 +128,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		}
 		else if  (!( strcasecmp( p2, "GROUP" ) ))
 		{
-			if (!( nomfic = az_create_affinity_group_request( p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_affinity_group_request( p3, p3, p4, p5 ) ))
 				return( failure(27,"cannot create","affinity group request" ) );
 			else
 			{ 	
@@ -138,7 +139,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 
 		else if  (!( strcasecmp( p2, "STORAGE" ) ))
 		{
-			if (!( nomfic = az_create_storage_service_request( p3, p4, p5, p6, p7 ) ))
+			if (!( nomfic = az_create_storage_service_request( p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","storage service request" ) );
 			else
 			{ 	
@@ -154,7 +155,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SUBSCRIPTION" ) ))
 			az_result( az_get_subscription() );
-		else if (!( strcasecmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "HOST" ) ))
 			az_result( az_get_server( p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			az_result( az_get_flavor( p3 ) );
@@ -171,7 +172,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcasecmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "HOST" ) ))
 		{
 			if (!( nomfic = az_create_server_request( p2, p3, p4, personality, resource ) ))
 				az_result( az_update_server( p4, nomfic ) );
@@ -183,7 +184,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
-		else if (!( strcasecmp( p2, "SERVER" ) ))
+		else if (!( strcasecmp( p2, "HOST" ) ))
 			az_result( az_delete_server( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
@@ -286,14 +287,14 @@ private	int	az_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | STORAGE  | OPERATIONS  | LOCATIONS ");
-	printf("\n          GROUPS  | PROFILES | DEFINITIONS | CERTIFICATES ] ");
-	printf("\n   CREATE [ SERVER  <name> <image> <flavor> ] ");
-	printf("\n   CREATE [ GROUP   <name> <label> <description> <location> ] ");
-	printf("\n   CREATE [ STORAGE <name> <label> <description> <location <group> ] ");
-	printf("\n   GET    [ SUBSCRIPTION | SERVER | GROUP | CERTIFICATE | STORAGE ] <id> ");
-	printf("\n   UPDATE SERVER <id> ");
-	printf("\n   DELETE [ SERVER | GROUP | STORAGE | CERTIFICATE | LOCATION ] <id> ");
+	printf("\n   LIST   [ HOSTS   | STORAGE  | OPERATIONS  | LOCATIONS ");
+	printf("\n            GROUPS  | PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   CREATE [ GROUP   <name> <description> <location>         ] ");
+	printf("\n   CREATE [ HOST    <name> <description> <location> <group> ] ");
+	printf("\n   CREATE [ STORAGE <name> <description> <location> <group> ] ");
+	printf("\n   GET    [ SUBSCRIPTION | HOST | GROUP | CERTIFICATE | STORAGE ] <id> ");
+	printf("\n   UPDATE HOST <id> ");
+	printf("\n   DELETE [ HOST | GROUP | STORAGE | CERTIFICATE | LOCATION ] <id> ");
 	printf("\n\n");
 	return( 0 );
 }
