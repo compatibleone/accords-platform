@@ -264,6 +264,26 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 	else	request.other = vptr;
 
 	memset( &best, 0, sizeof( struct os_image_infos ));
+
+	/* ------------------------------------------ */
+	/* scan list for a perfect IPS produced match */
+	/* ------------------------------------------ */
+	for ( 	dptr=eptr->first;
+		dptr != (struct data_element *) 0;
+		dptr = dptr->next )
+	{
+		if (!( vptr = json_atribut( dptr, "name" ) ))
+			continue;
+		else if ( strcmp( vptr, cptr->image.id ) != 0 )
+			continue;
+		else if (!( vptr = json_atribut( dptr, "id" ) ))
+			continue;
+		else	return( allocate_string( vptr ) );
+	}
+
+	/* --------------------------------------------------- */
+	/* scan the image list for a system name partial match */
+	/* --------------------------------------------------- */
 	for ( 	dptr=eptr->first;
 		dptr != (struct data_element *) 0;
 		dptr = dptr->next )
@@ -376,7 +396,8 @@ public	int	create_openstack_contract(
 		return( terminate_openstack_contract( 585, &contract ) );
 	else if (!( pptr->image = resolve_contract_image( &contract ) ))
 		return( terminate_openstack_contract( 586, &contract ) );
-	else 
+	else if (!( pptr->original = allocate_string( pptr->image ) ))
+		return( terminate_openstack_contract( 586, &contract ) );
 	{
 		/* ----------------------------------------------- */
 		/* resolve any price informatino for this category */

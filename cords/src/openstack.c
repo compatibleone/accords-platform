@@ -39,6 +39,8 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->flavor )
 			 sptr->flavor = liberate(sptr->flavor);
+		if ( sptr->original )
+			 sptr->original = liberate(sptr->original);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->profile )
@@ -77,6 +79,7 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->flavor = (char*) 0;
+		sptr->original = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->node = (char*) 0;
@@ -127,6 +130,10 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"flavor") ))
 		{
 			if ( wptr->value ) { sptr->flavor = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"original") ))
+		{
+			if ( wptr->value ) { sptr->original = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"image") ))
 		{
@@ -197,6 +204,7 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));

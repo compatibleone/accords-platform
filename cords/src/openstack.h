@@ -8,6 +8,7 @@ struct	openstack
 
 	char *	name;
 	char *	flavor;
+	char *	original;
 	char *	image;
 	char *	profile;
 

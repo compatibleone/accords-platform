@@ -64,7 +64,7 @@ public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
 	{
-		printf("\n*** failure %u",e);
+		printf("\n***(%u) failure %u",getpid(),e);
 		if ( m1 )
 			printf(" : %s",m1);
 		if ( m2 )
@@ -156,20 +156,17 @@ private char *	build_application_node(char * image, char * provider )
 	char *	tls=default_tls();
 	char *	agent=_CORDS_CONTRACT_AGENT;
 
-	printf("coips:build application_node(%s)\n",image);
-	printf("coips:retrieve infrastructure(%s)\n",_COIPS_MODEL);
+	if ( check_debug() ) rest_log_message("coips:build application_node");
 
 	/* retrieve the COIPS infrastructure description */
 	/* --------------------------------------------- */
 	if (!( yptr = cords_retrieve_named_instance_list( 
 		_CORDS_INFRASTRUCTURE, "occi.infrastructure.name", _COIPS_MODEL, agent, tls ) ))
 	{
-		printf("no list\n");
 		return( (char *) 0 );
 	}
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent, tls )))
 	{
-		printf("no instance\n");
 		return( (char *) 0 );
 	}
 	else
@@ -183,8 +180,6 @@ private char *	build_application_node(char * image, char * provider )
 		uptr = occi_remove_response( uptr );
 	}
 
-	printf("coips:build temporary node (%s)\n",infrastructure);
-
 	if (!( ihost = occi_resolve_category_provider(_CORDS_NODE,agent, tls) ))
 		return((char *) 0);
 	else
@@ -192,8 +187,6 @@ private char *	build_application_node(char * image, char * provider )
 		sprintf(buffer,"%s/%s/",ihost,_CORDS_NODE);
 		liberate( ihost );
 	}
-
-	printf("using(%s)\n",buffer);
 
 	/* ------------------------------------ */
 	/* build the temporary node description */
@@ -242,6 +235,7 @@ private char *	build_application_node(char * image, char * provider )
 		sprintf(buffer,"%s/%s/%s",yptr->host,_CORDS_NODE,vptr);
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
+		if ( check_debug() ) rest_log_message("coips:build application_node:done");
 		return( allocate_string( buffer ) );
 	}		
 
@@ -256,6 +250,7 @@ private	char *	negotiate_application_contract(char * node)
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
+	if ( check_debug() ) rest_log_message("coips:negotiate_application_contract");
 	if (!( document = cords_instance_node(
 		node, node, _CORDS_CONTRACT_AGENT, default_tls(), "coips", "coips", "coips") ))
 		return( (char *) 0 );
@@ -272,6 +267,7 @@ private	char *	negotiate_application_contract(char * node)
 	else
 	{
 		document = document_drop( document );
+		if ( check_debug() ) rest_log_message("coips:negotiate_application_contract:done");
 		return(contract);
 	}
 }
@@ -282,7 +278,9 @@ private	char *	negotiate_application_contract(char * node)
 /* ------------------------- */
 private char * 	provision_application_contract(char *contract)
 {
+	if ( check_debug() ) rest_log_message("coips:provision_application_contract");
 	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
+	if ( check_debug() ) rest_log_message("coips:provision_application_contract:done");
 	return(contract);
 }
 
@@ -298,6 +296,7 @@ private	char * 	install_application_package( char * cosacs , char * package )
 	struct	occi_response * zptr;
 	char *	vptr;
 
+	if ( check_debug() ) rest_log_message("coips:install_application_package");
 	/* retrieve the package details */
 	/* ---------------------------- */
 	if (!( zptr = occi_simple_get( package, _CORDS_SERVICE_AGENT, default_tls() ) ))
@@ -312,7 +311,11 @@ private	char * 	install_application_package( char * cosacs , char * package )
 		return( (char *) 0 );
 	else if (!( cosacs_create_script( cosacs, "cosacs:start", "", type ) ))
 		return((char *) 0) ;
-	else	return( package );
+	else
+	{
+		if ( check_debug() ) rest_log_message("coips:install_application_package:done");
+		return( package );
+	}
 }
 
 /* ------------------------- */
@@ -368,6 +371,8 @@ private void	delete_application_node(  char * node )
 private	void	update_ezvm_image( struct cords_application * aptr )
 {
 	if ( check_debug() ) rest_log_message("coips:update_ezvm");
+	/* TODO */
+	if ( check_debug() ) rest_log_message("coips:update_ezvm:done");
 	return;
 }
 

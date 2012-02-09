@@ -140,6 +140,8 @@ private void autoload_openstack_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
 				pptr->flavor = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "original" )) != (struct xml_atribut *) 0)
+				pptr->original = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
@@ -198,6 +200,9 @@ public  void autosave_openstack_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," flavor=%c",0x0022);
 		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," original=%c",0x0022);
+		fprintf(h,"%s",(pptr->original?pptr->original:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
@@ -263,6 +268,8 @@ private void set_openstack_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "flavor" ) ))
 			pptr->flavor = allocate_string(vptr);
+		if (!( strcmp( nptr, "original" ) ))
+			pptr->original = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
@@ -332,6 +339,13 @@ private int pass_openstack_filter(
 		if (!( pptr->flavor ))
 			return(0);
 		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
+			return(0);
+		}
+	if (( fptr->original )
+	&&  (strlen( fptr->original ) != 0)) {
+		if (!( pptr->original ))
+			return(0);
+		else if ( strcmp(pptr->original,fptr->original) != 0)
 			return(0);
 		}
 	if (( fptr->image )
@@ -432,6 +446,9 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
@@ -881,6 +898,8 @@ public struct occi_category * occi_cords_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "original",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
@@ -954,6 +973,17 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.original='%s'\r\n",(sptr->original?sptr->original:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
