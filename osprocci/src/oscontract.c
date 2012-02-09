@@ -420,7 +420,17 @@ public	int	delete_openstack_contract(
 	struct	os_response * osptr;
 	if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
 		osptr = liberate_os_response( osptr );
-	return(0);
+	if (!( pptr->image ))
+		return( 0 );
+	else if (!( pptr->original ))
+		return( 0 );
+	else if (!( strcmp( pptr->original, pptr->image ) ))
+		return( 0 );
+	else
+	{
+		os_delete_image( pptr->image );
+		return(0);
+	}
 }
 
 	/* ------------- */

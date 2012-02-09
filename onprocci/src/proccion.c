@@ -415,6 +415,56 @@ private	struct	rest_response * save_opennebula(
 #endif
 }
 
+/*	-------------------------------------------	*/
+/* 	    s n a p s h o t _ o p e n n e b u l a  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_opennebula(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	char		reference[512];
+	struct	on_response * osptr;
+	int		status;
+	struct	opennebula * pptr;
+	char	*	filename;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->status == _OCCI_IDLE )
+		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+
+#ifndef	_ON_PERSONALITY
+	else 	return( rest_html_response( aptr, 200, "OK" ) );
+#else
+	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if (!( filename = on_create_image_request( pptr->name, pptr->number ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr = on_create_image( filename ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else
+	{
+		/* --------------------------------- */
+		/* retrieve crucial data from server */
+		/* --------------------------------- */
+		status = connect_opennebula_image( osptr, pptr );
+		osptr = liberate_on_response( osptr );
+		if (!( status ))
+		{
+			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+			if (!( on_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
+		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	}
+#endif
+}
+
 /*	--------------------------------------------------------	*/
 /* 	s t o p  _ o p e n n e b u l a _ p r o v i s i o n i n g  	*/
 /*	--------------------------------------------------------	*/
@@ -652,6 +702,8 @@ public	struct	occi_category * build_opennebula( char * domain )
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_opennebula)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_opennebula)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_opennebula)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"softboot","",softboot_opennebula)))
 			return( optr );

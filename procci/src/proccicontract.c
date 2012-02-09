@@ -435,6 +435,46 @@ private	struct	rest_response * save_contract(
 	}
 }
 
+/*	-------------------------------------------	*/
+/* 	    s n a p s h o t _ c o n t r a c t		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_contract(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_contract * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state != _OCCI_IDLE )
+		{
+			if ( is_common_contract( pptr ) )
+			{
+				cords_invoke_action( pptr->common, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ((!( pptr->type ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				cords_invoke_action( pptr->provider, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			else if ( pptr->service )
+			{
+				cords_invoke_action( pptr->service, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			pptr->when  = time((long*) 0);
+			autosave_cords_contract_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
 /*	-----------------------------------------------------------	*/
 /*		d e l e t e _ g e n e r i c _ c o n t r a c t		*/
 /*	-----------------------------------------------------------	*/
@@ -570,6 +610,8 @@ private	struct	occi_category *	procci_contract_builder( char * domain, char * ca
 		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_contract)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_contract)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
 			return( optr );

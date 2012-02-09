@@ -387,9 +387,9 @@ private	struct	rest_response * restart_service(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
-
+	
 /*	-------------------------------------------	*/
-/* 	   	s a v e _ s e r v i c e		*/
+/* 	   	s a v e _ s e r v i c e			*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_service(
 		struct occi_category * optr, 
@@ -417,7 +417,35 @@ private	struct	rest_response * save_service(
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s t o p _ s e r v i c e
+/* 	   s n a p s h o t _ s e r v i c e		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_service(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char			* mptr;
+	char 			* wptr;
+	struct	cords_service * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	{
+		if ( pptr->state != _OCCI_IDLE )
+		{
+			service_action( pptr->id, _CORDS_SNAPSHOT );
+			pptr->when  = time((long*) 0);
+			autosave_cords_service_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	   	s t o p _ s e r v i c e			*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * stop_service(
 		struct occi_category * optr, 
@@ -577,6 +605,8 @@ private	struct	occi_category *	broker_service_builder( char * domain, char * cat
 		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_service)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_service)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_service)))
 			return( optr );
