@@ -43,6 +43,7 @@
 #define	_CORDS_START	"start"
 #define	_CORDS_SUSPEND	"suspend"
 #define	_CORDS_SAVE	"save"
+#define	_CORDS_SNAPSHOT "snapshot"
 #define	_CORDS_RESTART	"restart"
 #define	_CORDS_STOP	"stop"
 #define	_CORDS_INSTANCE	"instance"

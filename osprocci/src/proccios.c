@@ -297,7 +297,9 @@ private	int	connect_openstack_image( struct os_response * rptr,struct openstack 
 				reset_openstack_server( pptr );
 				return( 27 );
 			}
-			else if (!( strcmp( vptr, "SAVING" )))
+			else if (!( strcmp( vptr, "ACTIVE" )))
+				break;
+			else 
 			{
 				sleep(1);
 				if ( zptr )
@@ -309,8 +311,6 @@ private	int	connect_openstack_image( struct os_response * rptr,struct openstack 
 				}
 				else	yptr = zptr;
 			}
-			else if (!( strcmp( vptr, "ACTIVE" )))
-				break;
 		}
 		return( 0 );
 	}
@@ -686,7 +686,97 @@ private	struct	rest_response * start_openstack(
 }
 
 /*	-------------------------------------------	*/
-/* 	      s a v e  _ o p e n s t a c k	  	*/
+/*		o s _ i m a g e _ n u m b e r 		*/
+/*	-------------------------------------------	*/
+private	char * os_image_number( char * url )
+{
+	int	c;
+	char *	rptr;
+	char *	wptr;
+	if (!( wptr = rptr = url ))
+		return( url );
+	else
+	{
+		while ((c =  *(wptr++)) != 0)
+			if ( c == '/' )
+				rptr = wptr;
+		return(allocate_string( rptr ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	    s n a p s h o t _ o p e n s t a c k	  	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_openstack(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	char	reference[512];
+	struct	rest_header * hptr;
+	struct	os_response * osptr;
+	int		status;
+	struct	openstack * pptr;
+	char 	*	inumber;
+	char	*	filename;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->status == _OCCI_IDLE )
+		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	/* ------------------------------------------------------------	*/
+	/* here we will launch a snapshot of the current server image 	*/
+	/* this will be because the service contract requested it in   	*/
+	/* which case it will be the future restart state of the vm   	*/
+	/* but this must be handled carefully. The current state must 	*/
+	/* be generated to a new image filename. 		      	*/
+	/* ------------------------------------------------------------ */
+	/* the id field is the best choice for this since it is unique	*/
+	/* the number   is the current server instance number		*/
+	/* ------------------------------------------------------------ */
+	else if (!( filename = os_create_image_request( pptr->id, pptr->number ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr = os_create_image( filename, pptr->number ) ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if ( osptr->response->status  >= 300 )
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( hptr = rest_resolve_header( osptr->response->first, _HTTP_LOCATION ) ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( hptr->value ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( inumber = os_image_number( hptr->value ) ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else
+	{
+		/* --------------------------------- */
+		/* retrieve crucial data from server */
+		/* --------------------------------- */
+		osptr = liberate_os_response( osptr );
+		if (!( osptr = os_get_image( inumber ) ))
+		 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+
+		status = connect_openstack_image( osptr, pptr );
+		osptr = liberate_os_response( osptr );
+		if (!( status ))
+		{
+			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+			if (!( os_valid_price( pptr->price ) ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else	return( rest_html_response( aptr, 200, "OK" ) );
+		}
+		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      s a v e _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_openstack(
 		struct occi_category * optr, 
@@ -695,10 +785,12 @@ private	struct	rest_response * save_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	rest_header * hptr;
 	char	reference[512];
 	struct	os_response * osptr;
 	int		status;
 	struct	openstack * pptr;
+	char	*	inumber;
 	char	*	filename;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -706,15 +798,38 @@ private	struct	rest_response * save_openstack(
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	/* ------------------------------------------------------------	*/
+	/* here we will launch a snapshot of the current server image 	*/
+	/* this will result from  an image production request from the	*/
+	/* image production services COIPS. 				*/
+	/* ------------------------------------------------------------ */
+	/* the name field is : the name of the contract and is the same */
+	/* all contracts of the same original node description.		*/
+	/* the number     is :	the current server instance number	*/
+	/* ------------------------------------------------------------ */
 	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( osptr = os_create_image( filename, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if ( osptr->response->status  >= 300 )
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( hptr = rest_resolve_header( osptr->response->first, _HTTP_LOCATION ) ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( hptr->value ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( inumber = os_image_number( hptr->value ) ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
+		osptr = liberate_os_response( osptr );
+		if (!( osptr = os_get_image( inumber ) ))
+		 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+
 		status = connect_openstack_image( osptr, pptr );
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
@@ -1018,6 +1133,8 @@ public	struct	occi_category * build_openstack( char * domain )
 		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_openstack)))
 			return( optr );

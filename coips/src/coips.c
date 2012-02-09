@@ -283,7 +283,7 @@ private	char *	negotiate_application_contract(char * node)
 private char * 	provision_application_contract(char *contract)
 {
 	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
-	return((char *) "yes");
+	return(contract);
 }
 
 
@@ -320,8 +320,10 @@ private	char * 	install_application_package( char * cosacs , char * package )
 /* ------------------------- */
 char *	save_application_image( char * contract )
 {
+	if ( check_debug() ) rest_log_message("coips:save_image");
 	cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() );
-	return((char *) "yes");
+	if ( check_debug() ) rest_log_message("coips:save_image:done");
+	return(contract);
 }
 
 /* ------------------------- */
@@ -329,7 +331,9 @@ char *	save_application_image( char * contract )
 /* ------------------------- */
 private	void 	stop_application_provisioning(  char * contract )
 {
+	if ( check_debug() ) rest_log_message("coips:stop_server");
 	cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() );
+	if ( check_debug() ) rest_log_message("coips:stop_server:done");
 	return;
 }
 
@@ -339,7 +343,9 @@ private	void 	stop_application_provisioning(  char * contract )
 /* ------------------------- */
 private	void	delete_application_provisioning(  char * contract )
 {
+	if ( check_debug() ) rest_log_message("coips:delete_server");
 	occi_simple_delete( contract, _CORDS_SERVICE_AGENT, default_tls() );
+	if ( check_debug() ) rest_log_message("coips:delete_server:done");
 	return;
 }
 
@@ -349,7 +355,9 @@ private	void	delete_application_provisioning(  char * contract )
 /* ------------------------- */
 private void	delete_application_node(  char * node )
 {
+	if ( check_debug() ) rest_log_message("coips:delete_node");
 	occi_simple_delete( node, _CORDS_SERVICE_AGENT, default_tls() );
+	if ( check_debug() ) rest_log_message("coips:delete_node:done");
 	return;
 }
 
@@ -359,6 +367,7 @@ private void	delete_application_node(  char * node )
 /* ------------------------- */
 private	void	update_ezvm_image( struct cords_application * aptr )
 {
+	if ( check_debug() ) rest_log_message("coips:update_ezvm");
 	return;
 }
 
@@ -371,10 +380,14 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	char *	contract;
 	char *	package;
 	char *	image;
+	int	packages=0;
 
 	/* ------------------------- */
 	/* build a provisioning node */
 	/* ------------------------- */
+
+	if ( check_debug() ) rest_log_message("coips:build_application");
+
 	if (!( node = build_application_node(aptr->image, aptr->provider) ))
 		return( 800 );
 
@@ -394,21 +407,20 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	/* ------------------------- */
 	/* For Each Package 	     */
 	/* ------------------------- */
-#ifdef	HANDLE_PACKAGES
+	while ( packages )
+	{
 		/* --------------------------------- */
 		/* Install and configure the Package */
 		/* --------------------------------- */
 		if (!( package = install_application_package( contract , package ) ))
 			return( 802 );
+	}
 
 	/* ------------------------- */
 	/* Save Image 		     */
 	/* ------------------------- */
 	if (!( image = save_application_image( contract ) ))
 		return( 803 );
-#else
-	sleep(60);
-#endif
 
 	/* ------------------------- */
 	/* Stop Provisioning 	     */
@@ -430,6 +442,7 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	/* ------------------------- */
 	update_ezvm_image( aptr );
 
+	if ( check_debug() ) rest_log_message("coips:build_application:done");
 	return(0);
 }
 

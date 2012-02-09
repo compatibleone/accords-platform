@@ -1169,7 +1169,7 @@ public	struct	os_response *	os_delete_image	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_delete_request( nptr, Os.tls, Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );

@@ -2490,7 +2490,7 @@ public	struct	xml_element * cords_instance_node(
 	/* -------------------------------- */
 	/* recover provider information now */
 	/* -------------------------------- */
-	else if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent, tls )))
+	if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent, tls )))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);

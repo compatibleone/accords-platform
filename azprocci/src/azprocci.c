@@ -56,7 +56,7 @@ public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
 	{
-		printf("\n*** failure %u",e);
+		printf("\n***(%u) failure %u",getpid(),e);
 		if ( m1 )
 			printf(" : %s",m1);
 		if ( m2 )
