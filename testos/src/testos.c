@@ -87,16 +87,6 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 	if (!( p1))
 		return( failure( 30,"p1", "required") );
 
-	if (!( strcasecmp(p1,"GET" ) ))
-		return( os_result( os_client_get_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcasecmp(p1,"POST" ) ))
-		return( os_result( os_client_post_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcasecmp(p1,"DELETE" ) ))
-		return( os_result( os_client_delete_request( p2, 0, agent, hptr ) ) );
-	else if (!( strcasecmp(p1,"PUT" ) ))
-		return( os_result( os_client_put_request( p2, 0, agent, p3, hptr ) ) );
-	else if (!( strcasecmp(p1,"HEAD" ) ))
-		return( os_result( os_client_head_request( p2, 0, agent, hptr ) ) );
 	else if (!( strcasecmp(p1,"LIST" ) ))
 	{
 		if (!( p2 ))
@@ -142,7 +132,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
-	else if (!( strcasecmp(p1,"RETRIEVE" ) ))
+	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
@@ -157,7 +147,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
-	else if (!( strcasecmp(p1,"UPDATE" ) ))
+	else if (!( strcasecmp(p1,"PUT" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
@@ -172,7 +162,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
 	}
-	else if (!( strcasecmp(p1,"REMOVE" ) ))
+	else if (!( strcasecmp(p1,"DELETE" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
@@ -265,9 +255,9 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.04");
-	printf("\n   Beta Version 23/12/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.05");
+	printf("\n   Beta Version 09/02/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
@@ -275,15 +265,9 @@ private	int	os_banner()
 	printf("\n   CREATE   <name> <image> <flavor> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   METADATA  <id>  <names=values>   ");
-	printf("\n   RETRIEVE [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");
-	printf("\n   UPDATE [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   REMOVE [ SERVER <id> | IMAGE <id> | METADATA <id> <name> ] ");
-	printf("\n");
-	printf("\n   REST Methods");
-	printf("\n");
-	printf("\n   [ GET | DELETE | HEAD ] <url> ");
-	printf("\n   [ PUT | POST ] <url> <filename> ");
-
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");
+	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

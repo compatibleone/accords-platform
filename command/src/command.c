@@ -181,6 +181,8 @@ private	int	service_operation( char * command, char * service )
 			return( cords_service_action( id, "stop" ) );
 		else if (!( strcasecmp( command, "SAVE" ) ))
 			return( cords_service_action( id, "save" ) );
+		else if (!( strcasecmp( command, "SNAPSHOT" ) ))
+			return( cords_service_action( id, "snapshot" ) );
 		else if (!( strcasecmp( command, "DELETE" ) ))
 			return( cords_service_delete( id ) );
 		else	return( failure( 30,"incorrect command", command ) );
@@ -242,14 +244,15 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.02");
-	printf("\n   Beta Version : 07/01/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.03");
+	printf("\n   Beta Version : 09/02/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
-	printf("\n         command <options> START  <service_file> ");
-	printf("\n         command <options> STOP   <service_file> ");
-	printf("\n         command <options> SAVE   <service_file> ");
-	printf("\n         command <options> DELETE <service_file> ");
+	printf("\n         command <options> START    <service_file> ");
+	printf("\n         command <options> STOP     <service_file> ");
+	printf("\n         command <options> SAVE     <service_file> ");
+	printf("\n         command <options> SNAPSHOT <service_file> ");
+	printf("\n         command <options> DELETE   <service_file> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");
