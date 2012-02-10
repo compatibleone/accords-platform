@@ -295,21 +295,26 @@ private	char * 	install_application_package( char * cosacs , char * package )
 	char *	type="command";
 	struct	occi_response * zptr;
 	char *	vptr;
+	int	status=0;
 
-	if ( check_debug() ) rest_log_message("coips:install_application_package");
+	if ( check_debug() )
+	{
+		rest_log_message("coips:install_application_package");
+		rest_log_message( package );
+	}
 	/* retrieve the package details */
 	/* ---------------------------- */
 	if (!( zptr = occi_simple_get( package, _CORDS_SERVICE_AGENT, default_tls() ) ))
 		return( (char * )0 );
 	else if (!( vptr = cords_extract_atribut( zptr, "occi","package", "installation" )))
 		return( (char * )0 );
-	else if (!( cosacs_create_script( cosacs, "cosacs:run", vptr, type ) ))
+	else if ((status = cosacs_create_script( cosacs, "cosacs:run", vptr, type )) != 0)
 		return( (char * )0 );
 	else if (!( vptr = cords_extract_atribut( zptr, "occi", "package", "configuration" )))
 		return( (char * )0 );
-	else if (!( cosacs_create_script( cosacs, "cosacs:run", vptr, type ) ))
+	else if ((status = cosacs_create_script( cosacs, "cosacs:run", vptr, type )) != 0)
 		return( (char *) 0 );
-	else if (!( cosacs_create_script( cosacs, "cosacs:start", "", type ) ))
+	else if ((status = cosacs_create_script( cosacs, "cosacs:start", "", type )) != 0)
 		return((char *) 0) ;
 	else
 	{
@@ -321,12 +326,12 @@ private	char * 	install_application_package( char * cosacs , char * package )
 /* ------------------------- */
 /* Save Image 		     */
 /* ------------------------- */
-char *	save_application_image( char * contract )
+private void	save_application_image( char * contract )
 {
 	if ( check_debug() ) rest_log_message("coips:save_image");
 	cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:save_image:done");
-	return(contract);
+	return;
 }
 
 /* ------------------------- */
@@ -376,16 +381,49 @@ private	void	update_ezvm_image( struct cords_application * aptr )
 	return;
 }
 
+
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the coips instance category		*/
+/*	------------------------------------------------------------------	*/
+
+/*	------------------------------------------------------------------	*/
+/*			c o i p s _ l i n k _ v a l u e				*/
+/*	------------------------------------------------------------------	*/
+private	char *	coips_link_value( char * sptr )
+{
+	char *	rptr;
+	if (!( sptr ))
+		return( sptr );
+	else if ( *sptr != '<' )
+		return( sptr );
+	else if (!( rptr = allocate_string( (sptr+1) )))
+		return( rptr );
+	else 
+	{
+		for ( sptr=rptr; *sptr != 0; sptr++ )
+		{
+			if ( *sptr == '>' )
+			{
+				*sptr = 0;
+				break;
+			}
+		}
+		return( rptr );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			b u i l d _ a p p l i c a t i o n			*/
 /*	------------------------------------------------------------------	*/
 private	int	build_application( struct occi_category * optr, struct cords_application * aptr)
 {
 	char *	node;
 	char *	contract;
+	char *	linkvalue;
 	char *	package;
-	char *	image;
 	int	packages=0;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
 
 	/* ------------------------- */
 	/* build a provisioning node */
@@ -399,33 +437,46 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	/* ------------------------- */
 	/* negotiate the contracts   */
 	/* ------------------------- */
-	if (!( contract = negotiate_application_contract(node)))
+	else if (!( contract = negotiate_application_contract(node)))
 		return( 801 );
 
 
 	/* ------------------------- */
 	/* provision the contract    */
 	/* ------------------------- */
-	if (!( contract = provision_application_contract(contract)))
+	else if (!( contract = provision_application_contract(contract)))
 		return( 801 );
-
-	/* ------------------------- */
-	/* For Each Package 	     */
-	/* ------------------------- */
-	while ( packages )
+	
+	else if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
+		return( 802 );
+	else 
 	{
-		/* --------------------------------- */
-		/* Install and configure the Package */
-		/* --------------------------------- */
-		if (!( package = install_application_package( contract , package ) ))
-			return( 802 );
+		/* ------------------------- */
+		/* For Each Package 	     */
+		/* ------------------------- */
+		for (	eptr=zptr->first;
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
+		{
+			if (!( eptr->name ))
+				continue;
+			else if (!( eptr->value ))
+				continue;
+			else if ( strcasecmp(eptr->name,"LINK") != 0 )
+				continue;
+			else if (!( linkvalue = coips_link_value( eptr->value )))
+				continue;
+			else if (!( package = install_application_package( contract , linkvalue ) ))
+				return( 803 );
+			else	linkvalue = liberate( linkvalue );
+		}
+		zptr = occi_remove_response( zptr );
 	}
 
 	/* ------------------------- */
 	/* Save Image 		     */
 	/* ------------------------- */
-	if (!( image = save_application_image( contract ) ))
-		return( 803 );
+	save_application_image( contract );
 
 	/* ------------------------- */
 	/* Stop Provisioning 	     */

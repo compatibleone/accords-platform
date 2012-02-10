@@ -834,6 +834,16 @@ private	struct	rest_response * save_openstack(
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
 		{
+			/* ----------------------------- */
+			/* save must update the original */
+			/* to ensure image preservation  */
+			/* ----------------------------- */
+			if ( pptr->image )
+			{ 
+				if ( pptr->original ) 
+					pptr->original = liberate( pptr->original );
+				pptr->original = allocate_string( pptr->image );
+			}
 			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 			if (!( os_valid_price( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
