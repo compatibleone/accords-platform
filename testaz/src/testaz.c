@@ -97,6 +97,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "HOSTS" ) ))
 			az_result( az_list_servers() );
+		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
+			az_result( az_list_deployments(p3) );
 		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
 			az_result( az_list_certificates(p3) );
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
@@ -123,6 +125,16 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			else
 			{ 	
 				az_result( az_create_server( nomfic ) );
+				return( 0 );
+			}
+		}
+		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
+		{
+			if (!( nomfic = az_create_deployment_request( p3, p3, p4, p5 ) ))
+				return( failure(27,"cannot create","deployment request" ) );
+			else
+			{ 	
+				az_result( az_create_deployment( nomfic, p7, p7 ) );
 				return( 0 );
 			}
 		}
@@ -155,6 +167,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SUBSCRIPTION" ) ))
 			az_result( az_get_subscription() );
+		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
+			az_result( az_get_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
 			az_result( az_get_server( p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
@@ -184,6 +198,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
+			az_result( az_delete_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
 			az_result( az_delete_server( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
@@ -289,12 +305,16 @@ private	int	az_banner()
 	printf("\n");
 	printf("\n   LIST   [ HOSTS   | STORAGE  | OPERATIONS  | LOCATIONS ");
 	printf("\n            GROUPS  | PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   LIST   [ DEPLOYMENT ] <host> " );
 	printf("\n   CREATE [ GROUP   <name> <description> <location>         ] ");
 	printf("\n   CREATE [ HOST    <name> <description> <location> <group> ] ");
 	printf("\n   CREATE [ STORAGE <name> <description> <location> <group> ] ");
+	printf("\n   CREATE [ DEPLOYMENT <name> <image> <configuration> <host> <slot> ] ");
 	printf("\n   GET    [ SUBSCRIPTION | HOST | GROUP | CERTIFICATE | STORAGE ] <id> ");
+	printf("\n   GET    [ DEPLOYMENT ] <host> <slot> " );
 	printf("\n   UPDATE HOST <id> ");
 	printf("\n   DELETE [ HOST | GROUP | STORAGE | CERTIFICATE | LOCATION ] <id> ");
+	printf("\n   DELETE [ DEPLOYMENT ] <host> <slot> " );
 	printf("\n\n");
 	return( 0 );
 }

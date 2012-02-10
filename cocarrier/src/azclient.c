@@ -717,7 +717,6 @@ public	struct	az_response *	az_create_server( char * filename )
 {
 	return( azure_create_operation( "/services/hostedservices", filename ) );
 }
-
 	
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ s u b s c r i p t i o n		*/
@@ -728,6 +727,77 @@ public	struct	az_response *	az_get_subscription()
 	return( azure_list_operation( "" ));
 }
 
+/*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ d e p l o y m e n t s			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_list_deployments(char * server)
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots" , server ); 
+	return( azure_list_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z _ c r e a t e _ d e p l o y m e n t				*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_create_deployment( char * filename, char * server, char * slot )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
+	return( azure_create_operation( buffer, filename ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*				a z _ g e t _ d e p l o y m e n t 			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_get_deployment( char * server, char * slot )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
+	return( azure_retrieve_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ d e l e t e _ d e p l o y m e n t 			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_delete_deployment( char * server, char * slot )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
+	return( azure_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	  a z _ c r e a t e _ d e p l o y m e n t _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * az_create_deployment_request(
+	char * name, char * label, char * image, char * configuration )
+{
+	char *	filename;
+	FILE *	h;
+	char 	buffer[1024];
+	int	n;
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<CreateDeployment xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<Name>%s</Name>\n",name);
+		fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",image);
+		n = EncodeBase64( buffer, label,strlen(label));
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		n = EncodeBase64( buffer, configuration,strlen(configuration));
+		fprintf(h,"\t<Configuration>%s</Configuration>\n",buffer);
+		fprintf(h,"\t<StartDeployment>true</StartDeployment>\n");
+		fprintf(h,"\t<TreatWarningsAsError>true</TreatWarningsAsError>\n");
+		fprintf(h,"</CreateDeployment>\n");
+		fclose(h);
+		return( filename );
+	}
+}
 
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ s e r v e r 			*/
@@ -933,8 +1003,6 @@ public	int	az_initialise_client(
 
 
 #endif	/* _az_client_c */
-	/* ------------ */
-
-
+		/* ------------ */
 
 
