@@ -1,5 +1,5 @@
-#ifndef	_connection_h
-#define	_connection_h
+#ifndef	_connections_h
+#define	_connections_h
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -19,7 +19,7 @@ struct	connection {
 
 #define	CONNECTIONPTR	struct connection * 
 
-#endif	/* _connection_h */
-	/* ------------- */
+#endif	/* _connections_h */
+	/* -------------- */
 
 

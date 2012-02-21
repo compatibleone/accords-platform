@@ -24,7 +24,7 @@
 
 #include "standard.h"
 #include "allocate.h"
-#include "connection.h"
+#include "connections.h"
 #include "base64.h"
 #include "restheader.h"
 #include "restrequest.h"

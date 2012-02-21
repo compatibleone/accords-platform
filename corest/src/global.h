@@ -26,7 +26,7 @@
 #define	_SASL_PLAIN		0
 #define	_DEBUG_SOCKET		16
 
-#include "connection.h"
+#include "connections.h"
 #include "element.h"
 
 #endif	/* _global_h */
