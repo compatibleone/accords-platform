@@ -44,7 +44,11 @@ if [ -z "$restport" ]; then
 fi
 
 if [ -z "$publisher" ]; then
-    publisher=http://$resthost:$restport
+	if [ -z "$tls" ]; then
+	    publisher=http://$resthost:$restport
+	else
+	    publisher=https://$resthost:$restport
+	fi
 fi
 
 if [ -z "$monitor" ]; then
@@ -311,6 +315,7 @@ _accords_config() {
 	_mksecs broker 1
 	_mksecs ezvm 1
 	_mksecs coips 1
+	_mksecs cosacs 1
 	_mksecs parser 1
 	_mksecs procci 1
 	_mksecs osprocci 1
