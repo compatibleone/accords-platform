@@ -21,6 +21,7 @@ elif test -e @pkgsysconfdir@/accords.ini; then
     . @pkgsysconfdir@/accords.ini
 fi
 
+tls=$1
 trace=1
 threads=1
 verbose=0

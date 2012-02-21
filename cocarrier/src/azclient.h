@@ -186,7 +186,7 @@ public	char * az_create_storage_service_request(
 	char * location );
 
 #endif	/* _az_client_h */
-		/* ------------ */
+	/* ------------ */
 
 
 

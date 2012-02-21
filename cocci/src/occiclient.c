@@ -522,12 +522,46 @@ public	char * occi_client_uri( struct occi_client * cptr, char * object )
 }
 
 /*	------------------------------------------------------------	*/
+/*		    o c c i _ a p p e n d _ d e f a u l t 		*/
+/*	------------------------------------------------------------	*/
+/*	this function appends the list of default headers that are	*/
+/*	needed to transmit security and athorization information.	*/
+/*	The headers have to be duplicated to be	sure that no cross 	*/	
+/*	memory allocations occur !					*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header   * occi_append_default( 
+			struct 	occi_client  * cptr,
+			struct 	rest_header  * root,
+			struct 	rest_header  * hptr )
+{
+	struct	rest_header * wptr;
+	struct	rest_header * last;
+
+	if ((last = root) != (struct rest_header *) 0)
+		while ( last->next ) 
+			last = last->next;
+
+	for (	;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		if (!( wptr = rest_create_header( hptr->name, hptr->value ) ))
+			return( wptr );
+		else if (!( wptr->previous = last ))
+			root = wptr;
+		else 	wptr->previous->next = wptr;
+		last = wptr;
+	}
+	return( root );
+}
+
+/*	------------------------------------------------------------	*/
 /*		    o c c i _ l o a d _ c a t e g o r i e s		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_load_categories( struct occi_client * cptr )
 {
 	char *	uri;
-	struct	rest_header * hptr;
+	struct	rest_header * hptr=(struct rest_header *) 0;
 	struct	rest_response * rptr;
 
 	if ( check_debug() )
@@ -536,7 +570,11 @@ public	struct	occi_client *	occi_load_categories( struct occi_client * cptr )
 	if (!( uri = occi_client_uri( cptr, "/-/" ) ))
 		return( occi_delete_client( cptr ) );
 
-	else if (!( rptr = rest_client_get_request(uri,cptr->tls,cptr->agent,(void *) 0) ))
+	else if ((OcciManager.headers)
+	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+		return( occi_delete_client( cptr ) );
+
+	else if (!( rptr = rest_client_get_request(uri,cptr->tls,cptr->agent,hptr ) ))
 	{
 		liberate( uri );
 		return( occi_delete_client( cptr ) );
@@ -788,40 +826,6 @@ private	struct	rest_header * occi_append_account(
 	return( root );
 }
 	
-/*	------------------------------------------------------------	*/
-/*		    o c c i _ a p p e n d _ d e f a u l t 		*/
-/*	------------------------------------------------------------	*/
-/*	this function appends the list of default headers that are	*/
-/*	needed to transmit security and athorization information.	*/
-/*	The headers have to be duplicated to be	sure that no cross 	*/	
-/*	memory allocations occur !					*/
-/*	------------------------------------------------------------	*/
-public	struct	rest_header   * occi_append_default( 
-			struct 	occi_client  * cptr,
-			struct 	rest_header  * root,
-			struct 	rest_header  * hptr )
-{
-	struct	rest_header * wptr;
-	struct	rest_header * last;
-
-	if ((last = root) != (struct rest_header *) 0)
-		while ( last->next ) 
-			last = last->next;
-
-	for (	;
-		hptr != (struct rest_header *) 0;
-		hptr = hptr->next )
-	{
-		if (!( wptr = rest_create_header( hptr->name, hptr->value ) ))
-			return( wptr );
-		else if (!( wptr->previous = last ))
-			root = wptr;
-		else 	wptr->previous->next = wptr;
-		last = wptr;
-	}
-	return( root );
-}
-
 /*	------------------------------------------------------------	*/
 /*		     o c c i _ j s o n _ b o d y 			*/
 /*	------------------------------------------------------------	*/
