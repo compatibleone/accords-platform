@@ -19,6 +19,10 @@ struct	openstack
 	char *	number;
 	char *	rootpass;
 	char *	reference;
+	char *	network;
+
+	char *	access;
+
 	char *	publicaddr;
 	char *	privateaddr;
 

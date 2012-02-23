@@ -24,6 +24,12 @@
 #include "cordslang.h"
 #include "occiresolver.h"
 #include "cosacsctrl.h"
+#include "cp.h"
+#include "cb.h"
+
+public	char *	cords_extract_atribut( 
+	struct occi_response * zptr, char * domain,
+	char * category, char * nptr );
 
 /*	------------------------------------------	*/
 /*		o s _ v a l i d _ p r i c e		*/
@@ -35,6 +41,20 @@ private	int	os_valid_price( char * price )
 	else if (!( strlen( price )))
 		return( 0 );
 	else if (!( strcmp( price, _CORDS_NULL ) ))
+		return( 0 );
+	else	return( 1 );
+}	
+
+/*	------------------------------------------	*/
+/*		o s _ v a l i d _ a d d r e s s		*/
+/*	------------------------------------------	*/
+private	int	os_valid_address( char * address )
+{
+	if (!( address ))
+		return(0);
+	else if (!( strlen( address )))
+		return( 0 );
+	else if (!( strcmp( address, _CORDS_NULL ) ))
 		return( 0 );
 	else	return( 1 );
 }	
@@ -548,7 +568,10 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		/* ------------------------------------------------------------- */
 		/* determine the openstack message version and collect addresses */
 		/* ------------------------------------------------------------- */
-		if (!( version = resolve_openstack_version( pptr->profile ) ))
+		if ( os_valid_address( pptr->access ) )
+			pptr->publicaddr  = allocate_string(pptr->access);
+
+		else if (!( version = resolve_openstack_version( pptr->profile ) ))
 			resolve_os_v10_addresses( yptr, pptr );
 
 		else if (!( strcmp( version, "v1.0" ) ))
@@ -595,6 +618,92 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 	}
 }
 
+
+private	int	os_resolve_access_address( struct openstack * pptr )
+{
+	struct	occi_element * header=(struct occi_element *) 0;
+	struct	occi_response * yptr=(struct occi_response *) 0;
+	char	buffer[1024];
+	char 	* vptr;
+
+	if (!( pptr ))
+		return( 1001 );
+
+	else if ( os_valid_address( pptr->access ) )
+		return( 0 );
+
+	/* ----------------------------------------- */
+	/* check of use of CONETS has been inhibited */
+	/* ----------------------------------------- */
+	else if ((vptr = getenv( "USECONETS" )) != (char *) 0)
+	{
+		if ( *vptr == '0' ) 
+		{
+			pptr->access = (char *) 0;
+			return( 0 );
+		}
+		/* -------------------------------------- */
+		/* USECONETS must exist and be set to '1' */
+		/* in order that CONETS be used for IP    */
+		/* address allocation 			  */
+		/* -------------------------------------- */
+	}
+	else
+	{
+		pptr->access = (char *) 0;
+		return( 0 );
+	}
+	
+
+	/* ------------------------------------------------ */
+	/* create an IP address for the provisioned machine */
+	/* ------------------------------------------------ */
+	if (!( header = occi_create_element( "occi.ipaddress.network", pptr->network ) ))
+	{
+		return( 1002 );
+	}
+	else if (!( yptr = cords_create_instance( 
+			_CORDS_IPADDRESS, 
+			_CORDS_CONTRACT_AGENT, 
+			header, default_tls() ) ))
+	{
+		return( 1003 );
+	}
+	else if (!( vptr = cords_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		return( 1004 );
+	}
+	else if (!( vptr = occi_category_id( vptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		return( 1005 );
+	}
+	else
+	{
+		sprintf(buffer,"%s/%s/%s",yptr->host,_CORDS_IPADDRESS,vptr);
+		yptr = occi_remove_response( yptr );
+		if (!( yptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			return( 1006 );
+		else if (!( vptr = cords_extract_atribut( 
+					yptr, "occi", _CORDS_IPADDRESS, "value" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			return( 1007 );
+		}
+		else
+		{
+			strcpy( buffer, vptr );
+			yptr = occi_remove_response( yptr );
+			if ( pptr->access ) pptr->access = liberate( pptr->access );
+			if (!( pptr->access = allocate_string( buffer ) ))
+				return( 1008 );
+			else	return( 0 );
+		}
+	}		
+}
+
+
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
@@ -610,6 +719,7 @@ private	struct	rest_response * start_openstack(
 	struct	os_response * metaptr;
 	struct	openstack * pptr;
 	int		status;
+	char 	*	accessAddress=(char *) 0;
 	char	*	filename;
 	char	*	metafilename;
 	char		buffer[512];
@@ -631,11 +741,14 @@ private	struct	rest_response * start_openstack(
 
 	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
+	if (( status = os_resolve_access_address( pptr )) != 0)
+		return( rest_html_response( aptr, status, "Server Failure : Access Address" ) );
+
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
 		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
 
 	if (!( filename = os_create_server_request( 
-		pptr->name, pptr->image, pptr->flavor, personality, resource ) ))
+		pptr->name, pptr->image, pptr->flavor, pptr->access, personality, resource ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
 	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Request" ) );
@@ -1134,7 +1247,7 @@ private	struct	occi_interface	openstack_interface = {
 public	struct	occi_category * build_openstack( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_openstack_builder( domain,_CORDS_OPENSTACK ) ))
+	if (!( optr = occi_openstack_builder( domain,_CORDS_OPENSTACK ) ))
 		return( optr );
 	else
 	{

@@ -63,7 +63,7 @@ public struct occi_category * occi_cords_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
 public struct occi_category * occi_cords_agency_builder(char *a,char * b);
 
-public struct occi_category * occi_cords_openstack_builder(char *a,char * b);
+public struct occi_category * occi_openstack_builder(char *a,char * b);
 public struct occi_category * occi_cords_osconfig_builder(char *a,char * b);
 public struct occi_category * occi_cords_opennebula_builder(char *a,char * b);
 public struct occi_category * occi_cords_onconfig_builder(char *a,char * b);
@@ -126,7 +126,7 @@ const static struct {
 	{ "publication", occi_cords_publication_builder },
 	{ "enquiry", occi_cords_enquiry_builder },
 	{ "agency", occi_cords_agency_builder },
-	{ "openstack", occi_cords_openstack_builder },
+	{ "openstack", occi_openstack_builder },
 	{ "osconfig", occi_cords_osconfig_builder },
 	{ "opennebula", occi_cords_opennebula_builder },
 	{ "onconfig", occi_cords_onconfig_builder },

@@ -726,6 +726,7 @@ public	char * os_create_server_request(
 		char * identity,	/* the identity of the server 	*/
 		char * image,		/* the server image identifier  */
 		char * flavor,		/* the server machine flavour	*/
+		char * address,		/* the public IP address 	*/
 		char * personality,	/* the source personality data	*/
 		char * resource )	/* the target personality file  */
 {
@@ -764,6 +765,10 @@ public	char * os_create_server_request(
 		{
 			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,Os.base,image,0x0022);
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,Os.base,flavor,0x0022);
+		}
+		if ( address )
+		{
+			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
 

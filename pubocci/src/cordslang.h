@@ -123,6 +123,7 @@
 #define	_CORDS_FILE		"file"
 #define	_CORDS_SCRIPT		"script"
 #define	_CORDS_VM		"vm"
+#define	_CORDS_IPADDRESS	"ipaddress"
 
 /*	------------------------	*/
 /*	cords  parser  feed back	*/

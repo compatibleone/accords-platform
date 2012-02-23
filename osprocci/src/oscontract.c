@@ -22,10 +22,6 @@
 
 #include "occiclient.h"
 
-public	char *	cords_extract_atribut( 
-	struct occi_response * zptr, char * domain,
-	char * category, char * nptr );
-
 struct	cords_vector
 {
 	char *	id;
@@ -336,42 +332,44 @@ public	int	create_openstack_contract(
 	if (!( contract.node.id = pptr->node ))
 		return( 0 );
 	else if (!( contract.node.message = occi_simple_get( contract.node.id, agent, tls ) ))
-		return( terminate_openstack_contract( 570, &contract ) );
+		return( terminate_openstack_contract( 1170, &contract ) );
 
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
 	else if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
-		return( terminate_openstack_contract( 571, &contract ) );
+		return( terminate_openstack_contract( 1171, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
-		return( terminate_openstack_contract( 572, &contract ) );
+		return( terminate_openstack_contract( 1172, &contract ) );
 
 	else if (!( contract.compute.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
-		return( terminate_openstack_contract( 573, &contract ) );
+		return( terminate_openstack_contract( 1173, &contract ) );
 	else if (!( contract.compute.message = occi_simple_get( contract.compute.id, agent, tls ) ))
-		return( terminate_openstack_contract( 574, &contract ) );
+		return( terminate_openstack_contract( 1174, &contract ) );
 
 	else if (!( contract.network.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
-		return( terminate_openstack_contract( 575, &contract ) );
+		return( terminate_openstack_contract( 1175, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
-		return( terminate_openstack_contract( 576, &contract ) );
+		return( terminate_openstack_contract( 1177, &contract ) );
+	else if (!( pptr->network = allocate_string( contract.network.id ) ))
+		return( terminate_openstack_contract( 1176, &contract ) );
 
 	else if (!( contract.storage.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
-		return( terminate_openstack_contract( 577, &contract ) );
+		return( terminate_openstack_contract( 1178, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
-		return( terminate_openstack_contract( 578, &contract ) );
+		return( terminate_openstack_contract( 1179, &contract ) );
 
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
 	else if (!( contract.flavors = os_list_flavor_details() ))
-		return( terminate_openstack_contract( 579, &contract ) );
+		return( terminate_openstack_contract( 1180, &contract ) );
 	else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
-		return( terminate_openstack_contract( 580, &contract ) );
+		return( terminate_openstack_contract( 1181, &contract ) );
 		
 
 	/* ---------------------------------- */
@@ -379,25 +377,25 @@ public	int	create_openstack_contract(
 	/* ---------------------------------- */
 	if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
-		return( terminate_openstack_contract( 581, &contract ) );
+		return( terminate_openstack_contract( 1182, &contract ) );
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
-		return( terminate_openstack_contract( 582, &contract ) );
+		return( terminate_openstack_contract( 1183, &contract ) );
 
 	else if (!( contract.system.id = cords_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
-		return( terminate_openstack_contract( 583, &contract ) );
+		return( terminate_openstack_contract( 1184, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
-		return( terminate_openstack_contract( 584, &contract ) );
+		return( terminate_openstack_contract( 1185, &contract ) );
 
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
 	else if (!( contract.images = os_list_image_details() ))
-		return( terminate_openstack_contract( 585, &contract ) );
+		return( terminate_openstack_contract( 1186, &contract ) );
 	else if (!( pptr->image = resolve_contract_image( &contract ) ))
-		return( terminate_openstack_contract( 586, &contract ) );
+		return( terminate_openstack_contract( 1187, &contract ) );
 	else if (!( pptr->original = allocate_string( pptr->image ) ))
-		return( terminate_openstack_contract( 586, &contract ) );
+		return( terminate_openstack_contract( 1188, &contract ) );
 	{
 		/* ----------------------------------------------- */
 		/* resolve any price informatino for this category */

@@ -36,12 +36,17 @@ private	int	create_ipaddress(struct occi_category * optr, void * vptr)
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
-  	 return(0);
+		return(0);
         
-        if (*(pptr->version)=='\0')
-         pptr->version=_DEFAULT_VERSION;
-        if (*(pptr->type)=='\0')
-         pptr->type=_DEFAULT_TYPE;
+	if (!( pptr->version ))
+         	pptr->version=_DEFAULT_VERSION;
+        else if (*(pptr->version)=='\0')
+         	pptr->version=_DEFAULT_VERSION;
+
+	if (!( pptr->type ))
+        	pptr->type=_DEFAULT_TYPE;
+        else if (*(pptr->type)=='\0')
+		pptr->type=_DEFAULT_TYPE;
 
         range = allocate_string(retrieve_iprange(pptr->version, pptr->type, conets_agent, default_tls()));
        
@@ -52,13 +57,16 @@ private	int	create_ipaddress(struct occi_category * optr, void * vptr)
 
         timestamp = time(NULL);
         sprintf(timebuff,"%ld",timestamp);
+
 	pptr->timestamp = allocate_string(timebuff);
 	pptr->owner = allocate_string(Conets.user);
-        if (*(pptr->domain)=='\0')
-          pptr->domain=_DEFAULT_DOMAIN;
+
+	if (!( pptr->domain ))
+        	pptr->domain=_DEFAULT_DOMAIN;
+        else if (*(pptr->domain)=='\0')
+		pptr->domain=_DEFAULT_DOMAIN;
         
-        domainame = allocate_string( retrieve_domain(pptr->domain, conets_agent, default_tls()) );
- 	if (!domainame)
+        if (!( domainame = allocate_string( retrieve_domain(pptr->domain, conets_agent, default_tls()) ) ))
             if (!create_new_domain(pptr->domain, conets_agent, default_tls()))
 		failure (44, "create", "domain"); 
  	 

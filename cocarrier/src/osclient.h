@@ -48,7 +48,7 @@ struct	os_response
 #define	_OS_NS_COMPUTE_V10	"http://docs.rackspacecloud.com/servers/api/v1.0"
 
 public	char * os_create_server_request(
-	char * identity, char * flavor, char * image, char * personality, char * resource );
+	char * identity, char * flavor, char * image, char * address, char * personality, char * resource );
 public	char * os_create_metadata_request( char * values );
 public	char * os_create_meta_request( char * key, char * value );
 public	char * os_create_image_request(char * identity, char * server );

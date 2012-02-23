@@ -104,7 +104,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 	}
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if (!( nomfic = os_create_server_request( p2, p3, p4, personality, resource ) ))
+		if (!( nomfic = os_create_server_request( p2, p3, p4, p5, personality, resource ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
 		{ 	
@@ -262,7 +262,7 @@ private	int	os_banner()
 	printf("\n   CRUD Operations ");
 	printf("\n");
 	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | METADATA <id> ]  ");
-	printf("\n   CREATE   <name> <image> <flavor> ");
+	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");

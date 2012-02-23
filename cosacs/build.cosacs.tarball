@@ -1,4 +1,4 @@
-echo "cosacs --config cosacs.xml COSACS/1.0"  > run-cosacs
+echo "cd /home/cosacs; /usr/local/bin/cosacs --config /home/cosacs/cosacs.xml COSACS/1.0"  > run-cosacs
 chmod +x run-cosacs
 echo "mkdir rest" > install-cosacs
 echo "chmod 0660 rest" >> install-cosacs

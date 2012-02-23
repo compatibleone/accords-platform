@@ -57,6 +57,10 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->rootpass = liberate(sptr->rootpass);
 		if ( sptr->reference )
 			 sptr->reference = liberate(sptr->reference);
+		if ( sptr->network )
+			 sptr->network = liberate(sptr->network);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
@@ -88,6 +92,8 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->number = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->reference = (char*) 0;
+		sptr->network = (char*) 0;
+		sptr->access = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->hostname = (char*) 0;
@@ -167,6 +173,14 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->reference = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"network") ))
+		{
+			if ( wptr->value ) { sptr->network = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"access") ))
+		{
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"publicaddr") ))
 		{
 			if ( wptr->value ) { sptr->publicaddr = allocate_string(wptr->value); }
@@ -213,6 +227,8 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.network='%s'\r\n",prefix,nptr,(sptr->network?sptr->network:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
