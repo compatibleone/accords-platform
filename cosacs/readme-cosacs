@@ -1,0 +1,48 @@
+
+-----------------------
+CompatibleOne
+-----------------------
+Embedded COSACS Package
+-----------------------
+The following files are required for the installation of the COSACS package on base operating system
+image for use by the CompatibleOne ACCORDS platform brokering system.
+
+
+Executable Program
+	/usr/local/bin/cosacs
+
+CompatibleOne Libraries:
+	/usr/local/lib/libcocci.so.0 
+	/usr/local/lib/libocci.so.0 
+	/usr/local/lib/libcords.so.0 
+	/usr/local/lib/libcorest.so.0 
+	/usr/local/lib/libcoxml.so.0 
+	/usr/local/lib/libpubocci.so.0 
+	/usr/local/lib/libcopabr.so.0 
+
+System Libraries
+	/lib/libuuid.so.1 
+	/usr/lib/libssl.so.0.9.7 
+	/usr/lib/libcrypto.so.0.9.7
+	/lib/libpthread.so.0 
+	/lib/libc.so.6 
+	/lib/libdl.so.2 
+	/lib/ld-linux.so.2 
+
+Documentation
+	cosacs.help
+
+Configuration Files
+	cosacs.xml
+	install-cosacs
+	run-cosacs
+
+Security Files
+	Certificates.crt
+	security/cosacsTls.xml
+	security/cosacsKey.pem
+	security/cosacsCert.pem
+
+
+
+

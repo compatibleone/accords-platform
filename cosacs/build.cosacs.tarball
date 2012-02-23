@@ -1,0 +1,36 @@
+echo "cosacs --config cosacs.xml COSACS/1.0"  > run-cosacs
+chmod +x run-cosacs
+echo "mkdir rest" > install-cosacs
+echo "chmod 0660 rest" >> install-cosacs
+cp /usr/local/bin/cosacs ./cosacs
+echo "mv cosacs /usr/local/bin" >> install-cosacs
+cp /usr/local/lib/libcocci.so.0 ./libcocci.so.0
+cp /usr/local/lib/libocci.so.0 ./libocci.so.0
+cp /usr/local/lib/libcords.so.0 ./libcords.so.0
+cp /usr/local/lib/libcorest.so.0 ./libcorest.so.0
+cp /usr/local/lib/libcoxml.so.0 ./libcoxml.so.0
+cp /usr/local/lib/libpubocci.so.0 ./libpubocci.so.0
+cp /usr/local/lib/libcopabr.so.0 ./libcopabr.so.0
+echo "mv lib*.so.0 /usr/local/lib" >> install-cosacs
+echo "<accords>" > cosacs.xml
+echo "<cosacs " >> cosacs.xml
+echo " publisher='' " >> cosacs.xml
+echo " operator=''  " >> cosacs.xml
+echo " identity=''  " >> cosacs.xml
+echo " verbose='0'  " >> cosacs.xml
+echo " debug='0'    " >> cosacs.xml
+echo " threads='1'> " >> cosacs.xml
+echo " <rest host='127.0.0.1' port='8286'/>" >> cosacs.xml
+echo " <security " >> cosacs.xml
+echo "  user='service-cosacs' " >> cosacs.xml
+echo "  password='co-system' " >> cosacs.xml
+echo "  monitor='1' " >> cosacs.xml
+echo "  tls=''  " >> cosacs.xml
+echo " 	/> " >> cosacs.xml
+echo " <domain='occi' />" >> cosacs.xml
+echo "</cosacs> " >> cosacs.xml
+echo "</accords> " >> cosacs.xml
+echo "echo launch ./run-cosacs as a background task to start the module" >> install-cosacs
+chmod +x install-cosacs
+tar -czvf cosacstarball.tgz cosacs libcocci.so.0 libocci.so.0 libcords.so.0 libcorest.so.0 libcoxml.so.0 libpubocci.so.0 libcopabr.so.0 cosacs.xml install-cosacs run-cosacs readme-cosacs
+rm cosacs libcocci.so.0 libocci.so.0 libcords.so.0 libcorest.so.0 libcoxml.so.0 libpubocci.so.0 libcopabr.so.0   cosacs.xml install-cosacs run-cosacs 
