@@ -43,6 +43,8 @@ public struct cords_ipaddress * liberate_cords_ipaddress(struct cords_ipaddress 
 			 sptr->value = liberate(sptr->value);
 		if ( sptr->domain )
 			 sptr->domain = liberate(sptr->domain);
+		if ( sptr->network )
+			 sptr->network = liberate(sptr->network);
 		if ( sptr->timestamp )
 			 sptr->timestamp = liberate(sptr->timestamp);
 		if ( sptr->owner )
@@ -65,6 +67,7 @@ public struct cords_ipaddress * reset_cords_ipaddress(struct cords_ipaddress * s
 		sptr->type = (char*) 0;
 		sptr->value = (char*) 0;
 		sptr->domain = (char*) 0;
+		sptr->network = (char*) 0;
 		sptr->timestamp = (char*) 0;
 		sptr->owner = (char*) 0;
 	}
@@ -113,6 +116,10 @@ public int xmlin_cords_ipaddress(struct cords_ipaddress * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->domain = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"network") ))
+		{
+			if ( wptr->value ) { sptr->network = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"timestamp") ))
 		{
 			if ( wptr->value ) { sptr->timestamp = allocate_string(wptr->value); }
@@ -140,6 +147,7 @@ public int rest_occi_cords_ipaddress(FILE * fh,struct cords_ipaddress * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.domain='%s'\r\n",prefix,nptr,(sptr->domain?sptr->domain:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.network='%s'\r\n",prefix,nptr,(sptr->network?sptr->network:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.timestamp='%s'\r\n",prefix,nptr,(sptr->timestamp?sptr->timestamp:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.owner='%s'\r\n",prefix,nptr,(sptr->owner?sptr->owner:""));
 	return(0);

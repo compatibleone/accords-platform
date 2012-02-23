@@ -54,6 +54,8 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------- */
 	/* prepare COSACS identity */
 	/* ----------------------- */
+	if (!( host = getenv( "COSACS" ) ))
+		host = cosacs;
 	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_PROBE);
 
 	if ( prefix )
@@ -102,6 +104,8 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------- */
 	/* prepare COSACS identity */
 	/* ----------------------- */
+	if (!( host = getenv( "COSACS" ) ))
+		host = cosacs;
 	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_METADATA);
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -146,6 +150,8 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	/* ----------------------- */
 	/* prepare COSACS identity */
 	/* ----------------------- */
+	if (!( host = getenv( "COSACS" ) ))
+		host = cosacs;
 	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_SCRIPT);
 
 	/* ----------------------------------- */
@@ -188,6 +194,8 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 	/* ----------------------- */
 	/* prepare COSACS identity */
 	/* ----------------------- */
+	if (!( host = getenv( "COSACS" ) ))
+		host = cosacs;
 	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_FILE);
 
 	/* ----------------------------------- */

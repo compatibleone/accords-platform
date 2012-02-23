@@ -144,6 +144,8 @@ private void autoload_cords_ipaddress_nodes() {
 				pptr->value = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "domain" )) != (struct xml_atribut *) 0)
 				pptr->domain = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "network" )) != (struct xml_atribut *) 0)
+				pptr->network = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "timestamp" )) != (struct xml_atribut *) 0)
 				pptr->timestamp = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "owner" )) != (struct xml_atribut *) 0)
@@ -187,6 +189,9 @@ public  void autosave_cords_ipaddress_nodes() {
 		fprintf(h," domain=%c",0x0022);
 		fprintf(h,"%s",(pptr->domain?pptr->domain:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," network=%c",0x0022);
+		fprintf(h,"%s",(pptr->network?pptr->network:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," timestamp=%c",0x0022);
 		fprintf(h,"%s",(pptr->timestamp?pptr->timestamp:""));
 		fprintf(h,"%c",0x0022);
@@ -222,6 +227,8 @@ private void set_cords_ipaddress_field(
 			pptr->value = allocate_string(vptr);
 		if (!( strcmp( nptr, "domain" ) ))
 			pptr->domain = allocate_string(vptr);
+		if (!( strcmp( nptr, "network" ) ))
+			pptr->network = allocate_string(vptr);
 		if (!( strcmp( nptr, "timestamp" ) ))
 			pptr->timestamp = allocate_string(vptr);
 		if (!( strcmp( nptr, "owner" ) ))
@@ -285,6 +292,13 @@ private int pass_cords_ipaddress_filter(
 		else if ( strcmp(pptr->domain,fptr->domain) != 0)
 			return(0);
 		}
+	if (( fptr->network )
+	&&  (strlen( fptr->network ) != 0)) {
+		if (!( pptr->network ))
+			return(0);
+		else if ( strcmp(pptr->network,fptr->network) != 0)
+			return(0);
+		}
 	if (( fptr->timestamp )
 	&&  (strlen( fptr->timestamp ) != 0)) {
 		if (!( pptr->timestamp ))
@@ -324,6 +338,9 @@ private struct rest_response * cords_ipaddress_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.domain=%s",optr->domain,optr->id,pptr->domain);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.network=%s",optr->domain,optr->id,pptr->network);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.timestamp=%s",optr->domain,optr->id,pptr->timestamp);
@@ -744,6 +761,8 @@ public struct occi_category * occi_cords_ipaddress_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "domain",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "network",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "timestamp",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "owner",0,0) ))
@@ -817,6 +836,17 @@ public struct rest_header *  cords_ipaddress_occi_headers(struct cords_ipaddress
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_ipaddress.domain='%s'\r\n",(sptr->domain?sptr->domain:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_ipaddress.network='%s'\r\n",(sptr->network?sptr->network:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

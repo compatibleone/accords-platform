@@ -9,6 +9,7 @@ struct cords_ipaddress
 	char * type;
 	char * value;
         char * domain;
+	char * network;
         char * timestamp;
 	char * owner;
 };
