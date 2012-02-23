@@ -22,7 +22,7 @@ elif test -e $confdir/accords.ini; then
     . $confdir/accords.ini
 fi
 
-tls=$1
+tls=
 trace=1
 threads=1
 verbose=0
