@@ -81,11 +81,16 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 	char	*	personality="";
 	char	*	resource=_CORDS_LAUNCH_CFG;
 
-	if (!( p2 ))
-		return( failure( 30,"p2", "required") );
-
-	if (!( p1))
+	if (!( p1 ))
 		return( failure( 30,"p1", "required") );
+
+	else if (!( strcasecmp(p1,"ADDRESS" ) ))
+	{
+		os_result( os_create_address() );
+		return( 0 );
+	}
+	else if (!( p2 ))
+		return( failure( 30,"p2", "required") );
 
 	else if (!( strcasecmp(p1,"LIST" ) ))
 	{
@@ -97,11 +102,14 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( ( detail ? os_list_flavor_details() : os_list_flavors()) );
 		else if (!( strcasecmp( p2, "IMAGES" ) ))
 			os_result( ( detail ? os_list_image_details() : os_list_images()) );
+		else if (!( strcasecmp( p2, "ADDRESSES" ) ))
+			os_result( ( detail ? os_list_floating_ip_details() : os_list_floating_ips()) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
+
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
 		if (!( nomfic = os_create_server_request( p2, p3, p4, p5, personality, resource ) ))
@@ -119,6 +127,16 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else
 		{ 	
 			os_result( os_create_image( nomfic, p3 ) );
+			return( 0 );
+		}
+	}
+	else if (!( strcasecmp(p1,"ASSOCIATE" ) ))
+	{
+		if (!( nomfic = os_create_address_request( p2 ) ))
+			return( failure(27,"cannot create snapshot","request" ) );
+		else
+		{ 	
+			os_result( os_server_address( nomfic, p3 ) );
 			return( 0 );
 		}
 	}
@@ -170,6 +188,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_delete_server( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_delete_image( p3 ) );
+		else if (!( strcasecmp( p2, "ADDRESS" ) ))
+			os_result( os_delete_address( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_delete_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -255,19 +275,21 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.05");
-	printf("\n   Beta Version 09/02/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.06");
+	printf("\n   Beta Version 25/02/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | METADATA <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | METADATA <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   SNAPSHOT <name> <server> ");
+	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
+	printf("\n   ASSOCIATE <address> <serverid>   ");
 	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

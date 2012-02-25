@@ -351,17 +351,14 @@ public	struct	os_response *	os_list_server_details	( )
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ l i s t _ f l a v o u r s			*/
+/*			o s _ l i s t _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_flavors( )
+private struct	os_response *	os_list_operation( char * buffer )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
-	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-
-	sprintf(buffer,"/flavors");
 
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
@@ -381,6 +378,30 @@ public	struct	os_response *	os_list_flavors( )
 		return( rptr );
 	}
 	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ l i s t _ f l o a t i n g _ i p s		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_floating_ips( )
+{
+	return( os_list_operation( "/os-floating-ips" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	   o s _ l i s t _ f l o a t i n g _ i p _ d e t a i l s	*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_floating_ip_details( )
+{
+	return( os_list_operation( "/os-floating-ips/detail" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ l i s t _ f l a v o u r s			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_flavors( )
+{
+	return( os_list_operation( "/flavors" ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -388,32 +409,7 @@ public	struct	os_response *	os_list_flavors( )
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_list_flavor_details( )
 {
-	struct	os_response	*	rptr=(struct os_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-
-	sprintf(buffer,"/flavors/detail");
-
-	if (!( hptr = os_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( os_list_operation( "/flavors/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -421,31 +417,7 @@ public	struct	os_response *	os_list_flavor_details( )
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_list_images( )
 {
-	struct	os_response	*	rptr=(struct os_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images");
-
-	if (!( hptr = os_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( os_list_operation( "/images" ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -453,31 +425,7 @@ public	struct	os_response *	os_list_images( )
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_list_image_details( )
 {
-	struct	os_response	*	rptr=(struct os_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images/detail");
-
-	if (!( hptr = os_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( os_list_operation( "/images/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -551,6 +499,31 @@ private	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
 	if ( *sptr ) *(sptr++) = 0;
 	*rptr = sptr;
 	return(1);	
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o s _ c r e a t e _  a d d r e s s _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * os_create_address_request( char * address )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<addFloatingIp xmlns=%c%s%c>\n",0x0022,Os.namespace,0x0022);
+		fprintf(h,"<address>%s</address>\n",address);
+		fprintf(h,"</addFloatingIp>\n");
+		fclose(h);
+		return( filename );
+	}
 }
 			
 /*	------------------------------------------------------------	*/
@@ -899,6 +872,67 @@ public	struct	os_response *	os_create_image( char * filename, char * id )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _  a d d r e s s 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_address()
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-floating-ips");
+
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, (char *) 0, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ s e r v e r _ a d d r e s s 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_server_address( char * filename, char * serverid )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/servers/%s/action",serverid);
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _  s e r v e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_create_server( char * filename )
@@ -1153,16 +1187,14 @@ public	struct	os_response *	os_delete_server(  char * id )
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ d e l e t e _ i m a g e 			*/
+/*			o s _ d e l e t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_image	(  char * id )
+private	struct	os_response *	os_delete_operation(  char * buffer )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
-	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images/%s",id);
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Os.base )))
@@ -1181,6 +1213,26 @@ public	struct	os_response *	os_delete_image	(  char * id )
 		return( rptr );
 	}
 	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e l e t e _ i m a g e 			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_image	(  char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/images/%s",id);
+	return( os_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e l e t e _ a d d r e s s		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_address(  char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-floating-ips/%s",id);
+	return( os_delete_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
