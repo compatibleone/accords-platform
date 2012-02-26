@@ -295,7 +295,7 @@ private	struct	rest_client * rest_liberate_client( struct rest_client * cptr )
 private	struct rest_client * 	rest_open_client( char * host, int port, char * tls )
 {
 	struct rest_client *  cptr;
- 
+	char	buffer[1024]; 
 	if (!( port ))
 		return((struct rest_client*) 0); 
 	else if (!( cptr = rest_allocate_client() ))
@@ -310,7 +310,8 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 	else if (!( socket_connect( cptr->net.socket, host, port  ) ))
 	{
-	        failure(errno,"socket_connect",strerror(errno));
+		sprintf(buffer,"socket_connect(%s:%u)",host,port);
+	        failure(errno,buffer,strerror(errno));
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( tls ))

@@ -22,6 +22,8 @@ struct	openstack
 	char *	network;
 
 	char *	access;
+	char *	floating;
+	char *	floatingid;
 
 	char *	publicaddr;
 	char *	privateaddr;

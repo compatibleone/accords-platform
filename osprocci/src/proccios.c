@@ -268,6 +268,9 @@ private	int	reset_openstack_server( struct openstack * pptr )
 		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+		if ( pptr->access ) pptr->access = liberate( pptr->access );
+		if ( pptr->floating ) pptr->floating = liberate( pptr->floating );
+		if ( pptr->floatingid ) pptr->floatingid = liberate( pptr->floatingid );
 		pptr->number = allocate_string("");
 		pptr->hostname = allocate_string("");
 		pptr->rootpass  = allocate_string("");
@@ -568,7 +571,10 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		/* ------------------------------------------------------------- */
 		/* determine the openstack message version and collect addresses */
 		/* ------------------------------------------------------------- */
-		if ( os_valid_address( pptr->access ) )
+		if ( os_valid_address( pptr->floating ) )
+			pptr->publicaddr  = allocate_string(pptr->floating);
+
+		else if ( os_valid_address( pptr->access ) )
 			pptr->publicaddr  = allocate_string(pptr->access);
 
 		else if (!( version = resolve_openstack_version( pptr->profile ) ))
@@ -619,23 +625,19 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 }
 
 
-private	int	os_resolve_access_address( struct openstack * pptr )
+/*	------------------------------------------------------------------	*/
+/*		c o n e t s _ a c c e s s _ a d d r e s s			*/
+/*	------------------------------------------------------------------	*/
+private	int	conets_access_address( struct openstack * pptr )
 {
 	struct	occi_element * header=(struct occi_element *) 0;
 	struct	occi_response * yptr=(struct occi_response *) 0;
 	char	buffer[1024];
 	char 	* vptr;
-
-	if (!( pptr ))
-		return( 1001 );
-
-	else if ( os_valid_address( pptr->access ) )
-		return( 0 );
-
 	/* ----------------------------------------- */
 	/* check of use of CONETS has been inhibited */
 	/* ----------------------------------------- */
-	else if ((vptr = getenv( "USECONETS" )) != (char *) 0)
+	if ((vptr = getenv( "USECONETS" )) != (char *) 0)
 	{
 		if ( *vptr == '0' ) 
 		{
@@ -695,7 +697,12 @@ private	int	os_resolve_access_address( struct openstack * pptr )
 		{
 			strcpy( buffer, vptr );
 			yptr = occi_remove_response( yptr );
-			if ( pptr->access ) pptr->access = liberate( pptr->access );
+			if ( pptr->access )
+				pptr->access = liberate( pptr->access );
+			if ( pptr->floating )
+				pptr->floating = liberate( pptr->floating );
+			if ( pptr->floatingid )
+				pptr->floatingid = liberate( pptr->floatingid );
 			if (!( pptr->access = allocate_string( buffer ) ))
 				return( 1008 );
 			else	return( 0 );
@@ -703,6 +710,99 @@ private	int	os_resolve_access_address( struct openstack * pptr )
 	}		
 }
 
+/*	------------------------------------------------------------------	*/
+/*			 n o v a _ a c c e s s _ a d d r e s s			*/
+/*	------------------------------------------------------------------	*/
+private	int	nova_access_address( struct openstack * pptr )
+{
+	struct	os_response	*	rptr;
+	char *	vptr;
+	char *	wptr;
+	if (!( rptr = os_create_address() ))
+		return( 118 );
+	else if (!( vptr = json_atribut( rptr->jsonroot, "ip" )))
+		return( 118 );
+	else if (!( wptr = json_atribut( rptr->jsonroot, "id" )))
+		return( 118 );
+	else
+	{
+		if ( pptr->access )
+			pptr->access = liberate( pptr->access );
+
+		if ( pptr->floating )
+			pptr->floating = liberate( pptr->floating );
+
+		if ( pptr->floatingid )
+			pptr->floatingid = liberate( pptr->floatingid );
+
+		if (!( pptr->floating = allocate_string( vptr )))
+		{
+			liberate_os_response( rptr );
+			return( 27 );
+		}
+		else if (!( pptr->floatingid = allocate_string( wptr )))
+		{
+			liberate_os_response( rptr );
+			return( 27 );
+		}
+		else
+		{
+			liberate_os_response( rptr );
+			return( 0 );
+		}
+
+	}
+}
+
+/*	--------------------------------------------------------------------	*/
+/*			o s _ u s e _ c o n e t s				*/
+/*	--------------------------------------------------------------------	*/
+private	int	os_use_conets( struct openstack * pptr )
+{
+	char *	version;
+	if (!( version = resolve_openstack_version( pptr->profile ) ))
+		return( 1 );
+	else if (!( strcmp( version, "v1.0" ) ))
+		return( 1 );
+	else if (!( strcmp( version, "v1.1" ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	--------------------------------------------------------------------	*/
+/*		o s _ r e s o l v e _ a c c e s s _ a d d r e s s		*/
+/*	--------------------------------------------------------------------	*/
+private	int	os_resolve_access_address( struct openstack * pptr )
+{
+	if (!( pptr ))
+		return( 0 );
+	else if ( os_use_conets( pptr ) )
+		return( conets_access_address( pptr ) );
+	else	return( nova_access_address( pptr ) );
+}
+
+
+/*	------------------------------------------------------------------	*/
+/*		o s _ r e s o l v e _ a c c e s s _ a d d r e s s		*/
+/*	------------------------------------------------------------------	*/
+private	int	associate_server_address( struct openstack * pptr )
+{
+	char *	nomfic;
+	struct	os_response * rptr;
+	if (!( pptr ))
+		return( 1001 );
+	else if (!( os_valid_address( pptr->floating ) ))
+		return( 1002 );
+	else if (!( nomfic = os_create_address_request( pptr->floating ) ))
+		return( 1003 );
+	else if (!( rptr = os_server_address( nomfic, pptr->number ) ))
+		return( 1004 );
+	else
+	{
+		liberate_os_response( rptr );
+		return( 0 );
+	}
+}
 
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
@@ -761,6 +861,13 @@ private	struct	rest_response * start_openstack(
 		/* --------------------------------- */
 		if (!( status = connect_openstack_server( osptr, pptr ) ))
 		{
+			/* -------------------------------------------- */
+			/* attempt to associate the floating IP address */
+			/* -------------------------------------------- */
+			if ( pptr->floating )
+				if ((status = associate_server_address( pptr )) != 0 )
+				 	return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
+
 			/* ---------------------------- */
 			/* launch the COSACS operations */
 			/* ---------------------------- */
@@ -977,7 +1084,13 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 	struct	os_response * osptr;
 	if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return((struct os_response *) 0);
-	else 	return( os_delete_server( pptr->number ) );
+	else
+	{
+		if ( pptr->floatingid )
+			if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
+				osptr = liberate_os_response( osptr );
+		return( os_delete_server( pptr->number ) );
+		}
 }
 
 /*	-------------------------------------------	*/
@@ -1002,20 +1115,15 @@ private	struct	rest_response * stop_openstack(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
-		if ( pptr->status == _OCCI_IDLE )
+		osptr = liberate_os_response( osptr );
+		reset_openstack_server( pptr );
+		pptr->when = time((long *) 0);
+		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+		if (!( os_valid_price( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
-		else
-		{
-			reset_openstack_server( pptr );
-			pptr->when = time((long *) 0);
-			osptr = liberate_os_response( osptr );
-			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
-			if (!( os_valid_price( pptr->price ) ))
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else	return( rest_html_response( aptr, 200, "OK" ) );
-		}
+		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 

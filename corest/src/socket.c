@@ -140,8 +140,9 @@ public	int	socket_connect( int h, char * u,int port )
 	struct sockaddr_in server;
 
 	if ( check_debug() & _DEBUG_SOCKET ) 
+	{
 		printf( "socket_connect(%u,%s,%u)\n",h,u,port);
-
+	}
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);

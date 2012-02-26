@@ -302,6 +302,7 @@ private	char * 	install_application_package( char * cosacs , char * package )
 		rest_log_message("coips:install_application_package");
 		rest_log_message( package );
 	}
+
 	/* retrieve the package details */
 	/* ---------------------------- */
 	if (!( zptr = occi_simple_get( package, _CORDS_SERVICE_AGENT, default_tls() ) ))
@@ -421,8 +422,11 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	char *	contract;
 	char *	linkvalue;
 	char *	package;
+	char *	cosacs=(char *) 0;
+	char *	vptr;
 	int	packages=0;
 	struct	occi_response * zptr;
+	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
 
 	/* ------------------------- */
@@ -466,11 +470,28 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 				continue;
 			else if (!( linkvalue = coips_link_value( eptr->value )))
 				continue;
-			else if (!( package = install_application_package( contract , linkvalue ) ))
-				return( 803 );
-			else	linkvalue = liberate( linkvalue );
+			else
+			{
+				if (!( cosacs ))
+				{
+					/* --------------------------- */
+					/* retrieve the cosacs address */
+					/* --------------------------- */
+					if (!( wptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
+						return( 803 );
+					else if (!( vptr = cords_extract_atribut( wptr, "occi","contract", "hostname" )))
+						return( 804 );
+					else if (!( cosacs = allocate_string( vptr ) ))
+						return( 805 );
+					else	wptr = occi_remove_response( wptr );
+				}
+				if (!( package = install_application_package( cosacs, linkvalue ) ))
+					return( 806 );
+				else	linkvalue = liberate( linkvalue );
+			}
 		}
 		zptr = occi_remove_response( zptr );
+		if ( cosacs ) cosacs = liberate( cosacs );
 	}
 
 	/* ------------------------- */

@@ -31,9 +31,40 @@
 /*	is ready and correclty in place in 	*/
 /*	the application image of the vm		*/
 /*	------------------------------------	*/
-#define	_COSACS_HOST "http://127.0.0.1"
+#define	_COSACS_HOST "127.0.0.1"
 #define	_COSACS_PORT 8286
 #define	_COSACS_START "cosacs:start"
+#define	_COSACS_ITERATIONS 0
+
+
+/*	-------------------------------------------------	*/
+/*	c o s a c s _ o c c i _ c r e a t e _ c l i e n t	*/
+/*	-------------------------------------------------	*/
+/*	it may be necessary to repeat the attempt to make	*/
+/*	the occi client connection for the cosacs module.	*/
+/*	-------------------------------------------------	*/
+private	struct	occi_client * cosacs_occi_create_client( char * url, char * agent, char * tls )
+{
+	struct	occi_client * cptr=(struct occi_client *) 0;
+	int	period=1;
+	int	iteration=_COSACS_ITERATIONS;
+
+	if (!( iteration ))
+		return( occi_create_client( url, agent, tls ) );
+	else
+	{
+		while (( iteration ) && (!( cptr )))
+		{
+			if (!(cptr = occi_create_client( url, agent, tls )))
+			{
+				sleep(period);
+				period++;
+				iteration--;
+			}
+		}
+		return(cptr);
+	}
+}
 
 /*	-----------------------------------------------------------	*/
 /*		c o s a c s _ c r e a t e _ p r o b e 			*/
@@ -56,7 +87,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_PROBE);
+	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_PROBE);
 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -65,7 +96,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(0);
@@ -106,7 +137,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_METADATA);
+	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_METADATA);
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
@@ -114,7 +145,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(0);
@@ -152,12 +183,12 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_SCRIPT);
+	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_SCRIPT);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(0);
@@ -201,7 +232,7 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(0);

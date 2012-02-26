@@ -162,6 +162,10 @@ private void autoload_openstack_nodes() {
 				pptr->network = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
 				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "floating" )) != (struct xml_atribut *) 0)
+				pptr->floating = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "floatingid" )) != (struct xml_atribut *) 0)
+				pptr->floatingid = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicaddr" )) != (struct xml_atribut *) 0)
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
@@ -238,6 +242,12 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," access=%c",0x0022);
 		fprintf(h,"%s",(pptr->access?pptr->access:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," floating=%c",0x0022);
+		fprintf(h,"%s",(pptr->floating?pptr->floating:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," floatingid=%c",0x0022);
+		fprintf(h,"%s",(pptr->floatingid?pptr->floatingid:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," publicaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->publicaddr?pptr->publicaddr:""));
 		fprintf(h,"%c",0x0022);
@@ -300,6 +310,10 @@ private void set_openstack_field(
 			pptr->network = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
 			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "floating" ) ))
+			pptr->floating = allocate_string(vptr);
+		if (!( strcmp( nptr, "floatingid" ) ))
+			pptr->floatingid = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicaddr" ) ))
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
@@ -432,6 +446,20 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->access,fptr->access) != 0)
 			return(0);
 		}
+	if (( fptr->floating )
+	&&  (strlen( fptr->floating ) != 0)) {
+		if (!( pptr->floating ))
+			return(0);
+		else if ( strcmp(pptr->floating,fptr->floating) != 0)
+			return(0);
+		}
+	if (( fptr->floatingid )
+	&&  (strlen( fptr->floatingid ) != 0)) {
+		if (!( pptr->floatingid ))
+			return(0);
+		else if ( strcmp(pptr->floatingid,fptr->floatingid) != 0)
+			return(0);
+		}
 	if (( fptr->publicaddr )
 	&&  (strlen( fptr->publicaddr ) != 0)) {
 		if (!( pptr->publicaddr ))
@@ -507,6 +535,12 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.floating=%s",optr->domain,optr->id,pptr->floating);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.floatingid=%s",optr->domain,optr->id,pptr->floatingid);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
@@ -954,6 +988,10 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "floating",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "floatingid",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "publicaddr",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
@@ -1132,6 +1170,28 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.floating='%s'\r\n",(sptr->floating?sptr->floating:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.floatingid='%s'\r\n",(sptr->floatingid?sptr->floatingid:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
