@@ -527,7 +527,7 @@ public	int	cosacs_metadata_instructions(
 	/* ---------------------------------------- */
 	/* sync disks after script actions then run */
 	/* ---------------------------------------- */
-	cosacs_create_script( cosacs,_COSACS_RUN,   "sync",    "process" );
+	cosacs_create_script( cosacs,_COSACS_RUN,   "sync",   "command" );
 	cosacs_create_script( cosacs,_COSACS_START, contract, "process" );
 
 	if ( check_debug() )
