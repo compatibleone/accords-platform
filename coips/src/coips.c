@@ -138,6 +138,14 @@ private	struct rest_extension * coips_extension( void * v,struct rest_server * s
 	return( xptr );
 }
 
+/*	------------------------------------------------------------------	*/
+/*			c o i p s _ s yn c h r o n i s e 			*/
+/*	------------------------------------------------------------------	*/
+private	void	coips_synchronise()
+{
+	sleep(1);
+}
+
 /* ------------------------- */
 /* build a provisioning node */
 /* ------------------------- */
@@ -236,10 +244,9 @@ private char *	build_application_node(char * image, char * provider )
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
 		if ( check_debug() ) rest_log_message("coips:build application_node:done");
+		coips_synchronise();
 		return( allocate_string( buffer ) );
 	}		
-
-	return((char *) 0);
 }
 
 /* ------------------------- */
@@ -268,6 +275,7 @@ private	char *	negotiate_application_contract(char * node)
 	{
 		document = document_drop( document );
 		if ( check_debug() ) rest_log_message("coips:negotiate_application_contract:done");
+		coips_synchronise();
 		return(contract);
 	}
 }
@@ -281,6 +289,7 @@ private char * 	provision_application_contract(char *contract)
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract");
 	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract:done");
+	coips_synchronise();
 	return(contract);
 }
 
@@ -290,7 +299,7 @@ private char * 	provision_application_contract(char *contract)
 /* ------------------------- */
 private	char * 	install_application_package( char * cosacs , char * package )
 {
-	char *	action="cosacs:run";
+	char *	action=_COSACS_RUN;
 	char *	command=(char *) 0;
 	char *	type="command";
 	struct	occi_response * zptr;
@@ -309,17 +318,20 @@ private	char * 	install_application_package( char * cosacs , char * package )
 		return( (char * )0 );
 	else if (!( vptr = cords_extract_atribut( zptr, "occi","package", "installation" )))
 		return( (char * )0 );
-	else if ((status = cosacs_create_script( cosacs, "cosacs:run", vptr, type )) != 0)
+	else if ((status = cosacs_create_script( cosacs, _COSACS_RUN, vptr, type )) != 0)
 		return( (char * )0 );
 	else if (!( vptr = cords_extract_atribut( zptr, "occi", "package", "configuration" )))
 		return( (char * )0 );
-	else if ((status = cosacs_create_script( cosacs, "cosacs:run", vptr, type )) != 0)
+	else if ((status = cosacs_create_script( cosacs, _COSACS_RUN, vptr, type )) != 0)
 		return( (char *) 0 );
-	else if ((status = cosacs_create_script( cosacs, "cosacs:start", "", type )) != 0)
+	else if ((status = cosacs_create_script( cosacs, _COSACS_RUN, "sync", type )) != 0)
+		return( (char *) 0 );
+	else if ((status = cosacs_create_script( cosacs, _COSACS_START, "production", type )) != 0)
 		return((char *) 0) ;
 	else
 	{
 		if ( check_debug() ) rest_log_message("coips:install_application_package:done");
+		coips_synchronise();
 		return( package );
 	}
 }
@@ -332,6 +344,7 @@ private void	save_application_image( char * contract )
 	if ( check_debug() ) rest_log_message("coips:save_image");
 	cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:save_image:done");
+	coips_synchronise();
 	return;
 }
 
@@ -343,6 +356,7 @@ private	void 	stop_application_provisioning(  char * contract )
 	if ( check_debug() ) rest_log_message("coips:stop_server");
 	cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:stop_server:done");
+	coips_synchronise();
 	return;
 }
 
@@ -355,6 +369,7 @@ private	void	delete_application_provisioning(  char * contract )
 	if ( check_debug() ) rest_log_message("coips:delete_server");
 	occi_simple_delete( contract, _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:delete_server:done");
+	coips_synchronise();
 	return;
 }
 
@@ -367,6 +382,7 @@ private void	delete_application_node(  char * node )
 	if ( check_debug() ) rest_log_message("coips:delete_node");
 	occi_simple_delete( node, _CORDS_SERVICE_AGENT, default_tls() );
 	if ( check_debug() ) rest_log_message("coips:delete_node:done");
+	coips_synchronise();
 	return;
 }
 
@@ -483,11 +499,19 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 						return( 804 );
 					else if (!( cosacs = allocate_string( vptr ) ))
 						return( 805 );
-					else	wptr = occi_remove_response( wptr );
+					else	
+					{
+						wptr = occi_remove_response( wptr );
+						coips_synchronise();
+					}
 				}
 				if (!( package = install_application_package( cosacs, linkvalue ) ))
 					return( 806 );
-				else	linkvalue = liberate( linkvalue );
+				else
+				{
+					linkvalue = liberate( linkvalue );
+					coips_synchronise();
+				}
 			}
 		}
 		zptr = occi_remove_response( zptr );

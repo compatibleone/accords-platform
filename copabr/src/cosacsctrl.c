@@ -32,9 +32,16 @@
 /*	the application image of the vm		*/
 /*	------------------------------------	*/
 #define	_COSACS_HOST "127.0.0.1"
-#define	_COSACS_START "cosacs:start"
 #define	_COSACS_ITERATIONS 10
 
+/*	-------------------------------------------------	*/
+/*		c o s a c s _ s y n c h r o n i s e		*/
+/*	-------------------------------------------------	*/
+private	void	cosacs_synchronise()
+{
+	sleep(1);
+	return;
+}
 
 /*	-------------------------------------------------	*/
 /*	c o s a c s _ o c c i _ c r e a t e _ c l i e n t	*/
@@ -64,6 +71,7 @@ private	struct	occi_client * cosacs_occi_create_client( char * url, char * agent
 				iteration--;
 			}
 		}
+		cosacs_synchronise();
 		return(cptr);
 	}
 }
@@ -102,19 +110,20 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* create client and request then POST */
 	/* ----------------------------------- */
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
-		return(0);
+		return(1100);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(0);
+		return(1101);
 	else if ((!(dptr=occi_request_element(rptr,"occi.probe.name"  , work   ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.metric", metric ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.stream", stream ) )))
 	{
 		rptr = occi_remove_request( rptr );
-		return(0);
+		return(1102);
 	}
 	else
 	{
 		zptr = occi_client_post( cptr, rptr );
+		cosacs_synchronise();
 		zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
 		return(0);
@@ -159,36 +168,37 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 	{
 		rest_log_debug("failure::cosacs::occi_create_client");
-		return(0);
+		return(1100);
 	}
 
 	if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 	{
 		rest_log_debug("failure::cosacs::occi_create_request");
-		return(0);
+		return(1101);
 	}
 
 	if (!(dptr=occi_request_element(rptr,"occi.metadata.name" , work  ) ))
 	{
 		rest_log_debug("failure::cosacs::occi_element(name)");
 		rptr = occi_remove_request( rptr );
-		return(0);
+		return(1102);
 	}
 
 	if (!(dptr=occi_request_element(rptr,"occi.metadata.value", value ) ))
 	{
 		rest_log_debug("failure::cosacs::occi_element(value)");
 		rptr = occi_remove_request( rptr );
-		return(0);
+		return(1103);
 	}
 	else
 	{
 		if (!( zptr = occi_client_post( cptr, rptr ) ))
 			rest_log_debug("failure::cosacs::occi_client_post)");
 		else	zptr = occi_remove_response( zptr );
+		cosacs_synchronise();
 		rptr = occi_remove_request( rptr );
 		rest_log_debug("exit::cosacs_create_meta");
-		return(1);
+		return(0);
 	}
 }
 
@@ -220,19 +230,20 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 		printf("create_cosacs_script(%s,%s,%s,%s)\n",buffer,action,parameters,type);
 
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
-		return(0);
+		return(1100);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(0);
+		return(1101);
 	else if ((!(dptr=occi_request_element(rptr,"occi.script.name" ,  action     ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.script.syntax", parameters ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.script.nature", type       ) )))
 	{
 		rptr = occi_remove_request( rptr );
-		return(0);
+		return(1102);
 	}
 	else
 	{
 		zptr = occi_client_post( cptr, rptr );
+		cosacs_synchronise();
 		zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
 		return(0);
@@ -267,18 +278,19 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 		printf("create_cosacs_file(%s,%s,%s)\n",buffer,remotename,type);
 
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
-		return(0);
+		return(1100);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(0);
+		return(1101);
 	else if ((!(dptr=occi_request_element(rptr,"occi.file.name" , remotename ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.file.type",  type       ) )))
 	{
 		rptr = occi_remove_request( rptr );
-		return(0);
+		return(1102);
 	}
 	else
 	{
 		zptr = occi_client_post( cptr, rptr );
+		cosacs_synchronise();
 		zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
 		return(0);
@@ -369,21 +381,21 @@ public	int	cosacs_metadata_instructions(
 		sprintf(duffer,"cosacs::metadata(%s,%s)","publisher",publisher);
 		rest_log_debug( duffer );
 	}
-	if ( cosacs_create_metadata( cosacs, (char *) 0, "publisher", publisher ) )
+	if (!( cosacs_create_metadata( cosacs, (char *) 0, "publisher", publisher ) ))
 	{
 		if ( check_debug() )
 		{
 			sprintf(duffer,"cosacs::metadata(%s,%s)","contract",contract);
 			rest_log_debug( duffer );
 		}
-		if ( cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  ) )
+		if (!( cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  ) ))
 		{
 			if ( check_debug() )
 			{
 				sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
 				rest_log_debug( duffer );
 			}
-			if ( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) )
+			if (!( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) ))
 				rest_log_debug("end::cosacs::metadata::static");
 			else	rest_log_debug("error::cosacs::metadata::cosacs");
 		}
@@ -445,7 +457,7 @@ public	int	cosacs_metadata_instructions(
 					/* ------------------------------------------------------------ */
 					/* Create a COSACS Meta Data instance using the name value pair */
 					/* ------------------------------------------------------------ */
-					cosacs_create_script( cosacs, "cosacs:run", jptr->value, fptr->value );
+					cosacs_create_script( cosacs,_COSACS_RUN, jptr->value, fptr->value );
 					zzptr = occi_remove_response ( zzptr );
 					zptr = occi_remove_response ( zptr );
 				}
@@ -465,7 +477,7 @@ public	int	cosacs_metadata_instructions(
 					/* ------------------------------------------------------------ */
 					/* Create a COSACS Meta Data instance using the name value pair */
 					/* ------------------------------------------------------------ */
-					cosacs_create_metadata( cosacs, fptr->value, gptr->value, jptr->value );
+					(void) cosacs_create_metadata( cosacs, fptr->value, gptr->value, jptr->value );
 
 					zzptr = occi_remove_response ( zzptr );
 					zptr = occi_remove_response ( zptr );
@@ -511,6 +523,11 @@ public	int	cosacs_metadata_instructions(
 		sprintf(duffer,"cosacs::script::create(%s,%s)",contract,"process");
 		rest_log_debug( duffer );
 	}
+
+	/* ---------------------------------------- */
+	/* sync disks after script actions then run */
+	/* ---------------------------------------- */
+	cosacs_create_script( cosacs,_COSACS_RUN,   "sync",    "process" );
 	cosacs_create_script( cosacs,_COSACS_START, contract, "process" );
 
 	if ( check_debug() )
