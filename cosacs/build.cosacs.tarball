@@ -17,7 +17,7 @@ echo "<cosacs " >> cosacs.xml
 echo " publisher='' " >> cosacs.xml
 echo " operator=''  " >> cosacs.xml
 echo " identity=''  " >> cosacs.xml
-echo " verbose='0'  " >> cosacs.xml
+echo " verbose='1'  " >> cosacs.xml
 echo " debug='0'    " >> cosacs.xml
 echo " threads='1'> " >> cosacs.xml
 echo " <rest host='127.0.0.1' port='8286'/>" >> cosacs.xml
@@ -27,7 +27,7 @@ echo "  password='co-system' " >> cosacs.xml
 echo "  monitor='1' " >> cosacs.xml
 echo "  tls=''  " >> cosacs.xml
 echo " 	/> " >> cosacs.xml
-echo " <domain='occi' />" >> cosacs.xml
+echo " <domain name='occi' />" >> cosacs.xml
 echo "</cosacs> " >> cosacs.xml
 echo "</accords> " >> cosacs.xml
 echo "echo launch ./run-cosacs as a background task to start the module" >> install-cosacs

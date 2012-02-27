@@ -250,11 +250,6 @@ private	int	service_action( char * id, char * action )
 		if ((zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, "" )) 
 			!= (struct occi_response *) 0)
 		{
-			if ( generate_service_report )
-			{
-				if ( contracts++ )
-					fprintf(h,",\n");
-			}
 			items=0;
 
 			/* ---------------------------------------------------------- */

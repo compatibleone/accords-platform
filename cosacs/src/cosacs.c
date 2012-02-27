@@ -82,8 +82,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.02");
-	printf("\n   Beta Version : 02/02/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.03");
+	printf("\n   Beta Version : 28/02/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -411,17 +411,8 @@ private	int	cosacs_operation( char * nptr )
 
 	rest_initialise_log(Cosacs.monitor);
 
-	if (!( Cosacs.identity ))
-		return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first,(char *) 0 ) );
-	else
-	{
-		initialise_occi_publisher( Cosacs.publisher, (char*) 0, (char *) 0, (char *) 0);
-		return( publishing_occi_server(
-			Cosacs.user, Cosacs.password,
-			Cosacs.identity,  nptr, 
-			Cosacs.restport, Cosacs.tls, 
-			Cosacs.threads, first ) );
-	}
+	return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first,(char *) 0 ) );
+
 }
 
 /*	------------------------------------------------------------------	*/

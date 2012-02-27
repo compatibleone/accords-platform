@@ -25,6 +25,7 @@
 #include "occiresolver.h"
 #include "occilogin.h"
 #include "cp.h"
+#include "json.h"
 
 private	int	verbose=0;
 private	int	debug=0;
@@ -147,12 +148,120 @@ private	int	cords_service_delete( char * id )
 	return( status );
 }
 
+private	int	cosacs_command_tool( char * host, char * command ,char * category, char * item )
+{
+	struct	occi_response * rptr;
+	char buffer[2048];
+	if ( verbose )
+	{
+		printf("\nCosacs { Host=%s,",host);
+		printf(" Command=%s",command);
+		printf(" Category=%s",category);
+		printf(" Item=%s } \n ",item);
+	}
+	sprintf(buffer,"http://%s:8286/%s/%s",host,category,item);
+
+	if ( verbose )
+		printf("   %s %s\n",command,buffer);
+
+	if (!( strcasecmp( command, "LIST" ) ))
+	{
+		if (!( rptr = occi_simple_get( buffer, agent, tls ) ))
+			return( failure(  400,"OCCI LIST", "request failed" ) );
+		else
+		{
+			occi_show_response( rptr );
+			rptr = occi_remove_response( rptr );
+			return(0);
+		}
+	}
+	else if (!( strcasecmp( command, "GET" ) ))
+	{
+		if (!( rptr = occi_simple_get( buffer, agent, tls ) ))
+			return( failure(  400,"OCCI client GET", "request failed" ) );
+		else
+		{
+			occi_show_response( rptr );
+			rptr = occi_remove_response( rptr );
+			return(0);
+		}
+	}
+	else if (!( strcasecmp( command, "DELETE" ) ))
+		return(0);
+	else if (!( strcasecmp( command, "POST" ) ))
+		return( 0 );
+	else	return(0);
+}
+
+/*	-----------------------------------------------------	*/
+/*	   c o s a c s _ s e r v i c e _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+private	int	cosacs_service_operation( char * service, char * syntax )
+{
+	struct	data_element * dptr;
+	struct	data_element * eptr;
+	char * vptr;
+	char * hostname;
+	char * command=syntax;
+	char * category;
+	if (!( service )) 
+		return( failure(  30,"expected service filename", "" ) );
+	else if (!( syntax ))
+		return( failure(  30,"expected syntax", "" ) );
+
+	else if ( verbose )
+		printf("\n Cosacs Service %s { %s } \n",service, syntax );
+	if (!( dptr = json_parse_file( service )))
+		return( failure(  40,"parsing json", service ) );
+	else if (!( eptr = json_element( dptr, "attributs" ) ))
+	{
+		dptr = drop_data_element( dptr );
+		return( failure(  118, "missing attributes in", service ) );
+	}
+	else if (!( vptr = json_atribut( eptr, "occi.contract.hostname" ) ))
+	{
+		dptr = drop_data_element( dptr );
+		return( failure(  118, "missing or null hostname in", service ) );
+	}
+	else if (!( hostname = allocate_string( vptr ) ))
+	{
+		dptr = drop_data_element( dptr );
+		return( failure(  118, "allocation failure in", service ) );
+	}
+	else
+	{
+		dptr = drop_data_element( dptr );
+		while ( (*syntax) && ( *syntax != ' '))
+			syntax++;
+
+		if ( *syntax == ' ' )
+			*(syntax++) = 0; 
+
+		while ( *syntax == ' ' )
+			syntax++;
+
+		category = syntax;
+
+		while ( (*syntax) && ( *syntax != ' '))
+			syntax++;
+
+		if ( *syntax == ' ' )
+			*(syntax++) = 0; 
+
+		while ( *syntax == ' ' )
+			syntax++;
+
+		return( cosacs_command_tool( hostname, command, category, syntax ) );
+	}
+}
+
 /*	-----------------------------------------------------	*/
 /*		  s e r v i c e _ o p e r a t i o n		*/
 /*	-----------------------------------------------------	*/
-private	int	service_operation( char * command, char * service )
+private	int	service_operation( char * command, char * service, char * syntax )
 {
 	char *	id;
+	char *	filename=service;
 	FILE *	h;
 	if (!( command ))
 		return( 31 );
@@ -185,6 +294,8 @@ private	int	service_operation( char * command, char * service )
 			return( cords_service_action( id, "snapshot" ) );
 		else if (!( strcasecmp( command, "DELETE" ) ))
 			return( cords_service_delete( id ) );
+		else if (!( strcasecmp( command, "COSACS" ) ))
+			return( cosacs_service_operation( filename, syntax ) );
 		else	return( failure( 30,"incorrect command", command ) );
 	}	
 }
@@ -197,6 +308,7 @@ private	int	operation( int argc, char * argv[] )
 	int	argi=1;
 	char *	aptr;
 	int	status;
+	char *	syntax=(char *) 0;
 	char *	command=(char *) 0;
 	while ( argi < argc )
 	{
@@ -209,7 +321,12 @@ private	int	operation( int argc, char * argv[] )
 				command = aptr;
 				continue;
 			}
-			else if (!(status = service_operation( command, aptr ) ))
+			else if ((!( strcasecmp( command, "COSACS" ))) && (!( syntax )))
+			{
+				syntax = aptr;
+				continue;
+			}
+			else if (!(status = service_operation( command, aptr, syntax ) ))
 				continue;
 			else	return( failure( status, command, aptr ) );
 		}
@@ -244,8 +361,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.03");
-	printf("\n   Beta Version : 09/02/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.04");
+	printf("\n   Beta Version : 27/02/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START    <service_file> ");
@@ -253,6 +370,7 @@ private	int	banner()
 	printf("\n         command <options> SAVE     <service_file> ");
 	printf("\n         command <options> SNAPSHOT <service_file> ");
 	printf("\n         command <options> DELETE   <service_file> ");
+	printf("\n         command <options> COSACS   <service_file> <instruction> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");
