@@ -77,6 +77,7 @@ struct	occi_response
 	struct	rest_response * response;
 };
 
+public	struct	occi_client *	occi_flush_client( char * address, int port );
 public	struct	occi_client   *	occi_remove_client( struct occi_client * cptr );
 public	struct	occi_client   *	occi_create_client( char * host, char * agent, char * tls );
 public	struct	occi_client   *	occi_redirect_client( struct occi_client * cptr, char * uri );

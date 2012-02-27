@@ -296,8 +296,9 @@ private	struct	data_element * json_get_matrix( FILE * h, struct data_element * p
 	int	c;
 	while (1)
 	{
-
-		if (!( add_data_element( parent ) ))
+		if (!( parent ))
+			return( parent );
+		else if (!( add_data_element( parent ) ))
 			return( drop_data_element( parent ) );
 		else if (!( json_get_value( h, parent->last ) ))
 			return( drop_data_element( parent ) );

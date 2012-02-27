@@ -32,7 +32,6 @@
 /*	the application image of the vm		*/
 /*	------------------------------------	*/
 #define	_COSACS_HOST "127.0.0.1"
-#define	_COSACS_PORT 8286
 #define	_COSACS_START "cosacs:start"
 #define	_COSACS_ITERATIONS 10
 
@@ -78,7 +77,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	char 	work[1024];
 	char *	agent=_CORDS_CONTRACT_AGENT;
 
-	char *	host=_COSACS_HOST; /* TODO will be cosacs parameter when ready */
+	char *	host=_COSACS_HOST; 
 
 	struct	occi_client * cptr;
 	struct	occi_request * rptr;
@@ -131,12 +130,14 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	char 	work[1024];
 	char *	agent=_CORDS_CONTRACT_AGENT;
 
-	char *	host=_COSACS_HOST; /* TODO will be cosacs parameter when ready */
+	char *	host=_COSACS_HOST; 
 
 	struct	occi_client * cptr;
 	struct	occi_request * rptr;
 	struct	occi_response * zptr;
 	struct	occi_element * dptr;
+
+	rest_log_debug("entry::cosacs_create_meta");
 
 	/* ----------------------- */
 	/* prepare COSACS identity */
@@ -144,6 +145,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
 	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_METADATA);
+
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
@@ -155,21 +157,38 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* create client and request then POST */
 	/* ----------------------------------- */
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
-		return(0);
-	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(0);
-	else if ((!(dptr=occi_request_element(rptr,"occi.metadata.name" , work  ) ))
-	     ||  (!(dptr=occi_request_element(rptr,"occi.metadata.value", value ) )))
 	{
+		rest_log_debug("failure::cosacs::occi_create_client");
+		return(0);
+	}
+
+	if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+	{
+		rest_log_debug("failure::cosacs::occi_create_request");
+		return(0);
+	}
+
+	if (!(dptr=occi_request_element(rptr,"occi.metadata.name" , work  ) ))
+	{
+		rest_log_debug("failure::cosacs::occi_element(name)");
+		rptr = occi_remove_request( rptr );
+		return(0);
+	}
+
+	if (!(dptr=occi_request_element(rptr,"occi.metadata.value", value ) ))
+	{
+		rest_log_debug("failure::cosacs::occi_element(value)");
 		rptr = occi_remove_request( rptr );
 		return(0);
 	}
 	else
 	{
-		zptr = occi_client_post( cptr, rptr );
-		zptr = occi_remove_response( zptr );
+		if (!( zptr = occi_client_post( cptr, rptr ) ))
+			rest_log_debug("failure::cosacs::occi_client_post)");
+		else	zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
-		return(0);
+		rest_log_debug("exit::cosacs_create_meta");
+		return(1);
 	}
 }
 
@@ -179,7 +198,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 public	int	cosacs_create_script( char * cosacs, char * action, char * parameters, char * type )
 {
 	char	buffer[1024];
-	char *	host=_COSACS_HOST; /* TODO will be cosacs parameter when ready */
+	char *	host=_COSACS_HOST; 
 	char *	agent=_CORDS_CONTRACT_AGENT;
 
 	struct	occi_client * cptr;
@@ -226,7 +245,7 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 public	int	cosacs_create_file( char * cosacs, char * remotename, char * localname, char * type )
 {
 	char	buffer[1024];
-	char *	host=_COSACS_HOST; /* TODO will be cosacs parameter when ready */
+	char *	host=_COSACS_HOST; 
 	char *	agent=_CORDS_CONTRACT_AGENT;
 
 	struct	occi_client * cptr;
@@ -296,11 +315,14 @@ public	int	cosacs_metadata_instructions(
 	struct	occi_client   * kptr=(struct occi_client   *) 0;
 	struct	occi_request  * qptr=(struct occi_request  *) 0;
 	char	buffer[4096];
-	char	tempname[4096];
+	char	duffer[2048];
 	int	length=0;
 
 	if ( check_debug() )
-		printf("start::cosacs_metadata_instructions(%s,%s)\n",cosacs,contract);
+	{
+		sprintf(duffer,"start::cosacs::metadata(%s,%s)",cosacs,contract);
+		rest_log_debug( duffer );
+	}
 
 	/* ------------------------------------------------------------------------- */
 	/* select / resolve the instruction category service provider identification */
@@ -341,9 +363,34 @@ public	int	cosacs_metadata_instructions(
 	/* -------------------------------------------------- */
 	/* for each instruction category instance in the list */
 	/* -------------------------------------------------- */
-	cosacs_create_metadata( cosacs, (char *) 0, "publisher", publisher );
-	cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  );
-	cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    );
+	if ( check_debug() )
+	{
+		rest_log_debug("start::cosacs::metadata::static");
+		sprintf(duffer,"cosacs::metadata(%s,%s)","publisher",publisher);
+		rest_log_debug( duffer );
+	}
+	if ( cosacs_create_metadata( cosacs, (char *) 0, "publisher", publisher ) )
+	{
+		if ( check_debug() )
+		{
+			sprintf(duffer,"cosacs::metadata(%s,%s)","contract",contract);
+			rest_log_debug( duffer );
+		}
+		if ( cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  ) )
+		{
+			if ( check_debug() )
+			{
+				sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
+				rest_log_debug( duffer );
+			}
+			if ( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) )
+				rest_log_debug("end::cosacs::metadata::static");
+			else	rest_log_debug("error::cosacs::metadata::cosacs");
+		}
+		else	rest_log_debug("error::cosacs::metadata::contract");
+	}
+	else	rest_log_debug("error::cosacs::metadata::publisher");
+
 	for (	eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
@@ -360,6 +407,12 @@ public	int	cosacs_metadata_instructions(
 		{
 			strcat( buffer, vptr );
 			liberate( vptr );
+		}
+
+		if ( check_debug() )
+		{
+			sprintf(duffer,"cosacs::metadata::instruction(%s)",buffer);
+			rest_log_debug( duffer );
 		}
 
 		/* -------------------------------------------------- */
@@ -413,6 +466,7 @@ public	int	cosacs_metadata_instructions(
 					/* Create a COSACS Meta Data instance using the name value pair */
 					/* ------------------------------------------------------------ */
 					cosacs_create_metadata( cosacs, fptr->value, gptr->value, jptr->value );
+
 					zzptr = occi_remove_response ( zzptr );
 					zptr = occi_remove_response ( zptr );
 				}
@@ -451,10 +505,19 @@ public	int	cosacs_metadata_instructions(
 	}
 
 	yptr = occi_remove_response ( yptr );
+
+	if ( check_debug() )
+	{
+		sprintf(duffer,"cosacs::script::create(%s,%s)",contract,"process");
+		rest_log_debug( duffer );
+	}
 	cosacs_create_script( cosacs,_COSACS_START, contract, "process" );
 
 	if ( check_debug() )
-		printf("finish::cosacs_metadata_instructions(%s,%s)\n",cosacs,contract);
+	{
+		sprintf(duffer,"finish::cosacs::metadata(%s,%s)",cosacs,contract);
+		rest_log_debug( duffer );
+	}
 	return(0);
 }
 

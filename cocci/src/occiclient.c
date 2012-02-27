@@ -499,6 +499,26 @@ public	struct	occi_client *	occi_delete_client( struct occi_client * cptr )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ f l u s h _ c l i e n t		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_client *	occi_flush_client( char * host, int port )
+{
+	struct	occi_client *	cptr;
+	for (	cptr=OcciManager.first;
+		cptr != (struct occi_client *) 0;
+		cptr = cptr->next )
+	{
+		if ( cptr->target->port != port )
+			continue;
+		else if (!( strcmp( cptr->target->host, host ) ))
+			break;
+	}
+	if (!( cptr ))
+		return( cptr );
+	else	return( occi_delete_client( cptr ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*			o c c i _ r e m o v e _ c l i e n t		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_remove_client( struct occi_client * cptr )

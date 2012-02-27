@@ -59,6 +59,7 @@ public	char *	default_tls();
 #define	_CORDS_DEFAULT_USER	"admin"
 #define	_CORDS_DEFAULT_PASSWORD	"admin"
 
+#define	_COSACS_PORT 8286
 
 #define	_OCCI_PRIORITY		1	/* the service is to be offered first	*/
 #define	_OCCI_PRIVATE		2	/* the service is not to be published	*/

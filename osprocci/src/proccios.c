@@ -1121,8 +1121,11 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 	else
 	{
 		if ( pptr->floatingid )
+		{
+			occi_flush_client( pptr->floating, _COSACS_PORT );
 			if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
 				osptr = liberate_os_response( osptr );
+		}
 		return( os_delete_server( pptr->number ) );
 		}
 }

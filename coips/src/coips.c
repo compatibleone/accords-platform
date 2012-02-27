@@ -491,6 +491,7 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 			}
 		}
 		zptr = occi_remove_response( zptr );
+		occi_flush_client( cosacs, _COSACS_PORT );
 		if ( cosacs ) cosacs = liberate( cosacs );
 	}
 
