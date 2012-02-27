@@ -783,24 +783,58 @@ private	int	os_resolve_access_address( struct openstack * pptr )
 
 
 /*	------------------------------------------------------------------	*/
-/*		o s _ r e s o l v e _ a c c e s s _ a d d r e s s		*/
+/*		  a s s o c i a t e _ s e r v e r _ a d d r e s s		*/
+/*	------------------------------------------------------------------	*/
+/*	the server is up and running, an address has been allocated and 	*/
+/*	now we must attribute this addresse to this serrver and wait until	*/
+/*	it is ready ...								*/
 /*	------------------------------------------------------------------	*/
 private	int	associate_server_address( struct openstack * pptr )
 {
+	int	iterate=30;
 	char *	nomfic;
-	struct	os_response * rptr;
+	char *	vptr;
+	struct	os_response * osptr;
 	if (!( pptr ))
 		return( 1001 );
 	else if (!( os_valid_address( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_create_address_request( pptr->floating ) ))
 		return( 1003 );
-	else if (!( rptr = os_server_address( nomfic, pptr->number ) ))
+	else if (!( osptr = os_server_address( nomfic, pptr->number ) ))
 		return( 1004 );
 	else
 	{
-		liberate_os_response( rptr );
-		return( 0 );
+		osptr = liberate_os_response( osptr );
+		nomfic = liberate( nomfic );
+		while (iterate)
+		{
+			if (!( osptr = os_get_address( pptr->floatingid ) ))
+				return( 1005 );
+			else if (!( vptr = json_atribut( osptr->jsonroot, "instance_id") ))
+			{
+				osptr = liberate_os_response( osptr );
+				return( 1006 );
+			}
+			else if ( strcmp( vptr, pptr->number ) )
+			{
+				osptr = liberate_os_response( osptr );
+				sleep(1);
+				iterate--;
+				continue;
+			}
+			else
+			{
+				osptr = liberate_os_response( osptr );
+				break;
+			}
+		}
+		if (!( iterate ))
+			return( 1007 );
+		else
+		{
+			return( 0 );
+		}
 	}
 }
 

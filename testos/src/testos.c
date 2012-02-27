@@ -160,6 +160,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_get_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_get_image( p3 ) );
+		else if (!( strcasecmp( p2, "ADDRESS" ) ))
+			os_result( os_get_address( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_get_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );

@@ -594,6 +594,37 @@ public	char * os_create_meta_request( char * key, char * value )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ g e t _ a d d r e s s			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_address( char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-floating-ips/%s",id);
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*			o s _ g e t _ m e t a d a t a			*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_get_metadata( char * id, char * name )

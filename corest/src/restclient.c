@@ -300,25 +300,31 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 		return((struct rest_client*) 0); 
 	else if (!( cptr = rest_allocate_client() ))
 	{
-		failure(27,"rest","allocate client");
+		if ( check_debug() )
+			failure(27,"rest","allocate client");
 		return( cptr );
 	}
 	else if (!(cptr->net.socket = socket_create(AF_INET, SOCK_STREAM, 0  )))
 	{
-		failure(errno,"socket_create","errno");
+		if ( check_debug() )
+			failure(errno,"socket_create","errno");
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( socket_connect( cptr->net.socket, host, port  ) ))
 	{
-		sprintf(buffer,"socket_connect(%s:%u)",host,port);
-	        failure(errno,buffer,strerror(errno));
+		if ( check_debug() )
+		{
+			sprintf(buffer,"socket_connect(%s:%u)",host,port);
+		        failure(errno,buffer,strerror(errno));
+		}
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( tls ))
 		return( cptr );
 	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
 	{
-		failure(27,"rest","tls configuration");
+		if ( check_debug() )
+			failure(27,"rest","tls configuration");
 		return( rest_liberate_client( cptr ) );
 	}
 	else

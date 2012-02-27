@@ -76,8 +76,6 @@ public	struct	os_response *
 
 public	struct	os_response *	os_list_servers	( );
 public	struct	os_response *	os_list_flavors( );
-public	struct	os_response *	os_list_floating_ips();
-public	struct	os_response *	os_list_floating_ip_details();
 public	struct	os_response *	os_list_images  ( );
 public	struct	os_response *	os_list_metadata( char * id );
 public	struct	os_response *	os_list_image_details();
@@ -86,20 +84,24 @@ public	struct	os_response *	os_list_server_details();
 
 public	struct	os_response *	os_create_server( char * filename );
 public	struct	os_response *	os_create_image( char * filename, char * serverid );
+
 public	struct	os_response *	os_create_address();
+public	struct	os_response *	os_get_address( char * id );
+public	struct	os_response *	os_list_floating_ips();
+public	struct	os_response *	os_list_floating_ip_details();
+public	struct	os_response *	os_server_address( char * filename, char * serverid );
+public	struct	os_response *	os_delete_address( char * id );
 
 public	struct	os_response *	os_get_server	( char * id );
 public	struct	os_response *	os_get_flavor  ( char * id );
 public	struct	os_response *	os_get_image    ( char * id );
 public	struct	os_response *	os_get_metadata( char * id, char * name );
-public	struct	os_response *	os_server_address( char * filename, char * serverid );
 
 public	struct	os_response *	os_update_server( char * id, char * filename );
 public	struct	os_response *	os_update_metadata( char * id, char * name, char * value );
 public	struct	os_response *	os_create_metadata( char * id, char * values );
 
 public	struct	os_response *	os_delete_server( char * id );
-public	struct	os_response *	os_delete_address( char * id );
 public	struct	os_response *	os_delete_image ( char * id );
 public	struct	os_response *	os_delete_metadata( char * id, char * name );
 

@@ -34,7 +34,7 @@
 #define	_COSACS_HOST "127.0.0.1"
 #define	_COSACS_PORT 8286
 #define	_COSACS_START "cosacs:start"
-#define	_COSACS_ITERATIONS 0
+#define	_COSACS_ITERATIONS 10
 
 
 /*	-------------------------------------------------	*/
@@ -49,12 +49,15 @@ private	struct	occi_client * cosacs_occi_create_client( char * url, char * agent
 	int	period=1;
 	int	iteration=_COSACS_ITERATIONS;
 
+
 	if (!( iteration ))
 		return( occi_create_client( url, agent, tls ) );
 	else
 	{
 		while (( iteration ) && (!( cptr )))
 		{
+			if ( check_debug() )
+				printf("create_cosacs_client(%s,%u;%u)\n",url,iteration,period);
 			if (!(cptr = occi_create_client( url, agent, tls )))
 			{
 				sleep(period);
@@ -92,6 +95,9 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
+
+	if ( check_debug() )
+		printf("create_cosacs_probe(%s,%s)\n",buffer,work);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */
@@ -142,6 +148,9 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
 
+	if ( check_debug() )
+		printf("create_cosacs_metadata(%s,%s,%s)\n",buffer,work,value);
+
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
@@ -188,6 +197,9 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
+	if ( check_debug() )
+		printf("create_cosacs_script(%s,%s,%s,%s)\n",buffer,action,parameters,type);
+
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
@@ -232,6 +244,9 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
+	if ( check_debug() )
+		printf("create_cosacs_file(%s,%s,%s)\n",buffer,remotename,type);
+
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
 		return(0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
@@ -283,6 +298,9 @@ public	int	cosacs_metadata_instructions(
 	char	buffer[4096];
 	char	tempname[4096];
 	int	length=0;
+
+	if ( check_debug() )
+		printf("start::cosacs_metadata_instructions(%s,%s)\n",cosacs,contract);
 
 	/* ------------------------------------------------------------------------- */
 	/* select / resolve the instruction category service provider identification */
@@ -435,6 +453,8 @@ public	int	cosacs_metadata_instructions(
 	yptr = occi_remove_response ( yptr );
 	cosacs_create_script( cosacs,_COSACS_START, contract, "process" );
 
+	if ( check_debug() )
+		printf("finish::cosacs_metadata_instructions(%s,%s)\n",cosacs,contract);
 	return(0);
 }
 
