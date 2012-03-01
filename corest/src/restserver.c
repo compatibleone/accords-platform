@@ -280,6 +280,24 @@ private	void rest_response_file(  struct rest_client * cptr, char * filename )
 	return;
 }
 
+/*	---------------------------------------------------	*/
+/*		r e s t _ r e p l a c e _ h e a d e r		*/
+/*	---------------------------------------------------	*/
+public	void	rest_replace_header( struct rest_header * hptr, char * vptr )
+{
+	if (!( hptr ))
+		return;
+	else if (!( vptr ))
+		return;
+	else
+	{
+		if ( hptr->value )
+			hptr->value = liberate( hptr->value );
+		hptr->value = allocate_string( vptr );
+		return;
+	}
+}
+
 /*	------------------------------------------------	*/
 /*	   	r e s t _ s h o w _ r e q u e s t 		*/
 /*	------------------------------------------------	*/

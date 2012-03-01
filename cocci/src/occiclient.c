@@ -24,6 +24,7 @@
 #include "occic.c"
 #include "occim.c"
 #include "occiauth.h"
+#include "occibody.h"
 
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
@@ -847,51 +848,6 @@ private	struct	rest_header * occi_append_account(
 }
 	
 /*	------------------------------------------------------------	*/
-/*		     o c c i _ j s o n _ b o d y 			*/
-/*	------------------------------------------------------------	*/
-private	char *	occi_json_body( 
-		struct occi_client * cptr, 
-		struct occi_request * rptr,
-		struct rest_header  * hptr,
-		char * body )
-{
-	FILE *	h;
-	char *	filename;
-	char *	message;
-
-	if (!( filename = rest_temporary_filename( ".json" ) ))
-		return( body );
-
-	else  if (!( message = occi_json_category( rptr->category ) ))
-		return( body );
-
-	else if (!( h = fopen(filename,"w")))
-	{
-		liberate( message );
-		return( body );
-	}
-	else
-	{
-		fprintf(h,"%s\r\n",message);
-		liberate( message );
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------	*/
-/*		     o c c i _ x m l _ b o d y 				*/
-/*	------------------------------------------------------------	*/
-private	char * 	occi_xml_body( 
-		struct occi_client * cptr, 
-		struct occi_request * rptr,
-		struct rest_header  * hptr,
-		char * body )
-{
-	return( body );
-}
-
-/*	------------------------------------------------------------	*/
 /*		     o c c i _ c l i e n t _ b o d y 			*/
 /*	------------------------------------------------------------	*/
 private	char *	occi_client_body( 
@@ -909,13 +865,9 @@ private	char *	occi_client_body(
 		return( body );
 	else if (!( strcasecmp( wptr->value, _OCCI_TEXT_PLAIN ) ))
 		return( body );
-	else if (!( strcasecmp( wptr->value, _OCCI_MIME_OCCI ) ))
+	else if (!( strcasecmp( wptr->value, _OCCI_MIME_OCCI  ) ))
 		return( body );
-	else if (!( strcasecmp( wptr->value, _OCCI_MIME_JSON ) ))
-		return( occi_json_body( cptr, rptr, hptr, body ) );
-	else if (!( strcasecmp( wptr->value, _OCCI_MIME_XML  ) ))
-		return( occi_xml_body( cptr, rptr, hptr, body ) );
-	else	return( body );
+	else	return( occi_response_body( wptr->value, rptr->category , hptr ) );
 }
 
 /*	------------------------------------------------------------	*/

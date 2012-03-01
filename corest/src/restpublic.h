@@ -1,6 +1,8 @@
 #ifndef	_restpublic_h
 #define	_restpublic_h
 
+public	void	rest_replace_header( struct rest_header * hptr, char * vptr );
+
 public	char *	
 	service_prefix_url( char * url, char * prefix );
 

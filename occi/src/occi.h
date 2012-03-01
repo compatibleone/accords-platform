@@ -88,9 +88,24 @@ public	char *	default_tls();
 #define	_OCCI_CATEGORY		"CATEGORY"
 
 #define	_OCCI_TEXT_PLAIN	"text/plain"
+#define	_OCCI_TEXT_OCCI		"text/occi"
 #define	_OCCI_MIME_OCCI		"text/occi"
-#define	_OCCI_MIME_JSON		"application/json+occi"
-#define	_OCCI_MIME_XML		"application/xml+occi"
+
+#define	_OCCI_OCCI_PHP		"application/php+occi"
+#define	_OCCI_APP_PHP		"application/php"
+#define	_OCCI_TEXT_PHP		"text/php"
+
+#define	_OCCI_MIME_PHP		"text/php"
+
+#define	_OCCI_OCCI_JSON		"application/json+occi"
+#define	_OCCI_APP_JSON		"application/json"
+#define	_OCCI_TEXT_JSON		"text/json"
+#define	_OCCI_MIME_JSON		"text/json"
+
+#define	_OCCI_OCCI_XML		"application/xml+occi"
+#define	_OCCI_APP_XML		"application/xml"
+#define	_OCCI_TEXT_XML		"text/xml"
+#define	_OCCI_MIME_XML		"text/xml"
 
 /*	-------------------------------------------------------------------	*/
 /*	      o c c i   a c t i o n   t a r g e t   i n t e r f a c e 		*/
