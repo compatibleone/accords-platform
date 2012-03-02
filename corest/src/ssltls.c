@@ -19,7 +19,8 @@
 /*		64	certificate is DER not PEM		*/
 /*		128	SSL v23 compatible mode			*/
 /*		256	Inhibit Internal Certificate Check	*/
-/*	-------------------------------------------------	*/
+/*		512	Activate Use of an external Engine	*/
+/*	--------------------------------------------------	*/
 
 #define	_USE_SSL		4
 #define	_REQUEST_PEER		8
@@ -28,6 +29,7 @@
 #define	_DER_CERTIFICATE	64
 #define	_SSL_COMPATIBLE		128
 #define	_SSL_INTERNAL		256
+#define	_OPENSSL_ENGINE		512
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
