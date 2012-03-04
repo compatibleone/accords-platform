@@ -321,6 +321,7 @@ public	int	create_openstack_contract(
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
 	int	status;
+	char *	vptr;
 
 	if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return( status );
@@ -333,11 +334,22 @@ public	int	create_openstack_contract(
 		return( 0 );
 	else if (!( contract.node.message = occi_simple_get( contract.node.id, agent, tls ) ))
 		return( terminate_openstack_contract( 1170, &contract ) );
-
+	else
+	{
+		/* ---------------------------------------------------- */
+		/* recover and store the public/private access property */
+		/* ---------------------------------------------------- */
+		if (!( vptr = cords_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_ACCESS ) ))
+			vptr = _CORDS_PUBLIC;
+		if ( pptr->access ) pptr->access = liberate( pptr->access );
+		if (!( pptr->access = allocate_string( vptr ) ))
+			return( terminate_openstack_contract( 1127, &contract ) );
+	}
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
-	else if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
+	if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_openstack_contract( 1171, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))

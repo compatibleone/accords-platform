@@ -45,6 +45,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->profile = liberate(sptr->profile);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
 		if ( sptr->rootpass )
 			 sptr->rootpass = liberate(sptr->rootpass);
 		if ( sptr->reference )
@@ -74,6 +76,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->number = (char*) 0;
+		sptr->access = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->reference = (char*) 0;
 		sptr->publicaddr = (char*) 0;
@@ -131,6 +134,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->number = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"access") ))
+		{
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"rootpass") ))
 		{
 			if ( wptr->value ) { sptr->rootpass = allocate_string(wptr->value); }
@@ -179,6 +186,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));

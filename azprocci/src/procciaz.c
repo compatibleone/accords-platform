@@ -605,7 +605,7 @@ private	struct	occi_interface	windowsazure_interface = {
 public	struct	occi_category * build_windowsazure( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_windowsazure_builder( domain,"windowsazure" ) ))
+	if (!( optr = occi_windowsazure_builder( domain,"windowsazure" ) ))
 		return( optr );
 	else
 	{

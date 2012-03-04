@@ -41,6 +41,8 @@ public struct occi_manager * liberate_occi_manager(struct occi_manager * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->mimetype )
 			 sptr->mimetype = liberate(sptr->mimetype);
+		if ( sptr->accepts )
+			 sptr->accepts = liberate(sptr->accepts);
 		sptr = liberate( sptr );
 	}
 	return((struct occi_manager *) 0);
@@ -59,6 +61,7 @@ public struct occi_manager * reset_occi_manager(struct occi_manager * sptr)
 		sptr->last = (struct occi_client*) 0;
 		sptr->name = (char*) 0;
 		sptr->mimetype = (char*) 0;
+		sptr->accepts = (char*) 0;
 		sptr->clients =  0;
 		sptr->optimise =  0;
 	}

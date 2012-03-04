@@ -10,6 +10,7 @@ struct	occi_manager
 	struct	occi_client 	* last;
 	char 			* name;
 	char			* mimetype;
+	char			* accepts;
 	int			  clients;
 	int			  optimise;
 };

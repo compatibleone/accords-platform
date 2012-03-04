@@ -268,7 +268,7 @@ private	int	reset_openstack_server( struct openstack * pptr )
 		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		if ( pptr->access ) pptr->access = liberate( pptr->access );
+		if ( pptr->accessip ) pptr->accessip = liberate( pptr->accessip );
 		if ( pptr->floating ) pptr->floating = liberate( pptr->floating );
 		if ( pptr->floatingid ) pptr->floatingid = liberate( pptr->floatingid );
 		pptr->number = allocate_string("");
@@ -574,8 +574,8 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		if ( os_valid_address( pptr->floating ) )
 			pptr->publicaddr  = allocate_string(pptr->floating);
 
-		else if ( os_valid_address( pptr->access ) )
-			pptr->publicaddr  = allocate_string(pptr->access);
+		else if ( os_valid_address( pptr->accessip ) )
+			pptr->publicaddr  = allocate_string(pptr->accessip);
 
 		else if (!( version = resolve_openstack_version( pptr->profile ) ))
 			resolve_os_v10_addresses( yptr, pptr );
@@ -641,7 +641,7 @@ private	int	conets_access_address( struct openstack * pptr )
 	{
 		if ( *vptr == '0' ) 
 		{
-			pptr->access = (char *) 0;
+			pptr->accessip = (char *) 0;
 			return( 0 );
 		}
 		/* -------------------------------------- */
@@ -652,7 +652,7 @@ private	int	conets_access_address( struct openstack * pptr )
 	}
 	else
 	{
-		pptr->access = (char *) 0;
+		pptr->accessip = (char *) 0;
 		return( 0 );
 	}
 	
@@ -697,13 +697,13 @@ private	int	conets_access_address( struct openstack * pptr )
 		{
 			strcpy( buffer, vptr );
 			yptr = occi_remove_response( yptr );
-			if ( pptr->access )
-				pptr->access = liberate( pptr->access );
+			if ( pptr->accessip )
+				pptr->accessip = liberate( pptr->accessip );
 			if ( pptr->floating )
 				pptr->floating = liberate( pptr->floating );
 			if ( pptr->floatingid )
 				pptr->floatingid = liberate( pptr->floatingid );
-			if (!( pptr->access = allocate_string( buffer ) ))
+			if (!( pptr->accessip = allocate_string( buffer ) ))
 				return( 1008 );
 			else	return( 0 );
 		}
@@ -726,8 +726,8 @@ private	int	nova_access_address( struct openstack * pptr )
 		return( 118 );
 	else
 	{
-		if ( pptr->access )
-			pptr->access = liberate( pptr->access );
+		if ( pptr->accessip )
+			pptr->accessip = liberate( pptr->accessip );
 
 		if ( pptr->floating )
 			pptr->floating = liberate( pptr->floating );
@@ -838,6 +838,23 @@ private	int	associate_server_address( struct openstack * pptr )
 	}
 }
 
+/*	----------------------------------------------------------------	*/
+/*		r e l e a s e _f l o a t i n g _ a d d r e s s			*/
+/*	----------------------------------------------------------------	*/
+private	void	release_floating_address( struct openstack * pptr )
+{
+	struct	os_response * osptr;
+	if ( pptr->floatingid )
+	{
+		if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
+			osptr = liberate_os_response( osptr );
+		pptr->floatingid = liberate( pptr->floatingid );
+	}
+	if ( pptr->floating )
+		pptr->floating = liberate( pptr->floating );
+	return;
+}
+
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
@@ -871,7 +888,7 @@ private	struct	rest_response * start_openstack(
 		OsProcci.identity,_CORDS_OPENSTACK,pptr->id,OsProcci.publisher);
 	
 	if (!( personality = allocate_string(buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure : Personality" ) );
+		return( rest_html_response( aptr, 4000, "Server Failure : Personality" ) );
 
 	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
@@ -879,13 +896,13 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, status, "Server Failure : Access Address" ) );
 
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
-		return( rest_html_response( aptr, 500, "Server Failure : Configuration Instructions" ) );
+		return( rest_html_response( aptr, 4002, "Server Failure : Configuration Instructions" ) );
 
 	if (!( filename = os_create_server_request( 
-		pptr->name, pptr->image, pptr->flavor, pptr->access, personality, resource ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
+		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource ) ))
+	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
-	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Request" ) );
+	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
 
 	else
 	{
@@ -909,16 +926,30 @@ private	struct	rest_response * start_openstack(
 				pptr->hostname, _CORDS_CONFIGURATION,
 				reference, OsProcci.publisher );
 
+			/* ------------------------------------- */
+			/* release the public IP if not required */
+			/* ------------------------------------- */
+			if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
+			{
+				release_floating_address( pptr );
+				if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
+				{
+					reset_openstack_server( pptr );
+				 	return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
+				}
+
+			}
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
 			if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Missing Meta Data Server ID" ) );
+			 	return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
 
 			else if (!( metafilename = os_create_metadata_request( personality ) ))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Message" ) );
+			 	return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
 			else if (!( metaptr = os_create_metadata( idptr, metafilename )))
-			 	return( rest_html_response( aptr, 400, "Bad Request : Create MetaData Request" ) );
+			 	return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
 			else
 			{
 				metaptr = liberate_os_response( metaptr );
@@ -934,7 +965,7 @@ private	struct	rest_response * start_openstack(
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
+		else  	return( rest_html_response( aptr, 4256, "Server Failure : Connect Open Stack" ) );
 	}
 
 }
@@ -1115,7 +1146,6 @@ private	struct	rest_response * save_openstack(
 private	struct os_response *	stop_openstack_provisioning( struct openstack * pptr )
 {
 	int	status;
-	struct	os_response * osptr;
 	if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return((struct os_response *) 0);
 	else
@@ -1123,8 +1153,7 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		if ( pptr->floatingid )
 		{
 			occi_flush_client( pptr->floating, _COSACS_PORT );
-			if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
-				osptr = liberate_os_response( osptr );
+			release_floating_address( pptr );
 		}
 		return( os_delete_server( pptr->number ) );
 		}

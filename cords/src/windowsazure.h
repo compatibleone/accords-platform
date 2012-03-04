@@ -12,6 +12,7 @@ struct	windowsazure
 	char *	profile;
 
 	char *	number;
+	char *	access;
 	char *	rootpass;
 	char *	reference;
 	char *	publicaddr;

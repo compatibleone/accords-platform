@@ -690,7 +690,7 @@ private	struct	occi_interface	opennebula_interface = {
 public	struct	occi_category * build_opennebula( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_opennebula_builder( domain,"opennebula" ) ))
+	if (!( optr = occi_opennebula_builder( domain,"opennebula" ) ))
 		return( optr );
 	else
 	{

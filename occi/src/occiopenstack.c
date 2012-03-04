@@ -162,6 +162,8 @@ private void autoload_openstack_nodes() {
 				pptr->network = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
 				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "accessip" )) != (struct xml_atribut *) 0)
+				pptr->accessip = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "floating" )) != (struct xml_atribut *) 0)
 				pptr->floating = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "floatingid" )) != (struct xml_atribut *) 0)
@@ -242,6 +244,9 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," access=%c",0x0022);
 		fprintf(h,"%s",(pptr->access?pptr->access:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," accessip=%c",0x0022);
+		fprintf(h,"%s",(pptr->accessip?pptr->accessip:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," floating=%c",0x0022);
 		fprintf(h,"%s",(pptr->floating?pptr->floating:""));
 		fprintf(h,"%c",0x0022);
@@ -310,6 +315,8 @@ private void set_openstack_field(
 			pptr->network = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
 			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "accessip" ) ))
+			pptr->accessip = allocate_string(vptr);
 		if (!( strcmp( nptr, "floating" ) ))
 			pptr->floating = allocate_string(vptr);
 		if (!( strcmp( nptr, "floatingid" ) ))
@@ -446,6 +453,13 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->access,fptr->access) != 0)
 			return(0);
 		}
+	if (( fptr->accessip )
+	&&  (strlen( fptr->accessip ) != 0)) {
+		if (!( pptr->accessip ))
+			return(0);
+		else if ( strcmp(pptr->accessip,fptr->accessip) != 0)
+			return(0);
+		}
 	if (( fptr->floating )
 	&&  (strlen( fptr->floating ) != 0)) {
 		if (!( pptr->floating ))
@@ -535,6 +549,9 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.accessip=%s",optr->domain,optr->id,pptr->accessip);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.floating=%s",optr->domain,optr->id,pptr->floating);
@@ -988,6 +1005,8 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "accessip",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "floating",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "floatingid",0,0) ))
@@ -1170,6 +1189,17 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.accessip='%s'\r\n",(sptr->accessip?sptr->accessip:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

@@ -36,6 +36,7 @@ private	struct	occi_manager OcciManager =
 		(struct occi_client *) 0,
 		"CO-OCCI-MAN",
 		_OCCI_MIME_OCCI,
+		_OCCI_MIME_JSON,
 		0,
 		1	/* optimised */
 	};

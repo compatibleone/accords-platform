@@ -146,6 +146,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
+				pptr->access = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rootpass" )) != (struct xml_atribut *) 0)
 				pptr->rootpass = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "reference" )) != (struct xml_atribut *) 0)
@@ -202,6 +204,9 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," access=%c",0x0022);
+		fprintf(h,"%s",(pptr->access?pptr->access:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," rootpass=%c",0x0022);
 		fprintf(h,"%s",(pptr->rootpass?pptr->rootpass:""));
 		fprintf(h,"%c",0x0022);
@@ -254,6 +259,8 @@ private void set_windowsazure_field(
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
+		if (!( strcmp( nptr, "access" ) ))
+			pptr->access = allocate_string(vptr);
 		if (!( strcmp( nptr, "rootpass" ) ))
 			pptr->rootpass = allocate_string(vptr);
 		if (!( strcmp( nptr, "reference" ) ))
@@ -334,6 +341,13 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->number,fptr->number) != 0)
 			return(0);
 		}
+	if (( fptr->access )
+	&&  (strlen( fptr->access ) != 0)) {
+		if (!( pptr->access ))
+			return(0);
+		else if ( strcmp(pptr->access,fptr->access) != 0)
+			return(0);
+		}
 	if (( fptr->rootpass )
 	&&  (strlen( fptr->rootpass ) != 0)) {
 		if (!( pptr->rootpass ))
@@ -399,6 +413,9 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.rootpass=%s",optr->domain,optr->id,pptr->rootpass);
@@ -817,7 +834,7 @@ private void	redirect_occi_windowsazure_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_windowsazure */
-public struct occi_category * occi_cords_windowsazure_builder(char * a,char * b) {
+public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -835,6 +852,8 @@ public struct occi_category * occi_cords_windowsazure_builder(char * a,char * b)
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "rootpass",0,0) ))
 			return(optr);
@@ -930,6 +949,17 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.number='%s'\r\n",(sptr->number?sptr->number:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.access='%s'\r\n",(sptr->access?sptr->access:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

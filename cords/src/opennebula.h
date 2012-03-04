@@ -13,6 +13,7 @@ struct	opennebula
 	char *	node;
 	char *	price;
 	char *	account;
+	char * 	access;
 	char *	publicaddr;
 	char *	privateaddr;
 	char *	profile;

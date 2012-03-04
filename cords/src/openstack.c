@@ -61,6 +61,8 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->network = liberate(sptr->network);
 		if ( sptr->access )
 			 sptr->access = liberate(sptr->access);
+		if ( sptr->accessip )
+			 sptr->accessip = liberate(sptr->accessip);
 		if ( sptr->floating )
 			 sptr->floating = liberate(sptr->floating);
 		if ( sptr->floatingid )
@@ -98,6 +100,7 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->reference = (char*) 0;
 		sptr->network = (char*) 0;
 		sptr->access = (char*) 0;
+		sptr->accessip = (char*) 0;
 		sptr->floating = (char*) 0;
 		sptr->floatingid = (char*) 0;
 		sptr->publicaddr = (char*) 0;
@@ -187,6 +190,10 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"accessip") ))
+		{
+			if ( wptr->value ) { sptr->accessip = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"floating") ))
 		{
 			if ( wptr->value ) { sptr->floating = allocate_string(wptr->value); }
@@ -243,6 +250,7 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.network='%s'\r\n",prefix,nptr,(sptr->network?sptr->network:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.accessip='%s'\r\n",prefix,nptr,(sptr->accessip?sptr->accessip:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floating='%s'\r\n",prefix,nptr,(sptr->floating?sptr->floating:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floatingid='%s'\r\n",prefix,nptr,(sptr->floatingid?sptr->floatingid:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
