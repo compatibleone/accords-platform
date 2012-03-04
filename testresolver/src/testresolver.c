@@ -22,6 +22,7 @@
 
 #include "occiresolver.h"
 
+private	char *	accepts=(char *) 0;
 private	int	verbose=0;
 private	int	debug=0;
 private	int	price=0;
@@ -102,6 +103,10 @@ private	int	test_resolver_operation( char * host, char * agent, char * object )
 
 	if ( object )
 	{
+		if ( accepts )
+		{
+			occi_client_accept( accepts );
+		}
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 		if (( aptr = occi_resolver( object, agent )) != (struct occi_response *) 0)
 		{
@@ -143,6 +148,11 @@ private	int	test_resolver_command( int argc, char * argv[] )
 				else if (!( strcmp( aptr, "publisher" ) ))
 				{
 					publisher = argv[argi++];
+					continue;
+				}
+				else if (!( strcmp( aptr, "accept" ) ))
+				{
+					accepts = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "tls" ) ))
@@ -193,12 +203,13 @@ private	int	test_resolver_command( int argc, char * argv[] )
 
 private	int	test_resolver_banner()
 {
-	printf("\n   CO-TEST-RESOLVER : CompatibleOne OCCI Test Resolver : Version 1.0a.0.01");
-	printf("\n   Beta Version : 16/10/2011 ");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue \n");
+	printf("\n   CO-TEST-RESOLVER : CompatibleOne OCCI Test Resolver : Version 1.0a.0.02");
+	printf("\n   Beta Version : 04/03/2012 ");
+	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue \n");
 	printf("\n   --verbose                         activate status  messages       ");
 	printf("\n   --debug                           activate debug   messages       ");
 	printf("\n   --tls       <filename>            specify TLS configuration       ");
+	printf("\n   --accept    <filename>            specify ACCEPT MIME type        ");
 	printf("\n   --publisher <hostname>            set publisher URL               ");
 	printf("\n   --agent     <agentname>           set client agent identification \n\n");
 	return(0);

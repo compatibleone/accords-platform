@@ -81,12 +81,13 @@ public	char *	join_string( char * rptr, char * sptr )
 	if (!( sptr ))
 		return( rptr );
 	else if (!( rptr ))
-		return( sptr );
-	else if (!( wptr = allocate( strlen( rptr ) + strlen( sptr ) ) ))
+		return( allocate_string( sptr ) );
+	else if (!( wptr = allocate( strlen( rptr ) + strlen( sptr) + 1 ) ))
 		return( wptr );
 	else 
 	{
-		strcat( strcpy( wptr, rptr ), sptr );
+		strcpy( wptr, rptr );
+		strcat( wptr, sptr );
 		liberate( rptr );
 		return( wptr );
 	}

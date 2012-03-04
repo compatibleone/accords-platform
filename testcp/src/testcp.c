@@ -26,7 +26,7 @@
 
 struct	cords_parser_config
 {
-	char *	mimetype;
+	char *	accept;
 	char *	publisher;
 	char *	host;
 	char *	agent;
@@ -87,10 +87,9 @@ private	int	test_cords_parser_operation( char * filename )
 	int	status;
 	char *	auth;
 
-	if ( Cp.mimetype )
+	if ( Cp.accept )
 	{
-		occi_client_accept( Cp.mimetype );
-		occi_client_content_type( Cp.mimetype );
+		occi_client_accept( Cp.accept );
 	}
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
@@ -141,7 +140,7 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 				}
 				else if (!( strcmp( aptr, "mime" ) ))
 				{
-					Cp.mimetype = argv[argi++];
+					Cp.accept = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "host" ) ))
@@ -203,13 +202,14 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.a.0.02 ");
-	printf("\n   Beta Version 27/09/2011 \n");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
+	printf("\n   Cords Parser : Version 1.0.a.0.03 ");
+	printf("\n   Beta Version 04/03/2012 \n");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
-	printf("\n   --mime <mimetype>    specify the OCCI mime type ");
+	printf("\n   --mime <accept>    specify the OCCI mime type ");
 	printf("\n   --host <host>        specify the publisher hostname ");
+	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --result <filename>  specify the output plan filename ");
 	printf("\n   --verbose            activate verbose messages ");

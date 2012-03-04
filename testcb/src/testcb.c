@@ -26,12 +26,14 @@
 
 struct	cords_broker_config
 {
+	char *	accept;
 	char *	publisher;
 	char *	host;
 	char *	agent;
 	char *	result;
 	char *	tls;
 } Cb = 	{
+	(char * ) 0,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_BROKER_AGENT,
@@ -109,6 +111,11 @@ private	int	test_cords_broker_operation( char * filename )
 	int	status;
 	char *	auth;
 
+	if ( Cb.accept )
+	{
+		occi_client_accept( Cb.accept );
+	}
+
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( auth = login_occi_user( "test-broker","co-system",Cb.agent, Cb.tls ) ))
@@ -154,6 +161,11 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 				else if (!( strcmp( aptr, "publisher" ) ))
 				{
 					Cb.publisher = argv[argi++];
+					continue;
+				}
+				else if (!( strcmp( aptr, "mime" ) ))
+				{
+					Cb.accept = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "host" ) ))
@@ -215,13 +227,14 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.a.0.01 ");
-	printf("\n   Beta Version 27/07/2011 \n");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
+	printf("\n   Cords Broker : Version 1.0.a.0.02 ");
+	printf("\n   Beta Version 04/03/2012 \n");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
 	printf("\n   --host <host>        specify the publisher hostname ");
 	printf("\n   --agent <name>       specify the name of the agent ");
+	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --result <filename>  specify the output plan filename ");
 	printf("\n   --verbose            activate verbose messages ");
 	printf("\n   --debug              activate debug messages \n");

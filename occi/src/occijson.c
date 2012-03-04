@@ -57,7 +57,7 @@ private	char *	occi_json_uri( char * url, char * nptr )
 		return( rptr );
 	else
 	{
-		sprintf(rptr,"%c%s#%s%c",'"',url,nptr,'"');
+		sprintf(rptr,"%c%s%s%c",'"',url,nptr,'"');
 		return( rptr );
 	}
 }
@@ -164,10 +164,9 @@ private	char * occi_json_attributes( struct occi_category * optr )
 	struct	occi_attribute * aptr;
 	int	items=0;
 	char *	rptr=(char *) 0;
-	char *	tptr;
 	char *	wptr;
 
-	if (!( rptr = occi_json_namecomplex( "attributes", "{" ) ))
+	if (!( rptr = occi_json_namecomplex( "attributes", "[" ) ))
 		return( rptr );
 
 	for (	aptr=optr->first;
@@ -177,35 +176,50 @@ private	char * occi_json_attributes( struct occi_category * optr )
 		if ( items++ )
 			if (!( rptr = join_string( rptr, ",\r\n" ) ))
 				return( rptr );		
+		
+		if (!( rptr = join_string( rptr, "{" ) ))
+			return( rptr );
 
-		if (!( tptr = occi_json_domaincomplex( optr, aptr->name, "{\r\n" ) ))
+		else if (!( wptr = occi_json_namevalue( "name", aptr->name )))
 			return( liberate( rptr ) );
+
+		else if (!( rptr = join_strings( rptr , wptr ) ))
+			return( rptr );
 
 		else if (!( wptr = occi_json_namevalue( 
 				"mutable", (aptr->immutable?"false":"true") ) ))
 			return( liberate( rptr ) );
-		else if (!( tptr = join_strings( tptr , wptr ) ))
-			return( liberate( rptr ) );
+
+		else if (!( rptr = join_string( rptr, "," ) ))
+			return( rptr );
+
+		else if (!( rptr = join_strings( rptr , wptr ) ))
+			return( rptr );
 
 		else if (!( wptr = occi_json_namevalue( 
 				"required", (aptr->mandatory?"true":"false") ) ))
 			return( liberate( rptr ) );
-		else if (!( tptr = join_strings( tptr , wptr ) ))
-			return( liberate( rptr ) );
+
+		else if (!( rptr = join_string( rptr, "," ) ))
+			return( rptr );
+
+		else if (!( rptr = join_strings( rptr , wptr ) ))
+			return( rptr );
 
 		else if (!( wptr = occi_json_namevalue( 
 				"type", "string" ) ))
 			return( liberate( rptr ) );
-		else if (!( tptr = join_strings( tptr , wptr ) ))
-			return( liberate( rptr ) );
 
-		else if (!( rptr = join_strings( rptr, tptr ) ))
+		else if (!( rptr = join_string( rptr, "," ) ))
+			return( rptr );
+
+		else if (!( rptr = join_strings( rptr , wptr ) ))
 			return( rptr );
 
 		else if (!( rptr = join_string( rptr, "}" ) ))
 			return( rptr );
 	}
-	return( join_string( rptr, "\r\n}" ) );
+	return( join_string( rptr, "\r\n]" ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -249,15 +263,23 @@ public	char *	occi_json_category( struct occi_category * optr )
 		return( rptr );
 	else if (!( tptr = occi_json_namevalue( "scheme", optr->scheme ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
 		return( rptr );
 	else if (!( tptr = occi_json_namevalue( "class", optr->class ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
 		return( rptr );
 	else if (!( tptr = occi_json_namevalue( "title", optr->title ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
+		return( rptr );
+	else if (!( rptr = join_string( rptr, "," ) ))
 		return( rptr );
 	else if (!( tptr = occi_json_namevalue( "related", optr->rel ) ))
 		return( liberate( rptr ) );
@@ -280,14 +302,20 @@ public	char *	occi_json_capacity( struct occi_category * optr )
 		return( rptr );
 	else if (!( tptr = occi_json_attributes( optr ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
 		return( rptr );
 	else if (!( tptr = occi_json_actions( optr ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
 		return( rptr );
 	else if (!( tptr = occi_json_namevalue( "location", optr->location ) ))
 		return( liberate( rptr ) );
+	else if (!( rptr = join_string( rptr, "," ) ))
+		return( rptr );
 	else if (!( rptr = join_strings( rptr, tptr ) ))
 		return( rptr );
 	else	return( join_string( rptr, "\r\n}" ) );
