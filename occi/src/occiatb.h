@@ -11,5 +11,7 @@ struct	occi_attribute
 	int			  immutable;
 };
 
+public struct occi_attribute * add_occi_attribute(struct occi_category * pptr);
+
 #endif 	
 

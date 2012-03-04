@@ -24,5 +24,10 @@ struct	occi_category
 	void			* payload;
 };
 
+public	struct	occi_category * allocate_occi_category();
+public	struct	occi_category * liberate_occi_category(struct occi_category * sptr);
+
+
+
 #endif 	
 

@@ -68,7 +68,7 @@ private	char *	occi_json_body(
 	char *	vptr;
 	int		attributs=0;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
-	if (!( filename = rest_temporary_filename( ".json" ) ))
+	if (!( filename = rest_temporary_filename( "json" ) ))
 		return( filename );
 
 	else if (!( h = fopen(filename,"w")))
@@ -134,7 +134,7 @@ private	char *	occi_text_body(
 	char *	vptr;
 	int		attributs=0;
 
-	if (!( filename = rest_temporary_filename( ".txt" ) ))
+	if (!( filename = rest_temporary_filename( "txt" ) ))
 		return((char *) 0);
 
 	else if (!( h = fopen(filename,"w") ))
@@ -185,7 +185,7 @@ private	char *	occi_php_body(
 	char		buffer[2048];
 	char *	vptr;
 	int		attributs=0;
-	if (!( filename = rest_temporary_filename( ".php" ) ))
+	if (!( filename = rest_temporary_filename( "php" ) ))
 		return( filename );
 
 	else if (!( h = fopen(filename,"w")))
@@ -248,7 +248,7 @@ private	char * 	occi_xml_body(
 	char *	vptr;
 	int		elements=0;
 	int		attributs=0;
-	if (!( filename = rest_temporary_filename( ".xml" ) ))
+	if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( filename );
 
 	else if (!( h = fopen(filename,"w")))

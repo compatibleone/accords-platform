@@ -25,6 +25,9 @@
 #include "occim.c"
 #include "occiauth.h"
 #include "occibody.h"
+#include "json.h"
+#include "document.h"
+#include "occicat.h"
 
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
@@ -577,6 +580,225 @@ public	struct	rest_header   * occi_append_default(
 	return( root );
 }
 
+/*	-----------------------------------------------------------	*/
+/*	  o c c i _ a n a l y s e _ h t t p _ c a t e g o r i e s	*/
+/*	-----------------------------------------------------------	*/
+private	struct	occi_client * occi_analyse_http_categories( struct occi_client * cptr, struct rest_response * rptr ){
+	struct	rest_header * hptr=(struct rest_header *) 0;
+
+	for (	hptr=rptr->first;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( hptr->value ))
+			continue;
+		else if ( strcasecmp( hptr->name, _OCCI_CATEGORY ) != 0 )
+			continue;
+		else if (!( occi_client_add_category( cptr, hptr->value ) ))
+		{
+			cptr = occi_delete_client( cptr );
+			break;
+		}
+	}
+	return( cptr );
+}
+
+/*	-----------------------------------------------------------	*/
+/*	  o c c i _ a n a l y s e _ t e x t _ c a t e g o r i e s	*/
+/*	-----------------------------------------------------------	*/
+private	struct	occi_client * occi_analyse_text_categories( struct occi_client * cptr, struct rest_response * rptr )
+{
+	char	buffer[8192];
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	FILE *	h;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( rptr->body ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( h= fopen( rptr->body, "r" ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else
+	{
+		fclose(h);
+		return( cptr );
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/*	   o c c i _ a n a l y s e _ x m l _ c a t e g o r i e s	*/
+/*	-----------------------------------------------------------	*/
+private	struct	occi_client * occi_analyse_xml_categories( struct occi_client * cptr, struct rest_response * rptr )
+{
+	char	buffer[8192];
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	xml_element * document;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( rptr->body ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( document = document_parse_file( rptr->body ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else
+	{
+
+		document = document_drop( document );
+		return( cptr );
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/*	  o c c i _ a n a l y s e _ j s o n _ c a t e g o r i e s	*/
+/*	-----------------------------------------------------------	*/
+private	struct	occi_client * occi_analyse_json_categories( struct occi_client * cptr, struct rest_response * rptr )
+{
+	char	buffer[8192];
+	struct	occi_category *	optr;
+	struct	occi_attribute *aptr;
+	struct	occi_action * mptr;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	data_element * qptr;
+	struct	data_element * bptr;
+	struct	data_element * dptr;
+	struct	data_element * eptr;
+	struct	data_element * sptr;
+	char *	vptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( rptr->body ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( dptr = json_parse_file( rptr->body  ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( eptr = json_element( dptr, "categories") ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else
+	{
+		/* ----------------- */
+		/* for each category */
+		/* ----------------- */
+		for (	sptr=eptr->first;
+			sptr !=( struct data_element *) 0;
+			sptr = sptr->next )
+		{
+			/* ------------------------- */
+			/* add a new client category */
+			/* ------------------------- */
+			if (!( optr = allocate_occi_category() ))
+				break;
+			else if (!( optr->previous = cptr->lastcat ))
+				cptr->firstcat = optr;
+			else	optr->previous->next = optr;
+
+			cptr->lastcat = optr;
+
+			/* -------------------------------------- */
+			/* collect and store the category details */
+			/* -------------------------------------- */
+			if (!( vptr = json_atribut( sptr->first, "term" ) ))
+				break;
+			else if (!( optr->id = occi_unquoted_value( vptr ) ))
+				break;
+
+			if (!( vptr = json_atribut( sptr->first, "scheme" )))
+				break;
+			else if (!( optr->scheme=occi_unquoted_value( vptr )))
+				break;
+
+			if (!( vptr = json_atribut( sptr->first, "class" )))
+				break;
+			else if (!( optr->class=occi_unquoted_value( vptr ) ))
+				break;
+
+			if (!( vptr = json_atribut( sptr->first, "rel" )))
+				break;
+			else if (!( optr->rel=occi_unquoted_value( vptr ) ))
+				break;
+
+			if (!( vptr = json_atribut( sptr->first, "title" )))
+				break;
+			else if (!( optr->title=occi_unquoted_value( vptr ) ))
+				break;
+
+			if (!( vptr = json_atribut( sptr->first, "location" )))
+				break;
+			else if (!( optr->location=occi_unquoted_value( vptr ) ))
+				break;
+
+			/* ----------------------------------------- */
+			/* collect and store the category attributes */
+			/* ----------------------------------------- */
+			if (!( qptr = json_element( sptr->first, "attributes" )))
+				break;
+			else
+			{
+				for (	bptr=qptr->first;
+					bptr !=( struct data_element *) 0;
+					bptr = bptr->next )
+				{
+
+					if (!( vptr = json_atribut( bptr->first, "name" ) ))
+						break;
+					else if (!( aptr = add_occi_attribute( optr ) ))
+						break;
+					else if (!( aptr->name = occi_unquoted_value( vptr ) ))
+						break;
+				}
+			}
+
+			/* -------------------------------------- */
+			/* collect and store the category actions */
+			/* -------------------------------------- */
+			if (!( qptr = json_element( sptr->first, "actions" )))
+				break;
+			else
+			{
+				for (	bptr=qptr->first;
+					bptr !=( struct data_element *) 0;
+					bptr = bptr->next )
+				{
+
+					if (!( vptr = json_atribut( bptr->first, "name" ) ))
+						break;
+					else if (!( mptr = add_occi_action( optr ) ))
+						break;
+					else if (!( mptr->name = occi_unquoted_value( vptr ) ))
+						break;
+				}
+			}
+		}
+		dptr = drop_data_element( dptr );
+		return( cptr );
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/*		o c c i _ a n a l y s e _ c a t e g o r i e s		*/
+/*	-----------------------------------------------------------	*/
+private	struct	occi_client * occi_analyse_categories( struct occi_client * cptr, struct rest_response * rptr )
+{
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( hptr->value ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_OCCI ) ))
+		return( occi_analyse_http_categories( cptr, rptr ) );
+	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_PLAIN ) ))
+		return( occi_analyse_text_categories( cptr, rptr ) );
+	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
+		return( occi_analyse_json_categories( cptr, rptr ) );
+	else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
+		return( occi_analyse_xml_categories( cptr, rptr ) );
+	else	return( occi_analyse_http_categories( cptr, rptr ) );
+}
+
 /*	------------------------------------------------------------	*/
 /*		    o c c i _ l o a d _ c a t e g o r i e s		*/
 /*	------------------------------------------------------------	*/
@@ -611,22 +833,8 @@ public	struct	occi_client *	occi_load_categories( struct occi_client * cptr )
 	if ( check_debug() )
 		printf("   OCCI Client : %s %u %s \n",rptr->version,rptr->status,rptr->message);
 
-	for (	hptr=rptr->first;
-		hptr != (struct rest_header *) 0;
-		hptr = hptr->next )
-	{
-		if (!( hptr->name ))
-			continue;
-		else if (!( hptr->value ))
-			continue;
-		else if ( strcasecmp( hptr->name, _OCCI_CATEGORY ) != 0 )
-			continue;
-		else if (!( occi_client_add_category( cptr, hptr->value ) ))
-		{
-			cptr = occi_delete_client( cptr );
-			break;
-		}
-	}
+	cptr = occi_analyse_categories( cptr, rptr );
+
 	rptr = liberate_rest_response( rptr );
 	return( cptr );
 }

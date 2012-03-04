@@ -12,5 +12,7 @@ struct	occi_action
 	void			* action;
 };
 
+public struct occi_action * add_occi_action(struct occi_category * pptr);
+
 #endif 	
 
