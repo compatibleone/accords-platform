@@ -30,12 +30,9 @@ private	struct rest_header * occi_consume_header( struct rest_header * hptr )
 {
 	struct	rest_header * previous;
 	struct	rest_header * next;
-	if ((previous = hptr->previous) != (struct rest_header *) 0)
-		previous->next = hptr->next;
-	if (( next = hptr->next) != (struct rest_header *)0)
-		next->previous = next;
-	liberate_rest_header( hptr );
-	return( next );
+	if ( hptr->name )
+		hptr->name = liberate( hptr->name );
+	return( hptr->next );
 }
 
 /*	------------------------------------------------------------	*/
@@ -80,7 +77,9 @@ private	char *	occi_json_body(
 		fprintf(h,"{ %c%s%c : ",0x0022,cptr->id,0x0022 );
 		while ( hptr )
 		{
-			if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
 				rest_replace_header( hptr, _OCCI_MIME_JSON );
 				hptr = hptr->next;
@@ -145,7 +144,9 @@ private	char *	occi_text_body(
 		fprintf(h,"{ Category: %c%s%c; ",0x0022,cptr->id,0x0022 );
 		while ( hptr )
 		{
-			if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
 				rest_replace_header( hptr, _OCCI_MIME_JSON );
 				hptr = hptr->next;
@@ -197,7 +198,9 @@ private	char *	occi_php_body(
 		fprintf(h,"<?php\n\%c%s%c => array(",0x0022,cptr->id,0x0022);
 		while ( hptr )
 		{
-			if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
 				rest_replace_header( hptr, _OCCI_MIME_JSON );
 				hptr = hptr->next;
@@ -261,7 +264,9 @@ private	char * 	occi_xml_body(
 
 		while ( hptr )
 		{
-			if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
 				rest_replace_header( hptr, _OCCI_MIME_XML );
 				hptr = hptr->next;

@@ -453,7 +453,9 @@ private	struct rest_response *	occi_content_type(
 {
 	char *	body;
 	struct	rest_header * hptr;
-	if (!( hptr = rest_resolve_header( qptr->first, _HTTP_ACCEPT ) ))
+	if (!( rptr ))
+		return( rptr );
+	else if (!( hptr = rest_resolve_header( qptr->first, _HTTP_ACCEPT ) ))
 		return( rptr );
 	else if (!( body = occi_response_body( hptr->value, cptr, rptr->first ) ))
 		return( rptr );
