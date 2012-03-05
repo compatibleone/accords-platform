@@ -175,6 +175,56 @@ private	char *	resolve_placement( char * provider, char * zone, char * agent, ch
 	return((char *) 0);
 }
 
+/*	-----------------------------------------------------------	*/
+/*		p r i c e _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	price_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	return( 30 );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		l o c a t i o n _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	location_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	return( 30 );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		s c o r e _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	score_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	return( 30 );
+}
+
+/*	-----------------------------------------------------------	*/
+/*			d e f a u l t _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	default_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	if (!(pptr->solution = resolve_placement( pptr->provider, pptr->zone, agent, tls )))
+		return(30);
+	else	return(0);
+}
+
 /*	--------------------------------------------------	*/
 /*	c r e a t e _ p l a c e m e n t _ s o l u t i o n	*/
 /*	--------------------------------------------------	*/
@@ -193,8 +243,32 @@ private	int	create_placement_solution(
 		liberate( pptr->solution );
 		pptr->solution = (char *) 0;
 	}
-	pptr->solution = resolve_placement( pptr->provider, pptr->zone, agent, tls );
-	return(0);
+
+	/* -------------------------------------------------- */
+	/* ensure at least the default algorithm is specified */
+	/* -------------------------------------------------- */
+	if (!( pptr->algorithm ))
+		pptr->algorithm = allocate_string( "default" );
+
+	else if (!( strcmp( pptr->algorithm, _CORDS_NULL ) ))
+	{
+		pptr->algorithm = liberate( pptr->algorithm );
+		if (!( pptr->algorithm = allocate_string( "default" ) ))
+			return( 27 );
+	}
+
+	/* -------------------------------------------------- */
+	/* select by  indicated placement algorithm operation */
+	/* -------------------------------------------------- */
+	if (!( strcmp( pptr->algorithm, "default" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "price" ) ))
+		return( price_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "location" ) ))
+		return( location_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "scoring" ) ))
+		return( score_based_placement( optr, pptr, agent, tls ) );
+	else	return( 78 );
 }
 
 /*	-------------------------------------------	*/

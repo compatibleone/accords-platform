@@ -61,9 +61,10 @@ private	char *	occi_json_body(
 {
 	FILE *	h;
 	char *	filename;
-	char		buffer[2048];
+	char	buffer[2048];
 	char *	vptr;
-	int		attributs=0;
+	int	attributs=0;
+	int	locations=0;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	if (!( filename = rest_temporary_filename( "json" ) ))
 		return( filename );
@@ -74,7 +75,6 @@ private	char *	occi_json_body(
 	}
 	else
 	{
-		fprintf(h,"{ %c%s%c : ",0x0022,cptr->id,0x0022 );
 		while ( hptr )
 		{
 			if (!( hptr->name ))
@@ -89,8 +89,27 @@ private	char *	occi_json_body(
 				contentlength = hptr;
 				hptr = hptr->next;
 			}
+			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			{
+				if (!( locations++ ))
+				{
+					fprintf(h,"{ %c%s%c : { %c%s%c : { %clocation%c : [\n",
+						0x0022,cptr->domain,0x0022, 
+						0x0022,cptr->id,0x0022,
+						0x0022, 0x0022 );
+				}
+				else	fprintf(h,",\n");
+				fprintf(h,"\t%c%s%c",0x0022,hptr->value,0x0022);
+				hptr = occi_consume_header( hptr );
+			}
 			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
 			{
+				if (!( attributs++ ))
+				{
+					fprintf(h,"{ %c%s%c : { %c%s%c : ",
+						0x0022,cptr->domain,0x0022, 
+						0x0022,cptr->id,0x0022 );
+				}
 				strcpy((vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
@@ -111,9 +130,9 @@ private	char *	occi_json_body(
 		}
 		if ( attributs )
 			fprintf(h,"\t}\n");
-		else	fprintf(h,"%c%c\n",0x0022,0x0022);
-		fprintf(h,"}\n");
-
+		else if ( locations )
+			fprintf(h,"\t] } \n");
+		fprintf(h,"}\n}\n");
 		fclose(h);
 		return( occi_content_length(contentlength, filename ));
 	}
@@ -333,7 +352,7 @@ public	char * occi_response_body( char * accepts, struct occi_category * cptr, s
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_XML   ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_XML  ) )))
 		return( occi_xml_body(  cptr, hptr  ) );
-	else	return((char *) 0);
+	else	return( occi_text_body( cptr, hptr ) );
 }
 
 	/* ---------- */

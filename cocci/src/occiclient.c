@@ -391,6 +391,161 @@ public	struct	occi_response * allocate_occi_response()
 }
 
 /*	------------------------------------------------------------	*/
+/*	  o c c i _ c r e a t e _ d e f a u l t _ r e s p o n s e	*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_default_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	rest_header * hptr;
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+	for (	hptr=zptr->first;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE )))
+		{
+			if (!( nptr = allocate_string( hptr->value )))
+				continue;
+			else
+			{
+				for ( vptr=nptr; *vptr != 0; vptr++ )
+					if ( *vptr == '=' )
+						break;
+				if ( *vptr == '=' )
+					*(vptr++) = 0;
+				if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+					break;
+			}
+		}
+		else if (!( strcasecmp( hptr->name, _OCCI_LOCATION )))
+		{
+			if (!(eptr=occi_response_element(aptr,rptr->name,hptr->value)))
+				break;
+		}
+		else if (!( strcasecmp( hptr->name, _OCCI_LINKHEAD )))
+		{
+			if (!(eptr=occi_response_element(aptr,"link",hptr->value)))
+				break;
+		}
+	}
+	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ c r e a t e _ t e x t _ r e s p o n s e		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_text_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+
+	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ c r e a t e _ p h p _ r e s p o n s e		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_php_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+
+	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ c r e a t e _ x m l _ r e s p o n s e		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_xml_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+
+	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ c r e a t e _ j s o n _ r e s p o n s e		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_json_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+	char	*	domain;
+	char 	*	category;
+	struct	data_element * dptr;
+	struct	data_element * root;
+	struct	data_element * cptr;
+	char	buffer[2048];
+
+	if (!( dptr = json_parse_file( zptr->body ) ))
+		return( aptr );
+	else	root = dptr;
+	if (!( domain = dptr->name ))
+	{
+		drop_data_element( root );
+		return( aptr );
+	}
+	else if (!( dptr = dptr->first ))
+	{
+		drop_data_element( root );
+		return( aptr );
+	}
+	else if (!( category = dptr->name ))
+	{
+		drop_data_element( root );
+		return( aptr );
+	}
+	else
+	{
+		for (	cptr = dptr->first;
+			cptr = cptr->next;
+			cptr != (struct data_element *) 0 )
+		{
+			if (!( cptr->name ))
+				continue;
+			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
+				continue;
+			else if (!( vptr = occi_unquoted_value( cptr->value ) ))
+				continue;
+			else
+			{
+				sprintf(buffer,"%s.%s.%s",domain,category,nptr);
+				if (!(eptr=occi_response_element(aptr,buffer,vptr)))
+					break;
+				liberate( nptr );
+				liberate( vptr );
+				continue;
+			}
+		}
+		drop_data_element( root );
+		return( aptr );
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*		 o c c i _ c r e a t e _ r e s p o n s e		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_create_response( 
@@ -398,10 +553,7 @@ public	struct	occi_response *	occi_create_response(
 	struct rest_response * zptr )
 {
 	struct	rest_header * hptr;
-	struct	occi_element * eptr;
 	struct	occi_response * aptr;
-	char	*	nptr;
-	char	*	vptr;
 
 	if ((!( zptr )) || (!( rptr )))
 		return((struct occi_response *) 0);
@@ -418,39 +570,25 @@ public	struct	occi_response *	occi_create_response(
 		aptr->type = rptr->type;
 		aptr->response = zptr;
 		aptr->category = rptr->category;
-		for (	hptr=zptr->first;
-			hptr != (struct rest_header *) 0;
-			hptr = hptr->next )
-		{
-			if (!( hptr->name ))
-				continue;
-			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE )))
-			{
-				if (!( nptr = allocate_string( hptr->value )))
-					continue;
-				else
-				{
-					for ( vptr=nptr; *vptr != 0; vptr++ )
-						if ( *vptr == '=' )
-							break;
-					if ( *vptr == '=' )
-						*(vptr++) = 0;
-					if (!(eptr=occi_response_element(aptr,nptr,vptr)))
-						break;
-				}
-			}
-			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION )))
-			{
-				if (!(eptr=occi_response_element(aptr,rptr->name,hptr->value)))
-					break;
-			}
-			else if (!( strcasecmp( hptr->name, _OCCI_LINKHEAD )))
-			{
-				if (!(eptr=occi_response_element(aptr,"link",hptr->value)))
-					break;
-			}
-		}
-		return( aptr );
+		if (!( hptr = rest_resolve_header( zptr->first, _HTTP_CONTENT_LENGTH ) ))
+			return( occi_create_default_response( aptr, rptr,  zptr ) );
+		else if (!( hptr = rest_resolve_header( zptr->first, _HTTP_CONTENT_TYPE ) ))
+			return( occi_create_default_response( aptr, rptr,  zptr ) );
+		else if (!( strcasecmp( hptr->name, _OCCI_TEXT_OCCI ) ))
+			return( occi_create_text_response( aptr, rptr,  zptr ) );
+		else if ((!( strcasecmp( hptr->name, _OCCI_OCCI_PHP ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_PHP  ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_PHP ) )))
+			return( occi_create_php_response( aptr, rptr,  zptr ) );
+		else if ((!( strcasecmp( hptr->name, _OCCI_OCCI_JSON ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_JSON  ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_JSON ) )))
+			return( occi_create_json_response( aptr, rptr,  zptr ) );
+		else if ((!( strcasecmp( hptr->name, _OCCI_MIME_XML  ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_XML   ) ))
+		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_XML  ) )))
+			return( occi_create_xml_response( aptr, rptr,  zptr ) );
+		else	return( occi_create_default_response( aptr, rptr,  zptr ) );
 	}
 }
 
