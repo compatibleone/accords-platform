@@ -83,8 +83,8 @@ private	void	coes_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.05");
-	printf("\n   Beta Version : 02/02/2012");
+	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.06");
+	printf("\n   Beta Version : 05/03/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -292,6 +292,14 @@ private	int	coes_operation( char * nptr )
 	optr->access |= (_OCCI_PRIVATE | _OCCI_CONSUMER);
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_quota_builder( Coes.domain, "quota" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

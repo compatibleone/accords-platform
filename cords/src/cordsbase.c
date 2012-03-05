@@ -24,6 +24,7 @@
 
 #include "compute.c"
 #include "network.c"
+#include "port.c"
 #include "storage.c"
 #include "security.c"
 #include "authorise.c"
@@ -91,6 +92,7 @@
 #include "optimise.c"
 #include "algorithm.c"
 #include "placement.c"
+#include "quota.c"
 
 #include "ipaddress.c"
 #include "domain.c"

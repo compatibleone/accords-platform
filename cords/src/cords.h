@@ -22,6 +22,7 @@
 
 #include "compute.h"
 #include "network.h"
+#include "port.h"
 #include "storage.h"
 #include "infrastructure.h"
 #include "package.h"
@@ -66,6 +67,7 @@
 #include "algorithm.h"
 #include "placement.h"
 #include "instance.h"
+#include "quota.h"
 
 #include "provider.h"
 #include "profile.h"

@@ -89,9 +89,9 @@ private	void	conets_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Networking Services : Version 1.0a.0.02");
-	printf("\n   Beta Version : 01/12/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Networking Services : Version 1.0a.0.03");
+	printf("\n   Beta Version : 05/03/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -166,6 +166,14 @@ private	int	conets_operation( char * nptr )
 	optr->callback  = &ipaddress_interface;
 
 	if (!( optr = occi_cords_domain_builder( Conets.domain, "domain" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_port_builder( Conets.domain, "port" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

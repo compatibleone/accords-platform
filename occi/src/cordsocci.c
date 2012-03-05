@@ -43,6 +43,7 @@
 #include "occiinvoice.c"
 #include "occicontract.c"
 #include "occinetwork.c"
+#include "occiport.c"
 #include "occipackage.c"
 #include "occiparameter.c"
 #include "occiplan.c"
@@ -79,6 +80,7 @@
 #include "occioptimise.c"
 #include "occialgorithm.c"
 #include "occiplacement.c"
+#include "occiquota.c"
 
 #include "occiipaddress.c"
 #include "occidomain.c"
