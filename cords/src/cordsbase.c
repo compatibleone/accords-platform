@@ -25,6 +25,7 @@
 #include "compute.c"
 #include "network.c"
 #include "port.c"
+#include "firewall.c"
 #include "storage.c"
 #include "security.c"
 #include "authorise.c"

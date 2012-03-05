@@ -44,6 +44,7 @@
 #include "occicontract.c"
 #include "occinetwork.c"
 #include "occiport.c"
+#include "occifirewall.c"
 #include "occipackage.c"
 #include "occiparameter.c"
 #include "occiplan.c"

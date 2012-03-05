@@ -14,6 +14,7 @@ public struct occi_category * occi_cords_metric_builder(char *a,char * b);
 public struct occi_category * occi_cords_alert_builder(char *a,char * b);
 public struct occi_category * occi_cords_quota_builder(char *a,char * b);
 public struct occi_category * occi_cords_port_builder(char *a,char * b);
+public struct occi_category * occi_cords_firewall_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_application_builder(char *a,char * b);
 public struct occi_category * occi_cords_instruction_builder(char *a,char * b);

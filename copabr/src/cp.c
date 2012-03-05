@@ -1443,6 +1443,40 @@ private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char 
 	else	return( cords_image_production( dptr, agent, tls ) );
 }
 
+/*	---------------------------------------------------	*/
+/*	   c o r d s _ t e r m i n a t e _ n e t w o r k	*/
+/*	---------------------------------------------------	*/
+private	int	cords_terminate_network( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+
+	if ((status = cords_append_links(dptr,_CORDS_PORT,agent,tls)) != 0)
+		return(cords_append_error(dptr,status,"linkage failure"));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating category"));
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------	*/
+/*	   c o r d s _ t e r m i n a t e _ p a c k a g e	*/
+/*	---------------------------------------------------	*/
+private	int	cords_terminate_package( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+
+	if ((status = cords_append_links(dptr,_CORDS_PORT,agent,tls)) != 0)
+		return(cords_append_error(dptr,status,"linkage failure"));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element"));
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating category"));
+	else	return( 0 );
+}
+
 /*	-----------------------------------------------------------------	*/
 /*	      c o r d s _ t e r m i n a t e _ i n f r a s t r u c t u r e	*/
 /*	-----------------------------------------------------------------	*/
@@ -1763,6 +1797,10 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 		return( cords_terminate_contract( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_NODE ) ))
 		return( cords_terminate_node( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_NETWORK ) ))
+		return( cords_terminate_network( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_PACKAGE ) ))
+		return( cords_terminate_package( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_INFRASTRUCTURE ) ))
 		return( cords_terminate_infrastructure( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_IMAGE ) ))

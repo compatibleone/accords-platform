@@ -85,6 +85,7 @@
 #define	_CORDS_IMAGE		"image"
 #define	_CORDS_SYSTEM		"system"
 #define	_CORDS_PACKAGE		"package"
+#define	_CORDS_PORT		"port"
 
 #define	_CORDS_CONFIGURATION	"configuration"
 #define	_CORDS_INTERFACE	"interface"
