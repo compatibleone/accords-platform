@@ -449,7 +449,7 @@ public	struct	occi_response *	occi_create_text_response(
 	char	*	nptr;
 	char	*	vptr;
 
-	return( aptr );
+	return( occi_create_default_response( aptr, rptr, zptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -1232,7 +1232,7 @@ private	char *	occi_client_body(
 		return( body );
 	else if (!( wptr->value ))
 		return( body );
-	else if (!( strcasecmp( wptr->value, _OCCI_TEXT_PLAIN ) ))
+	else if (!( strcasecmp( wptr->value, _OCCI_TEXT_OCCI ) ))
 		return( body );
 	else if (!( strcasecmp( wptr->value, _OCCI_MIME_OCCI  ) ))
 		return( body );
