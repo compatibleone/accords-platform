@@ -312,7 +312,8 @@ private	void	rest_show_request( struct rest_request * rptr)
 			for (	hptr=rptr->first;
 				hptr != (struct rest_header *) 0;
 				hptr = hptr->next )
-				printf("   %s: %s \n",hptr->name,hptr->value);
+				if ( hptr->name )
+					printf("   %s: %s \n",hptr->name,hptr->value);
 		}
 	}
 	return;
@@ -332,7 +333,8 @@ private	void	rest_show_response( struct rest_response * aptr)
 			for (	hptr=aptr->first;
 				hptr != (struct rest_header *) 0;
 				hptr = hptr->next )
-				printf("   %s: %s \n",hptr->name,hptr->value);
+				if ( hptr->name )
+					printf("   %s: %s \n",hptr->name,hptr->value);
 		}
 	}
 	return;
@@ -388,8 +390,11 @@ private	struct rest_response * rest_transmit_response(
 			hptr != (struct rest_header *) 0;
 			hptr = hptr->next )
 		{
-			rest_response_string( cptr, hptr->name   , ": ");
-			rest_response_string( cptr, hptr->value  , "\r\n");
+			if ( hptr->name )
+			{
+				rest_response_string( cptr, hptr->name   , ": ");
+				rest_response_string( cptr, hptr->value  , "\r\n");
+			}
 		}
 	}
 
@@ -397,8 +402,11 @@ private	struct rest_response * rest_transmit_response(
 		hptr != (struct rest_header *) 0;
 		hptr = hptr->next )
 	{
-		rest_response_string( cptr, hptr->name   , ": ");
-		rest_response_string( cptr, hptr->value  , "\r\n");
+		if ( hptr->name )
+		{
+			rest_response_string( cptr, hptr->name   , ": ");
+			rest_response_string( cptr, hptr->value  , "\r\n");
+		}
 	}
 
 	rest_response_string( cptr, "\0" , "\r\n");

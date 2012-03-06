@@ -63,6 +63,7 @@ private	char *	occi_json_body(
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
+	char *	nptr;
 	int	attributs=0;
 	int	locations=0;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
@@ -106,11 +107,12 @@ private	char *	occi_json_body(
 			{
 				if (!( attributs++ ))
 				{
-					fprintf(h,"{ %c%s%c : { %c%s%c : ",
+					fprintf(h,"{ %c%s%c : { %c%s%c : { \n",
 						0x0022,cptr->domain,0x0022, 
 						0x0022,cptr->id,0x0022 );
 				}
-				strcpy((vptr = buffer),hptr->value);
+				else	fprintf(h,",\n");
+				strcpy((nptr = vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
 					if ( *vptr == '=' )
@@ -118,12 +120,10 @@ private	char *	occi_json_body(
 						*(vptr++) = 0;
 						break;
 					}
-					else	vptr++;
+					else if ( *(vptr++) == '.' )
+						nptr = vptr;
 				}
-				if (!( attributs++ ))
-					fprintf(h,"{\n");
-				else	fprintf(h,",\n");
-				fprintf(h,"\t%c%s%c : %c%s%c",0x0022,buffer,0x0022,0x0022,vptr,0x0022);
+				fprintf(h,"\t%c%s%c : %c%s%c",0x0022,nptr,0x0022,0x0022,vptr,0x0022);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
@@ -204,6 +204,7 @@ private	char *	occi_php_body(
 	char *	filename;
 	char		buffer[2048];
 	char *	vptr;
+	char *	nptr;
 	int		attributs=0;
 	if (!( filename = rest_temporary_filename( "php" ) ))
 		return( filename );
@@ -231,7 +232,7 @@ private	char *	occi_php_body(
 			}
 			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
 			{
-				strcpy((vptr = buffer),hptr->value);
+				strcpy((nptr = vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
 					if ( *vptr == '=' )
@@ -239,11 +240,12 @@ private	char *	occi_php_body(
 						*(vptr++) = 0;
 						break;
 					}
-					else	vptr++;
+					else if ( *(vptr++) == '.' )
+						nptr = vptr;
 				}
 				if ( attributs++ )
 					fprintf(h,",\n");
-				fprintf(h,"\t%c%s%c => %c%s%c",0x0022,buffer,0x0022,0x0022,vptr,0x0022);
+				fprintf(h,"\t%c%s%c => %c%s%c",0x0022,nptr,0x0022,0x0022,vptr,0x0022);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
@@ -268,6 +270,7 @@ private	char * 	occi_xml_body(
 	char *	filename;
 	char		buffer[2048];
 	char *	vptr;
+	char *	nptr;
 	int		elements=0;
 	int		attributs=0;
 	if (!( filename = rest_temporary_filename( "xml" ) ))
@@ -307,19 +310,20 @@ private	char * 	occi_xml_body(
 			}
 			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
 			{
-				strcpy((vptr = buffer),hptr->value);
+				strcpy((nptr = vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
 					if ( *vptr == '=' )
 					{
 						*(vptr++) = 0;
-						break;
+							break;
 					}
-					else	vptr++;
+					else if ( *(vptr++) == '.' )
+						nptr = vptr;
 				}
 				if (!( attributs++ ))
 					fprintf(h,"<%s\n",cptr->id);
-				fprintf(h,"\t%s=%c%s%c\n",buffer,0x0022,vptr,0x0022);
+				fprintf(h,"\t%s=%c%s%c\n",nptr,0x0022,vptr,0x0022);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;

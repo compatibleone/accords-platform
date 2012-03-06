@@ -543,7 +543,7 @@ public	struct	occi_response *	occi_create_json_response(
 				{
 					if (!( vptr = occi_unquoted_value( bptr->value ) ))
 						break;
-					else if (!(eptr=occi_response_element(aptr,buffer,vptr)))
+					else if (!(eptr=occi_response_element(aptr,rptr->name,vptr)))
 						break;
 					else	liberate( vptr );
 				}
@@ -903,8 +903,12 @@ private	struct	occi_client * occi_analyse_json_categories( struct occi_client * 
 						break;
 					else if (!( aptr = add_occi_attribute( optr ) ))
 						break;
-					else if (!( aptr->name = occi_unquoted_value( vptr ) ))
-						break;
+					else
+					{
+						sprintf(buffer,"%s.%s.%s","occi",optr->id,vptr);
+						 if (!( aptr->name = occi_unquoted_value( buffer ) ))
+							break;
+					}
 				}
 			}
 
