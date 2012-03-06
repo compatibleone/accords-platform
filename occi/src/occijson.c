@@ -281,7 +281,7 @@ public	char *	occi_json_category( struct occi_category * optr )
 		return( rptr );
 	else if (!( rptr = join_string( rptr, "," ) ))
 		return( rptr );
-	else if (!( tptr = occi_json_namevalue( "related", optr->rel ) ))
+	else if (!( tptr = occi_json_namevalue( "rel", optr->rel ) ))
 		return( liberate( rptr ) );
 	else	return( join_strings( rptr, tptr ) );
 }
