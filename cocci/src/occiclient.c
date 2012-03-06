@@ -93,8 +93,8 @@ public	struct	rest_header * occi_client_authentication( char * aptr )
 	else
 	{
 		if ( hptr->value )
-			liberate( hptr->value );
-		else	hptr->value = allocate_string( aptr );
+			hptr->value = liberate( hptr->value );
+		hptr->value = allocate_string( aptr );
 		return( hptr );
 	}
 }
@@ -115,8 +115,8 @@ public	struct	rest_header * occi_client_accept( char * aptr )
 	else
 	{
 		if ( hptr->value )
-			liberate( hptr->value );
-		else	hptr->value = allocate_string( aptr );
+			hptr->value = liberate( hptr->value );
+		hptr->value = allocate_string( aptr );
 		return( hptr );
 	}
 }
@@ -137,8 +137,8 @@ public	struct	rest_header * occi_client_content_type( char * aptr )
 	else
 	{
 		if ( hptr->value )
-			liberate( hptr->value );
-		else	hptr->value = allocate_string( aptr );
+			hptr->value = liberate( hptr->value );
+		hptr->value = allocate_string( aptr );
 		return( hptr );
 	}
 }
