@@ -498,12 +498,19 @@ public	struct	occi_response *	occi_create_json_response(
 	struct	data_element * dptr;
 	struct	data_element * root;
 	struct	data_element * cptr;
+	struct	data_element * bptr;
 	char	buffer[2048];
 
 	if (!( dptr = json_parse_file( zptr->body ) ))
 		return( aptr );
 	else	root = dptr;
-	if (!( domain = dptr->name ))
+	/* step over the first one : its the filename */
+	if (!( dptr = dptr->first ))
+	{
+		drop_data_element( root );
+		return( aptr );
+	}
+	else if (!( domain = dptr->name ))
 	{
 		drop_data_element( root );
 		return( aptr );
@@ -521,13 +528,28 @@ public	struct	occi_response *	occi_create_json_response(
 	else
 	{
 		for (	cptr = dptr->first;
-			cptr = cptr->next;
-			cptr != (struct data_element *) 0 )
+			cptr != (struct data_element *) 0;
+			cptr = cptr->next )
 		{
 			if (!( cptr->name ))
 				continue;
 			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
 				continue;
+			else if (!( strcmp( nptr, "location" ) ))
+			{
+				for (	bptr = cptr->first;
+					bptr != (struct data_element *) 0;
+					bptr = bptr->next )
+				{
+					if (!( vptr = occi_unquoted_value( bptr->value ) ))
+						break;
+					else if (!(eptr=occi_response_element(aptr,buffer,vptr)))
+						break;
+					else	liberate( vptr );
+				}
+				liberate( nptr );
+				break;					
+			}
 			else if (!( vptr = occi_unquoted_value( cptr->value ) ))
 				continue;
 			else
@@ -574,19 +596,19 @@ public	struct	occi_response *	occi_create_response(
 			return( occi_create_default_response( aptr, rptr,  zptr ) );
 		else if (!( hptr = rest_resolve_header( zptr->first, _HTTP_CONTENT_TYPE ) ))
 			return( occi_create_default_response( aptr, rptr,  zptr ) );
-		else if (!( strcasecmp( hptr->name, _OCCI_TEXT_OCCI ) ))
+		else if (!( strcasecmp( hptr->value, _OCCI_TEXT_OCCI ) ))
 			return( occi_create_text_response( aptr, rptr,  zptr ) );
-		else if ((!( strcasecmp( hptr->name, _OCCI_OCCI_PHP ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_PHP  ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_PHP ) )))
+		else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_PHP ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_APP_PHP  ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_PHP ) )))
 			return( occi_create_php_response( aptr, rptr,  zptr ) );
-		else if ((!( strcasecmp( hptr->name, _OCCI_OCCI_JSON ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_JSON  ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_JSON ) )))
+		else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
 			return( occi_create_json_response( aptr, rptr,  zptr ) );
-		else if ((!( strcasecmp( hptr->name, _OCCI_MIME_XML  ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_APP_XML   ) ))
-		     ||  (!( strcasecmp( hptr->name, _OCCI_TEXT_XML  ) )))
+		else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
+		     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
 			return( occi_create_xml_response( aptr, rptr,  zptr ) );
 		else	return( occi_create_default_response( aptr, rptr,  zptr ) );
 	}
