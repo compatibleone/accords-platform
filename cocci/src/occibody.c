@@ -139,6 +139,114 @@ private	char *	occi_json_body(
 }
 
 /*	------------------------------------------------------------	*/
+/*	  		o c c i _ h t m l _ s t y l e 			*/
+/*	------------------------------------------------------------	*/
+private	void	occi_html_style( FILE * h, char * filename )
+{
+	FILE * css;
+	int	c;
+	if (!( filename ))
+		return;
+	else if (!( css = fopen( filename,"r" ) ))
+		return;
+	else	
+	{
+		fprintf(h,"<style type='text/css' media=SCREEN>\n");
+		while ((c = fgetc(css)) > 0)
+			fputc(c,h);
+		fclose(css);
+		fprintf(h,"</style>\n");
+		return;
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	  		o c c i _ h t m l _ b o d y 			*/
+/*	------------------------------------------------------------	*/
+private	char *	occi_html_body( 
+		struct occi_category * cptr,
+		struct rest_header  * hptr )
+{
+	FILE *	h;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	nptr;
+	int	attributs=0;
+	int	locations=0;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	if (!( filename = rest_temporary_filename( "html" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+		while ( hptr )
+		{
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			{
+				rest_replace_header( hptr, _OCCI_TEXT_HTML );
+				hptr = hptr->next;
+			}
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
+			{
+				contentlength = hptr;
+				hptr = hptr->next;
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			{
+				if (!( locations++ ))
+				{
+					fprintf(h,"<html><head><title>ACCORDS OCCI Location List %s</title>\n",cptr->id);
+					occi_html_style(h,"style.css");
+					fprintf(h,"</head><body><div align=center><h2>ACCORDS OCCI Location List</h2><hr>\n");
+					fprintf(h,"<a href='/%s/'>/%s/</a><hr><p><table>\n",cptr->id,cptr->id);
+				}
+				fprintf(h,"<tr><th><a href='http://%s'>http://%s</a></th></tr>\n",hptr->value,hptr->value);
+				hptr = occi_consume_header( hptr );
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			{
+				if (!( attributs++ ))
+				{
+					fprintf(h,"<html><head><title>ACCORDS OCCI Category Instance %s</title>\n",cptr->id);
+					occi_html_style(h,"style.css");
+					fprintf(h,"</head><body><div align=center><h2>ACCORDS OCCI Category Instance</h2><hr>\n");
+					fprintf(h,"<a href='/%s/'>/%s/</a><hr><p><table>\n",cptr->id,cptr->id);
+				}
+				strcpy((nptr = vptr = buffer),hptr->value);
+				while ( *vptr )
+				{
+					if ( *vptr == '=' )
+					{
+						*(vptr++) = 0;
+						break;
+					}
+					else if ( *(vptr++) == '.' )
+						nptr = vptr;
+				}
+				fprintf(h,"<tr><th>%s</th><td>%s</td></tr>\n",nptr,vptr);
+				hptr = occi_consume_header( hptr );
+			}
+			else	hptr = hptr->next;
+		}
+		if ( attributs )
+			fprintf(h,"</table>\n");
+		else if ( locations )
+			fprintf(h,"</table>\n");
+		else	fprintf(h,"<html><head></head><body><div align=center><hr>No Content\n");
+		fprintf(h,"<hr></div></body></html>\n");
+		fclose(h);
+		return( occi_content_length(contentlength, filename ));
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*		   	o c c i _ t e x t _ b o d y 			*/
 /*	------------------------------------------------------------	*/
 private	char *	occi_text_body( 
@@ -337,6 +445,41 @@ private	char * 	occi_xml_body(
 	}
 }
 
+/*	--------------------------------------------------------------	*/
+/*		a c c e p t _ s t r i n g _ i n c l u d e s		*/
+/*	--------------------------------------------------------------	*/
+private	int	accept_string_includes( char * sptr, char * tptr )
+{
+	char *	xptr;
+	char *	wptr;
+	char *	root;
+	if (!( wptr = allocate_string( sptr ) ))
+		return( 0 );
+	else	root = wptr;
+	while ( *wptr )
+	{
+		xptr = wptr;
+		while ( *xptr )
+		{
+			if (( *xptr == ',' )|| ( *xptr == ';' ))
+			{
+				*(xptr++) = 0;
+				break;
+			}
+			else	xptr++;
+		}
+		printf("accept(%s,%s)\n",tptr,wptr);
+		if (!( strcmp( wptr, tptr ) ))
+		{
+			liberate( root );
+			return( 1 );
+		}
+		wptr = xptr;	
+	}
+	liberate( root );
+	return( 0 );
+}
+
 /*	---------------------------------------------------	*/
 /*		o c c i _ r e s p o n s e _ b o d y  		*/
 /*	---------------------------------------------------	*/
@@ -344,6 +487,8 @@ public	char * occi_response_body( char * accepts, struct occi_category * cptr, s
 {
 	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
 		return( occi_text_body( cptr, hptr ) );
+	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
+		return( occi_html_body( cptr, hptr ) );
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_PHP  ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_PHP ) )))
