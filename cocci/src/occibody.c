@@ -22,7 +22,7 @@
 #define	_occi_body_c
 
 #include "occibody.h"
-
+#include "xlink.h"
 /*	------------------------------------------------------------	*/
 /*		o c c i _ c o n s u m e _ h e a d e r 			*/
 /*	------------------------------------------------------------	*/
@@ -163,7 +163,7 @@ private	void	occi_html_style( FILE * h, char * filename )
 /*	------------------------------------------------------------	*/
 /*	  		o c c i _ h t m l _ b o d y 			*/
 /*	------------------------------------------------------------	*/
-private	char *	occi_html_body( 
+private	char *	occi_html_capacities( 
 		struct occi_category * cptr,
 		struct rest_header  * hptr )
 {
@@ -172,9 +172,47 @@ private	char *	occi_html_body(
 	char	buffer[2048];
 	char *	vptr;
 	char *	nptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	if (!( filename = rest_temporary_filename( "html" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+		fprintf(h,"<html><head><title>ACCORDS OCCI Capabilities</title>\n");
+		occi_html_style(h,"style.css");
+		fprintf(h,"</head><body><div align=center><h2>ACCORDS OCCI Capabilities</h2>\n");
+		fprintf(h,"<a href='/-/'>/-/</a><p><table>\n");
+		fprintf(h,"<a href='/%s/'>/%s/</a><p><table>\n",cptr->id,cptr->id);
+		fprintf(h,"</table>\n");
+		fprintf(h,"</div></body></html>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	  		o c c i _ h t m l _ b o d y 			*/
+/*	------------------------------------------------------------	*/
+private	char *	occi_html_body( 
+		struct occi_category * cptr,
+		struct rest_header  * hptr )
+{
+	FILE *	h;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	name;
+	char *	wptr;
 	int	attributs=0;
 	int	locations=0;
+	char *	publisher;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
 	if (!( filename = rest_temporary_filename( "html" ) ))
 		return( filename );
 
@@ -204,8 +242,15 @@ private	char *	occi_html_body(
 				{
 					fprintf(h,"<html><head><title>ACCORDS OCCI Location List %s</title>\n",cptr->id);
 					occi_html_style(h,"style.css");
-					fprintf(h,"</head><body><div align=center><h2>ACCORDS OCCI Location List</h2><hr>\n");
-					fprintf(h,"<a href='/%s/'>/%s/</a><hr><p><table>\n",cptr->id,cptr->id);
+					fprintf(h,"</head><body><div align=center><table><tr><th><h2>ACCORDS OCCI Location List</h2></th></tr>\n");
+					if ((publisher = default_publisher()) != (char *) 0)
+					{
+						fprintf(h,"<tr><th>");
+						fprintf(h,"<a href='%s/publication/'>",publisher);
+						fprintf(h,"/publication/</a>\n");
+						fprintf(h,"</th></tr>");
+					}
+					fprintf(h,"<tr><th><a href='/%s/'>/%s/</a></th></tr><tr><td><div align=center><table>\n",cptr->id,cptr->id);
 				}
 				fprintf(h,"<tr><th><a href='http://%s'>http://%s</a></th></tr>\n",hptr->value,hptr->value);
 				hptr = occi_consume_header( hptr );
@@ -216,10 +261,17 @@ private	char *	occi_html_body(
 				{
 					fprintf(h,"<html><head><title>ACCORDS OCCI Category Instance %s</title>\n",cptr->id);
 					occi_html_style(h,"style.css");
-					fprintf(h,"</head><body><div align=center><h2>ACCORDS OCCI Category Instance</h2><hr>\n");
-					fprintf(h,"<a href='/%s/'>/%s/</a><hr><p><table>\n",cptr->id,cptr->id);
+					fprintf(h,"</head><body><div align=center><table><tr><th><h2>ACCORDS OCCI Category Instance</h2></th></tr>\n");
+					if ((publisher = default_publisher()) != (char *) 0)
+					{
+						fprintf(h,"<tr><th>");
+						fprintf(h,"<a href='%s/publication/'>",publisher);
+						fprintf(h,"/publication/</a>\n");
+						fprintf(h,"</th></tr>");
+					}
+					fprintf(h,"<tr><th><a href='/%s/'>/%s/</a></th></tr><tr><td><div align=center><table>\n",cptr->id,cptr->id);
 				}
-				strcpy((nptr = vptr = buffer),hptr->value);
+				strcpy((name = vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
 					if ( *vptr == '=' )
@@ -228,19 +280,40 @@ private	char *	occi_html_body(
 						break;
 					}
 					else if ( *(vptr++) == '.' )
-						nptr = vptr;
+						name = vptr;
 				}
-				fprintf(h,"<tr><th>%s</th><td>%s</td></tr>\n",nptr,vptr);
+				fprintf(h,"<tr><th>%s</th>",name);
+				fprintf(h,"<td><input type=text name='%s' value='%s'></td></tr>\n",name,vptr);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
 		}
 		if ( attributs )
+		{
+			fprintf(h,"<tr><th>Links</th><td>\n");
+			for (	nptr=occi_first_link_node();
+				nptr != (struct occi_link_node *) 0;
+				nptr = nptr->next )
+			{
+				if (!( lptr = nptr->contents ))
+					continue;
+				else if (!( lptr->source ))
+					continue;
+				else if (!( lptr->target ))
+					continue;
+				else if (!( wptr = occi_category_id( lptr->source ) ))
+					continue;
+				else if ( strcmp( wptr, cptr->id ) != 0)
+					continue;
+				else	fprintf(h,"%s<br>",lptr->target);
+			}
+			fprintf(h,"</td></tr>\n");
 			fprintf(h,"</table>\n");
+		}
 		else if ( locations )
 			fprintf(h,"</table>\n");
-		else	fprintf(h,"<html><head></head><body><div align=center><hr>No Content\n");
-		fprintf(h,"<hr></div></body></html>\n");
+		else	fprintf(h,"<html><head></head><body><div align=center><table><tr><th>No Content</th></tr>\n");
+		fprintf(h,"</div></table></div></body></html>\n");
 		fclose(h);
 		return( occi_content_length(contentlength, filename ));
 	}
@@ -468,7 +541,6 @@ private	int	accept_string_includes( char * sptr, char * tptr )
 			}
 			else	xptr++;
 		}
-		printf("accept(%s,%s)\n",tptr,wptr);
 		if (!( strcmp( wptr, tptr ) ))
 		{
 			liberate( root );

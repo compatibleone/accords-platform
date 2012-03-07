@@ -365,7 +365,7 @@ _accords_config() {
     echo "Creating Accords Global Configuration File: $target"
     echo "<accords>" > $target
 
-    _mkpub 
+    _mkpub publisher
     _mkmon coss 
     _mkmon comons 
     _mkcfg coes 
@@ -451,13 +451,22 @@ _mktls() {
 }
 
 _mkpub() {
-    echo "<publisher>" >> $target
-    echo "<rest host='"$resthost"' port='"$restport"'/>" >> $target
-    echo "<security admin='admin' pass='admin' authorise='0' monitor='"$trace"' " >> $target
-    _mktls publisher
-    echo "<memory file='publications.xml' autosave='1'/>" >> $target
-    echo "<domain name='"$domain"'/>" >> $target
-    echo "</publisher>" >> $target
+    module=$1
+    echo "<"${module} >> $target
+    echo "    publisher=''"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity=''" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"'/>" >> $target
+    echo "</"${module}">" >> $target
 }
 
 _mkmon() {

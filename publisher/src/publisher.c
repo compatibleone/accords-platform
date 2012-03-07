@@ -27,6 +27,7 @@
 #include "occi.h"
 #include "document.h"
 #include "occibuilder.h"
+#include "accords.h"
 
 /*	-------------------------------------	*/
 /* 	f u n c t i o n   p r o t o t y p e s	*/
@@ -49,18 +50,19 @@ private	struct rest_response * publisher_delete_item(
 /*	p u b l i s h e r   c o n f i g u r a t i o n	*/
 /*	---------------------------------------------	*/  
 
-struct	publisher_configuration Publisher = {
-	0,		/* monitor */
-	1,		/* threads */
-	0,0,0,0,0,0,
-	"admin", "admin",
-	"http://127.0.0.1",  80,
-	"xmpp.yourinside.com",  8000,
-	"/home/xmpp/compatibleone",
-	"occi",
-	"publisher.xml", "publications.xml",
-	(struct publication *) 0,
-	(struct publication *) 0,
+struct	accords_configuration Publisher = {
+	0,0,
+	0,0,0,
+	(char *) 0,
+	(char *) 0,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_DEFAULT_OPERATOR,
+	_CORDS_DEFAULT_USER,
+	_CORDS_DEFAULT_PASSWORD,
+	"http",  80,
+	"xmpp",  8000,
+	"domain",
+	"publisher.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -74,7 +76,7 @@ public	int	check_debug()		{	return(Publisher.debug);		}
 /*		    c h e c k _ d e b u g 		*/
 /*	---------------------------------------------	*/  
 public	int	check_verbose()		{	return(Publisher.verbose);		}
-public	char *	default_publisher()	{	return(_CORDS_DEFAULT_PUBLISHER);	}
+public	char *	default_publisher()	{	return((char *) 0);			}
 public	char *	default_tls()		{	return(Publisher.tls);			}
 
 /*	---------------------------------------------	*/  
@@ -155,103 +157,10 @@ private	void	publisher_kill(int a, int b)	{ return;		 }
 /*	---------------------------------------------	*/  
 private	void	publisher_load()
 {
-	struct	xml_element * document;
-	struct	xml_element * eptr;
-	struct	xml_element * vptr;
-	struct	xml_atribut * aptr;
-	set_xml_echo(Publisher.debug);
-	if (( document = document_parse_file( Publisher.config )) != (struct xml_element *) 0)
-	{
-		if ( Publisher.verbose )
-			printf("   Publisher loading configuration from : %s \n",Publisher.config);
-
-		if (( eptr = document_element( document, "publisher" )) != (struct xml_element *) 0)
-		{
-			if (( vptr = document_element( eptr, "rest" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
-					Publisher.resthost = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
-					Publisher.restport = document_atribut_value( aptr );
-				if ((aptr = document_atribut( vptr, "threads" )) != (struct xml_atribut *) 0)
-					Publisher.threads = document_atribut_value( aptr );
-			}
-			if (( vptr = document_element( eptr, "xmpp" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
-					Publisher.chathost = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
-					Publisher.chatport = document_atribut_value( aptr );
-				if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
-					Publisher.chatagent = document_atribut_string( aptr );
-			}
-			if (( vptr = document_element( eptr, "security" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "user" )) != (struct xml_atribut *) 0)
-					Publisher.user = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "pass" )) != (struct xml_atribut *) 0)
-					Publisher.password = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
-					Publisher.tls = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "authorise" )) != (struct xml_atribut *) 0)
-					Publisher.authorise = document_atribut_value( aptr );
-				if ((aptr = document_atribut( vptr, "monitor")) != (struct xml_atribut *) 0)
-					Publisher.monitor = document_atribut_value( aptr );
-			}
-			if (( vptr = document_element( eptr, "memory" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "file" )) != (struct xml_atribut *) 0)
-					Publisher.memory = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "autosave" )) != (struct xml_atribut *) 0)
-					Publisher.autosave = document_atribut_value( aptr );
-			}
-			if (( vptr = document_element( eptr, "domain" )) != (struct xml_element *) 0)
-			{
-				if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
-					Publisher.domain = document_atribut_string( aptr );
-			}
-		}
-		document = document_drop( document );
-	}
-	else if ( Publisher.verbose )
-		printf("   Publisher failed to load configuration from : %s \n",Publisher.config);
-	set_xml_echo(0);
+	load_accords_configuration( &Publisher, "publisher" );
 	return;
 }
 
-
-/*	---------------------------------------------	*/  
-/*		p u b l i s h e r _ s a v e		*/
-/*	---------------------------------------------	*/
-/*	save publisher configuration information to 	*/
-/*	the XML configuration file.			*/  
-/*	---------------------------------------------	*/  
-private	void	publisher_save()
-{
-	FILE	*	h;
-	if (( h = fopen( Publisher.config, "w" )) != (FILE *) 0)
-	{
-		if ( Publisher.verbose )
-			printf("   Publisher saving configuration to : %s \n",Publisher.config);
-
-		fprintf(h,"<?xml version='1.0' encoding='utf-8'?>\n");
-		fprintf(h,"<publisher>\n");
-		fprintf(h,"\t<rest host='%s' port='%u' threads='%u'/>\n",
-			Publisher.resthost,Publisher.restport,Publisher.threads);
-		fprintf(h,"\t<xmpp host='%s' port='%u' agent='%s' />\n",
-			Publisher.chathost,Publisher.chatport,Publisher.chatagent);
-		fprintf(h,"\t<security admin='%s' pass='%s' tls='%s' authorise='%u'/>\n",
-			Publisher.user,Publisher.password,(Publisher.tls?Publisher.tls:""),Publisher.authorise);
-		fprintf(h,"\t<memory file='%s' autosave='%u'/>\n",Publisher.memory,Publisher.autosave);
-		fprintf(h,"\t<domain name='%s'/>\n",Publisher.domain);
-		fprintf(h,"</publisher>\n");
-
-		fclose(h);
-	}
-	else if ( Publisher.verbose )
-		printf("   Publisher failed to save configuration to : %s \n",Publisher.config);
-	return;
-}
 
 /*	---------------------------------------------	*/
 /*	  p u b l i s h e r _ i n i t i a l i s e 	*/
@@ -701,59 +610,10 @@ private	int	publisher(int argc, char * argv[] )
 				Publisher.debug = 0xFFFF;
 				continue;
 			case	'-'	:
-				if (!( strcmp( aptr, "verbose" ) ))
-				{
-					Publisher.verbose += 1;
-					Publisher.verbose &= 1;
-				}
-				else if (!( strcmp( aptr, "debug" ) ))
-				{
-					Publisher.debug += 1;
-					Publisher.debug &= 1;
-				}
-				else if (!( strcmp( aptr, "tls" ) ))
-				{
-					Publisher.tls = allocate_string( argv[++argi] );
-				}
-				else if (!( strcmp( aptr, "autosave" ) ))
-				{
-					Publisher.autosave += 1;
-					Publisher.autosave &= 1;
-				}
-				else if (!( strcmp( aptr, "authorise" ) ))
-				{
-					Publisher.authorise += 1;
-					Publisher.authorise &= 1;
-				}
-				else if (!( strcmp( aptr, "help" ) ))
-					return( help() );
-				else if (!( strcmp( aptr, "chatagent" ) ))
-					Publisher.chatagent = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "domain" ) ))
-					Publisher.domain = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "memory" ) ))
-					Publisher.memory = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "config" ) ))
-				{
-					Publisher.config = allocate_string( argv[++argi] );
-					publisher_load();
-				}
-				else if (!( strcmp( aptr, "user" ) ))
-					Publisher.user = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "password" ) ))
-					Publisher.password = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "resthost" ) ))
-					Publisher.resthost = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "restport" ) ))
-					Publisher.restport = atoi( argv[++argi] );
-				else if (!( strcmp( aptr, "chathost" ) ))
-					Publisher.chathost = allocate_string( argv[++argi] );
-				else if (!( strcmp( aptr, "chatport" ) ))
-					Publisher.chatport = atoi( argv[++argi] );
-				else if (!( strcmp( aptr, "threads" ) ))
-					Publisher.threads = atoi( argv[++argi] );
-				else	break;
-				continue;
+				if (!( argi = accords_configuration_option( aptr, argi, argv )))
+					break;
+				else	continue;
+
 			}
 			status = 30;
 			break;
