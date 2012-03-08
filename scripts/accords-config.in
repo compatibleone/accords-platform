@@ -5,11 +5,11 @@
 # Copyright: 
 #   Prologue 2011
 #   Mandriva 2011
-#
+#   Bull 2012
 # Author: 
 #   Jean Parpaillon
 #   Jamie Marshall
-#
+#   Liliana Cabalantti
 
 set -e
 
@@ -21,7 +21,20 @@ elif test -e @pkgsysconfdir@/accords.ini; then
     . @pkgsysconfdir@/accords.ini
 fi
 
-tls=$1
+# -------------------------------------
+# to activate the security using nethsm
+# set nethsm to 1
+# then specify the security directory.
+# -------------------------------------
+nethsm=1
+tls=$HOME/.accords/security
+# -------------------------------------
+# sans security 
+# -------------------------------------
+# nethsm=
+# tls=
+# -------------------------------------
+
 trace=1
 threads=1
 verbose=0

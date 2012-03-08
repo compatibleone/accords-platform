@@ -5,10 +5,12 @@
 # Copyright: 
 #   Prologue 2011
 #   Mandriva 2011
+#   Bull 2012
 #
 # Author: 
 #   Jean Parpaillon
 #   Jamie Marshall
+#   Liliana Cabalantti
 #
 
 set -e
@@ -22,7 +24,20 @@ elif test -e $confdir/accords.ini; then
     . $confdir/accords.ini
 fi
 
+# -------------------------------------
+# to activate the security using nethsm
+# set nethsm to 1
+# then specify the security directory.
+# -------------------------------------
+# nethsm=1
+# tls=$HOME/.accords/security
+# -------------------------------------
+# sans security 
+# -------------------------------------
+nethsm=
 tls=
+# -------------------------------------
+
 trace=1
 threads=1
 verbose=0
@@ -281,29 +296,7 @@ _run_fileserver() {
     fileserver --config $target CO-FS/1.0
 }
 
-_accords_config() {
-    if test `id -u` -eq 0; then
-	export secdir=$confdir/security
-    else
-	export secdir=$HOME/.accords/security
-    fi
-
-    if [ -z "$tls" ]; then
-	echo "Accords Security Not Required"
-    else
-	echo "Creating Accords Security Files"
-    
-	export calist=Certificates.crt
-	export pass=Accords
-	export options=13
-    
-	if test -d $secdir; then
-	    echo "ACCORDS security dir exists ($secdir): please remove it first !"
-	    exit 1
-	else
-	    mkdir -p $secdir
-	fi
-
+_make_security_files() {
 	_mksecs publisher 0
 	_mksecs fileserver 0
 	_mksecs coss 0
@@ -329,37 +322,74 @@ _accords_config() {
 	_mksect testos 1
 	_mksect testresolver 1
 	_mksect command 1
+}
 
-	echo "Creating Accords Certificats"
-	
-	export bits=2048
-	export days=365
-	export sslconfig=./openssl.cnf
+_accords_config() {
+    if test `id -u` -eq 0; then
+	export secdir=$confdir/security
+    else
+	export secdir=$HOME/.accords/security
+    fi
 
-	_mkcert coss
-	_mkcert coes
-	_mkcert coees
-	_mkcert coobas
-	_mkcert comons
-	_mkcert conets
-	_mkcert broker
-	_mkcert parser
-	_mkcert ezvm
-	_mkcert coips
-	_mkcert publisher
-	_mkcert fileserver
-	_mkcert procci
-	_mkcert osprocci
-	_mkcert onprocci
-	_mkcert azprocci
-	_mkcert cosacs
+    if [ -z "$tls" ]; then
+	echo "Accords Security Not Required"
+    else
+	echo "Creating Accords Security Files"
+    
+	export calist=Certificates.crt
+	export pass=Accords
+
+	if [ -z "$nethsm" ]; then 
+		export options=13
+
+	else
+		export options=525
+	fi
+    
+
+	if test -d $secdir; then
+	   if [ -z "$nethsm" ]; then
+	    	echo "ACCORDS security dir exists ($secdir): please remove it first !"
+	    	exit 1
+	   else
+	    	echo "ACCORDS security dir exists ($secdir): certificates have not been regenerated !"
+		_make_security_files
+	   fi
+	else
+	    	mkdir -p $secdir
+		_make_security_files
+
+		echo "Creating Accords Certificats"
 	
-	_mkcert testcp
-	_mkcert testcb
-	_mkcert testos
-	_mkcert teston
-	_mkcert testresolver
-	_mkcert command
+		export bits=2048
+		export days=365
+		export sslconfig=./openssl.cnf
+
+		_mkcert coss
+		_mkcert coes
+		_mkcert coees
+		_mkcert coobas
+		_mkcert comons
+		_mkcert conets
+		_mkcert broker
+		_mkcert parser
+		_mkcert ezvm
+		_mkcert coips
+		_mkcert publisher
+		_mkcert fileserver
+		_mkcert procci
+		_mkcert osprocci
+		_mkcert onprocci
+		_mkcert azprocci
+		_mkcert cosacs
+	
+		_mkcert testcp
+		_mkcert testcb
+		_mkcert testos
+		_mkcert teston
+		_mkcert testresolver
+		_mkcert command
+	fi
     fi
 
     echo "Creating Accords Global Configuration File: $target"
@@ -429,14 +459,23 @@ _mksect() {
 }
 
 _mkcert() {
+    echo "Creating certificate for module $1"
     module=$1
     if test ! -e $sslconfig; then
 	echo "Can not find openSSL config file: $sslconfig"
 	exit 1
     fi
-    openssl req -config $sslconfig \
-	-newkey $bits -x509 -days $days -sha1 \
-	-keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem 2> /dev/null
+
+    if [ -z "$nethsm" ]; then
+
+	openssl req -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem 2> /dev/null
+    else
+	openssl req -engine pkcs11 -keyform e -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem
+    fi
     chmod 0400 ${secdir}/${module}PrivateKey.pem
     chmod 0444 ${secdir}/${module}Certificate.pem
 }

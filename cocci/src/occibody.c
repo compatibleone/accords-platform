@@ -395,6 +395,7 @@ private	char *	occi_php_body(
 	char		buffer[2048];
 	char *	vptr;
 	char *	nptr;
+	int		locations=0;
 	int		attributs=0;
 	if (!( filename = rest_temporary_filename( "php" ) ))
 		return( filename );
@@ -405,7 +406,7 @@ private	char *	occi_php_body(
 	}
 	else
 	{
-		fprintf(h,"<?php\n\%c%s%c => array(",0x0022,cptr->id,0x0022);
+		fprintf(h,"<?php\n");
 		while ( hptr )
 		{
 			if (!( hptr->name ))
@@ -420,8 +421,31 @@ private	char *	occi_php_body(
 				contentlength = hptr;
 				hptr = hptr->next;
 			}
+			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			{
+				if (!( locations++ ))
+				{
+					fprintf(h," return( ");
+					fprintf(h," array( %c%s%c ",0x0022,"occi",0x0022);
+					fprintf(h," => array( %c%s%c", 0x0022,cptr->id, 0x0022);
+					fprintf(h," => array( %c%s%c", 0x0022,"location", 0x0022);
+					fprintf(h," => array( \n");
+				}
+				else	fprintf(h,",\n");
+				fprintf(h,"\t%c%s%c",0x0022,hptr->value,0x0022);
+				hptr = occi_consume_header( hptr );
+			}
 			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
 			{
+				if (!( attributs++ ))
+				{
+					fprintf(h," return( ");
+					fprintf(h," array( %c%s%c ",0x0022,"occi",0x0022);
+					fprintf(h," => array( %c%s%c", 0x0022,cptr->id, 0x0022);
+					fprintf(h," => array( \n");
+				}
+				else	fprintf(h,",\n");
+
 				strcpy((nptr = vptr = buffer),hptr->value);
 				while ( *vptr )
 				{
@@ -440,7 +464,13 @@ private	char *	occi_php_body(
 			}
 			else	hptr = hptr->next;
 		}
-		fprintf(h," );\n");
+
+		if ( locations )
+			fprintf(h," )))) );\n");
+
+		else if ( attributs )
+			fprintf(h," ))) );\n");
+		
 		fprintf(h,"?>");
 
 		fclose(h);

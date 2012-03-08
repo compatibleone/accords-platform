@@ -1,6 +1,7 @@
 #ifndef	_abalssl_c
 #define	_abalssl_c
 
+#include <openssl/engine.h>
 #include "allocate.h"
 /*	-------------------------------------------------	*/
 /*			A B A L    S S L			*/
@@ -19,8 +20,7 @@
 /*		64	certificate is DER not PEM		*/
 /*		128	SSL v23 compatible mode			*/
 /*		256	Inhibit Internal Certificate Check	*/
-/*		512	Activate Use of an external Engine	*/
-/*	--------------------------------------------------	*/
+/*	-------------------------------------------------	*/
 
 #define	_USE_SSL		4
 #define	_REQUEST_PEER		8
@@ -29,7 +29,7 @@
 #define	_DER_CERTIFICATE	64
 #define	_SSL_COMPATIBLE		128
 #define	_SSL_INTERNAL		256
-#define	_OPENSSL_ENGINE		512
+#define _OPENSSL_ENGINE         512
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
@@ -43,6 +43,8 @@ private	int	SSL_READY=0;
 #define	_DEFAULT_PASSWORD 	"password"
 #define	_DEFAULT_CERTIFICATE	"root.pem"
 #define	_DEFAULT_CA_LIST	"calist.pem"
+
+#define ENGINE_ID               "pkcs11"
 
 char *	SslKeyFile=(char *) 0;
 char *	SslPassWord=(char *) 0;
@@ -597,6 +599,39 @@ private	int	tls_check_certificate( X509_STORE_CTX * certificate, void * arg )
 }
 
 /*	------------------------------------------------	*/
+/*	s e t u p _ e n g i n e (  )	*/
+/*	------------------------------------------------	*/
+/*	Initialise an engine		*/
+/*	------------------------------------------------	*/
+
+ENGINE *setup_engine(const char *engine)
+        {
+        ENGINE *e = NULL;
+
+        if (engine)
+	  {
+	    ENGINE_load_builtin_engines();
+	    if ((e = ENGINE_by_id(engine)) == NULL)
+	      {
+		printf("engine: %s\n", engine);
+		tls_show_errors( "invalid engine");
+		return NULL;
+	      }
+	    if(!ENGINE_set_default(e, ENGINE_METHOD_ALL))
+	      {
+		printf("engine: %s\n", ENGINE_get_id(e));
+		tls_show_errors( "can't use that engine");
+		ENGINE_free(e);
+		return NULL;
+	      }
+	    printf("engine: %s OK\n", engine);
+	    /* Free our "structural" reference. */
+	    ENGINE_free(e);
+	  }
+	return e;
+	}
+
+/*	------------------------------------------------	*/
 /*	b u i l d _ s s l _ c o n t e x t ( cptr, mode )	*/
 /*	------------------------------------------------	*/
 /*	Builds and initialises a secure socket layer		*/
@@ -609,6 +644,8 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 	char 	buffer[1024];
 	int	oof=0;
 	void	*	fptr=(void *) 0;
+	ENGINE *e=NULL;
+	EVP_PKEY *pkey=NULL;
 
 	if ( SSL_debug )
 	{
@@ -672,6 +709,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
+	
 	if (!(cptr->context = SSL_CTX_new(fptr) )) 
 	{
 		tls_show_errors( "SSL_CTX_new" );
@@ -699,7 +737,6 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 
 	if ( mode )
 	{
-
 		if ( mode & _DER_CERTIFICATE )
 		{
 			if (!(oof=SSL_CTX_use_certificate_file(
@@ -720,14 +757,47 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 	
 		SSL_CTX_set_default_passwd_cb(cptr->context,ssl_password_callback);
 
-		if (!(oof = SSL_CTX_use_PrivateKey_file(
+		if ( mode & _OPENSSL_ENGINE )
+		  {
+		    /* setup engine pkcs11 */
+		    e = setup_engine(ENGINE_ID);
+		    if (e == NULL)
+		      {
+			close_connection( cptr );
+			return( 0 );
+		      }    
+
+		    printf("load key from token, SslKeyFile = %s\n", SslKeyFile);
+		    pkey = ENGINE_load_private_key(e, SslKeyFile, NULL, NULL);
+		    if (!pkey) 
+		      {
+			tls_show_errors( "ENGINE_load_private_key" );
+			close_connection( cptr );
+			ENGINE_free(e);
+			return( 0 );
+		      }
+		    printf("key loaded from token\n");
+		    if (!(oof = SSL_CTX_use_PrivateKey(cptr->context,pkey)))
+		      {
+			tls_show_errors( "SSL_CTX_use_PrivateKey" );
+			close_connection( cptr );
+			ENGINE_free(e);
+			return( 0 );
+		      }
+		    EVP_PKEY_free(pkey);
+		    ENGINE_free(e);
+		  }
+		else
+		  {
+		    if (!(oof = SSL_CTX_use_PrivateKey_file(
 			cptr->context,SslKeyFile,
 			(mode & _DER_KEY ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
-		{
+		      {
 			tls_show_errors( "SSL_CTX_use_PrivateKey_file" );
 			close_connection( cptr );
 			return( 0 );
-		}
+		      }
+		  }
 		
 		if ( SslCaList )
 		{
