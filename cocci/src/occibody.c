@@ -205,6 +205,7 @@ private	char *	occi_html_body(
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
+	char *	xptr;
 	char *	name;
 	char *	wptr;
 	int	attributs=0;
@@ -236,6 +237,7 @@ private	char *	occi_html_body(
 				contentlength = hptr;
 				hptr = hptr->next;
 			}
+
 			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
 			{
 				if (!( locations++ ))
@@ -243,18 +245,25 @@ private	char *	occi_html_body(
 					fprintf(h,"<html><head><title>ACCORDS OCCI Location List %s</title>\n",cptr->id);
 					occi_html_style(h,"style.css");
 					fprintf(h,"</head><body><div align=center><table><tr><th><h2>ACCORDS OCCI Location List</h2></th></tr>\n");
+					fprintf(h,"<tr><th>");
 					if ((publisher = default_publisher()) != (char *) 0)
 					{
-						fprintf(h,"<tr><th>");
-						fprintf(h,"<a href='%s/publication/'>",publisher);
+						fprintf(h,"<a href='/publication/'>");
 						fprintf(h,"/publication/</a>\n");
 						fprintf(h,"</th></tr>");
 					}
 					fprintf(h,"<tr><th><a href='/%s/'>/%s/</a></th></tr><tr><td><div align=center><table>\n",cptr->id,cptr->id);
 				}
-				fprintf(h,"<tr><th><a href='http://%s'>http://%s</a></th></tr>\n",hptr->value,hptr->value);
+				if (!(xptr = occi_category_id( hptr->value )))
+					fprintf(h,"<tr><th><a href='http://%s'>http://%s</a></th></tr>\n",hptr->value,hptr->value);
+				else
+				{
+					fprintf(h,"<tr><th><a href='%s'>%s</a></th></tr>\n",xptr, xptr );
+					liberate( xptr );
+				}
 				hptr = occi_consume_header( hptr );
 			}
+
 			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
 			{
 				if (!( attributs++ ))
@@ -265,7 +274,7 @@ private	char *	occi_html_body(
 					if ((publisher = default_publisher()) != (char *) 0)
 					{
 						fprintf(h,"<tr><th>");
-						fprintf(h,"<a href='%s/publication/'>",publisher);
+						fprintf(h,"<a href='/publication/'>");
 						fprintf(h,"/publication/</a>\n");
 						fprintf(h,"</th></tr>");
 					}
