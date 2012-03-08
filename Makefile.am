@@ -21,11 +21,11 @@ endif
 if ENABLE_COREST
 SUBDIRS += corest
 endif
-if ENABLE_COCCI
-SUBDIRS += cocci
-endif
 if ENABLE_COCARRIER
 SUBDIRS += cocarrier
+endif
+if ENABLE_COCCI
+SUBDIRS += cocci
 endif
 if ENABLE_COPABR
 SUBDIRS += copabr
