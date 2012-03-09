@@ -1957,6 +1957,8 @@ public	int 	cords_parse_element( struct xml_element * document, char * agent, ch
 	return( status );
 }
 
+#include "cpxsd.c"
+
 /*	---------------------------------------------------	*/
 /*	     c o r d s _ d o c u m e n t _ p a r s e r		*/
 /*	---------------------------------------------------	*/
@@ -1974,6 +1976,7 @@ public	struct	xml_element * cords_document_parser( char * host, char * filename,
 {
 	int	status=0;
 	struct	xml_element *	document;
+	struct	xml_element *	xsd;
 	struct	xml_atribut *	aptr;
 	char *			sptr;
 
@@ -1982,34 +1985,14 @@ public	struct	xml_element * cords_document_parser( char * host, char * filename,
 
 	if (!( document = document_parse_file( filename ) ))
 		return(document);
+
+	else if (!( xsd = document_load_xsd( document ) ))
+		return(document);
+
 	else
 	{
 		if ( check_verbose() )
 			printf("   CORDS Request Parser Phase 2\n");
-
-		if (!( aptr = document_atribut( document,"xmlns" ) ))
-		{
-			cords_append_error( document, 707,"namespace failure");
-			return( document );
-		}
-
-		else if (!( aptr->value ))
-		{
-			cords_append_error( document, 708,"namespace failure");
-			return( document );
-		}
-		else if (!( sptr = occi_unquoted_value( aptr->value ) ))
-		{
-			cords_append_error( document, 709,"namespace failure");
-			return( document );
-		}
-		else if ( strcmp( sptr, _CORDS_NS ) != 0 )
-		{
-			liberate( sptr );
-			cords_append_error( document, 710,"namespace failure");
-			return( document );
-		}
-		else	liberate( sptr );
 
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
