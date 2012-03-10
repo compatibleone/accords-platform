@@ -32,13 +32,15 @@ struct	cords_parser_config
 	char *	agent;
 	char *	result;
 	char *	tls;
+	int	xsd;
 } Cp = 	{
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_PARSER_AGENT,
 	(char *) 0,
-	(char *) 0
+	(char *) 0,
+	0
 	};
 
 private	int	debug=0;
@@ -67,7 +69,7 @@ private	int	ll_test_cords_parser_operation( char * filename )
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = cords_document_parser( Cp.host, filename, Cp.agent, Cp.tls ) ))
+	else if (!( dptr = cords_document_parser( Cp.host, filename, Cp.agent, Cp.tls, Cp.xsd ) ))
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
@@ -128,6 +130,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 				{	verbose=1; continue;	}
 				else if (!( strcmp( aptr, "debug" ) ))
 				{	debug=1; continue;	}
+				else if (!( strcmp( aptr, "xsd" ) ))
+				{	Cp.xsd=1; continue;	}
 				else if (!( strcmp( aptr, "tls" ) ))
 				{
 					Cp.tls = argv[argi++];
@@ -202,12 +206,13 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.a.0.03 ");
-	printf("\n   Beta Version 04/03/2012 \n");
+	printf("\n   Cords Parser : Version 1.0.a.0.04 ");
+	printf("\n   Beta Version 10/03/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
+	printf("\n   --xsd                activate xsd validation ");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
-	printf("\n   --mime <accept>    specify the OCCI mime type ");
+	printf("\n   --mime <accept>      specify the OCCI mime type ");
 	printf("\n   --host <host>        specify the publisher hostname ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --agent <name>       specify the name of the agent ");

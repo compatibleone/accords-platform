@@ -1,21 +1,172 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
 #ifndef	_cpxsd_c
 #define	_cpxsd_c
+
+#define	_XSD_ELEMENT "xsd:element"
+#define	_XSD_COMPLEX "xsd:complexType"
+#define	_XSD_ATRIBUT "xsd:attribute"
+#define	_XSD_SEQUENCE "xsd:sequence"
+
+#define	_XSD_NAME "name"
+#define _XSD_TYPE "type"
+
+private	struct	xml_element * enforceXsd=(struct xml_element *) 0;
+
+/*	---------------------------------------------------	*/
+/*		c o r d s _ d o c u m e n t _ x s d 		*/
+/*	---------------------------------------------------	*/
+public	void	cords_document_xsd( struct xml_element * xsd )
+{
+	enforceXsd = xsd;
+	return;
+}
+
+/*	---------------------------------------------------	*/
+/*			x s d _ t y p e 			*/
+/*	---------------------------------------------------	*/
+/*	localises the named type definition structure of an	*/
+/*	element.						*/
+/*	---------------------------------------------------	*/
+public	struct	xml_element * xsd_type( struct xml_element * xsd, char * nptr )
+{
+	struct	xml_element * wptr=(struct xml_element *) 0;
+	struct	xml_element * tptr=(struct xml_element *) 0;
+	struct	xml_atribut * aptr;
+	char 		    * vptr;
+	if ( check_debug() ) { printf("xsd:type( %s )\n",nptr); }
+	for (	wptr = document_element( xsd, _XSD_COMPLEX );
+		wptr != (struct xml_element *) 0;
+		wptr = wptr->next )
+	{
+		if ( strcasecmp( wptr->name, _XSD_COMPLEX ) )
+			continue;
+		else if (!( aptr = document_atribut( wptr, _XSD_NAME ) ))
+			continue;
+		else if (!( aptr->value ))
+			continue;
+		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+			continue;
+		else if (!( strcmp( vptr, nptr ) ))
+		{
+			liberate( vptr );
+			return( wptr );
+		}
+		else
+		{
+			liberate( vptr );
+			continue;
+		}
+	}
+	if ( check_debug() ) { printf("xsd:failure( attribute %s )\n",nptr); }
+	return( wptr );
+}
 
 /*	---------------------------------------------------	*/
 /*			x s d _ e l e m e n t 			*/
 /*	---------------------------------------------------	*/
-private	struct	xml_element *	xsd_element( struct xml_element * xsd, char * nptr )
+/*	returns the type description structure of a named	*/
+/*	element of the xsd 					*/
+/*	---------------------------------------------------	*/
+public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 {
-	struct	xml_element * wptr;
+	struct	xml_element * wptr=(struct xml_element *) 0;
+	struct	xml_element * tptr=(struct xml_element *) 0;
+	struct	xml_atribut * aptr;
+	char		    * vptr;
+	if ( check_debug() ) { printf("xsd:element( %s )\n",nptr); }
+	if (!( xsd ))
+		return( xsd );
+	else if (!( xsd->first ))
+		return( xsd->first );
+	else if (!( strcmp( xsd->first->name, _XSD_SEQUENCE ) ))
+		xsd = xsd->first;
+	for (	wptr = document_element( xsd, _XSD_ELEMENT );
+		wptr != (struct xml_element *) 0;
+		wptr = wptr->next )
+	{
+		if ( strcasecmp( wptr->name, _XSD_ELEMENT ) )
+			continue;
+		else if (!( aptr = document_atribut( wptr, _XSD_NAME ) ))
+			continue;
+		else if (!( aptr->value ))
+			continue;
+		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+			continue;
+		else if (!( strcmp( vptr, nptr ) ))
+			liberate(vptr);
+		else 	continue;
+
+		if (!( aptr = document_atribut( wptr, _XSD_TYPE ) ))
+			return((struct xml_element *) 0);
+		else if (!( aptr->value ))
+			return((struct xml_element *) 0);
+		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+			continue;
+		else if (!( strncmp( vptr, "xsd:", strlen( "xsd:" ) ) ))
+		{
+			liberate( vptr );
+			return( wptr );
+		}
+		else
+		{
+			tptr = xsd_type( enforceXsd, vptr );
+			liberate( vptr );
+			return( tptr );
+		}
+	}
+	if ( check_debug() ) { printf("xsd:failure( element %s )\n",nptr); }
 	return((struct xml_element *) 0);
 }
 
 /*	---------------------------------------------------	*/
 /*			x s d _ a t r i b u t 			*/
 /*	---------------------------------------------------	*/
-private	struct	xml_element *	xsd_atribut( struct xml_element * xsd, char * nptr )
+public	struct	xml_element *	xsd_atribut( struct xml_element * xsd, char * nptr )
 {
-	struct	xml_element * wptr;
+	struct	xml_element * wptr=(struct xml_element *) 0;
+	struct	xml_element * tptr=(struct xml_element *) 0;
+	struct	xml_atribut * aptr;
+	char		    * vptr;
+	if ( check_debug() ) { printf("xsd:attribute( %s )\n",nptr); }
+	for (	wptr = document_element( xsd, _XSD_ATRIBUT );
+		wptr != (struct xml_element *) 0;
+		wptr = wptr->next )
+	{
+		if ( strcasecmp( wptr->name, _XSD_ATRIBUT ) )
+			continue;
+		else if (!( aptr = document_atribut( wptr, _XSD_NAME ) ))
+			continue;
+		else if (!( aptr->value ))
+			continue;
+		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+			continue;
+		else if (!( strcmp( vptr, nptr ) ))
+		{
+			liberate( vptr );
+			return( wptr );
+		}
+		else	liberate( vptr );
+	}
+	if ( check_debug() ) { printf("xsd:failure( attribute %s )\n",nptr); }
 	return((struct xml_element *) 0);
 }
 

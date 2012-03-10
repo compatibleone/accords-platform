@@ -21,6 +21,8 @@
 #define	_cords_parser_c
 
 #include "cp.h"
+#include "cpxsd.h"
+
 
 /*	---------------------------------------------------	*/
 /*		c o r d s _ a p p e n d _ c h o i c e		*/
@@ -1775,20 +1777,10 @@ public	int	cords_terminate_element( struct xml_element * dptr, char * agent,char
 }
 
 /*	---------------------------------------------------	*/
-/*	     c o r d s _ t e r m i n a t e _ l e v e l		*/
+/*	     c o r d s _ t e r m i n a t e _ x m l 		*/
 /*	---------------------------------------------------	*/
-/*	completion of certain levels of a cords document is	*/
-/*	in need of post processing to position atribut info	*/
-/*	---------------------------------------------------	*/
-public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char * tls )
+private	int	cords_terminate_xml( struct xml_element * dptr, char * agent,char * tls )
 {
-	if ( check_debug() )
-	{
-		if ( dptr )
-			if ( dptr->name )
-				printf("terminate level( %s )\n",dptr->name);
-	}
-
 	if (!( strcmp( dptr->name, _CORDS_MANIFEST ) ))
 		return( cords_terminate_request( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_SERVICE ) ))
@@ -1817,6 +1809,53 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 }
 
 /*	---------------------------------------------------	*/
+/*	     c o r d s _ t e r m i n a t e _ l e v e l		*/
+/*	---------------------------------------------------	*/
+/*	completion of certain levels of a cords document is	*/
+/*	in need of post processing to position atribut info	*/
+/*	this algorithm has been extended to allow control 	*/
+/*	to be handled by an XSD for attribute validation 	*/
+/*	and link creation.					*/
+/*	---------------------------------------------------	*/
+public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char * tls )
+{
+	if ( check_debug() )
+	{
+		if ( dptr )
+			if ( dptr->name )
+				printf("terminate level( %s )\n",dptr->name);
+	}
+	return( cords_terminate_xml( dptr, agent, tls ) );
+}
+
+/*	---------------------------------------------------	*/
+/*		c o r d s _ t e r m i n a t e _ x s d		*/
+/*	---------------------------------------------------	*/
+/*	validation of the conformity of the element and its	*/
+/*	attributes with respect to the indicated XSD.		*/
+/*	TODO: This will then allow the standard terminate	*/
+/*	level operation which is hard coded. It must be 	*/
+/*	performed under control of the XSD to allow new XSD	*/
+/*	types of documents to be correctly processed by the	*/
+/*	standard ACCORDS parser engine.				*/
+/*	---------------------------------------------------	*/
+private	int	cords_terminate_xsd( 
+	struct xml_element * wptr,
+	struct xml_element * dptr, char * agent,char * tls )
+{
+	struct	xml_element * bptr;
+	struct	xml_atribut * aptr;
+	for (	aptr=dptr->firstatb;
+		aptr != (struct xml_atribut *) 0;
+		aptr = aptr->next )
+	{
+		if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
+			return(cords_append_error(dptr,799,"xsd:incorrect attribute"));
+	}
+	return( cords_terminate_level( dptr, agent, tls ) );		
+}
+
+/*	---------------------------------------------------	*/
 /*		c o r d s _ p a r s e _ e l e m e n t		*/
 /*	---------------------------------------------------	*/
 /*	this function performs the major decisional work of 	*/
@@ -1841,7 +1880,9 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 /*	Identifier will be appended to the list of atributs	*/
 /*	of the XML Document.					*/
 /*	---------------------------------------------------	*/
-private	int 	ll_cords_parse_element( struct xml_element * document, char * agent, char * tls, int level )
+private	int 	ll_cords_parse_element( 
+	struct	xml_element * xst, 
+	struct xml_element * document, char * agent, char * tls, int level )
 {
 	int	status;
 	struct	rest_header * 	hptr;
@@ -1930,13 +1971,15 @@ private	int 	ll_cords_parse_element( struct xml_element * document, char * agent
 	for (	eptr=document->first;
 		eptr != (struct xml_element *) 0;
 		eptr = eptr->next )
-		if ((status = cords_parse_element( eptr, agent,tls,(level+1) )) != 0)
+		if ((status = cords_parse_element( xst, eptr, agent,tls,(level+1) )) != 0)
 			return( status );
 
 	/* --------------------------------------------- */
 	/* this level of processing can now be completed */
 	/* --------------------------------------------- */
-	return( cords_terminate_level( document, agent,tls ) );
+	if ( xst )
+		return( cords_terminate_xsd( xst, document, agent, tls ) );
+	else	return( cords_terminate_level( document, agent,tls ) );
 
 }
 
@@ -1946,12 +1989,22 @@ private	int 	ll_cords_parse_element( struct xml_element * document, char * agent
 /*	this is a wrapper for the above function offering 	*/
 /*	trace entry and exit trace information in debug mode	*/
 /*	---------------------------------------------------	*/
-public	int 	cords_parse_element( struct xml_element * document, char * agent, char * tls, int level )
+public	int 	cords_parse_element( 
+		struct xml_element * xst, 
+		struct xml_element * document, char * agent, char * tls, int level )
 {
 	int	status;
 	if ( check_debug() )
 		printf("\n#enter: cords_parse_element(%u, %s, %s )\n",level,document->name,agent);
-	status = ll_cords_parse_element( document, agent, tls, level );
+
+	if (!( xst ))
+		status = ll_cords_parse_element( xst, document, agent, tls, level );
+
+	else if (!( xst = xsd_element( xst, document->name ) ))
+		status = cords_append_error(document,798,"xsd:incorrect element");
+
+	else	status = ll_cords_parse_element( xst, document, agent, tls, level );
+
 	if ( check_debug() )
 		printf("#leave: cords_parse_element(%u, %s, %s )\n",level,document->name,agent);
 	return( status );
@@ -1972,11 +2025,13 @@ public	int 	cords_parse_element( struct xml_element * document, char * agent, ch
 /*	fields of the different instances comprising the 	*/
 /*	provisioning request.					*/
 /*	------------------------------------------------	*/
-public	struct	xml_element * cords_document_parser( char * host, char * filename, char * agent, char * tls )
+public	struct	xml_element * cords_document_parser( 
+	char * host, char * filename, char * agent, char * tls, int usexsd )
 {
 	int	status=0;
 	struct	xml_element *	document;
 	struct	xml_element *	xsd;
+	struct	xml_element *	xst=(struct xml_element *) 0;
 	struct	xml_atribut *	aptr;
 	char *			sptr;
 
@@ -1994,11 +2049,18 @@ public	struct	xml_element * cords_document_parser( char * host, char * filename,
 		if ( check_verbose() )
 			printf("   CORDS Request Parser Phase 2\n");
 
+		if ( usexsd )
+			cords_document_xsd((xst = xsd));
+		else	cords_document_xsd((xst = (struct xml_element *) 0));
+
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
-		if (!( cords_parse_element( document, agent, tls, 0 )))
-			return( document );
-		else	return( document );
+		(void) cords_parse_element( xst, document, agent, tls, 0 );
+
+		xsd = cords_drop_document( xsd );
+		cords_document_xsd( xsd );
+		return( document );
+
 	}
 }
 

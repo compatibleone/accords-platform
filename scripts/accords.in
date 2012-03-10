@@ -170,9 +170,9 @@ _co_command() {
 
 _co_parser() {
     if [ -z "$tls" ]; then
-	testcp --publisher "$publisher" --verbose $1.xml
+	testcp --publisher "$publisher" --verbose $2 $1.xml
     else
-	testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $1.xml
+	testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
     fi
 }
 
