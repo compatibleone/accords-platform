@@ -300,8 +300,10 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return( on_result( on_put_object( p2, default_tls(), agent, p3, p4, hptr ) ) );
 	else if (!( p5 ))
 		return( failure( 30,"p5", "required") );
+	else if (!( p6 ))
+		return( failure( 30,"p6", "required") );
 	else if (!( strcasecmp(p1,"POST" ) ))
-		return( on_result( on_post_object( p2, default_tls(), agent, hptr, p3, p4, p5, p5 ) ) );
+		return( on_result( on_post_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6 ) ) );
 	else	return( failure(32, "incorrect value for p1: ", p1 ) );
 }
 
