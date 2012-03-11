@@ -1366,11 +1366,30 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 		/* -------------------- */
 		/* build a new instance */
 		/* -------------------- */
-		zptr = occi_client_post( cptr, rptr );
-		zptr = occi_remove_response( zptr );
+		if (!(zptr = occi_client_post( cptr, rptr )))
+		{
 		rptr = occi_remove_request( rptr );
 		liberate( pptr );
 		return( 0 );
+
+		}
+		else if (!( host = cords_extract_location( zptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			rptr = occi_remove_request( rptr );
+			liberate( pptr );
+			return( 0 );
+		}
+		else
+		{
+			sprintf(buffer,"http://%s",host);
+			liberate( host );
+			zptr = occi_remove_response( zptr );
+			cords_invoke_action( buffer, "build", agent, tls );
+			rptr = occi_remove_request( rptr );
+			liberate( pptr );
+			return( 0 );
+		}
 	}
 }
 

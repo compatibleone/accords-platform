@@ -430,9 +430,9 @@ private	char *	coips_link_value( char * sptr )
 }
 
 /*	------------------------------------------------------------------	*/
-/*			b u i l d _ a p p l i c a t i o n			*/
+/*			l l _ b u i l d _ a p p l i c a t i o n			*/
 /*	------------------------------------------------------------------	*/
-private	int	build_application( struct occi_category * optr, struct cords_application * aptr)
+private	int	ll_build_application( struct occi_category * optr, struct cords_application * aptr)
 {
 	char *	node;
 	char *	contract;
@@ -548,6 +548,23 @@ private	int	build_application( struct occi_category * optr, struct cords_applica
 	return(0);
 }
 
+
+/*	-------------------------------------------	*/
+/* 	      b u i l d _ a p p l i c a t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	build_application(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_application * pptr;
+	if (!( pptr = vptr ))
+		return(0);
+	else 	return( ll_build_application (optr, pptr ) );
+}
+
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
@@ -559,7 +576,8 @@ private	int	create_cords_application(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(build_application(optr,pptr));
+	else	return(0);
+	/* build_application(optr,pptr)); */
 }
 
 /*	-------------------------------------------	*/
@@ -629,6 +647,9 @@ private	int	coips_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &cords_application_interface;
+
+	if (!( optr = occi_add_action( optr,"build","",build_application)))
+		return( optr );
 
 	rest_initialise_log(Coips.monitor);
 
