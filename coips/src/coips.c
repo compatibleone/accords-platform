@@ -552,7 +552,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 /*	-------------------------------------------	*/
 /* 	      b u i l d _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	build_application(
+private	struct rest_response * build_application(
 		struct occi_category * optr, 
 		struct rest_client * cptr, 
 		struct rest_request * rptr, 
@@ -560,9 +560,12 @@ private	int	build_application(
 		void * vptr )
 {
 	struct	cords_application * pptr;
+	int	status;
 	if (!( pptr = vptr ))
 		return(0);
-	else 	return( ll_build_application (optr, pptr ) );
+	else if ((status = ll_build_application (optr, pptr )) != 0)
+		return( rest_html_response( aptr, status, "BUILD FAILURE" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
 /*	-------------------------------------------	*/

@@ -23,6 +23,10 @@
 #include "cp.h"
 #include "cpxsd.h"
 
+private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
+
+#include "cpxsd.c"
+
 
 /*	---------------------------------------------------	*/
 /*		c o r d s _ a p p e n d _ c h o i c e		*/
@@ -1856,20 +1860,130 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 /*	types of documents to be correctly processed by the	*/
 /*	standard ACCORDS parser engine.				*/
 /*	---------------------------------------------------	*/
+private	int	xsd_builder=1;
 private	int	cords_terminate_xsd( 
 	struct xml_element * wptr,
 	struct xml_element * dptr, char * agent,char * tls )
 {
+	int	status;
+	char *	vptr;
+	char *	nptr;
+	char	buffer[1024];
 	struct	xml_element * bptr;
+	struct	xml_element * eptr;
+	struct	xml_element * fptr;
 	struct	xml_atribut * aptr;
+	int	modifications=0;
+	int	linked=0;
+
+	/* ---------------------------------- */
+	/* for each attributes of the element */
+	/* ---------------------------------- */
 	for (	aptr=dptr->firstatb;
 		aptr != (struct xml_atribut *) 0;
 		aptr = aptr->next )
 	{
+		/* -------------------------------------------- */
+		/* ensure the attribute is specified in the XSD */
+		/* -------------------------------------------- */
 		if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
-			return(cords_append_error(dptr,799,"xsd:incorrect attribute"));
+		{
+			sprintf(buffer,"xsd:incorrect attribute:%s",aptr->name);
+			return(cords_append_error(dptr,799,buffer));
+		}
 	}
-	return( cords_terminate_level( dptr, agent, tls ) );		
+
+	/* ---------------------------------------------------------- */
+	/* if not local xsd controlled build then do hard wired build */
+	/* ---------------------------------------------------------- */
+	if (!( xsd_builder ))
+		return( cords_terminate_level( dptr, agent, tls ) );		
+	else
+	{
+		/* ------------------------------------------------- */
+		/* link up the single elements to their attribute ID */
+		/* ------------------------------------------------- */
+		for (	eptr=dptr->first;
+			eptr !=(struct xml_element *) 0;
+			eptr = eptr->next )
+		{
+
+			/* ---------------------------------------------------- */
+			/* locate the atribut of the same name as the attribute */
+			/* ---------------------------------------------------- */
+			if (!( fptr = xsd_atribut( wptr, eptr->name ) ))
+				continue;
+
+			/* ----------------------------------------------------- */
+			/* locate id of sub element and set same named attribute */
+			/* ----------------------------------------------------- */
+			else if (!(status = cords_instance_identifier( dptr, eptr->name ) ))
+			{
+				modifications++;
+				continue;
+			}
+			else	return( status );
+		}
+
+		/* locate the first max occurs unbounded */
+		/* ------------------------------------- */
+		for ( 	eptr=first_xsd_element( wptr );
+			eptr != (struct xml_element *) 0;
+			eptr = eptr->next )
+		{
+			for (	aptr=eptr->firstatb;
+				aptr !=(struct xml_atribut *) 0;
+				aptr = aptr->next )
+			{
+				if (!( aptr->name ))
+					continue;
+				else if (!( strcmp( aptr->name, _XSD_NAME ) ))
+				{
+					nptr = aptr->value;
+					continue;
+				}
+				else if ( strcmp( aptr->name, _XSD_MAXOCCURS ) )
+					continue;
+				else if (!( aptr->value ))
+					continue;
+				else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+					continue;
+				else if (!( strcmp( vptr, _XSD_UNBOUNDED ) ))
+				{
+					liberate(vptr);
+					if (!( nptr ))
+						continue;
+					else if (!( nptr = occi_unquoted_value( nptr ) ))
+						continue;
+					else if ((status = cords_append_links(dptr,nptr,agent,tls)) != 0)
+					{
+						liberate( nptr );
+						sprintf(buffer,"linkage failure:%s",nptr);
+						return(cords_append_error(dptr,status,buffer));
+					}
+					else
+					{
+						linked=1;
+						liberate( nptr );
+						break;
+					}
+				}
+				else	liberate(vptr);
+			}
+			if ( linked )
+				break;
+		}
+		/* ----------------------------------------- */
+		/* ensure existance of an ID attribute value */
+		/* ----------------------------------------- */
+		if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+			return(cords_append_error(dptr,701,"unresolved element"));
+		else if (!( modifications ))
+			return( 0 );
+		else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+			return(cords_append_error(dptr,704,"updating category"));
+		else	return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -2027,7 +2141,6 @@ public	int 	cords_parse_element(
 	return( status );
 }
 
-#include "cpxsd.c"
 
 /*	---------------------------------------------------	*/
 /*	     c o r d s _ d o c u m e n t _ p a r s e r		*/

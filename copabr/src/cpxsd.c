@@ -25,6 +25,9 @@
 #define	_XSD_COMPLEX "xsd:complexType"
 #define	_XSD_ATRIBUT "xsd:attribute"
 #define	_XSD_SEQUENCE "xsd:sequence"
+#define	_XSD_MAXOCCURS "maxOccurs"
+#define	_XSD_MINOCCURS "minOccurs"
+#define	_XSD_UNBOUNDED "unbounded"
 
 #define	_XSD_NAME "name"
 #define _XSD_TYPE "type"
@@ -81,6 +84,50 @@ public	struct	xml_element * xsd_type( struct xml_element * xsd, char * nptr )
 }
 
 /*	---------------------------------------------------	*/
+/*		f i r s t _ x s d _ e l e m e n t 		*/
+/*	---------------------------------------------------	*/
+public	struct	xml_element * first_xsd_element( struct xml_element * xsd )
+{
+	if (!( xsd ))
+		return( xsd );
+	else if (!( xsd->first ))
+		return( xsd->first );
+	else if (!( strcmp( xsd->first->name, _XSD_SEQUENCE ) ))
+		xsd = xsd->first;
+	if (!( xsd ))
+		return(xsd);
+	else	return( xsd->first );
+}
+
+
+/*	---------------------------------------------------	*/
+/*		x s d _ e l e m e n t _ t y p e 		*/
+/*	---------------------------------------------------	*/
+public	struct	xml_element * xsd_element_type( struct xml_element * wptr )
+{
+	struct	xml_element * tptr;
+	struct	xml_atribut * aptr;
+	char		    * vptr;
+	if (!( aptr = document_atribut( wptr, _XSD_TYPE ) ))
+		return((struct xml_element *) 0);
+	else if (!( aptr->value ))
+		return((struct xml_element *) 0);
+	else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+		return((struct xml_element *) 0);
+	else if (!( strncmp( vptr, "xsd:", strlen( "xsd:" ) ) ))
+	{
+		liberate( vptr );
+		return( wptr );
+	}
+	else
+	{
+		tptr = xsd_type( enforceXsd, vptr );
+		liberate( vptr );
+		return( tptr );
+	}
+}
+
+/*	---------------------------------------------------	*/
 /*			x s d _ e l e m e n t 			*/
 /*	---------------------------------------------------	*/
 /*	returns the type description structure of a named	*/
@@ -91,7 +138,7 @@ public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 	struct	xml_element * wptr=(struct xml_element *) 0;
 	struct	xml_element * tptr=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
-	char		    * vptr;
+	char 		    * vptr;
 	if ( check_debug() ) { printf("xsd:element( %s )\n",nptr); }
 	if (!( xsd ))
 		return( xsd );
@@ -99,6 +146,7 @@ public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 		return( xsd->first );
 	else if (!( strcmp( xsd->first->name, _XSD_SEQUENCE ) ))
 		xsd = xsd->first;
+
 	for (	wptr = document_element( xsd, _XSD_ELEMENT );
 		wptr != (struct xml_element *) 0;
 		wptr = wptr->next )
@@ -112,26 +160,12 @@ public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
 			continue;
 		else if (!( strcmp( vptr, nptr ) ))
+		{
 			liberate(vptr);
+			return( xsd_element_type( wptr ) );
+		}
 		else 	continue;
 
-		if (!( aptr = document_atribut( wptr, _XSD_TYPE ) ))
-			return((struct xml_element *) 0);
-		else if (!( aptr->value ))
-			return((struct xml_element *) 0);
-		else if (!( vptr = occi_unquoted_value( aptr->value ) ))
-			continue;
-		else if (!( strncmp( vptr, "xsd:", strlen( "xsd:" ) ) ))
-		{
-			liberate( vptr );
-			return( wptr );
-		}
-		else
-		{
-			tptr = xsd_type( enforceXsd, vptr );
-			liberate( vptr );
-			return( tptr );
-		}
 	}
 	if ( check_debug() ) { printf("xsd:failure( element %s )\n",nptr); }
 	return((struct xml_element *) 0);

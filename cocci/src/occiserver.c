@@ -501,7 +501,7 @@ private	struct rest_response * occi_invoke_post(
 	struct rest_client   * cptr, 
 	struct rest_request  * rptr )
 {
-	struct	rest_response * aptr;
+	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_interface * iptr;
 	if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );

@@ -22,11 +22,13 @@
 
 
 public	struct	xml_element * xsd_type( struct xml_element * xsd, char * nptr );
+public	struct	xml_element * first_xsd_element( struct xml_element * xsd );
 public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr );
-public	struct	xml_element *	xsd_atribut( struct xml_element * xsd, char * nptr );
-public	struct xml_element * xsd_validate_element( 
-	struct xml_element * xsd,
-	struct xml_element * eptr );
+public	struct	xml_element * xsd_element_type( struct xml_element * wptr );
+public	struct	xml_element * xsd_atribut( struct xml_element * xsd, char * nptr );
+public	struct 	xml_element * xsd_validate_element( 
+	struct 	xml_element * xsd,
+	struct 	xml_element * eptr );
 
 
 	/* -------- */
