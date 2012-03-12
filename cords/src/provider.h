@@ -11,6 +11,9 @@ struct	cords_provider
 	char *	profile;
 	char *	operator;
 	char *	price;
+	char *	zone;
+	char *	opinion;
+	char * 	security;
 };
 
 #endif

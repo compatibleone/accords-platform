@@ -278,6 +278,19 @@ public	char * on_create_compute_request(
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
 			fprintf(h,"</NIC>\n");
 		}
+		if (!( local ))
+		{
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n","1");
+			fprintf(h,"</NIC>\n");
+		}
+
+		fprintf(h,"<GRAPHICS>\n");
+		fprintf(h,"<TYPE>vnc</TYPE>\n");
+		fprintf(h,"<PORT>-1</PORT>\n");
+		fprintf(h,"<LISTEN>0.0.0.0</LISTEN>\n");
+		fprintf(h,"</GRAPHICS>\n");
+
 		fprintf(h,"</COMPUTE>\n");
 		fclose(h);
 		return( filename );

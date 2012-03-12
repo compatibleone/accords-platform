@@ -380,9 +380,9 @@ private	int	on_command(int argc, char * argv[] )
 /* ------------------------------------------------------------------------------------ */
 private	int	on_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.02");
-	printf("\n   Beta Version 07/01/2012");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue" );
+	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.03");
+	printf("\n   Beta Version 12/03/2012");
+	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue" );
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");

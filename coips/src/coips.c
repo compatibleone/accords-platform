@@ -652,7 +652,7 @@ private	int	coips_operation( char * nptr )
 	optr->callback  = &cords_application_interface;
 
 	if (!( optr = occi_add_action( optr,"build","",build_application)))
-		return( optr );
+		return( 28 );
 
 	rest_initialise_log(Coips.monitor);
 

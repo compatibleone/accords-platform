@@ -47,6 +47,12 @@ public struct cords_provider * liberate_cords_provider(struct cords_provider * s
 			 sptr->operator = liberate(sptr->operator);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
+		if ( sptr->zone )
+			 sptr->zone = liberate(sptr->zone);
+		if ( sptr->opinion )
+			 sptr->opinion = liberate(sptr->opinion);
+		if ( sptr->security )
+			 sptr->security = liberate(sptr->security);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_provider *) 0);
@@ -67,6 +73,9 @@ public struct cords_provider * reset_cords_provider(struct cords_provider * sptr
 		sptr->profile = (char*) 0;
 		sptr->operator = (char*) 0;
 		sptr->price = (char*) 0;
+		sptr->zone = (char*) 0;
+		sptr->opinion = (char*) 0;
+		sptr->security = (char*) 0;
 	}
 	return(sptr);
 
@@ -121,6 +130,18 @@ public int xmlin_cords_provider(struct cords_provider * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"zone") ))
+		{
+			if ( wptr->value ) { sptr->zone = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"opinion") ))
+		{
+			if ( wptr->value ) { sptr->opinion = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"security") ))
+		{
+			if ( wptr->value ) { sptr->security = allocate_string(wptr->value); }
+		}
 	}
 	return(0);
 
@@ -142,6 +163,9 @@ public int rest_occi_cords_provider(FILE * fh,struct cords_provider * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.opinion='%s'\r\n",prefix,nptr,(sptr->opinion?sptr->opinion:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
 	return(0);
 
 }
