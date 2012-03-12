@@ -259,7 +259,8 @@ public	char * on_create_compute_request(
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		fprintf(h,"</DISK>\n");
-		if ( (On.version) && ( atoi( On.version ) >= 3 ))
+		fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
+		if ( (On.version) && ( atoi( On.version ) >= 5 ))
 		{
 			/* ----------------------------------- */
 			/* added for OpenNebula 3.0 compliance */

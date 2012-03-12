@@ -9,8 +9,10 @@ struct	cords_quota
 	char *	description;
 	char *	operator;
 	char *	price;
+	char *	zone;
+	char *	opinion;
 	int	ceiling;
-	int	floor;
+	int	offered;
 	int	reserved;
 	int	consumed;
 	int	status;

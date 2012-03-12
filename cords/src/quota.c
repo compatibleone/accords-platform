@@ -43,6 +43,10 @@ public struct cords_quota * liberate_cords_quota(struct cords_quota * sptr)
 			 sptr->operator = liberate(sptr->operator);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
+		if ( sptr->zone )
+			 sptr->zone = liberate(sptr->zone);
+		if ( sptr->opinion )
+			 sptr->opinion = liberate(sptr->opinion);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_quota *) 0);
@@ -61,8 +65,10 @@ public struct cords_quota * reset_cords_quota(struct cords_quota * sptr)
 		sptr->description = (char*) 0;
 		sptr->operator = (char*) 0;
 		sptr->price = (char*) 0;
+		sptr->zone = (char*) 0;
+		sptr->opinion = (char*) 0;
 		sptr->ceiling =  0;
-		sptr->floor =  0;
+		sptr->offered =  0;
 		sptr->reserved =  0;
 		sptr->consumed =  0;
 		sptr->status =  0;
@@ -112,13 +118,21 @@ public int xmlin_cords_quota(struct cords_quota * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"zone") ))
+		{
+			if ( wptr->value ) { sptr->zone = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"opinion") ))
+		{
+			if ( wptr->value ) { sptr->opinion = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"ceiling") ))
 		{
 			if ( wptr->value ) { sptr->ceiling = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"floor") ))
+		else if (!( strcmp(wptr->name,"offered") ))
 		{
-			if ( wptr->value ) { sptr->floor = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->offered = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"reserved") ))
 		{
@@ -151,8 +165,10 @@ public int rest_occi_cords_quota(FILE * fh,struct cords_quota * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.opinion='%s'\r\n",prefix,nptr,(sptr->opinion?sptr->opinion:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.ceiling='%u'\r\n",prefix,nptr,sptr->ceiling);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.floor='%u'\r\n",prefix,nptr,sptr->floor);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.offered='%u'\r\n",prefix,nptr,sptr->offered);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reserved='%u'\r\n",prefix,nptr,sptr->reserved);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.consumed='%u'\r\n",prefix,nptr,sptr->consumed);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);

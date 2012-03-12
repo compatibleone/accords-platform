@@ -144,10 +144,14 @@ private void autoload_cords_quota_nodes() {
 				pptr->operator = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
+				pptr->zone = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "opinion" )) != (struct xml_atribut *) 0)
+				pptr->opinion = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "ceiling" )) != (struct xml_atribut *) 0)
 				pptr->ceiling = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "floor" )) != (struct xml_atribut *) 0)
-				pptr->floor = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "offered" )) != (struct xml_atribut *) 0)
+				pptr->offered = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "reserved" )) != (struct xml_atribut *) 0)
 				pptr->reserved = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "consumed" )) != (struct xml_atribut *) 0)
@@ -193,11 +197,17 @@ public  void autosave_cords_quota_nodes() {
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," zone=%c",0x0022);
+		fprintf(h,"%s",(pptr->zone?pptr->zone:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," opinion=%c",0x0022);
+		fprintf(h,"%s",(pptr->opinion?pptr->opinion:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," ceiling=%c",0x0022);
 		fprintf(h,"%u",pptr->ceiling);
 		fprintf(h,"%c",0x0022);
-		fprintf(h," floor=%c",0x0022);
-		fprintf(h,"%u",pptr->floor);
+		fprintf(h," offered=%c",0x0022);
+		fprintf(h,"%u",pptr->offered);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," reserved=%c",0x0022);
 		fprintf(h,"%u",pptr->reserved);
@@ -237,10 +247,14 @@ private void set_cords_quota_field(
 			pptr->operator = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "zone" ) ))
+			pptr->zone = allocate_string(vptr);
+		if (!( strcmp( nptr, "opinion" ) ))
+			pptr->opinion = allocate_string(vptr);
 		if (!( strcmp( nptr, "ceiling" ) ))
 			pptr->ceiling = atoi(vptr);
-		if (!( strcmp( nptr, "floor" ) ))
-			pptr->floor = atoi(vptr);
+		if (!( strcmp( nptr, "offered" ) ))
+			pptr->offered = atoi(vptr);
 		if (!( strcmp( nptr, "reserved" ) ))
 			pptr->reserved = atoi(vptr);
 		if (!( strcmp( nptr, "consumed" ) ))
@@ -306,8 +320,22 @@ private int pass_cords_quota_filter(
 		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
+	if (( fptr->zone )
+	&&  (strlen( fptr->zone ) != 0)) {
+		if (!( pptr->zone ))
+			return(0);
+		else if ( strcmp(pptr->zone,fptr->zone) != 0)
+			return(0);
+		}
+	if (( fptr->opinion )
+	&&  (strlen( fptr->opinion ) != 0)) {
+		if (!( pptr->opinion ))
+			return(0);
+		else if ( strcmp(pptr->opinion,fptr->opinion) != 0)
+			return(0);
+		}
 	if (( fptr->ceiling ) && ( pptr->ceiling != fptr->ceiling )) return(0);
-	if (( fptr->floor ) && ( pptr->floor != fptr->floor )) return(0);
+	if (( fptr->offered ) && ( pptr->offered != fptr->offered )) return(0);
 	if (( fptr->reserved ) && ( pptr->reserved != fptr->reserved )) return(0);
 	if (( fptr->consumed ) && ( pptr->consumed != fptr->consumed )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
@@ -338,10 +366,16 @@ private struct rest_response * cords_quota_occi_response(
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.zone=%s",optr->domain,optr->id,pptr->zone);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.opinion=%s",optr->domain,optr->id,pptr->opinion);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.ceiling=%u",optr->domain,optr->id,pptr->ceiling);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.floor=%u",optr->domain,optr->id,pptr->floor);
+	sprintf(cptr->buffer,"%s.%s.offered=%u",optr->domain,optr->id,pptr->offered);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.reserved=%u",optr->domain,optr->id,pptr->reserved);
@@ -765,9 +799,13 @@ public struct occi_category * occi_cords_quota_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "zone",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "opinion",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "ceiling",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "floor",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "offered",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "reserved",0,0) ))
 			return(optr);
@@ -854,6 +892,28 @@ public struct rest_header *  cords_quota_occi_headers(struct cords_quota * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_quota.zone='%s'\r\n",(sptr->zone?sptr->zone:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_quota.opinion='%s'\r\n",(sptr->opinion?sptr->opinion:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_quota.ceiling='%u'\r\n",sptr->ceiling);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -865,7 +925,7 @@ public struct rest_header *  cords_quota_occi_headers(struct cords_quota * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_quota.floor='%u'\r\n",sptr->floor);
+	sprintf(buffer,"occi.cords_quota.offered='%u'\r\n",sptr->offered);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
