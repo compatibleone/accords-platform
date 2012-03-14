@@ -422,7 +422,7 @@ public	int	create_opennebula_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.networks = on_list_images() ))
+	else if (!( contract.images = on_list_images() ))
 		return( terminate_opennebula_contract( 585, &contract ) );
 	else if (!( pptr->image = resolve_opennebula_image( &contract ) ))
 		return( terminate_opennebula_contract( 586, &contract ) );
@@ -431,7 +431,7 @@ public	int	create_opennebula_contract(
 	/* --------------------------------------- */
 	/* retrieve the public network information */
 	/* --------------------------------------- */
-	else if (!( contract.flavors = on_list_network_pool() ))
+	else if (!( contract.networks = on_list_network_pool() ))
 		return( terminate_opennebula_contract( 587, &contract ) );
 	else if (!( pptr->publicnetwork = resolve_opennebula_network( &contract ) ))
 		return( terminate_opennebula_contract( 588, &contract ) );
