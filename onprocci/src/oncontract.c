@@ -212,6 +212,35 @@ private	char *	opennebula_image_id( char * href )
 	}
 }
 
+/*	---------------------------------------------------	*/
+/*		o p e n n e b u l a _ n e t w o r k _ i d	*/
+/*	---------------------------------------------------	*/
+private	char *	opennebula_network_id( char * href )
+{
+	struct	url * uptr;
+	char *	result;
+	if (!( href ))
+		return( href );
+	else if (!( uptr = analyse_url( href ) ))
+		return( liberate( href ) );
+	else if (!( uptr->object ))
+	{
+		uptr = liberate_url( uptr );
+		return( liberate( href ) );
+	}
+	else if (!( result = allocate_string( uptr->object ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( liberate( href ) );
+	}
+	else
+	{
+		uptr = liberate_url( uptr );
+		href = liberate( href );
+		return( result );
+	}
+}
+
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ o p e n n e b u l a _ n e t w o r k 		*/
 /*	-----------------------------------------------------------------	*/
@@ -219,6 +248,7 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 {
 	struct	on_network_infos	request;
 	struct	on_network_infos	infos;
+	struct	on_network_infos	best;
 
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
@@ -233,18 +263,19 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 	/* retrieve appropriate parameters from node network components */
 	/* ------------------------------------------------------------ */
 
-	else if (!( vptr = cords_extract_atribut( cptr->system.message, "occi", 
+	else if (!( vptr = cords_extract_atribut( cptr->network.message, "occi", 
 		_CORDS_NETWORK, _CORDS_NAME ) ))
 		return((char *) 0);
 	else if (!( request.name = occi_unquoted_value( vptr ) ))
 		return((char *) 0);
 
-	memset( &infos, 0, sizeof( struct on_network_infos ));
+	memset( &best, 0, sizeof( struct on_network_infos ));
 
 	for ( 	dptr=eptr->first;
 		dptr != (struct xml_element *) 0;
 		dptr = dptr->next )
 	{
+		memset( &infos, 0, sizeof( struct on_network_infos ));
 		if (!( aptr = document_atribut( dptr, "href" ) ))
 			continue;
 		else 	infos.href = occi_unquoted_value( aptr->value );
@@ -255,11 +286,9 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 
 		if (!( strncasecmp( infos.name, request.name, strlen( request.name ) ) ))
 		{
-			vptr = allocate_string( infos.href );
-			liberate( infos.href );
-			liberate( infos.name );
-			liberate( request.name );
-			return( vptr );
+			best.href = infos.href;
+			best.name = infos.name;
+			break;
 		}
 		else
 		{
@@ -268,6 +297,11 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 		}
 	}
 	liberate( request.name );
+	if ( best.name )
+		best.name = liberate( best.name );
+	if (!( best.href ))
+		return( best.href );
+	else 	return( opennebula_network_id( best.href ) );
 	return((char *) 0);
 }
 

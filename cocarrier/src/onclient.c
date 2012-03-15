@@ -225,6 +225,9 @@ public	char * on_create_storage_request(
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ c o m p u t e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
+/*	this function creates an xml file containing the compute create		*/
+/*	request providing the flavor, image and network description.		*/
+/*	----------------------------------------------------------------	*/
 public	char * on_create_compute_request(
 		char * identity, 
 		char * flavour, 
@@ -254,11 +257,20 @@ public	char * on_create_compute_request(
 		fprintf(h,"<COMPUTE>\n");
 		fprintf(h,"<NAME>%s</NAME>\n",identity);
 		fprintf(h,"<INSTANCE_TYPE>%s</INSTANCE_TYPE>\n",flavour);
+
 		fprintf(h,"<STATE>running</STATE>\n");
+
+		/* -------------------------------------------- */
+		/* specify the base operating system disk image */
+		/* -------------------------------------------- */
 		fprintf(h,"<DISK>\n");
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		fprintf(h,"</DISK>\n");
+
+		/* ------------------------------ */
+		/* 64 bit architecture is crucial */
+		/* ------------------------------ */
 		fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
 		if ( (On.version) && ( atoi( On.version ) >= 5 ))
 		{
@@ -267,25 +279,38 @@ public	char * on_create_compute_request(
 			/* ----------------------------------- */
 			fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
 		}
+		/* -------------------------------------- */
+		/* a local address must always be present */
+		/* -------------------------------------- */
 		if ( local )
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",local);
 			fprintf(h,"</NIC>\n");
 		}
+		else
+		{
+			/* ------------- */
+			/* default local */
+			/* ------------- */
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n","1");
+			fprintf(h,"</NIC>\n");
+		}
+
+		/* -------------------------------------- */
+		/* a second public address may be present */
+		/* -------------------------------------- */
 		if ( network )
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
 			fprintf(h,"</NIC>\n");
 		}
-		if (!( local ))
-		{
-			fprintf(h,"<NIC>\n");
-			fprintf(h,"<NETWORK href='%s'/>\n","1");
-			fprintf(h,"</NIC>\n");
-		}
 
+		/* ----------------------------------------------- */
+		/* a stanhdard graphical interface would be useful */
+		/* ----------------------------------------------- */
 		fprintf(h,"<GRAPHICS>\n");
 		fprintf(h,"<TYPE>vnc</TYPE>\n");
 		fprintf(h,"<PORT>-1</PORT>\n");

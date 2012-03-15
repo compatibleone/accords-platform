@@ -8,11 +8,10 @@ struct	cords_image
 	char *	name;
 	char *	system;
 	char *	price;
-	int	packages;
+	char *	application;
 	char *	created;
 	char *	updated;
-	struct	cords_package * firstpack;
-	struct	cords_package * lastpack;
+	int	packages;
 	int	state;
 };
 
