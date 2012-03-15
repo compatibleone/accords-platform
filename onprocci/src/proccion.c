@@ -385,38 +385,26 @@ private	struct	rest_response * save_opennebula(
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 
-#ifndef	_ON_PERSONALITY
-	else 	return( rest_html_response( aptr, 200, "OK" ) );
-#else
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = on_create_image_request( pptr->name, pptr->number ) ))
+	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->image ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = on_create_image( filename ) ))
+	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_opennebula_image( osptr, pptr );
 		osptr = liberate_on_response( osptr );
-		if (!( status ))
-		{
-			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-			if (!( on_valid_price( pptr->price ) ))
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else	return( rest_html_response( aptr, 200, "OK" ) );
-		}
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		if (!( on_valid_price( pptr->price ) ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
-#endif
 }
 
 /*	-------------------------------------------	*/
-/* 	    s n a p s h o t _ o p e n n e b u l a  	*/
+/* 	      s a v e  _ o p e n n e b u l a	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * snapshot_opennebula(
 		struct occi_category * optr, 
@@ -435,34 +423,22 @@ private	struct	rest_response * snapshot_opennebula(
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 
-#ifndef	_ON_PERSONALITY
-	else 	return( rest_html_response( aptr, 200, "OK" ) );
-#else
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = on_create_image_request( pptr->name, pptr->number ) ))
+	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->image ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = on_create_image( filename ) ))
+	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_opennebula_image( osptr, pptr );
 		osptr = liberate_on_response( osptr );
-		if (!( status ))
-		{
-			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-			if (!( on_valid_price( pptr->price ) ))
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else	return( rest_html_response( aptr, 200, "OK" ) );
-		}
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		if (!( on_valid_price( pptr->price ) ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
-#endif
 }
 
 /*	--------------------------------------------------------	*/

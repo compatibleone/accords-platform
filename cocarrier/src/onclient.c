@@ -297,6 +297,54 @@ public	char * on_create_compute_request(
 		return( filename );
 	}
 }
+/*	----------------------------------------------------------------	*/
+/*	 	o n _ c r e a t e _ i m a g e _ r e q u e s t			*/
+/*	----------------------------------------------------------------	*/
+public	char * on_create_image_request(
+		char * number,
+		char * oldnumber,
+		char * newname
+		)
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		/* ----------------------------------------- */
+		/* generate image creation request element */
+		/* ----------------------------------------- */
+		fprintf(h,"<COMPUTE href='%s/compute/%s'>\n",On.base,number);
+		fprintf(h,"<ID>%s</ID>\n",number);
+		fprintf(h,"<DISK id='0'");
+		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",oldnumber);
+		fprintf(h,"<SAVE_AS name='%s'/>\n",newname);
+		fprintf(h,"</DISK>\n");
+		fprintf(h,"</COMPUTE>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ c r e a t e _ i m a g e 				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_create_image( char * id, char * filename ) 
+{ 
+	char 	buffer[2048];
+	sprintf(buffer,"/compute/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
 
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ s e r v e r _ r e q u e s t			*/

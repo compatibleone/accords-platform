@@ -26,6 +26,13 @@ struct	on_response
 
 #define	_ON_NS_COMPUTE	"http://docs.opennebula.org/compute/api/"
 
+public	struct	on_response *	on_create_image( char * id, char * filename );
+
+public	char * on_create_image_request(
+		char * number,
+		char * oldnumber,
+		char * newname
+		);
 
 public	char * on_create_server_request(
 	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * personality, char * resource );
