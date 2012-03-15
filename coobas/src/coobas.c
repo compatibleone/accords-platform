@@ -240,21 +240,21 @@ private	void	invoice_document_transaction(
 	else	klass = "evenrow";
 	fprintf(h,"<tr class='%s'>",klass);
 	fprintf(h,"<th><a href='%s'>%u</a><th> \n",transaction,pptr->transactions);
-	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"when")))
+	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"when")))
 		fprintf(h,"%s",vptr);
 	fprintf(h,"<th><a href='%s'>",transaction);
-	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"source")))
+	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"source")))
 		fprintf(h,"%s",vptr);
-	if (( vptr = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"description")))
+	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"description")))
 		fprintf(h," %s",vptr);
 	fprintf(h,"</a></th>\n");
 	fprintf(h,"<th><a href='%s'>\n",price);
-	if (( vptr = cords_extract_atribut( zptr, "occi", _CORDS_PRICE,"rate")))
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PRICE,"rate")))
 	{
 		fprintf(h,"%s ",vptr);
 		update_invoice_total( pptr, vptr );
 	}
-	if (( vptr = cords_extract_atribut( zptr, "occi", _CORDS_PRICE,"currency")))
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PRICE,"currency")))
 		fprintf(h," %s",vptr);
 	fprintf(h,"</a></th></tr>\n");
 	return;
@@ -331,7 +331,7 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		/* ------------------------------ */
 		/* retrieve the price information */
 		/* ------------------------------ */
-		else if (!( price = cords_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,_CORDS_PRICE)))
+		else if (!( price = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,_CORDS_PRICE)))
 		{
 			yptr = occi_remove_response( yptr );
 			liberate(host);

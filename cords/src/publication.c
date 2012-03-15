@@ -35,6 +35,8 @@ public struct publication * liberate_publication(struct publication * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->remote )
+			 sptr->remote = liberate(sptr->remote);
 		if ( sptr->what )
 			 sptr->what = liberate(sptr->what);
 		if ( sptr->where )
@@ -71,6 +73,7 @@ public struct publication * reset_publication(struct publication * sptr)
 		sptr->previous = (struct publication*) 0;
 		sptr->next = (struct publication*) 0;
 		sptr->id = (char*) 0;
+		sptr->remote = (char*) 0;
 		sptr->what = (char*) 0;
 		sptr->where = (char*) 0;
 		sptr->why = (char*) 0;
@@ -114,6 +117,10 @@ public int xmlin_publication(struct publication * sptr,struct xml_element * eptr
 		if (!( strcmp(wptr->name,"id") ))
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"remote") ))
+		{
+			if ( wptr->value ) { sptr->remote = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"what") ))
 		{
@@ -186,6 +193,7 @@ public int rest_occi_publication(FILE * fh,struct publication * sptr,char * pref
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.remote='%s'\r\n",prefix,nptr,(sptr->remote?sptr->remote:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.what='%s'\r\n",prefix,nptr,(sptr->what?sptr->what:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.where='%s'\r\n",prefix,nptr,(sptr->where?sptr->where:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.why='%s'\r\n",prefix,nptr,(sptr->why?sptr->why:""));

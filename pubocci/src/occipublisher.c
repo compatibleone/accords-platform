@@ -117,7 +117,7 @@ private	char * 	cords_consumer_publication(
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
-	else if (!( ihost = cords_extract_location( yptr ) ))
+	else if (!( ihost = occi_extract_location( yptr ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -188,7 +188,7 @@ private	char * 	cords_provider_publication(
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
-	else if (!( ihost = cords_extract_location( yptr ) ))
+	else if (!( ihost = occi_extract_location( yptr ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );

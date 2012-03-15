@@ -22,7 +22,7 @@
 
 #include "occiclient.h"
 
-public	char *	cords_extract_atribut( 
+public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
 	char * category, char * nptr );
 
@@ -152,22 +152,22 @@ private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
 	/* -------------------------------------------------------------- */
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
 	else	request.memory = on_normalise_value( vptr,'G' );
 
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_CORES ) ))
 		request.cores = 0;
 	else	request.cores = on_normalise_value( vptr,'U' );
 
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_SPEED ) ))
 		request.speed = 0;
 	else	request.speed = on_normalise_value(vptr,'G');
 	
-	if (!( vptr = cords_extract_atribut( cptr->storage.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
 	else	request.storage = on_normalise_value(vptr,'G');
@@ -263,7 +263,7 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 	/* retrieve appropriate parameters from node network components */
 	/* ------------------------------------------------------------ */
 
-	else if (!( vptr = cords_extract_atribut( cptr->network.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( cptr->network.message, "occi", 
 		_CORDS_NETWORK, _CORDS_NAME ) ))
 		return((char *) 0);
 	else if (!( request.name = occi_unquoted_value( vptr ) ))
@@ -326,12 +326,12 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
 	/* ---------------------------------------------------------- */
-	if (!( vptr = cords_extract_atribut( cptr->system.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->system.message, "occi", 
 		_CORDS_SYSTEM, _CORDS_NAME ) ))
 		return((char *) 0);
 	else	request.name = vptr;
 
-	if (!( vptr = cords_extract_atribut( cptr->image.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_NAME ) ))
 		return((char *) 0);
 	else	request.other = vptr;
@@ -406,25 +406,25 @@ public	int	create_opennebula_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
-	else if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
+	else if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_opennebula_contract( 571, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
 		return( terminate_opennebula_contract( 572, &contract ) );
 
-	else if (!( contract.compute.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.compute.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
 		return( terminate_opennebula_contract( 573, &contract ) );
 	else if (!( contract.compute.message = occi_simple_get( contract.compute.id, agent, tls ) ))
 		return( terminate_opennebula_contract( 574, &contract ) );
 
-	else if (!( contract.network.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.network.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
 		return( terminate_opennebula_contract( 575, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
 		return( terminate_opennebula_contract( 576, &contract ) );
 
-	else if (!( contract.storage.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.storage.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
 		return( terminate_opennebula_contract( 577, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
@@ -441,13 +441,13 @@ public	int	create_opennebula_contract(
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
-	if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
+	if (!( contract.image.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
 		return( terminate_opennebula_contract( 581, &contract ) );
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
 		return( terminate_opennebula_contract( 582, &contract ) );
 
-	else if (!( contract.system.id = cords_extract_atribut( contract.image.message, "occi", 
+	else if (!( contract.system.id = occi_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
 		return( terminate_opennebula_contract( 583, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))

@@ -136,6 +136,8 @@ private void autoload_publication_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "remote" )) != (struct xml_atribut *) 0)
+				pptr->remote = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "what" )) != (struct xml_atribut *) 0)
 				pptr->what = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "where" )) != (struct xml_atribut *) 0)
@@ -190,6 +192,9 @@ public  void autosave_publication_nodes() {
 		fprintf(h,"<publication\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," remote=%c",0x0022);
+		fprintf(h,"%s",(pptr->remote?pptr->remote:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," what=%c",0x0022);
 		fprintf(h,"%s",(pptr->what?pptr->what:""));
@@ -254,6 +259,8 @@ private void set_publication_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "remote" ) ))
+			pptr->remote = allocate_string(vptr);
 		if (!( strcmp( nptr, "what" ) ))
 			pptr->what = allocate_string(vptr);
 		if (!( strcmp( nptr, "where" ) ))
@@ -311,6 +318,13 @@ private int pass_publication_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
+			return(0);
+		}
+	if (( fptr->remote )
+	&&  (strlen( fptr->remote ) != 0)) {
+		if (!( pptr->remote ))
+			return(0);
+		else if ( strcmp(pptr->remote,fptr->remote) != 0)
 			return(0);
 		}
 	if (( fptr->what )
@@ -400,6 +414,9 @@ private struct rest_response * publication_occi_response(
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.remote=%s",optr->domain,optr->id,pptr->remote);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.what=%s",optr->domain,optr->id,pptr->what);
@@ -839,7 +856,7 @@ private void	redirect_occi_publication_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_publication */
-public struct occi_category * occi_cords_publication_builder(char * a,char * b) {
+public struct occi_category * occi_publication_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -848,6 +865,8 @@ public struct occi_category * occi_cords_publication_builder(char * a,char * b) 
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_publication_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "remote",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "what",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "where",0,0) ))
@@ -901,6 +920,17 @@ public struct rest_header *  publication_occi_headers(struct publication * sptr)
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
 	sprintf(buffer,"publication; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.publication.remote='%s'\r\n",(sptr->remote?sptr->remote:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

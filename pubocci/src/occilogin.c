@@ -57,7 +57,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 			uptr = occi_remove_response( uptr );
 			return((char *) 0);
 		}
-		else if (!( vptr = cords_extract_location( yptr ) ))
+		else if (!( vptr = occi_extract_location( yptr ) ))
 		{
 			uptr = occi_remove_response( uptr );
 			yptr = occi_remove_response( yptr );

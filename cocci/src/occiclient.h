@@ -86,6 +86,7 @@ public	struct	occi_request  *	occi_remove_request( struct occi_request * rptr );
 public	struct	occi_request  *	occi_set_request_account( struct occi_request * rptr, char * account );
 public	struct	occi_response *	occi_simple_get( char * reference, char * agent, char * tls );
 public	struct	occi_response *	occi_simple_put(char * reference, struct occi_element * eptr, char * agent, char * tls );
+public	struct	occi_response *	occi_simple_post(char * reference, struct occi_element * eptr, char * agent, char * tls );
 public	struct	occi_response *	occi_simple_delete( char * reference, char * agent, char * tls );
 public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct occi_request * rptr );
 public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct occi_request * rptr );
@@ -104,6 +105,11 @@ public	struct	occi_element  *	occi_request_from_response(struct occi_request * q
 public	struct	rest_header   * occi_client_authentication( char * aptr );
 public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
+public  char *	occi_extract_location( struct occi_response * rptr );
+public	char *	occi_extract_atribut( 
+	struct occi_response * zptr, char * domain,
+	char * category, char * nptr );
+
 
 #endif 	/* _occi_client_h */
 	/* -------------- */

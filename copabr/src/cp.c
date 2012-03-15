@@ -126,35 +126,6 @@ private	int	cords_append_choices( struct occi_response * rptr, struct xml_elemen
 	}
 }
 
-/*	---------------------------------------------------	*/
-/*	    c o r d s _ e x t r a c t _ l o c a t i o n		*/
-/*	---------------------------------------------------	*/
-/*	this function will scan the element list of an occi	*/
-/*	response and will extract the first "location" item	*/
-/*	encountered. If no element list is available then	*/
-/*	the header list of the eventual rest response will	*/
-/*	be scanned for X-OCCI-Location fields. The first	*/
-/*	one encountered will be returned.			*/
-/*	---------------------------------------------------	*/
-public  char *	cords_extract_location( struct occi_response * rptr )
-{
-	struct	rest_response * aptr;
-	struct	occi_element  * eptr;
-	struct	rest_header   * hptr;
-	if (!( aptr = rptr->response ))
-	{
-		for (	eptr = rptr->first;
-			eptr != (struct occi_element *) 0;
-			eptr = eptr->next )
-			if (!( strcmp( eptr->name, "location" )))
-				return( eptr->value );
-		return((char *) 0);
-	}
-	else if (!( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION ) ))
-		return((char *) 0);
-	else	return( hptr->value );
-}
-
 /*	-------------------------------------------------------------------	*/
 /*	c o r d s _ r e t r i e v e _ n a m e d _ i n s t a n c e _ l i s t	*/
 /*	-------------------------------------------------------------------	*/
@@ -420,7 +391,7 @@ public	int	cords_resolve_location( struct occi_response * zptr, struct xml_eleme
 	char	buffer[8192];
 	if ( cords_count_locations( zptr ) > 1 )
 		return( cords_append_choices( zptr, document ) );
-	else if (!( vptr = cords_extract_location( zptr ) ))
+	else if (!( vptr = occi_extract_location( zptr ) ))
 		return(713);
 	else if (!( vptr = occi_category_id( vptr ) ))
 		return(714);
@@ -451,7 +422,7 @@ private	int	cords_resolve_last_location( struct occi_response * zptr, struct xml
 	char	buffer[8192];
 	if ( cords_count_locations( zptr ) > 1 )
 		vptr = allocate_string( zptr->last->value );
-	else if (!( vptr = cords_extract_location( zptr ) ))
+	else if (!( vptr = occi_extract_location( zptr ) ))
 		return(713);
 
 	if (!( vptr = occi_category_id( vptr ) ))
@@ -488,7 +459,7 @@ private	int	cords_perform_stitchup(
 	char	buffer[8192];
 	if ( cords_count_locations( zptr ) > 1 )
 		return( cords_append_choices( zptr, document ) );
-	else if (!( vptr = cords_extract_location( zptr ) ))
+	else if (!( vptr = occi_extract_location( zptr ) ))
 		return(713);
 	else if (!( vptr = occi_category_id( vptr ) ))
 		return(714);
@@ -1376,7 +1347,7 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 			liberate( pptr );
 			return( 0 );
 		}
-		else if (!( host = cords_extract_location( zptr ) ))
+		else if (!( host = occi_extract_location( zptr ) ))
 		{
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );

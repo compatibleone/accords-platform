@@ -223,7 +223,7 @@ private char *	build_application_node(char * image, char * provider )
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
-	else if (!( vptr = cords_extract_location( yptr ) ))
+	else if (!( vptr = occi_extract_location( yptr ) ))
 	{
 		uptr = occi_remove_response( uptr );
 		yptr = occi_remove_response( yptr );
@@ -316,11 +316,11 @@ private	char * 	install_application_package( char * cosacs , char * package )
 	/* ---------------------------- */
 	if (!( zptr = occi_simple_get( package, _CORDS_SERVICE_AGENT, default_tls() ) ))
 		return( (char * )0 );
-	else if (!( vptr = cords_extract_atribut( zptr, "occi","package", "installation" )))
+	else if (!( vptr = occi_extract_atribut( zptr, "occi","package", "installation" )))
 		return( (char * )0 );
 	else if ((status = cosacs_create_script( cosacs, _COSACS_RUN, vptr, type )) != 0)
 		return( (char * )0 );
-	else if (!( vptr = cords_extract_atribut( zptr, "occi", "package", "configuration" )))
+	else if (!( vptr = occi_extract_atribut( zptr, "occi", "package", "configuration" )))
 		return( (char * )0 );
 	else if ((status = cosacs_create_script( cosacs, _COSACS_RUN, vptr, type )) != 0)
 		return( (char *) 0 );
@@ -495,7 +495,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 					/* --------------------------- */
 					if (!( wptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
 						return( 803 );
-					else if (!( vptr = cords_extract_atribut( wptr, "occi","contract", "hostname" )))
+					else if (!( vptr = occi_extract_atribut( wptr, "occi","contract", "hostname" )))
 						return( 804 );
 					else if (!( cosacs = allocate_string( vptr ) ))
 						return( 805 );

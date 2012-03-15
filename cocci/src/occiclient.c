@@ -303,6 +303,64 @@ public	struct	occi_request  *	occi_remove_request( struct occi_request * rptr )
 	return((struct occi_request *) 0);
 }
 
+/*	-------------------------------------------------------		*/
+/*		o c c i _ e x t r a c t _ a t r i b u t			*/
+/*	-------------------------------------------------------		*/
+public	char *	occi_extract_atribut( 
+		struct occi_response * zptr, 
+		char * domain,
+		char * category,
+		char * nptr )
+{
+	char	buffer[2048];
+	sprintf(buffer,"%s.%s.%s",domain,category,nptr);
+	struct	occi_element * eptr;
+	for (	eptr = zptr->first;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if ( strcmp( eptr->name, buffer ) )
+			continue;
+		else if (!( eptr->value ))
+			break;
+		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+			break;
+		else	return( occi_unquoted_value( eptr->value ) );
+	}
+	return((char*) 0);
+}
+
+/*	---------------------------------------------------	*/
+/*	     o c c i _ e x t r a c t _ l o c a t i o n		*/
+/*	---------------------------------------------------	*/
+/*	this function will scan the element list of an occi	*/
+/*	response and will extract the first "location" item	*/
+/*	encountered. If no element list is available then	*/
+/*	the header list of the eventual rest response will	*/
+/*	be scanned for X-OCCI-Location fields. The first	*/
+/*	one encountered will be returned.			*/
+/*	---------------------------------------------------	*/
+public  char *	occi_extract_location( struct occi_response * rptr )
+{
+	struct	rest_response * aptr;
+	struct	occi_element  * eptr;
+	struct	rest_header   * hptr;
+	if (!( aptr = rptr->response ))
+	{
+		for (	eptr = rptr->first;
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
+			if (!( strcmp( eptr->name, "location" )))
+				return( eptr->value );
+		return((char *) 0);
+	}
+	else if (!( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION ) ))
+		return((char *) 0);
+	else	return( hptr->value );
+}
+
 /*	------------------------------------------------------------	*/
 /*	     o c c i _ s e t _ r e q u e s t _ a c c o u n t		*/
 /*	------------------------------------------------------------	*/
@@ -1295,6 +1353,40 @@ public	struct	occi_response *	occi_simple_put(
 			break;
 
 	if (!( zptr = occi_client_put ( cptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( zptr );
+	}
+	else
+	{
+		qptr = occi_remove_request( qptr );
+		return( zptr );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		     o c c i _ s i m p l e _ p o s t 			*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_simple_post( 
+	char * reference, struct occi_element * eptr, char * agent, char * tls )
+{	
+	struct	occi_element 	* fptr;
+	struct	occi_client  	* cptr;
+	struct 	occi_request  	* qptr;
+	struct 	occi_response 	* zptr=(struct occi_response *) 0;
+
+	if (!( cptr = occi_create_client( reference, agent, tls ) ))
+	 	return((struct occi_response *) 0);
+	else if (!( qptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+	 	return((struct occi_response *) 0);
+
+	for (	;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+		if (!( fptr = occi_request_element( qptr, eptr->name, eptr->value ) ))
+			break;
+
+	if (!( zptr = occi_client_post ( cptr, qptr ) ))
 	{
 		qptr = occi_remove_request( qptr );
 		return( zptr );

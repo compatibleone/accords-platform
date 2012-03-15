@@ -27,7 +27,7 @@
 #include "cp.h"
 #include "cb.h"
 
-public	char *	cords_extract_atribut( 
+public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
 	char * category, char * nptr );
 
@@ -671,7 +671,7 @@ private	int	conets_access_address( struct openstack * pptr )
 	{
 		return( 1003 );
 	}
-	else if (!( vptr = cords_extract_location( yptr ) ))
+	else if (!( vptr = occi_extract_location( yptr ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		return( 1004 );
@@ -687,7 +687,7 @@ private	int	conets_access_address( struct openstack * pptr )
 		yptr = occi_remove_response( yptr );
 		if (!( yptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			return( 1006 );
-		else if (!( vptr = cords_extract_atribut( 
+		else if (!( vptr = occi_extract_atribut( 
 					yptr, "occi", _CORDS_IPADDRESS, "value" ) ))
 		{
 			yptr = occi_remove_response( yptr );

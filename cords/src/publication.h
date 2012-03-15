@@ -6,6 +6,7 @@ struct	publication
 	struct	publication	* previous;
 	struct	publication	* next;
 	char *	id;
+	char *	remote;
 	char *	what;
 	char *	where;
 	char *	why;

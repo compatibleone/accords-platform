@@ -150,35 +150,6 @@ private	struct	occi_response * cords_retrieve_instance(
 }
 
 /*	-------------------------------------------------------		*/
-/*		c o r d s _ e x t r a c t _ a t r i b u t		*/
-/*	-------------------------------------------------------		*/
-public	char *	cords_extract_atribut( 
-		struct occi_response * zptr, 
-		char * domain,
-		char * category,
-		char * nptr )
-{
-	char	buffer[2048];
-	sprintf(buffer,"%s.%s.%s",domain,category,nptr);
-	struct	occi_element * eptr;
-	for (	eptr = zptr->first;
-		eptr != (struct occi_element *) 0;
-		eptr = eptr->next )
-	{
-		if (!( eptr->name ))
-			continue;
-		else if ( strcmp( eptr->name, buffer ) )
-			continue;
-		else if (!( eptr->value ))
-			break;
-		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
-			break;
-		else	return( occi_unquoted_value( eptr->value ) );
-	}
-	return((char*) 0);
-}
-	
-/*	-------------------------------------------------------		*/
 /*		    c o r d s _ e x t r a c t _ l i n k			*/
 /*	-------------------------------------------------------		*/
 private	struct	occi_element * 	cords_extract_link( struct occi_element * eptr )
@@ -426,7 +397,7 @@ private	int	cords_affectation_instruction(
 			liberate_cordscript_action( action );
 			return(52);
 		}
-		else if (!( ihost = cords_extract_location( yptr ) ))
+		else if (!( ihost = occi_extract_location( yptr ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -556,7 +527,7 @@ private	int	cords_invocation_instruction(
 			liberate_cordscript_action( action );
 			return(52);
 		}
-		else if (!( ihost = cords_extract_location( yptr ) ))
+		else if (!( ihost = occi_extract_location( yptr ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -680,7 +651,7 @@ private	int	cords_interface_instruction(
 		liberate_cordscript_action( action );
 		return(52);
 	}
-	else if (!( ihost = cords_extract_location( yptr ) ))
+	else if (!( ihost = occi_extract_location( yptr ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -842,7 +813,7 @@ private	int	cords_action_instruction(
 			symbol = liberate( symbol );
 			return(52);
 		}
-		else if (!( ihost = cords_extract_location( yptr ) ))
+		else if (!( ihost = occi_extract_location( yptr ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -887,11 +858,11 @@ private	int	cords_configuration_action(
 	char *	statement=(char *) 0;
 	struct	cordscript_action * aptr=(struct cordscript_action*) 0;
 
-	if (!( statement = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
+	if (!( statement = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
 	{
 		return( 78 );
 	}
-	else if (!( type = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
+	else if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
 
 	if (!( strcmp( type, "cordscript" )))
@@ -919,11 +890,11 @@ private	int	cords_interface_action(
 	char *	statement=(char *) 0;
 	struct	cordscript_action * aptr=(struct cordscript_action*) 0;
 
-	if (!( statement = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
+	if (!( statement = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
 		return( 78 );
-	if (!( type = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
+	if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
-	if (!( name = cords_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_NAME ) ))
+	if (!( name = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_NAME ) ))
 		name = allocate_string("method");
 
 	if (!( strcmp( type, "cordscript" )))
@@ -1209,7 +1180,7 @@ private	char * 	cords_create_provider( struct xml_element * dptr , char * agent,
 	/* --------------------- */
 	/* return the identifier */
 	/* --------------------- */
-	else if (!( host = cords_extract_location( yptr ) ))
+	else if (!( host = occi_extract_location( yptr ) ))
 		return((char *) 0);
 	else if (!( host = occi_category_id( host ) ))
 		return( host );
@@ -1298,7 +1269,7 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!( id = cords_extract_location( yptr ) ))
+			else if (!( id = occi_extract_location( yptr ) ))
 			{
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
@@ -1312,7 +1283,7 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 				kptr = occi_remove_client( kptr );
 				if (!( yptr = occi_simple_get( id, agent, tls ) ))
 					continue;
-				else if (!( result = cords_extract_atribut( 
+				else if (!( result = occi_extract_atribut( 
 					yptr, Operator.domain, 
 					_CORDS_PLACEMENT, _CORDS_SOLUTION ))) 
 				{
@@ -1445,7 +1416,7 @@ private	char * 	cords_contract_provider(
 	/* --------------------- */
 	/* return the identifier */
 	/* --------------------- */
-	else if (!( host = cords_extract_location( yptr ) ))
+	else if (!( host = occi_extract_location( yptr ) ))
 		return((char *) 0);
 	else if (!( host = occi_category_id( host ) ))
 		return( host );
@@ -1634,7 +1605,7 @@ private	char *	cords_resolve_provider( struct occi_response * node, char * defau
 	/* ----------------------------------------- */
 	/* retrieve the provider information instance */
 	/* ----------------------------------------- */
-	if (!( value = cords_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROVIDER ))) 
+	if (!( value = occi_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROVIDER ))) 
 		return( cords_research_provider(defaut,agent, tls) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( cords_research_provider(defaut,agent, tls) );
@@ -1657,7 +1628,7 @@ private	char *	cords_resolve_profile( struct occi_response * node, char * defaut
 	/* ----------------------------------------- */
 	/* retrieve the provider information instance */
 	/* ----------------------------------------- */
-	if (!( value = cords_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROFILE ))) 
+	if (!( value = occi_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROFILE ))) 
 		return( allocate_string( defaut ) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( allocate_string( defaut ) );
@@ -1722,9 +1693,9 @@ private	char *	cords_instance_service( char * host, char * planid, char * agent,
 		service = (char *) 0;
 	else if (!( zptr = cords_retrieve_instance( host, plan, agent, tls )))
 		service = (char *) 0;
-	else if (!( name = cords_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_NAME ) ))
+	else if (!( name = occi_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_NAME ) ))
 		service = (char *) 0;
-	else if (!( manifest = cords_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_MANIFEST ) ))
+	else if (!( manifest = occi_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_MANIFEST ) ))
 		service = (char *) 0;
 	else	service = cords_manifest_broker( host, plan, name, manifest, agent, tls, root );
 
@@ -1851,7 +1822,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	/* ------------------------------------ */
 	/* retrieve the infrastructure instance */
 	/* ------------------------------------ */
-	if (( App->hid  = cords_extract_atribut( App->node, Operator.domain, 
+	if (( App->hid  = occi_extract_atribut( App->node, Operator.domain, 
 			_CORDS_NODE, _CORDS_INFRASTRUCTURE )) != (char *) 0)
 	{
 		if (!( App->hardware = cords_retrieve_instance( host, App->hid, agent, tls )))
@@ -1863,7 +1834,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 
 		/* retrieve the compute instance */
 		/* ----------------------------- */
-		if (( App->hid  = cords_extract_atribut( App->hardware, Operator.domain, 
+		if (( App->hid  = occi_extract_atribut( App->hardware, Operator.domain, 
 				_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE )) != (char *) 0)
 		{
 			if (!( App->compute = cords_retrieve_instance( host, App->hid, agent, tls )))
@@ -1877,7 +1848,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 
 		/* retrieve the storage instance */
 		/* ----------------------------- */
-		if (( App->hid  = cords_extract_atribut( App->hardware, Operator.domain, 
+		if (( App->hid  = occi_extract_atribut( App->hardware, Operator.domain, 
 				_CORDS_INFRASTRUCTURE, _CORDS_STORAGE )) != (char *) 0)
 		{
 			if (!( App->storage = cords_retrieve_instance( host, App->hid, agent, tls )))
@@ -1891,7 +1862,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 
 		/* retrieve the network instance */
 		/* ----------------------------- */
-		if (( App->hid  = cords_extract_atribut( App->hardware, Operator.domain, 
+		if (( App->hid  = occi_extract_atribut( App->hardware, Operator.domain, 
 				_CORDS_INFRASTRUCTURE, _CORDS_NETWORK )) != (char *) 0)
 		{
 			if (!( App->network = cords_retrieve_instance( host, App->hid, agent, tls )))
@@ -1908,7 +1879,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	/* ------------------------------------ */
 	/* retrieve the infrastructure instance */
 	/* ------------------------------------ */
-	if (( App->sid  = cords_extract_atribut( App->node, Operator.domain, 
+	if (( App->sid  = occi_extract_atribut( App->node, Operator.domain, 
 			_CORDS_NODE, _CORDS_IMAGE )) != (char *) 0)
 	{
 		if (!( App->software = cords_retrieve_instance( host, App->sid, agent, tls )))
@@ -1918,7 +1889,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 		}
 		else	App->sid = liberate( App->sid );
 
-		if (( App->sid  = cords_extract_atribut( App->software, Operator.domain, 
+		if (( App->sid  = occi_extract_atribut( App->software, Operator.domain, 
 				_CORDS_IMAGE, _CORDS_SYSTEM )) != (char *) 0)
 		{
 			if (!( App->system = cords_retrieve_instance( host, App->sid, agent, tls )))
@@ -2188,7 +2159,7 @@ private	struct	xml_element * 	cords_simple_private_common_contract(
 	/* ------------------------------------------ */
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
-	if (!( common = cords_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
+	if (!( common = occi_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
 		if (!( common = cords_build_simple_common( App, host, id, agent, tls, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
@@ -2261,7 +2232,7 @@ private	struct	xml_element * 	cords_complex_private_common_contract(
 	/* ------------------------------------------ */
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
-	if (!( common = cords_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
+	if (!( common = occi_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
 		if (!( common = cords_build_complex_common( App, host, id, agent, tls, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
@@ -2463,12 +2434,12 @@ public	struct	xml_element * cords_instance_node(
 	/* ------------------------------------------ */
 	/* retrieve the node name and type attributes */
 	/* ------------------------------------------ */
-	else if (!(App.nameApp = cords_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_NAME)))
+	else if (!(App.nameApp = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_NAME)))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
 	}
-	else if (!(App.typeApp = cords_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_TYPE)))
+	else if (!(App.typeApp = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_TYPE)))
 	{
 		if (!(App.typeApp = allocate_string(_CORDS_SIMPLE)))
 		{
@@ -2504,7 +2475,7 @@ public	struct	xml_element * cords_instance_node(
 	/* ----------------------------------------------------- */
 	/* check for scope COMMON and then access PUBLIC/PRIVATE */
 	/* ----------------------------------------------------- */
-	if ((App.scopeApp = cords_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_SCOPE)) != (char *) 0)
+	if ((App.scopeApp = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_SCOPE)) != (char *) 0)
 	{
 		if (!( strcasecmp( App.scopeApp, _CORDS_COMMON )))
 			App.scope = _SCOPE_COMMON;
@@ -2512,7 +2483,7 @@ public	struct	xml_element * cords_instance_node(
 			App.scope = _SCOPE_NORMAL;
 		else	App.scope = _SCOPE_NORMAL;
 		
-		if ((App.accessApp = cords_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_ACCESS)) != (char *) 0)
+		if ((App.accessApp = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_ACCESS)) != (char *) 0)
 		{
 			if (!( strcasecmp( App.accessApp, _CORDS_PUBLIC )))
 				App.scope |= _ACCESS_PUBLIC;
@@ -2699,19 +2670,19 @@ public	char *	cords_manifest_broker(
 	/* -------------------------------------------------- */
 	/* retrieve the account information instance and name */
 	/* -------------------------------------------------- */
-	if (( CbC.accID  = cords_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
+	if (( CbC.accID  = occi_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
 			!= (char *) 0)
 	{
 		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent, tls )))
 			return( cords_terminate_provisioning( 905, &CbC ) );
-		else if (!( CbC.accName  = cords_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+		else if (!( CbC.accName  = occi_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 			return( cords_terminate_provisioning( 905, &CbC ) );
 	}
 
 	/* ---------------------------------------- */
 	/* retrieve the security procedure instance */
 	/* ---------------------------------------- */
-	if (( CbC.secID  = cords_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_SECURITY )) 
+	if (( CbC.secID  = occi_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_SECURITY )) 
 		!= (char *) 0)
 	{
 		if (!( CbC.security = cords_retrieve_instance( host, CbC.secID, agent, tls )))
@@ -2721,7 +2692,7 @@ public	char *	cords_manifest_broker(
 	/* ----------------------------------- */
 	/* retrieve the configuration instance */
 	/* ----------------------------------- */
-	if (!( CbC.confID = cords_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
+	if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
 		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
@@ -2729,7 +2700,7 @@ public	char *	cords_manifest_broker(
 	/* ------------------------------- */
 	/* retrieve the interface instance */
 	/* ------------------------------- */
-	if (( CbC.interID = cords_extract_atribut( CbC.manifest,Operator.domain,
+	if (( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
 		_CORDS_MANIFEST,_CORDS_INTERFACE)) != (char *) 0)
 		if (!( CbC.interface = cords_retrieve_instance( host, CbC.interID, agent, tls)))
 			return( cords_terminate_provisioning( 908, &CbC ) );

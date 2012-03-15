@@ -102,6 +102,17 @@ public	void	accords_configuration_options()
 	return;
 }
 
+private	int	is_valid_value( char * sptr )
+{
+	if (!( sptr ))
+		return( 0 );
+	else if (!( strlen( sptr ) ))
+		return(0);
+	else if (!( strcmp( sptr, "(null)" ) ))
+		return(0);
+	else	return(1);
+}
+
 /*	----------------------------------------------------	*/
 /*	l o a d _ a c c o r d s _ c o n f i g u r a t i o n	*/
 /*	----------------------------------------------------	*/
@@ -184,7 +195,7 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		/* --------------------------------------- */
 		/* ensure service prefixed identity string */
 		/* --------------------------------------- */
-		if ( configuration->identity )
+		if ( is_valid_value( configuration->identity ) )
 		{
 			configuration->identity = service_prefix_url( 
 				configuration->identity,
@@ -195,7 +206,7 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		/* ---------------------------------------- */
 		/* ensure service prefixed publisher string */
 		/* ---------------------------------------- */
-		if ( configuration->publisher )
+		if ( is_valid_value( configuration->publisher ) )
 		{
 			configuration->publisher = service_prefix_url( 
 				configuration->publisher,

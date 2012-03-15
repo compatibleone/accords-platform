@@ -148,22 +148,22 @@ private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
 	/* -------------------------------------------------------------- */
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
 	else	request.memory = os_normalise_value( vptr,'G' );
 
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_CORES ) ))
 		request.cores = 0;
 	else	request.cores = os_normalise_value( vptr,'U' );
 
-	if (!( vptr = cords_extract_atribut( cptr->compute.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_SPEED ) ))
 		request.speed = 0;
 	else	request.speed = os_normalise_value(vptr,'G');
 	
-	if (!( vptr = cords_extract_atribut( cptr->storage.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
 	else	request.storage = os_normalise_value(vptr,'G');
@@ -249,12 +249,12 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
 	/* ---------------------------------------------------------- */
-	if (!( vptr = cords_extract_atribut( cptr->system.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->system.message, "occi", 
 		_CORDS_SYSTEM, _CORDS_NAME ) ))
 		return((char *) 0);
 	else	request.name = vptr;
 
-	if (!( vptr = cords_extract_atribut( cptr->image.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_NAME ) ))
 		return((char *) 0);
 	else	request.other = vptr;
@@ -339,7 +339,7 @@ public	int	create_openstack_contract(
 		/* ---------------------------------------------------- */
 		/* recover and store the public/private access property */
 		/* ---------------------------------------------------- */
-		if (!( vptr = cords_extract_atribut( contract.node.message, "occi", 
+		if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_ACCESS ) ))
 			vptr = _CORDS_PUBLIC;
 		if ( pptr->access ) pptr->access = liberate( pptr->access );
@@ -349,19 +349,19 @@ public	int	create_openstack_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
-	if (!( contract.infrastructure.id = cords_extract_atribut( contract.node.message, "occi", 
+	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_openstack_contract( 1171, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
 		return( terminate_openstack_contract( 1172, &contract ) );
 
-	else if (!( contract.compute.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.compute.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
 		return( terminate_openstack_contract( 1173, &contract ) );
 	else if (!( contract.compute.message = occi_simple_get( contract.compute.id, agent, tls ) ))
 		return( terminate_openstack_contract( 1174, &contract ) );
 
-	else if (!( contract.network.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.network.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
 		return( terminate_openstack_contract( 1175, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
@@ -369,7 +369,7 @@ public	int	create_openstack_contract(
 	else if (!( pptr->network = allocate_string( contract.network.id ) ))
 		return( terminate_openstack_contract( 1176, &contract ) );
 
-	else if (!( contract.storage.id = cords_extract_atribut( contract.infrastructure.message, "occi", 
+	else if (!( contract.storage.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
 		return( terminate_openstack_contract( 1178, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
@@ -387,13 +387,13 @@ public	int	create_openstack_contract(
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
-	if (!( contract.image.id = cords_extract_atribut( contract.node.message, "occi", 
+	if (!( contract.image.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
 		return( terminate_openstack_contract( 1182, &contract ) );
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
 		return( terminate_openstack_contract( 1183, &contract ) );
 
-	else if (!( contract.system.id = cords_extract_atribut( contract.image.message, "occi", 
+	else if (!( contract.system.id = occi_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
 		return( terminate_openstack_contract( 1184, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))

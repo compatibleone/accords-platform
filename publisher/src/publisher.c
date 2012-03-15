@@ -28,6 +28,8 @@
 #include "document.h"
 #include "occibuilder.h"
 #include "accords.h"
+#include "cordslang.h"
+#include "occiclient.h"
 
 /*	-------------------------------------	*/
 /* 	f u n c t i o n   p r o t o t y p e s	*/
@@ -79,6 +81,39 @@ public	int	check_verbose()		{	return(Publisher.verbose);		}
 public	char *	default_publisher()	{	return((char *) 0);			}
 public	char *	default_tls()		{	return(Publisher.tls);			}
 
+/*	-------------------------------------------------	*/  
+/*	r e t r i e v e _ m a s t e r _ p u b l i s h e r	*/
+/*	-------------------------------------------------	*/  
+public	char *	retrieve_master_publisher()		
+{
+	if (!( Publisher.publisher ))
+		return((char *) 0 );
+	else if (!( strlen( Publisher.publisher ) ))
+		return((char *) 0 );
+	else if (!( strcmp( Publisher.publisher, _CORDS_NULL ) ))
+		return((char *) 0 );
+	else
+	{
+		printf("Master Publisher : %s\n",Publisher.publisher);
+		Publisher.verbose=1;
+		return( Publisher.publisher );
+	}
+}
+
+/*	-----------------------------------------------------	*/  
+/*	r e t r i e v e _ r e m o t e _ p u b l i c a t i o n	*/
+/*	-----------------------------------------------------	*/  
+public	char *	retrieve_remote_publication(struct publication * pptr)		
+{
+	if (!( pptr->remote ))
+		return((char *) 0 );
+	else if (!( strlen( pptr->remote ) ))
+		return((char *) 0 );
+	else if (!( strcmp( pptr->remote, _CORDS_NULL ) ))
+		return((char *) 0 );
+	else	return( pptr->remote );
+}
+
 /*	---------------------------------------------	*/  
 /*		    	f a i l u r e			*/
 /*	---------------------------------------------	*/  
@@ -103,44 +138,11 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	---------------------------------------------	*/ 
 private	int	banner()
 {
-	printf("\n   CO-PUB : CompatibleOne Service Publisher : Version 1.0a.0.03");
-	printf("\n   Beta Version : 26/10/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
-	printf("\n\n");
-}
-
-/*	---------------------------------------------	*/  
-/*		    	h e l p				*/
-/*	---------------------------------------------	*/
-/*	displays the collection of command line flags	*/
-/*	in response to the --help command		*/   
-/*	---------------------------------------------	*/  
-private	int	help()
-{
-	banner();
-
-	printf("\nOptions: ");
-
-	printf("\n   --debug                  toggle debug messages   ");
-	printf("\n   --verbose                toggle info  messages   ");
-	printf("\n   --authorize              toggle authorization    ");
-	printf("\n   --autosave               toggle autosave flag    ");
-	printf("\n   --help                   this help screen        ");
-
-	printf("\n   --threads  <1|0>         toggle use of threads   ");
-	printf("\n   --tls      <name>        specify tls configuration ");
-	printf("\n   --resthost <name>        specify rest server host name or address");
-	printf("\n   --restport <number>      specify rest server port");
-
-	printf("\n   --chathost <name>        specify chat server host name or address");
-	printf("\n   --chatagent <name>       specify chat agent program name  ");
-	printf("\n   --chatport <number>      specify chat server port");
-
-	printf("\n   --user     <name>        specify user log name   ");
-	printf("\n   --password <value>       specify user password   ");
-	printf("\n   --domain   <value>       specify publisher domain");
-	printf("\n   --memory   <value>       specify memory filename ");
-	printf("\n   --config   <value>       specify configuration   ");
+	printf("\n   CO-PUB : CompatibleOne Service Publisher : Version 1.0b.0.01");
+	printf("\n   Beta Version : 15/03/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
+	printf("\n");
+	accords_configuration_options();
 	printf("\n\n");
 	return(0);
 }
@@ -257,11 +259,235 @@ private	struct	rest_response * restart_publication(
 	}
 }
 
+/*	--------------------------------------------------------	*/
+/*		b u i l d _ m a s t e r _ i n s t a n c e		*/
+/*	--------------------------------------------------------	*/
+private	struct occi_element * build_master_instance( struct publication * pptr )
+{
+	struct	occi_element * root=(struct occi_element *) 0;
+	struct	occi_element * eptr=(struct occi_element *) 0;
+	struct	occi_element * foot=(struct occi_element *) 0;
+
+	if ( retrieve_remote_publication( pptr ) )
+	{
+		if (!( eptr = occi_create_element( "occi.publisher.id", pptr->remote ) ))
+			return( occi_remove_elements( root ) );
+		else if (!( eptr->previous = foot ))
+			root = eptr;
+		else	foot->next = eptr;
+		foot = eptr;
+	}
+
+	if (!( eptr = occi_create_element( "occi.publisher.what", pptr->what ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.where", pptr->where ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.why", pptr->why ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.who", pptr->who ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.pass", pptr->pass ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.identity", (pptr->identity ? pptr->identity : "") ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.zone", (pptr->zone ? pptr->zone : "") ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.price", ( pptr->price ? pptr->price : "") ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.rating", (pptr->rating ? pptr->rating : "") ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.publisher.operator", (pptr->operator ? pptr->operator : "") ) ))
+		return( occi_remove_elements( root ) );
+	else if (!( eptr->previous = foot ))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	return( root );
+}
+
+/*	--------------------------------------------------------	*/
+/*		s t o r e _ m a s t e r _ i n s t a n c e		*/
+/*	--------------------------------------------------------	*/
+private	int	store_master_instance( struct publication * pptr, struct occi_response * zptr )
+{
+	struct	occi_element * eptr;
+	char *	vptr;
+
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "id" ))!=(char *) 0)
+	{
+		if ( pptr->remote ) 
+			pptr->remote = liberate( pptr->remote );
+		if (!( pptr->remote = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "what" ))!=(char *) 0)
+	{
+		if ( pptr->what ) 
+			pptr->what = liberate( pptr->what );
+		if (!( pptr->what = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "where" ))!=(char *) 0)
+	{
+		if ( pptr->where ) 
+			pptr->where = liberate( pptr->where );
+		if (!( pptr->where = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "why" ))!=(char *) 0)
+	{
+		if ( pptr->why ) 
+			pptr->why = liberate( pptr->why );
+		if (!( pptr->why = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "who" ))!=(char *) 0)
+	{
+		if ( pptr->who ) 
+			pptr->who = liberate( pptr->who );
+		if (!( pptr->who = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "pass" ))!=(char *) 0)
+	{
+		if ( pptr->pass ) 
+			pptr->pass = liberate( pptr->pass );
+		if (!( pptr->pass = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "identity" ))!=(char *) 0)
+	{
+		if ( pptr->identity ) 
+			pptr->identity = liberate( pptr->identity );
+		if (!( pptr->identity = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "zone" ))!=(char *) 0)
+	{
+		if ( pptr->zone ) 
+			pptr->zone = liberate( pptr->zone );
+		if (!( pptr->zone = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "price" ))!=(char *) 0)
+	{
+		if ( pptr->price ) 
+			pptr->price = liberate( pptr->price );
+		if (!( pptr->price = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "rating" ))!=(char *) 0)
+	{
+		if ( pptr->rating ) 
+			pptr->rating = liberate( pptr->rating );
+		if (!( pptr->rating = allocate_string( vptr ) ))
+			return(27);
+	}
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "operator" ))!=(char *) 0)
+	{
+		if ( pptr->operator ) 
+			pptr->operator = liberate( pptr->operator );
+		if (!( pptr->operator = allocate_string( vptr ) ))
+			return(27);
+	}
+	return(0);
+}
+
+/*	-------------------------------------------------	*/
+/* 	m a s t e r _ c r e a t e _ p u b l i c a t i o n 	*/
+/*	-------------------------------------------------	*/
+private	int	master_create_publication( struct publication * pptr )
+{
+	struct occi_response * zptr=(struct occi_response *) 0;
+	struct occi_element * eptr=(struct occi_element *) 0;
+	char * master;
+	char * host;
+	char   buffer[1024];
+	if (!( master = retrieve_master_publisher() ))
+		return(0);
+	else	sprintf(buffer,"%s/publication/",master);
+
+	if (!( eptr = build_master_instance( pptr )))
+		return(0);
+
+	else if (!( zptr = occi_simple_post( buffer, eptr, _CORDS_CONTRACT_AGENT, Publisher.tls ) ))
+	{
+		eptr = occi_remove_elements( eptr );
+		return(0);
+	}
+	else if (!( host = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );	
+		eptr = occi_remove_elements( eptr );
+		return(0);
+	}
+	else	sprintf(buffer,"http://%s",host);
+	if (!( pptr->remote = allocate_string( buffer ) ))
+	{
+		zptr = occi_remove_response( zptr );	
+		eptr = occi_remove_elements( eptr );
+		return(0);
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );	
+		eptr = occi_remove_elements( eptr );
+		return(0);
+	}
+}
+
 /*	-------------------------------------------	*/
 /* 	    c r e a t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------	*/
 private	int	create_publication(struct occi_category * optr, void * vptr)
 {
+	struct occi_response * zptr=(struct occi_response *) 0;
 	struct	occi_kind_node * nptr;
 	struct	publication * pptr;
 	if (!( nptr = vptr ))
@@ -273,7 +499,31 @@ private	int	create_publication(struct occi_category * optr, void * vptr)
 		pptr->when  = time((long *) 0);
 		pptr->uptime = 0;
 		pptr->state  = _OCCI_RUNNING;
+		return( master_create_publication( pptr ) );
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/* 	m a s t e r _ r e t r i e v e _ p u b l i c a t i o n 	*/
+/*	-----------------------------------------------------	*/
+private	int	master_retrieve_publication( struct publication * pptr )
+{
+	struct occi_response * zptr=(struct occi_response *) 0;
+	char * master;
+	char * remote;
+	int    status;
+	if (!( master = retrieve_master_publisher() ))
+		return( 0 );
+	else if (!( remote = retrieve_remote_publication(pptr) ))
 		return(0);
+
+	else if (!( zptr = occi_simple_get( remote, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return(0);
+	else
+	{
+		status = store_master_instance( pptr, zptr );
+		zptr = occi_remove_response( zptr );	
+		return(status);
 	}
 }
 
@@ -290,6 +540,34 @@ private	int	retrieve_publication(struct occi_category * optr, void * vptr)
 		return(0);
 	{
 		pptr->uptime = (time((long*) 0) - pptr->when);
+		return( master_retrieve_publication( pptr ) );
+	}
+}
+
+/*	-------------------------------------------------	*/
+/* 	m a s t e r _ u p d a t e _ p u b l i c a t i o n 	*/
+/*	-------------------------------------------------	*/
+private	int	master_update_publication( struct publication * pptr )
+{
+	struct occi_response * zptr=(struct occi_response *) 0;
+	struct occi_element  * eptr=(struct occi_element *) 0;
+	char * master;
+	char * remote;
+	if (!( master = retrieve_master_publisher() ))
+		return( 0 );
+	else if (!( remote = retrieve_remote_publication(pptr) ))
+		return(0);
+	else if (!( eptr = build_master_instance( pptr )))
+		return(0);
+	else if (!( zptr = occi_simple_put( remote, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		eptr = occi_remove_elements( eptr );
+		return(0);
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );	
+		eptr = occi_remove_elements( eptr );
 		return(0);
 	}
 }
@@ -308,6 +586,27 @@ private	int	update_publication(struct occi_category * optr, void * vptr)
 	else
 	{
 		pptr->uptime = (time((long*) 0) - pptr->when);
+		return( master_update_publication( pptr ) );
+	}
+}
+
+/*	-------------------------------------------------	*/
+/* 	m a s t e r _ d e l e t e _ p u b l i c a t i o n 	*/
+/*	-------------------------------------------------	*/
+private	int	master_delete_publication( struct publication * pptr )
+{
+	struct occi_response * zptr=(struct occi_response *) 0;
+	char * master;
+	char * remote;
+	if (!( master = retrieve_master_publisher() ))
+		return( 0 );
+	else if (!( remote = retrieve_remote_publication(pptr) ))
+		return(0);
+	else if (!( zptr = occi_simple_delete( remote, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return(0);
+	else
+	{
+		zptr = occi_remove_response( zptr );	
 		return(0);
 	}
 }
@@ -323,7 +622,7 @@ private	int	delete_publication(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return( master_delete_publication( pptr ) );
 }
 
 private	struct	occi_interface	publication_interface = {
@@ -524,7 +823,7 @@ private	int	publisher_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_publisher.xml");
 
-	if (!( optr = occi_cords_publication_builder( Publisher.domain,"publication" ) ))
+	if (!( optr = occi_publication_builder( Publisher.domain,"publication" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
