@@ -92,12 +92,7 @@ public	char *	retrieve_master_publisher()
 		return((char *) 0 );
 	else if (!( strcmp( Publisher.publisher, _CORDS_NULL ) ))
 		return((char *) 0 );
-	else
-	{
-		printf("Master Publisher : %s\n",Publisher.publisher);
-		Publisher.verbose=1;
-		return( Publisher.publisher );
-	}
+	else	return( Publisher.publisher );
 }
 
 /*	-----------------------------------------------------	*/  
