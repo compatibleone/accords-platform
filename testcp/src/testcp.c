@@ -206,8 +206,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.a.0.04 ");
-	printf("\n   Beta Version 10/03/2012 \n");
+	printf("\n   Cords Parser : Version 1.0.b.0.01 ");
+	printf("\n   Beta Version 17/03/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                activate xsd validation ");

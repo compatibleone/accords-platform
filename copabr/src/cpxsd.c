@@ -21,16 +21,7 @@
 #ifndef	_cpxsd_c
 #define	_cpxsd_c
 
-#define	_XSD_ELEMENT "xsd:element"
-#define	_XSD_COMPLEX "xsd:complexType"
-#define	_XSD_ATRIBUT "xsd:attribute"
-#define	_XSD_SEQUENCE "xsd:sequence"
-#define	_XSD_MAXOCCURS "maxOccurs"
-#define	_XSD_MINOCCURS "minOccurs"
-#define	_XSD_UNBOUNDED "unbounded"
-
-#define	_XSD_NAME "name"
-#define _XSD_TYPE "type"
+#include "cpxsd.h"
 
 private	struct	xml_element * enforceXsd=(struct xml_element *) 0;
 

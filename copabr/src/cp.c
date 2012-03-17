@@ -1844,6 +1844,7 @@ private	int	cords_terminate_xsd(
 	struct	xml_element * eptr;
 	struct	xml_element * fptr;
 	struct	xml_atribut * aptr;
+	struct	xml_atribut * xptr;
 	int	modifications=0;
 	int	linked=0;
 
@@ -1943,6 +1944,75 @@ private	int	cords_terminate_xsd(
 			}
 			if ( linked )
 				break;
+		}
+
+		/* -------------------------------- */
+		/* recover default attribute values */
+		/* -------------------------------- */
+		for ( 	eptr=wptr->first;
+			eptr != (struct xml_element *) 0;
+			eptr = eptr->next )
+		{
+			/* ---------------------- */
+			/* locate an xsd:attribue */
+			/* ---------------------- */
+			if (!( eptr->name ))
+				continue;
+			else if ( strcmp( eptr->name, _XSD_ATRIBUT ) )
+				continue;
+
+			/* ------------------------------------------- */
+			/* locate a specific "default" attribute value */
+			/* ------------------------------------------- */
+			for (	nptr=(char *) 0,
+				vptr=(char *) 0,
+				aptr=eptr->firstatb;
+				aptr !=(struct xml_atribut *) 0;
+				aptr = aptr->next )
+			{
+				if (!( aptr->name ))
+					continue;
+				else if (!( strcmp( aptr->name, _XSD_DEFAULT ) ))
+				{
+					if (!( aptr->value ))
+						continue;
+					else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+						continue;
+					else if (!( nptr ))
+						continue;
+				}
+				else if (!( strcmp( aptr->name, _XSD_NAME ) ))
+				{
+					if (!( aptr->value ))
+						continue;
+					else if (!( nptr = occi_unquoted_value( aptr->value ) ))
+						continue;
+					else if (!( vptr ))
+						continue;
+				}
+				else	continue;
+				/* ------------------------------------- */
+				/* detect the presence of this attribute */
+				/* ------------------------------------- */
+				for (	xptr=dptr->firstatb;
+					xptr != (struct xml_atribut *) 0;
+					xptr = xptr->next )
+				{
+					if (!( xptr->name ))
+						continue;
+					else if (!( strcmp( xptr->name, nptr ) ))
+						break;
+				}
+				/* ---------------------------------------------- */
+				/* add the attribute since it has a default value */
+				/* and does not exist				  */
+				/* ---------------------------------------------- */
+				if (!( xptr ))
+				{
+					document_add_atribut(dptr, nptr, vptr );
+					modifications++;
+				}
+			}
 		}
 		/* ----------------------------------------- */
 		/* ensure existance of an ID attribute value */

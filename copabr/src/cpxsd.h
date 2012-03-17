@@ -20,6 +20,18 @@
 #ifndef	_cpxsd_h
 #define	_cpxsd_h
 
+#define	_XSD_ELEMENT "xsd:element"
+#define	_XSD_COMPLEX "xsd:complexType"
+#define	_XSD_ATRIBUT "xsd:attribute"
+#define	_XSD_SEQUENCE "xsd:sequence"
+#define	_XSD_MAXOCCURS "maxOccurs"
+#define	_XSD_MINOCCURS "minOccurs"
+#define	_XSD_UNBOUNDED "unbounded"
+
+#define	_XSD_DEFAULT "default"
+#define	_XSD_NAME "name"
+#define _XSD_TYPE "type"
+
 
 public	struct	xml_element * xsd_type( struct xml_element * xsd, char * nptr );
 public	struct	xml_element * first_xsd_element( struct xml_element * xsd );
