@@ -21,6 +21,7 @@
 #define	_cords_parser_c
 
 #include "cp.h"
+#include "csp.h"
 #include "cpxsd.h"
 
 private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
@@ -262,9 +263,11 @@ public	struct	occi_response 	* cords_create_instance(
 			continue;
 		else 
 		{
-			rptr->first = header;
-			while (header->next)
-				header = header->next;
+			if (( rptr->first = header ) != (struct occi_element *) 0)
+			{
+				while (header->next)
+					header = header->next;
+			}
 			rptr->last = header;
 
 			if (!( zptr = occi_client_post( cptr, rptr ) ))
@@ -1359,9 +1362,18 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 			sprintf(buffer,"http://%s",host);
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );
-			cords_invoke_action( buffer, "build", agent, tls );
-			liberate( pptr );
-			return( 0 );
+			if (!( zptr = cords_invoke_action( buffer, "build", agent, tls ) ))
+			{
+				liberate( pptr );
+				return( 0 );
+			}
+			else
+			{
+				zptr = occi_remove_response( zptr );
+				liberate( pptr );
+				return( 0 );
+			}
+
 		}
 	}
 }
@@ -1820,6 +1832,247 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent,char *
 	return( cords_terminate_xml( dptr, agent, tls ) );
 }
 
+/*	-----------------------------------------------------------------	*/
+/*		c o r d s _ p a r s e r _ x s d _ d e f a u l t			*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_parser_xsd_default( 
+	struct xml_element * wptr,
+	struct xml_element * dptr )
+{
+	int	modifications=0;
+	char *	vptr;
+	char *	nptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * xptr;
+	for ( 	eptr=wptr->first;
+		eptr != (struct xml_element *) 0;
+		eptr = eptr->next )
+	{
+		/* ---------------------- */
+		/* locate an xsd:attribue */
+		/* ---------------------- */
+		if (!( eptr->name ))
+			continue;
+		else if ( strcmp( eptr->name, _XSD_ATRIBUT ) )
+			continue;
+
+		/* ------------------------------------------- */
+		/* locate a specific "default" attribute value */
+		/* ------------------------------------------- */
+		for (	nptr=(char *) 0,
+			vptr=(char *) 0,
+			aptr=eptr->firstatb;
+			aptr !=(struct xml_atribut *) 0;
+			aptr = aptr->next )
+		{
+			if (!( aptr->name ))
+				continue;
+			else if (!( strcmp( aptr->name, _XSD_DEFAULT ) ))
+			{
+				if (!( aptr->value ))
+					continue;
+				else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+					continue;
+				else if (!( nptr ))
+					continue;
+			}
+			else if (!( strcmp( aptr->name, _XSD_NAME ) ))
+			{
+				if (!( aptr->value ))
+					continue;
+				else if (!( nptr = occi_unquoted_value( aptr->value ) ))
+					continue;
+				else if (!( vptr ))
+					continue;
+			}
+			else	continue;
+
+			/* ------------------------------------- */
+			/* detect the presence of this attribute */
+			/* ------------------------------------- */
+			for (	xptr=dptr->firstatb;
+				xptr != (struct xml_atribut *) 0;
+				xptr = xptr->next )
+			{
+				if (!( xptr->name ))
+					continue;
+				else if (!( strcmp( xptr->name, nptr ) ))
+					break;
+			}
+			/* ---------------------------------------------- */
+			/* add the attribute since it has a default value */
+			/* and does not exist				  */
+			/* ---------------------------------------------- */
+
+			if (!( xptr ))
+			{
+				document_add_atribut(dptr, nptr, vptr );
+				modifications++;
+			}
+		}
+	}
+	return( modifications );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		c o r d s _ n e w _ c o r d s c r i p t _ i n s t a n c e	*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_new_cordscript_instance(
+	struct	xml_atribut * aptr,
+	struct xml_element * wptr,
+	struct xml_element * dptr,
+	struct	cordscript_action * fptr,
+	char *	agent,
+	char *	tls )
+{
+	struct	occi_response * zptr;
+	char *	vptr;
+	char	buffer[1024];
+	if (!( zptr = cords_create_instance(
+		fptr->lvalue->prefix, agent, (struct occi_element *) 0, tls ) ))
+		return(0);
+	else if (!( vptr = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return(0);
+	}
+	else
+	{
+		sprintf(buffer,"http://%s",vptr);
+		if ( aptr->value ) aptr->value = liberate( aptr->value );
+		aptr->value = allocate_string( buffer );
+		zptr = occi_remove_response( zptr );
+		if ( aptr->value )
+			return(0);
+		else	return(27);
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	   c o r d s _ i n v o k e _ c o r d s c r i p t _ a c t i o n		*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_invoke_cordscript_action(
+	struct	xml_atribut * aptr,
+	struct xml_element * wptr,
+	struct xml_element * dptr,
+	struct	cordscript_action * fptr,
+	char *	agent,
+	char *	tls )
+{
+	struct	occi_response * zptr;
+	struct	xml_atribut * bptr;
+	if (!( bptr = document_atribut( dptr, fptr->lvalue->prefix )))
+		return(0);
+	else if (!( bptr->value ))
+		return(0);
+	else
+	{
+		if (!( zptr = cords_invoke_action( bptr->value, fptr->lvalue->value, agent, tls )))
+			return(0);
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			return( 0 );
+		}
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		c o r d s _ p a r s e r _ a t r i b u t _ a c t i o n 		*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_parser_atribut_action(
+	struct	xml_atribut * aptr,
+	struct xml_element * wptr,
+	struct xml_element * dptr,
+	char *	agent,
+	char *	tls )
+{
+	struct	cordscript_action * eptr;
+	struct	cordscript_action * fptr;
+	struct	occi_response * zptr;
+	char *	xptr;
+
+	if (!( aptr->name ))
+		return(0);
+	else if (!(xptr = aptr->value))
+		return(0);
+	else if ( strncmp( xptr, "cordscript:", strlen( "cordscript:" ) ) != 0 )
+		return(0);
+	else
+	{
+		/* ----------------------------- */
+		/* step over leading white space */
+		/* ----------------------------- */
+		xptr += strlen("cordscript:");
+		while ( ( *xptr == ' ' ) 
+		|| 	( *xptr == '\t') 
+		|| 	( *xptr == '\r')
+		||	( *xptr == '\n') )
+		{
+			 xptr++;
+		}
+		/* ---------------------------- */
+		/* invoke cordscript expression */
+		/* ---------------------------- */
+		if (!( eptr = cordscript_parse_statement( xptr ) ))
+			return(0);
+		else
+		{
+			if ( check_debug() )
+			{
+				cordscript_show( eptr );
+			}
+			for (	fptr = eptr;
+				fptr != (struct cordscript_action *) 0;
+				fptr = fptr->next )
+			{
+				switch ( fptr->type )
+				{
+				case	_CORDSCRIPT_NEW	:
+					cords_new_cordscript_instance( aptr, wptr, dptr, fptr, agent, tls );
+					continue;
+				case	_CORDSCRIPT_START	:
+				case	_CORDSCRIPT_STOP	:
+				case	_CORDSCRIPT_SAVE	:
+				case	_CORDSCRIPT_SNAPSHOT	:
+				case	_CORDSCRIPT_DELETE	:
+				case	_CORDSCRIPT_BUILD	:
+					cords_invoke_cordscript_action( aptr, wptr, dptr, fptr, agent, tls );
+					continue;
+				}
+			}
+			eptr =  liberate_cordscript_actions( eptr );
+			return(0);
+		}
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		c o r d s _ p a r s e r _ x s d _ a c t i o n s			*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_parser_xsd_actions( 
+	struct xml_element * wptr,
+	struct xml_element * dptr,
+	char *	agent,
+	char *	tls )
+{
+	int	status=0;
+	struct	xml_atribut * aptr;
+	/* ------------------------------------- */
+	/* detect the presence of this attribute */
+	/* ------------------------------------- */
+	for (	aptr=dptr->firstatb;
+		aptr != (struct xml_atribut *) 0;
+		aptr = aptr->next )
+	{
+		if (!(status = cords_parser_atribut_action( aptr, wptr, dptr, agent, tls )))
+			continue;
+		else	break;
+	}
+	return(status);
+}
+
 /*	---------------------------------------------------	*/
 /*		c o r d s _ t e r m i n a t e _ x s d		*/
 /*	---------------------------------------------------	*/
@@ -1844,7 +2097,6 @@ private	int	cords_terminate_xsd(
 	struct	xml_element * eptr;
 	struct	xml_element * fptr;
 	struct	xml_atribut * aptr;
-	struct	xml_atribut * xptr;
 	int	modifications=0;
 	int	linked=0;
 
@@ -1946,84 +2198,30 @@ private	int	cords_terminate_xsd(
 				break;
 		}
 
-		/* -------------------------------- */
-		/* recover default attribute values */
-		/* -------------------------------- */
-		for ( 	eptr=wptr->first;
-			eptr != (struct xml_element *) 0;
-			eptr = eptr->next )
-		{
-			/* ---------------------- */
-			/* locate an xsd:attribue */
-			/* ---------------------- */
-			if (!( eptr->name ))
-				continue;
-			else if ( strcmp( eptr->name, _XSD_ATRIBUT ) )
-				continue;
-
-			/* ------------------------------------------- */
-			/* locate a specific "default" attribute value */
-			/* ------------------------------------------- */
-			for (	nptr=(char *) 0,
-				vptr=(char *) 0,
-				aptr=eptr->firstatb;
-				aptr !=(struct xml_atribut *) 0;
-				aptr = aptr->next )
-			{
-				if (!( aptr->name ))
-					continue;
-				else if (!( strcmp( aptr->name, _XSD_DEFAULT ) ))
-				{
-					if (!( aptr->value ))
-						continue;
-					else if (!( vptr = occi_unquoted_value( aptr->value ) ))
-						continue;
-					else if (!( nptr ))
-						continue;
-				}
-				else if (!( strcmp( aptr->name, _XSD_NAME ) ))
-				{
-					if (!( aptr->value ))
-						continue;
-					else if (!( nptr = occi_unquoted_value( aptr->value ) ))
-						continue;
-					else if (!( vptr ))
-						continue;
-				}
-				else	continue;
-				/* ------------------------------------- */
-				/* detect the presence of this attribute */
-				/* ------------------------------------- */
-				for (	xptr=dptr->firstatb;
-					xptr != (struct xml_atribut *) 0;
-					xptr = xptr->next )
-				{
-					if (!( xptr->name ))
-						continue;
-					else if (!( strcmp( xptr->name, nptr ) ))
-						break;
-				}
-				/* ---------------------------------------------- */
-				/* add the attribute since it has a default value */
-				/* and does not exist				  */
-				/* ---------------------------------------------- */
-				if (!( xptr ))
-				{
-					document_add_atribut(dptr, nptr, vptr );
-					modifications++;
-				}
-			}
-		}
+		
 		/* ----------------------------------------- */
 		/* ensure existance of an ID attribute value */
 		/* ----------------------------------------- */
 		if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 			return(cords_append_error(dptr,701,"unresolved element"));
-		else if (!( modifications ))
-			return( 0 );
-		else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
-			return(cords_append_error(dptr,704,"updating category"));
-		else	return(0);
+		else
+		{
+			/* -------------------------------- */
+			/* recover default attribute values */
+			/* -------------------------------- */
+			modifications += cords_parser_xsd_default( wptr, dptr );
+
+			/* ------------------------------------- */
+			/* detect and perform cordscript actions */
+			/* ------------------------------------- */
+			modifications += cords_parser_xsd_actions( wptr, dptr, agent, tls );
+			
+			if (!( modifications ))
+				return( 0 );
+			else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+				return(cords_append_error(dptr,704,"updating category"));
+			else	return(0);
+		}
 	}
 }
 

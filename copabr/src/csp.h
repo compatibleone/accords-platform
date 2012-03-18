@@ -38,12 +38,23 @@
 #define	_CORDSCRIPT_MONITOR	2
 #define	_CORDSCRIPT_SYSTEM 	3
 #define	_CORDSCRIPT_FORK   	4
-#define	_CORDSCRIPT_INVOKE   	5
+#define	_CORDSCRIPT_NEW   	5
+#define	_CORDSCRIPT_DELETE     	6
+#define	_CORDSCRIPT_START   	7
+#define	_CORDSCRIPT_STOP   	8
+#define	_CORDSCRIPT_SAVE   	9
+#define	_CORDSCRIPT_SNAPSHOT  	10
+#define	_CORDSCRIPT_BUILD   	11
+#define	_CORDSCRIPT_INSTANCE   	12
+#define	_CORDSCRIPT_INVOKE   	13
 
 public	struct	cordscript_action *	cordscript_parse_statement( char * statement );
 public	int				cordscript_parse_method( char * token );
 public	char *				cordscript_method( int	symbol );
+public 	struct cordscript_action * 	liberate_cordscript_actions(struct cordscript_action * sptr);
 
 #endif	/* _cords_script_parser_h */
 	/* ---------------------- */
+
+
 

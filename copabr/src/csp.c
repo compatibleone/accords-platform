@@ -316,6 +316,29 @@ public	struct	cordscript_element *	cordscript_term()
 	return( eptr );
 }
 
+/*	-----------------------		*/
+/*	cordscript method names		*/
+/*	-----------------------		*/
+private	char * cordscript_methodname[] = 
+	{
+	(char *)	"set",
+	(char *)	"configure",
+	(char *)	"monitor",
+	(char *)	"system",
+	(char *)	"fork",
+	(char *)	"new",
+	(char *)	"delete",
+	(char *)	"start",
+	(char *)	"stop  ",
+	(char *)	"save",
+	(char *)	"snapshot",
+	(char *)	"build",
+	(char *)	"instance",
+	(char *)	"invoke",
+	(char *) 0
+	};
+
+
 /*	---------------------------------------------------------	*/
 /*	     c o r d s c r i p t _ p a r s e _ m e t h o d		*/
 /*	---------------------------------------------------------	*/
@@ -323,15 +346,15 @@ public	struct	cordscript_element *	cordscript_term()
 /*	---------------------------------------------------------	*/
 public	int	cordscript_parse_method( char * token )
 {
-	if (!( strcasecmp( Csp.token, "configure" )))
-		return( _CORDSCRIPT_CONFIGURE );
-	else if (!( strcasecmp( Csp.token, "monitor" )))
-		return( _CORDSCRIPT_MONITOR );
-	else if (!( strcasecmp( Csp.token, "system" )))
-		return( _CORDSCRIPT_SYSTEM  );
-	else if (!( strcasecmp( Csp.token, "fork" )))
-		return( _CORDSCRIPT_FORK );
-	else	return( _CORDSCRIPT_INVOKE );
+	int	i=0;
+	while ( cordscript_methodname[i] )
+	{
+		if (!( strcasecmp( Csp.token, cordscript_methodname[i] )))
+			return(i);
+		else	i++;
+	}
+	return( _CORDSCRIPT_INVOKE );
+
 }
 
 /*	---------------------------------------------------------	*/
@@ -351,7 +374,9 @@ public	char *	cordscript_method( int	symbol )
 		return( "system" );
 	else if ( symbol == _CORDSCRIPT_FORK )
 		return( "fork" );
-	else	return( "none" );
+	else if ( symbol > _CORDSCRIPT_INVOKE )
+		return( "none" );
+	else	return( cordscript_methodname[ symbol ] );
 }
 
 /*	---------------------------------------------------------	*/
@@ -559,6 +584,26 @@ private	void	cordscript_show_command( struct cordscript_action * aptr )
 }
 	
 /*	---------------------------------------------------------	*/
+/*	    c o r d s c r i p t _ s h o w _  m e t h o d		*/
+/*	---------------------------------------------------------	*/
+private	void	cordscript_show_method( struct cordscript_action * aptr )
+{
+	int	punctuation='(';
+	struct	cordscript_element * eptr;
+	cordscript_show_element( aptr->lvalue );
+	for ( 	eptr=aptr->rvalue;
+		eptr != (struct cordscript_element *) 0;
+		eptr = eptr->next )
+	{
+		printf(" %c ",punctuation);
+		cordscript_show_element( eptr );
+		punctuation = ',';
+	}
+	printf(" );\n");
+	return;
+}
+	
+/*	---------------------------------------------------------	*/
 /*	    c o r d s c r i p t _ s h o w _ a f f e c t			*/
 /*	---------------------------------------------------------	*/
 private	void	cordscript_show_affect( struct cordscript_action * aptr )
@@ -591,7 +636,7 @@ public	void	cordscript_show( struct cordscript_action * aptr )
 			cordscript_show_command( aptr );
 		else if ( aptr->type == _CORDSCRIPT_AFFECT )
 			cordscript_show_affect( aptr );
-		else	printf("unknown cordscript action type\n");
+		else	cordscript_show_method( aptr );
 	}
 	printf("}\n");
 	return;
