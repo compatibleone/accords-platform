@@ -1916,6 +1916,46 @@ private	int	cords_parser_xsd_default(
 }
 
 /*	-----------------------------------------------------------------	*/
+/*		c o r d s _ i n v o c a t i o n _ p a r a m e t e r s		*/
+/*	-----------------------------------------------------------------	*/
+private	struct occi_element * cords_invocation_parameters(
+	struct	xml_atribut * aptr,
+	struct xml_element * dptr,
+	struct	cordscript_action * fptr )
+{
+	char *	nptr;
+	char *	vptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_element * eptr;
+	struct	occi_element * root=(struct occi_element *) 0;
+	struct	occi_element * last=(struct occi_element *) 0;
+	struct	occi_element * hptr=(struct occi_element *) 0;
+	char	buffer[1024];
+	for (	eptr=fptr->rvalue;
+		eptr !=(struct cordscript_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( nptr = eptr->prefix ))
+			continue;
+		else if (!( strcmp( nptr, "id" ) ))
+			vptr = dptr->name;
+		else	vptr = nptr;
+
+		sprintf(buffer,"occi.%s.%s",fptr->lvalue->prefix,vptr);
+
+		if (!( bptr = document_atribut( dptr, nptr ) ))
+			continue;
+		else if (!( hptr = occi_create_element( buffer, bptr->value ) ))
+			continue;
+		else if (!( hptr->previous = last ))
+			root = hptr;
+		else	last->next = hptr;
+		last = hptr;
+	}
+	return( root );
+}
+
+/*	-----------------------------------------------------------------	*/
 /*		c o r d s _ n e w _ c o r d s c r i p t _ i n s t a n c e	*/
 /*	-----------------------------------------------------------------	*/
 private	int	cords_new_cordscript_instance(
@@ -1927,10 +1967,16 @@ private	int	cords_new_cordscript_instance(
 	char *	tls )
 {
 	struct	occi_response * zptr;
+	struct	occi_element * hptr=(struct occi_element *) 0;
+
 	char *	vptr;
 	char	buffer[1024];
+	struct	cordscript_element *eptr;
+
+	hptr = cords_invocation_parameters( aptr, dptr, fptr );	
+
 	if (!( zptr = cords_create_instance(
-		fptr->lvalue->prefix, agent, (struct occi_element *) 0, tls ) ))
+		fptr->lvalue->prefix, agent, hptr, tls ) ))
 		return(0);
 	else if (!( vptr = occi_extract_location( zptr ) ))
 	{

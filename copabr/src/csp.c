@@ -451,7 +451,10 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 				{
 					if (!( rvalue = cordscript_term() ))
 					{
-						if ( aptr->type != _CORDSCRIPT_INVOKE )
+						if (( aptr->type == _CORDSCRIPT_SYSTEM )
+						||  ( aptr->type == _CORDSCRIPT_FORK )
+						||  ( aptr->type == _CORDSCRIPT_MONITOR )
+						||  ( aptr->type == _CORDSCRIPT_CONFIGURE ))
 							return( liberate_cordscript_actions( root ) );
 						else if (!( lvalue ))
 							break;
@@ -469,6 +472,7 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 						break;
 					}
 				}
+				lvalue = (struct cordscript_element *) 0;
 				if ( cordscript_punctuation() != ')' )
 					return( liberate_cordscript_actions( root ) );
 				else if ( cordscript_punctuation() != ';' )
@@ -505,7 +509,7 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 			}
 		}
 	}
-	return( aptr );
+	return( root );
 }
 
 /*	---------------------------------------------------------	*/
