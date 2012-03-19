@@ -34,7 +34,7 @@
 		<xsd:attribute 
 			name="plan" 
 			type="xsd:string"
-			default="cordscript: plan.new(id.value);"
+			default="cordscript: plan.new(id.value,name.value);"
 			/>
 		<xsd:attribute name="zone" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
@@ -179,7 +179,7 @@
 		<xsd:attribute 	
 			name="application" 
 			type="xsd:string"
-			default="cordscript: application.new(id.value);"/>
+			default="cordscript: application.new(id.value); application.build();"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
