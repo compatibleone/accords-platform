@@ -2281,10 +2281,17 @@ private	int	cords_terminate_xsd(
 			/* -------------------------------- */
 			modifications += cords_parser_xsd_default( wptr, dptr );
 
+			if ( modifications )
+			{
+				if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+					return(cords_append_error(dptr,704,"updating category"));
+				else	modifications=0;
+			}
+
 			/* ------------------------------------- */
 			/* detect and perform cordscript actions */
 			/* ------------------------------------- */
-			modifications += cords_parser_xsd_actions( wptr, dptr, agent, tls );
+			modifications = cords_parser_xsd_actions( wptr, dptr, agent, tls );
 			
 			if (!( modifications ))
 				return( 0 );

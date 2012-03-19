@@ -728,6 +728,8 @@ private	int	cords_action_instruction(
 
 	else if (!( strcasecmp( mname, "none" ) ))
 		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
+	else if (!( strcasecmp( mname, "set" ) ))
+		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
 
 	else if (!( strcasecmp( mname, "system" ) ))
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );

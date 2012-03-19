@@ -213,14 +213,14 @@ private	int	test_cords_parser_banner(char * n)
 	printf("\n   --xsd                dis-activate xsd validation ");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
 	printf("\n   --mime <accept>      specify the OCCI mime type ");
-	printf("\n   --host <host>        specify the publisher hostname ");
+	printf("\n   --publisher <host>   specify the publisher hostname ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --result <filename>  specify the output plan filename ");
 	printf("\n   --verbose            activate verbose messages ");
 	printf("\n   --debug              activate debug messages \n");
 	printf("\n   Example : \n");
-	printf("\n   %s --host http://127.0.0.1:8086 cords.xml \n\n",n);
+	printf("\n   %s --publisher http://127.0.0.1:8086 cords.xml \n\n",n);
 	return(0);
 }
 
