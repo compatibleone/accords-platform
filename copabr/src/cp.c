@@ -1915,6 +1915,25 @@ private	int	cords_parser_xsd_default(
 	return( modifications );
 }
 
+/*	-------------------------------------------------	*/
+/*	 c o r d s _ c a s c a d i n g _ a t t r i b u t	*/
+/*	-------------------------------------------------	*/
+/*	this function allows an attribute to be resolved 	*/
+/*	back up the document tree in the parent attribute	*/
+/*	lists of an xml document element.			*/
+/*	This is useful for gaining access to an XML NS or	*/
+/*	an element name for example				*/
+/*	-------------------------------------------------	*/
+private	struct	xml_atribut * cords_cascading_attribute( 
+	struct xml_element * dptr,
+	char * nptr )
+{
+	struct	xml_atribut * bptr;
+	if (!( bptr = document_atribut( dptr, nptr ) ))
+		return( cords_cascading_attribute( dptr->parent, nptr ) );
+	else	return( bptr );
+}
+
 /*	-----------------------------------------------------------------	*/
 /*		c o r d s _ i n v o c a t i o n _ p a r a m e t e r s		*/
 /*	-----------------------------------------------------------------	*/
@@ -1943,7 +1962,7 @@ private	struct occi_element * cords_invocation_parameters(
 
 		sprintf(buffer,"occi.%s.%s",fptr->lvalue->prefix,vptr);
 
-		if (!( bptr = document_atribut( dptr, nptr ) ))
+		if (!( bptr = cords_cascading_attribute( dptr, nptr ) ))
 			continue;
 		else if (!( hptr = occi_create_element( buffer, bptr->value ) ))
 			continue;
