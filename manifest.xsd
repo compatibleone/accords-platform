@@ -179,7 +179,7 @@
 		<xsd:attribute 	
 			name="application" 
 			type="xsd:string"
-			default="cordscript: application.new(id.value); application.build();"/>
+			default="cordscript: application.new(id.value,provider.value); application.build();"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
