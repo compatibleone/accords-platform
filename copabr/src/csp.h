@@ -27,6 +27,8 @@
 #include "cse.h"
 #include "csa.h"
 
+#define	_CORDSCRIPT_PREFIX	"cordscript:"
+
 #define	_MAX_CORDSCRIPT_TOKEN	1024
 
 #define	_CORDSCRIPT_LITERAL	0

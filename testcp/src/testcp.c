@@ -40,7 +40,7 @@ struct	cords_parser_config
 	_CORDS_PARSER_AGENT,
 	(char *) 0,
 	(char *) 0,
-	0
+	1
 	};
 
 private	int	debug=0;
@@ -131,7 +131,7 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 				else if (!( strcmp( aptr, "debug" ) ))
 				{	debug=1; continue;	}
 				else if (!( strcmp( aptr, "xsd" ) ))
-				{	Cp.xsd=1; continue;	}
+				{	Cp.xsd=0; continue;	}
 				else if (!( strcmp( aptr, "tls" ) ))
 				{
 					Cp.tls = argv[argi++];
@@ -207,10 +207,10 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 private	int	test_cords_parser_banner(char * n)
 {
 	printf("\n   Cords Parser : Version 1.0.b.0.01 ");
-	printf("\n   Beta Version 17/03/2012 \n");
+	printf("\n   Beta Version 19/03/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
-	printf("\n   --xsd                activate xsd validation ");
+	printf("\n   --xsd                dis-activate xsd validation ");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
 	printf("\n   --mime <accept>      specify the OCCI mime type ");
 	printf("\n   --host <host>        specify the publisher hostname ");

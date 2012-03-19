@@ -2067,14 +2067,14 @@ private	int	cords_parser_atribut_action(
 		return(0);
 	else if (!(xptr = aptr->value))
 		return(0);
-	else if ( strncmp( xptr, "cordscript:", strlen( "cordscript:" ) ) != 0 )
+	else if ( strncmp( xptr, _CORDSCRIPT_PREFIX, strlen( _CORDSCRIPT_PREFIX ) ) != 0 )
 		return(0);
 	else
 	{
 		/* ----------------------------- */
 		/* step over leading white space */
 		/* ----------------------------- */
-		xptr += strlen("cordscript:");
+		xptr += strlen(_CORDSCRIPT_PREFIX);
 		while ( ( *xptr == ' ' ) 
 		|| 	( *xptr == '\t') 
 		|| 	( *xptr == '\r')
