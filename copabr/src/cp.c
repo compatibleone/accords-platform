@@ -1964,11 +1964,16 @@ private	struct occi_element * cords_invocation_parameters(
 
 		if (!( bptr = cords_cascading_attribute( dptr, nptr ) ))
 			continue;
-		else if (!( hptr = occi_create_element( buffer, bptr->value ) ))
+		else if (!( bptr->value ))
+			continue;
+		else if (!( vptr = occi_unquoted_value( bptr->value )))
+			continue;
+		else if (!( hptr = occi_create_element( buffer, vptr ) ))
 			continue;
 		else if (!( hptr->previous = last ))
 			root = hptr;
 		else	last->next = hptr;
+		if ( vptr ) vptr = liberate( vptr );
 		last = hptr;
 	}
 	return( root );
