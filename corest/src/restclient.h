@@ -36,6 +36,13 @@ public	struct	rest_response *
 	rest_client_get_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr );
 
+/*	---	*/
+/*	TRY	*/
+/*	---	*/
+public	struct	rest_response * 
+	rest_client_try_get_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr, int timeout, int retry );
+
 /*	------	*/
 /*	DELETE	*/
 /*	------	*/

@@ -337,6 +337,53 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 }
 
 /*	------------------------------------------------	*/
+/*	    r e s t _ t r y _ o p e n _ c l i e n t		*/
+/*	------------------------------------------------	*/
+private	struct rest_client * 	rest_try_open_client( char * host, int port, char * tls, int timeout, int retry )
+{
+	struct rest_client *  cptr;
+	char	buffer[1024]; 
+	if (!( port ))
+		return((struct rest_client*) 0); 
+	else if (!( cptr = rest_allocate_client() ))
+	{
+		if ( check_debug() )
+			failure(27,"rest","allocate client");
+		return( cptr );
+	}
+	else if (!(cptr->net.socket = socket_create(AF_INET, SOCK_STREAM, 0  )))
+	{
+		if ( check_debug() )
+			failure(errno,"socket_create","errno");
+		return( rest_liberate_client( cptr ) );
+	}
+	while ( retry-- )
+	{
+		if (!( socket_try_connect( cptr->net.socket, host, port, timeout  ) ))
+			continue;
+		else	break;
+	}
+	if (!( retry ))
+		return( rest_liberate_client( cptr ) );
+
+	if (!( tls ))
+		return( cptr );
+	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
+	{
+		if ( check_debug() )
+			failure(27,"rest","tls configuration");
+		return( rest_liberate_client( cptr ) );
+	}
+	else
+	{
+		tls_configuration_use( cptr->tlsconf );
+		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
+			return( rest_liberate_client( cptr ) );
+		else	return( cptr );
+	}
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ c l i e n t _ r e s p o n s e		*/
 /*	------------------------------------------------	*/
 private	struct	rest_response *	rest_client_response( int status, char * message, char * nptr )
@@ -709,6 +756,52 @@ public	struct	rest_response * rest_client_get_request(
 	}
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+	{
+		if ( check_debug() )
+			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		liberate_url( uptr );
+		return( rest_client_response( 602, "Client Failure", agent ) );
+	}
+	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+		return( rest_client_response( 603, "Request Creation", agent ) );
+	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+		return( rest_client_response( 603, "Request Headers", agent ) );
+	else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		return( rest_client_response( 603, "Request Send", agent ) );
+	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		return( aptr );
+	}
+
+}
+
+/*	--------------------------------------------------------	*/
+/*	 r e s t _ c l i e n t _ t r y _ g e t _ r e q u e s t 		*/
+/*	--------------------------------------------------------	*/
+public	struct	rest_response * rest_client_try_get_request( 
+		char * target, char * tls, char * agent, struct rest_header * hptr, int timeout, int retry )
+{
+	struct	rest_response 	* aptr;
+	struct	url		* uptr;
+	struct	rest_client 	* cptr;
+	struct	rest_request 	* rptr;
+	
+	while (1)
+	{
+	if ( check_debug() )
+		printf("REST Client Request : GET %s \n",target );
+
+
+	if (!( uptr = analyse_url( target ) ))
+		return( rest_client_response( 600, "Url Anaysis", agent ) );
+
+	else if (!( uptr = validate_url( uptr )))
+	{
+		return( rest_client_response( 601, "Url Validation", agent ) );
+	}
+
+	else if (!( cptr = rest_try_open_client(uptr->host,uptr->port,tls, timeout, retry)))
 	{
 		if ( check_debug() )
 			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);

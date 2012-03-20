@@ -146,13 +146,15 @@ public	int	socket_connect( int h, char * u,int port )
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);
-	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) {
+	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
+	{
 		socket_close( h ) ;
 		return(0);
-		}
+	}
      	if (!(hp = gethostbyname(u)))
 		return( 0 );
-	else 	{
+	else 	
+	{
 		server.sin_family = AF_INET;
 		memcpy(tempxfer, hp->h_addr_list[0],4);
 		memcpy(&server.sin_addr.s_addr,tempxfer,4);
@@ -163,7 +165,58 @@ public	int	socket_connect( int h, char * u,int port )
 			sizeof( struct sockaddr ) ) < 0 )
 			return(0);
 		else	return(1);
-		}
+	}
+}
+
+/*	--------------------------------------------------	*/
+/*		s o c k e t _ t r y _ c o n n e c t		*/
+/*	--------------------------------------------------	*/
+private	int	socket_alarm=0;
+private	void	socket_try_catcher( int s ) { socket_alarm=1; }
+public	int	socket_try_connect( int h, char * u,int port, int timeout )
+{
+	int	status=0;
+	void *	vptr;
+	unsigned  char tempxfer[4];
+	char *	wptr;
+	struct  hostent *hp=(struct hostent *) 0;
+	struct sockaddr_in address;
+	struct sockaddr_in server;
+
+	if ( check_debug() & _DEBUG_SOCKET ) 
+	{
+		printf( "socket_connect(%u,%s,%u)\n",h,u,port);
+	}
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = htonl(INADDR_ANY);
+	address.sin_port = htons(0);
+	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
+	{
+		socket_close( h ) ;
+		return(0);
+	}
+     	if (!(hp = gethostbyname(u)))
+		return( 0 );
+	else 	
+	{
+		server.sin_family = AF_INET;
+		memcpy(tempxfer, hp->h_addr_list[0],4);
+		memcpy(&server.sin_addr.s_addr,tempxfer,4);
+		server.sin_port = htons(port);
+		socket_alarm=0;
+		vptr = signal(SIGALRM,socket_try_catcher);
+		alarm( timeout );
+		status = connect( h, 
+			(struct sockaddr *) & server,
+			sizeof( struct sockaddr ) );
+		alarm(0);
+		vptr = signal(SIGALRM,vptr);
+		if ( socket_alarm )
+			return(0);
+		else if ( status < 0 )
+			return(0);
+		else	return(1);
+	}
 }
 
 /*	------------------------------------------	*/

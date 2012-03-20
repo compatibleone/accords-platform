@@ -24,6 +24,8 @@
 #include "occi.h"
 #include "cosacsctrl.h"
 #include "cordslang.h"
+#include "restclient.h"
+#include "restpublic.h"
 
 /*	------------------------------------	*/
 /*	the COSACS host is currently forced 	*/
@@ -247,6 +249,29 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 		zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
 		return(0);
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/*		   c o s a c s _ t e s t _ in t e r f a c e		*/
+/*	-----------------------------------------------------------	*/
+public	int	cosacs_test_interface( char * cosacs, int timeout, int retry )
+{
+	char	buffer[1024];
+	char *	host=_COSACS_HOST; 
+	char *	agent=_CORDS_CONTRACT_AGENT;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	rest_response * rptr;
+	if (!( host = getenv( "COSACS" ) ))
+		host = cosacs;
+	sprintf(buffer,"%s:%u/-/",host,_COSACS_PORT);
+
+	if (!( rptr = rest_client_try_get_request( buffer, default_tls(), agent, hptr, timeout, retry ) ))
+		return(0);
+	else	
+	{
+		rptr = liberate_rest_response( rptr );
+		return(1);
 	}
 }
 
