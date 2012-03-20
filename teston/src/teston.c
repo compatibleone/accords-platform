@@ -60,10 +60,19 @@ private	int	on_result( struct on_response * rptr )
 		switch ( rptr->nature )
 		{
 		case	_TEXT_JSON	:
-			json_show( rptr->jsonroot );
-			printf("\n");		
+			if ( rptr->jsonroot )
+			{
+				json_show( rptr->jsonroot );
+				printf("\n");		
+			}
 			break;
 		case	_TEXT_XML	:
+			if ( rptr->xmlroot )
+			{
+				document_show_element( rptr->xmlroot, 0 );
+				printf("\n");
+			}
+			break;
 		default			:
 			if (!( rptr->response ))
 				break;
@@ -160,6 +169,120 @@ private	struct	on_response * on_post_object(
 		if (!( filename = on_create_network_request( p3, p4, p5 )))
 			return((struct on_response *) 0);
 		else	return( on_post_request( "/network", filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ s a v e _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_save_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		struct rest_header * hptr,
+		char * p3,
+		char * p4,
+		char * p5 )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "server" ) ))
+	{
+		if (!( filename = on_create_image_request( p3, p4, p5 )))
+			return((struct on_response *) 0);
+		else 	return( on_create_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "compute" ) ))
+	{
+		if (!( filename = on_create_image_request( p3, p4, p5 )))
+			return((struct on_response *) 0);
+		else 	return( on_create_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ s t o p _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_stop_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "server" ) ))
+	{
+		if (!( filename = on_stop_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_stop_compute( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "compute" ) ))
+	{
+		if (!( filename = on_stop_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_stop_compute( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ s h u t d o w n _ o b j e c t		*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_shutdown_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "server" ) ))
+	{
+		if (!( filename = on_shutdown_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_shutdown_compute( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "compute" ) ))
+	{
+		if (!( filename = on_shutdown_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_shutdown_compute( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ s t a r t _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_start_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "server" ) ))
+	{
+		if (!( filename = on_start_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_start_compute( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "compute" ) ))
+	{
+		if (!( filename = on_start_compute_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_start_compute( p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -294,12 +417,20 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return( on_result( on_get_object( p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"DELETE" ) ))
 		return( on_result( on_delete_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"STOP" ) ))
+		return( on_result( on_stop_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"SHUTDOWN" ) ))
+		return( on_result( on_shutdown_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"START" ) ))
+		return( on_result( on_start_object( p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( p4 ))
 		return( failure( 30,"p4", "required") );
 	else if (!( strcasecmp(p1,"PUT" ) ))
 		return( on_result( on_put_object( p2, default_tls(), agent, p3, p4, hptr ) ) );
 	else if (!( p5 ))
 		return( failure( 30,"p5", "required") );
+	else if (!( strcasecmp(p1,"SAVE" ) ))
+		return( on_result( on_save_object( p2, default_tls(), agent, hptr, p3, p4, p5 ) ) );
 	else if (!( p6 ))
 		return( failure( 30,"p6", "required") );
 	else if (!( strcasecmp(p1,"POST" ) ))
@@ -392,9 +523,13 @@ private	int	on_banner()
 	printf("\n");
 	printf("\n   [ GET    [ compute | storage | network | server ] {id} ");
 	printf("\n   [ DELETE [ compute | storage | network | server ] {id} ");
-	printf("\n   [ POST   compute {name} {small|medium|large} {image} {network} ");
-	printf("\n   [ POST   storage {name} {description} {type} {size} ");
-	printf("\n   [ POST   network {name} {address} {class} ");
+	printf("\n   [ POST     compute {name} {small|medium|large} {image} {network} ");
+	printf("\n   [ SAVE     compute {id} {number} {name} ");
+	printf("\n   [ STOP     compute {id} ");
+	printf("\n   [ START    compute {id} ");
+	printf("\n   [ SHUTDOWN compute {id} ");
+	printf("\n   [ POST     storage {name} {description} {type} {size} ");
+	printf("\n   [ POST     network {name} {address} {class} ");
 	printf("\n   [ PUT    [ compute | storage | network | server ] {id} {filename} ");
 	printf("\n\n");
 	return( 0 );

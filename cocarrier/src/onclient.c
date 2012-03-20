@@ -279,6 +279,17 @@ public	char * on_create_compute_request(
 			/* ----------------------------------- */
 			fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
 		}
+
+		/* -------------------------------------- */
+		/* a second public address may be present */
+		/* -------------------------------------- */
+		if ( network )
+		{
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n",network);
+			fprintf(h,"</NIC>\n");
+		}
+
 		/* -------------------------------------- */
 		/* a local address must always be present */
 		/* -------------------------------------- */
@@ -298,16 +309,6 @@ public	char * on_create_compute_request(
 			fprintf(h,"</NIC>\n");
 		}
 
-		/* -------------------------------------- */
-		/* a second public address may be present */
-		/* -------------------------------------- */
-		if ( network )
-		{
-			fprintf(h,"<NIC>\n");
-			fprintf(h,"<NETWORK href='%s'/>\n",network);
-			fprintf(h,"</NIC>\n");
-		}
-
 		/* ----------------------------------------------- */
 		/* a stanhdard graphical interface would be useful */
 		/* ----------------------------------------------- */
@@ -322,6 +323,100 @@ public	char * on_create_compute_request(
 		return( filename );
 	}
 }
+
+/*	----------------------------------------------------------------	*/
+/*	 	o n _ s t o p _ c o m p u t e _ r e q u e s t		*/
+/*	----------------------------------------------------------------	*/
+public	char * on_stop_compute_request( char * identity )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		/* ---------------------------------------- */
+		/* generate server creation request element */
+		/* ---------------------------------------- */
+		fprintf(h,"<COMPUTE>\n");
+		fprintf(h,"<ID>%s</ID>\n",identity);
+		fprintf(h,"<STATE>stopped</STATE>\n");
+		fprintf(h,"</COMPUTE>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	 	o n _ s h u t d o w n _ c o m p u t e _ r e q u e s t		*/
+/*	----------------------------------------------------------------	*/
+public	char * on_shutdown_compute_request( char * identity )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		/* ---------------------------------------- */
+		/* generate server creation request element */
+		/* ---------------------------------------- */
+		fprintf(h,"<COMPUTE>\n");
+		fprintf(h,"<ID>%s</ID>\n",identity);
+		fprintf(h,"<STATE>shutdown</STATE>\n");
+		fprintf(h,"</COMPUTE>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	 	o n _ s t a r t _ c o m p u t e _ r e q u e s t			*/
+/*	----------------------------------------------------------------	*/
+public	char * on_start_compute_request( char * identity )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		/* ---------------------------------------- */
+		/* generate server creation request element */
+		/* ---------------------------------------- */
+		fprintf(h,"<COMPUTE>\n");
+		fprintf(h,"<ID>%s</ID>\n",identity);
+		fprintf(h,"<STATE>running</STATE>\n");
+		fprintf(h,"</COMPUTE>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ i m a g e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
@@ -350,8 +445,8 @@ public	char * on_create_image_request(
 		/* ----------------------------------------- */
 		fprintf(h,"<COMPUTE href='%s/compute/%s'>\n",On.base,number);
 		fprintf(h,"<ID>%s</ID>\n",number);
-		fprintf(h,"<DISK id='0'");
-		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",oldnumber);
+		fprintf(h,"<DISK id='0'>");
+		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,oldnumber);
 		fprintf(h,"<SAVE_AS name='%s'/>\n",newname);
 		fprintf(h,"</DISK>\n");
 		fprintf(h,"</COMPUTE>\n");
@@ -678,6 +773,36 @@ public	struct	on_response *	on_create_compute( char * filename )
 	char 	buffer[2048];
 	sprintf(buffer,"/compute");
 	return( on_post_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ s t o p _ c o m p u t e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_stop_compute( char * id, char * filename ) 
+{ 
+	char 	buffer[2048];
+	sprintf(buffer,"/compute/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ s h u t d o w n _ c o m p u t e			*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_shutdown_compute( char * id, char * filename ) 
+{ 
+	char 	buffer[2048];
+	sprintf(buffer,"/compute/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ s t a r t _ c o m p u t e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_start_compute( char * id, char * filename ) 
+{ 
+	char 	buffer[2048];
+	sprintf(buffer,"/compute/%s",id);
+	return( on_put_request( buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/

@@ -107,6 +107,13 @@ public	struct	on_response *	on_delete_network( char * id );
 public	struct	on_response *	on_delete_server( char * id );
 
 public	struct	on_response *	on_delete_image ( char * id );
+public	char * 	on_stop_compute_request( char * identity );
+public	struct	on_response *	on_stop_compute( char * id, char * filename );
+
+public	char * 	on_start_compute_request( char * identity );
+public	struct	on_response *	on_start_compute( char * id, char * filename );
+public	char * 	on_shutdown_compute_request( char * identity );
+public	struct	on_response *	on_shutdown_compute( char * id, char * filename );
 
 #endif	/* _on_client_h */
 	/* ------------ */

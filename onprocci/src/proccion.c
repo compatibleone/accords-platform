@@ -92,32 +92,51 @@ private	int	resolve_on_addresses( struct on_response * yptr, struct opennebula *
 	char	*	vptr;
 	struct	xml_element * eptr;
 	struct	xml_element * iptr;
+	char	*	firstadr=(char *) 0;
+	char	*	nextadr=(char *) 0;
 
-	/* ---------------------------------------------- */
-	/* attempt to resolve a first and private address */
-	/* ---------------------------------------------- */
+	/* ---------------------------------- */
+	/* NB: OpenNebula will attempt to set */
+	/* up its gateway on the 1st address  */
+	/* so it has to be the public one if  */
+	/* a public one is to be used.	      */
+	/* ---------------------------------- */
+	/* attempt to resolve a first address */
+	/* ---------------------------------- */
 	if (!( eptr = document_element( yptr->xmlroot, "NIC")))
 		return( 0 );
 	else if (!( iptr = document_element( eptr, "IP")))
 		return( 0 );
-	else if (!( pptr->privateaddr  = allocate_string(iptr->value)))	
+	else if (!( firstadr = allocate_string(iptr->value)))
 		return( 27 );
+
+
+	/* ----------------------------------- */
+	/* attempt to resolve a second address */
+	/* ----------------------------------- */
+	if (!( eptr = document_element( eptr->next, "NIC")))
+		return( 0 );
+	else if (!( iptr = document_element( eptr, "IP")))
+		return( 0 );
+	else if (!( nextadr  = allocate_string(iptr->value)))
+		return( 27 );
+
+	if ( nextadr )
+	{
+		pptr->privateaddr = nextadr;
+		pptr->publicaddr  = firstadr;
+	}
+	else
+	{
+		pptr->privateaddr = firstadr;		
+		pptr->publicaddr = nextadr;
+	}
 
 	if ( check_debug() )
 	{
 		rest_log_message("*** ON PROCCI Instance PRIVATE IP ***");
 		rest_log_message( pptr->publicaddr );
 	}
-
-	/* ---------------------------------------------- */
-	/* attempt to resolve a second and public address */
-	/* ---------------------------------------------- */
-	if (!( eptr = document_element( eptr->next, "NIC")))
-		return( 0 );
-	else if (!( iptr = document_element( eptr, "IP")))
-		return( 0 );
-	else if (!( pptr->publicaddr  = allocate_string(iptr->value)))	
-		return( 27 );
 
 	if ( check_debug() )
 	{

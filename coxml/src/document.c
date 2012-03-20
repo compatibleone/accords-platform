@@ -297,6 +297,56 @@ public	struct	xml_element * document_parse_file( char * sptr )
 }
 
 /*	---------------------------------------------------	*/
+/*	     d o c u m e n t _ s h o w _ e l e m e n t		*/
+/*	---------------------------------------------------	*/
+public	void	document_show_element( struct xml_element * eptr, int level )
+{
+	struct	xml_atribut * aptr;
+	struct	xml_element * cptr;
+	char	*	sptr;
+	int	i;
+
+	for (;  eptr != (struct xml_element *) 0; eptr = eptr->next )
+	{
+		for (i=0; i < level; i++) printf("\t");
+		printf("<");
+		printf("%s",eptr->name);
+		for (	aptr=eptr->firstatb; 
+			aptr != (struct xml_atribut *) 0; 
+			aptr = aptr->next )
+		{
+			printf("\n");
+			for (i=0; i < (level+1); i++) printf("\t");
+			printf("%s=%c%",aptr->name,0x0022);
+			if ( aptr->value )
+			{
+				for ( 	sptr=aptr->value;
+					*sptr != 0;
+					sptr++)
+					if ( *sptr != '"' )
+						printf("%c",*sptr);
+			
+			}
+			printf("%c",0x0022);
+		}
+		if ((!( eptr->first )) && (!( eptr->value )))
+		{	printf("/>\n");	}
+		else	
+		{
+			printf(">\n");
+			document_show_element( eptr->first,(level+1) );
+			if ( eptr->value )
+			{
+				for (i=0; i < level; i++) printf("\t");
+				printf("%s\n",eptr->value);
+			}
+			for (i=0; i < level; i++) printf("\t");
+			printf("</%s>\n",eptr->name);
+		}
+	}
+}
+
+/*	---------------------------------------------------	*/
 /*	d o c u m e n t _ s e r i a l i s e _ e l e m e n t	*/
 /*	---------------------------------------------------	*/
 private	void	document_serialise_element( FILE * h, struct xml_element * eptr, int level )
