@@ -17,20 +17,28 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_onprocci_c
-#define	_onprocci_c
+#ifndef	_cosched_c
+#define	_cosched_c
 
 #include "standard.h"
-#include "procci.h"
+#include "broker.h"
 #include "rest.h"
 #include "occi.h"
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "occiclient.h"
+#include "cosacsctrl.h"
+#include "cordslang.h"
+#include "cp.h"
+#include "cb.h"
 
-struct	accords_configuration OnProcci = {
-	0,0, 
+#define	_COSCHED_MODEL "cosched:model"
+#define _COSCHED_ACCOUNT "cosched"
+
+struct	accords_configuration Cosched = {
+	0,0,
 	0,0,0,
 	(char *) 0,
 	(char *) 0,
@@ -41,22 +49,22 @@ struct	accords_configuration OnProcci = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"onprocci.xml",
+	"cosched.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(OnProcci.debug);		}
-public	int	check_verbose()		{	return(OnProcci.verbose);	}
-public	char *	default_publisher()	{	return(OnProcci.publisher);	}
-public	char *	default_operator()	{	return(OnProcci.operator);	}
-public	char *	default_tls()		{	return(OnProcci.tls);		}
+public	int	check_debug()		{	return(Cosched.debug);		}
+public	int	check_verbose()		{	return(Cosched.verbose);		}
+public	char *	default_publisher()	{	return(Cosched.publisher);	}
+public	char *	default_operator()	{	return(Cosched.operator);	}
+public	char *	default_tls()		{	return(Cosched.tls);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
 	{
-		printf("\n*** failure %u",e);
+		printf("\n***(%u) failure %u",getpid(),e);
 		if ( m1 )
 			printf(" : %s",m1);
 		if ( m2 )
@@ -67,22 +75,22 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		 o n p r o c c i _ l o a d 		*/
+/*	 	   c o s c h e d _ l o a d 		*/
 /*	---------------------------------------------	*/
-/*	this function loads onprocci    configuration	*/
+/*	this function loads cosched  configuration	*/
 /*	from the xml configuration file.		*/
 /*	---------------------------------------------	*/  
-private	void	onprocci_load()
+private	void	cosched_load()
 {
-	load_accords_configuration( &OnProcci, "onprocci" );
+	load_accords_configuration( &Cosched, "cosched" );
 	return;
 }
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne OpenNebula Procci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 21/03/2012");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
+	printf("\n   CompatibleOne Job Scheduling Services : Version 1.0a.0.01");
+	printf("\n   Beta Version : 21/02/2012");
+	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -91,13 +99,14 @@ private	int	banner()
 }
 
 /*	------------------------------------------------------------------	*/
-/*			o n p r o c c i _ i n i t i a l i s e			*/
+/*			c o s c h e d _ i n i t i a l i s e			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_server * onprocci_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * cosched_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
 		return((struct rest_server *) 0);
+
 	else
 	{
 		xptr->net = (struct connection *) 0;
@@ -106,13 +115,13 @@ private	struct rest_server * onprocci_initialise(  void * v,struct rest_server *
 }
 
 /*	------------------------------------------------------------------	*/
-/*			o n p r o c c i _ a u t h o r i s e 			*/
+/*			c o s c h e d _ a u t h o r i s e 			*/
 /*	------------------------------------------------------------------	*/
-private	int	onprocci_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	cosched_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, OnProcci.user ) )
+	if ( strcmp( username, Cosched.user ) )
 		return(0);
-	else if ( strcmp( password, OnProcci.password ) )
+	else if ( strcmp( password, Cosched.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -122,69 +131,63 @@ private	int	onprocci_authorise(  void * v,struct rest_client * cptr, char * user
 }
 
 /*	------------------------------------------------------------------	*/
-/*			o n p r o c c i _ e x t e n s i o n 			*/
+/*			c o s c h e d _ e x t e n s i o n 				*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_extension * onprocci_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * cosched_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
 
-#include "proccion.c"
-
 /*	------------------------------------------------------------------	*/
-/*			o n p r o c c i _ o p e r a t i o n				*/
+/*			c o s c h e d _ s yn c h r o n i s e 			*/
 /*	------------------------------------------------------------------	*/
-private	int	onprocci_operation( char * nptr )
+private	void	cosched_synchronise()
 {
+	sleep(1);
+}
 
+/*	------------------------------------------------------------------	*/
+/*			c o s c h e d _ o p e r a t i o n				*/
+/*	------------------------------------------------------------------	*/
+private	int	cosched_operation( char * nptr )
+{
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_opennebula.xml");
+	set_autosave_cords_xlink_name("links_cosched.xml");
 
-	if (!( optr = build_opennebula( OnProcci.domain ) ))
+	if (!( optr = occi_cords_schedule_builder( Cosched.domain, "schedule" ) ))
 		return( 27 );
-
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
+	rest_initialise_log(Cosched.monitor);
 
-	if (!( optr = build_opennebula_configuration( OnProcci.domain ) ))
-		return( 27 );
-
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	rest_initialise_log( OnProcci.monitor );
-
-	if (!( OnProcci.identity ))
-		return( occi_server(  nptr, OnProcci.restport, OnProcci.tls, OnProcci.threads, first,(char *) 0 ) );
+	if (!( Cosched.identity ))
+		return( occi_server(  nptr, Cosched.restport, Cosched.tls, Cosched.threads, first,(char *) 0 ) );
 	else
 	{
-		initialise_occi_publisher( OnProcci.publisher, (char*) 0, (char *) 0, (char *) 0);
+		initialise_occi_publisher( Cosched.publisher, (char*) 0, (char *) 0, (char *) 0);
 		return( publishing_occi_server(
-			OnProcci.user, OnProcci.password,
-			OnProcci.identity,  nptr, 
-			OnProcci.restport, OnProcci.tls, 
-			OnProcci.threads, first ) );
+			Cosched.user, Cosched.password,
+			Cosched.identity,  nptr, 
+			Cosched.restport, Cosched.tls, 
+			Cosched.threads, first ) );
 	}
 }
 
-
 /*	------------------------------------------------------------------	*/
-/*				o n p r o c c i 					*/
+/*				c o s c h e d 					*/
 /*	------------------------------------------------------------------	*/
-private	int	onprocci(int argc, char * argv[] )
+private	int	cosched(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	onprocci_load();
+	cosched_load();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -195,10 +198,10 @@ private	int	onprocci(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				OnProcci.verbose=1;
+				Cosched.verbose=1;
 				continue;
 			case	'd'	:
-				OnProcci.debug = 0xFFFF;
+				Cosched.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -208,7 +211,7 @@ private	int	onprocci(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = onprocci_operation(aptr) ))
+		else if (!( status = cosched_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -222,11 +225,11 @@ public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
 		return( banner() );
-	else	return( onprocci( argc, argv ) );
+	else	return( cosched( argc, argv ) );
 }
 
 
-	/* ----------- */
-#endif	/* _onprocci_c */
-	/* ----------- */
+	/* --------- */
+#endif	/* _cosched_c */
+	/* --------- */
 

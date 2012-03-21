@@ -1,5 +1,5 @@
 #
-# COSS Makefile.am
+# COIPS Makefile.am
 #
 # Copyright 2012, Prologue, All rights reserved
 #

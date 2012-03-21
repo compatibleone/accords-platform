@@ -1,10 +1,10 @@
 #
-# COSS Makefile.am
+# COSACS Makefile.am
 #
 # Copyright 2011, Mandriva, All rights reserved
 #
 # Authors:
-#   Jean-Philippe Braun <jpbraun@mandriva.com>
+#   Jamie Marshall <ijm667@hotmail.com>
 #
 
 bin_PROGRAMS = cosacs
