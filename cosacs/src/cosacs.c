@@ -150,6 +150,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	FILE *	h=(FILE *) 0;
 	int	execmode=0;
 	int	metadatas=0;
+	int	scripts=0;
 
 	/* ----------------------------------- */
 	/* first mark this script item as done */
@@ -201,6 +202,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	if ( metadatas )
 	{
 		autosave_cords_metadata_nodes();
+		sync();
 	}
 
 	/* --------------------------------- */
@@ -250,8 +252,18 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 				fprintf(h,"%s&\n",sptr->syntax);
 			else	fprintf(h,"%s\n",sptr->syntax);
 			sptr->status = 1;
+			scripts++;
 		}
 	}
+	/* --------------------------------------------- */
+	/* save the scripts now that they have been used */
+	/* --------------------------------------------- */
+	if ( scripts )
+	{
+		autosave_cords_script_nodes();
+		sync();
+	}
+
 	/* -------------------------- */
 	/* did a script get generated */
 	/* -------------------------- */
