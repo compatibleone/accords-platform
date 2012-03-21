@@ -82,8 +82,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/02/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.04");
+	printf("\n   Beta Version : 21/03/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -149,6 +149,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	char *	tempname=(char *) 0;
 	FILE *	h=(FILE *) 0;
 	int	execmode=0;
+	int	metadatas=0;
 
 	/* ----------------------------------- */
 	/* first mark this script item as done */
@@ -191,7 +192,15 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 				fprintf(h,"export %s=%c%s%c\n",mptr->name,0x0022,mptr->value,0x0022);
 			else	fprintf(h,"export %s=\n",mptr->name);
 			mptr->status = 1;
+			metadatas++;
 		}
+	}
+	/* -------------------------------------------- */
+	/* save the meta data now that it has been used */
+	/* -------------------------------------------- */
+	if ( metadatas )
+	{
+		autosave_cords_metadata_nodes();
 	}
 
 	/* --------------------------------- */
