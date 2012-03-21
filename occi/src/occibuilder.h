@@ -4,6 +4,7 @@
 
 #include "cords.h"
 
+public struct occi_category * occi_cords_schedule_builder(char *a,char * b);
 public struct occi_category * occi_cords_interface_builder(char *a,char * b);
 public struct occi_category * occi_cords_session_builder(char *a,char * b);
 public struct occi_category * occi_cords_consumer_builder(char *a,char * b);
@@ -88,6 +89,7 @@ const static struct {
 	{ "instance", occi_cords_instance_builder },
 	{ "value", occi_cords_value_builder },
 	{ "vm", occi_cords_vm_builder },
+	{ "schedule", occi_cords_schedule_builder },
 	{ "metadata", occi_cords_metadata_builder },
 	{ "file", occi_cords_file_builder },
 	{ "script", occi_cords_script_builder },

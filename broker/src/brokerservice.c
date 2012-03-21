@@ -235,7 +235,8 @@ private	int	service_action( char * id, char * action )
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
 
-		cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() );
+		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
 		if ( contracts++ ) fprintf(h,",\n" );
 

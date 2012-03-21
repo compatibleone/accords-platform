@@ -12,6 +12,8 @@
 <cords_user 
  id='3d960eb3-cosa-4bdd-a6a7-20e9fe0b85f7' name='service-cosacs' password='co-system' />
 <cords_user 
+ id='3d960eb3-shed-4bdd-a6a7-20e9fe0b85f7' name='service-cosched' password='co-system' />
+<cords_user 
  id='3d960eb3-coip-4bdd-a6a7-20e9fe0b85f7' name='service-coips' password='co-system' />
 <cords_user 
  id='fa77ed3c-coob-407c-9cd2-40cee4749af2' name='service-coobas' password='co-system' />

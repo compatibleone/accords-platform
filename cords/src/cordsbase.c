@@ -70,6 +70,7 @@
 #include "transaction.c"
 #include "invoice.c"
 #include "vm.c"
+#include "schedule.c"
 #include "manifest.c"
 #include "plan.c"
 #include "xlink.c"

@@ -19,54 +19,54 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _vm_c_
-#define _vm_c_
+#ifndef _schedule_c_
+#define _schedule_c_
 
-#include "vm.h"
+#include "schedule.h"
 
-/*	--------------------------	*/
-/*	o c c i _ c o r d s _ v m 	*/
-/*	--------------------------	*/
+/*	--------------------------------------	*/
+/*	o c c i _ c o r d s _ s c h e d u l e 	*/
+/*	--------------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct cords_vm * allocate_cords_vm();
-struct cords_vm * liberate_cords_vm(struct cords_vm * optr);
-private pthread_mutex_t list_cords_vm_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * cords_vm_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * cords_vm_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_cords_vm_node() { return( cords_vm_first ); }
+struct cords_schedule * allocate_cords_schedule();
+struct cords_schedule * liberate_cords_schedule(struct cords_schedule * optr);
+private pthread_mutex_t list_cords_schedule_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * cords_schedule_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * cords_schedule_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_cords_schedule_node() { return( cords_schedule_first ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_cords_vm_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_schedule_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		cords_vm_first = nptr->next;
+		cords_schedule_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		cords_vm_last = nptr->previous;
+		cords_schedule_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_cords_vm_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_cords_vm_control );
-	nptr = ll_drop_cords_vm_node( nptr );
-	pthread_mutex_unlock( &list_cords_vm_control );
+private struct occi_kind_node * drop_cords_schedule_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_schedule_control );
+	nptr = ll_drop_cords_schedule_node( nptr );
+	pthread_mutex_unlock( &list_cords_schedule_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_cords_vm_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_schedule_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
-	for ( nptr = cords_vm_first;
+	struct cords_schedule * pptr;
+	for ( nptr = cords_schedule_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -75,75 +75,83 @@ private struct occi_kind_node * ll_locate_cords_vm_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_cords_vm_node(char * id) {
+private struct occi_kind_node * locate_cords_schedule_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_vm_control );
-	nptr = ll_locate_cords_vm_node(id);
-	pthread_mutex_unlock( &list_cords_vm_control );
+	pthread_mutex_lock( &list_cords_schedule_control );
+	nptr = ll_locate_cords_schedule_node(id);
+	pthread_mutex_unlock( &list_cords_schedule_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_cords_vm_node(int mode) {
+private struct occi_kind_node * ll_add_cords_schedule_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_cords_vm()))
+		if (!( nptr->contents = allocate_cords_schedule()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = cords_vm_last ))
-				cords_vm_first = nptr;
+			if (!( nptr->previous = cords_schedule_last ))
+				cords_schedule_first = nptr;
 			else	nptr->previous->next = nptr;
-			cords_vm_last = nptr;
+			cords_schedule_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_cords_vm_node(int mode) {
+private struct occi_kind_node * add_cords_schedule_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_vm_control );
-	nptr = ll_add_cords_vm_node( mode );
-	pthread_mutex_unlock( &list_cords_vm_control );
+	pthread_mutex_lock( &list_cords_schedule_control );
+	nptr = ll_add_cords_schedule_node( mode );
+	pthread_mutex_unlock( &list_cords_schedule_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_cords_vm_name="cords_vm.xml";
-private void autoload_cords_vm_nodes() {
-	char * fn=autosave_cords_vm_name;	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+private char*autosave_cords_schedule_name="cords_schedule.xml";
+private void autoload_cords_schedule_nodes() {
+	char * fn=autosave_cords_schedule_name;	struct occi_kind_node * nptr;
+	struct cords_schedule * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"cords_vms")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_schedules")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "cords_vm" ) ) continue;
-			else if (!( nptr = add_cords_vm_node(0))) break;
+			else if ( strcmp( vptr->name, "cords_schedule" ) ) continue;
+			else if (!( nptr = add_cords_schedule_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
-				pptr->image = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
-				pptr->provider = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
-				pptr->application = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "operation" )) != (struct xml_atribut *) 0)
+				pptr->operation = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "requested" )) != (struct xml_atribut *) 0)
+				pptr->requested = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "expected" )) != (struct xml_atribut *) 0)
+				pptr->expected = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "started" )) != (struct xml_atribut *) 0)
+				pptr->started = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "completed" )) != (struct xml_atribut *) 0)
+				pptr->completed = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "priority" )) != (struct xml_atribut *) 0)
+				pptr->priority = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
 				pptr->status = document_atribut_value(aptr);
 			}
@@ -155,68 +163,88 @@ private void autoload_cords_vm_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_cords_vm_name(char * fn) {
-	autosave_cords_vm_name = fn;	return;
+public  void set_autosave_cords_schedule_name(char * fn) {
+	autosave_cords_schedule_name = fn;	return;
 }
-public  void autosave_cords_vm_nodes() {
-	char * fn=autosave_cords_vm_name;	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+public  void autosave_cords_schedule_nodes() {
+	char * fn=autosave_cords_schedule_name;	struct occi_kind_node * nptr;
+	struct cords_schedule * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_cords_vm_control );
+	pthread_mutex_lock( &list_cords_schedule_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<cords_vms>\n");
-	for ( nptr = cords_vm_first;
+	fprintf(h,"<cords_schedules>\n");
+	for ( nptr = cords_schedule_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<cords_vm\n");
+		fprintf(h,"<cords_schedule\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," image=%c",0x0022);
-		fprintf(h,"%s",(pptr->image?pptr->image:""));
+		fprintf(h," operation=%c",0x0022);
+		fprintf(h,"%s",(pptr->operation?pptr->operation:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," provider=%c",0x0022);
-		fprintf(h,"%s",(pptr->provider?pptr->provider:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," application=%c",0x0022);
-		fprintf(h,"%s",(pptr->application?pptr->application:""));
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," requested=%c",0x0022);
+		fprintf(h,"%u",pptr->requested);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," expected=%c",0x0022);
+		fprintf(h,"%u",pptr->expected);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," started=%c",0x0022);
+		fprintf(h,"%u",pptr->started);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," completed=%c",0x0022);
+		fprintf(h,"%u",pptr->completed);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," priority=%c",0x0022);
+		fprintf(h,"%u",pptr->priority);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," status=%c",0x0022);
 		fprintf(h,"%u",pptr->status);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</cords_vms>\n");
+	fprintf(h,"</cords_schedules>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_cords_vm_control );
+	pthread_mutex_unlock( &list_cords_schedule_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_cords_vm_field(
+private void set_cords_schedule_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
-		if (!( strcmp( nptr, "image" ) ))
-			pptr->image = allocate_string(vptr);
-		if (!( strcmp( nptr, "provider" ) ))
-			pptr->provider = allocate_string(vptr);
-		if (!( strcmp( nptr, "application" ) ))
-			pptr->application = allocate_string(vptr);
+		if (!( strcmp( nptr, "operation" ) ))
+			pptr->operation = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "requested" ) ))
+			pptr->requested = atoi(vptr);
+		if (!( strcmp( nptr, "expected" ) ))
+			pptr->expected = atoi(vptr);
+		if (!( strcmp( nptr, "started" ) ))
+			pptr->started = atoi(vptr);
+		if (!( strcmp( nptr, "completed" ) ))
+			pptr->completed = atoi(vptr);
+		if (!( strcmp( nptr, "priority" ) ))
+			pptr->priority = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
 			pptr->status = atoi(vptr);
 		}
@@ -226,23 +254,23 @@ private void set_cords_vm_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct cords_vm * filter_cords_vm_info(
+private struct cords_schedule * filter_cords_schedule_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct cords_vm * pptr;
-		if (!( pptr = allocate_cords_vm()))
+	struct cords_schedule * pptr;
+		if (!( pptr = allocate_cords_schedule()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_vm_field) ))
-		return( liberate_cords_vm(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_schedule_field) ))
+		return( liberate_cords_schedule(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_cords_vm_filter(
-	struct cords_vm * pptr,struct cords_vm * fptr) {
+private int pass_cords_schedule_filter(
+	struct cords_schedule * pptr,struct cords_schedule * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -250,25 +278,18 @@ private int pass_cords_vm_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
-	if (( fptr->image )
-	&&  (strlen( fptr->image ) != 0)) {
-		if (!( pptr->image ))
+	if (( fptr->operation )
+	&&  (strlen( fptr->operation ) != 0)) {
+		if (!( pptr->operation ))
 			return(0);
-		else if ( strcmp(pptr->image,fptr->image) != 0)
-			return(0);
-		}
-	if (( fptr->provider )
-	&&  (strlen( fptr->provider ) != 0)) {
-		if (!( pptr->provider ))
-			return(0);
-		else if ( strcmp(pptr->provider,fptr->provider) != 0)
+		else if ( strcmp(pptr->operation,fptr->operation) != 0)
 			return(0);
 		}
-	if (( fptr->application )
-	&&  (strlen( fptr->application ) != 0)) {
-		if (!( pptr->application ))
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
 			return(0);
-		else if ( strcmp(pptr->application,fptr->application) != 0)
+		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
 	if (( fptr->price )
@@ -278,6 +299,11 @@ private int pass_cords_vm_filter(
 		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
+	if (( fptr->requested ) && ( pptr->requested != fptr->requested )) return(0);
+	if (( fptr->expected ) && ( pptr->expected != fptr->expected )) return(0);
+	if (( fptr->started ) && ( pptr->started != fptr->started )) return(0);
+	if (( fptr->completed ) && ( pptr->completed != fptr->completed )) return(0);
+	if (( fptr->priority ) && ( pptr->priority != fptr->priority )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
@@ -285,25 +311,37 @@ private int pass_cords_vm_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_occi_response(
+private struct rest_response * cords_schedule_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct cords_vm * pptr)
+	struct cords_schedule * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	sprintf(cptr->buffer,"%s.%s.operation=%s",optr->domain,optr->id,pptr->operation);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.provider=%s",optr->domain,optr->id,pptr->provider);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.application=%s",optr->domain,optr->id,pptr->application);
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.requested=%u",optr->domain,optr->id,pptr->requested);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.expected=%u",optr->domain,optr->id,pptr->expected);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.started=%u",optr->domain,optr->id,pptr->started);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.completed=%u",optr->domain,optr->id,pptr->completed);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.priority=%u",optr->domain,optr->id,pptr->priority);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
@@ -319,37 +357,37 @@ private struct rest_response * cords_vm_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_get_item(
+private struct rest_response * cords_schedule_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_cords_vm_nodes();
-	return( cords_vm_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_schedule_nodes();
+	return( cords_schedule_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_post_link(
+private struct rest_response * cords_schedule_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -359,16 +397,16 @@ private struct rest_response * cords_vm_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_post_mixin(
+private struct rest_response * cords_schedule_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -378,7 +416,7 @@ private struct rest_response * cords_vm_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_post_action(
+private struct rest_response * cords_schedule_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -386,10 +424,10 @@ private struct rest_response * cords_vm_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -405,26 +443,26 @@ private struct rest_response * cords_vm_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_post_item(
+private struct rest_response * cords_schedule_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_cords_vm_node(1)))
+	if (!( nptr = add_cords_schedule_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_vm_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_schedule_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_cords_vm_nodes();
+	autosave_cords_schedule_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -436,37 +474,37 @@ private struct rest_response * cords_vm_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_put_item(
+private struct rest_response * cords_schedule_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_vm_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_schedule_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_cords_vm_nodes();
-	return( cords_vm_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_schedule_nodes();
+	return( cords_schedule_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_head_item(
+private struct rest_response * cords_schedule_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
-	if (!( nptr = locate_cords_vm_node(id)))
+	struct cords_schedule * pptr;
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -476,20 +514,20 @@ private struct rest_response * cords_vm_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_delete_item(
+private struct rest_response * cords_schedule_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_vm * pptr;
+	struct cords_schedule * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_vm_node(id)))
+	if (!( nptr = locate_cords_schedule_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_cords_vm_node( nptr );
-	autosave_cords_vm_nodes();
+	drop_cords_schedule_node( nptr );
+	autosave_cords_schedule_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -498,25 +536,25 @@ private struct rest_response * cords_vm_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_get_list(
+private struct rest_response * cords_schedule_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct cords_vm * pptr;
-	struct cords_vm * fptr;
+	struct cords_schedule * pptr;
+	struct cords_schedule * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_cords_vm_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_cords_schedule_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = cords_vm_first;
+	for ( sptr = cords_schedule_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_cords_vm_filter( pptr, fptr ) ))
+		if (!( pass_cords_schedule_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -530,7 +568,7 @@ private struct rest_response * cords_vm_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_vm_delete_all(
+private struct rest_response * cords_schedule_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -538,26 +576,26 @@ private struct rest_response * cords_vm_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct cords_vm * pptr;
-	struct cords_vm * fptr;
+	struct cords_schedule * pptr;
+	struct cords_schedule * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_cords_vm_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_cords_schedule_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=cords_vm_first;
+	nptr=cords_schedule_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_cords_vm_filter( pptr, fptr ) ))) {
+		||  (!( pass_cords_schedule_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_cords_vm_node( nptr );
+			drop_cords_schedule_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_cords_vm_nodes();
+	autosave_cords_schedule_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -566,7 +604,7 @@ private struct rest_response * cords_vm_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_vm_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_schedule_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -581,16 +619,16 @@ private struct rest_response * occi_cords_vm_get(void * vptr, struct rest_client
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_vm_get_list( optr, cptr, rptr, aptr ) );
+		return( cords_schedule_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_vm_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_vm_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_schedule_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -605,14 +643,14 @@ private struct rest_response * occi_cords_vm_head(void * vptr, struct rest_clien
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_vm_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_vm_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_schedule_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -627,24 +665,24 @@ private struct rest_response * occi_cords_vm_post(void * vptr, struct rest_clien
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( cords_vm_post_item( optr, cptr, rptr, aptr ) );
+		return( cords_schedule_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( cords_vm_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( cords_vm_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( cords_vm_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_vm_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_schedule_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -659,14 +697,14 @@ private struct rest_response * occi_cords_vm_put(void * vptr, struct rest_client
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_vm_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_vm_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_schedule_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -681,58 +719,66 @@ private struct rest_response * occi_cords_vm_delete(void * vptr, struct rest_cli
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_vm_delete_all( optr, cptr, rptr, aptr ) );
+		return( cords_schedule_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_vm_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_schedule_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_cords_vm_mt( struct rest_interface * iptr )
+private void	redirect_occi_cords_schedule_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_cords_vm_get;
-	iptr->post = occi_cords_vm_post;
-	iptr->put = occi_cords_vm_put;
-	iptr->delete = occi_cords_vm_delete;
-	iptr->head = occi_cords_vm_head;
+	iptr->get = occi_cords_schedule_get;
+	iptr->post = occi_cords_schedule_post;
+	iptr->put = occi_cords_schedule_put;
+	iptr->delete = occi_cords_schedule_delete;
+	iptr->head = occi_cords_schedule_head;
 	return;
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_cords_vm */
-public struct occi_category * occi_cords_vm_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_cords_schedule */
+public struct occi_category * occi_cords_schedule_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource cords_vm";
+	char * f="CompatibleOne OCCI resource cords_schedule";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_cords_vm_mt(optr->interface);
-		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
+		redirect_occi_cords_schedule_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "operation",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "requested",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "expected",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "started",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "completed",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "priority",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
-		autoload_cords_vm_nodes();
+		autoload_cords_schedule_nodes();
 		return(optr);
 	}
 
 }
 
-/*	------------------------------------------	*/
-/*	c o r d s _ v m _ o c c i _ h e a d e r s 	*/
-/*	------------------------------------------	*/
-public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
+/*	------------------------------------------------------	*/
+/*	c o r d s _ s c h e d u l e _ o c c i _ h e a d e r s 	*/
+/*	------------------------------------------------------	*/
+public struct rest_header *  cords_schedule_occi_headers(struct cords_schedule * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -747,7 +793,7 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"cords_vm; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"cords_schedule; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -758,7 +804,7 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_vm.image='%s'\r\n",(sptr->image?sptr->image:""));
+	sprintf(buffer,"occi.cords_schedule.operation='%s'\r\n",(sptr->operation?sptr->operation:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -769,7 +815,7 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_vm.provider='%s'\r\n",(sptr->provider?sptr->provider:""));
+	sprintf(buffer,"occi.cords_schedule.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -780,7 +826,7 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_vm.application='%s'\r\n",(sptr->application?sptr->application:""));
+	sprintf(buffer,"occi.cords_schedule.price='%s'\r\n",(sptr->price?sptr->price:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -791,7 +837,7 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_vm.price='%s'\r\n",(sptr->price?sptr->price:""));
+	sprintf(buffer,"occi.cords_schedule.requested='%u'\r\n",sptr->requested);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -802,11 +848,55 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_vm.status='%u'\r\n",sptr->status);
+	sprintf(buffer,"occi.cords_schedule.expected='%u'\r\n",sptr->expected);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.started='%u'\r\n",sptr->started);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.completed='%u'\r\n",sptr->completed);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.priority='%u'\r\n",sptr->priority);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.status='%u'\r\n",sptr->status);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _vm_c_ */
+#endif	/* _schedule_c_ */

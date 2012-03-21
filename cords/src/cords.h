@@ -41,6 +41,7 @@
 #include "transaction.h"
 #include "invoice.h"
 #include "vm.h"
+#include "schedule.h"
 #include "tarif.h"
 #include "user.h"
 #include "security.h"

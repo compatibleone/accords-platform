@@ -75,7 +75,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher accords-config"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-cosched run-publisher accords-config"
 
 _co_start() {
     echo "Starting ACCORDS"
@@ -130,6 +130,10 @@ _co_start() {
 
     echo "Starting accords procci services"
     run-procci &
+    sleep 1
+
+    echo "Starting accords scheduling services"
+    run-cosched &
     sleep 1
 
     echo "Starting accords open stack services"
@@ -199,6 +203,7 @@ _co_status() {
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
+    netstat -a -p | grep LISTEN | grep cosched
     netstat -a -p | grep LISTEN | grep ezvm
     netstat -a -p | grep LISTEN | grep coips
     netstat -a -p | grep LISTEN | grep cosacs
@@ -209,6 +214,7 @@ _co_stop() {
     _stop_service onprocci
     _stop_service osprocci
     _stop_service azprocci
+    _stop_service cosched
     _stop_service procci
     _stop_service broker
     _stop_service parser
@@ -287,6 +293,9 @@ _run_parser() {
 _run_procci() {
     procci --config $target CO-PROCCI/1.0
 }
+_run_cosched() {
+    cosched --config $target CO-SCHED/1.0
+}
  
 _run_publisher() {
     publisher --config $target CO-PUB/1.0
@@ -311,6 +320,7 @@ _make_security_files() {
 	_mksecs cosacs 1
 	_mksecs parser 1
 	_mksecs procci 1
+	_mksecs cosched 1
 	_mksecs osprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
@@ -378,6 +388,7 @@ _accords_config() {
 		_mkcert publisher
 		_mkcert fileserver
 		_mkcert procci
+		_mkcert cosched
 		_mkcert osprocci
 		_mkcert onprocci
 		_mkcert azprocci
@@ -411,6 +422,7 @@ _accords_config() {
     _mkcfg ezvm
     _mkcfg coips
     _mkcfg coees 
+    _mkcfg cosched
     _mkcosacs cosacs
 
     echo "</accords>" >> $target
@@ -641,6 +653,9 @@ case `basename $0` in
 	;;
     run-procci)
 	_run_procci $*
+	;;
+    run-cosched)
+	_run_cosched $*
 	;;
     run-cosacs)
 	_run_cosacs $*

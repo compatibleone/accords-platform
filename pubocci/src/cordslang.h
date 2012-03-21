@@ -47,6 +47,7 @@
 #define	_CORDS_RESTART	"restart"
 #define	_CORDS_STOP	"stop"
 #define	_CORDS_INSTANCE	"instance"
+#define	_CORDS_BUILD	"build"
 
 /*	-------------------------	*/
 /*	cords atribut identifiers	*/

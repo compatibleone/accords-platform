@@ -67,7 +67,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -131,6 +131,10 @@ _co-start() {
     run-procci &
     sleep 1
 
+    echo "Starting accords scheduling services"
+    run-cosched &
+    sleep 1
+
     echo "Starting accords open stack services"
     run-osprocci &
     sleep 1
@@ -178,6 +182,7 @@ _co-status() {
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
     netstat -a -p | grep LISTEN | grep procci
+    netstat -a -p | grep LISTEN | grep cosched
     netstat -a -p | grep LISTEN | grep ezvm
     netstat -a -p | grep LISTEN | grep coips
 }
@@ -188,6 +193,8 @@ co-stop() {
     killall osprocci
     sleep 1
     killall azprocci
+    sleep 1
+    killall cosched
     sleep 1
     killall procci
     sleep 1
@@ -274,6 +281,10 @@ _run-parser() {
 
 _run-procci() {
     procci --config $target CO-PROCCI/1.0
+}
+ 
+_run-cosched() {
+    cosched --config $target CO-SCHED/1.0
 }
  
 _run-publisher() {

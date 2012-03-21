@@ -139,15 +139,128 @@ private	struct rest_extension * cosched_extension( void * v,struct rest_server *
 }
 
 /*	------------------------------------------------------------------	*/
-/*			c o s c h e d _ s yn c h r o n i s e 			*/
+/*			c o s c h e d _ s y n c h r o n i s e 			*/
 /*	------------------------------------------------------------------	*/
 private	void	cosched_synchronise()
 {
 	sleep(1);
 }
 
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ s c h e d u l e   		*/
+/*	-------------------------------------------	*/
+private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
+{
+	struct	occi_response * zptr;
+	struct	occi_kind_node * nptr;
+	struct	cords_schedule * pptr;
+	char *	root;
+	char *	work;
+	char * wptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if ( pptr->status )
+		return( 0 );
+	else if (!( pptr->operation ))
+		return( 0 );
+	else if (!( wptr = allocate_string( pptr->operation ) ))
+		return(0);
+	else 
+	{
+		work = root = wptr;
+		while ( *wptr )
+		{
+			if ( *wptr == '?' )
+				break;
+			else	wptr++;
+		}
+		if ( *wptr != '?' )
+			return(0);
+		else
+		{
+			*(wptr++) = 0;
+			work = wptr;
+			while ( *wptr )
+			{
+				if ( *wptr == '=' )
+					break;
+				else	wptr++;
+			}
+			if ( *wptr != '=' )
+				return(0);
+			else	*(wptr++) = 0;
+		}	
+		if ( strcmp( work, "action" ) )
+			return(0);
+		else if (!( zptr = cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
+		{
+			root = liberate( root );
+			return(0);
+		}
+		else
+		{
+			pptr->status++;
+			zptr = occi_remove_response( zptr );
+			return(0);
+		}
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	  r e t r i e v e _ s c h e d u l e   		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_cords_schedule(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_schedule * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ s c h e d u l e   		*/
+/*	-------------------------------------------	*/
+private	int	update_cords_schedule(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_schedule * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ s c h e d u l e  	 	*/
+/*	-------------------------------------------	*/
+private	int	delete_cords_schedule(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_schedule * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	cords_schedule_interface = {
+	create_cords_schedule,
+	retrieve_cords_schedule,
+	update_cords_schedule,
+	delete_cords_schedule
+	};
+	
+
+
 /*	------------------------------------------------------------------	*/
-/*			c o s c h e d _ o p e r a t i o n				*/
+/*			c o s c h e d _ o p e r a t i o n			*/
 /*	------------------------------------------------------------------	*/
 private	int	cosched_operation( char * nptr )
 {
@@ -163,6 +276,7 @@ private	int	cosched_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->callback = &cords_schedule_interface;
 
 	rest_initialise_log(Cosched.monitor);
 

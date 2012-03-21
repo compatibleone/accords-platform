@@ -60,6 +60,7 @@
 #include "occitransaction.c"
 #include "occiuser.c"
 #include "occivm.c"
+#include "occischedule.c"
 #include "occimetadata.c"
 #include "occiscript.c"
 #include "occifile.c"

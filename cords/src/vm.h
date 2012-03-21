@@ -4,11 +4,11 @@
 struct	cords_vm
 {
 	char *	id;
-	int	status;
 	char *	image;
 	char *	provider;
-	char *	storage;
-	char *	reference;
+	char *	application;
+	char *	price;
+	int	status;
 };
 
 #endif

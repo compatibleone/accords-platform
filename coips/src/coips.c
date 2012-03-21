@@ -580,7 +580,6 @@ private	int	create_cords_application(struct occi_category * optr, void * vptr)
 	else if (!( pptr = nptr->contents ))
 		return(0);
 	else	return(0);
-	/* build_application(optr,pptr)); */
 }
 
 /*	-------------------------------------------	*/
@@ -643,7 +642,7 @@ private	int	coips_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_coips.xml");
 
-	if (!( optr = occi_cords_application_builder( Coips.domain, "application" ) ))
+	if (!( optr = occi_cords_application_builder( Coips.domain, _CORDS_APPLICATION ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -651,7 +650,7 @@ private	int	coips_operation( char * nptr )
 	last = optr;
 	optr->callback  = &cords_application_interface;
 
-	if (!( optr = occi_add_action( optr,"build","",build_application)))
+	if (!( optr = occi_add_action( optr,_CORDS_BUILD,"",build_application)))
 		return( 28 );
 
 	rest_initialise_log(Coips.monitor);

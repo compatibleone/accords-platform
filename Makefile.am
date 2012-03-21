@@ -45,6 +45,9 @@ endif
 if ENABLE_COIPS
 SUBDIRS += coips
 endif
+if ENABLE_COSCHED
+SUBDIRS += cosched
+endif
 if ENABLE_COES
 SUBDIRS += coes
 endif
