@@ -146,6 +146,8 @@ private void autoload_opennebula_nodes() {
 				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "original" )) != (struct xml_atribut *) 0)
+				pptr->original = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
 				pptr->node = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
@@ -215,6 +217,9 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," original=%c",0x0022);
+		fprintf(h,"%s",(pptr->original?pptr->original:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," node=%c",0x0022);
 		fprintf(h,"%s",(pptr->node?pptr->node:""));
@@ -289,6 +294,8 @@ private void set_opennebula_field(
 			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "original" ) ))
+			pptr->original = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
 			pptr->node = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
@@ -381,6 +388,13 @@ private int pass_opennebula_filter(
 		if (!( pptr->image ))
 			return(0);
 		else if ( strcmp(pptr->image,fptr->image) != 0)
+			return(0);
+		}
+	if (( fptr->original )
+	&&  (strlen( fptr->original ) != 0)) {
+		if (!( pptr->original ))
+			return(0);
+		else if ( strcmp(pptr->original,fptr->original) != 0)
 			return(0);
 		}
 	if (( fptr->node )
@@ -497,6 +511,9 @@ private struct rest_response * opennebula_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
@@ -955,6 +972,8 @@ public struct occi_category * occi_opennebula_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "original",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
@@ -1063,6 +1082,17 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.opennebula.image='%s'\r\n",(sptr->image?sptr->image:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.original='%s'\r\n",(sptr->original?sptr->original:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

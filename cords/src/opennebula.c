@@ -45,6 +45,8 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
+		if ( sptr->original )
+			 sptr->original = liberate(sptr->original);
 		if ( sptr->node )
 			 sptr->node = liberate(sptr->node);
 		if ( sptr->price )
@@ -88,6 +90,7 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->hostname = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
+		sptr->original = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->account = (char*) 0;
@@ -151,6 +154,10 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"image") ))
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"original") ))
+		{
+			if ( wptr->value ) { sptr->original = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"node") ))
 		{
@@ -228,6 +235,7 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));

@@ -10,6 +10,7 @@ struct	opennebula
 	char *	hostname;
 	char *	flavor;
 	char *	image;
+	char *	original;
 	char *	node;
 	char *	price;
 	char *	account;

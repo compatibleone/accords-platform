@@ -401,74 +401,76 @@ public	int	create_opennebula_contract(
 	if (!( contract.node.id = pptr->node ))
 		return( 0 );
 	else if (!( contract.node.message = occi_simple_get( contract.node.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 570, &contract ) );
+		return( terminate_opennebula_contract( 1570, &contract ) );
 
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
 	else if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
-		return( terminate_opennebula_contract( 571, &contract ) );
+		return( terminate_opennebula_contract( 1571, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 572, &contract ) );
+		return( terminate_opennebula_contract( 1572, &contract ) );
 
 	else if (!( contract.compute.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
-		return( terminate_opennebula_contract( 573, &contract ) );
+		return( terminate_opennebula_contract( 1573, &contract ) );
 	else if (!( contract.compute.message = occi_simple_get( contract.compute.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 574, &contract ) );
+		return( terminate_opennebula_contract( 1574, &contract ) );
 
 	else if (!( contract.network.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
-		return( terminate_opennebula_contract( 575, &contract ) );
+		return( terminate_opennebula_contract( 1575, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 576, &contract ) );
+		return( terminate_opennebula_contract( 1576, &contract ) );
 
 	else if (!( contract.storage.id = occi_extract_atribut( contract.infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
-		return( terminate_opennebula_contract( 577, &contract ) );
+		return( terminate_opennebula_contract( 1577, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 578, &contract ) );
+		return( terminate_opennebula_contract( 1578, &contract ) );
 
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
 	else if (!( contract.flavors = on_list_flavors() ))
-		return( terminate_opennebula_contract( 579, &contract ) );
+		return( terminate_opennebula_contract( 1579, &contract ) );
 	else if (!( pptr->flavor = resolve_opennebula_flavor( &contract ) ))
-		return( terminate_opennebula_contract( 580, &contract ) );
+		return( terminate_opennebula_contract( 1580, &contract ) );
 		
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
 	if (!( contract.image.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
-		return( terminate_opennebula_contract( 581, &contract ) );
+		return( terminate_opennebula_contract( 1581, &contract ) );
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 582, &contract ) );
+		return( terminate_opennebula_contract( 1582, &contract ) );
 
 	else if (!( contract.system.id = occi_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
-		return( terminate_opennebula_contract( 583, &contract ) );
+		return( terminate_opennebula_contract( 1583, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 584, &contract ) );
+		return( terminate_opennebula_contract( 1584, &contract ) );
 
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
 	else if (!( contract.images = on_list_images() ))
-		return( terminate_opennebula_contract( 585, &contract ) );
+		return( terminate_opennebula_contract( 1585, &contract ) );
 	else if (!( pptr->image = resolve_opennebula_image( &contract ) ))
-		return( terminate_opennebula_contract( 586, &contract ) );
+		return( terminate_opennebula_contract( 1586, &contract ) );
+	else if (!( pptr->original = allocate_string( pptr->image ) ))
+		return( terminate_opennebula_contract( 1587, &contract ) );
 		
 
 	/* --------------------------------------- */
 	/* retrieve the public network information */
 	/* --------------------------------------- */
 	else if (!( contract.networks = on_list_network_pool() ))
-		return( terminate_opennebula_contract( 587, &contract ) );
+		return( terminate_opennebula_contract( 1588, &contract ) );
 	else if (!( pptr->publicnetwork = resolve_opennebula_network( &contract ) ))
-		return( terminate_opennebula_contract( 588, &contract ) );
+		return( terminate_opennebula_contract( 1589, &contract ) );
 
 
 	else 
@@ -495,9 +497,19 @@ public	int	delete_opennebula_contract(
 	struct	on_response * osptr;
 	if ((osptr = stop_opennebula_provisioning( pptr )) != (struct on_response *) 0)
 		osptr = liberate_on_response( osptr );
+	if (!( pptr->image ))
+		return( 0 );
+	else if (!( pptr->original ))
+		return( 0 );
+	else if (!( strcmp( pptr->original, pptr->image ) ))
+		return( 0 );
+	else
+	{
+		on_delete_image( pptr->image );
+		return(0);
+	}
 	return(0);
 }
-
 
 	/* ------------- */
 #endif	/* _oncontract_c */
