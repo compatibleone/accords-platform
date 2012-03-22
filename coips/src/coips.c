@@ -158,6 +158,7 @@ private char *	build_application_node(char * image, char * provider )
 	struct	occi_request 	* qptr;
 	struct	occi_element  	* dptr;
 	char *	infrastructure;
+	char *	iname;
 	char *	vptr;
 	char *	ihost;
 	char	buffer[2048];
@@ -207,24 +208,32 @@ private char *	build_application_node(char * image, char * provider )
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
-	else if ((!(dptr=occi_request_element(qptr,"occi.node.name", 		image 		) ))
+	else if (!( iname = occi_category_id( image ) ))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.node.name", 		iname 		) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.node.provider",    	provider	) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.node.profile",    	_COIPS_ACCOUNT	) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.node.image",    	image		) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.node.infrastructure", 	infrastructure  ) )))
 	{
+		liberate( iname );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
 	else if (!( yptr = occi_client_post( kptr, qptr ) ))
 	{
+		liberate( iname );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
 		return((char *) 0);
 	}
 	else if (!( vptr = occi_extract_location( yptr ) ))
 	{
+		liberate( iname );
 		uptr = occi_remove_response( uptr );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -232,6 +241,7 @@ private char *	build_application_node(char * image, char * provider )
 	}
 	else if (!( vptr = occi_category_id( vptr ) ))
 	{
+		liberate( iname );
 		uptr = occi_remove_response( uptr );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -239,6 +249,7 @@ private char *	build_application_node(char * image, char * provider )
 	}
 	else
 	{
+		liberate( iname );
 		uptr = occi_remove_response( uptr );
 		sprintf(buffer,"%s/%s/%s",yptr->host,_CORDS_NODE,vptr);
 		yptr = occi_remove_response( yptr );
