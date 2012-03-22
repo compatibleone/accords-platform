@@ -338,6 +338,40 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 
 	memset( &best, 0, sizeof( struct on_image_infos ));
 
+	/* ------------------------------------------ */
+	/* scan list for a perfect IPS produced match */
+	/* ------------------------------------------ */
+	for ( 	dptr=eptr->first;
+		dptr != (struct xml_element *) 0;
+		dptr = dptr->next )
+	{
+		if (!( aptr = document_atribut( dptr, "name" ) ))
+		{
+			image.id = liberate( image.id );
+			continue;
+		}
+
+		else if (!( vptr = occi_unquoted_value(aptr->value)))
+			continue;
+
+		if ( strcmp( vptr, cptr->image.id ) != 0 )
+		{
+			liberate( vptr );
+			continue;
+		}
+		else	liberate( vptr );
+
+		if (!( aptr = document_atribut( dptr, "href" ) ))
+			continue;
+		else if (!( vptr = occi_unquoted_value(aptr->value)))
+			continue;
+		else 	return( opennebula_image_id( vptr ) );
+	
+	}
+
+	/* --------------------------------------------------- */
+	/* scan the image list for a system name partial match */
+	/* --------------------------------------------------- */
 	for ( 	dptr=eptr->first;
 		dptr != (struct xml_element *) 0;
 		dptr = dptr->next )
