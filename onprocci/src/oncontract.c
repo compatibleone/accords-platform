@@ -315,6 +315,7 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	struct	on_image_infos	image;
 	struct	on_image_infos	best;
 	char *			vptr;
+	char *			iname;
 
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
@@ -338,6 +339,9 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 
 	memset( &best, 0, sizeof( struct on_image_infos ));
 
+	if (!( iname = occi_category_id( cptr->image.id )))
+		return((char *) 0);
+
 	/* ------------------------------------------ */
 	/* scan list for a perfect IPS produced match */
 	/* ------------------------------------------ */
@@ -354,20 +358,23 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 		else if (!( vptr = occi_unquoted_value(aptr->value)))
 			continue;
 
-		if ( strcmp( vptr, cptr->image.id ) != 0 )
+		if ( strcmp( vptr, iname ) != 0 )
 		{
 			liberate( vptr );
 			continue;
 		}
 		else	liberate( vptr );
 
+		liberate( iname );
+
 		if (!( aptr = document_atribut( dptr, "href" ) ))
-			continue;
+			return((char *) 0);
 		else if (!( vptr = occi_unquoted_value(aptr->value)))
-			continue;
+			return((char *) 0);
 		else 	return( opennebula_image_id( vptr ) );
 	
 	}
+	liberate( iname );
 
 	/* --------------------------------------------------- */
 	/* scan the image list for a system name partial match */

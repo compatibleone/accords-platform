@@ -388,6 +388,11 @@ private	struct	on_response * on_delete_object(
 		sprintf(buffer,"%s/%s","/storage",parameter );
 		return( on_delete_request( buffer ) );
 	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		sprintf(buffer,"%s/%s","/storage",parameter );
+		return( on_delete_request( buffer ) );
+	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
 		sprintf(buffer,"%s/%s","/network",parameter );

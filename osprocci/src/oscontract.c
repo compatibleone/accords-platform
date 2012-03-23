@@ -239,7 +239,7 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 	struct	os_image_infos	image;
 	struct	os_image_infos	best;
 	char *			vptr;
-
+	char *			iname=(char*) 0;
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
@@ -264,18 +264,30 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 	/* ------------------------------------------ */
 	/* scan list for a perfect IPS produced match */
 	/* ------------------------------------------ */
+
+	if (!( iname = occi_category_id( cptr->image.id )))
+		return((char *) 0);
+
 	for ( 	dptr=eptr->first;
 		dptr != (struct data_element *) 0;
 		dptr = dptr->next )
 	{
 		if (!( vptr = json_atribut( dptr, "name" ) ))
 			continue;
-		else if ( strcmp( vptr, cptr->image.id ) != 0 )
+		else if ( strcmp( vptr, iname ) != 0 )
 			continue;
 		else if (!( vptr = json_atribut( dptr, "id" ) ))
-			continue;
-		else	return( allocate_string( vptr ) );
+		{
+			liberate( iname );
+			return((char *) 0);
+		}
+		else
+		{
+			liberate( iname );
+			return( allocate_string( vptr ) );
+		}
 	}
+	liberate( iname );
 
 	/* --------------------------------------------------- */
 	/* scan the image list for a system name partial match */
