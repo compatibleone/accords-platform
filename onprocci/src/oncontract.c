@@ -315,7 +315,7 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 	struct	on_image_infos	image;
 	struct	on_image_infos	best;
 	char *			vptr;
-	char *			iname;
+	char *			iname=(char *) 0;
 
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
@@ -363,9 +363,11 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 			liberate( vptr );
 			continue;
 		}
-		else	liberate( vptr );
-
-		liberate( iname );
+		else
+		{
+			liberate( iname );
+			liberate( vptr );
+		}
 
 		if (!( aptr = document_atribut( dptr, "href" ) ))
 			return((char *) 0);
@@ -374,6 +376,7 @@ private	char *	resolve_opennebula_image( struct cords_on_contract * cptr )
 		else 	return( opennebula_image_id( vptr ) );
 	
 	}
+
 	liberate( iname );
 
 	/* --------------------------------------------------- */

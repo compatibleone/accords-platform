@@ -903,6 +903,14 @@ private	struct	rest_response * start_openstack(
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
+	else if ( osptr->response->status >= 400 )
+	{
+		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
+		osptr = liberate_os_response( osptr );
+		return( aptr );
+	}
 
 	else
 	{

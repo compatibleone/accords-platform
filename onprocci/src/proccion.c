@@ -348,10 +348,17 @@ private	struct	rest_response * start_opennebula(
 
 	if (!( filename = on_create_compute_request( 
 		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, personality, resource ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Message" ) );
+	 	return( rest_html_response( aptr, 2400, "Bad Request : Create Server Message" ) );
 	else if (!( osptr = on_create_compute( filename )))
-	 	return( rest_html_response( aptr, 400, "Bad Request : Create Server Request" ) );
-
+	 	return( rest_html_response( aptr, 2401, "Bad Request : Create Server Request" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 2402, "Bad Request : Create Server No Response" ) );
+	else if ( osptr->response->status >= 400 )
+	{
+		aptr = rest_html_response( aptr, osptr->response->status + 2000, "Bad Request : Create Server No Response" );
+		osptr = liberate_on_response( osptr );
+		return( aptr );
+	}
 	else
 	{
 		liberate( filename );
@@ -428,7 +435,7 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 {
 	char * filename;
 	struct	on_response * rptr;
-
+	char *	vptr;
 	if (!( filename = on_shutdown_compute_request( pptr->number ) ))
 		return(0);
 	else if (!( rptr = on_shutdown_compute( pptr->number, filename ) ))
@@ -440,7 +447,35 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 	{
 		filename = liberate( filename );
 		rptr = liberate_on_response( rptr );
-		return(1);
+		while (1)
+		{
+			if (!( rptr = on_get_server( pptr->number )))
+			{
+				return(0);
+			}
+			else if (!( vptr = xml_element_value( rptr->xmlroot, "STATE" )))
+			{
+				rptr = liberate_on_response( rptr );
+				return(0);
+			}
+			else if (!( strcmp( vptr, "DONE" )))
+			{
+				sleep(1);
+				rptr = liberate_on_response( rptr );
+				return(0);
+			}
+			else if (!( strcmp( vptr, "ACTIVE" )))
+			{
+				sleep(1);
+				rptr = liberate_on_response( rptr );
+				continue;
+			}
+			else if (!( strcmp( vptr, "FAILED" )))
+			{
+				rptr = liberate_on_response( rptr );
+				return( 666 );
+			}
+		}
 	}
 }
 
@@ -470,6 +505,14 @@ private	struct	rest_response * save_opennebula(
 	 	return( rest_html_response( aptr, 1403, "image message failure" ) );
 	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
+	else if ( osptr->response->status >= 400 )
+	{
+		aptr = rest_html_response( aptr, osptr->response->status + 1000, "create image request" );
+		osptr = liberate_on_response( osptr );
+		return( aptr );
+	}
 	else if (!( osptr = on_connect_image( pptr, osptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
 	else if (!( on_shutdown_image( pptr ) ))
@@ -522,6 +565,14 @@ private	struct	rest_response * snapshot_opennebula(
 	 	return( rest_html_response( aptr, 1403, "image request failure" ) );
 	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
+	else if (!( osptr->response ))
+	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
+	else if ( osptr->response->status >= 400 )
+	{
+		aptr = rest_html_response( aptr, osptr->response->status + 1000, "create image request" );
+		osptr = liberate_on_response( osptr );
+		return( aptr );
+	}
 	else if (!( osptr = on_connect_image( pptr, osptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
 	else if (!( on_shutdown_image( pptr ) ))
