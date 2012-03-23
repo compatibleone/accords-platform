@@ -173,8 +173,6 @@ private	int	reset_opennebula_server( struct opennebula * pptr )
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		if ( pptr->image ) pptr->image = liberate( pptr->image );
-		if ( pptr->original ) pptr->original = liberate( pptr->original );
 		pptr->number = allocate_string("");
 		pptr->hostname = allocate_string("");
 		pptr->publicaddr = allocate_string("");

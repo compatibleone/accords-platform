@@ -23,6 +23,8 @@
 #include "onclient.h"
 #include "restpublic.h"
 
+#define	_CORDS_NULL "(null)"
+
 private	struct	on_config On = {
 	(char *) 0,
 	(char *) 0,
@@ -283,7 +285,9 @@ public	char * on_create_compute_request(
 		/* -------------------------------------- */
 		/* a second public address may be present */
 		/* -------------------------------------- */
-		if ( network )
+		if ((!( network ))
+		||  (!( strlen( network ) ))
+		||  (!( strcmp( network, _CORDS_NULL ) )))
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
@@ -293,19 +297,25 @@ public	char * on_create_compute_request(
 		/* -------------------------------------- */
 		/* a local address must always be present */
 		/* -------------------------------------- */
-		if ( local )
-		{
-			fprintf(h,"<NIC>\n");
-			fprintf(h,"<NETWORK href='%s'/>\n",local);
-			fprintf(h,"</NIC>\n");
-		}
-		else
+		if ((!( local ))
+		||  (!( strlen( local ) ))
+		||  (!( strcmp( local, _CORDS_NULL ) )))
+
 		{
 			/* ------------- */
 			/* default local */
 			/* ------------- */
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n","1");
+			fprintf(h,"</NIC>\n");
+		}
+		else
+		{
+			/* --------------- */
+			/* explicite local */
+			/* --------------- */
+			fprintf(h,"<NIC>\n");
+			fprintf(h,"<NETWORK href='%s'/>\n",local);
 			fprintf(h,"</NIC>\n");
 		}
 
