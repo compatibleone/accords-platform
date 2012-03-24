@@ -37,6 +37,7 @@ public	struct	occi_response *	cords_retrieve_category(struct xml_element * docum
 public	struct	occi_response * cords_resolve_category(struct xml_element * document, struct xml_atribut * kptr, char * agent, char * tls);
 public	struct	occi_response * cords_create_category( struct xml_element * document, char * agent, char * tls);
 public	struct	occi_response * cords_invoke_action( char * resource, char * action, char * agent, char * tls );
+public	struct	occi_response * ll_cords_invoke_action( char * resource, char * action, char * agent, char * tls );
 public	struct	occi_response * cords_create_link( char * from, char * to, char * agent, char * tls );
 public	struct	occi_response * cords_retrieve_named_instance_list(char * category,char * name, char * value,char * agent, char * tls);
 public	struct	occi_response * cords_retrieve_named_instance( struct occi_response * yptr, char * agent, char * tls );

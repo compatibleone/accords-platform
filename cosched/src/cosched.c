@@ -194,7 +194,7 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 		}	
 		if ( strcmp( work, "action" ) )
 			return(0);
-		else if (!( zptr = cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
+		else if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
 		{
 			root = liberate( root );
 			return(0);

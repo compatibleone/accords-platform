@@ -979,27 +979,98 @@ private	int	cords_instance_member( struct xml_element * dptr, char * element, ch
 }
 
 /*	---------------------------------------------------	*/
-/*	 	c o r d s _ i n v o k e _ a c t i o n 		*/
+/*	   l l _ c o r d s _ i n v o k e _ a c t i o n 		*/
 /*	---------------------------------------------------	*/
-/*	issues a POST request for the invocation of the   	*/
-/*	indicated action on the indicated resource instance	*/
-/*	---------------------------------------------------	*/	
-public	struct	occi_response * cords_invoke_action( char * resource, char * action, char * agent, char * tls )
+public	struct	occi_response * ll_cords_invoke_action( char * resource, char * action, char * agent, char * tls )
 {
 	struct	occi_request 	* rptr;
 	struct	occi_client	* cptr;
-	struct	occi_response 	* zptr;
 	char	actihost[4096];
 	sprintf(actihost,"%s?action=%s",resource,action);
 	if (!( cptr = occi_create_client( actihost, agent, tls ) ))
 		return((struct occi_response *) 0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return((struct occi_response *) 0);
-	else if (!( zptr = occi_client_post( cptr, rptr ) ))
-		return(zptr);
-	else	return(zptr);
+	else 	return( occi_client_post( cptr, rptr ) );
 }
 
+/*	---------------------------------------------------	*/
+/*	 	c o r d s _ i n v o k e _ a c t i o n 		*/
+/*	---------------------------------------------------	*/
+/*	issues a POST request for the invocation of the   	*/
+/*	indicated action on the indicated resource instance	*/
+/*	---------------------------------------------------	*/	
+public	struct	occi_response * cords_schedule_action( char * resource, char * action, char * agent, char * tls )
+{
+	struct	url 		* uptr;
+	struct	occi_element 	* eptr;
+	struct	occi_response 	* zptr;
+	char	buffer[1024];
+	int	schedule=0;
+	char *	scheduler=(char *) 0;
+	if (!( resource ))
+		return((struct occi_response *) 0);
+	else if (!( uptr = analyse_url( resource ) ))
+		return((struct occi_response *) 0);
+	else
+	{
+		sprintf(buffer,"/%s/",_CORDS_SERVICE);
+		if (!( strncmp( uptr->object, buffer, strlen( buffer) ) ))
+			schedule=1;
+		else 
+		{
+			sprintf(buffer,"/%s/",_CORDS_APPLICATION);
+			if (!( strncmp( uptr->object, buffer, strlen( buffer) ) ))
+				schedule=1;
+			else	schedule=0;
+		}
+
+		liberate_url( uptr );
+
+		if (!( schedule ))
+			return( ll_cords_invoke_action( resource, action, agent, tls ) );
+		else if (!( scheduler = occi_resolve_category_provider( _CORDS_SCHEDULE, agent, tls ) ))
+			return( ll_cords_invoke_action( resource, action, agent, tls ) );
+		else 	sprintf(buffer,"%s?action=%s",resource,action);
+
+		if (!( eptr = occi_create_element( "occi.schedule.operation", buffer ) ))
+			return( ll_cords_invoke_action( resource, action, agent, tls ) );
+		else	sprintf(buffer,"%s/%s/",scheduler,_CORDS_SCHEDULE);
+
+		if (!( zptr = occi_simple_post( buffer, eptr, agent, tls ) ))
+		{
+			eptr = occi_remove_elements( eptr );
+			return( ll_cords_invoke_action( resource, action, agent, tls ) );
+		}
+		else
+		{
+			eptr = occi_remove_elements( eptr );
+			return(zptr);
+		}
+		/* return( ll_cords_invoke_action( resource, action, agent, tls ) ); */
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	 	c o r d s _ i n v o k e _ a c t i o n 		*/
+/*	---------------------------------------------------	*/
+/*	issues a POST request for the invocation of the   	*/
+/*	indicated action on the indicated resource instance	*/
+/*	---------------------------------------------------	*/	
+private	int	use_scheduler=1;
+public	struct	occi_response * cords_invoke_action( char * resource, char * action, char * agent, char * tls )
+{
+	if (!( use_scheduler ))
+		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	else if (!( action ))	
+		return((struct occi_response *) 0);
+	else if (!( strcasecmp( action, _CORDS_START ) ))
+		return( cords_schedule_action( resource, action, agent, tls ) );
+	else if (!( strcasecmp( action, _CORDS_BUILD ) ))
+		return( cords_schedule_action( resource, action, agent, tls ) );
+	else	return( ll_cords_invoke_action( resource, action, agent, tls ) );
+}
+ 
 /*	---------------------------------------------------	*/
 /*	 	  c o r d s _ c r e a t e _ l i n k		*/
 /*	---------------------------------------------------	*/

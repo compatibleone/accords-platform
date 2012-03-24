@@ -122,6 +122,7 @@
 
 #define	_CORDS_TRANSACTION	"transaction"
 #define	_CORDS_APPLICATION	"application"
+#define	_CORDS_SCHEDULE		"schedule"
 
 #define	_CORDS_METADATA		"metadata"
 #define	_CORDS_FILE		"file"
