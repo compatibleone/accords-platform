@@ -169,6 +169,7 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 		return(0);
 	else 
 	{
+		pptr->requested = time((long *) 0);
 		work = root = wptr;
 		while ( *wptr )
 		{
@@ -194,16 +195,22 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 		}	
 		if ( strcmp( work, "action" ) )
 			return(0);
-		else if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
+		else 
 		{
-			root = liberate( root );
-			return(0);
-		}
-		else
-		{
-			pptr->status++;
-			zptr = occi_remove_response( zptr );
-			return(0);
+			pptr->started = time((long *) 0);
+			if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
+			{
+				pptr->completed = time((long *) 0);
+				root = liberate( root );
+				return(0);
+			}
+			else
+			{
+				pptr->completed = time((long *) 0);
+				pptr->status++;
+				zptr = occi_remove_response( zptr );
+				return(0);
+			}
 		}
 	}
 }

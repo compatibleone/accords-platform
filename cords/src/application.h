@@ -7,6 +7,10 @@ struct	cords_application
 	char	*	image;
 	char	*	provider;
 	char	*	price;
+	int		created;
+	int		started;
+	int		completed;
+	int		duration;
 };
 
 #endif

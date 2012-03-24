@@ -59,6 +59,10 @@ public struct cords_application * reset_cords_application(struct cords_applicati
 		sptr->image = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->price = (char*) 0;
+		sptr->created =  0;
+		sptr->started =  0;
+		sptr->completed =  0;
+		sptr->duration =  0;
 	}
 	return(sptr);
 
@@ -105,6 +109,22 @@ public int xmlin_cords_application(struct cords_application * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"created") ))
+		{
+			if ( wptr->value ) { sptr->created = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"started") ))
+		{
+			if ( wptr->value ) { sptr->started = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"completed") ))
+		{
+			if ( wptr->value ) { sptr->completed = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"duration") ))
+		{
+			if ( wptr->value ) { sptr->duration = atoi(wptr->value); }
+		}
 	}
 	return(0);
 
@@ -124,6 +144,10 @@ public int rest_occi_cords_application(FILE * fh,struct cords_application * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%u'\r\n",prefix,nptr,sptr->created);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.started='%u'\r\n",prefix,nptr,sptr->started);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.completed='%u'\r\n",prefix,nptr,sptr->completed);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.duration='%u'\r\n",prefix,nptr,sptr->duration);
 	return(0);
 
 }

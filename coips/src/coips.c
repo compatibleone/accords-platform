@@ -462,26 +462,33 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 
 	if ( check_debug() ) rest_log_message("coips:build_application");
 
+	aptr->status = 1;
+
 	if (!( node = build_application_node(aptr->image, aptr->provider) ))
 		return( 800 );
 
 	/* ------------------------- */
 	/* negotiate the contracts   */
 	/* ------------------------- */
-	else if (!( contract = negotiate_application_contract(node)))
+	aptr->status = 2;
+
+	if (!( contract = negotiate_application_contract(node)))
 		return( 801 );
 
 
 	/* ------------------------- */
 	/* provision the contract    */
 	/* ------------------------- */
-	else if (!( contract = provision_application_contract(contract)))
+	aptr->status = 3;
+
+	if (!( contract = provision_application_contract(contract)))
 		return( 801 );
 	
-	else if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
+	if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
 		return( 802 );
 	else 
 	{
+		aptr->status = 4;
 		/* ------------------------- */
 		/* For Each Package 	     */
 		/* ------------------------- */
@@ -533,28 +540,34 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	/* Save Image 		     */
 	/* ------------------------- */
+	aptr->status = 5;
 	save_application_image( contract );
 
 	/* ------------------------- */
 	/* Stop Provisioning 	     */
 	/* ------------------------- */
+	aptr->status = 6;
 	stop_application_provisioning( contract );
 
 	/* ------------------------- */
 	/* Delete Provisioning 	     */
 	/* ------------------------- */
+	aptr->status = 7;
 	delete_application_provisioning( contract );
 
 	/* ------------------------- */
 	/* Delete Provisioning 	     */
 	/* ------------------------- */
+	aptr->status = 8;
 	delete_application_node( node );
 
 	/* ------------------------- */
 	/* Update Image name 	     */
 	/* ------------------------- */
+	aptr->status = 9;
 	update_ezvm_image( aptr );
 
+	aptr->status = 10;
 	if ( check_debug() ) rest_log_message("coips:build_application:done");
 	return(0);
 }
@@ -571,12 +584,29 @@ private	struct rest_response * build_application(
 		void * vptr )
 {
 	struct	cords_application * pptr;
+	char	buffer[1024];
 	int	status;
 	if (!( pptr = vptr ))
 		return(0);
-	else if ((status = ll_build_application (optr, pptr )) != 0)
-		return( rest_html_response( aptr, status, "BUILD FAILURE" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( pptr->status > 0 )
+		return(0);
+	else
+	{
+		pptr->started = time((long *) 0);
+		if ((status = ll_build_application (optr, pptr )) != 0)
+		{
+			pptr->completed = time((long *) 0);
+			pptr->duration  = (pptr->completed - pptr->started);
+			sprintf(buffer,"Application Build Failure Phase #%u",pptr->status);
+			return( rest_html_response( aptr, status, buffer ) );
+		}
+		else
+		{
+			pptr->completed = time((long *) 0);
+			pptr->duration  = (pptr->completed - pptr->started);
+			return( rest_html_response( aptr, 200, "OK" ) );
+		}
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -590,7 +620,12 @@ private	int	create_cords_application(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else
+	{
+		pptr->created = time((long *) 0);
+		pptr->status  = 0;
+		return(0);
+	}
 }
 
 /*	-------------------------------------------	*/
