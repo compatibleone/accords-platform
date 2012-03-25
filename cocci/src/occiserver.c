@@ -374,9 +374,9 @@ private	struct rest_response * occi_get_capacities(
 		ctptr = hptr->value;
 	else	ctptr = _OCCI_MIME_OCCI;
 
-	else if ((!( strcasecmp( ctptr, _OCCI_OCCI_JSON ) ))
-	     ||  (!( strcasecmp( ctptr, _OCCI_APP_JSON  ) ))
-	     ||  (!( strcasecmp( ctptr, _OCCI_TEXT_JSON ) )))
+	if ((!( strcasecmp( ctptr, _OCCI_OCCI_JSON ) ))
+	||  (!( strcasecmp( ctptr, _OCCI_APP_JSON  ) ))
+	||  (!( strcasecmp( ctptr, _OCCI_TEXT_JSON ) )))
 	{
 		if (!( mptr = occi_json_capacities( optr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );

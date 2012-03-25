@@ -2373,6 +2373,41 @@ private	int	cords_terminate_xsd(
 	}
 }
 
+/*	---------------------------------	*/
+/*	c o r d s _ d o m a i n _ n a m e	*/
+/*	---------------------------------	*/
+private	struct	xml_atribut *	cords_domain_name( struct xml_atribut * aptr, char * nptr )
+{
+	char *	wptr;
+	if (!( aptr ))
+		return( aptr );
+	else if (!( nptr ))
+		return( aptr );
+	else if (!( wptr = aptr->value ))
+		return( aptr );
+	else if ( *wptr =='"' )
+	{
+		if (!( wptr = occi_unquoted_value( wptr ) ))
+			return( aptr );
+		else
+		{
+			aptr->value = liberate( aptr->value );
+			aptr->value = wptr;
+		}
+	}
+	if ( *wptr != ':' )
+		return( aptr );
+	else if (!( wptr = allocate( strlen( nptr ) + strlen( aptr->value ) + 3 ) ))
+		return( aptr );
+	else
+	{
+		sprintf( wptr, "%s%s",nptr, aptr->value );
+		aptr->value = liberate( aptr->value );
+		aptr->value = wptr;
+		return( aptr );
+	}
+}
+
 /*	---------------------------------------------------	*/
 /*		c o r d s _ p a r s e _ e l e m e n t		*/
 /*	---------------------------------------------------	*/
@@ -2399,8 +2434,9 @@ private	int	cords_terminate_xsd(
 /*	of the XML Document.					*/
 /*	---------------------------------------------------	*/
 private	int 	ll_cords_parse_element( 
+	char *	domain,
 	struct	xml_element * xst, 
-	struct xml_element * document, char * agent, char * tls, int level )
+	struct 	xml_element * document, char * agent, char * tls, int level )
 {
 	int	status;
 	struct	rest_header * 	hptr;
@@ -2439,6 +2475,14 @@ private	int 	ll_cords_parse_element(
 		/* ------------------------------------------ */
 		if (( aptr = document_atribut( document, _CORDS_NAME )) != (struct xml_atribut *) 0)
 		{
+			/* ----------------------------- */
+			/* set the domain name value now */
+			/* ----------------------------- */
+			if (!( domain ))
+				domain = aptr->value;
+			else if (!( aptr = cords_domain_name( aptr, domain ) ))
+				return(cords_append_error(document,715,"prefixing domain"));
+		
 			/* ------------------------------- */
 			/* attempt to retrieve the element */
 			/* ------------------------------- */
@@ -2489,7 +2533,7 @@ private	int 	ll_cords_parse_element(
 	for (	eptr=document->first;
 		eptr != (struct xml_element *) 0;
 		eptr = eptr->next )
-		if ((status = cords_parse_element( xst, eptr, agent,tls,(level+1) )) != 0)
+		if ((status = cords_parse_element( domain, xst, eptr, agent,tls,(level+1) )) != 0)
 			return( status );
 
 	/* --------------------------------------------- */
@@ -2508,20 +2552,21 @@ private	int 	ll_cords_parse_element(
 /*	trace entry and exit trace information in debug mode	*/
 /*	---------------------------------------------------	*/
 public	int 	cords_parse_element( 
+		char *	domain,
 		struct xml_element * xst, 
 		struct xml_element * document, char * agent, char * tls, int level )
 {
 	int	status;
 	if ( check_debug() )
-		printf("\n#enter: cords_parse_element(%u, %s, %s )\n",level,document->name,agent);
+		printf("\n#enter: cords_parse_element(%s,%u, %s, %s )\n",(domain ? domain : _CORDS_NULL),level,document->name,agent);
 
 	if (!( xst ))
-		status = ll_cords_parse_element( xst, document, agent, tls, level );
+		status = ll_cords_parse_element( domain, xst, document, agent, tls, level );
 
 	else if (!( xst = xsd_element( xst, document->name ) ))
 		status = cords_append_error(document,798,"xsd:incorrect element");
 
-	else	status = ll_cords_parse_element( xst, document, agent, tls, level );
+	else	status = ll_cords_parse_element( domain, xst, document, agent, tls, level );
 
 	if ( check_debug() )
 		printf("#leave: cords_parse_element(%u, %s, %s )\n",level,document->name,agent);
@@ -2572,7 +2617,7 @@ public	struct	xml_element * cords_document_parser(
 
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
-		(void) cords_parse_element( xst, document, agent, tls, 0 );
+		(void) cords_parse_element( (char *) 0,xst, document, agent, tls, 0 );
 
 		xsd = cords_drop_document( xsd );
 		cords_document_xsd( xsd );

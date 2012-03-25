@@ -232,7 +232,9 @@ public	struct xml_element * document_parse_url( char * url )
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	rest_header * hptr;
 	struct	rest_response * rptr;
-	if (!( rptr = rest_client_get_request( url, (char *) 0,"Xsd Client", (struct rest_header *) 0) ))
+	if (!( strncmp( url,"file:///",strlen("file:///") ) ))
+		return((document = document_parse_file( (url + (strlen("file:///") - 1 ) ) ) ));
+	else if (!( rptr = rest_client_get_request( url, (char *) 0,"Xsd Client", (struct rest_header *) 0) ))
 		return( document );
 	else if ( rptr->status != 200 )
 		return( document );

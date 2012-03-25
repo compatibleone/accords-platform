@@ -47,6 +47,7 @@ char * category, char * agent, struct occi_element * eptr, char * tls );
 public	int	cords_delete_instance( char * uri, char * category, char * agent, char * tls );
 public	int	cords_resolve_location( struct occi_response * zptr, struct xml_element * document ); 
 public	int 	cords_parse_element(
+		char * domain,
 		struct xml_element * xst, 
 		struct xml_element * document, 
 		char * agent, char * tls, int level);

@@ -286,8 +286,8 @@ public	char * on_create_compute_request(
 		/* a second public address may be present */
 		/* -------------------------------------- */
 		if (( network )
-		||  ( strlen( network ) )
-		||  ( strcmp( network, _CORDS_NULL  )))
+		&&  ( strlen( network ) )
+		&&  ( strcmp( network, _CORDS_NULL  )))
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
