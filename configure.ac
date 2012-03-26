@@ -46,7 +46,9 @@ AC_CHECK_HEADERS([uuid/uuid.h uuid.h],
                 [break],
 		[AC_MSG_ERROR([You are missing uuid development files])])
 AC_SUBST([CFLAGS_UUID], ["-I/usr/include/uuid"])
-AC_SUBST([LDFLAGS_UUID], ["-luuid"])
+if test "$(uname -s)" = 'Linux' ; then
+	AC_SUBST([LDFLAGS_UUID], ["-luuid"])
+fi
 
 # Checks for pthread.
 AC_CHECK_HEADERS([pthread.h], [

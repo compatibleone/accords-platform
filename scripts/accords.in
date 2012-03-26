@@ -192,21 +192,42 @@ _co_status() {
     echo "-----------------------------"
     echo " Accords Platform Components "
     echo "-----------------------------"
-    netstat -a -p | grep LISTEN | grep publisher
-    netstat -a -p | grep LISTEN | grep fileserver
-    netstat -a -p | grep LISTEN | grep coss
-    netstat -a -p | grep LISTEN | grep comons
-    netstat -a -p | grep LISTEN | grep conets
-    netstat -a -p | grep LISTEN | grep coobas
-    netstat -a -p | grep LISTEN | grep coes
-    netstat -a -p | grep LISTEN | grep coees
-    netstat -a -p | grep LISTEN | grep parser
-    netstat -a -p | grep LISTEN | grep broker
-    netstat -a -p | grep LISTEN | grep procci
-    netstat -a -p | grep LISTEN | grep cosched
-    netstat -a -p | grep LISTEN | grep ezvm
-    netstat -a -p | grep LISTEN | grep coips
-    netstat -a -p | grep LISTEN | grep cosacs
+    if [ "$(uname -s)" = 'Linux' ] ; then
+	netstat -a -p | grep LISTEN | grep publisher
+	netstat -a -p | grep LISTEN | grep fileserver
+	netstat -a -p | grep LISTEN | grep coss
+	netstat -a -p | grep LISTEN | grep comons
+	netstat -a -p | grep LISTEN | grep conets
+	netstat -a -p | grep LISTEN | grep coobas
+	netstat -a -p | grep LISTEN | grep coes
+	netstat -a -p | grep LISTEN | grep coees
+	netstat -a -p | grep LISTEN | grep parser
+	netstat -a -p | grep LISTEN | grep broker
+	netstat -a -p | grep LISTEN | grep procci
+	netstat -a -p | grep LISTEN | grep cosched
+	netstat -a -p | grep LISTEN | grep ezvm
+	netstat -a -p | grep LISTEN | grep coips
+	netstat -a -p | grep LISTEN | grep cosacs
+    elif [ "$(uname -s)" = 'Darwin' ] ; then
+	lsof -i | grep LISTEN | grep publisher || true
+	lsof -i | grep LISTEN | grep fileserver || true
+	lsof -i | grep LISTEN | grep coss || true
+	lsof -i | grep LISTEN | grep comons || true
+	lsof -i | grep LISTEN | grep conets || true
+	lsof -i | grep LISTEN | grep coobas || true
+	lsof -i | grep LISTEN | grep coes || true
+	lsof -i | grep LISTEN | grep coees || true
+	lsof -i | grep LISTEN | grep parser || true
+	lsof -i | grep LISTEN | grep broker || true
+	lsof -i | grep LISTEN | grep procci || true
+	lsof -i | grep LISTEN | grep cosched || true
+	lsof -i | grep LISTEN | grep ezvm || true
+	lsof -i | grep LISTEN | grep coips || true
+	lsof -i | grep LISTEN | grep cosacs || true
+    else
+	echo "Unsupported OS ($(uname -s))"
+	exit 1
+    fi
 }
 
 _co_stop() {
@@ -441,8 +462,16 @@ _usage() {
 _stop_service() {
     service=$1
     echo "Stopping service: $service"
-    killall -q $service || true
-    killall -q lt-$service || true
+    if [ "$(uname -s)" = 'Linux' ] ; then
+	killall -q $service || true
+	killall -q lt-$service || true
+    elif [ "$(uname -s)" = 'Darwin' ] ; then
+	killall $service >/dev/null 2>&1 || true
+	killall lt-$service >/dev/null 2>&1 || true
+    else
+	echo "Unsupported OS ($(uname -s))"
+	exit 1
+    fi
     sleep 1
 }
 
