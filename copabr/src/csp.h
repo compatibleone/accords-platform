@@ -48,7 +48,8 @@
 #define	_CORDSCRIPT_SNAPSHOT  	10
 #define	_CORDSCRIPT_BUILD   	11
 #define	_CORDSCRIPT_INSTANCE   	12
-#define	_CORDSCRIPT_INVOKE   	13
+#define	_CORDSCRIPT_RESOLVE   	13
+#define	_CORDSCRIPT_INVOKE   	14
 
 public	struct	cordscript_action *	cordscript_parse_statement( char * statement );
 public	int				cordscript_parse_method( char * token );

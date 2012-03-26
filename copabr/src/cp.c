@@ -2051,6 +2051,72 @@ private	struct occi_element * cords_invocation_parameters(
 }
 
 /*	-----------------------------------------------------------------	*/
+/*	c o r d s _ r e s o l v e _ c o r d s c r i p t _ i n s t a n c e	*/
+/*	-----------------------------------------------------------------	*/
+private	int	cords_resolve_cordscript_instance(
+	struct	xml_atribut * aptr,
+	struct xml_element * wptr,
+	struct xml_element * dptr,
+	struct	cordscript_action * fptr,
+	char *	agent,
+	char *	tls )
+{
+	struct	cordscript_element * eptr;
+	struct	occi_response * yptr;
+	struct	occi_response * uptr;
+	char	buffer[1024];
+	char *	mptr;
+	char *	nptr;
+	char *	vptr;
+	struct	xml_atribut * bptr;
+	struct	occi_element * hptr=(struct occi_element *) 0;
+
+	/* ----------------------------------------- */
+	/* recover the category.attribute expression */
+	/* ----------------------------------------- */
+	if (!( eptr=fptr->rvalue ))
+		return(0);
+	else if (!( mptr = eptr->prefix ))
+		return(0);
+	else	sprintf(buffer,"%s.%s.%s","occi",mptr, eptr->value );
+
+	/* -------------------------- */
+	/* recover the attribute name */
+	/* -------------------------- */
+	if (!( eptr = eptr->next ))
+		return(0);
+	else if (!( nptr = eptr->prefix ))
+		return(0);
+
+	/* ------------------------------------------ */
+	/* then resolve the cascading attribute value*/
+	/* ------------------------------------------ */
+	else if (!( bptr = cords_cascading_attribute( dptr, nptr ) ))
+		return(0);
+	else if (!( bptr->value ))
+		return(0);
+	else if (!( vptr = occi_unquoted_value( bptr->value )))
+		return(0);
+
+	else if (!( yptr = cords_retrieve_named_instance_list( mptr, buffer, vptr, agent,tls ) ))
+		return( 0 );
+	else if (!( uptr = cords_retrieve_named_instance( yptr, agent,tls )))
+	{
+		yptr = occi_remove_response( yptr );
+		return( 0 );
+	}
+	else	
+	{
+		sprintf(buffer,"%s%s",uptr->host,uptr->name);
+		yptr = occi_remove_response( yptr );
+		uptr = occi_remove_response( uptr );
+		if ( bptr->value ) bptr->value = liberate( bptr->value );
+		bptr->value = allocate_string( buffer );
+		return(0);
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
 /*		c o r d s _ n e w _ c o r d s c r i p t _ i n s t a n c e	*/
 /*	-----------------------------------------------------------------	*/
 private	int	cords_new_cordscript_instance(
@@ -2133,14 +2199,13 @@ private	int	cords_parser_atribut_action(
 	struct	cordscript_action * fptr;
 	struct	occi_response * zptr;
 	char *	xptr;
+	int	status=0;
 
 	if (!( aptr->name ))
 		return(0);
 	else if (!(xptr = aptr->value))
 		return(0);
-	else if ( strncmp( xptr, _CORDSCRIPT_PREFIX, strlen( _CORDSCRIPT_PREFIX ) ) != 0 )
-		return(0);
-	else
+	else if (!( strncmp( xptr, _CORDSCRIPT_PREFIX, strlen( _CORDSCRIPT_PREFIX ) ) ))
 	{
 		/* ----------------------------- */
 		/* step over leading white space */
@@ -2153,39 +2218,50 @@ private	int	cords_parser_atribut_action(
 		{
 			 xptr++;
 		}
-		/* ---------------------------- */
-		/* invoke cordscript expression */
-		/* ---------------------------- */
-		if (!( eptr = cordscript_parse_statement( xptr ) ))
-			return(0);
-		else
+	}
+
+	/* ---------------------------------------------------- */
+	/* detect a "cordscript" named attribute to be consumed */
+	/* ---------------------------------------------------- */
+	else if (!( strcmp( aptr->name, "cordscript" ) ))
+		status=1;
+	else	return( 0 );
+
+	/* ---------------------------- */
+	/* invoke cordscript expression */
+	/* ---------------------------- */
+	if (!( eptr = cordscript_parse_statement( xptr ) ))
+		return(0);
+	else
+	{
+		if ( check_debug() )
 		{
-			if ( check_debug() )
-			{
-				cordscript_show( eptr );
-			}
-			for (	fptr = eptr;
-				fptr != (struct cordscript_action *) 0;
-				fptr = fptr->next )
-			{
-				switch ( fptr->type )
-				{
-				case	_CORDSCRIPT_NEW	:
-					cords_new_cordscript_instance( aptr, wptr, dptr, fptr, agent, tls );
-					continue;
-				case	_CORDSCRIPT_START	:
-				case	_CORDSCRIPT_STOP	:
-				case	_CORDSCRIPT_SAVE	:
-				case	_CORDSCRIPT_SNAPSHOT	:
-				case	_CORDSCRIPT_DELETE	:
-				case	_CORDSCRIPT_BUILD	:
-					cords_invoke_cordscript_action( aptr, wptr, dptr, fptr, agent, tls );
-					continue;
-				}
-			}
-			eptr =  liberate_cordscript_actions( eptr );
-			return(0);
+			cordscript_show( eptr );
 		}
+		for (	fptr = eptr;
+			fptr != (struct cordscript_action *) 0;
+			fptr = fptr->next )
+		{
+			switch ( fptr->type )
+			{
+			case	_CORDSCRIPT_NEW	:
+				cords_new_cordscript_instance( aptr, wptr, dptr, fptr, agent, tls );
+				continue;
+			case	_CORDSCRIPT_RESOLVE	:
+				cords_resolve_cordscript_instance( aptr, wptr, dptr, fptr, agent, tls );
+				continue;
+			case	_CORDSCRIPT_START	:
+			case	_CORDSCRIPT_STOP	:
+			case	_CORDSCRIPT_SAVE	:
+			case	_CORDSCRIPT_SNAPSHOT	:
+			case	_CORDSCRIPT_DELETE	:
+			case	_CORDSCRIPT_BUILD	:
+				cords_invoke_cordscript_action( aptr, wptr, dptr, fptr, agent, tls );
+				continue;
+			}
+		}
+		eptr =  liberate_cordscript_actions( eptr );
+		return(status);
 	}
 }
 
@@ -2200,16 +2276,29 @@ private	int	cords_parser_xsd_actions(
 {
 	int	status=0;
 	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
 	/* ------------------------------------- */
 	/* detect the presence of this attribute */
 	/* ------------------------------------- */
-	for (	aptr=dptr->firstatb;
-		aptr != (struct xml_atribut *) 0;
-		aptr = aptr->next )
+	aptr=dptr->firstatb;
+	while (aptr != (struct xml_atribut *) 0)
 	{
-		if (!(status = cords_parser_atribut_action( aptr, wptr, dptr, agent, tls )))
-			continue;
-		else	break;
+		if ((status = cords_parser_atribut_action( aptr, wptr, dptr, agent, tls )) == 1)
+		{
+			/* ---------------------- */
+			/* consume this attribute */
+			/* ---------------------- */
+			bptr = aptr->next;
+			if (!( aptr->previous ))
+				dptr->firstatb = aptr->next;
+			else	aptr->previous->next = aptr->next;
+			if (!( aptr->next ))
+				dptr->lastatb = aptr->previous;
+			else	aptr->next->previous = aptr->previous;
+			aptr = liberate_atribut( aptr );
+			aptr = bptr;
+		}
+		else 	aptr = aptr->next;
 	}
 	return(status);
 }
@@ -2290,6 +2379,7 @@ private	int	cords_terminate_xsd(
 			else	return( status );
 		}
 
+		/* ------------------------------------- */
 		/* locate the first max occurs unbounded */
 		/* ------------------------------------- */
 		for ( 	eptr=first_xsd_element( wptr );

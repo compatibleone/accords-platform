@@ -334,6 +334,7 @@ private	char * cordscript_methodname[] =
 	(char *)	"snapshot",
 	(char *)	"build",
 	(char *)	"instance",
+	(char *)	"resolve",
 	(char *)	"invoke",
 	(char *) 0
 	};

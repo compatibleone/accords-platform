@@ -440,6 +440,27 @@ private	char *	coips_link_value( char * sptr )
 	}
 }
 
+/*	-----------------------------------------------------------	*/
+/*	f i r s t _ a p p l i c a t i o n _ p a c k a g e _ l i n k	*/
+/*	-----------------------------------------------------------	*/
+private	struct occi_element * 	first_application_package_link( struct occi_response * zptr )
+{
+	struct	occi_element  * eptr;
+	for (	eptr=zptr->first;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if ( strcasecmp(eptr->name,"LINK") != 0 )
+			continue;
+		else	break;
+	}
+	return( eptr );
+}
+
 /*	------------------------------------------------------------------	*/
 /*			l l _ b u i l d _ a p p l i c a t i o n			*/
 /*	------------------------------------------------------------------	*/
@@ -455,6 +476,22 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	struct	occi_response * zptr;
 	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
+
+
+	/* ---------------------------------------- */
+	/* check first for packages to be installed */
+	/* ---------------------------------------- */
+	if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
+	{
+		aptr->status = 10;
+		return( 0 );
+	}
+	else if (!( eptr = first_application_package_link( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		aptr->status = 10;
+		return( 0 );
+	}
 
 	/* ------------------------- */
 	/* build a provisioning node */
@@ -484,15 +521,13 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	if (!( contract = provision_application_contract(contract)))
 		return( 801 );
 	
-	if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
-		return( 802 );
 	else 
 	{
 		aptr->status = 4;
 		/* ------------------------- */
 		/* For Each Package 	     */
 		/* ------------------------- */
-		for (	eptr=zptr->first;
+		for (	eptr = first_application_package_link(zptr);
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
 		{
