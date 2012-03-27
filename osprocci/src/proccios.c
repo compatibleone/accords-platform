@@ -571,13 +571,7 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		/* ------------------------------------------------------------- */
 		/* determine the openstack message version and collect addresses */
 		/* ------------------------------------------------------------- */
-		if ( os_valid_address( pptr->floating ) )
-			pptr->publicaddr  = allocate_string(pptr->floating);
-
-		else if ( os_valid_address( pptr->accessip ) )
-			pptr->publicaddr  = allocate_string(pptr->accessip);
-
-		else if (!( version = resolve_openstack_version( pptr->profile ) ))
+		if (!( version = resolve_openstack_version( pptr->profile ) ))
 			resolve_os_v10_addresses( yptr, pptr );
 
 		else if (!( strcmp( version, "v1.0" ) ))
@@ -585,6 +579,31 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 
 		else if (!( strcmp( version, "v1.1" ) ))
 			resolve_os_v11_addresses( yptr, pptr );
+
+		/* ------------------------------------------------ */
+		/* now overload using a floating IP or an access IP */
+		/* if one or the other is available.		    */
+		/* ------------------------------------------------ */
+		if ( os_valid_address( pptr->floating ) )
+		{
+			if ( pptr->publicaddr ) 
+				pptr->publicaddr = liberate( pptr->publicaddr );
+			if (!( pptr->publicaddr  = allocate_string(pptr->floating) ))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+		}
+		else if ( os_valid_address( pptr->accessip ) )
+		{
+			if ( pptr->publicaddr ) 
+				pptr->publicaddr = liberate( pptr->publicaddr );
+			if (!( pptr->publicaddr  = allocate_string(pptr->accessip) ))
+			{
+				reset_openstack_server( pptr );
+				return( 27 );
+			}
+		}
 
 		/* ------------------------------------------------------------ */
 		/* set the host name field now to the public or private address */
