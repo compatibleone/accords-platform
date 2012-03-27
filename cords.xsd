@@ -133,7 +133,7 @@
 		<xsd:attribute 	
 			name="cordscript" 
 			type="xsd:string"
-			default="type.resolve(manifest.name,type.value);"
+			default="type.resolve(plan.name,type.value);"
 			/>
 
 	</xsd:complexType>
