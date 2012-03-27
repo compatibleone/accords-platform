@@ -2274,6 +2274,7 @@ private	int	cords_parser_xsd_actions(
 	char *	agent,
 	char *	tls )
 {
+	int	modifications=0;
 	int	status=0;
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
@@ -2283,8 +2284,9 @@ private	int	cords_parser_xsd_actions(
 	aptr=dptr->firstatb;
 	while (aptr != (struct xml_atribut *) 0)
 	{
-		if ((status = cords_parser_atribut_action( aptr, wptr, dptr, agent, tls )) == 1)
+		switch ((status = cords_parser_atribut_action( aptr, wptr, dptr, agent, tls )))
 		{
+		case	1	:
 			/* ---------------------- */
 			/* consume this attribute */
 			/* ---------------------- */
@@ -2297,10 +2299,15 @@ private	int	cords_parser_xsd_actions(
 			else	aptr->next->previous = aptr->previous;
 			aptr = liberate_atribut( aptr );
 			aptr = bptr;
+			modifications++;
+			continue;
+		case	0	:
+			modifications++;
+		default		:
+			aptr = aptr->next;
 		}
-		else 	aptr = aptr->next;
 	}
-	return(status);
+	return(modifications);
 }
 
 /*	---------------------------------------------------	*/
