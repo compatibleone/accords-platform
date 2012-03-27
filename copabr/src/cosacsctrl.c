@@ -147,6 +147,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	struct	occi_request * rptr;
 	struct	occi_response * zptr;
 	struct	occi_element * dptr;
+	int	i;
 
 	rest_log_debug("entry::cosacs_create_meta");
 
@@ -160,6 +161,13 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
+
+	/* -------------------------------------- */
+	/* ensure symbol and prefix has no period */
+	/* -------------------------------------- */
+	for (i=0; work[i] != 0; i++)
+		if (work[i] == '.')
+			work[i]='_';
 
 	if ( check_debug() )
 		printf("create_cosacs_metadata(%s,%s,%s)\n",buffer,work,value);
