@@ -107,24 +107,34 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="infrastructure" type="xsd:string"/>
 		<xsd:attribute name="image" type="xsd:string"/>
-		<xsd:attribute 	name="provider" 
-				type="xsd:string"
-				default="any"
-				/>
+		<xsd:attribute 
+			name="provider" 
+			type="xsd:string"
+			default="any"
+			/>
 		<xsd:attribute name="profile" type="xsd:string"/>
-		<xsd:attribute 	name="access" 
-				type="xsd:string"
-				default="private" 
-				/>
-		<xsd:attribute 	name="scope" 
-				type="xsd:string"
-				default="normal" 
-				/>
-		<xsd:attribute 	name="type" 
-				type="xsd:string"
-				default="simple" 
-				/>
+		<xsd:attribute 	
+			name="access" 
+			type="xsd:string"
+			default="private" 
+			/>
+		<xsd:attribute
+		 	name="scope" 
+			type="xsd:string"
+			default="normal" 
+			/>
+		<xsd:attribute 	
+			name="type" 
+			type="xsd:string"
+			default="simple" 
+			/>
 		<xsd:attribute name="status" type="xsd:integer"/>
+
+		<xsd:attribute 	
+			name="cordscript" 
+			type="xsd:string"
+			default="type.resolve(manifest.name,type.value);"
+			/>
 
 	</xsd:complexType>
 

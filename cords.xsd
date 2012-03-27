@@ -34,7 +34,7 @@
 		<xsd:attribute 
 			name="plan" 
 			type="xsd:string"
-			default="cordscript: plan.new(id.value);"
+			default="cordscript: plan.new(id.value,name.value);"
 			/>
 		<xsd:attribute name="zone" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
@@ -107,24 +107,34 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="infrastructure" type="xsd:string"/>
 		<xsd:attribute name="image" type="xsd:string"/>
-		<xsd:attribute 	name="provider" 
-				type="xsd:string"
-				default="any"
-				/>
+		<xsd:attribute 
+			name="provider" 
+			type="xsd:string"
+			default="any"
+			/>
 		<xsd:attribute name="profile" type="xsd:string"/>
-		<xsd:attribute 	name="access" 
-				type="xsd:string"
-				default="private" 
-				/>
-		<xsd:attribute 	name="scope" 
-				type="xsd:string"
-				default="normal" 
-				/>
-		<xsd:attribute 	name="type" 
-				type="xsd:string"
-				default="simple" 
-				/>
+		<xsd:attribute 	
+			name="access" 
+			type="xsd:string"
+			default="private" 
+			/>
+		<xsd:attribute
+		 	name="scope" 
+			type="xsd:string"
+			default="normal" 
+			/>
+		<xsd:attribute 	
+			name="type" 
+			type="xsd:string"
+			default="simple" 
+			/>
 		<xsd:attribute name="status" type="xsd:integer"/>
+
+		<xsd:attribute 	
+			name="cordscript" 
+			type="xsd:string"
+			default="type.resolve(manifest.name,type.value);"
+			/>
 
 	</xsd:complexType>
 
@@ -179,7 +189,7 @@
 		<xsd:attribute 	
 			name="application" 
 			type="xsd:string"
-			default="cordscript: application.new(id.value);"/>
+			default="cordscript: application.new(id.value,provider.value); application.build();"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
