@@ -9,6 +9,7 @@ struct	cords_user
 	char *	id;
 	char *	name;
 	char *	password;
+	char *	role;
 	char *	authorization;
 	int	when;
 	int	state;

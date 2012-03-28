@@ -1295,7 +1295,15 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 				else 
 				{
 					yptr = occi_remove_response( yptr );
-					return( allocate_string( result ) );
+					if (!( result = allocate_string( result )))
+						return( result );
+					else if (!( yptr = cords_invoke_action( result, _CORDS_CHOOSE, agent, tls ) ))
+						return( liberate( result ) );
+					else
+					{
+						yptr = occi_remove_response( yptr );
+						return( result );
+					}
 				}
 			}
 		}

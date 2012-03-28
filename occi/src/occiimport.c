@@ -19,54 +19,54 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _user_c_
-#define _user_c_
+#ifndef _import_c_
+#define _import_c_
 
-#include "user.h"
+#include "import.h"
 
-/*	------------------------------	*/
-/*	o c c i _ c o r d s _ u s e r 	*/
-/*	------------------------------	*/
+/*	----------------------------------	*/
+/*	o c c i _ c o r d s _ i m p o r t 	*/
+/*	----------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct cords_user * allocate_cords_user();
-struct cords_user * liberate_cords_user(struct cords_user * optr);
-private pthread_mutex_t list_cords_user_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * cords_user_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * cords_user_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_cords_user_node() { return( cords_user_first ); }
+struct cords_import * allocate_cords_import();
+struct cords_import * liberate_cords_import(struct cords_import * optr);
+private pthread_mutex_t list_cords_import_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * cords_import_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * cords_import_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_cords_import_node() { return( cords_import_first ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_cords_user_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_import_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		cords_user_first = nptr->next;
+		cords_import_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		cords_user_last = nptr->previous;
+		cords_import_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_cords_user_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_cords_user_control );
-	nptr = ll_drop_cords_user_node( nptr );
-	pthread_mutex_unlock( &list_cords_user_control );
+private struct occi_kind_node * drop_cords_import_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_import_control );
+	nptr = ll_drop_cords_import_node( nptr );
+	pthread_mutex_unlock( &list_cords_import_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_cords_user_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_import_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
-	for ( nptr = cords_user_first;
+	struct cords_import * pptr;
+	for ( nptr = cords_import_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -75,77 +75,71 @@ private struct occi_kind_node * ll_locate_cords_user_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_cords_user_node(char * id) {
+private struct occi_kind_node * locate_cords_import_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_user_control );
-	nptr = ll_locate_cords_user_node(id);
-	pthread_mutex_unlock( &list_cords_user_control );
+	pthread_mutex_lock( &list_cords_import_control );
+	nptr = ll_locate_cords_import_node(id);
+	pthread_mutex_unlock( &list_cords_import_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_cords_user_node(int mode) {
+private struct occi_kind_node * ll_add_cords_import_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_cords_user()))
+		if (!( nptr->contents = allocate_cords_import()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = cords_user_last ))
-				cords_user_first = nptr;
+			if (!( nptr->previous = cords_import_last ))
+				cords_import_first = nptr;
 			else	nptr->previous->next = nptr;
-			cords_user_last = nptr;
+			cords_import_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_cords_user_node(int mode) {
+private struct occi_kind_node * add_cords_import_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_user_control );
-	nptr = ll_add_cords_user_node( mode );
-	pthread_mutex_unlock( &list_cords_user_control );
+	pthread_mutex_lock( &list_cords_import_control );
+	nptr = ll_add_cords_import_node( mode );
+	pthread_mutex_unlock( &list_cords_import_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_cords_user_name="cords_user.xml";
-private void autoload_cords_user_nodes() {
-	char * fn=autosave_cords_user_name;	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+private char*autosave_cords_import_name="cords_import.xml";
+private void autoload_cords_import_nodes() {
+	char * fn=autosave_cords_import_name;	struct occi_kind_node * nptr;
+	struct cords_import * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"cords_users")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_imports")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "cords_user" ) ) continue;
-			else if (!( nptr = add_cords_user_node(0))) break;
+			else if ( strcmp( vptr->name, "cords_import" ) ) continue;
+			else if (!( nptr = add_cords_import_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "password" )) != (struct xml_atribut *) 0)
-				pptr->password = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "role" )) != (struct xml_atribut *) 0)
-				pptr->role = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "authorization" )) != (struct xml_atribut *) 0)
-				pptr->authorization = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
-				pptr->when = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "xmlns" )) != (struct xml_atribut *) 0)
+				pptr->xmlns = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -157,58 +151,49 @@ private void autoload_cords_user_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_cords_user_name(char * fn) {
-	autosave_cords_user_name = fn;	return;
+public  void set_autosave_cords_import_name(char * fn) {
+	autosave_cords_import_name = fn;	return;
 }
-public  void autosave_cords_user_nodes() {
-	char * fn=autosave_cords_user_name;	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+public  void autosave_cords_import_nodes() {
+	char * fn=autosave_cords_import_name;	struct occi_kind_node * nptr;
+	struct cords_import * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_cords_user_control );
+	pthread_mutex_lock( &list_cords_import_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<cords_users>\n");
-	for ( nptr = cords_user_first;
+	fprintf(h,"<cords_imports>\n");
+	for ( nptr = cords_import_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<cords_user\n");
+		fprintf(h,"<cords_import\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," password=%c",0x0022);
-		fprintf(h,"%s",(pptr->password?pptr->password:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," role=%c",0x0022);
-		fprintf(h,"%s",(pptr->role?pptr->role:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," authorization=%c",0x0022);
-		fprintf(h,"%s",(pptr->authorization?pptr->authorization:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," when=%c",0x0022);
-		fprintf(h,"%u",pptr->when);
+		fprintf(h," xmlns=%c",0x0022);
+		fprintf(h,"%s",(pptr->xmlns?pptr->xmlns:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</cords_users>\n");
+	fprintf(h,"</cords_imports>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_cords_user_control );
+	pthread_mutex_unlock( &list_cords_import_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_cords_user_field(
+private void set_cords_import_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -216,14 +201,8 @@ private void set_cords_user_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "password" ) ))
-			pptr->password = allocate_string(vptr);
-		if (!( strcmp( nptr, "role" ) ))
-			pptr->role = allocate_string(vptr);
-		if (!( strcmp( nptr, "authorization" ) ))
-			pptr->authorization = allocate_string(vptr);
-		if (!( strcmp( nptr, "when" ) ))
-			pptr->when = atoi(vptr);
+		if (!( strcmp( nptr, "xmlns" ) ))
+			pptr->xmlns = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -233,23 +212,23 @@ private void set_cords_user_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct cords_user * filter_cords_user_info(
+private struct cords_import * filter_cords_import_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct cords_user * pptr;
-		if (!( pptr = allocate_cords_user()))
+	struct cords_import * pptr;
+		if (!( pptr = allocate_cords_import()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_user_field) ))
-		return( liberate_cords_user(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_import_field) ))
+		return( liberate_cords_import(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_cords_user_filter(
-	struct cords_user * pptr,struct cords_user * fptr) {
+private int pass_cords_import_filter(
+	struct cords_import * pptr,struct cords_import * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -264,28 +243,13 @@ private int pass_cords_user_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->password )
-	&&  (strlen( fptr->password ) != 0)) {
-		if (!( pptr->password ))
+	if (( fptr->xmlns )
+	&&  (strlen( fptr->xmlns ) != 0)) {
+		if (!( pptr->xmlns ))
 			return(0);
-		else if ( strcmp(pptr->password,fptr->password) != 0)
-			return(0);
-		}
-	if (( fptr->role )
-	&&  (strlen( fptr->role ) != 0)) {
-		if (!( pptr->role ))
-			return(0);
-		else if ( strcmp(pptr->role,fptr->role) != 0)
+		else if ( strcmp(pptr->xmlns,fptr->xmlns) != 0)
 			return(0);
 		}
-	if (( fptr->authorization )
-	&&  (strlen( fptr->authorization ) != 0)) {
-		if (!( pptr->authorization ))
-			return(0);
-		else if ( strcmp(pptr->authorization,fptr->authorization) != 0)
-			return(0);
-		}
-	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -293,10 +257,10 @@ private int pass_cords_user_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_occi_response(
+private struct rest_response * cords_import_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct cords_user * pptr)
+	struct cords_import * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
@@ -305,16 +269,7 @@ private struct rest_response * cords_user_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.password=%s",optr->domain,optr->id,pptr->password);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.role=%s",optr->domain,optr->id,pptr->role);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.authorization=%s",optr->domain,optr->id,pptr->authorization);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
+	sprintf(cptr->buffer,"%s.%s.xmlns=%s",optr->domain,optr->id,pptr->xmlns);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -330,37 +285,37 @@ private struct rest_response * cords_user_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_get_item(
+private struct rest_response * cords_import_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_cords_user_nodes();
-	return( cords_user_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_import_nodes();
+	return( cords_import_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_post_link(
+private struct rest_response * cords_import_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -370,16 +325,16 @@ private struct rest_response * cords_user_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_post_mixin(
+private struct rest_response * cords_import_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -389,7 +344,7 @@ private struct rest_response * cords_user_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_post_action(
+private struct rest_response * cords_import_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -397,10 +352,10 @@ private struct rest_response * cords_user_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -416,26 +371,26 @@ private struct rest_response * cords_user_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_post_item(
+private struct rest_response * cords_import_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_cords_user_node(1)))
+	if (!( nptr = add_cords_import_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_user_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_import_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_cords_user_nodes();
+	autosave_cords_import_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -447,37 +402,37 @@ private struct rest_response * cords_user_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_put_item(
+private struct rest_response * cords_import_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_user_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_import_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_cords_user_nodes();
-	return( cords_user_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_import_nodes();
+	return( cords_import_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_head_item(
+private struct rest_response * cords_import_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
-	if (!( nptr = locate_cords_user_node(id)))
+	struct cords_import * pptr;
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -487,20 +442,20 @@ private struct rest_response * cords_user_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_delete_item(
+private struct rest_response * cords_import_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_user * pptr;
+	struct cords_import * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_user_node(id)))
+	if (!( nptr = locate_cords_import_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_cords_user_node( nptr );
-	autosave_cords_user_nodes();
+	drop_cords_import_node( nptr );
+	autosave_cords_import_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -509,25 +464,25 @@ private struct rest_response * cords_user_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_get_list(
+private struct rest_response * cords_import_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct cords_user * pptr;
-	struct cords_user * fptr;
+	struct cords_import * pptr;
+	struct cords_import * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_cords_user_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_cords_import_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = cords_user_first;
+	for ( sptr = cords_import_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_cords_user_filter( pptr, fptr ) ))
+		if (!( pass_cords_import_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -541,7 +496,7 @@ private struct rest_response * cords_user_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_user_delete_all(
+private struct rest_response * cords_import_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -549,26 +504,26 @@ private struct rest_response * cords_user_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct cords_user * pptr;
-	struct cords_user * fptr;
+	struct cords_import * pptr;
+	struct cords_import * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_cords_user_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_cords_import_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=cords_user_first;
+	nptr=cords_import_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_cords_user_filter( pptr, fptr ) ))) {
+		||  (!( pass_cords_import_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_cords_user_node( nptr );
+			drop_cords_import_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_cords_user_nodes();
+	autosave_cords_import_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -577,7 +532,7 @@ private struct rest_response * cords_user_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_user_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_import_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -592,16 +547,16 @@ private struct rest_response * occi_cords_user_get(void * vptr, struct rest_clie
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_user_get_list( optr, cptr, rptr, aptr ) );
+		return( cords_import_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_user_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_user_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_import_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -616,14 +571,14 @@ private struct rest_response * occi_cords_user_head(void * vptr, struct rest_cli
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_user_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_user_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_import_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -638,24 +593,24 @@ private struct rest_response * occi_cords_user_post(void * vptr, struct rest_cli
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( cords_user_post_item( optr, cptr, rptr, aptr ) );
+		return( cords_import_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( cords_user_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( cords_user_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( cords_user_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_user_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_import_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -670,14 +625,14 @@ private struct rest_response * occi_cords_user_put(void * vptr, struct rest_clie
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_user_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_user_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_import_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -692,60 +647,54 @@ private struct rest_response * occi_cords_user_delete(void * vptr, struct rest_c
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_user_delete_all( optr, cptr, rptr, aptr ) );
+		return( cords_import_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_user_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_import_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_cords_user_mt( struct rest_interface * iptr )
+private void	redirect_occi_cords_import_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_cords_user_get;
-	iptr->post = occi_cords_user_post;
-	iptr->put = occi_cords_user_put;
-	iptr->delete = occi_cords_user_delete;
-	iptr->head = occi_cords_user_head;
+	iptr->get = occi_cords_import_get;
+	iptr->post = occi_cords_import_post;
+	iptr->put = occi_cords_import_put;
+	iptr->delete = occi_cords_import_delete;
+	iptr->head = occi_cords_import_head;
 	return;
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_cords_user */
-public struct occi_category * occi_cords_user_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_cords_import */
+public struct occi_category * occi_cords_import_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource cords_user";
+	char * f="CompatibleOne OCCI resource cords_import";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_cords_user_mt(optr->interface);
+		redirect_occi_cords_import_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "password",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "role",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "authorization",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "xmlns",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_cords_user_nodes();
+		autoload_cords_import_nodes();
 		return(optr);
 	}
 
 }
 
-/*	----------------------------------------------	*/
-/*	c o r d s _ u s e r _ o c c i _ h e a d e r s 	*/
-/*	----------------------------------------------	*/
-public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
+/*	--------------------------------------------------	*/
+/*	c o r d s _ i m p o r t _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------------------	*/
+public struct rest_header *  cords_import_occi_headers(struct cords_import * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -760,7 +709,7 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"cords_user; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"cords_import; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -771,7 +720,7 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_user.name='%s'\r\n",(sptr->name?sptr->name:""));
+	sprintf(buffer,"occi.cords_import.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -782,7 +731,7 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_user.password='%s'\r\n",(sptr->password?sptr->password:""));
+	sprintf(buffer,"occi.cords_import.xmlns='%s'\r\n",(sptr->xmlns?sptr->xmlns:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -793,44 +742,11 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_user.role='%s'\r\n",(sptr->role?sptr->role:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_user.authorization='%s'\r\n",(sptr->authorization?sptr->authorization:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_user.when='%u'\r\n",sptr->when);
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_user.state='%u'\r\n",sptr->state);
+	sprintf(buffer,"occi.cords_import.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _user_c_ */
+#endif	/* _import_c_ */

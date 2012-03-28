@@ -2,8 +2,8 @@
 
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
-			Compatible One Resource and Request Description Schema Version 2.07
-			Provisionary Version 10th March 2012
+			Compatible One Resource and Request Description Schema Version 2.08
+			Provisionary Version 28th March 2012
 			Aligned with the CORDS Reference Manual
 			Enforced by the ACCORDS Parser
 		</xsd:documentation>
@@ -65,6 +65,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="password" type="xsd:string"/>
+		<xsd:attribute name="role" type="xsd:string"/>
 		<xsd:attribute name="authorization" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>

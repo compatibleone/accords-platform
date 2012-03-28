@@ -24,6 +24,7 @@
 #include "network.h"
 #include "port.h"
 #include "firewall.h"
+#include "import.h"
 #include "storage.h"
 #include "infrastructure.h"
 #include "package.h"

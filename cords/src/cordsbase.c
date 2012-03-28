@@ -22,6 +22,7 @@
 
 #include "standard.h"
 
+#include "import.c"
 #include "compute.c"
 #include "network.c"
 #include "port.c"

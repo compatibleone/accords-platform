@@ -48,6 +48,7 @@
 #define	_CORDS_STOP	"stop"
 #define	_CORDS_INSTANCE	"instance"
 #define	_CORDS_BUILD	"build"
+#define	_CORDS_CHOOSE	"choose"
 
 /*	-------------------------	*/
 /*	cords atribut identifiers	*/

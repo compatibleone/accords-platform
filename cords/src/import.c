@@ -19,17 +19,17 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _user_c_
-#define _user_c_
+#ifndef _import_c_
+#define _import_c_
 
 #include "element.h"
 
-#include "user.h"
+#include "import.h"
 
-/*	--------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ u s e r 	*/
-/*	--------------------------------------	*/
-public struct cords_user * liberate_cords_user(struct cords_user * sptr)
+/*	------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ i m p o r t 	*/
+/*	------------------------------------------	*/
+public struct cords_import * liberate_cords_import(struct cords_import * sptr)
 {
 	if ( sptr )
 	{
@@ -37,54 +37,45 @@ public struct cords_user * liberate_cords_user(struct cords_user * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->password )
-			 sptr->password = liberate(sptr->password);
-		if ( sptr->role )
-			 sptr->role = liberate(sptr->role);
-		if ( sptr->authorization )
-			 sptr->authorization = liberate(sptr->authorization);
+		if ( sptr->xmlns )
+			 sptr->xmlns = liberate(sptr->xmlns);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_user *) 0);
+	return((struct cords_import *) 0);
 
 }
 
-/*	--------------------------------	*/
-/*	r e s e t _ c o r d s _ u s e r 	*/
-/*	--------------------------------	*/
-public struct cords_user * reset_cords_user(struct cords_user * sptr)
+/*	------------------------------------	*/
+/*	r e s e t _ c o r d s _ i m p o r t 	*/
+/*	------------------------------------	*/
+public struct cords_import * reset_cords_import(struct cords_import * sptr)
 {
 	if ( sptr )
 	{
-		sptr->previous = (struct cords_user*) 0;
-		sptr->next = (struct cords_user*) 0;
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->password = (char*) 0;
-		sptr->role = (char*) 0;
-		sptr->authorization = (char*) 0;
-		sptr->when =  0;
+		sptr->xmlns = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
 
 }
 
-/*	--------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ u s e r 	*/
-/*	--------------------------------------	*/
-public struct cords_user * allocate_cords_user()
+/*	------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ i m p o r t 	*/
+/*	------------------------------------------	*/
+public struct cords_import * allocate_cords_import()
 {
-	struct cords_user * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_user ) ) ))
+	struct cords_import * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_import ) ) ))
 		return( sptr );
-	else	return( reset_cords_user(sptr) );
+	else	return( reset_cords_import(sptr) );
 }
 
-/*	--------------------------------	*/
-/*	x m l i n _ c o r d s _ u s e r 	*/
-/*	--------------------------------	*/
-public int xmlin_cords_user(struct cords_user * sptr,struct xml_element * eptr)
+/*	------------------------------------	*/
+/*	x m l i n _ c o r d s _ i m p o r t 	*/
+/*	------------------------------------	*/
+public int xmlin_cords_import(struct cords_import * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -99,21 +90,9 @@ public int xmlin_cords_user(struct cords_user * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"password") ))
+		else if (!( strcmp(wptr->name,"xmlns") ))
 		{
-			if ( wptr->value ) { sptr->password = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"role") ))
-		{
-			if ( wptr->value ) { sptr->role = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"authorization") ))
-		{
-			if ( wptr->value ) { sptr->authorization = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"when") ))
-		{
-			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->xmlns = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -124,10 +103,10 @@ public int xmlin_cords_user(struct cords_user * sptr,struct xml_element * eptr)
 
 }
 
-/*	----------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ u s e r 	*/
-/*	----------------------------------------	*/
-public int rest_occi_cords_user(FILE * fh,struct cords_user * sptr,char * prefix, char * nptr)
+/*	--------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ i m p o r t 	*/
+/*	--------------------------------------------	*/
+public int rest_occi_cords_import(FILE * fh,struct cords_import * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -135,13 +114,10 @@ public int rest_occi_cords_user(FILE * fh,struct cords_user * sptr,char * prefix
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.password='%s'\r\n",prefix,nptr,(sptr->password?sptr->password:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.role='%s'\r\n",prefix,nptr,(sptr->role?sptr->role:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.xmlns='%s'\r\n",prefix,nptr,(sptr->xmlns?sptr->xmlns:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _user_c_ */
+#endif	/* _import_c_ */

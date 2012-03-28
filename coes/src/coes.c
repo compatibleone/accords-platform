@@ -272,6 +272,28 @@ private	int	create_placement_solution(
 }
 
 /*	-------------------------------------------	*/
+/* 	      c h o o s e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * choose_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	char	buffer[1024];
+	int	status;
+	if (!( pptr = vptr ))
+		return(0);
+	else if ( pptr->status > 0 )
+		return(0);
+	else if ((status = create_placement_solution(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+		return( rest_html_response( aptr, status, "PLACEMENT FAILURE" ) );
+	else 	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
 /* 	      c r e a t e _ p l a c e m e n t  		*/
 /*	-------------------------------------------	*/
 private	int	create_placement(struct occi_category * optr, void * vptr)
@@ -284,7 +306,7 @@ private	int	create_placement(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr->node ))
 		return( 0 ); 
-	else	return(create_placement_solution(optr,pptr, _CORDS_CONTRACT_AGENT, Coes.tls));
+	else	return( 0 );
 }
 
 /*	-------------------------------------------	*/
@@ -380,6 +402,9 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
+		return( 28 );
 
 	rest_initialise_log( Coes.monitor );
 

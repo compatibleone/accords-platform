@@ -44,6 +44,7 @@ struct	cords_parser_config
 	};
 
 private	int	debug=0;
+private	int	echo=0;
 private	int	verbose=0;
 public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
@@ -96,6 +97,8 @@ private	int	test_cords_parser_operation( char * filename )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
+	set_xml_echo(echo);
+
 	if (!( auth = login_occi_user( "test-parser","co-system",Cp.agent, Cp.tls ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
@@ -130,6 +133,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 				{	verbose=1; continue;	}
 				else if (!( strcmp( aptr, "debug" ) ))
 				{	debug=1; continue;	}
+				else if (!( strcmp( aptr, "echo" ) ))
+				{	echo=1; continue;	}
 				else if (!( strcmp( aptr, "xsd" ) ))
 				{	Cp.xsd=0; continue;	}
 				else if (!( strcmp( aptr, "tls" ) ))

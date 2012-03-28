@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF8"?>
-<manifest name="coips:model" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+
+<import name="coips" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
 
 <description>compatibleone image oproduction services infrastructure model</description>
 
-<node name="coips:model">
-	<infrastructure name="coips:model">
-		<compute name="coips:model" architecture="x86" cores="1" memory="1G" speed="1G"/>
-		<storage name="coips:model" size="10G"/>
-		<network name="PUB_Compatible" label="ethernet" vlan="100M"/1>
-	</infrastructure>
-</node>
+<infrastructure name=":model">
+	<compute name=":model" architecture="x86" cores="1" memory="1G" speed="1G"/>
+	<storage name=":model" size="10G"/>
+	<network name="PUB_Compatible" label="ethernet" vlan="100M"/1>
+</infrastructure>
 
-</manifest>
+</import>
 

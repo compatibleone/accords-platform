@@ -4,6 +4,7 @@
 
 #include "cords.h"
 
+public struct occi_category * occi_cords_import_builder(char *a,char * b);
 public struct occi_category * occi_cords_schedule_builder(char *a,char * b);
 public struct occi_category * occi_cords_interface_builder(char *a,char * b);
 public struct occi_category * occi_cords_session_builder(char *a,char * b);

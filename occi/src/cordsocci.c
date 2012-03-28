@@ -26,6 +26,8 @@
 #include "cords.h"
 
 #include "document.h"
+
+#include "occiimport.c"
 #include "occiaccount.c"
 #include "occiaction.c"
 #include "occinode.c"
