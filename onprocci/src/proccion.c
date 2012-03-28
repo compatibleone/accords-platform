@@ -333,8 +333,6 @@ private	struct	rest_response * start_opennebula(
 	char	*	metafilename;
 	char		buffer[512];
 	char		reference[512];
-	char 	*	personality="";
-	char 	*	resource=_CORDS_LAUNCH_CFG;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status != _OCCI_IDLE )
@@ -345,7 +343,7 @@ private	struct	rest_response * start_opennebula(
 	sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 
 	if (!( filename = on_create_compute_request( 
-		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, personality, resource ) ))
+		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, pptr->architecture, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 2400, "Bad Request : Create Server Message" ) );
 	else if (!( osptr = on_create_compute( filename )))
 	 	return( rest_html_response( aptr, 2401, "Bad Request : Create Server Request" ) );

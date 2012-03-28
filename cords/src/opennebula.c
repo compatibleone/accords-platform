@@ -45,6 +45,10 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
+		if ( sptr->architecture )
+			 sptr->architecture = liberate(sptr->architecture);
+		if ( sptr->driver )
+			 sptr->driver = liberate(sptr->driver);
 		if ( sptr->original )
 			 sptr->original = liberate(sptr->original);
 		if ( sptr->node )
@@ -90,6 +94,8 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->hostname = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
+		sptr->architecture = (char*) 0;
+		sptr->driver = (char*) 0;
 		sptr->original = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->price = (char*) 0;
@@ -154,6 +160,14 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"image") ))
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"architecture") ))
+		{
+			if ( wptr->value ) { sptr->architecture = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"driver") ))
+		{
+			if ( wptr->value ) { sptr->driver = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"original") ))
 		{
@@ -235,6 +249,8 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.architecture='%s'\r\n",prefix,nptr,(sptr->architecture?sptr->architecture:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.driver='%s'\r\n",prefix,nptr,(sptr->driver?sptr->driver:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));

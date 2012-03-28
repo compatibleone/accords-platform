@@ -37,6 +37,8 @@ struct	cords_on_contract
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
+	char *	architecture;
+	char *	driver;
 	struct	cords_vector	network;
 	struct	cords_vector	storage;
 	struct	cords_vector	image;
@@ -97,6 +99,11 @@ private	int	terminate_opennebula_contract( int status, struct cords_on_contract 
 		cptr->images  = liberate_on_response( cptr->images  );
 	if ( cptr->networks  )
 		cptr->networks  = liberate_on_response( cptr->networks  );
+	if ( cptr->architecture  )
+		cptr->architecture  = liberate( cptr->architecture  );
+	if ( cptr->driver  )
+		cptr->driver  = liberate( cptr->driver  );
+	
 	return( status );
 }
 
@@ -148,10 +155,11 @@ private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 {
 	struct	on_compute_infos	request;
 	char *	vptr;
-
+	char *	wptr;
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
 	/* -------------------------------------------------------------- */
+	memset( &request, 0, sizeof(struct on_compute_infos));
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
@@ -172,6 +180,36 @@ private	char *	resolve_opennebula_flavor( struct cords_on_contract * cptr )
 		request.storage = 0;
 	else	request.storage = on_normalise_value(vptr,'G');
 
+	if (!( wptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
+		vptr = allocate_string("x86_64");
+	else 	vptr = allocate_string( wptr );
+
+	/* ---------------------------- */
+	/* scan for field separator ';' */
+	/* ---------------------------- */
+	wptr = vptr;
+	while ( *wptr != 0 )
+	{
+		if ( *wptr == ';' )
+			break;
+		else	wptr++;
+	}
+
+	/* --------------------------------------- */
+	/* detect the driver model field extension */
+	/* --------------------------------------- */
+	cptr->architecture = vptr;
+	if ( *wptr == ';' )
+	{
+		*(wptr++) = 0;
+		cptr->driver = allocate_string( wptr );
+	}
+	else	cptr->driver = (char *) 0;
+
+	/* ---------------------------------------- */
+	/* calculate the required memory model type */
+	/* ---------------------------------------- */
 	if (( request.storage <= 40000000 )
 	&& ( request.memory  <= 2048000 ))
 		return( allocate_string( "small" ) );
@@ -481,7 +519,14 @@ public	int	create_opennebula_contract(
 		return( terminate_opennebula_contract( 1579, &contract ) );
 	else if (!( pptr->flavor = resolve_opennebula_flavor( &contract ) ))
 		return( terminate_opennebula_contract( 1580, &contract ) );
-		
+	else
+	{
+		if ( contract.architecture )
+			pptr->architecture = allocate_string( contract.architecture );
+		if ( contract.driver )
+			pptr->driver = allocate_string( contract.driver );
+	}
+					
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */

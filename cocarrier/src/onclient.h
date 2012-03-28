@@ -35,10 +35,10 @@ public	char * on_create_image_request(
 		);
 
 public	char * on_create_server_request(
-	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * architecture, char * driver );
 
 public	char * on_create_compute_request(
-	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * personality, char * resource );
+	char * identity, char * flavour, char * image, char* pubnetwork,char* prinetwork, char * architecture, char * driver );
 
 public	char * on_create_storage_request(
 	char * name, char * description, char * type, char * size );

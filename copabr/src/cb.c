@@ -247,61 +247,6 @@ private	struct xml_atribut *	cords_resolve_contract_id( struct xml_element * doc
 	else	return( bptr );
 }
 
-/*	-------------------------------------------------------		*/
-/*		    c o r d s _ p o s t _ e v e n t			*/
-/*	-------------------------------------------------------		*/
-public	int	cords_post_event( char * message, char * nature, char * agent, char * tls )
-{
-	char	*	ihost;
-	struct	occi_client * kptr;
-	struct	occi_request * qptr;
-	struct	occi_response * yptr;
-	struct	occi_response * zptr;
-	struct	occi_element * dptr;
-	struct	xml_element * eptr;
-	struct	xml_atribut * aptr;
-	struct	xml_atribut * bptr;
-	struct	cordscript_element * lptr;
-	struct	cordscript_element * rvalue;
-	char	buffer[2048];
-
-	if (!( ihost = rest_log_comons_identity(_CORDS_EVENT,agent, tls) ))
-		return(46);
-
-	sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);
-
-	liberate( ihost );
-
-	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
-		return(46);
-	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
-	{
-		kptr = occi_remove_client( kptr );
-		return(50);
-	}
-	else if ((!(dptr=occi_request_element(qptr,"occi.event.description" , message ) ))
-	     ||  (!(dptr=occi_request_element(qptr,"occi.event.nature"      , nature  ) ))
-	     ||  (!(dptr=occi_request_element(qptr,"occi.event.source"      , agent   ) )))
-	{
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return(51);
-	}
-	else if (!( yptr = occi_client_post( kptr, qptr ) ))
-	{
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return(52);
-	}
-	else
-	{
-		yptr = occi_remove_response( yptr );
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return(0);
-	}
-}
-
 /*	---------------------------------------------------------	*/
 /*	c o r d s _ a f f e c t a t i o n _ i n s t r u c t i o n	*/
 /*	---------------------------------------------------------	*/

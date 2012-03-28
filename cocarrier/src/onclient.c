@@ -24,6 +24,7 @@
 #include "restpublic.h"
 
 #define	_CORDS_NULL "(null)"
+#define	_CORDS_NONE "none"
 
 private	struct	on_config On = {
 	(char *) 0,
@@ -224,6 +225,22 @@ public	char * on_create_storage_request(
 	}
 }
 
+/*	------------------------------------------------	*/
+/*		o n _ v a l i d _ s t r i n g			*/
+/*	------------------------------------------------	*/
+private	int	on_valid_string( char * vptr )
+{
+	if (!( vptr ))
+		return( 0 );
+	else if (!( strlen( vptr ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NULL ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NONE ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ c o m p u t e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
@@ -236,8 +253,8 @@ public	char * on_create_compute_request(
 		char * image,
 		char * network, 
 		char * local,
-		char * personality,
-		char * target ) 
+		char * architecture,
+		char * driver ) 
 {
 	char *	filename;
 	FILE *	h;
@@ -257,8 +274,14 @@ public	char * on_create_compute_request(
 		/* generate server creation request element */
 		/* ---------------------------------------- */
 		fprintf(h,"<COMPUTE>\n");
-		fprintf(h,"<NAME>%s</NAME>\n",identity);
-		fprintf(h,"<INSTANCE_TYPE>%s</INSTANCE_TYPE>\n",flavour);
+		if ( on_valid_string( identity ) )
+		{
+			fprintf(h,"<NAME>%s</NAME>\n",identity);
+		}
+		if ( on_valid_string( flavour ) )
+		{
+			fprintf(h,"<INSTANCE_TYPE>%s</INSTANCE_TYPE>\n",flavour);
+		}
 
 		fprintf(h,"<STATE>running</STATE>\n");
 
@@ -266,28 +289,29 @@ public	char * on_create_compute_request(
 		/* specify the base operating system disk image */
 		/* -------------------------------------------- */
 		fprintf(h,"<DISK>\n");
-		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
+		if ( on_valid_string( image ) )
+		{
+			fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
+		}
 		fprintf(h,"<TYPE>OS</TYPE>\n");
+		if ( on_valid_string( driver ) )
+		{
+			fprintf(h,"<DRIVER>%s</DRIVER>\n",driver);
+		}
 		fprintf(h,"</DISK>\n");
 
 		/* ------------------------------ */
 		/* 64 bit architecture is crucial */
 		/* ------------------------------ */
-		fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
-		if ( (On.version) && ( atoi( On.version ) >= 5 ))
+		if ( on_valid_string( architecture ) )
 		{
-			/* ----------------------------------- */
-			/* added for OpenNebula 3.0 compliance */
-			/* ----------------------------------- */
-			fprintf(h,"<OS><ARCH>x86_64</ARCH></OS>\n");
+			fprintf(h,"<OS><ARCH>%s</ARCH></OS>\n",architecture);
 		}
 
 		/* -------------------------------------- */
 		/* a second public address may be present */
 		/* -------------------------------------- */
-		if (( network )
-		&&  ( strlen( network ) )
-		&&  ( strcmp( network, _CORDS_NULL  )))
+		if ( on_valid_string( network ) )
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
@@ -297,10 +321,7 @@ public	char * on_create_compute_request(
 		/* -------------------------------------- */
 		/* a local address must always be present */
 		/* -------------------------------------- */
-		if ((!( local ))
-		||  (!( strlen( local ) ))
-		||  (!( strcmp( local, _CORDS_NULL ) )))
-
+		if (!( on_valid_string( local ) ))
 		{
 			/* ------------- */
 			/* default local */
