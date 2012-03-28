@@ -866,12 +866,20 @@ private	int	cords_configuration_action(
 	}
 	else if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
+	else if (!( strlen( type ) ))
+		type = allocate_string("cordscript");
+	else if (!( strcmp( type, _CORDS_NULL ) ))
+		type = allocate_string("cordscript");
 
-	if (!( strcmp( type, "cordscript" )))
-		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
-			cords_action_instruction( host, document, aptr,"configuration", agent, tls );
+	if ( type != (char *) 0 )
+	{
+		if (!( strcmp( type, "cordscript" )))
+			if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+				cords_action_instruction( host, document, aptr,"configuration", agent, tls );
 
-	type = liberate( type );
+		type = liberate( type );
+	}
+
 	statement = liberate( statement );	 
 
 	return(0);
