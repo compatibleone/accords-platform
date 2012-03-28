@@ -184,20 +184,21 @@ private	struct	on_response * on_save_object(
 		struct rest_header * hptr,
 		char * p3,
 		char * p4,
-		char * p5 )
+		char * p5,
+		char * p6 )
 {
 	char *	filename;
 	if (!( keyword ))
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_create_image_request( p3, p4, p5 )))
+		if (!( filename = on_create_image_request( p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
 		else 	return( on_create_image( p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_create_image_request( p3, p4, p5 )))
+		if (!( filename = on_create_image_request( p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
 		else 	return( on_create_image( p3, filename ) );
 	}
@@ -435,10 +436,10 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return( on_result( on_put_object( p2, default_tls(), agent, p3, p4, hptr ) ) );
 	else if (!( p5 ))
 		return( failure( 30,"p5", "required") );
-	else if (!( strcasecmp(p1,"SAVE" ) ))
-		return( on_result( on_save_object( p2, default_tls(), agent, hptr, p3, p4, p5 ) ) );
 	else if (!( p6 ))
 		return( failure( 30,"p6", "required") );
+	else if (!( strcasecmp(p1,"SAVE" ) ))
+		return( on_result( on_save_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6 ) ) );
 	else if (!( p7 ))
 		return( failure( 30,"p7", "required") );
 	else if (!( strcasecmp(p1,"POST" ) ))
@@ -532,7 +533,7 @@ private	int	on_banner()
 	printf("\n   [ GET    [ compute | storage | network | server ] {id} ");
 	printf("\n   [ DELETE [ compute | storage | network | server ] {id} ");
 	printf("\n   [ POST     compute {name} {small|medium|large} {image} {network} {driver} ");
-	printf("\n   [ SAVE     compute {id} {number} {name} ");
+	printf("\n   [ SAVE     compute {id} {number} {name} {driver} ");
 	printf("\n   [ STOP     compute {id} ");
 	printf("\n   [ START    compute {id} ");
 	printf("\n   [ SHUTDOWN compute {id} ");

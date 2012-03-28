@@ -31,7 +31,8 @@ public	struct	on_response *	on_create_image( char * id, char * filename );
 public	char * on_create_image_request(
 		char * number,
 		char * oldnumber,
-		char * newname
+		char * newname,
+		char * driver
 		);
 
 public	char * on_create_server_request(

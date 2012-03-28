@@ -497,7 +497,7 @@ private	struct	rest_response * save_opennebula(
 
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "configuration not found" ) );
-	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->name ) ))
+	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->name, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image message failure" ) );
 	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
@@ -557,7 +557,7 @@ private	struct	rest_response * snapshot_opennebula(
 
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "configuration not found" ) );
-	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->id ) ))
+	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->id, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image request failure" ) );
 	else if (!( osptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );

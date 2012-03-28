@@ -454,7 +454,8 @@ public	char * on_start_compute_request( char * identity )
 public	char * on_create_image_request(
 		char * number,
 		char * oldnumber,
-		char * newname
+		char * newname,
+		char * driver
 		)
 {
 	char *	filename;
@@ -479,6 +480,10 @@ public	char * on_create_image_request(
 		fprintf(h,"<DISK id='0'>");
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,oldnumber);
 		fprintf(h,"<SAVE_AS name='%s'/>\n",newname);
+		if ( on_valid_string( driver ) )
+		{
+			fprintf(h,"<DRIVER>%s</DRIVER>\n",driver);
+		}
 		fprintf(h,"</DISK>\n");
 		fprintf(h,"</COMPUTE>\n");
 		fclose(h);
