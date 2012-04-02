@@ -78,6 +78,9 @@ endif
 if ENABLE_OSPROCCI
 SUBDIRS += osprocci
 endif
+if ENABLE_OSOCCIPROCCI
+SUBDIRS += osocciprocci
+endif
 if ENABLE_ONPROCCI
 SUBDIRS += onprocci
 endif
