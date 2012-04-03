@@ -1150,13 +1150,26 @@ public	struct	occi_response * cords_delete_links( char * from, char * agent, cha
 }
 
 /*	---------------------------------------------------	*/
-/*	 	c o r d s _ a p p e n d _ l i n k s		*/
+/*		c o r d s _ r e m o v e _ l i n k s		*/
 /*	---------------------------------------------------	*/
-/*	collects all sub element id values of the provided	*/
-/*	type and declares them as links from the current	*/
-/*	element.						*/
-/*	---------------------------------------------------	*/	
-private	int	cords_append_links( struct xml_element * document, char * element, char * agent, char * tls )
+private	int	cords_remove_links( struct xml_element * document, char * agent, char * tls )
+{
+	struct	occi_response * zptr;
+	struct	xml_atribut * aptr;
+	if (!(aptr = document_atribut( document, _CORDS_ID )))
+		return( cords_append_error(document,701,"unresolved element") );
+	else if (!( zptr = cords_delete_links( aptr->value, agent,tls ) ))
+		return( cords_append_error(document,702,"deleting links") );
+	else	zptr = occi_remove_response( zptr );
+	return(0);
+}
+
+
+
+/*	---------------------------------------------------	*/
+/*	 	    c o r d s _ a d d _ l i n k s		*/
+/*	---------------------------------------------------	*/
+private	int	cords_add_links( struct xml_element * document, char * element, char * agent, char * tls )
 {
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
@@ -1165,12 +1178,9 @@ private	int	cords_append_links( struct xml_element * document, char * element, c
 	int			count=0;
 	char	buffer[512];
 	char	value[64];
-
+	
 	if (!(aptr = document_atribut( document, _CORDS_ID )))
 		return( cords_append_error(document,701,"unresolved element") );
-	else if (!( zptr = cords_delete_links( aptr->value, agent,tls ) ))
-		return( cords_append_error(document,702,"deleting links") );
-	else	zptr = occi_remove_response( zptr );
 
 	for (	eptr = document->first;
 		eptr != (struct xml_element *) 0;
@@ -1197,6 +1207,20 @@ private	int	cords_append_links( struct xml_element * document, char * element, c
 		sprintf(value,"%u",count);
 		return( cords_instance_member( document, buffer, value ) );
 	}
+}
+
+/*	---------------------------------------------------	*/
+/*	 	c o r d s _ a p p e n d _ l i n k s		*/
+/*	---------------------------------------------------	*/
+/*	collects all sub element id values of the provided	*/
+/*	type and declares them as links from the current	*/
+/*	element.						*/
+/*	---------------------------------------------------	*/	
+private	int	cords_append_links( struct xml_element * document, char * element, char * agent, char * tls )
+{
+	cords_remove_links( document, agent, tls );
+
+	return( cords_add_links( document, element, agent, tls ) );
 }
 
 /*	---------------------------------------------------	*/
@@ -2389,6 +2413,8 @@ private	int	cords_terminate_xsd(
 		/* ------------------------------------- */
 		/* locate the first max occurs unbounded */
 		/* ------------------------------------- */
+		status = cords_remove_links(dptr,agent,tls);
+
 		for ( 	eptr=first_xsd_element( wptr );
 			eptr != (struct xml_element *) 0;
 			eptr = eptr->next )
@@ -2417,7 +2443,7 @@ private	int	cords_terminate_xsd(
 						continue;
 					else if (!( nptr = occi_unquoted_value( nptr ) ))
 						continue;
-					else if ((status = cords_append_links(dptr,nptr,agent,tls)) != 0)
+					else if ((status = cords_add_links(dptr,nptr,agent,tls)) != 0)
 					{
 						liberate( nptr );
 						sprintf(buffer,"linkage failure:%s",nptr);
@@ -2425,15 +2451,14 @@ private	int	cords_terminate_xsd(
 					}
 					else
 					{
-						linked=1;
+						linked++;
 						liberate( nptr );
 						break;
 					}
 				}
 				else	liberate(vptr);
 			}
-			if ( linked )
-				break;
+			/* if ( linked ) break; */
 		}
 
 		
