@@ -396,6 +396,64 @@ private	void	document_serialise_element( FILE * h, struct xml_element * eptr, in
 	}
 }
 
+/*	------------------------------------------------------------	*/
+/*		d o c u m e n t _ r e m o v e _ e l e m e n t		*/
+/*	------------------------------------------------------------	*/
+public	int	document_remove_element( struct xml_element * eptr )
+{
+	struct	xml_element * wptr;
+	struct	xml_element * pptr;
+
+	if (!( eptr->previous ))
+	{
+		if ( eptr->parent )
+			eptr->parent->first = eptr->next;
+	}
+	else	eptr->previous->next = eptr->next;
+	if (!( eptr->next ))
+	{
+		if ( eptr->parent )
+			eptr->parent->last = eptr->previous;
+	}
+	else	eptr->next->previous = eptr->previous;
+	liberate_element( eptr );
+	return(0);
+}
+
+/*	------------------------------------------------------------	*/
+/*		d o c u m e n t _ a p p e n d _ e l e m e n t 		*/
+/*	------------------------------------------------------------	*/
+public	int	document_append_element( struct xml_element * dptr, struct xml_element * eptr )
+{
+	struct	xml_element * wptr;
+	if (!( eptr->next = dptr->next ))
+	{
+		if ( dptr->parent )
+			dptr->parent->last = eptr;
+	}
+	else	eptr->next->previous = eptr;
+	dptr->next = eptr;
+	eptr->previous = dptr;
+	return(0);
+}
+
+/*	------------------------------------------------------------	*/
+/*		d o c u m e n t _ a p p e n d _ e l e m e n t s		*/
+/*	------------------------------------------------------------	*/
+public	int	document_append_elements( struct xml_element * dptr, struct xml_element * eptr )
+{
+	struct	xml_element * wptr;
+	while ((wptr = eptr) != (struct xml_element *) 0)
+	{
+		eptr = eptr->next;
+		wptr->previous = wptr->next = (struct xml_element *) 0;
+		document_append_element( dptr, wptr );
+		dptr = wptr;
+	}
+	return(0);
+}
+
+
 /*	---------------------------------------------------	*/
 /*	   d o c u m e n t _ s e r i a l i s e _ f i l e 	*/
 /*	---------------------------------------------------	*/

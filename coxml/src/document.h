@@ -34,6 +34,10 @@ public	struct	xml_atribut * document_add_atribut( struct xml_element * eptr, cha
 public	char *	document_atribut_string( struct xml_atribut * aptr );
 public	int	document_atribut_value( struct xml_atribut * aptr );
 public	int	document_serialise_file( struct xml_element * eptr, char * filename );
+public	int	document_remove_element( struct xml_element * eptr );
+public	int	document_append_element( struct xml_element * dptr, struct xml_element * eptr );
+public	int	document_append_elements( struct xml_element * dptr, struct xml_element * eptr );
+
 
 
 #endif	/* _document_h */

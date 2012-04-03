@@ -254,6 +254,8 @@ public	struct xml_element * document_parse_url( char * url )
 /*	---------------------------------------------------	*/
 public	struct xml_element * document_load_xsd( struct xml_element * document )
 {
+	struct	xml_element 	* eptr;
+	struct	xml_element 	* wptr;
 	struct	xml_element 	* xsd=(struct xml_element *) 0;
 	struct	xml_atribut 	* aptr=(struct xml_atribut *) 0;
 	char 			* sptr=(char *) 0;
@@ -287,10 +289,49 @@ public	struct xml_element * document_load_xsd( struct xml_element * document )
 	}
 	else
 	{
+		liberate( sptr );
+		/* -------------------------------------------------- */
+		/* process the included and redefined schema elements */
+		/* -------------------------------------------------- */
+		while (((eptr = document_element( xsd, "include" )) != (struct xml_element *) 0)
+		||     ((eptr = document_element( xsd, "redefine" )) != (struct xml_element *) 0)
+		||     ((eptr = document_element( xsd, "xsd:include" )) != (struct xml_element *) 0)
+		||     ((eptr = document_element( xsd, "xsd:redefine" )) != (struct xml_element *) 0))
+		{
+			if (!( aptr = document_atribut( eptr, "schemaLocation" )))
+			{
+				cords_append_error( document, 709,"incorrect include");
+				break;
+			}
+			else if (!( aptr->value ))
+			{
+				cords_append_error( document, 709,"incorrect include");
+				break;
+			}
+			else if (!( sptr = occi_unquoted_value( aptr->value ) ))
+			{
+				cords_append_error( document, 709,"incorrect include");
+				break;
+			}
+			else if (!( wptr = document_parse_url( sptr ) ))
+			{
+				cords_append_error( document, 709,"namespace failure");
+				liberate( sptr );
+				break;
+			}
+			else
+			{
+				document_append_elements( eptr, wptr->first );
+				document_remove_element( eptr );
+				wptr->first = wptr->last = (struct xml_element *) 0;
+				liberate_element( wptr );
+				liberate( sptr );
+				continue;
+			}
+		}
 		/* ------------------ */
 		/* ok its been loaded */
 		/* ------------------ */
-		liberate( sptr );
 		return( xsd );
 	}
 }
