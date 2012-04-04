@@ -662,6 +662,48 @@ static	int	xml_use_token( struct xml_parser * sptr )
 	return( _XML_SUCCESS );
 }
 
+/*	--------------------------------------------------	*/
+/*		x m l _ c o n s u m e _ c o m m e n t		*/
+/*	--------------------------------------------------	*/
+/* 	consumes comments of the form :				*/
+/*		<!-- text --/> or <-- text --/>			*/
+/*	--------------------------------------------------	*/
+static	int	xml_consume_comment(struct xml_parser * sptr )
+{
+	int	state=0;
+	int	c;
+	while (1)
+	{
+		if ((c = xml_getch( sptr )) < 0)
+			return( _XML_INCORRECT_PUNCTUATION );
+		else
+		{
+			switch ( state )
+			{
+			case	0 :
+			case	1 : 
+				if ( c == '-' )
+					state++;
+				else	state=0;
+				continue;
+			case	2 :
+				if ( c == '/' )
+					state++;
+				else	state=0;
+				continue;
+			case	3 :
+				if ( c == '>')
+					return(_XML_SUCCESS);
+				else	state=0;
+				continue;
+			}
+		}
+	}
+ }
+
+/*	--------------------------------------------------	*/
+/* 		x m l _ u s e _ p u n c t u a t i o n		*/
+/*	--------------------------------------------------	*/
 static	int	xml_use_punctuation( struct xml_parser * sptr )
 {
 	switch ( sptr->state ) {
@@ -690,22 +732,28 @@ static	int	xml_use_punctuation( struct xml_parser * sptr )
 			break;
 
 		case	_TAG_NAME	:
-			if ( sptr->punctuation == '-' ) {
-				sptr->state = _TAG_COMMENT;
-				break;
-				}
-			else if ( sptr->punctuation == '/' ) {
+			if ( sptr->punctuation == '-' ) 
+			{
+				if ( sptr->nesting )
+					sptr->state = _TAG_OPEN;
+				else	sptr->state = _TAG_IDLE;
+				return( xml_consume_comment( sptr ));
+			}
+			else if ( sptr->punctuation == '/' ) 
+			{
 				sptr->state = _TAG_CLOSE;
 				break;
-				}
-			else if ( sptr->punctuation == '?' ) {
+			}
+			else if ( sptr->punctuation == '?' ) 
+			{
 				sptr->state = _TAG_QUESTION;
 				break;
-				}
-			else if ( sptr->punctuation == '!' ) {
+			}
+			else if ( sptr->punctuation == '!' ) 
+			{
 				sptr->state = _TAG_EXCLAIM;
 				break;
-				}
+			}
 			else	return( _XML_INCORRECT_PUNCTUATION );
 
 		case	_TAG_QUESTION	:
@@ -714,20 +762,29 @@ static	int	xml_use_punctuation( struct xml_parser * sptr )
 			break;
 
 		case	_TAG_ENDQUESTION :
-			if ( sptr->punctuation == '>' ) {
+			if ( sptr->punctuation == '>' ) 
+			{
 				if ( sptr->nesting )
 					sptr->state = _TAG_OPEN;
 				else	sptr->state = _TAG_IDLE;
-				}
+			}
 			else	sptr->state = _TAG_QUESTION;
 			break;
 
 		case	_TAG_EXCLAIM 	:
-			if ( sptr->punctuation == '>' ) {
+			if ( sptr->punctuation == '-' )
+			{
 				if ( sptr->nesting )
 					sptr->state = _TAG_OPEN;
 				else	sptr->state = _TAG_IDLE;
-				}
+				return( xml_consume_comment( sptr ));
+			}
+			else if ( sptr->punctuation == '>' ) 
+			{
+				if ( sptr->nesting )
+					sptr->state = _TAG_OPEN;
+				else	sptr->state = _TAG_IDLE;
+			}
 			break;
 
 		case	_TAG_ATBNAME 	:
