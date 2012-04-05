@@ -31,6 +31,7 @@
 #include "security.c"
 #include "authorise.c"
 #include "package.c"
+#include "agreement.c"
 
 #include "script.c"
 #include "file.c"
