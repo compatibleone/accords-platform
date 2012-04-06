@@ -1002,52 +1002,29 @@ public	struct	occi_response * ll_cords_invoke_action( char * resource, char * ac
 /*	---------------------------------------------------	*/	
 public	struct	occi_response * cords_schedule_action( char * resource, char * action, char * agent, char * tls )
 {
-	struct	url 		* uptr;
 	struct	occi_element 	* eptr;
 	struct	occi_response 	* zptr;
 	char	buffer[1024];
-	int	schedule=0;
 	char *	scheduler=(char *) 0;
 	if (!( resource ))
 		return((struct occi_response *) 0);
-	else if (!( uptr = analyse_url( resource ) ))
-		return((struct occi_response *) 0);
+	else if (!( scheduler = occi_resolve_category_provider( _CORDS_SCHEDULE, agent, tls ) ))
+		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	else 	sprintf(buffer,"%s?action=%s",resource,action);
+
+	if (!( eptr = occi_create_element( "occi.schedule.operation", buffer ) ))
+		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	else	sprintf(buffer,"%s/%s/",scheduler,_CORDS_SCHEDULE);
+
+	if (!( zptr = occi_simple_post( buffer, eptr, agent, tls ) ))
+	{
+		eptr = occi_remove_elements( eptr );
+		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	}
 	else
 	{
-		sprintf(buffer,"/%s/",_CORDS_SERVICE);
-		if (!( strncmp( uptr->object, buffer, strlen( buffer) ) ))
-			schedule=1;
-		else 
-		{
-			sprintf(buffer,"/%s/",_CORDS_APPLICATION);
-			if (!( strncmp( uptr->object, buffer, strlen( buffer) ) ))
-				schedule=1;
-			else	schedule=0;
-		}
-
-		liberate_url( uptr );
-
-		if (!( schedule ))
-			return( ll_cords_invoke_action( resource, action, agent, tls ) );
-		else if (!( scheduler = occi_resolve_category_provider( _CORDS_SCHEDULE, agent, tls ) ))
-			return( ll_cords_invoke_action( resource, action, agent, tls ) );
-		else 	sprintf(buffer,"%s?action=%s",resource,action);
-
-		if (!( eptr = occi_create_element( "occi.schedule.operation", buffer ) ))
-			return( ll_cords_invoke_action( resource, action, agent, tls ) );
-		else	sprintf(buffer,"%s/%s/",scheduler,_CORDS_SCHEDULE);
-
-		if (!( zptr = occi_simple_post( buffer, eptr, agent, tls ) ))
-		{
-			eptr = occi_remove_elements( eptr );
-			return( ll_cords_invoke_action( resource, action, agent, tls ) );
-		}
-		else
-		{
-			eptr = occi_remove_elements( eptr );
-			return(zptr);
-		}
-		/* return( ll_cords_invoke_action( resource, action, agent, tls ) ); */
+		eptr = occi_remove_elements( eptr );
+		return(zptr);
 	}
 }
 
