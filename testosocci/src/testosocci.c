@@ -165,28 +165,42 @@ private	int	test_os_occi_operation( char * nptr )
 	optr->access |= _OCCI_PRIVATE;
 	last = optr;
 
-	if (!( optr = occi_create_os_template( TestOsOcci.domain, "debian", "http://www.compatibleone.fr/template/os#debian", "debian" ) ))
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "debian", "http://www.compatibleone.fr/template/os#debian", "system debian" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_create_os_template( TestOsOcci.domain, "ubuntu", "http://www.compatibleone.fr/template/os#ubuntu", "debian" ) ))
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "ubuntu", "http://www.compatibleone.fr/template/os#ubuntu", "syste ubuntu" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_create_os_template( TestOsOcci.domain, "redhat", "http://www.compatibleone.fr/template/os#redhat", "debian" ) ))
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "redhat", "http://www.compatibleone.fr/template/os#redhat", "system redhat" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_create_os_template( TestOsOcci.domain, "useit", "http://www.compatibleone.fr/template/os#useit", "debian" ) ))
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "suze", "http://www.compatibleone.fr/template/os#suze", "system suze" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "centos", "http://www.compatibleone.fr/template/os#centos", "system centos" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "fedora", "http://www.compatibleone.fr/template/os#fedora", "system fedora" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
