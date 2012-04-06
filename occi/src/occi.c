@@ -85,6 +85,18 @@ public	struct	occi_category * occi_create_category( char * domain, char * name, 
 		return( cptr );
 	}
 }
+
+public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title )
+{
+	return( occi_create_category( domain, name, schema, "mixin", _OCCI_OS_TEMPLATE , title ) );
+}
+
+ 
+public	struct	occi_category * occi_create_resource_template( char * domain, char * name, char * schema, char * title )
+{
+	return( occi_create_category( domain, name, schema, "mixin", _OCCI_RESOURCE_TEMPLATE, title ) );
+}
+
  
 /*	---------------------------------------------------	*/
 /*		o c c i _ a d d _ a c t i o n           	*/

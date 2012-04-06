@@ -139,6 +139,10 @@ _co-start() {
     run-osprocci &
     sleep 1
 
+    echo "Starting accords test occi open stack server"
+    run-testosocci &
+    sleep 1
+
     echo "Starting accords occi open stack services"
     run-osocciprocci &
     sleep 1
@@ -195,6 +199,8 @@ co-stop() {
     killall onprocci
     sleep 1
     killall osocciprocci
+    sleep 1
+    killall testosocci
     sleep 1
     killall osprocci
     sleep 1
@@ -283,6 +289,10 @@ _run-osprocci() {
 
 _run-osocciprocci() {
     osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+}
+
+_run-testosocci() {
+    testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
 _run-parser() {

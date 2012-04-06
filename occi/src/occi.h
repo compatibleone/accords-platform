@@ -59,6 +59,10 @@ public	char *	default_tls();
 #define	_CORDS_DEFAULT_USER	"admin"
 #define	_CORDS_DEFAULT_PASSWORD	"admin"
 
+#define	_OCCI_OS_TEMPLATE	"http://schemas.ogf.org/occi/infrastructure#os_tpl"
+#define	_OCCI_RESOURCE_TEMPLATE	"http://schemas.ogf.org/occi/infrastructure#resource_tpl"
+
+
 /*	COSACS Global Parameters	*/
 /*	------------------------	*/
 #define	_COSACS_PORT 		8286
@@ -138,6 +142,8 @@ struct	occi_interface
 	int	(*delete)  (struct occi_category * optr, void * vptr);
 };
 
+public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title );
+public	struct	occi_category * occi_create_resource_template( char * domain, char * name, char * schema, char * title );
 public 	char *			occi_unquoted_value( char * sptr );
 public 	char *			occi_unquoted_link( char * sptr );
 public	struct	occi_link *	liberate_occi_link( struct occi_link * lptr);
