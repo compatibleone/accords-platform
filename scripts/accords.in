@@ -140,6 +140,10 @@ _co_start() {
     run-osprocci &
     sleep 1
 
+    echo "Starting accords occi open stack services"
+    run-osocciprocci &
+    sleep 1
+
     echo "Starting accords open nebula services"
     run-onprocci &
     sleep 1
@@ -233,6 +237,7 @@ _co_status() {
 _co_stop() {
     _stop_service cosacs
     _stop_service onprocci
+    _stop_service osocciprocci
     _stop_service osprocci
     _stop_service azprocci
     _stop_service cosched
@@ -307,6 +312,10 @@ _run_osprocci() {
     osprocci --config $target CO-OSPROCCI/1.0
 }
 
+_run_osocciprocci() {
+    osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+}
+
 _run_parser() {
     parser --config $target CO-PARSER/1.0
 }
@@ -343,6 +352,7 @@ _make_security_files() {
 	_mksecs procci 1
 	_mksecs cosched 1
 	_mksecs osprocci 1
+	_mksecs osocciprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
 	_mksecs command
@@ -411,6 +421,7 @@ _accords_config() {
 		_mkcert procci
 		_mkcert cosched
 		_mkcert osprocci
+		_mkcert osocciprocci
 		_mkcert onprocci
 		_mkcert azprocci
 		_mkcert cosacs
@@ -437,6 +448,7 @@ _accords_config() {
     _mkcfg broker 
     _mkcfg procci 
     _mkcfg osprocci  
+    _mkcfg osocciprocci  
     _mkcfg onprocci
     _mkcfg azprocci
     _mkcfg fileserver
@@ -676,6 +688,9 @@ case `basename $0` in
 	;;
     run-osprocci)
 	_run_osprocci $*
+	;;
+    run-osocciprocci)
+	_run_osocciprocci $*
 	;;
     run-parser)
 	_run_parser $*

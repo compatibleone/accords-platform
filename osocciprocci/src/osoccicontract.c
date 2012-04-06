@@ -39,8 +39,8 @@ struct	cords_os_contract
 	struct	cords_vector	image;
 	struct	cords_vector	system;
 	struct	cords_vector	package;
-	struct	os_response *	flavors;
-	struct	os_response *	images;
+	struct	rest_header *	flavors;
+	struct	rest_header *	images;
 };
 
 struct	os_compute_infos
@@ -85,19 +85,19 @@ private	struct	os_config * resolve_os_occi_configuration( char * sptr )
 /*	--------------------------------------------------------	*/
 /* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
 /*	--------------------------------------------------------	*/
-private	int	use_occi_openstack_configuration( char * sptr )
+private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 {
 	struct	os_config * pptr;
 
 	if (!( pptr = resolve_os_occi_configuration( sptr )))
-	 	return( 404 );
+	 	return( pptr );
 #ifdef	_OS_OCCI_PROCCI_TRUC
 	TODO
 	else 	return( os_initialise_client( 
 			pptr->user, pptr->password, 
 			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
 #else
-	return(0);
+	return(pptr);
 #endif
 }
 
@@ -122,14 +122,89 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 		cptr->system.message = occi_remove_response( cptr->system.message );
 	if ( cptr->package.message )
 		cptr->package.message = occi_remove_response( cptr->package.message );
-/*
- TODO
 	if ( cptr->flavors )
-		cptr->flavors = liberate_os_response( cptr->flavors );
+		cptr->flavors = liberate_rest_header( cptr->flavors );
 	if ( cptr->images  )
-		cptr->images  = liberate_os_response( cptr->images  );
- */
+		cptr->images  = liberate_rest_header( cptr->images  );
 	return( status );
+}
+
+/*	----------------------------------------------------------	*/
+/*		o c c i _ l i s t _ m i x i n s 			*/
+/*	----------------------------------------------------------	*/
+private struct rest_header * occi_list_mixins( char * scheme, char * host )
+{
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	occi_client * cptr;
+	struct	occi_category * kptr;
+
+	if (!( cptr = occi_create_client( host, _CORDS_OS_AGENT, default_tls() ) ))
+		return( root );
+	else
+	{
+		for (	kptr=cptr->firstcat;
+			kptr != (struct occi_category *) 0;
+			kptr = kptr->next )
+		{
+			if (!( kptr->scheme ))
+				continue;
+			else if ( strcmp( kptr->scheme, scheme ) )
+				continue;
+			else if (!( hptr = allocate_rest_header() ))
+				continue;
+			else if (!( hptr->name = allocate_string( scheme ) ))
+			{
+				hptr = liberate_rest_header( hptr );
+				continue;
+			}			
+			else if (!( hptr->name = allocate_string( kptr->id ) ))
+			{
+				hptr = liberate_rest_header( hptr );
+				continue;
+			}			
+			else
+			{
+				if (!( hptr->previous = foot ))
+					root = hptr;
+				else	hptr->previous->next = hptr;
+				foot = hptr;
+			}
+		}
+	}
+	return( root );
+}
+
+/*	----------------------------------------------------------	*/
+/*		o c c i _ l i s t _ o s _ t e m p l a t e s		*/
+/*	----------------------------------------------------------	*/
+private struct rest_header * occi_list_os_templates(char * host)
+{
+	return( occi_list_mixins( "http://schemas.openstack.org/template/os#", host ) );
+}
+
+/*	----------------------------------------------------------	*/
+/*		  r e s o l v e _ o s _ t e m p l a t e s		*/
+/*	----------------------------------------------------------	*/
+private char * resolve_os_template( struct cords_os_contract * cptr )
+{
+	return("(null)");
+}
+/*	----------------------------------------------------------	*/
+/*	 o c c i _ l i s t _ r e s o u r c e _ t e m p l a t e s	*/
+/*	----------------------------------------------------------	*/
+private struct rest_header * occi_list_resource_templates(char * host)
+{
+	return( occi_list_mixins( "http://schemas.openstack.org/template/resource#", host ) );
+}
+
+/*	----------------------------------------------------------	*/
+/*	   r e s o l v e _ r e s o u r c e _ t e m p l a t e s		*/
+/*	----------------------------------------------------------	*/
+private char * resolve_resource_template( struct cords_os_contract * cptr )
+{
+	return("(null)");
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -141,14 +216,15 @@ private	int	create_openstack_contract(
 		char * agent,
 		char * tls )
 {
+	struct	os_config * kptr;
 	struct	cords_os_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
 	int	status;
 	char *	vptr;
 
-	if ((status = use_occi_openstack_configuration( pptr->profile )) != 0)
-		return( status );
+	if (!( kptr = use_occi_openstack_configuration( pptr->profile )))
+		return( 777 );
 	else	memset( &contract, 0, sizeof( struct cords_os_contract ));
 
 	/* ---------------------------- */
@@ -202,13 +278,10 @@ private	int	create_openstack_contract(
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-/*
-TODO
-	else if (!( contract.flavors = os_list_flavor_details() ))
+	else if (!( contract.flavors = occi_list_resource_templates( kptr->host) ))
 		return( terminate_openstack_contract( 1180, &contract ) );
-	else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
+	else if (!( pptr->flavor = resolve_resource_template( &contract ) ))
 		return( terminate_openstack_contract( 1181, &contract ) );
-*/		
 
 	/* ---------------------------------- */
 	/* recover the node image description */
@@ -228,13 +301,11 @@ TODO
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-/*
- TODO
-	else if (!( contract.images = os_list_image_details() ))
+	else if (!( contract.images = occi_list_os_templates( kptr->host) ))
 		return( terminate_openstack_contract( 1186, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+	else if (!( pptr->image = resolve_os_template( &contract ) ))
 		return( terminate_openstack_contract( 1187, &contract ) );
- */
+
 	else if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_openstack_contract( 1188, &contract ) );
 	else

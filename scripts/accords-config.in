@@ -139,6 +139,10 @@ _co-start() {
     run-osprocci &
     sleep 1
 
+    echo "Starting accords occi open stack services"
+    run-osocciprocci &
+    sleep 1
+
     echo "Starting accords open nebula services"
     run-onprocci &
     sleep 1
@@ -189,6 +193,8 @@ _co-status() {
 
 co-stop() {
     killall onprocci
+    sleep 1
+    killall osocciprocci
     sleep 1
     killall osprocci
     sleep 1
@@ -273,6 +279,10 @@ _run-onprocci() {
 
 _run-osprocci() {
     osprocci --config $target CO-OSPROCCI/1.0
+}
+
+_run-osocciprocci() {
+    osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
 _run-parser() {

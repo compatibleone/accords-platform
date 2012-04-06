@@ -75,7 +75,7 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	---------------------------------------------	*/  
 private	void	OsOcciProcci_load()
 {
-	load_accords_configuration( &OsOcciProcci, "OsOcciProcci" );
+	load_accords_configuration( &OsOcciProcci, "osocciprocci" );
 	return;
 }
 
@@ -211,7 +211,7 @@ private	struct	occi_interface	openstack_interface = {
 private	struct	occi_category * build_occi_openstack( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_openstack_builder( domain,_CORDS_OPENSTACK ) ))
+	if (!( optr = occi_openstack_builder( domain, "occiopenstack" ) ))
 		return( optr );
 	else
 	{
@@ -260,7 +260,7 @@ private	struct	occi_category * build_occi_openstack( char * domain )
 private	struct	occi_category * build_occi_openstack_configuration( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_osconfig_builder( domain, "openstack_configuration" ) ))
+	if (!( optr = occi_cords_osconfig_builder( domain, "occi_openstack_configuration" ) ))
 		return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
 	else if (!( optr = occi_add_action( optr,"current","",set_default_openstack)))
