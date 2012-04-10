@@ -264,6 +264,57 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 	else	return( rptr );
 }
 
+
+public char * pa_java_procci_call(char * specific_parameters)
+{ 
+    #define RESULT_SIZE 1024*8
+
+    char* javaprocci = NULL;               // example: /home/mjost/Projects/gitorious/proactive/procci/co-proactive-procci/procci "
+    char* general_parameters = NULL;       // example: --host xx -- user xx --pass xx 
+    char* all_command = NULL;              // all the command together, including the specific_parameters
+    char* result = NULL;                   // output of the execution of the command 
+
+    fprintf(stderr, "Calling the Java ProActive Procci...");
+    if      (!(javaprocci = getenv("PA_PROCCI_PATH"))){
+        fprintf(stderr, "Environment variable PA_PROCCI_PATH not defined...");
+        return NULL;
+    }else if(!(general_parameters = allocate(100 + strlen(Wpa.host) + strlen(Wpa.user) + strlen(Wpa.password)))){
+        return NULL;
+    }else if(sprintf(general_parameters, " --rm-url %s --sched-url %s --user %s --pass %s ", Wpa.host, Wpa.host, Wpa.user, Wpa.password)<0){
+        return NULL;
+    }else if((all_command = allocate(strlen(javaprocci) + strlen(general_parameters) + strlen(specific_parameters) + 16))==0){
+        return NULL;
+    }else if(sprintf(all_command, "%s %s %s", javaprocci, general_parameters, specific_parameters)<0){
+        return NULL;
+    }else{
+        FILE* pf = NULL;
+        size_t size = 0;
+
+        fprintf(stderr, "ProActive Java call: '%s'\n", all_command);
+
+        pf = popen(all_command, "r");
+        if (!pf){
+            fprintf(stderr, "Could not open pipe for output.\n");
+            return NULL;
+        }
+
+        ssize_t bytes_read = getdelim(&result, &size, '\0',  pf);
+        if(bytes_read != -1){
+            // ok
+            fprintf(stderr, "----- raw call stdout: %s", result);
+        }else{
+            result = NULL;
+            fprintf(stderr, "----- raw call stdout: <empty>");
+        }
+
+        if (pclose(pf) !=0){
+            fprintf(stderr, "Error: Failed to close command stream.\n");
+        }
+        return result;
+    }
+
+}
+
 /*	------------------------------------------------------------	*/
 /*		p r o a c t i v e  _ re t r i e v e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
@@ -522,13 +573,55 @@ public	struct	pa_response *	pa_list_locations()
 	return( proactive_list_operation( "/locations" ) );
 }
 
+private char * put_jsonstring_in_file(char * jsontext){
+    char * tempfile = rest_temporary_filename("txt");
+
+    FILE* file = (FILE*) NULL;
+    if (!( file = fopen(tempfile,"wb" ))) {
+        fprintf(stderr, "Cannot open file %s...\n", tempfile);
+        free(tempfile);
+        return NULL;
+    } else if ( fwrite(jsontext,strlen(jsontext),1,file) <= 0 ) {
+        fprintf(stderr, "Cannot write file %s...\n", tempfile);
+        free(tempfile);
+        fclose(file);
+        return NULL;
+    }else{
+        fclose(file);
+        return( tempfile);
+    }
+}
+
 
 /*	------------------------------------------------------------	*/
 /*			p a _ l i s t _ s e r v e r s			*/
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_servers	( )
 {
-	return( proactive_list_operation( "/services/hostedservices" ) );
+    //printf("ProActive Listing servers... Using host %s  user %s  pass %s  version %s\n", Wpa.host, Wpa.user, Wpa.password, Wpa.version);
+    char * filename = NULL;
+    char * raw_list = NULL;
+
+    struct pa_response* result = (struct pa_response*) NULL;
+    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+        return NULL;
+    }else if (!(raw_list = pa_java_procci_call("-l"))){
+        fprintf(stderr, "Problem making call to the java layer...\n");
+        free(result);
+        return NULL;
+    }else{
+        result->nature = _TEXT_JSON;
+        result->content = raw_list;
+        result->xmlroot = NULL;
+        if (!(filename = put_jsonstring_in_file(raw_list))){
+            fprintf(stderr, "Problem putting the json in a file...\n");
+        }else{
+            result->jsonroot = json_parse_file(filename);
+            result->response = NULL;
+        }
+    }
+	return(result);
+	//return( proactive_list_operation( "/services/hostedservices" ) );
 }
 
 
@@ -713,9 +806,40 @@ public	struct	pa_response *	pa_create_image( char * filename )
 /*	------------------------------------------------------------	*/
 /*			p a _ c r e a t e _  s e r v e r 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_create_server( char * filename )
+public	struct	pa_response *	pa_create_server( char * name )
 {
-	return( proactive_create_operation( "/services/hostedservices", filename ) );
+    char * filename = NULL;
+    char * raw_list = NULL;
+    char command[1024];
+
+    struct pa_response* result = (struct pa_response*) NULL;
+    if (name != NULL){
+        sprintf(command,"-g %s" , name ); 
+    }else{
+        fprintf(stderr, "Invalid name for the server...\n");
+        return NULL;
+    }
+
+    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+        return NULL;
+    }else if (!(raw_list = pa_java_procci_call(command))){
+        fprintf(stderr, "Problem making call to the java layer...\n");
+        free(result);
+        return NULL;
+    }else{
+        result->nature = _TEXT_JSON;
+        result->content = raw_list;
+        result->xmlroot = NULL;
+        if (!(filename = put_jsonstring_in_file(raw_list))){
+            fprintf(stderr, "Problem putting the json in a file...\n");
+        }else{
+            fprintf(stderr, "Filename: %s\n", filename);
+            result->jsonroot = json_parse_file(filename);
+            result->response = NULL;
+        }
+    }
+	return(result);
+	//return( proactive_create_operation( "/services/hostedservices", filename ) );
 }
 	
 /*	------------------------------------------------------------	*/
@@ -931,10 +1055,41 @@ public	struct	pa_response *	pa_update_server(  char * id, char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_delete_server(  char * id )
 {
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	return( proactive_delete_operation( buffer ) );
+    char * filename = NULL;
+    char * raw_list = NULL;
+    char command[1024];
+
+    struct pa_response* result = (struct pa_response*) NULL;
+    if (id != NULL){
+        sprintf(command,"-d %s" , id ); 
+    }else{
+        fprintf(stderr, "Invalid name for the server...\n");
+        return NULL;
+    }
+
+    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+        return NULL;
+    }else if (!(raw_list = pa_java_procci_call(command))){
+        fprintf(stderr, "Problem making call to the java layer...\n");
+        free(result);
+        return NULL;
+    }else{
+        result->nature = _TEXT_JSON;
+        result->content = raw_list;
+        result->xmlroot = NULL;
+        if (!(filename = put_jsonstring_in_file(raw_list))){
+            fprintf(stderr, "Problem putting the json in a file...\n");
+        }else{
+            result->jsonroot = json_parse_file(filename);
+            result->response = NULL;
+        }
+    }
+	return(result);
+	//char	buffer[1024];
+	//sprintf(buffer,"/services/hostedservices/%s",id);
+	//return( proactive_delete_operation( buffer ) );
 }
+
 
 /*	------------------------------------------------------------	*/
 /*			p a _ d e l e t e _ i m a g e 			*/
