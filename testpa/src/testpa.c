@@ -120,13 +120,14 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = pa_create_server_request( p3, p3, p4, p5, p6 ) ))
-				return( failure(27,"cannot create","request" ) );
-			else
-			{ 	
-				pa_result( pa_create_server( nomfic ) );
+			//if (!( nomfic = pa_create_server_request( p3, p3, p4, p5, p6 ) ))
+			//	return( failure(27,"cannot create","request" ) );
+			//else
+			//{ 	
+				//pa_result( pa_create_server( nomfic ) );
+				pa_result( pa_create_server( p3 ) );
 				return( 0 );
-			}
+			//}
 		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 		{
