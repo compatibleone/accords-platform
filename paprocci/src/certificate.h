@@ -17,35 +17,13 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_oson_occi_c
-#define	_oson_occi_c
+#ifndef	_certificate_h
+#define	_certificate_h
 
 #include "standard.h"
-#include "rest.h"
-#include "occi.h"
-#include "cords.h"
-#include "document.h"
 
-#include "occiopenstack.c"
-#include "occiosconfig.c"
+public	char * 	proactive_create_certificate( char * stub, int days );
 
-#include "occideltacloud.c"
-#include "occidcconfig.c"
-
-#include "occiopennebula.c"
-#include "occionconfig.c"
-
-#include "occiwindowsazure.c"
-#include "occiazconfig.c"
-
-#include "occiproactive.c"
-#include "occipaconfig.c"
-
-	/* ------------- */
-#endif	/* _oson_occi_c */
-	/* ------------- */
-
-
-
-
+#endif	/* _certificate_h */
+	/* -------------- */
 

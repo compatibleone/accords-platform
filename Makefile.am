@@ -96,6 +96,9 @@ endif
 if ENABLE_DCPROCCI
 SUBDIRS += dcprocci
 endif
+if ENABLE_PAPROCCI
+SUBDIRS += paprocci
+endif
 if ENABLE_COMMAND
 SUBDIRS += command
 endif
@@ -116,6 +119,9 @@ SUBDIRS += testcb
 endif
 if ENABLE_TESTAZ
 SUBDIRS += testaz
+endif
+if ENABLE_TESTPA
+SUBDIRS += testpa
 endif
 if ENABLE_FILESERVER
 SUBDIRS += fileserver
