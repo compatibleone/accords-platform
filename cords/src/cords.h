@@ -90,7 +90,9 @@
 #include "opennebula.h"
 #include "onconfig.h"
 #include "windowsazure.h"
+#include "proactive.h"
 #include "azconfig.h"
+#include "paconfig.h"
 
 #include "ipaddress.h"
 #include "domain.h"
