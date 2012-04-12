@@ -8,8 +8,7 @@
 #
 lib_LTLIBRARIES = libcocarrier.la
 EXTRA_DIST = dataelement.c dataelement.h \
-	eucahack.c azconfig.h \
-	onconfig.h osconfig.c osconfig.h
+	eucahack.c osconfig.c
 
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     osclient.c osclient.h \
