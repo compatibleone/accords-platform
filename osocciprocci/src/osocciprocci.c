@@ -260,6 +260,7 @@ private	struct	occi_category * build_occi_openstack( char * domain )
 private	struct	occi_category * build_occi_openstack_configuration( char * domain )
 {
 	struct	occi_category * optr;
+
 	if (!( optr = occi_cords_osconfig_builder( domain, "occi_openstack_configuration" ) ))
 		return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
@@ -281,6 +282,8 @@ private	int	OsOcciProcci_operation( char * nptr )
 	struct	occi_category * optr=(struct occi_category *) 0;
 
 	set_autosave_cords_xlink_name("links_openstack.xml");
+	set_autosave_os_config_name("osocci_config.xml");
+	set_autosave_openstack_name("osocci_openstack.xml");
 
 	if (!( optr = build_occi_openstack( OsOcciProcci.domain ) ))
 		return( 27 );
