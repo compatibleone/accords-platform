@@ -28,6 +28,7 @@ AC_HEADER_STDC
 # Some global compilation flags
 # http://www.gnu.org/software/autoconf/manual/automake.html#Flag-Variables-Ordering
 AM_CFLAGS=
+AM_LDFLAGS="-Wl,--no-as-needed"
 AC_ARG_ENABLE([debug],
       [AS_HELP_STRING([--enable-debug],
 		      [Enable debug @<:@default=disable@:>@])],
