@@ -41,6 +41,10 @@ public struct cords_user * liberate_cords_user(struct cords_user * sptr)
 			 sptr->password = liberate(sptr->password);
 		if ( sptr->role )
 			 sptr->role = liberate(sptr->role);
+		if ( sptr->email )
+			 sptr->email = liberate(sptr->email);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		if ( sptr->authorization )
 			 sptr->authorization = liberate(sptr->authorization);
 		sptr = liberate( sptr );
@@ -62,6 +66,8 @@ public struct cords_user * reset_cords_user(struct cords_user * sptr)
 		sptr->name = (char*) 0;
 		sptr->password = (char*) 0;
 		sptr->role = (char*) 0;
+		sptr->email = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->authorization = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
@@ -107,6 +113,14 @@ public int xmlin_cords_user(struct cords_user * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->role = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"email") ))
+		{
+			if ( wptr->value ) { sptr->email = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"authorization") ))
 		{
 			if ( wptr->value ) { sptr->authorization = allocate_string(wptr->value); }
@@ -137,6 +151,8 @@ public int rest_occi_cords_user(FILE * fh,struct cords_user * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.password='%s'\r\n",prefix,nptr,(sptr->password?sptr->password:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.role='%s'\r\n",prefix,nptr,(sptr->role?sptr->role:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.email='%s'\r\n",prefix,nptr,(sptr->email?sptr->email:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
