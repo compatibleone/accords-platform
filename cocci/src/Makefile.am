@@ -12,7 +12,9 @@ EXTRA_DIST = occic.c occic.h \
 	occipublisher.h \
 	occirescat.h occiresolver.h \
 	occirespro.h \
-	urlpublic.h
+	urlpublic.h \
+	authitem.c authitem.h \
+	occiauth.h occiauth.c authcache.h
 
 libcocci_la_SOURCES = occiclient.c occiclient.h \
     occiserver.c accords.c accords.h occibody.c occibody.h
