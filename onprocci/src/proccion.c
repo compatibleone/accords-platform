@@ -67,9 +67,9 @@ private	struct	on_config * resolve_on_configuration( char * sptr )
 		else if (!( pptr->name ))
 			continue;
 		else if (!( strcmp( pptr->name, sptr ) ))
-			break;
+			return( pptr );
 	}
-	return( pptr );
+	return( (struct on_config *) 0);
 }
 
 /*	--------------------------------------------------------	*/

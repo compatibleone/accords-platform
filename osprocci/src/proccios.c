@@ -76,9 +76,9 @@ private	struct	os_config * resolve_os_configuration( char * sptr )
 		else if (!( pptr->name ))
 			continue;
 		else if (!( strcmp( pptr->name, sptr ) ))
-			break;
+			return( pptr );
 	}
-	return( pptr );
+	return((struct os_config *) 0);
 }
 
 /*	--------------------------------------------------------	*/
