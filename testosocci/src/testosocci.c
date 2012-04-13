@@ -165,6 +165,27 @@ private	int	test_os_occi_operation( char * nptr )
 	optr->access |= _OCCI_PRIVATE;
 	last = optr;
 
+	if (!( optr = occi_create_resource_template( TestOsOcci.domain, "small", "http://www.compatibleone.fr/template/resource#small", "small compute" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_create_resource_template( TestOsOcci.domain, "medium", "http://www.compatibleone.fr/template/resource#medium", "medium compute" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_create_resource_template( TestOsOcci.domain, "large", "http://www.compatibleone.fr/template/resource#large", "large compute" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_create_os_template( TestOsOcci.domain, "debian", "http://www.compatibleone.fr/template/os#debian", "system debian" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -172,7 +193,7 @@ private	int	test_os_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_create_os_template( TestOsOcci.domain, "ubuntu", "http://www.compatibleone.fr/template/os#ubuntu", "syste ubuntu" ) ))
+	if (!( optr = occi_create_os_template( TestOsOcci.domain, "ubuntu", "http://www.compatibleone.fr/template/os#ubuntu", "system ubuntu" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
