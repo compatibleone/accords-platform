@@ -40,9 +40,9 @@ private	struct	az_config * resolve_az_configuration( char * sptr )
 		else if (!( pptr->name ))
 			continue;
 		else if (!( strcmp( pptr->name, sptr ) ))
-			break;
+			return( pptr );
 	}
-	return( pptr );
+	return((struct az_config *) 0);
 }
 
 /*	--------------------------------------------------------	*/
