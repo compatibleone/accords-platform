@@ -132,72 +132,7 @@ private	struct rest_extension * OsOcciProcci_extension( void * v,struct rest_ser
 
 #include "osocciclient.c"
 #include "osoccicontract.c"
-
-/*	-------------------------------------------	*/
-/* 	      c r e a t e _ o p e n s t a c k  		*/
-/*	-------------------------------------------	*/
-private	int	create_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
-		return( 0 ); 
-	else	return(create_openstack_contract( optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ o p e n s t a c k  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ o p e n s t a c k 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ o p e n s t a c k  		*/
-/*	-------------------------------------------	*/
-private	int	delete_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
-}
-
-private	struct	occi_interface	openstack_interface = {
-	create_openstack,
-	retrieve_openstack,
-	update_openstack,
-	delete_openstack
-	};
-
+#include "occios.c"
 
 /*	-------------------------------------------	*/
 /* 	       b u i l d _ o p e n s t a c k  		*/
@@ -218,15 +153,15 @@ private	struct	occi_category * build_occi_openstack( char * domain )
 		optr->access |= _OCCI_PROVIDER;
 		optr->callback  = &openstack_interface;
 
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_occi_openstack)))
+			return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
-		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_openstack)))
-			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_openstack)))

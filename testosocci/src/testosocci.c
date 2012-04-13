@@ -141,6 +141,10 @@ private	int	test_os_occi_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_testosocci.xml");
 
+	set_autosave_cords_compute_name("osocci_compute.xml");
+	set_autosave_cords_network_name("osocci_network.xml");
+	set_autosave_cords_storage_name("osocci_storage.xml");
+
 	if (!( optr = occi_cords_compute_builder( TestOsOcci.domain,"compute" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

@@ -462,5 +462,19 @@ public struct	rest_response * delete_occi_os_network(char * nw)
  	else	return( rest_client_delete_request( url, OcciConfig.tls, OcciConfig.agent, hptr ) );
 }
 
+public int os_occi_initialise_client(char * user,char * password,char * host,char * version,char * agent,char * tls)
+{
+	struct	url * uptr;
+	if (!( uptr = analyse_url( host )))
+		return( 0 );
+	else
+	{
+		liberate_occi_os_configuration(0);
+		if ( set_occi_os_configuration( uptr->host, uptr->port, user, password, version, agent, tls ) != 0 )
+			return( 0 );
+		else	return( 1 );
+	}
+}
+
 #endif /* _occi_os_client_c */
 	/* ------------------ */
