@@ -28,6 +28,7 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
 
 struct	accords_configuration TestOsOcci = {
 	0,0, 
@@ -129,6 +130,82 @@ private	struct rest_extension * test_os_occi_extension( void * v,struct rest_ser
 	return( xptr );
 }
 
+/*	-------------------------------------------------------------------	*/
+/*		     	s t a r t _ o c c i _ c o m p u t e			*/
+/*	-------------------------------------------------------------------	*/
+private	struct	rest_response * start_occi_compute(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state != _OCCI_IDLE )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		pptr->state = _OCCI_ACTIVE;
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------------------------------	*/
+/*		     	s t o p _ o c c i _ c o m p u t e			*/
+/*	-------------------------------------------------------------------	*/
+private	struct	rest_response * stop_occi_compute(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state == _OCCI_IDLE )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		pptr->state = _OCCI_IDLE;
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------------------------------	*/
+/*		     	s a v e _ o c c i _ c o m p u t e			*/
+/*	-------------------------------------------------------------------	*/
+private	struct	rest_response * save_occi_compute(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------------------------------	*/
+/*		     s n a p s h o t _ o c c i _ c o m p u t e			*/
+/*	-------------------------------------------------------------------	*/
+private	struct	rest_response * snapshot_occi_compute(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
 /*	------------------------------------------------------------------	*/
 /*		t e s t o s o c c i _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -152,6 +229,14 @@ private	int	test_os_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	optr->access |= _OCCI_PRIVATE;
 	last = optr;
+	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_occi_compute)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_occi_compute)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_occi_compute)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_occi_compute)))
+		return( 27 );
 
 	if (!( optr = occi_cords_storage_builder( TestOsOcci.domain,"storage" ) ))
 		return( 27 );

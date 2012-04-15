@@ -83,10 +83,13 @@ public	int	set_occi_os_configuration( char * host, int port, char * user, char *
 	if ( agent )
 		if (!( OcciConfig.agent = allocate_string( agent ) ))
 			return( liberate_occi_os_configuration(27) );
-	if ( tls )
+	if (( tls )
+	&&  ( strlen( tls ) > 0 )
+	&&  ( strcmp( tls, _CORDS_NULL ) ))
+	{
 		if (!( OcciConfig.tls = allocate_string( tls ) ))
 			return( liberate_occi_os_configuration(27) );
-
+	}
 	OcciConfig.port = port;
 	return( 0 );	
 }
@@ -242,10 +245,10 @@ private	char *	occi_os_instance_url( char * term, char * id )
 	return( allocate_string( buffer ) );
 }
 
-private	char *	occi_os_action_url( char * term, char * id, char * action )
+private	char *	occi_os_action_url( char * id, char * action )
 {
 	char buffer[1024];
-	sprintf(buffer,"%s:%u%s%s?action=%s",OcciConfig.host,OcciConfig.port,term,id,action);
+	sprintf(buffer,"%s?action=%s",id,action);
 	return( allocate_string( buffer ) );
 }
 
@@ -322,7 +325,6 @@ public struct	rest_response * create_occi_os_compute(char * machine, char * syst
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
-	if (!( hptr = occi_os_headers((char *) 0, (char *) 0)))
 	if (!( hptr = occi_os_compute_headers()))
 		return( occi_os_failure( hptr ) );
 	else if (!( url = occi_os_category_url( "/compute/" ) ))
@@ -349,7 +351,7 @@ public struct	rest_response * stop_occi_os_compute(char * vm)
 	char * url;
 	if (!( hptr = occi_os_compute_action_headers("stop")))
 		return( occi_os_failure( hptr ));
-	else if (!( url = occi_os_action_url( "/compute/",vm,"stop" ) ))
+	else if (!( url = occi_os_action_url( vm,"stop" ) ))
 		return( occi_os_failure( liberate_rest_header( hptr )) );
 	else	return( rest_client_post_request( url, OcciConfig.tls, OcciConfig.agent, (char *) 0, hptr ) );
 }
@@ -369,7 +371,7 @@ public struct	rest_response * start_occi_os_compute(char * vm)
 	char * url;
 	if (!( hptr = occi_os_compute_action_headers("start")))
 		return( occi_os_failure( hptr ) );
-	else if (!( url = occi_os_action_url( "/compute/",vm,"start" ) ))
+	else if (!( url = occi_os_action_url( vm,"start" ) ))
 		return( occi_os_failure( liberate_rest_header( hptr ) ) );
 	else	return( rest_client_post_request( url, OcciConfig.tls, OcciConfig.agent, (char *) 0, hptr ) );
 }
@@ -465,12 +467,22 @@ public struct	rest_response * delete_occi_os_network(char * nw)
 public int os_occi_initialise_client(char * user,char * password,char * host,char * version,char * agent,char * tls)
 {
 	struct	url * uptr;
+	int	status;
+	char * hptr=(char *) 0;
 	if (!( uptr = analyse_url( host )))
 		return( 0 );
+	else if (!( hptr = serialise_url_host_no_port( uptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( 0 );
+	}
 	else
 	{
 		liberate_occi_os_configuration(0);
-		if ( set_occi_os_configuration( uptr->host, uptr->port, user, password, version, agent, tls ) != 0 )
+		status = set_occi_os_configuration( hptr, uptr->port, user, password, version, agent, tls );
+		uptr = liberate_url( uptr );
+		hptr = liberate( hptr );
+		if ( status )
 			return( 0 );
 		else	return( 1 );
 	}
@@ -478,3 +490,4 @@ public int os_occi_initialise_client(char * user,char * password,char * host,cha
 
 #endif /* _occi_os_client_c */
 	/* ------------------ */
+

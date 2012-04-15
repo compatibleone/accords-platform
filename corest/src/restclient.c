@@ -192,6 +192,16 @@ public char 	  * serialise_url_host( struct url * uptr )
 	return( allocate_string( buffer ) );
 }
 
+/*	----------------------------------------------------	*/
+/*	s e r i a l i s e  _ u r l _ h o s t _ n o _ p o r t	*/
+/*	----------------------------------------------------	*/
+public char 	  * serialise_url_host_no_port( struct url * uptr )
+{
+	char	buffer[8192];
+	sprintf(buffer,"%s://%s",uptr->service,uptr->host);
+	return( allocate_string( buffer ) );
+}
+
 /*	-------------------------------------------------	*/
 /*	  s e r i a l i s e  _ u r l _ h o s t _ p o r t	*/
 /*	-------------------------------------------------	*/

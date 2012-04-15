@@ -76,7 +76,7 @@ private	struct	rest_response * start_occi_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((kptr = use_occi_openstack_configuration( pptr->profile )) != 0)
+	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
 	else
 	{
@@ -140,7 +140,7 @@ private	struct	rest_response * save_occi_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((kptr = use_occi_openstack_configuration( pptr->profile )) != 0)
+	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
 	else
 	{
@@ -173,7 +173,7 @@ private	struct	rest_response * snapshot_occi_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((kptr = use_occi_openstack_configuration( pptr->profile )) != 0)
+	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
 	else
 	{
@@ -207,7 +207,7 @@ private	struct	rest_response * stop_occi_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((kptr = use_occi_openstack_configuration( pptr->profile )) != 0)
+	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
 	else
 	{
