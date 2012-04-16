@@ -206,6 +206,38 @@ private	struct	rest_response * snapshot_occi_compute(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+/*	-------------------------------------------	*/
+/* 		a l l o c _ f l o a t _ i p		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * alloc_float_ip(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	----------------------------------------------	*/
+/* 		d e a l l o c _ f l o a t _ i p		*/
+/*	----------------------------------------------	*/
+private	struct	rest_response * dealloc_float_ip(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_compute * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
 /*	------------------------------------------------------------------	*/
 /*		t e s t o s o c c i _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -229,6 +261,7 @@ private	int	test_os_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	optr->access |= _OCCI_PRIVATE;
 	last = optr;
+
 	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_occi_compute)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_occi_compute)))
@@ -236,6 +269,10 @@ private	int	test_os_occi_operation( char * nptr )
 	else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_occi_compute)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_occi_compute)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,"alloc_float_ip","",alloc_float_ip)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,"dealloc_float_ip","",dealloc_float_ip)))
 		return( 27 );
 
 	if (!( optr = occi_cords_storage_builder( TestOsOcci.domain,"storage" ) ))

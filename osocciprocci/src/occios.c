@@ -66,6 +66,9 @@ private	int	occi_os_hostname( struct rest_response * zptr, struct openstack * pp
 	char	buffer[1024];
 	char *	host;
 
+	if (!( zptr ))
+		return( 0 );
+
 	for (	hptr = rest_resolve_header( zptr->first, _OCCI_ATTRIBUTE );
 		hptr != (struct rest_header *) 0;
 		hptr = rest_resolve_header( hptr->next, _OCCI_ATTRIBUTE ) )
@@ -89,7 +92,10 @@ private	int	occi_os_hostname( struct rest_response * zptr, struct openstack * pp
 			else	return(1);
 		}
 	}
-	return(0);
+	if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+	if (!( pptr->hostname = occi_unquoted_value( "hostname" ) ))
+		return(0);
+	else	return(1);
 }
 
 /*	-------------------------------------------	*/
@@ -154,12 +160,15 @@ private	struct	rest_response * start_occi_openstack(
 		/* -------------------------------- */
 		if (!( qptr = get_occi_os_compute(pptr->reference)))
 		 	return( rest_html_response( aptr, 801, "Bad Request (RETRIEVE COMPUTE)" ) );
-		else	qptr = liberate_rest_response( qptr );
+		else
+		{
 
-		/* --------------------------------------- */
-		/* establish the resulting host name value */
-		/* --------------------------------------- */
-		occi_os_hostname( qptr, pptr );
+			/* --------------------------------------- */
+			/* establish the resulting host name value */
+			/* --------------------------------------- */
+			occi_os_hostname( qptr, pptr );
+			qptr = liberate_rest_response( qptr );
+		}
 
 		/* ---------------------------- */
 		/* launch the COSACS operations */
