@@ -6,11 +6,40 @@ public struct	rest_response * create_occi_os_compute(char * machine, char * syst
 public struct	rest_response * stop_occi_os_compute(char * vm);
 public struct	rest_response * start_occi_os_compute(char * vm);
 public struct	rest_response * delete_occi_os_network(char * nw);
-public struct	rest_response * attach_occi_os_network(char * vm,char * nw);
+public struct	rest_response * attach_occi_os_network(char * vm, char * nw);
 public struct	rest_response * create_occi_os_network(char * label);
 public struct	rest_response * delete_occi_os_compute(char * vm);
-public int	os_occi_initialise_client(char * user,char * password,char * host,char * domain,char * agent,char * tls);
+public struct	rest_response * create_occi_os_security_group(char * g);
+public struct	rest_response * create_occi_os_security_rule(char * g, char * r);
+public struct	rest_response * list_occi_os_security_rules(char * g);
+public struct	rest_response * get_occi_os_security_rule(char * g, char * r);
+public struct	rest_response * delete_occi_os_security_rule(char * g, char * r);
+public struct	rest_response * delete_occi_os_security_group(char * g);
+public struct	rest_response * create_occi_os_secure_compute(char * machine, char * system, char * g);
+public struct	rest_response * allocate_occi_os_floating_ip(char * id);
+public struct	rest_response * release_occi_os_floating_ip(char * id);
+
+public int	os_occi_initialise_client(
+			char * user,
+			char * password,
+			char * host,
+			char * domain,
+			char * agent,
+			char * tls);
 
 #endif 	/* _occi_client_h */
-		/* -------------- */
+	/* -------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -207,6 +207,14 @@ private	struct rest_header * occi_os_compute_headers()
 	return( occi_os_headers( buffer, "text/occi" ) );
 }
 
+private	struct rest_header * occi_os_security_headers()
+{
+	char	buffer[1024];
+	sprintf(buffer, "security; scheme=%chttp://schemas.ogf.org/occi/infrastructure#%c; class=%ckind%c",
+			0x0022,0x0022,0x0022,0x0022 );
+	return( occi_os_headers( buffer, "text/occi" ) );
+}
+
 private	struct rest_header * occi_os_compute_action_headers(char * nptr)
 {
 	char	buffer[1024];
@@ -488,6 +496,175 @@ public int os_occi_initialise_client(char * user,char * password,char * host,cha
 	}
 }
 
-#endif /* _occi_os_client_c */
-	/* ------------------ */
+/*	---------------------------------------------------------------------------------	*/
+/*				new features being developped					*/
+/*	---------------------------------------------------------------------------------	*/
+
+/*	OCCI CREATE SECURITY GROUP
+	--------------------------
+	curl -v -H 'X-Auth-Token: '$KID 
+	-H 'X-Auth-Tenant-Id: '$TEN_ID 
+	-H 'X-Auth-User: '$OS_USER 
+	-H 'Content-Type: text/occi' 
+	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"; rel="http://schemas.ogf.org/occi/infrastructure/security#group"; location="/mygroups/"' 
+	-X POST localhost:8787/-/
+ */
+
+public	struct rest_response * create_occi_os_security_group(char * g)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_security_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+
+}
+
+/*	OCCI CREATE SECURITY RULE
+	-------------------------
+    	curl -v -X POST localhost:8787/network/security/rule/ 
+	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID 
+	-H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
+	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"' 
+	-H 'Category: rule; scheme="http://schemas.openstack.org/occi/infrastructure/network/security#"; class="kind"' 
+	-H 'X-OCCI-Attribute: occi.network.security.protocol = "TCP"' 
+	-H 'X-OCCI-Attribute: occi.network.security.to = 22' 
+	-H 'X-OCCI-Attribute: occi.network.security.from = 22' 
+	-H 'X-OCCI-Attribute: occi.network.security.range = "0.0.0.0/24"'
+*/
+
+public	struct rest_response * create_occi_os_security_rule(char * g, char * r)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_security_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+/*	OCCI LIST SECURITY RULES
+	------------------------
+    	curl -v -X GET localhost:8787/mygroups/ 
+	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER
+*/
+
+public	struct rest_response * list_occi_os_security_rules(char * g)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_security_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+/*	OCCI GET SECURITY RULE
+	----------------------
+	curl -v -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H '
+	X-Auth-User: '$OS_USER 
+	-X GET http://localhost:8787/network/security/rule/$RULE
+*/
+
+public	struct rest_response * get_occi_os_security_rule(char * g, char * r)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_security_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+/* 	OCCI DELETE SECURITY RULE
+	-------------------------
+    	curl -v -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
+	-X DELETE http://localhost:8787/network/security/rule/$RULE
+*/
+
+public	struct rest_response * delete_occi_os_security_rule(char * g,char * r)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	char 	buffer[1024];
+	sprintf(buffer,"/security/%s/rule/",g,r );
+	if (!( hptr = occi_os_network_headers()))
+		return( occi_os_failure( hptr ));
+	else if (!( url = occi_os_instance_url( buffer,"" ) ))
+		return( occi_os_failure( liberate_rest_header( hptr ) ) );
+ 	else	return( rest_client_delete_request( url, OcciConfig.tls, OcciConfig.agent, hptr ) );
+}
+
+/*	OCCI DELETE SECURITY GROUP
+	--------------------------
+    	curl -v -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER -H 'Content-Type: text/occi' 
+	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"' 
+	-X DELETE localhost:8787/-/
+*/
+
+public	struct rest_response * delete_occi_os_security_group(char * g)
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	char 	buffer[1024];
+	sprintf(buffer,"/security/%s",g );
+	if (!( hptr = occi_os_security_headers()))
+		return( occi_os_failure( hptr ));
+	else if (!( url = occi_os_instance_url( buffer,"" ) ))
+		return( occi_os_failure( liberate_rest_header( hptr ) ) );
+ 	else	return( rest_client_delete_request( url, OcciConfig.tls, OcciConfig.agent, hptr ) );
+}
+
+/*	OCCI CREATE COMPUTE WITH SECURITY GROUP
+	---------------------------------------
+    	curl -v -X POST localhost:8787/compute/ 
+	-H 'Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"' 
+	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
+	-H 'X-Auth-User: '$OS_USER -H 'Category: itsy; scheme="http://schemas.openstack.org/template/resource#"; class="mixin"' 
+	-H 'Category: cirros-0.3.0-x86_64-uec; scheme="http://schemas.openstack.org/template/os#"; class="mixin"' 
+	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"'
+*/
+
+public	struct rest_response * create_occi_os_secure_compute( char * machine, char* system, char * g )
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_compute_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+/*	OCCI ALLOCATE FLOATING IP FOR COMPUTE
+	-------------------------------------
+    	curl -v -X POST "localhost:8787/compute/$VM?action=alloc_float_ip" 
+	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
+	-H 'Category: alloc_float_ip; scheme="http://schemas.openstack.org/instance/action#"; class="action"' 
+	-H 'X-OCCI-Attribute: org.openstack.network.floating.pool="nova"'
+*/
+
+public	struct rest_response * allocate_occi_os_floating_ip( char * id )
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_compute_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+/*	OCCI DE ALLOCATE FLOATING IP OF COMPUTE
+	---------------------------------------
+    	curl -v -X POST "localhost:8787/compute/$VM?action=dealloc_float_ip" 
+	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
+	-H 'X-Auth-User: '$OS_USER 
+	-H 'Category: dealloc_float_ip; scheme="http://schemas.openstack.org/instance/action#"; class="action"'
+*/
+
+public	struct rest_response * release_occi_os_floating_ip( char * id )
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_compute_headers()))
+		return( occi_os_failure( hptr ));
+	else	return( (struct rest_response * ) 0);
+}
+
+#endif 	/* _occi_os_client_c */
+	/* ----------------- */
 
