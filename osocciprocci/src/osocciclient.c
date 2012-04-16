@@ -331,7 +331,7 @@ private	struct	rest_header * occi_os_add_attribute( struct rest_header * root, c
 			foot = foot->next;
 
 	sprintf(buffer, "%s=%c%s%c", name, 0x0022,value,0x0022 );
-	if (!( hptr = occi_os_header( "X-OCCI-Attribute", buffer ) ))
+	if (!( hptr = occi_os_header( _OCCI_ATTRIBUTE, buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))
 		root = hptr;
@@ -629,6 +629,15 @@ public	struct rest_response * list_occi_os_security_rules(char * g)
 */
 
 public	struct rest_response * get_occi_os_security_rule( char * id )
+{
+	struct rest_header * hptr=(struct rest_header *) 0;
+	char * url;
+	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+		return( occi_os_failure( hptr ));
+	else	return( rest_client_get_request( id, OcciConfig.tls, OcciConfig.agent, hptr ) );
+}
+
+public	struct rest_response * get_occi_os_compute( char * id )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;

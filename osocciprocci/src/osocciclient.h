@@ -10,6 +10,7 @@ public struct	rest_response * create_occi_os_compute(char * machine, char * syst
 public struct	rest_response * stop_occi_os_compute(char * vm);
 public struct	rest_response * start_occi_os_compute(char * vm);
 public struct	rest_response * delete_occi_os_network(char * nw);
+public struct	rest_response * get_occi_os_compute(char * id);
 public struct	rest_response * attach_occi_os_network(char * vm, char * nw);
 public struct	rest_response * create_occi_os_network(char * label);
 public struct	rest_response * delete_occi_os_compute(char * vm);

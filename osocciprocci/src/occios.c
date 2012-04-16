@@ -57,6 +57,41 @@ private	int	occi_os_reference( struct rest_response * zptr, struct openstack * p
 	}
 }
 
+/*	------------------------------------------	*/
+/*	    o c c i _ o s _ h o s t n a m e 		*/
+/*	------------------------------------------	*/
+private	int	occi_os_hostname( struct rest_response * zptr, struct openstack * pptr )
+{
+	struct	rest_header * hptr;
+	char	buffer[1024];
+	char *	host;
+
+	for (	hptr = rest_resolve_header( zptr->first, _OCCI_ATTRIBUTE );
+		hptr != (struct rest_header *) 0;
+		hptr = rest_resolve_header( hptr->next, _OCCI_ATTRIBUTE ) )
+	{
+		if (!( hptr->value ))
+			continue;
+		else if ( strncmp( 	hptr->value, 
+					"org.openstack.network.floating.ip", 
+				 strlen("org.openstack.network.floating.ip") ) )
+			continue;
+		else
+		{
+			sprintf(buffer,"http://%s",(hptr->value+strlen("org.openstack.network.floating.ip")+1));
+			if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+			if (!( pptr->hostname = allocate_string( buffer ) ))
+				return( 0 );
+			strcpy( buffer, pptr->hostname );
+			if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+			if (!( pptr->hostname = occi_unquoted_value( buffer ) ))
+				return( 0 );
+			else	return(1);
+		}
+	}
+	return(0);
+}
+
 /*	-------------------------------------------	*/
 /* 	  s t a r t  _ o c c i_ o p e n s t a c k  	*/
 /*	-------------------------------------------	*/
@@ -100,12 +135,48 @@ private	struct	rest_response * start_occi_openstack(
 		 	return( rest_html_response( aptr, 801, "Bad Request (NO REFERENCE)" ) );
 		}
 
-		/* ------------------------------ */
-		/* TODO : send OCCI START message */
-		/* ------------------------------ */
+		/* ----------------------- */
+		/* send OCCI START message */
+		/* ----------------------- */
 		if (!( qptr = start_occi_os_compute(pptr->reference )))
 		 	return( rest_html_response( aptr, 801, "Bad Request (START COMPUTE)" ) );
 		else	qptr = liberate_rest_response( qptr );
+
+		/* ---------------------- */
+		/* Allocate a Floating IP */
+		/* ---------------------- */
+		if (!( qptr = allocate_occi_os_floating_ip(pptr->reference)))
+		 	return( rest_html_response( aptr, 801, "Bad Request (ALLOCATE FLOATING IP)" ) );
+		else	qptr = liberate_rest_response( qptr );
+
+		/* -------------------------------- */
+		/* Retrieve the Floating IP address */
+		/* -------------------------------- */
+		if (!( qptr = get_occi_os_compute(pptr->reference)))
+		 	return( rest_html_response( aptr, 801, "Bad Request (RETRIEVE COMPUTE)" ) );
+		else	qptr = liberate_rest_response( qptr );
+
+		/* --------------------------------------- */
+		/* establish the resulting host name value */
+		/* --------------------------------------- */
+		occi_os_hostname( qptr, pptr );
+
+		/* ---------------------------- */
+		/* launch the COSACS operations */
+		/* ---------------------------- */
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_CONFIGURATION,
+			pptr->reference, OsOcciProcci.publisher );
+
+		/* ------------------------------------- */
+		/* release the public IP if not required */
+		/* ------------------------------------- */
+		if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
+		{
+			if (!( qptr = release_occi_os_floating_ip(pptr->reference)))
+			 	return( rest_html_response( aptr, 801, "Bad Request (RELEASE FLOATING IP)" ) );
+			else	qptr = liberate_rest_response( qptr );
+		}
 
 		pptr->when = time((long *) 0);
 		pptr->status = _OCCI_RUNNING;
@@ -218,6 +289,13 @@ private	struct	rest_response * stop_occi_openstack(
 		 	return( rest_html_response( aptr, 801, "Bad Request (STOP COMPUTE)" ) );
 		else	qptr = liberate_rest_response( qptr );
 
+		/* ----------------------- */
+		/* Release the Floating IP */
+		/* ----------------------- */
+		if (!( qptr = release_occi_os_floating_ip(pptr->reference)))
+		 	return( rest_html_response( aptr, 801, "Bad Request (ALLOCATE FLOATING IP)" ) );
+		else	qptr = liberate_rest_response( qptr );
+
 		/* ------------------------------ */
 		/* TODO: send OCCI DELETE request */
 		/* ------------------------------ */
@@ -228,6 +306,7 @@ private	struct	rest_response * stop_occi_openstack(
 		pptr->status = _OCCI_IDLE;
 		pptr->when = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
+
 		if (!( occi_valid_price( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
