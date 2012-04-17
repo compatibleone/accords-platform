@@ -44,6 +44,76 @@ private struct occi_os_configuration OcciConfig =
 	0
 };
 
+private	struct	rest_response * occi_os_failure( struct rest_header * hptr )
+{
+	hptr = liberate_rest_header( hptr );
+	return(( struct rest_response * ) 0 );
+}
+
+private	struct	rest_header * occi_os_header(char* nptr, char * vptr)
+{
+	struct	rest_header * hptr=(struct rest_header *) 0;
+
+	if (!( hptr = allocate_rest_header()))
+		return( hptr );
+	else if (!( hptr->name = allocate_string( nptr )))
+		return( liberate_rest_header( hptr ) );
+	else if (!( hptr->value = allocate_string( vptr )))
+		return( liberate_rest_header( hptr ) );
+	else	return( hptr );
+}
+
+public	char *	keystone_auth_message( char * user, char * password, char * tenant )
+{
+	char *	filename;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<auth xmlns:xsi=%c%s%c xmlns=%c%s%c tenantId=%c%s%c>\n",
+				0x0022,"http://www.w3.org/2001/XMLSchema-instance",0x0022,
+				0x0022,"http://docs.openstack.com/identity/api/v2.0",0x0022,
+				0x0022,tenant,0x0022);
+		fprintf(h,"<passwordCredentials username=%c%s%c password=%c%s%c/>\n",
+				0x0022,user,0x0022,0x0022,password,0x0022);
+		fprintf(h,"</auth>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+public	struct	rest_header * keystone_authorization()
+{
+	struct	rest_response * rptr;
+	struct	rest_header * hptr;
+	char *	filename;
+	char	buffer[1024];
+	if (!( OcciConfig.authorization ))
+	{
+		if (!( hptr = occi_os_header( "Content-Type", "text/xml" ) ))
+			return( hptr );
+
+		else sprintf(buffer,"%s:35357/v2.0/tokens");
+		if (!( filename = keystone_auth_message( 
+			OcciConfig.user, 
+			OcciConfig.password,
+			OcciConfig.tenant ) ))
+			return((struct rest_header *) 0);
+		else if (!( rptr = rest_client_post_request( 
+			buffer, OcciConfig.tls, OcciConfig.agent, filename, hptr ) ))
+			return( liberate_rest_header( hptr ) );
+		else	hptr = liberate_rest_header( hptr );
+
+	}
+	if (!( OcciConfig.authorization ))
+		return((struct rest_header *) 0);
+	else 	return( occi_os_header( "X-Auth-Token", OcciConfig.authorization ) );
+}
+
 public	int	liberate_occi_os_configuration(int status)
 {
 	if ( OcciConfig.host )
@@ -92,25 +162,6 @@ public	int	set_occi_os_configuration( char * host, int port, char * user, char *
 	}
 	OcciConfig.port = port;
 	return( 0 );	
-}
-
-struct	rest_response * occi_os_failure( struct rest_header * hptr )
-{
-	hptr = liberate_rest_header( hptr );
-	return(( struct rest_response * ) 0 );
-}
-
-struct	rest_header * occi_os_header(char* nptr, char * vptr)
-{
-	struct	rest_header * hptr=(struct rest_header *) 0;
-
-	if (!( hptr = allocate_rest_header()))
-		return( hptr );
-	else if (!( hptr->name = allocate_string( nptr )))
-		return( liberate_rest_header( hptr ) );
-	else if (!( hptr->value = allocate_string( vptr )))
-		return( liberate_rest_header( hptr ) );
-	else	return( hptr );
 }
 
 struct	rest_header * occi_os_headers(char * category, char * content)
