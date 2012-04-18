@@ -90,10 +90,10 @@ public	char *	keystone_auth_message( char * user, char * password, char * tenant
 	}
 }
 
-/*	-------------------------------------------	*/
-/*	k e y s t o n e _ a u t h o r i z a t i o n	*/
-/*	-------------------------------------------	*/
-public	struct	rest_header * keystone_authorization()
+/*	---------------------------------------------------------	*/
+/*	 c h e c k _ k e y s t o n e _ a u t h o r i z a t i o n	*/
+/*	---------------------------------------------------------	*/
+public	int	check_keystone_authorization()
 {
 	struct	xml_element * document;
 	struct	xml_element * eptr;
@@ -102,87 +102,103 @@ public	struct	rest_header * keystone_authorization()
 	struct	rest_header * hptr;
 	char *	filename;
 	char	buffer[1024];
-
 	if (!( OcciConfig.authorization ))
 	{
 		sprintf(buffer,"%s:35357/v2.0/tokens",OcciConfig.host);
 		if (!( hptr = occi_os_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
-			return( hptr );
+			return( 0 );
 		else if (!( hptr->next = occi_os_header( _HTTP_ACCEPT, "application/xml" ) ))
-			return( liberate_rest_header( hptr ) );
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
 		else	hptr->next->previous = hptr;
 		if (!( filename = keystone_auth_message( 
 			OcciConfig.user, 
 			OcciConfig.password,
 			OcciConfig.tenant ) ))
-			return( liberate_rest_header( hptr ) );
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
 		else if (!( rptr = rest_client_post_request( 
 			buffer, OcciConfig.tls, OcciConfig.agent, filename, hptr ) ))
-			return( liberate_rest_header( hptr ) );
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
 		else	hptr = liberate_rest_header( hptr );
 
 		if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
 		{
 			rptr = liberate_rest_response( rptr );
-			return( hptr );
+			return( 0 );
 		}
 		else if (!( hptr->value ))
 		{
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if ( strncasecmp( hptr->value, "application/xml", strlen("application/xml") ) )
 		{
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( rptr->body ))
 		{
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( document = document_parse_file( rptr->body ) ))
 		{
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( eptr = document_element( document, "token" ) ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( aptr = document_atribut( eptr, "id" ) ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( aptr->value ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( OcciConfig.authorization = allocate_string( aptr->value )))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else if (!( OcciConfig.authorization = occi_unquoted_value( OcciConfig.authorization ) ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			return((struct rest_header *) 0);
+			return( 0 );
 		}
 		else
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
 		}
-
 	}
+	return( 1 );
+}
+
+/*	-------------------------------------------	*/
+/*	k e y s t o n e _ a u t h o r i z a t i o n	*/
+/*	-------------------------------------------	*/
+public	struct	rest_header * keystone_authorization()
+{
+	check_keystone_authorization();
 	if (!( OcciConfig.authorization ))
 		return((struct rest_header *) 0);
 	else 	return( occi_os_header( "X-Auth-Token", OcciConfig.authorization ) );

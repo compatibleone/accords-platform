@@ -96,7 +96,11 @@ private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 			pptr->user, pptr->password, 
 			pptr->host, pptr->version, _CORDS_OS_AGENT, pptr->tls ) ))
 			return((struct os_config *) 0);
-	else	return( pptr );
+	else
+	{
+		check_keystone_authorization();
+		return( pptr );
+	}
 }
 
 /*	-----------------------------------------------------------------	*/
