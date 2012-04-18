@@ -241,7 +241,6 @@ public	int	check_keystone_authorization()
 public	struct	rest_header * keystone_authorization()
 {
 	check_keystone_authorization();
-	rest_show_request(1);
 	if (!( OcciConfig.authorization ))
 		return((struct rest_header *) 0);
 	else 	return( occi_os_header( "X-Auth-Token", OcciConfig.authorization ) );
