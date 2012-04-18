@@ -24,10 +24,15 @@
 
 struct	occi_os_configuration
 {
+	char *	requestocci;
+	char *	acceptocci;
+	char *	requestauth;
+	char *	acceptauth;
 	char *	authorization;
+	char *	tenantid;
 	char *	tls;
 	char *	agent;
-	char *	tenant;
+	char *	tenantname;
 	char *	user;
 	char *	password;
 	char *	host;
@@ -36,6 +41,13 @@ struct	occi_os_configuration
 
 private struct occi_os_configuration OcciConfig = 
 {
+	"text/occi",
+	"text/occi",
+	"application/xml",
+	"application/xml",
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
@@ -78,7 +90,7 @@ public	char *	keystone_auth_message( char * user, char * password, char * tenant
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
 			0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<auth xmlns:xsi=%c%s%c xmlns=%c%s%c tenantId=%c%s%c>\n",
+		fprintf(h,"<auth xmlns:xsi=%c%s%c xmlns=%c%s%c tenantName=%c%s%c>\n",
 				0x0022,"http://www.w3.org/2001/XMLSchema-instance",0x0022,
 				0x0022,"http://docs.openstack.com/identity/api/v2.0",0x0022,
 				0x0022,tenant,0x0022);
@@ -105,9 +117,9 @@ public	int	check_keystone_authorization()
 	if (!( OcciConfig.authorization ))
 	{
 		sprintf(buffer,"%s:35357/v2.0/tokens",OcciConfig.host);
-		if (!( hptr = occi_os_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
+		if (!( hptr = occi_os_header( _HTTP_CONTENT_TYPE, OcciConfig.requestauth ) ))
 			return( 0 );
-		else if (!( hptr->next = occi_os_header( _HTTP_ACCEPT, "application/xml" ) ))
+		else if (!( hptr->next = occi_os_header( _HTTP_ACCEPT, OcciConfig.acceptauth ) ))
 		{
 			liberate_rest_header( hptr );
 			return( 0 );
@@ -116,7 +128,7 @@ public	int	check_keystone_authorization()
 		if (!( filename = keystone_auth_message( 
 			OcciConfig.user, 
 			OcciConfig.password,
-			OcciConfig.tenant ) ))
+			OcciConfig.tenantname ) ))
 		{
 			liberate_rest_header( hptr );
 			return( 0 );
@@ -139,7 +151,7 @@ public	int	check_keystone_authorization()
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if ( strncasecmp( hptr->value, "application/xml", strlen("application/xml") ) )
+		else if ( strncasecmp( hptr->value, OcciConfig.acceptauth, strlen(OcciConfig.acceptauth) ) )
 		{
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
@@ -184,6 +196,36 @@ public	int	check_keystone_authorization()
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
+		else if (!( eptr = document_element( eptr, "tenant" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr = document_atribut( eptr, "id" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr->value ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( OcciConfig.tenantid = allocate_string( aptr->value )))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( OcciConfig.tenantid = occi_unquoted_value( OcciConfig.tenantid ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
 		else
 		{
 			document = document_drop( document );
@@ -199,10 +241,72 @@ public	int	check_keystone_authorization()
 public	struct	rest_header * keystone_authorization()
 {
 	check_keystone_authorization();
+	rest_show_request(1);
 	if (!( OcciConfig.authorization ))
 		return((struct rest_header *) 0);
 	else 	return( occi_os_header( "X-Auth-Token", OcciConfig.authorization ) );
 }
+
+/*	-------------------------------------------	*/
+/*	k e y s t o n e _ a u t h o r i z a t i o n	*/
+/*	-------------------------------------------	*/
+public	struct	rest_header * keystone_credentials()
+{
+	struct	rest_header * hptr;
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+
+	if (!( hptr = keystone_authorization() ))
+		return( hptr );
+	else	root = foot = hptr;
+
+	/* ---------------------------------------------- */
+	/* then the subscription  header if its available */
+	/* ---------------------------------------------- */
+	if ( OcciConfig.tenantid )
+	{
+		if (!( hptr = occi_os_header( "X-Auth-Tenant-Id", OcciConfig.tenantid ) ))
+			return( liberate_rest_header( root ) );
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+
+	/* ---------------------------------------------- */
+	/* then the user logname  header if its available */
+	/* ---------------------------------------------- */
+	if ( OcciConfig.tenantname )
+	{
+		if (!( hptr = occi_os_header( "X-Auth-User", OcciConfig.tenantname ) ))
+			return( liberate_rest_header( root ) );
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+
+	if ( OcciConfig.acceptocci )
+	{
+		if (!( hptr = occi_os_header( "Accept", OcciConfig.acceptocci ) ))
+			return( liberate_rest_header( root ) );
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+
+	if (!( hptr = occi_os_header( "Content-Type", OcciConfig.requestocci ) ))
+		return( liberate_rest_header( root ) );
+	else if (!( hptr->previous = foot ))
+		root = hptr;
+	else	hptr->previous->next = hptr;
+	foot = hptr;
+
+	return( root );
+
+}
+	
 
 /*	-----------------------------------------------------------	*/
 /*	l i b e r a t e _ o c c i _ o s _ c o n f i g u r a t i o n	*/
@@ -219,8 +323,10 @@ public	int	liberate_occi_os_configuration(int status)
 		OcciConfig.user = liberate( OcciConfig.user );
 	if ( OcciConfig.password )
 		OcciConfig.password = liberate( OcciConfig.password );
-	if ( OcciConfig.tenant )
-		OcciConfig.tenant = liberate( OcciConfig.tenant );
+	if ( OcciConfig.tenantname )
+		OcciConfig.tenantname = liberate( OcciConfig.tenantname );
+	if ( OcciConfig.tenantid )	
+		OcciConfig.tenantid = liberate( OcciConfig.tenantid );
 	if ( OcciConfig.authorization )
 		OcciConfig.authorization = liberate( OcciConfig.authorization );
 	OcciConfig.port = 0;
@@ -241,7 +347,7 @@ public	int	set_occi_os_configuration( char * host, int port, char * user, char *
 		if (!( OcciConfig.password = allocate_string( password ) ))
 			return( liberate_occi_os_configuration(27) );
 	if ( tenant )
-		if (!( OcciConfig.tenant = allocate_string( tenant ) ))
+		if (!( OcciConfig.tenantname = allocate_string( tenant ) ))
 			return( liberate_occi_os_configuration(27) );
 	if ( agent )
 		if (!( OcciConfig.agent = allocate_string( agent ) ))
@@ -265,26 +371,13 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 	struct	rest_header * root=(struct rest_header *) 0;
 	struct	rest_header * foot=(struct rest_header *) 0;
 	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	rest_header * aptr=(struct rest_header *) 0;
 
 	/* --------------------------------- */
 	/* first collect authorization token */
 	/* --------------------------------- */
-	if (!( hptr = keystone_authorization()))
-		return( hptr );
-	else	root = foot = hptr;
-
-	/* ---------------------------------------------- */
-	/* first position the category header if provided */
-	/* ---------------------------------------------- */
-	if ( category )
-	{
-		if (!( hptr = occi_os_header( "Category", category ) ))
-			return( liberate_rest_header( root ) );
-		else if (!( hptr->previous = foot ))
-			root = hptr;
-		else	hptr->previous->next = hptr;
-		foot = hptr;
-	}
+	if (!( aptr = keystone_authorization()))
+		return( aptr );
 
 	/* ---------------------------------------------- */
 	/* the add in the content type header if provided */
@@ -297,6 +390,20 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 			root = hptr;
 		else	hptr->previous->next = hptr;
 		foot = hptr;
+
+	}
+
+	/* ---------------------------------------------- */
+	/* add in the accept header for response messages */
+	/* ---------------------------------------------- */
+	if ( OcciConfig.acceptocci )
+	{
+		if (!( hptr = occi_os_header( "Accept", OcciConfig.acceptocci ) ))
+			return( liberate_rest_header( root ) );
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
 	}
 
 	/* ---------------------------------------------- */
@@ -304,7 +411,7 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 	/* ---------------------------------------------- */
 	if ( OcciConfig.authorization )
 	{
-		if (!( hptr = occi_os_header( "X-Auth-Tenant-Id", OcciConfig.authorization ) ))
+		if (!( hptr = aptr ))
 			return( liberate_rest_header( root ) );
 		else if (!( hptr->previous = foot ))
 			root = hptr;
@@ -315,9 +422,9 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 	/* ---------------------------------------------- */
 	/* then the subscription  header if its available */
 	/* ---------------------------------------------- */
-	if ( OcciConfig.tenant )
+	if ( OcciConfig.tenantid )
 	{
-		if (!( hptr = occi_os_header( "X-Auth-Token", OcciConfig.tenant ) ))
+		if (!( hptr = occi_os_header( "X-Auth-Tenant-Id", OcciConfig.tenantid ) ))
 			return( liberate_rest_header( root ) );
 		else if (!( hptr->previous = foot ))
 			root = hptr;
@@ -328,9 +435,9 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 	/* ---------------------------------------------- */
 	/* then the user logname  header if its available */
 	/* ---------------------------------------------- */
-	if ( OcciConfig.user )
+	if ( OcciConfig.tenantname )
 	{
-		if (!( hptr = occi_os_header( "X-Auth-User", OcciConfig.user ) ))
+		if (!( hptr = occi_os_header( "X-Auth-User", OcciConfig.tenantname ) ))
 			return( liberate_rest_header( root ) );
 		else if (!( hptr->previous = foot ))
 			root = hptr;
@@ -350,6 +457,19 @@ private	struct	rest_header * occi_os_headers(char * category, char * content)
 		foot = hptr;
 	}
 
+	/* ---------------------------------------------- */
+	/* then  position the category header if provided */
+	/* ---------------------------------------------- */
+	if ( category )
+	{
+		if (!( hptr = occi_os_header( "Category", category ) ))
+			return( liberate_rest_header( root ) );
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+
 	return( root );
 }
 
@@ -358,7 +478,7 @@ private	struct rest_header * occi_os_compute_headers()
 	char	buffer[1024];
 	sprintf(buffer, "compute; scheme=%chttp://schemas.ogf.org/occi/infrastructure#%c; class=%ckind%c",
 			0x0022,0x0022,0x0022,0x0022 );
-	return( occi_os_headers( buffer, "text/occi" ) );
+	return( occi_os_headers( buffer, OcciConfig.requestocci ) );
 }
 
 private	struct rest_header * occi_os_instance_action_headers(char * nptr)
@@ -366,7 +486,7 @@ private	struct rest_header * occi_os_instance_action_headers(char * nptr)
 	char	buffer[1024];
 	sprintf(buffer, "%s; scheme=%chttp://schemas.openstack.org/instance/action%c; class=%caction%c",
 			nptr, 0x0022,0x0022,0x0022,0x0022 );
-	return( occi_os_headers( buffer, "text/occi" ) );
+	return( occi_os_headers( buffer, OcciConfig.requestocci ) );
 }
 
 private	struct rest_header * occi_os_compute_action_headers(char * nptr)
@@ -374,7 +494,7 @@ private	struct rest_header * occi_os_compute_action_headers(char * nptr)
 	char	buffer[1024];
 	sprintf(buffer, "%s; scheme=%chttp://schemas.ogf.org/occi/infrastructure/compute/action%c; class=%caction%c",
 			nptr, 0x0022,0x0022,0x0022,0x0022 );
-	return( occi_os_headers( buffer, "text/occi" ) );
+	return( occi_os_headers( buffer, OcciConfig.requestocci ) );
 }
 
 private	struct rest_header * occi_os_network_headers()
@@ -382,7 +502,7 @@ private	struct rest_header * occi_os_network_headers()
 	char	buffer[1024];
 	sprintf(buffer, "network; scheme=%chttp://schemas.ogf.org/occi/infrastructure#%c; class=%ckind%c",
 			0x0022,0x0022,0x0022,0x0022 );
-	return( occi_os_headers( buffer, "text/occi" ) );
+	return( occi_os_headers( buffer, OcciConfig.requestocci ) );
 }
 
 private	struct rest_header * occi_os_network_interface_headers()
@@ -390,7 +510,7 @@ private	struct rest_header * occi_os_network_interface_headers()
 	char	buffer[1024];
 	sprintf(buffer, "networkinterface; scheme=%chttp://schemas.ogf.org/occi/infrastructure#%c; class=%ckind%c",
 			0x0022,0x0022,0x0022,0x0022 );
-	return( occi_os_headers( buffer, "text/occi" ) );
+	return( occi_os_headers( buffer, OcciConfig.requestocci ) );
 }
 
 private	char *	occi_os_category_url( char * term )
@@ -420,12 +540,17 @@ private	struct	rest_header * occi_os_add_mixin( struct rest_header * root, char 
 	struct	rest_header * foot;
 	char buffer[1024];
 
+	if (!( mixin ))
+		return( root );
+	else if (!( schema ))
+		return( root );
+
 	if ((foot = root) != (struct rest_header *) 0)
 		while ( foot->next )
 			foot = foot->next;
 
-	sprintf(buffer, "%s; scheme=%c%s%c; class=%cmixin%", mixin, 0x0022,schema,0x0022,0x0022,0x0022 );
-	if (!( hptr = occi_os_header( "Categroy", buffer ) ))
+	sprintf(buffer, "%s; scheme=%c%s%c; class=%cmixin%c", mixin, 0x0022,schema,0x0022,0x0022,0x0022 );
+	if (!( hptr = occi_os_header( "Category", buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))
 		root = hptr;
@@ -440,12 +565,17 @@ private	struct	rest_header * occi_os_add_kind( struct rest_header * root, char *
 	struct	rest_header * foot;
 	char buffer[1024];
 
+	if (!( kind ))
+		return( root );
+	else if (!( schema ))
+		return( root );
+
 	if ((foot = root) != (struct rest_header *) 0)
 		while ( foot->next )
 			foot = foot->next;
 
 	sprintf(buffer, "%s; scheme=%c%s%c; class=%ckind%", kind, 0x0022,schema,0x0022,0x0022,0x0022 );
-	if (!( hptr = occi_os_header( "Categroy", buffer ) ))
+	if (!( hptr = occi_os_header( "Category", buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))
 		root = hptr;
@@ -460,12 +590,19 @@ private	struct	rest_header * occi_os_add_mixin_rel( struct rest_header * root, c
 	struct	rest_header * foot;
 	char buffer[1024];
 
+	if (!( mixin ))
+		return( root );
+	else if (!( schema ))
+		return( root );
+	else if (!( rel ))
+		return( root );
+
 	if ((foot = root) != (struct rest_header *) 0)
 		while ( foot->next )
 			foot = foot->next;
 
 	sprintf(buffer, "%s; scheme=%c%s%c; class=%cmixin%c rel=%c%s%c", mixin, 0x0022,schema,0x0022,0x0022,0x0022,0x0022,rel,0x0022 );
-	if (!( hptr = occi_os_header( "Categroy", buffer ) ))
+	if (!( hptr = occi_os_header( "Category", buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))
 		root = hptr;
@@ -515,7 +652,7 @@ public struct	rest_response * occi_os_capacities()
 /* CREATE COMPUTE instance
 curl -v -X POST localhost:8787/compute/ 
 -H 'Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"' 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER 
@@ -540,7 +677,7 @@ public struct	rest_response * create_occi_os_compute(char * machine, char * syst
 
 /* STOP COMPUTE instance
 curl -v -X POST "localhost:8787/compute/$VM?action=stop" 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER 
@@ -560,7 +697,7 @@ public struct	rest_response * stop_occi_os_compute(char * vm)
 
 /* START COMPUTE instance
 curl -v -X POST localhost:8787/compute/$VM?action=start 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER 
@@ -580,7 +717,7 @@ public struct	rest_response * start_occi_os_compute(char * vm)
 
 /* DELETE COMPUTE instance
 curl -v -X DELETE localhost:8787/compute/$VM 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER
@@ -598,7 +735,7 @@ public struct	rest_response * delete_occi_os_compute(char * id)
 
 /* CREATE NETWORK
 curl -v -X POST localhost:8787/network/ 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER 
@@ -621,7 +758,7 @@ public struct	rest_response * create_occi_os_network(char * label)
 
 /* ATTACH NETWORK to COMPUTE instance
 curl -v -X POST localhost:8787/networklink/ 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER 
@@ -647,7 +784,7 @@ public struct	rest_response * attach_occi_os_network(char * vm,char * nw)
 
 /* DELETE NETWORK
 curl -v -X DELETE localhost:8787/network/$NET_ID 
--H 'Content-Type: text/occi' 
+-H 'Content-Type: OcciConfig.requestocci' 
 -H 'X-Auth-Token: '$KID 
 -H 'X-Auth-Tenant-Id: '$TEN_ID 
 -H 'X-Auth-User: '$OS_USER
@@ -695,7 +832,7 @@ public int os_occi_initialise_client(char * user,char * password,char * host,cha
 	curl -v -H 'X-Auth-Token: '$KID 
 	-H 'X-Auth-Tenant-Id: '$TEN_ID 
 	-H 'X-Auth-User: '$OS_USER 
-	-H 'Content-Type: text/occi' 
+	-H 'Content-Type: OcciConfig.requestocci' 
 	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"; rel="http://schemas.ogf.org/occi/infrastructure/security#group"; location="/mygroups/"' 
 	-X POST localhost:8787/-/
  */
@@ -704,7 +841,7 @@ public	struct rest_response * create_occi_os_security_group(char * g)
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else if (!( hptr = occi_os_add_mixin_rel( hptr, g, _OCCI_OS_SECURITY, _OCCI_SECURITY_GROUP ) ))
 		return( occi_os_failure( hptr ) );
@@ -716,7 +853,7 @@ public	struct rest_response * create_occi_os_security_group(char * g)
 /*	OCCI CREATE SECURITY RULE
 	-------------------------
     	curl -v -X POST localhost:8787/network/security/rule/ 
-	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID 
+	-H 'Content-Type: OcciConfig.requestocci' -H 'X-Auth-Token: '$KID 
 	-H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
 	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"' 
 	-H 'Category: rule; scheme="http://schemas.openstack.org/occi/infrastructure/network/security#"; class="kind"' 
@@ -734,7 +871,7 @@ public	struct rest_response * create_occi_os_security_rule(char * g, char * prot
 	char	vto[64];
 	sprintf(vfrom,"%u",from);
 	sprintf(vto,"%u",to);
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else if (!( hptr = occi_os_add_mixin( hptr, g, _OCCI_OS_SECURITY )))
 		return( occi_os_failure( hptr ) );
@@ -756,7 +893,7 @@ public	struct rest_response * create_occi_os_security_rule(char * g, char * prot
 /*	OCCI LIST SECURITY RULES
 	------------------------
     	curl -v -X GET localhost:8787/mygroups/ 
-	-H 'Content-Type: text/occi' 
+	-H 'Content-Type: OcciConfig.requestocci' 
 	-H 'X-Auth-Token: '$KID 
 	-H 'X-Auth-Tenant-Id: '$TEN_ID 
 	-H 'X-Auth-User: '$OS_USER
@@ -768,7 +905,7 @@ public	struct rest_response * list_occi_os_security_rules(char * g)
 	char * url;
 	char	buffer[1024];
 	sprintf(buffer,"/%s/",g);
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else if (!( url = occi_os_category_url( buffer ) ))
 		return( occi_os_failure( liberate_rest_header( hptr )) );
@@ -786,7 +923,7 @@ public	struct rest_response * get_occi_os_security_rule( char * id )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else	return( rest_client_get_request( id, OcciConfig.tls, OcciConfig.agent, hptr ) );
 }
@@ -795,7 +932,7 @@ public	struct rest_response * get_occi_os_compute( char * id )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else	return( rest_client_get_request( id, OcciConfig.tls, OcciConfig.agent, hptr ) );
 }
@@ -813,7 +950,7 @@ public	struct rest_response * delete_occi_os_security_rule(char * id )
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
 	char 	buffer[1024];
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
  	else	return( rest_client_delete_request( id, OcciConfig.tls, OcciConfig.agent, hptr ) );
 }
@@ -823,7 +960,7 @@ public	struct rest_response * delete_occi_os_security_rule(char * id )
     	curl -v -H 'X-Auth-Token: '$KID 
 	-H 'X-Auth-Tenant-Id: '$TEN_ID 
 	-H 'X-Auth-User: '$OS_USER 
-	-H 'Content-Type: text/occi' 
+	-H 'Content-Type: OcciConfig.requestocci' 
 	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"' 
 	-X DELETE localhost:8787/-/
 */
@@ -834,7 +971,7 @@ public	struct rest_response * delete_occi_os_security_group(char * g)
 	char * url;
 	char 	buffer[1024];
 	sprintf(buffer,"/security/%s",g );
-	if (!( hptr = occi_os_headers( (char *) 0, "text/occi" ) ))
+	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else if (!( hptr = occi_os_add_mixin( hptr, g, _OCCI_OS_SECURITY )))
 		return( occi_os_failure( hptr ) );
@@ -847,7 +984,7 @@ public	struct rest_response * delete_occi_os_security_group(char * g)
 	---------------------------------------
     	curl -v -X POST localhost:8787/compute/ 
 	-H 'Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"' 
-	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
+	-H 'Content-Type: OcciConfig.requestocci' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
 	-H 'X-Auth-User: '$OS_USER 
 	-H 'Category: itsy; scheme="http://schemas.openstack.org/template/resource#"; class="mixin"' 
 	-H 'Category: cirros-0.3.0-x86_64-uec; scheme="http://schemas.openstack.org/template/os#"; class="mixin"' 
@@ -874,7 +1011,7 @@ public	struct rest_response * create_occi_os_secure_compute( char * machine, cha
 /*	OCCI ALLOCATE FLOATING IP FOR COMPUTE
 	-------------------------------------
     	curl -v -X POST "localhost:8787/compute/$VM?action=alloc_float_ip" 
-	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
+	-H 'Content-Type: OcciConfig.requestocci' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID -H 'X-Auth-User: '$OS_USER 
 	-H 'Category: alloc_float_ip; scheme="http://schemas.openstack.org/instance/action#"; class="action"' 
 	-H 'X-OCCI-Attribute: org.openstack.network.floating.pool="nova"'
 */
@@ -895,7 +1032,7 @@ public	struct rest_response * allocate_occi_os_floating_ip( char * id )
 /*	OCCI DE ALLOCATE FLOATING IP OF COMPUTE
 	---------------------------------------
     	curl -v -X POST "localhost:8787/compute/$VM?action=dealloc_float_ip" 
-	-H 'Content-Type: text/occi' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
+	-H 'Content-Type: OcciConfig.requestocci' -H 'X-Auth-Token: '$KID -H 'X-Auth-Tenant-Id: '$TEN_ID 
 	-H 'X-Auth-User: '$OS_USER 
 	-H 'Category: dealloc_float_ip; scheme="http://schemas.openstack.org/instance/action#"; class="action"'
 */

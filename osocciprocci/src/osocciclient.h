@@ -24,6 +24,7 @@ public struct	rest_response * create_occi_os_secure_compute(char * machine, char
 public struct	rest_response * allocate_occi_os_floating_ip(char * id);
 public struct	rest_response * release_occi_os_floating_ip(char * id);
 public	int	check_keystone_authorization();
+public struct	rest_header   * keystone_credentials();
 
 public int	os_occi_initialise_client(
 			char * user,

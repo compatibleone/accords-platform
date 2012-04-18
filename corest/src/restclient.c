@@ -460,10 +460,23 @@ private	void rest_request_start( struct rest_client * cptr )
 /*	------------------------------------------------	*/
 /*	   r e s t _ r e q u e s t _ f l u s h 			*/
 /*	------------------------------------------------	*/
+private	int	show_rest_request=0;
+
+public	int	rest_show_request(int v)
+{
+	int	r=show_rest_request;
+	show_rest_request=v;
+	return( r );
+}
+
 private	void rest_request_flush( struct rest_client * cptr )
 {
 	if ( cptr->bytes )
 	{
+		if ( show_rest_request )
+		{
+			printf("\n%s\n",cptr->buffer );
+		}
 		rest_client_write( cptr );
 		rest_request_start( cptr );
 	}

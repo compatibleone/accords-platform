@@ -94,7 +94,7 @@ private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 	else if (!( 
 	 	os_occi_initialise_client( 
 			pptr->user, pptr->password, 
-			pptr->host, pptr->version, _CORDS_OS_AGENT, pptr->tls ) ))
+			pptr->host, pptr->namespace, _CORDS_OS_AGENT, pptr->tls ) ))
 			return((struct os_config *) 0);
 	else
 	{
@@ -142,15 +142,25 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 	struct	occi_client * cptr;
 	struct	occi_category * kptr;
 
+	if (!( hptr = keystone_credentials() ))
+		return( hptr );
+	else 	occi_add_default_header( hptr );
+
 	if (!( cptr = occi_create_client( host, _CORDS_OS_AGENT, default_tls() ) ))
+	{
+		occi_drop_default_headers();
 		return( root );
+	}
 	else
 	{
+		occi_drop_default_headers();
 		for (	kptr=cptr->firstcat;
 			kptr != (struct occi_category *) 0;
 			kptr = kptr->next )
 		{
 			if (!( kptr->scheme ))
+				continue;
+			else if (!( kptr->rel ))
 				continue;
 			else if ( strcmp( kptr->rel, scheme ) )
 				continue;
@@ -387,11 +397,11 @@ private	int	delete_openstack_contract(
 		char * tls )
 {
 	struct	os_response * osptr;
+	return( 0 );
 /*
- TODO
+TODO
 	if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
 		osptr = liberate_os_response( osptr );
- */
 	if (!( pptr->image ))
 		return( 0 );
 	else if (!( pptr->original ))
@@ -403,6 +413,7 @@ private	int	delete_openstack_contract(
 		os_delete_image( pptr->image );
 		return(0);
 	}
+*/
 }
 
 
