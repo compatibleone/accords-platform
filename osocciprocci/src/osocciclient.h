@@ -5,8 +5,9 @@
 #define	_OCCI_SECURITY_GROUP	"http://schemas.ogf.org/occi/infrastructure/security#group"
 #define	_OCCI_SECURITY_RULE	"http://schemas.openstack.org/occi/infrastructure/network/security#"
 
+public char *	occi_os_category_url( char * term );
 public struct	rest_response * occi_os_capacities();
-public struct	rest_response * create_occi_os_compute(char * machine, char * system);
+public struct	rest_response * create_occi_os_compute(char * machine, char * system, char * mptr, char * sptr);
 public struct	rest_response * stop_occi_os_compute(char * vm);
 public struct	rest_response * start_occi_os_compute(char * vm);
 public struct	rest_response * delete_occi_os_network(char * nw);

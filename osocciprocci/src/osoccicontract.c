@@ -204,7 +204,8 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 	struct	rest_header * hptr;
 	char *	vptr;
 	char *	sysname;
-	char *	bestcase="(null)";
+	char *	bestcase=(char *) 0;
+	char 	buffer[2048];
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
 	/* ---------------------------------------------------------- */
@@ -222,19 +223,25 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 	{
 		if (!( hptr->name ))
 			continue;
-		else if (!( hptr->value ))
+		if (!( hptr->value ))
 			continue;
-		else if  (!( strncasecmp( sysname,  hptr->name, strlen( sysname  ) )))
-			return( allocate_string( hptr->value ) );
+		if  (!( strncasecmp( sysname,  hptr->name, strlen( sysname  ) )))
+		{
+			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+			return( allocate_string( buffer ) );
+		}
 		else 
 		{
 			if  (!( strncasecmp( hptr->name, sysname,  strlen(hptr->name)  ) ))
-				bestcase = hptr->value;
-			continue;
+			{
+				sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+				return( allocate_string( buffer ) );
+			}
+			else	continue;
 		}
 	}
 	if (!( bestcase ))
-		return("(null)");
+		return( allocate_string("(null)") );
 	else	return( allocate_string( bestcase ) );
 }
 
@@ -254,7 +261,7 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 	struct	rest_header * hptr;
 	char *	vptr;
 	char *	machname;
-
+	char 	buffer[2048];
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_NAME ) ))
 		machname = "none";
@@ -269,10 +276,13 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 		else if (!( hptr->value ))
 			continue;
 		else if (!( strcmp( hptr->name, machname ) ))
-			return( allocate_string( hptr->value ) );
+		{
+			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+			return( allocate_string( buffer ) );
+		}
 		else	continue;
 	}
-	return("(null)");
+	return(allocate_string("(null)"));
 }
 
 /*	-----------------------------------------------------------------	*/

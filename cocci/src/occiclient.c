@@ -856,6 +856,7 @@ private	struct	occi_client * occi_analyse_text_categories( struct occi_client * 
 {
 	char	buffer[8192];
 	struct	rest_header * hptr=(struct rest_header *) 0;
+	char *	nptr;
 	FILE *	h;
 	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
 		return( occi_analyse_http_categories( cptr, rptr ) );
@@ -865,6 +866,24 @@ private	struct	occi_client * occi_analyse_text_categories( struct occi_client * 
 		return( occi_analyse_http_categories( cptr, rptr ) );
 	else
 	{
+		while ((nptr = fgets(buffer,8000,h)) != (char *) 0)
+		{
+			while ( *nptr == ' ' ) nptr++;
+			if (!( strncasecmp( nptr, _OCCI_CATEGORY, strlen( _OCCI_CATEGORY ) ) ))
+			{
+				nptr += strlen( _OCCI_CATEGORY );
+				while ( *nptr == ' ' ) nptr++;
+				if ( *nptr != ':' )				
+					continue;
+				else 	nptr++;
+				while ( *nptr == ' ' ) nptr++;
+				if (!( occi_client_add_category( cptr, nptr ) ))
+				{
+					cptr = occi_delete_client( cptr );
+					break;
+				}
+			}
+		}
 		fclose(h);
 		return( cptr );
 	}

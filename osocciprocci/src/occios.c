@@ -21,6 +21,7 @@
 #define	_occi_os_c
 
 #include "occiclient.h"
+
 /*	------------------------------------------	*/
 /*		o s _ v a l i d _ p r i c e		*/
 /*	------------------------------------------	*/
@@ -43,17 +44,70 @@ private	int	occi_os_reference( struct rest_response * zptr, struct openstack * p
 	struct	rest_header * hptr;
 	char	buffer[1024];
 	char *	host;
-	if (!( hptr = rest_resolve_header( zptr->first, _OCCI_LOCATION ) ))
+	if ((!( hptr = rest_resolve_header( zptr->first, _OCCI_LOCATION ) ))
+	&&  (!( hptr = rest_resolve_header( zptr->first, _HTTP_LOCATION ) )))
 		return(0);
 	else if (!( host = hptr->value ))
 		return(0);
 	else
 	{
-		sprintf(buffer,"http://%s",host);
+		if (!( strncmp( host, "http://", strlen( "http://" ) ) ))
+			strcpy( buffer, host );
+		else	sprintf(buffer,"http://%s",host);
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 		if (!( pptr->reference = allocate_string( buffer ) ))
 			return( 0 );
 		else	return( 1 );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		o c c i _ o s _ l o c a t e _ a t t r i b u t e		*/
+/*	------------------------------------------------------------	*/
+private	struct	rest_header * occi_os_locate_attribute( struct rest_response * zptr, char * atbname )
+{
+	struct	rest_header * hptr;
+	if (!( zptr )) 	return((struct rest_header *) 0);
+
+	for (	hptr = rest_resolve_header( zptr->first, _OCCI_ATTRIBUTE );
+		hptr != (struct rest_header *) 0;
+		hptr = rest_resolve_header( hptr->next, _OCCI_ATTRIBUTE ) )
+	{
+		if (!( hptr->value ))
+			continue;
+		else if ( strncmp( 	hptr->value, 
+					atbname, strlen( atbname ) ) )
+			continue;
+		else	break;
+	}
+	return( hptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o c c i _ o s _ a t t r i b u t e _ v a l u e 		*/
+/*	------------------------------------------------------------	*/
+private	char *	occi_os_attribute_value( struct rest_header * hptr )
+{
+	char *	vptr;
+	char *	rptr;
+	char *	wptr;
+	if (!( hptr )) 	
+		return((char *) 0);
+	else if (!( hptr->value ))
+	 	return((char *) 0);
+	else if (!( vptr = allocate_string( hptr->value ) ))
+	 	return((char *) 0);
+	{
+		wptr = vptr;
+		while (( *vptr ) && ( *vptr != '=' ) ) vptr++;
+		if ( *vptr != '=' ) 
+			return((char *) 0);
+		*(vptr++) = 0;
+		rptr = allocate_string( vptr );
+		liberate( wptr );
+		if (!( rptr ))
+			return( rptr );
+		else 	return( occi_unquoted_value( rptr ) );
 	}
 }
 
@@ -66,37 +120,110 @@ private	int	occi_os_hostname( struct rest_response * zptr, struct openstack * pp
 	char	buffer[1024];
 	char *	host;
 
-	if (!( zptr ))
-		return( 0 );
-
-	for (	hptr = rest_resolve_header( zptr->first, _OCCI_ATTRIBUTE );
-		hptr != (struct rest_header *) 0;
-		hptr = rest_resolve_header( hptr->next, _OCCI_ATTRIBUTE ) )
+	if (!( hptr = occi_os_locate_attribute( zptr, "org.openstack.network.floating.ip" ) ))
 	{
-		if (!( hptr->value ))
-			continue;
-		else if ( strncmp( 	hptr->value, 
-					"org.openstack.network.floating.ip", 
-				 strlen("org.openstack.network.floating.ip") ) )
-			continue;
-		else
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if (!( pptr->hostname = occi_unquoted_value( "hostname" ) ))
+			return(0);
+		else	return(1);
+	}
+	else
+	{
+		sprintf(buffer,"http://%s",(hptr->value+strlen("org.openstack.network.floating.ip")+1));
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if (!( pptr->hostname = allocate_string( buffer ) ))
+			return( 0 );
+		strcpy( buffer, pptr->hostname );
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if (!( pptr->hostname = occi_unquoted_value( buffer ) ))
+			return( 0 );
+		else	return(1);
+	}
+
+}
+
+/*	-----------------------------------------------------------	*/
+/*		o s _ o c c i _ c l e a n _ s t r i n g			*/
+/*	-----------------------------------------------------------	*/
+private	void	os_occi_clean_string( char * sptr )
+{
+	if ( sptr )
+	{
+		while ( *sptr )
 		{
-			sprintf(buffer,"http://%s",(hptr->value+strlen("org.openstack.network.floating.ip")+1));
-			if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-			if (!( pptr->hostname = allocate_string( buffer ) ))
-				return( 0 );
-			strcpy( buffer, pptr->hostname );
-			if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-			if (!( pptr->hostname = occi_unquoted_value( buffer ) ))
-				return( 0 );
-			else	return(1);
+			if ( *sptr == '\t' )
+				*(sptr++) = ' ';
+			else if ( *sptr == '\r' )
+				*sptr = 0;
+			else if ( *sptr == '\n' )
+				*sptr = 0;
+			else	sptr++;
 		}
 	}
-	if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-	if (!( pptr->hostname = occi_unquoted_value( "hostname" ) ))
-		return(0);
-	else	return(1);
+	return;
 }
+
+/*	---------------------------------------------------------	*/
+/* 	 p r o c e s s _ p l a i n _ t e x t a t t r i b u t e s 	*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_response * process_plain_text_attributes( struct rest_response * zptr )
+{
+	struct	rest_header * hptr;
+	char *	sptr;
+	char *	nptr;
+	char *	vptr;
+	FILE * h;
+	char	buffer[8192];
+	if (!( zptr ))
+		return( zptr );
+	else if (!( zptr->body ))
+		return( zptr );
+	else if (!( h = fopen( zptr->body, "r" ) ))
+		return( zptr );
+	else
+	{
+		while ((nptr = fgets(buffer, 8000, h)) != (char *) 0)
+		{
+			os_occi_clean_string( nptr );
+			while ( *nptr == ' ' ) nptr++;
+			if (!( strncasecmp( nptr, _OCCI_ATTRIBUTE, strlen( _OCCI_ATTRIBUTE ) ) ))
+			{
+				nptr+= strlen( _OCCI_ATTRIBUTE );
+				while ( *nptr == ' ' ) nptr++;
+				if ( *nptr == ':' ) nptr++;
+				while ( *nptr == ' ' ) nptr++;
+				if (!( hptr = rest_response_header( zptr, _OCCI_ATTRIBUTE, nptr ) ))
+					break;
+				else	continue;
+			}
+		}
+		return( zptr );
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	p r o c e s s _ o c c i _ o s _ a t t r i b u t e s	*/
+/*	---------------------------------------------------	*/
+private	struct	rest_response * process_occi_os_attributes( struct rest_response * zptr )
+{
+	struct	rest_header * hptr;
+	if (!( zptr ))
+		return( zptr );
+	else if (!( hptr = rest_resolve_header( zptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return( zptr );
+	else if (!( hptr->value ))
+		return( zptr );
+	else if (!( atoi( hptr->value ) ))
+		return( zptr );
+	else if (!( hptr = rest_resolve_header( zptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( zptr );
+	else if (!( hptr->value ))
+		return( zptr );
+	else if (!( strncasecmp( hptr->value, "text/plain", strlen("text/plain") ) ))
+		return( process_plain_text_attributes( zptr ) );
+	else	return( zptr );
+}
+
 
 /*	-------------------------------------------	*/
 /* 	  s t a r t  _ o c c i_ o p e n s t a c k  	*/
@@ -108,11 +235,18 @@ private	struct	rest_response * start_occi_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	rest_header * hptr;
 	char	reference[1024];
 	int	status=0;
+	int	startcompute=0;
 	struct	openstack * pptr;
 	struct	os_config * kptr;
 	struct	rest_response * qptr;
+	char	flavor[1024];
+	char *	fscheme;
+	char	image[1024];
+	char *	ischeme;
+
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status != _OCCI_IDLE )
@@ -121,15 +255,39 @@ private	struct	rest_response * start_occi_openstack(
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
 	else
 	{
-		/* ------------------------------ */
-		/* TODO : send OCCI POST request  */
-		/* ------------------------------ */
-		if (!( qptr = create_occi_os_compute(pptr->flavor,pptr->image) ))
+		/* ---------------------------------------- */
+		/* Prepare the Flavor and Image information */
+		/* ---------------------------------------- */
+		strcpy(flavor,pptr->flavor);
+
+		fscheme = flavor;
+		while (( *fscheme ) && ( *fscheme != ';' ))
+			fscheme++;
+		if ( *fscheme == ';' )
+			*(fscheme++) = 0;
+
+		strcpy(image,pptr->image);
+
+		ischeme = image;
+		while (( *ischeme ) && ( *ischeme != ';' ))
+			ischeme++;
+		if ( *ischeme == ';' )
+			*(ischeme++) = 0;
+	
+		/* ----------------------------- */
+		/* Create a new compute instance */
+		/* ----------------------------- */
+		if (!( qptr = create_occi_os_compute(flavor,image,fscheme,ischeme) ))
 		 	return( rest_html_response( aptr, 801, "Bad Request (POST COMPUTE)" ) );
 
-		else if ( qptr->status > 299 )
-		 	return( rest_html_response( aptr, 802, "Bad Request (POST FAILURE)" ) );
-
+		else if ((status = qptr->status) > 299 )
+		{
+			qptr = liberate_rest_response( qptr );
+		 	return( rest_html_response( aptr, status + 4000, "Bad Request (CREATE COMPUTE FAILURE)" ) );
+		}
+		/* ------------------------------------------- */
+		/* recover the compute instance identifier now */
+		/* ------------------------------------------- */
 		else if (!( occi_os_reference( qptr, pptr ) ))
 		{
 			qptr = liberate_rest_response( qptr );
@@ -141,18 +299,55 @@ private	struct	rest_response * start_occi_openstack(
 		 	return( rest_html_response( aptr, 801, "Bad Request (NO REFERENCE)" ) );
 		}
 
-		/* ----------------------- */
-		/* send OCCI START message */
-		/* ----------------------- */
-		if (!( qptr = start_occi_os_compute(pptr->reference )))
+		/* ------------------------------------ */
+		/* GET the Compute Instance information */
+		/* ------------------------------------ */
+		if (!( qptr = get_occi_os_compute(pptr->reference )))
 		 	return( rest_html_response( aptr, 801, "Bad Request (START COMPUTE)" ) );
-		else	qptr = liberate_rest_response( qptr );
+		else if (!( qptr = process_occi_os_attributes( qptr )))
+		 	return( rest_html_response( aptr, 801, "Bad Request (PROCESSING ATTRIBUTS)" ) );
+		else if (!( hptr = occi_os_locate_attribute( qptr, "occi.compute.state" ) ))
+			startcompute=1;
+		else if (!( vptr = occi_os_attribute_value( hptr ) ))
+			startcompute=1;
+		else
+		{ 
+			if (!( strcmp( vptr, "active" ) ))
+				startcompute=0;
+			else	startcompute=1;
+			liberate( vptr );
+		}
+
+		qptr = liberate_rest_response( qptr );
+
+		/* -------------------------------------------------- */
+		/* The POST COMPUTE seems to start the VM automaticly */
+		/* -------------------------------------------------- */
+		if ( startcompute )
+		{
+			/* ----------------------- */
+			/* send OCCI START message */
+			/* ----------------------- */
+			if (!( qptr = start_occi_os_compute(pptr->reference )))
+			 	return( rest_html_response( aptr, 801, "Bad Request (START COMPUTE)" ) );
+			else if ((status = qptr->status) > 299 )
+			{
+				qptr = liberate_rest_response( qptr );
+			 	return( rest_html_response( aptr, status + 4000, "Bad Request (START FAILURE)" ) );
+			}
+			else	qptr = liberate_rest_response( qptr );
+		}
 
 		/* ---------------------- */
 		/* Allocate a Floating IP */
 		/* ---------------------- */
 		if (!( qptr = allocate_occi_os_floating_ip(pptr->reference)))
 		 	return( rest_html_response( aptr, 801, "Bad Request (ALLOCATE FLOATING IP)" ) );
+		else if ((status = qptr->status) > 299 )
+		{
+			qptr = liberate_rest_response( qptr );
+		 	return( rest_html_response( aptr, status + 4000, "Bad Request (ALLOCATE IP FAILURE)" ) );
+		}
 		else	qptr = liberate_rest_response( qptr );
 
 		/* -------------------------------- */
@@ -160,9 +355,10 @@ private	struct	rest_response * start_occi_openstack(
 		/* -------------------------------- */
 		if (!( qptr = get_occi_os_compute(pptr->reference)))
 		 	return( rest_html_response( aptr, 801, "Bad Request (RETRIEVE COMPUTE)" ) );
-		else
+		else if (!( qptr = process_occi_os_attributes( qptr )))
+		 	return( rest_html_response( aptr, 801, "Bad Request (PROCESSING ATTRIBUTS)" ) );
 		{
-
+			
 			/* --------------------------------------- */
 			/* establish the resulting host name value */
 			/* --------------------------------------- */
@@ -187,6 +383,9 @@ private	struct	rest_response * start_occi_openstack(
 			else	qptr = liberate_rest_response( qptr );
 		}
 
+		/* ------------------------------------------------------- */
+		/* indicate that the machine is running and set start time */
+		/* ------------------------------------------------------- */
 		pptr->when = time((long *) 0);
 		pptr->status = _OCCI_RUNNING;
 		status = 0;
