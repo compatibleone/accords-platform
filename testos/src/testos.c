@@ -104,6 +104,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( ( detail ? os_list_image_details() : os_list_images()) );
 		else if (!( strcasecmp( p2, "ADDRESSES" ) ))
 			os_result( ( detail ? os_list_floating_ip_details() : os_list_floating_ips()) );
+		else if (!( strcasecmp( p2, "GROUPS" ) ))
+			os_result( ( detail ? os_list_security_group_details() : os_list_security_groups()) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -150,6 +152,26 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"GROUP" ) ))
+	{
+		if (!( nomfic = os_create_security_group_request( p2 ) ))
+			return( failure(27,"cannot create","security group request" ) );
+		else
+		{ 	
+			os_result( os_create_security_group( nomfic ) );
+			return( 0 );
+		}
+	}
+	else if (!( strcasecmp(p1,"RULE" ) ))
+	{
+		if (!( nomfic = os_create_security_rule_request( p2, p3, p4, p5, "0.0.0.0/0" ) ))
+			return( failure(27,"cannot create","security rule request" ) );
+		else
+		{ 	
+			os_result( os_create_security_rule( nomfic ) );
+			return( 0 );
+		}
+	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
@@ -162,6 +184,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_get_image( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_get_address( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			os_result( os_get_security_group( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_get_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -192,6 +216,10 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_delete_address( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			os_result( os_delete_security_group( p3 ) );
+		else if (!( strcasecmp( p2, "RULE" ) ))
+			os_result( os_delete_security_rule( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_delete_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -286,15 +314,17 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | METADATA <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | METADATA <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
+	printf("\n   GROUP    <name> ");
+	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

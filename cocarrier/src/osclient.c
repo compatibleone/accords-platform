@@ -676,6 +676,22 @@ public	struct	os_response *	os_list_floating_ip_details( )
 }
 
 /*	------------------------------------------------------------	*/
+/*		o s _ l i s t _ s e c u r i t y _ g r o u p		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_security_groups( )
+{
+	return( os_list_operation( "/os-security-groups" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	o s _ l i s t _ s e c u r i t y _ g r o u p _ d e t a i l s	*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_security_group_details( )
+{
+	return( os_list_operation( "/os-security-groups/detail" ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ f l a v o u r s			*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_list_flavors( )
@@ -778,6 +794,61 @@ private	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
 	if ( *sptr ) *(sptr++) = 0;
 	*rptr = sptr;
 	return(1);	
+}
+
+/*	-------------------------------------------------------------------	*/
+/*	    o s _ c r e a t e _ s e c u r i t y _ g r o u p _ r e q u e s t	*/
+/*	-------------------------------------------------------------------	*/
+public	char * os_create_security_group_request( char * nptr )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<security_group name=%c%s%c>\n",0x0022,nptr,0x0022);
+		fprintf(h,"<description>OpenStack Security Group : %s</description>\n",nptr);
+		fprintf(h,"</security_group>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	-------------------------------------------------------------------	*/
+/*	    o s _ c r e a t e _ s e c u r i t y _ r u l e _ r e q u e s t	*/
+/*	-------------------------------------------------------------------	*/
+public	char * os_create_security_rule_request( char * group, char * protocol, char * from, char * to, char * cidr )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<security_group_rule>\n");
+		fprintf(h,"<ip_protocol>%s</ip_protocol>\n",protocol);
+		fprintf(h,"<from_port>%s</from_port>\n",from);
+		fprintf(h,"<to_port>%s</to_port>\n",to);
+		fprintf(h,"<cidr>%s</cidr>\n",cidr);
+		fprintf(h,"<group/>\n");
+		fprintf(h,"<parent_group_id>%s</parent_group_id>\n",group);
+		fprintf(h,"</security_group_rule>\n");
+		fclose(h);
+		return( filename );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -883,6 +954,37 @@ public	struct	os_response *	os_get_address( char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-floating-ips/%s",id);
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ g e t _ s e c u r i t y _ g r o u p		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_security_group( char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-security-groups/%s",id);
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Os.base )))
@@ -1205,6 +1307,68 @@ public	struct	os_response *	os_create_address()
 		return( rptr );
 	}
 	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, (char *) 0, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ c r e a t e _  s e c u r i t y _ g r o u p	*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_security_group( char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-security-groups");
+
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ c r e a t e _  s e c u r i t y _ r u l e 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_security_rule( char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-security-group-rules");
+
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1542,6 +1706,26 @@ public	struct	os_response *	os_delete_address(  char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/os-floating-ips/%s",id);
+	return( os_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	 	o s _ d e l e t e _ s e c u r i t y _ g r o u p		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_security_group(  char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-security-groups/%s",id);
+	return( os_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	 	o s _ d e l e t e _ s e c u r i t y _ r u l e 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_security_rule(  char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-security-group-rules/%s",id);
 	return( os_delete_operation( buffer ) );
 }
 
