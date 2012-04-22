@@ -251,7 +251,7 @@ private	int	use_openstack_configuration( char * sptr )
 	 	return( 404 );
 
 	else 	return( os_initialise_client( 
-			pptr->user, pptr->password, 
+			pptr->user, pptr->password, pptr->namespace,
 			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
 }
 

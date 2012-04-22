@@ -209,6 +209,7 @@ private	int	os_command(int argc, char * argv[] )
 	char *	user=(char *) 0;
 	char *	pass=(char *) 0;
 	char *	host=(char *) 0;
+	char *	tenant=(char *) 0;
 	char *	agent="CO-OSCLIENT/1.0";
 	char *	version="v1.1";
 
@@ -226,7 +227,7 @@ private	int	os_command(int argc, char * argv[] )
 				return( failure( status, "missing", "--user parameter" ) );
 			else if (!( pass ))
 				return( failure( status, "missing", "--password parameter" ) );
-			else if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0)
+			else if ((status = os_initialise_client( user, pass, tenant, host, agent, version, tls )) != 0)
 				return( failure( status, "initialising", "client" ) );
 			else 	return( os_operation( aptr, 
 					( argi < argc ? argv[argi] : (char *) 0 ),
@@ -242,6 +243,8 @@ private	int	os_command(int argc, char * argv[] )
 				user = argv[argi++];
 			else if (!( strcasecmp( aptr,"password" ) ))
 				pass = argv[argi++];
+			else if (!( strcasecmp( aptr,"tenant" ) ))
+				tenant = argv[argi++];
 			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
 			else if (!( strcasecmp( aptr,"detail" ) ))
@@ -277,8 +280,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.06");
-	printf("\n   Beta Version 25/02/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.01");
+	printf("\n   Beta Version 22/04/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -296,6 +299,7 @@ private	int	os_banner()
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");
 	printf("\n     --password <value>    set account password  ");
+	printf("\n     --tenant <value>      set account tenant    ");
 	printf("\n     --host <hostname>     set host name         ");
 	printf("\n     --version <value>     set host version      ");
 	printf("\n     --agent   <name>      set test agent name   ");

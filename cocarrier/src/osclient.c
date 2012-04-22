@@ -22,6 +22,8 @@
 
 #include "osclient.h"
 
+char *                  occi_unquoted_value( char * sptr );
+
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
@@ -44,6 +46,23 @@ private	struct os_config Os = {
 	0 
 
 	};
+
+struct	keystone_config
+{
+	char *	requestauth;
+	char *	acceptauth;
+	char *	tenantname;
+	char *	tenantid;
+	char *	host;
+} KeyStone = 
+{
+	"application/xml",
+	"application/xml",
+	(char *) 0,
+	(char *) 0,
+	(char *) 0
+};
+
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o s _ r e s p o n s e			*/
@@ -181,6 +200,244 @@ public	struct	os_response *
 	return( os_check( rest_client_put_request( target, tls, nptr, filename, hptr ) ) );
 }
 
+/*	-------------------------------------------	*/
+/*	 k e y s t o n e _ a u t h _ m e s s a g e 	*/
+/*	-------------------------------------------	*/
+public	char *	keystone_auth_message( char * user, char * password, char * tenant )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<auth xmlns:xsi=%c%s%c xmlns=%c%s%c tenantName=%c%s%c>\n",
+				0x0022,"http://www.w3.org/2001/XMLSchema-instance",0x0022,
+				0x0022,"http://docs.openstack.com/identity/api/v2.0",0x0022,
+				0x0022,tenant,0x0022);
+		fprintf(h,"<passwordCredentials username=%c%s%c password=%c%s%c/>\n",
+				0x0022,user,0x0022,0x0022,password,0x0022);
+		fprintf(h,"</auth>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*	 c h e c k _ k e y s t o n e _ a u t h o r i z a t i o n	*/
+/*	---------------------------------------------------------	*/
+public	int	check_keystone_authorization()
+{
+	struct	xml_element * document;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	rest_response * rptr;
+	struct	rest_header * hptr;
+	char *	tptr;
+	char *	filename;
+	char	buffer[1024];
+	if (!( Os.authenticate ))
+	{
+		sprintf(buffer,"%s/tokens",Os.host);
+		if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, KeyStone.requestauth ) ))
+			return( 0 );
+		else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, KeyStone.acceptauth ) ))
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
+		else	hptr->next->previous = hptr;
+		if (!( filename = keystone_auth_message( 
+			Os.user, 
+			Os.password,
+			KeyStone.tenantname ) ))
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
+		else if (!( rptr = rest_client_post_request( 
+			buffer, Os.tls, Os.agent, filename, hptr ) ))
+		{
+			liberate_rest_header( hptr );
+			return( 0 );
+		}
+		else	hptr = liberate_rest_header( hptr );
+
+		if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		{
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( hptr->value ))
+		{
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if ( strncasecmp( hptr->value, KeyStone.acceptauth, strlen(KeyStone.acceptauth) ) )
+		{
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( rptr->body ))
+		{
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( document = document_parse_file( rptr->body ) ))
+		{
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( eptr = document_element( document, "token" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr = document_atribut( eptr, "id" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr->value ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( Os.authenticate = allocate_string( aptr->value )))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( Os.authenticate = occi_unquoted_value( Os.authenticate ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( eptr = document_element( eptr, "tenant" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr = document_atribut( eptr, "id" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( aptr->value ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( KeyStone.tenantid = allocate_string( aptr->value )))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( KeyStone.tenantid = occi_unquoted_value( KeyStone.tenantid ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( eptr = document_element( document, "serviceCatalog" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else if (!( eptr = document_element( eptr, "service" ) ))
+		{
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			return( 0 );
+		}
+		else
+		{
+			while ( eptr )
+			{
+				if (!( aptr = document_atribut( eptr, "type" ) ))
+				{
+					document = document_drop( document );
+					rptr = liberate_rest_response( rptr );
+					return( 0 );
+				}
+				else if (!( tptr = aptr->value ))
+				{
+					document = document_drop( document );
+					rptr = liberate_rest_response( rptr );
+					return( 0 );
+				}
+				else if ((!( tptr = allocate_string( tptr ) ))
+				     ||  (!( tptr = occi_unquoted_value( tptr ) )))
+				{
+					document = document_drop( document );
+					rptr = liberate_rest_response( rptr );
+					return( 0 );
+				}
+				else if (!( strcasecmp( tptr, "compute" ) ))
+				{
+					liberate( tptr );
+					if (!( eptr = document_element( eptr, "endpoint" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					if (!( aptr = document_atribut( eptr, "publicURL" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( aptr->value ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( Os.base = allocate_string( aptr->value ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( Os.base = occi_unquoted_value( Os.base ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else	break;
+				}
+				else
+				{
+					eptr = eptr->next;
+					liberate( tptr );
+				}
+			}
+			document = document_drop( document );
+			rptr = liberate_rest_response( rptr );
+			if (!( Os.base ))
+				return( 0 );
+			else	return( 1 );
+		}
+	}
+	return( 1 );
+}
+
 /*	------------------------------------------------------------	*/
 /*			o s _ a u t h e n t i c a t e ()		*/
 /*	------------------------------------------------------------	*/
@@ -191,88 +448,110 @@ public	struct	rest_header   *	os_authenticate	( )
 	struct	url		*	uptr;
 	char 			*	nptr;
 	int				status;
+	char 			*	eptr;
 	char	buffer[256];
-
-	if (!( Os.user ))
-		return( hptr );
-	else if (!( Os.password ))
-		return( hptr );
-	else if (!( Os.version ))
-		return( hptr );
-	else if (!( Os.authenticate ))
+	
+	/* --------------------------------- */
+	/* check if explicite Diablo Version */
+	/* --------------------------------- */
+	if (!( eptr = getenv("NOVADIABLO")))
+		status = 0;
+	else 	status = atoi(eptr);
+	
+	if (!( status ))
 	{
+		if (!( check_keystone_authorization() ))
+			return((struct rest_header * )0);
+		else if (!( Os.authenticate ))
+			return((struct rest_header * )0);
+	}
+	else
+	{
+		/* ------------------------------ */
+		/* Old Diablo Type Authentication */
+		/* ------------------------------ */
+		if (!( Os.user ))
+			return( hptr );
+		else if (!( Os.password ))
+			return( hptr );
+		else if (!( Os.version ))
+			return( hptr );
+		else if (!( Os.authenticate ))
+		{
+			sprintf(buffer,"/%s",Os.version);
 
-		sprintf(buffer,"/%s",Os.version);
+			if (!( uptr = analyse_url( Os.host )))
+				return( hptr );
+			else if (!( uptr = validate_url( uptr ) ))
+				return( hptr );
+			else if (!( uptr->object = allocate_string( buffer ) ))
+			{
+				uptr = liberate_url( uptr );
+				return( hptr );
+			}
+			else if (!( nptr = serialise_url( uptr,"" ) ))
+			{
+				uptr = liberate_url( uptr );
+				return( hptr );
+			}
+			else	uptr = liberate_url( uptr );
 
-		if (!( uptr = analyse_url( Os.host )))
-			return( hptr );
-		else if (!( uptr = validate_url( uptr ) ))
-			return( hptr );
-		else if (!( uptr->object = allocate_string( buffer ) ))
-		{
-			uptr = liberate_url( uptr );
-			return( hptr );
-		}
-		else if (!( nptr = serialise_url( uptr,"" ) ))
-		{
-			uptr = liberate_url( uptr );
-			return( hptr );
-		}
-		else	uptr = liberate_url( uptr );
 
-		if (!( hptr = rest_create_header( "X-Auth-User", Os.user ) ))
-		{
-			liberate( nptr );
-			return( hptr );
-		}
-		else if (!( hptr->next = rest_create_header( "X-Auth-Key", Os.password ) ))
-		{
-			liberate( nptr );
-			return( liberate_rest_header( hptr ) );
-		}
-		else	hptr->next->previous = hptr;
 
-		if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
-		{
-			liberate( nptr );
-			return( liberate_rest_header( hptr ) );
-		}
-		else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Auth-Token") ))
-		{
-			if (!( Os.authenticate = allocate_string("abcde-1234-5678-fgh-ijklm") ))
+			if (!( hptr = rest_create_header( "X-Auth-User", Os.user ) ))
+			{
+				liberate( nptr );
+				return( hptr );
+			}
+			else if (!( hptr->next = rest_create_header( "X-Auth-Key", Os.password ) ))
+			{
+				liberate( nptr );
+				return( liberate_rest_header( hptr ) );
+			}
+			else	hptr->next->previous = hptr;
+	
+			if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+			{
+				liberate( nptr );
+				return( liberate_rest_header( hptr ) );
+			}
+			else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Auth-Token") ))
+			{
+				if (!( Os.authenticate = allocate_string("abcde-1234-5678-fgh-ijklm") ))
+				{
+					liberate( nptr );
+					return( (struct rest_header *) 0 );
+				}
+			}
+			else if (!( Os.authenticate = allocate_string( hptr->value ) ))
 			{
 				liberate( nptr );
 				return( (struct rest_header *) 0 );
 			}
-		}
-		else if (!( Os.authenticate = allocate_string( hptr->value ) ))
-		{
-			liberate( nptr );
-			return( (struct rest_header *) 0 );
-		}
-		else if (( hptr = rest_resolve_header(
-				rptr->response->first,"X-Server-Management-Url")) 
-				!= (struct rest_header *) 0)
-		{
-			if (!( Os.base = allocate_string( hptr->value ) ))
+			else if (( hptr = rest_resolve_header(
+					rptr->response->first,"X-Server-Management-Url")) 
+					!= (struct rest_header *) 0)
+			{
+				if (!( Os.base = allocate_string( hptr->value ) ))
+				{
+					liberate( nptr );
+					return( (struct rest_header *) 0 );
+				}
+			}
+			else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Identity") ))
+			{
+				if (!( Os.base = allocate( strlen( Os.host ) + strlen( Os.version ) + 16 ) ))
+				{
+					liberate( nptr );
+					return( (struct rest_header *) 0 );
+				}
+				else	sprintf( Os.base, "%s/%s", Os.host, Os.version );
+			}
+			else if (!( Os.base = allocate_string( hptr->value ) ))
 			{
 				liberate( nptr );
 				return( (struct rest_header *) 0 );
 			}
-		}
-		else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Identity") ))
-		{
-			if (!( Os.base = allocate( strlen( Os.host ) + strlen( Os.version ) + 16 ) ))
-			{
-				liberate( nptr );
-				return( (struct rest_header *) 0 );
-			}
-			else	sprintf( Os.base, "%s/%s", Os.host, Os.version );
-		}
-		else if (!( Os.base = allocate_string( hptr->value ) ))
-		{
-			liberate( nptr );
-			return( (struct rest_header *) 0 );
 		}
 	}
 	if (!( Os.authenticate ))
@@ -1270,13 +1549,22 @@ public	struct	os_response *	os_delete_address(  char * id )
 /*		o s _ i n i t i a l i s e _ c l i e n t 		*/
 /*	------------------------------------------------------------	*/
 public	int	os_initialise_client( 
-		char * user, char * password, 
+		char * user, char * password, char * tenant, 
 		char * host, char * agent, char * version, char * tls )
 {
 	char	*	eptr;
+	struct	url * 	url;
+
 	if ((eptr = getenv("EUCAHACK")) != (char *) 0)
 		hack = atoi(eptr);
 	else	hack = 0;
+
+	if (!( url = analyse_url( host )))
+		return( 30 );
+	else if (!( KeyStone.host = serialise_url_host_no_port( url ) ))
+		return( 27 );
+	else	liberate_url( url );
+
 	if (!( Os.user = allocate_string( user )))
 		return( 27 );
 	if (!( Os.password = allocate_string( password )))
@@ -1286,6 +1574,8 @@ public	int	os_initialise_client(
 	else if (!( Os.agent = allocate_string( agent )))
 		return( 27 );
 	else if (!( Os.version = allocate_string( version )))
+		return( 27 );
+	else if (!( KeyStone.tenantname = allocate_string( tenant )))
 		return( 27 );
 
 	/* namespace selection */
