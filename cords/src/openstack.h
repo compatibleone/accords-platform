@@ -30,6 +30,9 @@ struct	openstack
 	char *	publicaddr;
 	char *	privateaddr;
 
+	char *	firewall;
+	char *	group;
+	char *	zone;
 	char *	hostname;
 
 	int	when;

@@ -195,13 +195,6 @@ private	int	procci_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_network_builder( Procci.domain,"network" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
 	rest_initialise_log( Procci.monitor );
 
 	if (!( Procci.identity ))

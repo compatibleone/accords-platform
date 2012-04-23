@@ -31,6 +31,7 @@
 #include "occibuilder.h"
 #include "occiresolver.h"
 #include "conetsengine.h"
+#include "stdnode.h"
 
 struct	accords_configuration Conets = {
 	0,0,
@@ -144,6 +145,104 @@ private	struct rest_extension * conets_extension( void * v,struct rest_server * 
 #include "conetsdomain.c"
 #include "conetsip.c"
 
+/*	-------------------------------------------	*/
+/*	      a d d _ f i r e w a l l _ p o r t		*/
+/*	-------------------------------------------	*/
+private	int	add_firewall_port( struct cords_firewall * pptr, char * source, struct occi_element * eptr )
+{
+	struct	occi_response * zptr;
+	char *	target;
+	if ( eptr->value )
+	{
+		if ((target = standard_message_link_value( eptr->value )) != (char *) 0)
+		{
+			if ((zptr = cords_create_link( 
+					source, target, 
+					_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			{
+				pptr->ports++;
+				zptr = occi_remove_response( zptr );
+			}
+			liberate( target );
+		}
+	}
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      b u i l d _ f i r e w a l l		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * build_firewall(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	occi_response * zptr;
+	struct	occi_element * eptr;
+	struct	occi_element * fptr;
+	struct	cords_firewall * pptr;
+	char *	sptr;
+	char	buffer[1024];
+	int	status;
+
+	struct	standard_node * nptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+	else if ( pptr->status > 0 )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( pptr->node ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( rest_html_response( aptr, 400, "Incorrect Request ID" ) );
+	else
+	{
+		/* ----------------------------------- */
+		/* first process network element ports */
+		/* ----------------------------------- */
+		sprintf(buffer,"%s/firewall/%s",Conets.identity,pptr->id);
+		pptr->ports=0;
+		if ((zptr = cords_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+		for (	fptr = first_standard_message_link( nptr->network.message );
+			fptr != (struct occi_element *) 0;
+			fptr = next_standard_message_link( fptr ) )
+			add_firewall_port( pptr, buffer, fptr );			
+
+		/* ------------------------------------ */
+		/* then process the image package ports */
+		/* ------------------------------------ */
+		for (	eptr = first_standard_message_link( nptr->image.message );
+			eptr != (struct occi_element *) 0;
+			eptr = next_standard_message_link( eptr ) )
+		{
+			/* ---------------------------------- */
+			/* retrieve the image package message */
+			/* ---------------------------------- */
+			if (!( sptr = standard_message_link_value( eptr->value ) ))
+				continue;
+			else 	status = get_standard_message( 
+					&nptr->package, sptr,
+					_CORDS_CONTRACT_AGENT, default_tls());
+			liberate( sptr );
+			if (status != 0)
+				continue;
+
+			/* ----------------------------------------- */
+			/* process the port messages of this package */
+			/* ----------------------------------------- */
+			for (	fptr = first_standard_message_link( nptr->package.message );
+				fptr != (struct occi_element *) 0;
+				fptr = next_standard_message_link( fptr ) )
+				add_firewall_port( pptr, buffer, fptr );			
+		}
+		pptr->status = 1;
+		nptr = drop_standard_node( nptr );
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
 /*	------------------------------------------------------------------	*/
 /*			c o n e t s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -173,6 +272,13 @@ private	int	conets_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
+	if (!( optr = occi_cords_network_builder( Conets.domain,"network" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_cords_port_builder( Conets.domain, "port" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -188,6 +294,9 @@ private	int	conets_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_add_action( optr,_CORDS_BUILD,"",build_firewall)))
+		return( 28 );
 
 	if (!( optr = occi_cords_connection_builder( Conets.domain, "connection" ) ))
 		return( 27 );

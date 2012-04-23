@@ -36,6 +36,9 @@
 #define	_CORDS_COMMON	"common"
 #define	_CORDS_NORMAL	"normal"
 #define	_CORDS_GLOBAL	"global"
+#define	_CORDS_TO	"to"
+#define	_CORDS_FROM	"from"
+#define	_CORDS_PROTOTYPE "prototype"
 
 /*	------------------------	*/
 /*	cords action identifiers	*/
@@ -90,6 +93,7 @@
 #define	_CORDS_IMAGE		"image"
 #define	_CORDS_SYSTEM		"system"
 #define	_CORDS_PACKAGE		"package"
+#define	_CORDS_FIREWALL		"firewall"
 #define	_CORDS_PORT		"port"
 
 #define	_CORDS_CONFIGURATION	"configuration"

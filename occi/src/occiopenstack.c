@@ -172,6 +172,12 @@ private void autoload_openstack_nodes() {
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
 				pptr->privateaddr = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
+				pptr->firewall = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
+				pptr->zone = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -259,6 +265,15 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," privateaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->privateaddr?pptr->privateaddr:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," firewall=%c",0x0022);
+		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," zone=%c",0x0022);
+		fprintf(h,"%s",(pptr->zone?pptr->zone:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
@@ -325,6 +340,12 @@ private void set_openstack_field(
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
 			pptr->privateaddr = allocate_string(vptr);
+		if (!( strcmp( nptr, "firewall" ) ))
+			pptr->firewall = allocate_string(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
+		if (!( strcmp( nptr, "zone" ) ))
+			pptr->zone = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -488,6 +509,27 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->privateaddr,fptr->privateaddr) != 0)
 			return(0);
 		}
+	if (( fptr->firewall )
+	&&  (strlen( fptr->firewall ) != 0)) {
+		if (!( pptr->firewall ))
+			return(0);
+		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
+			return(0);
+		}
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
+	if (( fptr->zone )
+	&&  (strlen( fptr->zone ) != 0)) {
+		if (!( pptr->zone ))
+			return(0);
+		else if ( strcmp(pptr->zone,fptr->zone) != 0)
+			return(0);
+		}
 	if (( fptr->hostname )
 	&&  (strlen( fptr->hostname ) != 0)) {
 		if (!( pptr->hostname ))
@@ -564,6 +606,15 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.zone=%s",optr->domain,optr->id,pptr->zone);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
@@ -1015,6 +1066,12 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "zone",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
@@ -1244,6 +1301,39 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.openstack.privateaddr='%s'\r\n",(sptr->privateaddr?sptr->privateaddr:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.firewall='%s'\r\n",(sptr->firewall?sptr->firewall:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.group='%s'\r\n",(sptr->group?sptr->group:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.openstack.zone='%s'\r\n",(sptr->zone?sptr->zone:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

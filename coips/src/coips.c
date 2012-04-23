@@ -527,7 +527,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 		/* ------------------------- */
 		/* For Each Package 	     */
 		/* ------------------------- */
-		for (	eptr = first_application_package_link(zptr);
+		for (	eptr = first_application_package_link( zptr );
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
 		{

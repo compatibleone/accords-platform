@@ -140,12 +140,14 @@ private void autoload_cords_firewall_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "contract" )) != (struct xml_atribut *) 0)
-				pptr->contract = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
 				pptr->provider = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
 				pptr->node = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "network" )) != (struct xml_atribut *) 0)
+				pptr->network = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
+				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "ports" )) != (struct xml_atribut *) 0)
 				pptr->ports = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
@@ -183,14 +185,17 @@ public  void autosave_cords_firewall_nodes() {
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," contract=%c",0x0022);
-		fprintf(h,"%s",(pptr->contract?pptr->contract:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," provider=%c",0x0022);
 		fprintf(h,"%s",(pptr->provider?pptr->provider:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," node=%c",0x0022);
 		fprintf(h,"%s",(pptr->node?pptr->node:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," network=%c",0x0022);
+		fprintf(h,"%s",(pptr->network?pptr->network:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," image=%c",0x0022);
+		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," ports=%c",0x0022);
 		fprintf(h,"%u",pptr->ports);
@@ -223,12 +228,14 @@ private void set_cords_firewall_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
-		if (!( strcmp( nptr, "contract" ) ))
-			pptr->contract = allocate_string(vptr);
 		if (!( strcmp( nptr, "provider" ) ))
 			pptr->provider = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
 			pptr->node = allocate_string(vptr);
+		if (!( strcmp( nptr, "network" ) ))
+			pptr->network = allocate_string(vptr);
+		if (!( strcmp( nptr, "image" ) ))
+			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "ports" ) ))
 			pptr->ports = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
@@ -278,13 +285,6 @@ private int pass_cords_firewall_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
-	if (( fptr->contract )
-	&&  (strlen( fptr->contract ) != 0)) {
-		if (!( pptr->contract ))
-			return(0);
-		else if ( strcmp(pptr->contract,fptr->contract) != 0)
-			return(0);
-		}
 	if (( fptr->provider )
 	&&  (strlen( fptr->provider ) != 0)) {
 		if (!( pptr->provider ))
@@ -297,6 +297,20 @@ private int pass_cords_firewall_filter(
 		if (!( pptr->node ))
 			return(0);
 		else if ( strcmp(pptr->node,fptr->node) != 0)
+			return(0);
+		}
+	if (( fptr->network )
+	&&  (strlen( fptr->network ) != 0)) {
+		if (!( pptr->network ))
+			return(0);
+		else if ( strcmp(pptr->network,fptr->network) != 0)
+			return(0);
+		}
+	if (( fptr->image )
+	&&  (strlen( fptr->image ) != 0)) {
+		if (!( pptr->image ))
+			return(0);
+		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
 	if (( fptr->ports ) && ( pptr->ports != fptr->ports )) return(0);
@@ -322,13 +336,16 @@ private struct rest_response * cords_firewall_occi_response(
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.contract=%s",optr->domain,optr->id,pptr->contract);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.provider=%s",optr->domain,optr->id,pptr->provider);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.network=%s",optr->domain,optr->id,pptr->network);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.ports=%u",optr->domain,optr->id,pptr->ports);
@@ -745,11 +762,13 @@ public struct occi_category * occi_cords_firewall_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "contract",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "network",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "ports",0,0) ))
 			return(optr);
@@ -812,17 +831,6 @@ public struct rest_header *  cords_firewall_occi_headers(struct cords_firewall *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_firewall.contract='%s'\r\n",(sptr->contract?sptr->contract:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.cords_firewall.provider='%s'\r\n",(sptr->provider?sptr->provider:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -835,6 +843,28 @@ public struct rest_header *  cords_firewall_occi_headers(struct cords_firewall *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_firewall.node='%s'\r\n",(sptr->node?sptr->node:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_firewall.network='%s'\r\n",(sptr->network?sptr->network:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_firewall.image='%s'\r\n",(sptr->image?sptr->image:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

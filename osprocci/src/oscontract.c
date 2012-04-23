@@ -34,6 +34,7 @@ struct	cords_os_contract
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
 	struct	cords_vector	network;
+	struct	cords_vector	firewall;
 	struct	cords_vector	storage;
 	struct	cords_vector	image;
 	struct	cords_vector	system;
@@ -72,6 +73,8 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 		cptr->compute.message = occi_remove_response( cptr->compute.message );
 	if ( cptr->network.message )
 		cptr->network.message = occi_remove_response( cptr->network.message );
+	if ( cptr->firewall.message )
+		cptr->firewall.message = occi_remove_response( cptr->firewall.message );
 	if ( cptr->storage.message )
 		cptr->storage.message = occi_remove_response( cptr->storage.message );
 	if ( cptr->image.message )
@@ -361,6 +364,14 @@ public	int	create_openstack_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
+	if (!( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_FIREWALL ) ))
+		return( terminate_openstack_contract( 1171, &contract ) );
+	else if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
+		return( terminate_openstack_contract( 1172, &contract ) );
+	else if (!( pptr->firewall = allocate_string( contract.firewall.id ) ))
+		return( terminate_openstack_contract( 1172, &contract ) );
+
 	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_openstack_contract( 1171, &contract ) );

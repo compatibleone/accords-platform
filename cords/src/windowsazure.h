@@ -18,6 +18,7 @@ struct	windowsazure
 	char *	publicaddr;
 	char *	privateaddr;
 
+	char *	firewall;
 	char *	hostname;
 
 	int	when;

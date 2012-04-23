@@ -55,6 +55,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
 			 sptr->privateaddr = liberate(sptr->privateaddr);
+		if ( sptr->firewall )
+			 sptr->firewall = liberate(sptr->firewall);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
 		sptr = liberate( sptr );
@@ -81,6 +83,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->reference = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
+		sptr->firewall = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
@@ -154,6 +157,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->privateaddr = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"firewall") ))
+		{
+			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"hostname") ))
 		{
 			if ( wptr->value ) { sptr->hostname = allocate_string(wptr->value); }
@@ -191,6 +198,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);

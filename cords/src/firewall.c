@@ -39,12 +39,14 @@ public struct cords_firewall * liberate_cords_firewall(struct cords_firewall * s
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
-		if ( sptr->contract )
-			 sptr->contract = liberate(sptr->contract);
 		if ( sptr->provider )
 			 sptr->provider = liberate(sptr->provider);
 		if ( sptr->node )
 			 sptr->node = liberate(sptr->node);
+		if ( sptr->network )
+			 sptr->network = liberate(sptr->network);
+		if ( sptr->image )
+			 sptr->image = liberate(sptr->image);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_firewall *) 0);
@@ -61,9 +63,10 @@ public struct cords_firewall * reset_cords_firewall(struct cords_firewall * sptr
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
-		sptr->contract = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->node = (char*) 0;
+		sptr->network = (char*) 0;
+		sptr->image = (char*) 0;
 		sptr->ports =  0;
 		sptr->status =  0;
 	}
@@ -104,10 +107,6 @@ public int xmlin_cords_firewall(struct cords_firewall * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"contract") ))
-		{
-			if ( wptr->value ) { sptr->contract = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"provider") ))
 		{
 			if ( wptr->value ) { sptr->provider = allocate_string(wptr->value); }
@@ -115,6 +114,14 @@ public int xmlin_cords_firewall(struct cords_firewall * sptr,struct xml_element 
 		else if (!( strcmp(wptr->name,"node") ))
 		{
 			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"network") ))
+		{
+			if ( wptr->value ) { sptr->network = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"image") ))
+		{
+			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"ports") ))
 		{
@@ -141,9 +148,10 @@ public int rest_occi_cords_firewall(FILE * fh,struct cords_firewall * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.contract='%s'\r\n",prefix,nptr,(sptr->contract?sptr->contract:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.network='%s'\r\n",prefix,nptr,(sptr->network?sptr->network:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.ports='%u'\r\n",prefix,nptr,sptr->ports);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);

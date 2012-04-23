@@ -18,6 +18,7 @@ struct	cords_contract
 	char *	scope;
 	char *	type;
 	char *	service;
+	char *	firewall;
 	int	when;
 	int	state;
 };

@@ -71,6 +71,12 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
 			 sptr->privateaddr = liberate(sptr->privateaddr);
+		if ( sptr->firewall )
+			 sptr->firewall = liberate(sptr->firewall);
+		if ( sptr->group )
+			 sptr->group = liberate(sptr->group);
+		if ( sptr->zone )
+			 sptr->zone = liberate(sptr->zone);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
 		sptr = liberate( sptr );
@@ -105,6 +111,9 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->floatingid = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
+		sptr->firewall = (char*) 0;
+		sptr->group = (char*) 0;
+		sptr->zone = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
@@ -210,6 +219,18 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->privateaddr = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"firewall") ))
+		{
+			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"group") ))
+		{
+			if ( wptr->value ) { sptr->group = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"zone") ))
+		{
+			if ( wptr->value ) { sptr->zone = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"hostname") ))
 		{
 			if ( wptr->value ) { sptr->hostname = allocate_string(wptr->value); }
@@ -255,6 +276,9 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floatingid='%s'\r\n",prefix,nptr,(sptr->floatingid?sptr->floatingid:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);

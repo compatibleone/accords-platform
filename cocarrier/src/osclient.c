@@ -22,6 +22,8 @@
 
 #include "osclient.h"
 
+#define	_CORDS_NULL "(null)"
+#define	_CORDS_NONE "none"
 char *                  occi_unquoted_value( char * sptr );
 
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
@@ -63,6 +65,22 @@ struct	keystone_config
 	(char *) 0
 };
 
+
+/*	------------------------------------------------	*/
+/*		o s _ v a l i d _ s t r i n g			*/
+/*	------------------------------------------------	*/
+private	int	os_valid_string( char * vptr )
+{
+	if (!( vptr ))
+		return( 0 );
+	else if (!( strlen( vptr ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NULL ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NONE ) ))
+		return( 0 );
+	else	return( 1 );
+}
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o s _ r e s p o n s e			*/
@@ -1113,7 +1131,9 @@ public	char * os_create_server_request(
 		char * flavor,		/* the server machine flavour	*/
 		char * address,		/* the public IP address 	*/
 		char * personality,	/* the source personality data	*/
-		char * resource )	/* the target personality file  */
+		char * resource,	/* the target personality file  */
+		char * group,		/* an eventual security group	*/
+		char * zone )		/* an eventual locality zone	*/
 {
 	char *	sptr=(char *) 0;
 	char *	tptr=(char *) 0;
@@ -1151,10 +1171,18 @@ public	char * os_create_server_request(
 			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,Os.base,image,0x0022);
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,Os.base,flavor,0x0022);
 		}
-		if ( address )
+		if ( os_valid_string( address ) )
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
+		if ( os_valid_string( group ) )
+		{
+			fprintf(h,"\tsecurity_group=%c%s%c\n",0x0022,group,0x0022);
+		}			
+		if ( os_valid_string( zone ) )
+		{
+			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
+		}			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
 
 		/* ----------------------------- */
@@ -1203,6 +1231,34 @@ public	char * os_create_server_request(
 			}
 		}
 		fprintf(h,"</server>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ c r e a te _ f l a v o r _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * os_create_flavor_request(char * identity, char * ram, char * cpus, char * disk )
+{
+	char *	filename;
+	FILE *	h;
+
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate() ))
+		return((char *) 0);
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<flavor name=%c%s%c>\n",0x0022,identity,0x0022);
+		fprintf(h,"<ram>%s</ram>\n",ram);
+		fprintf(h,"<vcpus>%s</vcpus>\n",cpus);
+		fprintf(h,"<disk>%s</disk>\n",disk);
+		fprintf(h,"</flavor>\n");
 		fclose(h);
 		return( filename );
 	}
@@ -1325,6 +1381,37 @@ public	struct	os_response *	os_create_security_group( char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-security-groups");
+
+	if (!( hptr = os_authenticate() ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _ f l a v o r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_flavor( char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/flavors");
 
 	if (!( hptr = os_authenticate() ))
 		return( rptr );
@@ -1696,6 +1783,16 @@ public	struct	os_response *	os_delete_image	(  char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/images/%s",id);
+	return( os_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e l e t e _ f l a v o r			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_flavor(  char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/flavors/%s",id);
 	return( os_delete_operation( buffer ) );
 }
 

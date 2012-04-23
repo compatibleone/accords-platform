@@ -107,6 +107,9 @@ public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
 public 	struct	rest_header   * occi_add_default_header(struct rest_header  * hptr);
 public 	void			occi_drop_default_headers();
+public	struct	occi_response * cords_delete_links( char * from, char * agent, char * tls );
+public	struct	occi_response * cords_create_link( char * from, char * to, char * agent, char * tls );
+
 
 public  char *	occi_extract_location( struct occi_response * rptr );
 public	char *	occi_extract_atribut( 

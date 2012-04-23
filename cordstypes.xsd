@@ -126,6 +126,11 @@
 			default="type.resolve(plan.name,type.value);"
 			/>
 
+		<xsd:attribute 	
+			name="firewall" 
+			type="xsd:string"
+			default="cordscript: firewall.new(id.value); firewall.build();"/>
+
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsInfrastructure">
@@ -154,6 +159,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsNetwork">
+		<xsd:sequence>
+			<xsd:element name="port" type="cordsPort" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="label" type="xsd:string"/>
@@ -198,6 +206,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsPackage">
+		<xsd:sequence>
+			<xsd:element name="port" type="cordsPort" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="version" type="xsd:string"/>
@@ -209,6 +220,25 @@
 		<xsd:attribute name="requirement" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
 		<xsd:attribute name="license" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsFirewall">
+		<xsd:sequence>
+			<xsd:element name="port" type="cordsPort" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsPort">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="protocol" type="xsd:string"/>
+		<xsd:attribute name="from" type="xsd:string"/>
+		<xsd:attribute name="to" type="xsd:string"/>
+		<xsd:attribute name="range" type="xsd:string"/>
 		<xsd:attribute name="status" type="xsd:integer"/>
 	</xsd:complexType>
 

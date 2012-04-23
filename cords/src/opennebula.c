@@ -73,6 +73,10 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->started = liberate(sptr->started);
 		if ( sptr->created )
 			 sptr->created = liberate(sptr->created);
+		if ( sptr->firewall )
+			 sptr->firewall = liberate(sptr->firewall);
+		if ( sptr->group )
+			 sptr->group = liberate(sptr->group);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
 		sptr = liberate( sptr );
@@ -108,6 +112,8 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->privatenetwork = (char*) 0;
 		sptr->started = (char*) 0;
 		sptr->created = (char*) 0;
+		sptr->firewall = (char*) 0;
+		sptr->group = (char*) 0;
 		sptr->configuration = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
@@ -217,6 +223,14 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->created = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"firewall") ))
+		{
+			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"group") ))
+		{
+			if ( wptr->value ) { sptr->group = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"configuration") ))
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
@@ -263,6 +277,8 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privatenetwork='%s'\r\n",prefix,nptr,(sptr->privatenetwork?sptr->privatenetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.started='%s'\r\n",prefix,nptr,(sptr->started?sptr->started:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%s'\r\n",prefix,nptr,(sptr->created?sptr->created:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);

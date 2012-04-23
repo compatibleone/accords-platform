@@ -26,6 +26,7 @@
 #include "cosacsctrl.h"
 #include "cp.h"
 #include "cb.h"
+#include "stdnode.h"
 
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
@@ -874,6 +875,114 @@ private	void	release_floating_address( struct openstack * pptr )
 	return;
 }
 
+/*	----------------------------------------------------------------	*/
+/*		b u i l d _ o p e n s t a c k _ f i r e w a l l			*/
+/*	----------------------------------------------------------------	*/
+private	int	build_openstack_firewall( struct openstack * pptr )
+{
+	char *	filename;
+	struct	os_response *	osptr;
+	struct	standard_message firewall;
+	struct	standard_message port;
+	struct	occi_element * eptr;
+	char * rulegroup=(char *) 0;
+	char * rulefrom=(char *) 0;
+	char * rulename=(char *) 0;
+	char * ruleto=(char *) 0;
+	char * ruleproto=(char *) 0;
+	int	started=0;
+	int	status=0;
+	char *	sptr;
+
+	memset( &firewall, 0, sizeof(struct standard_message));
+	memset( &port, 0, sizeof(struct standard_message));
+
+	if (!( pptr ))
+		return(0);
+	else if (!( pptr->firewall ))
+		return(0);
+	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+		return( 0 );
+	else
+	{
+		for (	eptr = first_standard_message_link( firewall.message );
+			eptr != (struct occi_element *) 0;
+			eptr = next_standard_message_link( eptr ) )
+		{
+			/* ------------------------ */
+			/* retrieve the port record */
+			/* ------------------------ */
+			if (!( sptr = standard_message_link_value( eptr->value )))
+				continue;
+			else if ((status = get_standard_message( &port, sptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+				continue;
+
+			/* --------------------------------------- */
+			/* build the security group if not started */
+			/* --------------------------------------- */
+			if (!( started++ ))
+			{
+				if (!( filename = os_create_security_group_request( pptr->id )))
+					return(0);
+				else if (!( osptr = os_create_security_group( filename ) ))
+				{
+					liberate( filename );
+					return(0);
+				}
+				else if (!( rulegroup = json_atribut( osptr->jsonroot, "id") ))
+				{
+					osptr = liberate_os_response( osptr );
+					liberate( filename );
+				}
+				else
+				{
+					/* ---------------------------------- */
+					/* save the security group identifier */
+					/* ---------------------------------- */
+					pptr->group = allocate_string( rulegroup );
+					osptr = liberate_os_response( osptr );
+					liberate( filename );
+				}
+			}			
+
+			/* ---------------------------------- */
+			/* retrieve the port rule information */
+			/* ---------------------------------- */
+			if (!( rulename = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_NAME ) ))
+				return(0);
+			else if (!( ruleproto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_PROTOTYPE ) ))
+				return(0);
+			else if (!( rulefrom = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_FROM ) ))
+				return(0);
+			else if (!( ruleto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_TO ) ))
+				return(0);
+
+			/* ---------------------------------- */
+			/* add the rule to the security group */
+			/* ---------------------------------- */
+			if (!( filename = os_create_security_rule_request( 
+					pptr->group, rulename, ruleproto, rulefrom, ruleto ) ))
+				return(0);
+			else if (!( osptr = os_create_security_rule( filename ) ))
+			{
+				liberate( filename );
+				return(0);
+			}
+			else
+			{
+				osptr = liberate_os_response( osptr );
+				liberate( filename );
+			}
+		}
+		return(0);
+	}
+}
+
+
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
@@ -917,8 +1026,11 @@ private	struct	rest_response * start_openstack(
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
 		return( rest_html_response( aptr, 4002, "Server Failure : Configuration Instructions" ) );
 
+	if ((status = build_openstack_firewall( pptr )) != 0)
+		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
+
 	if (!( filename = os_create_server_request( 
-		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource ) ))
+		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->group, pptr->zone ) ))
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );

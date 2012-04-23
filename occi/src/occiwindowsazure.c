@@ -156,6 +156,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
 				pptr->privateaddr = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
+				pptr->firewall = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -219,6 +221,9 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," privateaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->privateaddr?pptr->privateaddr:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," firewall=%c",0x0022);
+		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
@@ -269,6 +274,8 @@ private void set_windowsazure_field(
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
 			pptr->privateaddr = allocate_string(vptr);
+		if (!( strcmp( nptr, "firewall" ) ))
+			pptr->firewall = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -376,6 +383,13 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->privateaddr,fptr->privateaddr) != 0)
 			return(0);
 		}
+	if (( fptr->firewall )
+	&&  (strlen( fptr->firewall ) != 0)) {
+		if (!( pptr->firewall ))
+			return(0);
+		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
+			return(0);
+		}
 	if (( fptr->hostname )
 	&&  (strlen( fptr->hostname ) != 0)) {
 		if (!( pptr->hostname ))
@@ -428,6 +442,9 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
@@ -863,6 +880,8 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
@@ -1004,6 +1023,17 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.privateaddr='%s'\r\n",(sptr->privateaddr?sptr->privateaddr:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.firewall='%s'\r\n",(sptr->firewall?sptr->firewall:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

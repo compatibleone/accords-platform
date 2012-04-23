@@ -24,6 +24,8 @@ struct	opennebula
 	char *	privatenetwork;
 	char *	started;
 	char *	created;
+	char *	firewall;
+	char *	group;
 	char *	configuration;
 	int	when;
 	int	status;

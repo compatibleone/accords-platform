@@ -174,6 +174,10 @@ private void autoload_opennebula_nodes() {
 				pptr->started = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
 				pptr->created = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
+				pptr->firewall = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -264,6 +268,12 @@ public  void autosave_opennebula_nodes() {
 		fprintf(h," created=%c",0x0022);
 		fprintf(h,"%s",(pptr->created?pptr->created:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," firewall=%c",0x0022);
+		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
 		fprintf(h,"%c",0x0022);
@@ -332,6 +342,10 @@ private void set_opennebula_field(
 			pptr->started = allocate_string(vptr);
 		if (!( strcmp( nptr, "created" ) ))
 			pptr->created = allocate_string(vptr);
+		if (!( strcmp( nptr, "firewall" ) ))
+			pptr->firewall = allocate_string(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -502,6 +516,20 @@ private int pass_opennebula_filter(
 		else if ( strcmp(pptr->created,fptr->created) != 0)
 			return(0);
 		}
+	if (( fptr->firewall )
+	&&  (strlen( fptr->firewall ) != 0)) {
+		if (!( pptr->firewall ))
+			return(0);
+		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
+			return(0);
+		}
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
 	if (( fptr->configuration )
 	&&  (strlen( fptr->configuration ) != 0)) {
 		if (!( pptr->configuration ))
@@ -581,6 +609,12 @@ private struct rest_response * opennebula_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.created=%s",optr->domain,optr->id,pptr->created);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
@@ -1034,6 +1068,10 @@ public struct occi_category * occi_opennebula_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
@@ -1274,6 +1312,28 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.opennebula.created='%s'\r\n",(sptr->created?sptr->created:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.firewall='%s'\r\n",(sptr->firewall?sptr->firewall:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.opennebula.group='%s'\r\n",(sptr->group?sptr->group:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

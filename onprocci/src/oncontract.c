@@ -40,6 +40,7 @@ struct	cords_on_contract
 	char *	architecture;
 	char *	driver;
 	struct	cords_vector	network;
+	struct	cords_vector	firewall;
 	struct	cords_vector	storage;
 	struct	cords_vector	image;
 	struct	cords_vector	system;
@@ -488,6 +489,12 @@ public	int	create_opennebula_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
+	else if (!( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_FIREWALL ) ))
+		return( terminate_opennebula_contract( 1171, &contract ) );
+	else if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
+		return( terminate_opennebula_contract( 1172, &contract ) );
+
 	else if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_opennebula_contract( 1571, &contract ) );

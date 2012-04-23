@@ -22,6 +22,8 @@
 
 #include "osclient.h"
 
+private	char *	zone=(char *) 0;
+private char *	group=(char *) 0;
 private	int	detail=0;
 private	int	debug=0;
 private	int	verbose=0;
@@ -114,7 +116,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if (!( nomfic = os_create_server_request( p2, p3, p4, p5, personality, resource ) ))
+		if (!( nomfic = os_create_server_request( p2, p3, p4, p5, personality, resource, group, zone ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
 		{ 	
@@ -172,6 +174,16 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"FLAVOR" ) ))
+	{
+		if (!( nomfic = os_create_flavor_request( p2, p3, p4, p5 ) ))
+			return( failure(27,"cannot create","flavor request" ) );
+		else
+		{ 	
+			os_result( os_create_flavor( nomfic ) );
+			return( 0 );
+		}
+	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
@@ -216,6 +228,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_delete_address( p3 ) );
+		else if (!( strcasecmp( p2, "FLAVOR" ) ))
+			os_result( os_delete_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			os_result( os_delete_security_group( p3 ) );
 		else if (!( strcasecmp( p2, "RULE" ) ))
@@ -273,6 +287,10 @@ private	int	os_command(int argc, char * argv[] )
 				pass = argv[argi++];
 			else if (!( strcasecmp( aptr,"tenant" ) ))
 				tenant = argv[argi++];
+			else if (!( strcasecmp( aptr,"group" ) ))
+				group = argv[argi++];
+			else if (!( strcasecmp( aptr,"zone" ) ))
+				zone = argv[argi++];
 			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
 			else if (!( strcasecmp( aptr,"detail" ) ))
@@ -316,6 +334,7 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | METADATA <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
+	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   SNAPSHOT <name> <server> ");

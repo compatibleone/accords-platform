@@ -48,10 +48,11 @@ struct	os_response
 #define	_OS_NS_COMPUTE_V10	"http://docs.rackspacecloud.com/servers/api/v1.0"
 
 public	char * os_create_server_request(
-	char * identity, char * flavor, char * image, char * address, char * personality, char * resource );
+	char * identity, char * flavor, char * image, char * address, char * personality, char * resource, char * group, char * zone );
 public	char * os_create_metadata_request( char * values );
 public	char * os_create_meta_request( char * key, char * value );
 public	char * os_create_image_request(char * identity, char * server );
+public	char * os_create_flavor_request(char * identity, char * ram, char * cpus, char * disk );
 public	char * os_create_address_request( char * address );
 public	char * os_create_security_group_request( char * name );
 public	char * os_create_security_rule_request( char * name, char * protocol, char * from, char * to, char * cidr );
@@ -88,6 +89,7 @@ public	struct	os_response *	os_list_floating_ip_details();
 public	struct	os_response *	os_list_security_groups	( );
 public	struct	os_response *	os_list_security_group_details	( );
 
+public	struct	os_response *	os_create_flavor( char * filename );
 public	struct	os_response *	os_create_server( char * filename );
 public	struct	os_response *	os_create_image( char * filename, char * serverid );
 public	struct	os_response *	os_create_address();
@@ -108,6 +110,7 @@ public	struct	os_response *	os_create_metadata( char * id, char * values );
 
 public	struct	os_response *	os_delete_server( char * id );
 public	struct	os_response *	os_delete_image ( char * id );
+public	struct	os_response *	os_delete_flavor( char * id );
 public	struct	os_response *	os_delete_metadata( char * id, char * name );
 public	struct	os_response *	os_delete_address( char * id );
 public	struct	os_response *	os_delete_security_group( char * id );

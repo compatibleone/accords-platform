@@ -7,9 +7,10 @@ struct	cords_firewall
 	char *	id;
 	char *	name;
 	char *	description;
-	char *	contract;
 	char *	provider;
 	char *	node;
+	char *	network;
+	char *	image;
 	int	ports;
 	int	status;
 };

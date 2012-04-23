@@ -29,6 +29,7 @@
 #include "document.h"
 #include "occicat.h"
 #include "restlog.h"
+#include "stdnode.h"
 
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
@@ -1727,7 +1728,107 @@ public	int	occi_post_event( char * buffer, char * nature, char * agent )
 	return( cords_post_event( buffer, nature, agent, default_tls() ) );
 }
 
+/*	---------------------------------------------------	*/
+/*		c o r d s _ l i n k _ e l e m e n t   		*/
+/*	---------------------------------------------------	*/
+/*	this function appends a well formed OCCI element to	*/
+/*	the element list of the OCCI request. The element	*/
+/*	will describe a simple named xlink attribute for use 	*/
+/*	by link expressions.					*/
+/*	--------------------------------------------------	*/
+private	struct occi_element * cords_link_element( 
+		struct	occi_request * rptr,
+		char * 	nptr,
+		char * 	vptr )
+{
+	char	buffer[8192];
+	if (!( nptr ))
+		return((struct occi_element *) 0);
+	else	sprintf(buffer,"occi.link.%s",nptr);
+	if (!( vptr ))
+		return((struct occi_element *) 0);
+	else	return( occi_request_element( rptr, buffer, vptr ));
+}
 
+/*	---------------------------------------------------	*/
+/*	 	  c o r d s _ c r e a t e _ l i n k		*/
+/*	---------------------------------------------------	*/
+/*	issues a POST request for the creation of a link  	*/
+/*	"from" a category instance "to" the indicated other	*/
+/*	category instance.					*/
+/*	---------------------------------------------------	*/	
+public	struct	occi_response * cords_create_link( char * from, char * to, char * agent, char * tls )
+{
+	struct	occi_element  	* fptr;
+	struct	occi_response 	* zptr;
+	struct	occi_request 	* rptr;
+	struct	occi_client	* cptr;
+	struct	url		*  lptr;
+	char 			* linkhost;
+
+	if ( check_debug() )
+		printf("cords_create_link(%s,%s)\n",from,to);
+	if (!( lptr = analyse_url( from )))
+		return((struct occi_response *) 0);
+	else if (!( lptr = validate_url( lptr )))
+		return((struct occi_response *) 0);
+	else 	lptr->object = liberate( lptr->object );
+	if (!( lptr->object = allocate_string( _OCCI_XLINK )))
+		return((struct occi_response *) 0);
+	else if (!( linkhost = serialise_url( lptr,"" )))
+		return((struct occi_response *) 0);
+	else if (!( cptr = occi_create_client( linkhost, agent, tls ) ))
+		return((struct occi_response *) 0);
+	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		return((struct occi_response *) 0);
+	else if (!( fptr = cords_link_element( rptr, "source", from ) ))
+		return((struct occi_response *) 0);
+	else if (!( fptr = cords_link_element( rptr, "target", to ) ))
+		return((struct occi_response *) 0);
+	else if (!( zptr = occi_client_post( cptr, rptr ) ))
+		return(zptr);
+	else	return(zptr);
+}
+
+/*	---------------------------------------------------	*/
+/*	 	  c o r d s _ d e l e t e _ l i n k s		*/
+/*	---------------------------------------------------	*/
+/*	issues a DELETE request to perform the deletion of 	*/
+/*	all links of a category instance by specifying the 	*/
+/*	"from" attribute of the parent category instance.	*/
+/*	---------------------------------------------------	*/	
+public	struct	occi_response * cords_delete_links( char * from, char * agent, char * tls )
+{
+	struct	occi_element  	* fptr;
+	struct	occi_response 	* zptr;
+	struct	occi_request 	* rptr;
+	struct	occi_client	* cptr;
+	struct	url		*  lptr;
+	char 			* linkhost;
+
+	if ( check_debug() )
+		printf("cords_delete_links(%s)\n",from);
+	if (!( lptr = analyse_url( from )))
+		return((struct occi_response *) 0);
+	else if (!( lptr = validate_url( lptr )))
+		return((struct occi_response *) 0);
+	else 	lptr->object = liberate( lptr->object );
+	if (!( lptr->object = allocate_string( _OCCI_XLINK )))
+		return((struct occi_response *) 0);
+	else if (!( linkhost = serialise_url( lptr,"" )))
+		return((struct occi_response *) 0);
+	else if (!( cptr = occi_create_client( linkhost, agent, tls ) ))
+		return((struct occi_response *) 0);
+	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		return((struct occi_response *) 0);
+	else if (!( fptr = cords_link_element( rptr, "source", from ) ))
+		return((struct occi_response *) 0);
+	else if (!( zptr = occi_client_delete( cptr, rptr ) ))
+		return(zptr);
+	else	return(zptr);
+}
+
+#include "stdnode.c"
 
 #endif 	/* _occi_client_c */
 
