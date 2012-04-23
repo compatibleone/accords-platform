@@ -48,6 +48,16 @@ To build this package, you can run:
 # ./configure [options] (see ./configure --help for options)
 # make
 
+PLATFORM SPECIFICS
+------------------
+
+On some compilers (gcc 4.4), some additional flags are needed for the compiler.
+Try a compbination of:
+CFLAGS="-Wl,--no-as-needed"
+LDFLAGS="-ldl"
+
+You can pass these flags to configure script, or to make invocation.
+
 INSTALLATION
 ------------
 
