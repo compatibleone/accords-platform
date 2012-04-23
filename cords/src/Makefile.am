@@ -37,4 +37,4 @@ EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c
 libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI)
-libcords_la_LDFLAGS = $(AM_LDFLAGS) $(LD_COXML)
+libcords_la_LDFLAGS = $(LD_COXML)

@@ -20,4 +20,4 @@ libcocci_la_SOURCES = occiclient.c occiclient.h \
     occiserver.c accords.c accords.h occibody.c occibody.h
 
 libcocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_PUBOCCI) $(CFLAGS_COCARRIER)
-libcocci_la_LDFLAGS = $(AM_LDFLAGS) $(LD_COREST) $(LD_COCARRIER) $(LD_OCCI) $(LD_CORDS) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
+libcocci_la_LDFLAGS = $(LD_COREST) $(LD_COCARRIER) $(LD_OCCI) $(LD_CORDS) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
