@@ -142,14 +142,12 @@ private void autoload_cords_port_nodes() {
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "protocol" )) != (struct xml_atribut *) 0)
 				pptr->protocol = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "direction" )) != (struct xml_atribut *) 0)
-				pptr->direction = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "address" )) != (struct xml_atribut *) 0)
-				pptr->address = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
-				pptr->number = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
-				pptr->target = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "range" )) != (struct xml_atribut *) 0)
+				pptr->range = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "from" )) != (struct xml_atribut *) 0)
+				pptr->from = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "to" )) != (struct xml_atribut *) 0)
+				pptr->to = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
 				pptr->status = document_atribut_value(aptr);
 			}
@@ -188,17 +186,14 @@ public  void autosave_cords_port_nodes() {
 		fprintf(h," protocol=%c",0x0022);
 		fprintf(h,"%s",(pptr->protocol?pptr->protocol:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," direction=%c",0x0022);
-		fprintf(h,"%s",(pptr->direction?pptr->direction:""));
+		fprintf(h," range=%c",0x0022);
+		fprintf(h,"%s",(pptr->range?pptr->range:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," address=%c",0x0022);
-		fprintf(h,"%s",(pptr->address?pptr->address:""));
+		fprintf(h," from=%c",0x0022);
+		fprintf(h,"%s",(pptr->from?pptr->from:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," number=%c",0x0022);
-		fprintf(h,"%u",pptr->number);
-		fprintf(h,"%c",0x0022);
-		fprintf(h," target=%c",0x0022);
-		fprintf(h,"%u",pptr->target);
+		fprintf(h," to=%c",0x0022);
+		fprintf(h,"%s",(pptr->to?pptr->to:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," status=%c",0x0022);
 		fprintf(h,"%u",pptr->status);
@@ -230,14 +225,12 @@ private void set_cords_port_field(
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "protocol" ) ))
 			pptr->protocol = allocate_string(vptr);
-		if (!( strcmp( nptr, "direction" ) ))
-			pptr->direction = allocate_string(vptr);
-		if (!( strcmp( nptr, "address" ) ))
-			pptr->address = allocate_string(vptr);
-		if (!( strcmp( nptr, "number" ) ))
-			pptr->number = atoi(vptr);
-		if (!( strcmp( nptr, "target" ) ))
-			pptr->target = atoi(vptr);
+		if (!( strcmp( nptr, "range" ) ))
+			pptr->range = allocate_string(vptr);
+		if (!( strcmp( nptr, "from" ) ))
+			pptr->from = allocate_string(vptr);
+		if (!( strcmp( nptr, "to" ) ))
+			pptr->to = allocate_string(vptr);
 		if (!( strcmp( nptr, "status" ) ))
 			pptr->status = atoi(vptr);
 		}
@@ -292,22 +285,27 @@ private int pass_cords_port_filter(
 		else if ( strcmp(pptr->protocol,fptr->protocol) != 0)
 			return(0);
 		}
-	if (( fptr->direction )
-	&&  (strlen( fptr->direction ) != 0)) {
-		if (!( pptr->direction ))
+	if (( fptr->range )
+	&&  (strlen( fptr->range ) != 0)) {
+		if (!( pptr->range ))
 			return(0);
-		else if ( strcmp(pptr->direction,fptr->direction) != 0)
-			return(0);
-		}
-	if (( fptr->address )
-	&&  (strlen( fptr->address ) != 0)) {
-		if (!( pptr->address ))
-			return(0);
-		else if ( strcmp(pptr->address,fptr->address) != 0)
+		else if ( strcmp(pptr->range,fptr->range) != 0)
 			return(0);
 		}
-	if (( fptr->number ) && ( pptr->number != fptr->number )) return(0);
-	if (( fptr->target ) && ( pptr->target != fptr->target )) return(0);
+	if (( fptr->from )
+	&&  (strlen( fptr->from ) != 0)) {
+		if (!( pptr->from ))
+			return(0);
+		else if ( strcmp(pptr->from,fptr->from) != 0)
+			return(0);
+		}
+	if (( fptr->to )
+	&&  (strlen( fptr->to ) != 0)) {
+		if (!( pptr->to ))
+			return(0);
+		else if ( strcmp(pptr->to,fptr->to) != 0)
+			return(0);
+		}
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
@@ -333,16 +331,13 @@ private struct rest_response * cords_port_occi_response(
 	sprintf(cptr->buffer,"%s.%s.protocol=%s",optr->domain,optr->id,pptr->protocol);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.direction=%s",optr->domain,optr->id,pptr->direction);
+	sprintf(cptr->buffer,"%s.%s.range=%s",optr->domain,optr->id,pptr->range);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.address=%s",optr->domain,optr->id,pptr->address);
+	sprintf(cptr->buffer,"%s.%s.from=%s",optr->domain,optr->id,pptr->from);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.number=%u",optr->domain,optr->id,pptr->number);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.target=%u",optr->domain,optr->id,pptr->target);
+	sprintf(cptr->buffer,"%s.%s.to=%s",optr->domain,optr->id,pptr->to);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
@@ -758,13 +753,11 @@ public struct occi_category * occi_cords_port_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "protocol",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "direction",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "range",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "address",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "from",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "to",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
@@ -836,7 +829,7 @@ public struct rest_header *  cords_port_occi_headers(struct cords_port * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_port.direction='%s'\r\n",(sptr->direction?sptr->direction:""));
+	sprintf(buffer,"occi.cords_port.range='%s'\r\n",(sptr->range?sptr->range:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -847,7 +840,7 @@ public struct rest_header *  cords_port_occi_headers(struct cords_port * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_port.address='%s'\r\n",(sptr->address?sptr->address:""));
+	sprintf(buffer,"occi.cords_port.from='%s'\r\n",(sptr->from?sptr->from:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -858,18 +851,7 @@ public struct rest_header *  cords_port_occi_headers(struct cords_port * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_port.number='%u'\r\n",sptr->number);
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_port.target='%u'\r\n",sptr->target);
+	sprintf(buffer,"occi.cords_port.to='%s'\r\n",(sptr->to?sptr->to:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

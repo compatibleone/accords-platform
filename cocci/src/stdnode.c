@@ -25,7 +25,7 @@
 /*	-----------------------------------------------------------------	*/
 /*		r e l e a s e _ s t a n d a r d _ m e s s a g e 		*/
 /*	-----------------------------------------------------------------	*/
-private	void	release_standard_message( struct standard_message * mptr )
+public	void	release_standard_message( struct standard_message * mptr )
 {
 	if ( mptr->id )
 		mptr->id = liberate( mptr->id );

@@ -41,10 +41,12 @@ public struct cords_port * liberate_cords_port(struct cords_port * sptr)
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->protocol )
 			 sptr->protocol = liberate(sptr->protocol);
-		if ( sptr->direction )
-			 sptr->direction = liberate(sptr->direction);
-		if ( sptr->address )
-			 sptr->address = liberate(sptr->address);
+		if ( sptr->range )
+			 sptr->range = liberate(sptr->range);
+		if ( sptr->from )
+			 sptr->from = liberate(sptr->from);
+		if ( sptr->to )
+			 sptr->to = liberate(sptr->to);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_port *) 0);
@@ -62,10 +64,9 @@ public struct cords_port * reset_cords_port(struct cords_port * sptr)
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->protocol = (char*) 0;
-		sptr->direction = (char*) 0;
-		sptr->address = (char*) 0;
-		sptr->number =  0;
-		sptr->target =  0;
+		sptr->range = (char*) 0;
+		sptr->from = (char*) 0;
+		sptr->to = (char*) 0;
 		sptr->status =  0;
 	}
 	return(sptr);
@@ -109,21 +110,17 @@ public int xmlin_cords_port(struct cords_port * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->protocol = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"direction") ))
+		else if (!( strcmp(wptr->name,"range") ))
 		{
-			if ( wptr->value ) { sptr->direction = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->range = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"address") ))
+		else if (!( strcmp(wptr->name,"from") ))
 		{
-			if ( wptr->value ) { sptr->address = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->from = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"number") ))
+		else if (!( strcmp(wptr->name,"to") ))
 		{
-			if ( wptr->value ) { sptr->number = atoi(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"target") ))
-		{
-			if ( wptr->value ) { sptr->target = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->to = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"status") ))
 		{
@@ -147,10 +144,9 @@ public int rest_occi_cords_port(FILE * fh,struct cords_port * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.protocol='%s'\r\n",prefix,nptr,(sptr->protocol?sptr->protocol:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.direction='%s'\r\n",prefix,nptr,(sptr->direction?sptr->direction:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.address='%s'\r\n",prefix,nptr,(sptr->address?sptr->address:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%u'\r\n",prefix,nptr,sptr->number);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%u'\r\n",prefix,nptr,sptr->target);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.range='%s'\r\n",prefix,nptr,(sptr->range?sptr->range:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.from='%s'\r\n",prefix,nptr,(sptr->from?sptr->from:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.to='%s'\r\n",prefix,nptr,(sptr->to?sptr->to:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 

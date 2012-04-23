@@ -8,10 +8,9 @@ struct	cords_port
 	char *	name;
 	char *	description;
 	char *	protocol;
-	char *	direction;
-	char *	address;
-	int	number;
-	int	target;
+	char *	range;
+	char *	from;
+	char *	to;
 	int	status;
 };
 

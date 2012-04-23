@@ -38,7 +38,7 @@
 #define	_CORDS_GLOBAL	"global"
 #define	_CORDS_TO	"to"
 #define	_CORDS_FROM	"from"
-#define	_CORDS_PROTOTYPE "prototype"
+#define	_CORDS_PROTOCOL "protocol"
 
 /*	------------------------	*/
 /*	cords action identifiers	*/

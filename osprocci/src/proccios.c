@@ -948,24 +948,24 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 			/* ---------------------------------- */
 			/* retrieve the port rule information */
 			/* ---------------------------------- */
-			if (!( rulename = occi_extract_atribut( port.message, "occi", 
+			if ((!( rulename = occi_extract_atribut( port.message, "occi", 
 				_CORDS_PORT, _CORDS_NAME ) ))
-				return(0);
-			else if (!( ruleproto = occi_extract_atribut( port.message, "occi", 
-				_CORDS_PORT, _CORDS_PROTOTYPE ) ))
-				return(0);
-			else if (!( rulefrom = occi_extract_atribut( port.message, "occi", 
+			||  (!( ruleproto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_PROTOCOL ) ))
+			||  (!( rulefrom = occi_extract_atribut( port.message, "occi", 
 				_CORDS_PORT, _CORDS_FROM ) ))
+			||  (!( ruleto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_TO   ) )) )
+			{
+				release_standard_message( &port );
+				release_standard_message( &firewall );
 				return(0);
-			else if (!( ruleto = occi_extract_atribut( port.message, "occi", 
-				_CORDS_PORT, _CORDS_TO ) ))
-				return(0);
-
+			}
 			/* ---------------------------------- */
 			/* add the rule to the security group */
 			/* ---------------------------------- */
 			if (!( filename = os_create_security_rule_request( 
-					pptr->group, rulename, ruleproto, rulefrom, ruleto ) ))
+					pptr->group, ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
 				return(0);
 			else if (!( osptr = os_create_security_rule( filename ) ))
 			{
@@ -978,6 +978,8 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 				liberate( filename );
 			}
 		}
+		release_standard_message( &port );
+		release_standard_message( &firewall );
 		return(0);
 	}
 }

@@ -40,7 +40,7 @@ struct	standard_node
 	struct	standard_message port;
 };
 
-private	void			release_standard_message( struct standard_message * mptr );
+public	void			release_standard_message( struct standard_message * mptr );
 public	int			get_standard_message( struct standard_message * mptr, char * id, char * agent, char * tls );
 public	struct 	occi_element * 	first_standard_message_link( struct occi_response * zptr );
 public	struct 	occi_element * 	next_standard_message_link( struct occi_element * eptr );
