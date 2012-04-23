@@ -142,6 +142,10 @@ private void autoload_cords_user_nodes() {
 				pptr->password = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "role" )) != (struct xml_atribut *) 0)
 				pptr->role = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "email" )) != (struct xml_atribut *) 0)
+				pptr->email = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "authorization" )) != (struct xml_atribut *) 0)
 				pptr->authorization = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -184,6 +188,12 @@ public  void autosave_cords_user_nodes() {
 		fprintf(h," role=%c",0x0022);
 		fprintf(h,"%s",(pptr->role?pptr->role:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," email=%c",0x0022);
+		fprintf(h,"%s",(pptr->email?pptr->email:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," authorization=%c",0x0022);
 		fprintf(h,"%s",(pptr->authorization?pptr->authorization:""));
 		fprintf(h,"%c",0x0022);
@@ -220,6 +230,10 @@ private void set_cords_user_field(
 			pptr->password = allocate_string(vptr);
 		if (!( strcmp( nptr, "role" ) ))
 			pptr->role = allocate_string(vptr);
+		if (!( strcmp( nptr, "email" ) ))
+			pptr->email = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "authorization" ) ))
 			pptr->authorization = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -278,6 +292,20 @@ private int pass_cords_user_filter(
 		else if ( strcmp(pptr->role,fptr->role) != 0)
 			return(0);
 		}
+	if (( fptr->email )
+	&&  (strlen( fptr->email ) != 0)) {
+		if (!( pptr->email ))
+			return(0);
+		else if ( strcmp(pptr->email,fptr->email) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
 	if (( fptr->authorization )
 	&&  (strlen( fptr->authorization ) != 0)) {
 		if (!( pptr->authorization ))
@@ -309,6 +337,12 @@ private struct rest_response * cords_user_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.role=%s",optr->domain,optr->id,pptr->role);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.email=%s",optr->domain,optr->id,pptr->email);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.authorization=%s",optr->domain,optr->id,pptr->authorization);
@@ -730,6 +764,10 @@ public struct occi_category * occi_cords_user_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "role",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "email",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "authorization",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
@@ -794,6 +832,28 @@ public struct rest_header *  cords_user_occi_headers(struct cords_user * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_user.role='%s'\r\n",(sptr->role?sptr->role:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_user.email='%s'\r\n",(sptr->email?sptr->email:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_user.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

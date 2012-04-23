@@ -28,6 +28,7 @@
 #include "json.h"
 #include "document.h"
 #include "occicat.h"
+#include "restlog.h"
 
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
@@ -62,7 +63,7 @@ private	int	occi_check_response_authorization( struct rest_response * rptr )
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a d d _ d e f a u l t _ h e a d e r	*/
 /*	------------------------------------------------------------	*/
-private	struct	rest_header * occi_add_default_header(struct rest_header  * hptr)
+public 	struct	rest_header * occi_add_default_header(struct rest_header  * hptr)
 {
 	struct	rest_header * rptr;
 
@@ -76,6 +77,22 @@ private	struct	rest_header * occi_add_default_header(struct rest_header  * hptr)
 		rptr->next = hptr;
 	}
 	return( hptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		   o c c i _ a d d _ d e f a u l t _ h e a d e r	*/
+/*	------------------------------------------------------------	*/
+public	void	occi_drop_default_headers()
+{
+	struct	rest_header * rptr;
+
+	while (( rptr = OcciManager.headers ) != (struct rest_header *) 0)
+	{
+		OcciManager.headers = rptr->next;
+		rptr->next = rptr->previous = (struct rest_header *) 0;
+		liberate_rest_header( rptr );
+	}
+	return;
 }
 
 /*	------------------------------------------------------------	*/
@@ -275,6 +292,8 @@ private	struct	occi_category * occi_resolve_category( struct occi_category * cpt
 			continue;
 		else if (!( strcmp( cptr->id, nptr ) ))
 			break;
+		else if (!( cptr->location ))
+			continue;
 		else if (!( strncmp( nptr, cptr->location, strlen(cptr->location) ) ))
 			break;
 	}
@@ -695,6 +714,7 @@ private	struct occi_category * 	occi_client_add_category(
 		char * sptr )
 {
 	struct	occi_category * optr;
+	struct	occi_category * xptr;
 	if (!( cptr ))
 		return((struct occi_category *) 0);
 	else if (!( sptr ))
@@ -703,11 +723,17 @@ private	struct occi_category * 	occi_client_add_category(
 		return( optr );
 	else
 	{
+		xptr = optr;
 		cptr->categories++;
+		while ( xptr->next )
+		{
+			cptr->categories++;
+			xptr = xptr->next;
+		}
 		if (!( optr->previous = cptr->lastcat ))
 			cptr->firstcat = optr;
 		else	optr->previous->next = optr;
-		return((cptr->lastcat = optr));
+		return((cptr->lastcat = xptr));
 	}
 }
 
@@ -830,6 +856,7 @@ private	struct	occi_client * occi_analyse_text_categories( struct occi_client * 
 {
 	char	buffer[8192];
 	struct	rest_header * hptr=(struct rest_header *) 0;
+	char *	nptr;
 	FILE *	h;
 	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
 		return( occi_analyse_http_categories( cptr, rptr ) );
@@ -839,6 +866,24 @@ private	struct	occi_client * occi_analyse_text_categories( struct occi_client * 
 		return( occi_analyse_http_categories( cptr, rptr ) );
 	else
 	{
+		while ((nptr = fgets(buffer,8000,h)) != (char *) 0)
+		{
+			while ( *nptr == ' ' ) nptr++;
+			if (!( strncasecmp( nptr, _OCCI_CATEGORY, strlen( _OCCI_CATEGORY ) ) ))
+			{
+				nptr += strlen( _OCCI_CATEGORY );
+				while ( *nptr == ' ' ) nptr++;
+				if ( *nptr != ':' )				
+					continue;
+				else 	nptr++;
+				while ( *nptr == ' ' ) nptr++;
+				if (!( occi_client_add_category( cptr, nptr ) ))
+				{
+					cptr = occi_delete_client( cptr );
+					break;
+				}
+			}
+		}
 		fclose(h);
 		return( cptr );
 	}

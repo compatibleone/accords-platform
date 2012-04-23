@@ -81,11 +81,19 @@ private	void	OsOcciProcci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Open Stack OsOcciProcci : Version 1.0a.0.01");
-	printf("\n   Beta Version : 02/04/2012");
+	printf("\n   CompatibleOne Open Stack OsOcciProcci : Version 1.0a.0.02");
+	printf("\n   Beta Version : 19/04/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();
+	printf("\n");
+	printf("\nCommand Line Operation:");
+	printf("\n   -i --host {host} --tenant {tenant} ... ");
+	printf("\n      --user {user} --pass   {pass}   {command line syntax} \n");
+	printf("\nCommand Line Syntax:");
+	printf("\n   LIST   [ COMPUTE | NETWORK | STORAGE ] ");
+	printf("\n   GET    [ COMPUTE | NETWORK | STORAGE ] {id} ");
+	printf("\n   DELETE [ COMPUTE | NETWORK | STORAGE ] {id} ");
 	printf("\n\n");
 	return(0);
 
@@ -132,72 +140,7 @@ private	struct rest_extension * OsOcciProcci_extension( void * v,struct rest_ser
 
 #include "osocciclient.c"
 #include "osoccicontract.c"
-
-/*	-------------------------------------------	*/
-/* 	      c r e a t e _ o p e n s t a c k  		*/
-/*	-------------------------------------------	*/
-private	int	create_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
-		return( 0 ); 
-	else	return(create_openstack_contract( optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ o p e n s t a c k  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ o p e n s t a c k 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ o p e n s t a c k  		*/
-/*	-------------------------------------------	*/
-private	int	delete_openstack(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
-}
-
-private	struct	occi_interface	openstack_interface = {
-	create_openstack,
-	retrieve_openstack,
-	update_openstack,
-	delete_openstack
-	};
-
+#include "occios.c"
 
 /*	-------------------------------------------	*/
 /* 	       b u i l d _ o p e n s t a c k  		*/
@@ -218,15 +161,15 @@ private	struct	occi_category * build_occi_openstack( char * domain )
 		optr->access |= _OCCI_PROVIDER;
 		optr->callback  = &openstack_interface;
 
+		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_occi_openstack)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_occi_openstack)))
+			return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
-		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_SAVE,"",save_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_openstack)))
-			return( optr );
-		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_openstack)))
-			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_SUSPEND,"",suspend_openstack)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_RESTART,"",restart_openstack)))
@@ -260,6 +203,7 @@ private	struct	occi_category * build_occi_openstack( char * domain )
 private	struct	occi_category * build_occi_openstack_configuration( char * domain )
 {
 	struct	occi_category * optr;
+
 	if (!( optr = occi_cords_osconfig_builder( domain, "occi_openstack_configuration" ) ))
 		return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
@@ -281,6 +225,8 @@ private	int	OsOcciProcci_operation( char * nptr )
 	struct	occi_category * optr=(struct occi_category *) 0;
 
 	set_autosave_cords_xlink_name("links_openstack.xml");
+	set_autosave_os_config_name("osocci_config.xml");
+	set_autosave_openstack_name("osocci_openstack.xml");
 
 	if (!( optr = build_occi_openstack( OsOcciProcci.domain ) ))
 		return( 27 );
@@ -313,6 +259,238 @@ private	int	OsOcciProcci_operation( char * nptr )
 	}
 }
 
+/*	--------------------------------------------------	*/
+/*		o c c i _ o s _ d r a w l i n e			*/
+/*	--------------------------------------------------	*/
+private	void	occi_drawline()
+{
+	printf("--------------------------------------------------------------\n");
+	return;
+}
+
+/*	------------------------------------------------------------------	*/
+/*			o s o c c i c o m a n d r e s p o n s e 		*/
+/*	------------------------------------------------------------------	*/
+private	int	occi_os_command_response( 
+			char * command ,char * subject, char * extra,
+			struct rest_response * qptr )
+{
+	int	c;
+	struct	rest_header * hptr;
+	FILE *	h;
+	occi_drawline();
+	printf("\nOCCI OS COMMAND: %s %s %s \n", command, subject, (extra ? extra : "\0") );
+	if (!( qptr ))
+	{
+		printf("NO REST RESPONSE !\n");
+		occi_drawline();
+		return(32);
+	}
+	else if (!( qptr = process_occi_os_attributes( qptr )))
+	{
+		printf("BODY PROCESSING FAILURE !\n");
+		occi_drawline();
+		return(32);
+	}
+	else
+	{
+		occi_drawline();
+		printf("REST RESPONSE: %u %s\n",qptr->status, qptr->message);
+		occi_drawline();
+		printf("REST HEADER: \n");
+		for (	hptr=qptr->first;
+			hptr != (struct rest_header *) 0;
+			hptr = hptr->next )
+		{
+			if ( hptr->name )
+			{
+				printf("%s:",hptr->name);
+				if ( hptr->value )
+					printf("%s",hptr->value);
+				printf("\n");
+			}
+		}
+		occi_drawline();
+		if ( qptr->body )
+		{
+			printf("REST BODY: %s\n",qptr->body);
+			occi_drawline();
+			if (( h = fopen( qptr->body, "r")) !=(FILE *) 0)
+			{
+				while ((c = fgetc(h)) != -1)
+				{
+					if (!( c ))
+						break;
+					else 	printf("%c",c);
+				}
+				fclose(h);
+			}
+			printf("\n");
+			occi_drawline();
+		}
+		qptr = liberate_rest_response( qptr );
+		return( 0 );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			o s o c c i p r o c c i l a u n c h			*/
+/*	------------------------------------------------------------------	*/
+private	int	OsOcciProcciLaunch( 
+		char * host, char * user, char * pass, char * tenant, 
+		char * command, char * subject, char * extra )
+{
+	struct	rest_response * rptr;
+	if (!( host    ))	return(30);
+	if (!( user    ))	return(30);
+	if (!( pass    ))	return(30);
+	if (!( tenant  ))	return(30);
+	if (!( command ))	return(30);
+	if (!( subject ))	return(30);
+
+	os_occi_initialise_client( user, pass, host, tenant, "osocciprocci/1.0a", (char *) 0);
+
+	if (!( strcasecmp( command, "list" ) ))
+	{
+		if (!( strcasecmp( subject, "compute" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, 
+				get_occi_os_compute( 
+				occi_os_category_url( "/compute/" ) ) ));
+		}
+
+		else if (!( strcasecmp( subject, "network" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, 
+				get_occi_os_network( 
+				occi_os_category_url( "/network/" ) ) ));
+		}
+		else if (!( strcasecmp( subject, "storage" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, 
+				get_occi_os_storage( 
+				occi_os_category_url( "/storage/" ) ) ));
+		}
+		else
+		{
+			printf("\nincorrect subject : %s %s \n",command, subject );
+			return( 30 );
+		}
+
+	}
+	else if (!( strcasecmp( command, "get" ) ))
+	{
+		if (!( strcasecmp( subject, "compute" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, get_occi_os_compute( extra ) ));
+		}
+
+		else if (!( strcasecmp( subject, "storage" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, get_occi_os_storage( extra ) ));
+		}
+
+		else if (!( strcasecmp( subject, "network" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, get_occi_os_network( extra ) ));
+		}
+
+		else
+		{
+			printf("\nincorrect subject : %s %s \n",command, subject );
+			return( 30 );
+		}
+	}
+	else if (!( strcasecmp( command, "delete" ) ))
+	{
+		if (!( strcasecmp( subject, "compute" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, delete_occi_os_compute( extra ) ));
+		}
+
+		else if (!( strcasecmp( subject, "storage" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, delete_occi_os_storage( extra ) ));
+		}
+
+		else if (!( strcasecmp( subject, "network" ) ))
+		{
+			return( occi_os_command_response( command, subject, extra, delete_occi_os_network( extra ) ));
+		}
+		else
+		{
+			printf("\nincorrect subject : %s %s \n",command, subject );
+			return( 30 );
+		}
+	}
+	else
+	{
+		printf("\nincorrect command : %s \n",command );
+		return( 30 );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			o s o c c i p r o c c i c o m m a n d			*/
+/*	------------------------------------------------------------------	*/
+private	int	OsOcciProcciCommand( int argi, int argc, char * argv[] )
+{
+	int	c;
+	int	status=0;
+	char *	aptr;
+	char *	host;
+	char *	pass;
+	char *	tenant;
+	char * 	user;
+	char *	command=(char *) 0;
+	char *	subject=(char *) 0;
+	while ( argi < argc )
+	{
+		if (!( aptr = argv[++argi] ))
+			break;
+		else if ( *aptr == '-' )
+		{
+			aptr++;
+			switch((c = *(aptr++)))
+			{
+			case	'-'	:
+				if (!( strcmp( aptr, "host" ) ))
+				{
+					host = argv[++argi];
+					continue;
+				}
+				else if (!( strcmp( aptr, "user" ) ))
+				{
+					user = argv[++argi];
+					continue;
+				}
+				else if (!( strcmp( aptr, "pass" ) ))
+				{
+					pass = argv[++argi];
+					continue;
+				}
+				else if (!( strcmp( aptr, "tenant" ) ))
+				{
+					tenant = argv[++argi];
+					continue;
+				}
+				else	
+				{
+					printf("\nIncorrect command line option: --%s \n",aptr );
+					return(30);
+				}
+			default		:
+				printf("\nIncorrect command line option: -%c%s \n",c,aptr );
+				return(30);
+			}
+		}
+		else if (!( command ))
+			command = aptr;
+		else 	return( OsOcciProcciLaunch( host, user, pass, tenant, command, aptr, argv[++argi] ) );
+	}
+	return(0);
+}	
+
 
 /*	------------------------------------------------------------------	*/
 /*				o s o c c i p r o c c i m a i n 		*/
@@ -332,6 +510,8 @@ private	int	OsOcciProcciMain(int argc, char * argv[] )
 			aptr++;
 			switch( *(aptr++) )
 			{
+			case	'i'	:
+				return( OsOcciProcciCommand( argi, argc, argv ) );
 			case	'v'	:
 				OsOcciProcci.verbose=1;
 				continue;
@@ -354,7 +534,7 @@ private	int	OsOcciProcciMain(int argc, char * argv[] )
 }
 
 /*	------------------------------------------------------------------	*/
-/*					m a i n 							*/
+/*					m a i n 				*/
 /*	------------------------------------------------------------------	*/
 public	int	main(int argc, char * argv[] )
 {

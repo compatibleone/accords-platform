@@ -104,6 +104,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( ( detail ? os_list_image_details() : os_list_images()) );
 		else if (!( strcasecmp( p2, "ADDRESSES" ) ))
 			os_result( ( detail ? os_list_floating_ip_details() : os_list_floating_ips()) );
+		else if (!( strcasecmp( p2, "GROUPS" ) ))
+			os_result( ( detail ? os_list_security_group_details() : os_list_security_groups()) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -150,6 +152,26 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"GROUP" ) ))
+	{
+		if (!( nomfic = os_create_security_group_request( p2 ) ))
+			return( failure(27,"cannot create","security group request" ) );
+		else
+		{ 	
+			os_result( os_create_security_group( nomfic ) );
+			return( 0 );
+		}
+	}
+	else if (!( strcasecmp(p1,"RULE" ) ))
+	{
+		if (!( nomfic = os_create_security_rule_request( p2, p3, p4, p5, "0.0.0.0/0" ) ))
+			return( failure(27,"cannot create","security rule request" ) );
+		else
+		{ 	
+			os_result( os_create_security_rule( nomfic ) );
+			return( 0 );
+		}
+	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
@@ -162,6 +184,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_get_image( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_get_address( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			os_result( os_get_security_group( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_get_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -192,6 +216,10 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_delete_address( p3 ) );
+		else if (!( strcasecmp( p2, "GROUP" ) ))
+			os_result( os_delete_security_group( p3 ) );
+		else if (!( strcasecmp( p2, "RULE" ) ))
+			os_result( os_delete_security_rule( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_delete_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -209,6 +237,7 @@ private	int	os_command(int argc, char * argv[] )
 	char *	user=(char *) 0;
 	char *	pass=(char *) 0;
 	char *	host=(char *) 0;
+	char *	tenant=(char *) 0;
 	char *	agent="CO-OSCLIENT/1.0";
 	char *	version="v1.1";
 
@@ -226,7 +255,7 @@ private	int	os_command(int argc, char * argv[] )
 				return( failure( status, "missing", "--user parameter" ) );
 			else if (!( pass ))
 				return( failure( status, "missing", "--password parameter" ) );
-			else if ((status = os_initialise_client( user, pass, host, agent, version, tls )) != 0)
+			else if ((status = os_initialise_client( user, pass, tenant, host, agent, version, tls )) != 0)
 				return( failure( status, "initialising", "client" ) );
 			else 	return( os_operation( aptr, 
 					( argi < argc ? argv[argi] : (char *) 0 ),
@@ -242,6 +271,8 @@ private	int	os_command(int argc, char * argv[] )
 				user = argv[argi++];
 			else if (!( strcasecmp( aptr,"password" ) ))
 				pass = argv[argi++];
+			else if (!( strcasecmp( aptr,"tenant" ) ))
+				tenant = argv[argi++];
 			else if (!( strcasecmp( aptr,"version" ) ))
 				version = argv[argi++];
 			else if (!( strcasecmp( aptr,"detail" ) ))
@@ -277,25 +308,28 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0a.0.06");
-	printf("\n   Beta Version 25/02/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.01");
+	printf("\n   Beta Version 22/04/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | METADATA <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | METADATA <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
+	printf("\n   GROUP    <name> ");
+	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | METADATA ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");
 	printf("\n     --password <value>    set account password  ");
+	printf("\n     --tenant <value>      set account tenant    ");
 	printf("\n     --host <hostname>     set host name         ");
 	printf("\n     --version <value>     set host version      ");
 	printf("\n     --agent   <name>      set test agent name   ");

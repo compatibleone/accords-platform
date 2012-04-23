@@ -77,9 +77,9 @@ private	struct	os_config * resolve_os_occi_configuration( char * sptr )
 		else if (!( pptr->name ))
 			continue;
 		else if (!( strcmp( pptr->name, sptr ) ))
-			break;
+			return( pptr );
 	}
-	return( pptr );
+	return((struct os_config *) 0);
 }
 
 /*	--------------------------------------------------------	*/
@@ -91,14 +91,16 @@ private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 
 	if (!( pptr = resolve_os_occi_configuration( sptr )))
 	 	return( pptr );
-#ifdef	_OS_OCCI_PROCCI_TRUC
-	TODO
-	else 	return( os_initialise_client( 
+	else if (!( 
+	 	os_occi_initialise_client( 
 			pptr->user, pptr->password, 
-			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
-#else
-	return(pptr);
-#endif
+			pptr->host, pptr->namespace, _CORDS_OS_AGENT, pptr->tls ) ))
+			return((struct os_config *) 0);
+	else
+	{
+		check_keystone_authorization();
+		return( pptr );
+	}
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -140,21 +142,31 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 	struct	occi_client * cptr;
 	struct	occi_category * kptr;
 
+	if (!( hptr = keystone_credentials() ))
+		return( hptr );
+	else 	occi_add_default_header( hptr );
+
 	if (!( cptr = occi_create_client( host, _CORDS_OS_AGENT, default_tls() ) ))
+	{
+		occi_drop_default_headers();
 		return( root );
+	}
 	else
 	{
+		occi_drop_default_headers();
 		for (	kptr=cptr->firstcat;
 			kptr != (struct occi_category *) 0;
 			kptr = kptr->next )
 		{
 			if (!( kptr->scheme ))
 				continue;
-			else if ( strcmp( kptr->scheme, scheme ) )
+			else if (!( kptr->rel ))
+				continue;
+			else if ( strcmp( kptr->rel, scheme ) )
 				continue;
 			else if (!( hptr = allocate_rest_header() ))
 				continue;
-			else if (!( hptr->name = allocate_string( scheme ) ))
+			else if (!( hptr->value = allocate_string( kptr->scheme ) ))
 			{
 				hptr = liberate_rest_header( hptr );
 				continue;
@@ -181,7 +193,7 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 /*	----------------------------------------------------------	*/
 private struct rest_header * occi_list_os_templates(char * host)
 {
-	return( occi_list_mixins( "http://schemas.openstack.org/template/os#", host ) );
+	return( occi_list_mixins( _OCCI_OS_TEMPLATE, host ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -189,14 +201,56 @@ private struct rest_header * occi_list_os_templates(char * host)
 /*	----------------------------------------------------------	*/
 private char * resolve_os_template( struct cords_os_contract * cptr )
 {
-	return("(null)");
+	struct	rest_header * hptr;
+	char *	vptr;
+	char *	sysname;
+	char *	bestcase=(char *) 0;
+	char 	buffer[2048];
+	/* ---------------------------------------------------------- */
+	/* retrieve appropriate parameters from node image components */
+	/* ---------------------------------------------------------- */
+	if (!( vptr = occi_extract_atribut( cptr->system.message, "occi", 
+		_CORDS_SYSTEM, _CORDS_NAME ) ))
+		return((char *) 0);
+	else	sysname = vptr;
+
+	/* ----------------------------------------- */
+	/* scan the list of os templates for a match */
+	/* ----------------------------------------- */
+	for ( 	hptr=cptr->images;
+		hptr != (struct rest_header * ) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		if (!( hptr->value ))
+			continue;
+		if  (!( strncasecmp( sysname,  hptr->name, strlen( sysname  ) )))
+		{
+			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+			return( allocate_string( buffer ) );
+		}
+		else 
+		{
+			if  (!( strncasecmp( hptr->name, sysname,  strlen(hptr->name)  ) ))
+			{
+				sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+				return( allocate_string( buffer ) );
+			}
+			else	continue;
+		}
+	}
+	if (!( bestcase ))
+		return( allocate_string("(null)") );
+	else	return( allocate_string( bestcase ) );
 }
+
 /*	----------------------------------------------------------	*/
 /*	 o c c i _ l i s t _ r e s o u r c e _ t e m p l a t e s	*/
 /*	----------------------------------------------------------	*/
 private struct rest_header * occi_list_resource_templates(char * host)
 {
-	return( occi_list_mixins( "http://schemas.openstack.org/template/resource#", host ) );
+	return( occi_list_mixins( _OCCI_RESOURCE_TEMPLATE, host ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -204,7 +258,31 @@ private struct rest_header * occi_list_resource_templates(char * host)
 /*	----------------------------------------------------------	*/
 private char * resolve_resource_template( struct cords_os_contract * cptr )
 {
-	return("(null)");
+	struct	rest_header * hptr;
+	char *	vptr;
+	char *	machname;
+	char 	buffer[2048];
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_NAME ) ))
+		machname = "none";
+	else	machname = vptr;
+
+	for ( 	hptr=cptr->flavors;
+		hptr != (struct rest_header * ) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( hptr->value ))
+			continue;
+		else if (!( strcmp( hptr->name, machname ) ))
+		{
+			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+			return( allocate_string( buffer ) );
+		}
+		else	continue;
+	}
+	return(allocate_string("(null)"));
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -329,11 +407,11 @@ private	int	delete_openstack_contract(
 		char * tls )
 {
 	struct	os_response * osptr;
+	return( 0 );
 /*
- TODO
+TODO
 	if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
 		osptr = liberate_os_response( osptr );
- */
 	if (!( pptr->image ))
 		return( 0 );
 	else if (!( pptr->original ))
@@ -345,6 +423,7 @@ private	int	delete_openstack_contract(
 		os_delete_image( pptr->image );
 		return(0);
 	}
+*/
 }
 
 

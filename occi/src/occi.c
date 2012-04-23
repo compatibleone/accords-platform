@@ -223,9 +223,11 @@ public 	char *	occi_unquoted_link( char * sptr )
 public	struct	occi_category *	occi_parse_category( char * sptr )
 {
 	struct	occi_category *	optr;
+	struct	occi_category *	xptr;
 	char	*	wptr;
 	char	*	rptr;
 	char	*	vptr;
+	char 		terminator;
 	if (!( optr = allocate_occi_category() ))
 		return( optr );
 	else if (!( wptr = allocate_string( sptr )))
@@ -258,8 +260,23 @@ public	struct	occi_category *	occi_parse_category( char * sptr )
 			{
 				*(sptr++) = 0;
 				vptr = sptr;
-				while (( *sptr ) && ( *sptr != ';')) sptr++;
-				if ( *sptr == ';' ) *(sptr++) = 0;
+				if ( *sptr == 0x0022 )
+				{
+					sptr++;
+					while (( *sptr ) && ( *sptr != 0x0022)) sptr++;
+					while (( *sptr ) && ( *sptr != ';') && ( *sptr != ',')) sptr++;
+				}
+				else
+				{
+					while (( *sptr ) && ( *sptr != ';')) sptr++;
+				}
+				switch (( terminator = *sptr ))
+				{
+				case	';'	:
+				case	','	:
+					*(sptr++) = 0;
+					break;
+				}
 				if (!( strcmp( rptr, "scheme" )))
 					optr->scheme=occi_unquoted_value( vptr );
 				else if (!( strcmp( rptr, "class" )))
@@ -285,6 +302,15 @@ public	struct	occi_category *	occi_parse_category( char * sptr )
 						liberate( wptr );
 						return( optr );
 					}
+				}
+				if ( terminator == ',' )
+				{
+					if ((xptr = occi_parse_category( sptr )) != (struct occi_category *) 0)
+					{
+						xptr->previous = optr;
+						optr->next = xptr;
+					}
+					break;
 				}
 			}
 			else if ( *sptr == ';' )

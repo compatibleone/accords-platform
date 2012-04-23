@@ -105,6 +105,9 @@ public	struct	occi_element  *	occi_request_from_response(struct occi_request * q
 public	struct	rest_header   * occi_client_authentication( char * aptr );
 public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
+public 	struct	rest_header   * occi_add_default_header(struct rest_header  * hptr);
+public 	void			occi_drop_default_headers();
+
 public  char *	occi_extract_location( struct occi_response * rptr );
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
@@ -113,4 +116,5 @@ public	char *	occi_extract_atribut(
 
 #endif 	/* _occi_client_h */
 	/* -------------- */
+
 
