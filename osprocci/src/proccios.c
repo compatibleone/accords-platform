@@ -523,13 +523,18 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		{
 			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
 			{
-				reset_openstack_server( pptr );
-				return( 27 );
-			}
-			if ( check_debug() )
-			{
-				rest_log_message("*** OS PROCCI Testing Build Status ***");
-				rest_log_message( vptr );
+				if ( zptr ) zptr = liberate_os_response( zptr );
+				if (!( zptr = os_get_server( pptr->number )))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
+				else if (!( vptr = json_atribut( zptr->jsonroot, "status" )))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
+				else	yptr = zptr;
 			}
 			if (!( strcmp( vptr, "BUILD" )))
 			{
@@ -552,7 +557,8 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
 
-		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
+		if ((!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
+		&& (!( vptr = pptr->number )))
 		{
 			reset_openstack_server( pptr );
 			return( 27 );
