@@ -10,7 +10,7 @@ lib_LTLIBRARIES = libcorest.la
 EXTRA_DIST = global.h rest.h restpublic.h rests.c \
 	restworker.c tlsconfig.h url.h \
 	restc.c restheader.c restrequest.c restworker.h ssltls.c \
-	connection.h restc.h restheader.h restrequest.h rests.h restworkers.c \
+	restc.h restheader.h restrequest.h rests.h restworkers.c \
 	ssltls.h restresponse.c restthread.c restx.c standard.h \
 	restresponse.h restthread.h restx.h tlsconfig.c url.c
 
