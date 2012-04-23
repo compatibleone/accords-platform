@@ -10,7 +10,7 @@
 #
 
 bin_PROGRAMS = osocciprocci
-EXTRA_DIST = osocciclient.c occios.c
+EXTRA_DIST = osocciclient.c osocciclient.h osoccicontract.c occios.c
 
 osocciprocci_SOURCES = osocciprocci.c 
 

@@ -22,7 +22,10 @@ EXTRA_DIST = occiatb.h occienquiry.c occimachine.c occiparameter.c \
 	occijson.c occioptimise.c occirequest.c occixml.c occiappliance.c \
 	occicontract.c occilink.c occiosconfig.c occirequirement.c \
 	occiatb.c occidomain.c occilink.h occipackage.c occisecurity.c occiiprange.c \
-	occioperator.c occiplacement.c occivm.c
+	occioperator.c occiplacement.c occivm.c occiimport.c occiagreement.c \
+	occiapplication.c occiport.c occifirewall.c occischedule.c occimetadata.c \
+	occiscript.c occifile.c occialert.c occiinterface.c occisession.c occiconsumer.c \
+	occiconnection.c occistream.c occiprobe.c occimetric.c occiquota.c
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
