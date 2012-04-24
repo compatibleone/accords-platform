@@ -23,48 +23,49 @@
 #include "paclient.h"
 #include "cordslang.h"
 
-/* ---------------------------------------------------------------------------------- */
-/* if ((status = pa_initialise_client( user, pass, host, agent, version, tls )) != 0) */
-/* ---------------------------------------------------------------------------------- */
+/*! 
+ * Return the occi_kind_node content such that its name matches the given string parameter. 
+ * The content is always a pa_config*.  
+ * \param sptr name string to match.
+ * \return the matching content of the occi kind list. */
 private	struct	pa_config * resolve_pa_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
-	struct	pa_config * pptr=(struct pa_config *) 0;
-	struct	occi_kind_node  * occi_first_pa_config_node();
-	for (	nptr = occi_first_pa_config_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+	struct	pa_config * pptr=(struct pa_config *) 0;        // Resulting list. 
+	struct	occi_kind_node  * occi_first_pa_config_node();  // This function is somewhere defined. 
+	for (	nptr = occi_first_pa_config_node();             // Get the already existing list of occi kind nodes for this procci. 
+		nptr != (struct occi_kind_node *) 0;                // Traverse them all...
+		nptr = nptr->next )                                 // sptr string name, nptr occi kind node, pptr content of the node. 
 	{
-		if (!( pptr = nptr->contents ))
+		if (!( pptr = nptr->contents ))                     // If the current one has no contents, and inside it has no name, skip it. 
 			continue;
-		else if (!( pptr->name ))
+		else if (!( pptr->name ))                           
 			continue;
-		else if (!( strcmp( pptr->name, sptr ) ))
+		else if (!( strcmp( pptr->name, sptr ) ))           // If the name of the current contents of the occi kind node matches the given string... Return the content.
 			break;
 	}
 	return( pptr );
 }
 
-/*	--------------------------------------------------------	*/
-/* 	 u s e _ p r o a c t i v e _ c o n f i g u r a t i o n 		*/
-/*	--------------------------------------------------------	*/
+/*! 
+ * Loads ProActive account configuration, like user,
+ * password, host, etc. */
 private	int	use_proactive_configuration( char * sptr )
 {
 	struct	pa_config * pptr;
 
-	if (!( pptr = resolve_pa_configuration( sptr )))
+	if (!( pptr = resolve_pa_configuration( sptr ))) // Get from the procci occi kinds list, the node that matches the given string sptr.
 	 	return( 404 );
 
-	else 	return( pa_initialise_client( 
+	else 	return( pa_initialise_client(           // Initialize the current client with the information obtained. 
 			pptr->user, pptr->password, 
 			pptr->host, pptr->agent, pptr->version, pptr->tls,
 			pptr->namespace, pptr->subscription ));
 }
 
-/*	--------------------------------------------------------	*/
-/* 	       r e s e t _ p r o a c t i v e _ s e r v e r		*/
-/*	--------------------------------------------------------	*/
-private	int	reset_proactive_server( struct proactive * pptr )
+/*!
+ * Reset the structure that represents the proactive server. */
+private	int	reset_structure_proactive_server( struct proactive * pptr )
 {
 	if ( pptr )
 	{
@@ -87,69 +88,72 @@ private	int	reset_proactive_server( struct proactive * pptr )
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ i m a g e  		*/
 /*	--------------------------------------------------------	*/
-private	int	connect_proactive_image( struct pa_response * rptr,struct proactive * pptr )
-{
-	struct	pa_response * zptr;
-	struct	pa_response * yptr;
-	char *	vptr;
-	if (!( pptr ))
-		return( 118 );
-	else if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
-	{
-		reset_proactive_server( pptr );
-		return( 27 );
-	}
-	else
-	{
-		if ( pptr->image )
-			pptr->image = liberate( pptr->image );
-		if (!( pptr->image = allocate_string( vptr ) ))
-		{
-			reset_proactive_server( pptr );
-			return( 27 );
-		}
-		autosave_proactive_nodes();
-		/* ----------------------------------------------------- */
-		/* we must now await ACTIVE status to be able to collect */
-		/* the final identification information to complete the  */
-		/* proactive provisioning request.			 */
-		/* ----------------------------------------------------- */
-		yptr = rptr;
-		zptr = (struct pa_response *) 0;
-		while (1)
-		{
-			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
-			{
-				reset_proactive_server( pptr );
-				return( 27 );
-			}
-			else if (!( strcmp( vptr, "SAVING" )))
-			{
-				sleep(1);
-				if ( zptr )
-					zptr = liberate_pa_response( zptr );
-				if (!( zptr = pa_get_image( pptr->image )))
-				{
-					reset_proactive_server( pptr );
-					return( 555 );
-				}
-				else	yptr = zptr;
-			}
-			else if (!( strcmp( vptr, "ACTIVE" )))
-				break;
-		}
-		return( 0 );
-	}
-}
+//private	int	connect_proactive_image( struct pa_response * rptr,struct proactive * pptr )
+//{
+//	struct	pa_response * zptr;
+//	struct	pa_response * yptr;
+//	char *	vptr;
+//	if (!( pptr ))
+//		return( 118 );
+//	else if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
+//	{
+//		reset_structure_proactive_server( pptr );
+//		return( 27 );
+//	}
+//	else
+//	{
+//		if ( pptr->image )
+//			pptr->image = liberate( pptr->image );
+//		if (!( pptr->image = allocate_string( vptr ) ))
+//		{
+//			reset_structure_proactive_server( pptr );
+//			return( 27 );
+//		}
+//		autosave_proactive_nodes();
+//		/* ----------------------------------------------------- */
+//		/* we must now await ACTIVE status to be able to collect */
+//		/* the final identification information to complete the  */
+//		/* proactive provisioning request.			 */
+//		/* ----------------------------------------------------- */
+//		yptr = rptr;
+//		zptr = (struct pa_response *) 0;
+//		while (1)
+//		{
+//			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
+//			{
+//				reset_structure_proactive_server( pptr );
+//				return( 27 );
+//			}
+//			else if (!( strcmp( vptr, "SAVING" )))
+//			{
+//				sleep(1);
+//				if ( zptr )
+//					zptr = liberate_pa_response( zptr );
+//				if (!( zptr = pa_get_image( pptr->image )))
+//				{
+//					reset_structure_proactive_server( pptr );
+//					return( 555 );
+//				}
+//				else	yptr = zptr;
+//			}
+//			else if (!( strcmp( vptr, "ACTIVE" )))
+//				break;
+//		}
+//		return( 0 );
+//	}
+//}
 
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
+/*! This function fills in the struct proactive* given usign the information that lies into 
+ * the pa_response structure. */
 private	int	connect_proactive_server( struct pa_response * rptr,struct proactive * pptr )
 {
 	struct	pa_response * zptr;
 	struct	pa_response * yptr;
 	char *	vptr;
+    // MMM check it.
 	if (!( pptr ))
 		return( 118 );
 	else
@@ -168,22 +172,22 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 
 		if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		else if (!( pptr->number = allocate_string(vptr)))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		else if (!( vptr = json_atribut( rptr->jsonroot, "adminPass") ))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		else if (!( pptr->rootpass  = allocate_string(vptr)))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		autosave_proactive_nodes();
@@ -198,7 +202,7 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		{
 			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
 			{
-				reset_proactive_server( pptr );
+				reset_structure_proactive_server( pptr );
 				return( 27 );
 			}
 			else if (!( strcmp( vptr, "BUILD" )))
@@ -208,7 +212,7 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 					zptr = liberate_pa_response( zptr );
 				if (!( zptr = pa_get_server( pptr->number )))
 				{
-					reset_proactive_server( pptr );
+					reset_structure_proactive_server( pptr );
 					return( 555 );
 				}
 				else	yptr = zptr;
@@ -222,19 +226,19 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
 		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		else if (!( pptr->reference = allocate_string(vptr)))
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			return( 27 );
 		}
 		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
 		{
 			if (!( pptr->privateaddr  = allocate_string(vptr)))
 			{
-				reset_proactive_server( pptr );
+				reset_structure_proactive_server( pptr );
 				return( 27 );
 			}
 		}
@@ -242,7 +246,7 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		{
 			if (!( pptr->publicaddr  = allocate_string(vptr)))
 			{
-				reset_proactive_server( pptr );
+				reset_structure_proactive_server( pptr );
 				return( 27 );
 			}
 		}
@@ -250,7 +254,7 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		{
 			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
 			{
-				reset_proactive_server( pptr );
+				reset_structure_proactive_server( pptr );
 				return( 27 );
 			}
 		}
@@ -258,7 +262,7 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		{
 			if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
 			{
-				reset_proactive_server( pptr );
+				reset_structure_proactive_server( pptr );
 				return( 27 );
 			}
 		}
@@ -269,15 +273,15 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 	}
 }
 
-/*	-------------------------------------------	*/
-/* 	      s t a r t  _ p r o a c t i v e	  	*/
-/*	-------------------------------------------	*/
+/*! 
+ * This function locks one ProActive node. */
 private	struct	rest_response * start_proactive(
 		struct occi_category * optr, 
 		struct rest_client * cptr, 
 		struct rest_request * rptr, 
 		struct rest_response * aptr, 
-		void * vptr )
+		void * vptr )               // It is void* , but is casted to a struct proactive* since the request comes
+                                    // from the occiserver, which receives something generic (related maybe to OpenStack, or OpenNebula, or any other).
 {
 	struct	pa_response * osptr;
 	struct	proactive * pptr;
@@ -285,16 +289,21 @@ private	struct	rest_response * start_proactive(
 	char	*	filename;
 	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
-	if (!( pptr = vptr ))
+	if (!( pptr = vptr ))                                                       // Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )
+	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = pa_create_server_request( 
-		pptr->id, pptr->image, pptr->flavor, personality, resource ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = pa_create_server( filename )))
+    // could be used 
+		//pptr->id, pptr->image, pptr->flavor, personality, resource ) ))
+        //    char * name,
+        //    char * label,
+        //    char * description,
+        //    char * location,
+        //    char * group )
+        //
+	else if (!( osptr = pa_create_server( pptr->id)))                           // Request of a node. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
@@ -324,27 +333,30 @@ private	struct	rest_response * save_proactive(
 	int		status;
 	struct	proactive * pptr;
 	char	*	filename;
-	if (!( pptr = vptr ))
-	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
-		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = pa_create_image_request( pptr->name, pptr->number ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = pa_create_image( filename ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else
-	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_proactive_image( osptr, pptr );
-		osptr = liberate_pa_response( osptr );
-		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	}
+
+    return( rest_html_response( aptr, 404, "Invalid Action" ) ); 
+    
+	//if (!( pptr = vptr ))
+	 	//return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	//else if ( pptr->status == _OCCI_IDLE )
+		//return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+	//else if ((status = use_proactive_configuration( pptr->profile )) != 0)
+		//return( rest_html_response( aptr, status, "Not Found" ) );
+	//else if (!( filename = pa_create_image_request( pptr->name, pptr->number ) ))
+	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
+	//else if (!( osptr = pa_create_image( filename ) ))
+	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
+	//else
+	//{
+		///* --------------------------------- */
+		///* retrieve crucial data from server */
+		///* --------------------------------- */
+		//status = connect_proactive_image( osptr, pptr );
+		//osptr = liberate_pa_response( osptr );
+		//if (!( status ))
+			//return( rest_html_response( aptr, 200, "OK" ) );
+		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	//}
 }
 
 /*	-------------------------------------------	*/
@@ -364,7 +376,7 @@ private	struct	rest_response * stop_proactive(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where the user:pass is)
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if (!( osptr = pa_delete_server( pptr->number )))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -372,7 +384,7 @@ private	struct	rest_response * stop_proactive(
 	{
 		if ( pptr->status != _OCCI_IDLE )
 		{
-			reset_proactive_server( pptr );
+			reset_structure_proactive_server( pptr );
 			pptr->when = time((long *) 0);
 			osptr = liberate_pa_response( osptr );
 		}
@@ -388,7 +400,7 @@ private	struct	rest_response * restart_proactive(
 		struct rest_client * cptr, 
 		struct rest_request * rptr, 
 		struct rest_response * aptr, 
-		void * vptr )
+		void * vptr )                
 {
 	int	status;
 	struct	proactive * pptr;

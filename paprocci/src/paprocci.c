@@ -52,6 +52,8 @@ public	char *	default_publisher()	{	return(WpaProcci.publisher);	}
 public	char *	default_tls()		{	return(WpaProcci.tls);		}
 public	char *	default_operator()	{	return(WpaProcci.operator);	}
 
+/*!
+ * Called in any case of failure in this procci. */
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -67,10 +69,10 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		 o n p r o c c i _ l o a d 		*/
+/*		 p a p r o c c i _ l o a d 		            */
 /*	---------------------------------------------	*/
-/*	this function loads paprocci    configuration	*/
-/*	from the xml configuration file.		*/
+/*	this function loads paprocci configuration	    */
+/*	from the xml configuration file.		        */
 /*	---------------------------------------------	*/  
 private	void	paprocci_load()
 {
@@ -80,7 +82,7 @@ private	void	paprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Windows paure Procci : Version 1.0a.0.03");
+	printf("\n   CompatibleOne ProActive Procci : Version 1.0a.0.03");
 	printf("\n   Beta Version : 28/11/2011");
 	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
 	printf("\n");

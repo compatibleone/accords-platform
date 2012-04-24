@@ -54,6 +54,7 @@ private	struct pa_config Wpa = {
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ p a _ r e s p o n s e			*/
 /*	------------------------------------------------------------	*/
+/*! Free the pa_response structure. */
 public	struct pa_response * liberate_pa_response( struct pa_response * rptr )	
 {
 	if ( rptr )
@@ -74,6 +75,7 @@ public	struct pa_response * liberate_pa_response( struct pa_response * rptr )
 /*	------------------------------------------------------------	*/
 /*		 		p a _ c h e c k 			*/
 /*	------------------------------------------------------------	*/
+/*! Translate (if possible) a rest_response structure into a pa_response one. */
 private	struct	pa_response * pa_check( struct rest_response * aptr )
 {
 	struct	pa_response * rptr=(struct pa_response *) 0;
@@ -82,7 +84,7 @@ private	struct	pa_response * pa_check( struct rest_response * aptr )
 	{
 		if ( check_verbose() )
 		{
-		printf("   OS Client Response : %s %u %s\n",aptr->version,aptr->status,aptr->message);
+		printf("   PA Client Response : %s %u %s\n",aptr->version,aptr->status,aptr->message);
 
 			if ( check_debug() )
 			{
@@ -187,9 +189,8 @@ public	struct	pa_response *
 	return( pa_check( rest_client_put_request( target, tls, nptr, filename, hptr ) ) );
 }
 
-/*	------------------------------------------------------------	*/
-/*			p a _ a u t h e n t i c a t e ()		*/
-/*	------------------------------------------------------------	*/
+/*! 
+ * Prepare rest header for authentication. */
 public	struct	rest_header   *	pa_authenticate	( )
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
@@ -237,6 +238,7 @@ public	struct	pa_response *	proactive_create_operation( char * action, char * fi
 /*	------------------------------------------------------------	*/
 /*		p r o a c t i v e  _ l i s t _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
+/*! Put a raw string list into a pa_response structure. */
 private	struct	pa_response * proactive_list_operation( char * buffer )
 {
 	struct	pa_response	*	rptr=(struct pa_response *) 0;
@@ -265,6 +267,7 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 }
 
 
+/*! Function that calls the Java procci layer. */
 public char * pa_java_procci_call(char * specific_parameters)
 { 
     #define RESULT_SIZE 1024*8
@@ -378,118 +381,106 @@ private	struct	pa_response * proactive_delete_operation( char * buffer )
 /*	------------------------------------------------------------	*/
 /*	     p a _ c r e a t e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_create_affinity_group( char * filename )
-{
-	return( proactive_create_operation("/affinitygroups", filename) );
-}
+//public	struct	pa_response *	pa_create_affinity_group( char * filename )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	   p a _ r e t r i e v e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_retrieve_affinity_group( char * id )
-{
-	char 	buffer[1024];
-	sprintf(buffer,"/affinitygroups/%s",id);
-	return( proactive_retrieve_operation( buffer ) );
-}
+//public	struct	pa_response *	pa_retrieve_affinity_group( char * id )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ u p d a t e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_update_affinity_group( char * filename )
-{
-	return((struct pa_response *) 0);
-}
+//public	struct	pa_response *	pa_update_affinity_group( char * filename )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ d e l e t e _ a f f i n i t y _ g r o u p s		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_delete_affinity_group( char * id )
-{
-	char 	buffer[1024];
-	sprintf(buffer,"/affinitygroups/%s",id);
-	return( proactive_delete_operation( buffer ) );
-}
+//public	struct	pa_response *	pa_delete_affinity_group( char * id )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ a f f i n i t y _ g r o u p s		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_affinity_groups()
-{
-	return( proactive_list_operation( "/affinitygroups" ) );
-}
+//public	struct	pa_response *	pa_list_affinity_groups()
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ c r e a t e _ s t o r a g e _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_create_storage_service( char * filename )
-{
-	return( proactive_create_operation("/services/storageservices", filename) );
-}
+//public	struct	pa_response *	pa_create_storage_service( char * filename )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	   p a _ r e t r i e v e _ s t o r a g e _ s e r v i c e 	*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_retrieve_storage_service( char * id )
-{
-	char 	buffer[1024];
-	sprintf(buffer,"/services/storageservices/%s",id);
-	return( proactive_retrieve_operation( buffer ) );
-}
+//public	struct	pa_response *	pa_retrieve_storage_service( char * id )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ u p d a t e _ s t o r a g e _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_update_storage_service( char * filename )
-{
-	return((struct pa_response *) 0);
-}
+//public	struct	pa_response *	pa_update_storage_service( char * filename )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ d e l e t e _ s t o r a g e _ s e r v i c e		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_delete_storage_service( char * id )
-{
-	char 	buffer[1024];
-	sprintf(buffer,"/services/storageservices/%s",id);
-	return( proactive_delete_operation( buffer ) );
-}
+//public	struct	pa_response *	pa_delete_storage_service( char * id )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ s t o r a g e _ s e r v i c e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_storage_services()
-{
-	return( proactive_list_operation( "/services/storageservices" ) );
-}
+//public	struct	pa_response *	pa_list_storage_services()
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ o p e r a t i o n s			*/
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_operations(char * start,char * end)
 {
-	char buffer[2048];
-	sprintf(buffer,"/operations?StartTime=%s&EndTime=%s",start,end);
-	return( proactive_list_operation( buffer ) );
+	return((struct pa_response *) 0);
 }
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ W A T M _ p r o f i l e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_WATM_profiles()
-{
-	return( proactive_list_operation( "/services/WATM/profiles" ) );
-}
+//public	struct	pa_response *	pa_list_WATM_profiles()
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ W A T M _ definitions			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_WATM_definitions(char * profile )
-{
-	char 	buffer[2048];
-	sprintf(buffer,"/services/WATM/profiles/%s/definitions",profile );
-	return( proactive_list_operation( buffer ) );
-}
+//public	struct	pa_response *	pa_list_WATM_definitions(char * profile )
+//{
+//	return((struct pa_response *) 0);
+//}
 
 /*	------------------------------------------------------------	*/
 /*	     p a _ c r e a t e _ h o s t e d _ s e r v i c e 		*/
@@ -528,7 +519,7 @@ public	struct	pa_response *	pa_delete_hosted_service( char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_hosted_services()
 {
-	return( proactive_list_operation( "/services/hostedservices" ) );
+	return((struct pa_response *) 0);
 }
 
 /*	------------------------------------------------------------	*/
@@ -560,9 +551,7 @@ public	struct	pa_response *	pa_delete_certificate( char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_certificates(char * server)
 {
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates" , server ); 
-	return( proactive_list_operation( buffer ) );
+	return((struct pa_response *) 0);
 }
 
 /*	------------------------------------------------------------	*/
@@ -570,7 +559,7 @@ public	struct	pa_response *	pa_list_certificates(char * server)
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_locations()
 {
-	return( proactive_list_operation( "/locations" ) );
+	return((struct pa_response *) 0);
 }
 
 private char * put_jsonstring_in_file(char * jsontext){
@@ -596,9 +585,10 @@ private char * put_jsonstring_in_file(char * jsontext){
 /*	------------------------------------------------------------	*/
 /*			p a _ l i s t _ s e r v e r s			*/
 /*	------------------------------------------------------------	*/
+/*! List nodes available. */
 public	struct	pa_response *	pa_list_servers	( )
 {
-    //printf("ProActive Listing servers... Using host %s  user %s  pass %s  version %s\n", Wpa.host, Wpa.user, Wpa.password, Wpa.version);
+    //printf("ProActive Listing servers (ProActive nodes)... Using host %s  user %s  pass %s  version %s\n", Wpa.host, Wpa.user, Wpa.password, Wpa.version);
     char * filename = NULL;
     char * raw_list = NULL;
 
@@ -628,184 +618,24 @@ public	struct	pa_response *	pa_list_servers	( )
 /*	------------------------------------------------------------	*/
 /*			p a _ l i s t _ f l a v o u r s			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_flavors( )
-{
-	return( proactive_list_operation( "/flavors" )) ;
-}
+//public	struct	pa_response *	pa_list_flavors( )
+//{
+//	return( proactive_list_operation( "/flavors" )) ;
+//}
 
 
 /*	------------------------------------------------------------	*/
 /*			p a _ l i s t _ i m a g e s 			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_list_images( )
-{
-	return( proactive_list_operation( "/images" ) );
-}
+//public	struct	pa_response *	pa_list_images( )
+//{
+//	return( proactive_list_operation( "/images" ) );
+//}
 
 
 
-/*	------------------------------------------------------------	*/
-/*		p a _ c r e a te _  s e r v e r _ r e q u e s t		*/
-/*	------------------------------------------------------------	*/
-public	char * pa_create_server_request(
-	char * name,
-	char * label,
-	char * description,
-	char * location,
-	char * group )
-{
-	char *	filename;
-	FILE *	h;
-	char 	buffer[1024];
-	int	n;
-	n = EncodeBase64( buffer, label,strlen(label));
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	if (!( h = fopen( filename,"wa" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Wpa.namespace,0x0022);
-		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
-		fprintf(h,"\t<Label>%s</Label>\n",buffer);
-		fprintf(h,"\t<Description>%s</Description>\n",description);
-		if ( group )
-			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
-		else if ( location )
-			fprintf(h,"\t<Location>%s</Location>\n",location);
-		fprintf(h,"</CreateHostedService>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------------	*/
-/*	p a _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t	*/
-/*	------------------------------------------------------------------	*/
-public	char * pa_create_affinity_group_request(
-	char * name,
-	char * label,
-	char * description,
-	char * location )
-{
-	char *	filename;
-	FILE *	h;
-	char 	buffer[1024];
-	int	n;
-	n = EncodeBase64( buffer, label,strlen(label));
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	if (!( h = fopen( filename,"wa" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Wpa.namespace,0x0022);
-		fprintf(h,"\t<Name>%s</Name>\n",name);
-		fprintf(h,"\t<Label>%s</Label>\n",buffer);
-		if ( description )
-			fprintf(h,"\t<Description>%s</Description>\n",description);
-		fprintf(h,"\t<Location>%s</Location>\n",location);
-		fprintf(h,"</CreateAffinityGroup>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------------	*/
-/*	p a _ c r e a t e _  s t o r a g e _ s e r v i c e _ r e q u e s t	*/
-/*	------------------------------------------------------------------	*/
-public	char * pa_create_storage_service_request(
-	char * name,
-	char * label,
-	char * description,
-	char * location,
-	char * group )
-{
-	char *	filename;
-	FILE *	h;
-	char 	buffer[1024];
-	int	n;
-	n = EncodeBase64( buffer, label,strlen(label));
-
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	if (!( h = fopen( filename,"wa" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Wpa.namespace,0x0022);
-		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
-		fprintf(h,"\t<Description>%s</Description>\n",description);
-		fprintf(h,"\t<Label>%s</Label>\n",buffer);
-		if ( group )
-			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
-		else if ( location )
-			fprintf(h,"\t<Location>%s</Location>\n",location);
-		fprintf(h,"</CreateStorageServiceInput>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------	*/
-/*		p a _ c r e a te _  i m a g e _ r e q u e s t		*/
-/*	------------------------------------------------------------	*/
-public	char * pa_create_image_request(char * identity, char * server )
-{
-	char *	filename;
-	FILE *	h;
-
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	else if (!( h = fopen( filename,"wa" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateImage xmlns=%c%s%c\n",0x0022,Wpa.namespace,0x0022);
-		fprintf(h,"\tName=%c%s%c\n",0x0022,identity,0x0022);
-		fprintf(h,"\tDeployment=%c%s%c />\n",0x0022,server,0x0022);
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------	*/
-/*			p a _ c r e a t e _  i m a g e   		*/
-/*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_create_image( char * filename )
-{
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images");
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_post_request( nptr, Wpa.tls, Wpa.agent, filename, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
-/*	------------------------------------------------------------	*/
-/*			p a _ c r e a t e _  s e r v e r 		*/
-/*	------------------------------------------------------------	*/
+/*! 
+ * Lock a ProActive node using as parameters the file given.  */
 public	struct	pa_response *	pa_create_server( char * name )
 {
     char * filename = NULL;
@@ -839,7 +669,6 @@ public	struct	pa_response *	pa_create_server( char * name )
         }
     }
 	return(result);
-	//return( proactive_create_operation( "/services/hostedservices", filename ) );
 }
 	
 /*	------------------------------------------------------------	*/
@@ -861,15 +690,6 @@ public	struct	pa_response *	pa_list_deployments(char * server)
 	return( proactive_list_operation( buffer ) );
 }
 
-/*	------------------------------------------------------------	*/
-/*		p a _ c r e a t e _ d e p l o y m e n t				*/
-/*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_create_deployment( char * filename, char * server, char * slot )
-{
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
-	return( proactive_create_operation( buffer, filename ) );
-}
 
 /*	------------------------------------------------------------	*/
 /*				p a _ g e t _ d e p l o y m e n t 			*/
@@ -891,133 +711,111 @@ public	struct	pa_response *	pa_delete_deployment( char * server, char * slot )
 	return( proactive_delete_operation( buffer ) );
 }
 
-/*	------------------------------------------------------------	*/
-/*	  p a _ c r e a t e _ d e p l o y m e n t _ r e q u e s t		*/
-/*	------------------------------------------------------------	*/
-public	char * pa_create_deployment_request(
-	char * name, char * label, char * image, char * configuration )
-{
-	char *	filename;
-	FILE *	h;
-	char 	buffer[1024];
-	int	n;
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	if (!( h = fopen( filename,"wa" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateDeployment xmlns=%c%s%c>\n",0x0022,Wpa.namespace,0x0022);
-		fprintf(h,"\t<Name>%s</Name>\n",name);
-		fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",image);
-		n = EncodeBase64( buffer, label,strlen(label));
-		fprintf(h,"\t<Label>%s</Label>\n",buffer);
-		n = EncodeBase64( buffer, configuration,strlen(configuration));
-		fprintf(h,"\t<Configuration>%s</Configuration>\n",buffer);
-		fprintf(h,"\t<StartDeployment>true</StartDeployment>\n");
-		fprintf(h,"\t<TreatWarningsAsError>true</TreatWarningsAsError>\n");
-		fprintf(h,"</CreateDeployment>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	------------------------------------------------------------	*/
-/*			p a _ g e t _ s e r v e r 			*/
-/*	------------------------------------------------------------	*/
+/*! 
+ * Get information about one node already locked
+ * and returns this information. */
 public	struct	pa_response *	pa_get_server	(  char * id )
 {
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+
+	// information used before:  nptr, Wpa.tls, Wpa.agent, hptr 
+
+    char * filename = NULL;
+    char * raw_list = NULL;
+    char command[1024];
+
+    struct pa_response* result = (struct pa_response*) NULL;
+    if (id != NULL){
+        sprintf(command,"-y list_information_about_this_node %s" , id ); 
+    }else{
+        fprintf(stderr, "Invalid id for the server...\n");
+        return NULL;
+    }
+
+    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+        return NULL;
+    }else if (!(raw_list = pa_java_procci_call(command))){
+        fprintf(stderr, "Problem making call to the java layer...\n");
+        free(result);
+        return NULL;
+    }else{
+        result->nature = _TEXT_JSON;
+        result->content = raw_list;
+        result->xmlroot = NULL;
+        if (!(filename = put_jsonstring_in_file(raw_list))){
+            fprintf(stderr, "Problem putting the json in a file...\n");
+        }else{
+            fprintf(stderr, "Filename: %s\n", filename);
+            result->jsonroot = json_parse_file(filename);
+            result->response = NULL;
+        }
+    }
+	return(result);
 }
 
 
 /*	------------------------------------------------------------	*/
 /*			p a _ g e t _ f l av o u r			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_get_flavor(  char * id )
-{
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/flavors/%s",id);
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
+//public	struct	pa_response *	pa_get_flavor(  char * id )
+//{
+//	struct	pa_response	*	rptr=(struct pa_response *) 0;
+//	struct	url		*	uptr;
+//	char	buffer[1024];
+//	char 			*	nptr;
+//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+//	sprintf(buffer,"/flavors/%s",id);
+//	if (!( hptr = pa_authenticate() ))
+//		return( rptr );
+//	else if (!( uptr = analyse_url( Wpa.base )))
+//		return( rptr );
+//	else if (!( uptr = validate_url( uptr ) ))
+//		return( rptr );
+//	else if (!( nptr = serialise_url( uptr,buffer ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		return( rptr );
+//	}
+//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		liberate( nptr );
+//		return( rptr );
+//	}
+//	else	return( rptr );
+//}
+//
 
 /*	------------------------------------------------------------	*/
 /*			p a _ g e t _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_get_image 	(  char * id )
-{
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
+//public	struct	pa_response *	pa_get_image 	(  char * id )
+//{
+//	struct	pa_response	*	rptr=(struct pa_response *) 0;
+//	struct	url		*	uptr;
+//	char	buffer[1024];
+//	char 			*	nptr;
+//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+//	sprintf(buffer,"/images/%s",id);
+//	if (!( hptr = pa_authenticate() ))
+//		return( rptr );
+//	else if (!( uptr = analyse_url( Wpa.base )))
+//		return( rptr );
+//	else if (!( uptr = validate_url( uptr ) ))
+//		return( rptr );
+//	else if (!( nptr = serialise_url( uptr, buffer ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		return( rptr );
+//	}
+//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		liberate( nptr );
+//		return( rptr );
+//	}
+//	else	return( rptr );
+//}
+//
 
 /*	------------------------------------------------------------	*/
 /*			p a _ u p d a t e _ s e r v e r 		*/
@@ -1094,34 +892,34 @@ public	struct	pa_response *	pa_delete_server(  char * id )
 /*	------------------------------------------------------------	*/
 /*			p a _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	pa_response *	pa_delete_image	(  char * id )
-{
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
+//public	struct	pa_response *	pa_delete_image	(  char * id )
+//{
+//	struct	pa_response	*	rptr=(struct pa_response *) 0;
+//	struct	url		*	uptr;
+//	char	buffer[1024];
+//	char 			*	nptr;
+//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+//	sprintf(buffer,"/images/%s",id);
+//	if (!( hptr = pa_authenticate() ))
+//		return( rptr );
+//	else if (!( uptr = analyse_url( Wpa.base )))
+//		return( rptr );
+//	else if (!( uptr = validate_url( uptr ) ))
+//		return( rptr );
+//	else if (!( nptr = serialise_url( uptr,buffer ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		return( rptr );
+//	}
+//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
+//	{
+//		uptr = liberate_url( uptr );
+//		liberate( nptr );
+//		return( rptr );
+//	}
+//	else	return( rptr );
+//}
+//
 /*	------------------------------------------------------------	*/
 /*		p a _ i n i t i a l i s e _ c l i e n t 		*/
 /*	------------------------------------------------------------	*/
