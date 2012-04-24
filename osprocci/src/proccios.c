@@ -874,6 +874,20 @@ private	void	release_floating_address( struct openstack * pptr )
 	{
 		if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
 			osptr = liberate_os_response( osptr );
+	}
+	return;
+}
+
+/*	----------------------------------------------------------------	*/
+/*		r e l e a s e _f l o a t i n g _ a d d r e s s			*/
+/*	----------------------------------------------------------------	*/
+private	void	remove_floating_address( struct openstack * pptr )
+{
+	struct	os_response * osptr;
+	if ( pptr->floatingid )
+	{
+		if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
+			osptr = liberate_os_response( osptr );
 		pptr->floatingid = liberate( pptr->floatingid );
 	}
 	if ( pptr->floating )
@@ -1069,9 +1083,12 @@ private	struct	rest_response * start_openstack(
 			/* ---------------------------- */
 			/* launch the COSACS operations */
 			/* ---------------------------- */
-			cosacs_metadata_instructions( 
-				pptr->hostname, _CORDS_CONFIGURATION,
-				reference, OsProcci.publisher );
+			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+			{
+				cosacs_metadata_instructions( 
+					pptr->hostname, _CORDS_CONFIGURATION,
+					reference, OsProcci.publisher );
+			}
 
 			/* ------------------------------------- */
 			/* release the public IP if not required */
@@ -1079,6 +1096,7 @@ private	struct	rest_response * start_openstack(
 			if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
 			{
 				release_floating_address( pptr );
+				remove_floating_address( pptr );
 				if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
 				{
@@ -1293,6 +1311,7 @@ private	struct	rest_response * save_openstack(
 private	struct os_response *	stop_openstack_provisioning( struct openstack * pptr )
 {
 	int	status;
+	struct	os_response * osptr;
 	if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return((struct os_response *) 0);
 	else
@@ -1301,9 +1320,10 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		{
 			occi_flush_client( pptr->floating, _COSACS_PORT );
 			release_floating_address( pptr );
+			remove_floating_address( pptr );
 		}
 		return( os_delete_server( pptr->number ) );
-		}
+	}
 }
 
 /*	-------------------------------------------	*/
