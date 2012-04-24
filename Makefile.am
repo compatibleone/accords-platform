@@ -18,9 +18,6 @@ endif
 if ENABLE_CORDS
 SUBDIRS += cords
 endif
-if ENABLE_COREST
-SUBDIRS += corest
-endif
 if ENABLE_COCARRIER
 SUBDIRS += cocarrier
 endif
@@ -32,6 +29,9 @@ SUBDIRS += copabr
 endif
 if ENABLE_PUBOCCI
 SUBDIRS += pubocci
+endif
+if ENABLE_COREST
+SUBDIRS += corest
 endif
 if ENABLE_COSS
 SUBDIRS += coss

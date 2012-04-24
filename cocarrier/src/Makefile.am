@@ -16,4 +16,4 @@ libcocarrier_la_SOURCES = azclient.c azclient.h \
     json.c json.h 
 
 libcocarrier_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_CORDS) 
-libcocarrier_la_LDFLAGS = $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
+libcocarrier_la_LDFLAGS = $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
