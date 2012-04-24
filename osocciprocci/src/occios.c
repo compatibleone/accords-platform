@@ -21,6 +21,7 @@
 #define	_occi_os_c
 
 #include "occiclient.h"
+#include "stdnode.h"
 
 /*	------------------------------------------	*/
 /*		o s _ v a l i d _ p r i c e		*/
@@ -37,9 +38,9 @@ private	int	occi_valid_price( char * price )
 }	
 
 /*	------------------------------------------	*/
-/*	    o c c i _ o s _ r e f e r e n c e		*/
+/*	    o c c i _ o s _ l o c a t i o n		*/
 /*	------------------------------------------	*/
-private	int	occi_os_reference( struct rest_response * zptr, struct openstack * pptr )
+private	char *	occi_os_location( struct rest_response * zptr )
 {
 	struct	rest_header * hptr;
 	char	buffer[1024];
@@ -53,11 +54,26 @@ private	int	occi_os_reference( struct rest_response * zptr, struct openstack * p
 	{
 		if (!( strncmp( host, "http://", strlen( "http://" ) ) ))
 			strcpy( buffer, host );
+		else if (!( strncmp( host, "https://", strlen( "https://" ) ) ))
+			strcpy( buffer, host );
 		else	sprintf(buffer,"http://%s",host);
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	------------------------------------------	*/
+/*	    o c c i _ o s _ r e f e r e n c e		*/
+/*	------------------------------------------	*/
+private	int	occi_os_reference( struct rest_response * zptr, struct openstack * pptr )
+{
+	char *	location;
+	if (!( location = occi_os_location( zptr )))
+		return( 0 );
+	else
+	{
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if (!( pptr->reference = allocate_string( buffer ) ))
-			return( 0 );
-		else	return( 1 );
+		pptr->reference = location;
+		return(1);
 	}
 }
 
@@ -224,6 +240,98 @@ private	struct	rest_response * process_occi_os_attributes( struct rest_response 
 	else	return( zptr );
 }
 
+/*	----------------------------------------------------------------	*/
+/*		b u i l d _ o c c i _ o s _ f i r e w a l l			*/
+/*	----------------------------------------------------------------	*/
+private	int	build_occi_os_firewall( struct openstack * pptr )
+{
+	struct	rest_response *	qptr;
+	struct	standard_message firewall;
+	struct	standard_message port;
+	struct	occi_element * eptr;
+	char * rulegroup=(char *) 0;
+	char * rulefrom=(char *) 0;
+	char * rulename=(char *) 0;
+	char * ruleto=(char *) 0;
+	char * ruleproto=(char *) 0;
+	int	started=0;
+	int	status=0;
+	char *	sptr;
+
+	memset( &firewall, 0, sizeof(struct standard_message));
+	memset( &port, 0, sizeof(struct standard_message));
+
+	if (!( pptr ))
+		return(0);
+	else if (!( pptr->firewall ))
+		return(0);
+	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+		return( 0 );
+	else
+	{
+		for (	eptr = first_standard_message_link( firewall.message );
+			eptr != (struct occi_element *) 0;
+			eptr = next_standard_message_link( eptr ) )
+		{
+			/* ------------------------ */
+			/* retrieve the port record */
+			/* ------------------------ */
+			if (!( sptr = standard_message_link_value( eptr->value )))
+				continue;
+			else if ((status = get_standard_message( &port, sptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+				continue;
+
+			/* --------------------------------------- */
+			/* build the security group if not started */
+			/* --------------------------------------- */
+			if (!( started++ ))
+			{
+				if (!( qptr = create_occi_os_security_group( pptr->id ) ))
+					return(0);
+				else if (!( rulegroup = occi_os_location( qptr ) ))
+					qptr = liberate_rest_response( qptr );
+				else
+				{
+					/* ---------------------------------- */
+					/* save the security group identifier */
+					/* ---------------------------------- */
+					if ( pptr->group )
+						pptr->group = liberate( pptr->group );
+					pptr->group = rulegroup;
+					qptr = liberate_rest_response( qptr );
+				}
+			}			
+
+			/* ---------------------------------- */
+			/* retrieve the port rule information */
+			/* ---------------------------------- */
+			if ((!( rulename = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_NAME ) ))
+			||  (!( ruleproto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_PROTOCOL ) ))
+			||  (!( rulefrom = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_FROM ) ))
+			||  (!( ruleto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_TO   ) )) )
+			{
+				release_standard_message( &port );
+				release_standard_message( &firewall );
+				return(0);
+			}
+			/* ---------------------------------- */
+			/* add the rule to the security group */
+			/* ---------------------------------- */
+			if (!( qptr = create_occi_os_security_rule( 
+					pptr->id, ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
+				return(0);
+			else	qptr = liberate_rest_response( qptr );
+		}
+		release_standard_message( &port );
+		release_standard_message( &firewall );
+		return(0);
+	}
+}
+
 
 /*	-------------------------------------------	*/
 /* 	  s t a r t  _ o c c i_ o p e n s t a c k  	*/
@@ -273,11 +381,17 @@ private	struct	rest_response * start_occi_openstack(
 			ischeme++;
 		if ( *ischeme == ';' )
 			*(ischeme++) = 0;
+
+		/* ------------------------------ */
+		/* build the application firewall */
+		/* ------------------------------ */
+		if ((status = build_occi_os_firewall( pptr )) != 0)
+			return( rest_html_response( aptr, status + 4000, "Server Failure : Firewall Preparation" ) );
 	
 		/* ----------------------------- */
 		/* Create a new compute instance */
 		/* ----------------------------- */
-		if (!( qptr = create_occi_os_compute(flavor,image,fscheme,ischeme) ))
+		else if (!( qptr = create_occi_os_secure_compute(flavor,image,fscheme,ischeme, pptr->group, pptr->zone) ))
 		 	return( rest_html_response( aptr, 801, "Bad Request (POST COMPUTE)" ) );
 
 		else if ((status = qptr->status) > 299 )
@@ -285,6 +399,7 @@ private	struct	rest_response * start_occi_openstack(
 			qptr = liberate_rest_response( qptr );
 		 	return( rest_html_response( aptr, status + 4000, "Bad Request (CREATE COMPUTE FAILURE)" ) );
 		}
+
 		/* ------------------------------------------- */
 		/* recover the compute instance identifier now */
 		/* ------------------------------------------- */

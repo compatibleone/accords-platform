@@ -7,7 +7,7 @@
 
 public char *	occi_os_category_url( char * term );
 public struct	rest_response * occi_os_capacities();
-public struct	rest_response * create_occi_os_compute(char * machine, char * system, char * mptr, char * sptr);
+public struct	rest_response * create_occi_os_compute(char * machine, char * system, char * mptr, char * sptr );
 public struct	rest_response * stop_occi_os_compute(char * vm);
 public struct	rest_response * start_occi_os_compute(char * vm);
 public struct	rest_response * delete_occi_os_network(char * nw);
@@ -16,12 +16,12 @@ public struct	rest_response * attach_occi_os_network(char * vm, char * nw);
 public struct	rest_response * create_occi_os_network(char * label);
 public struct	rest_response * delete_occi_os_compute(char * vm);
 public struct	rest_response * create_occi_os_security_group(char * g);
-public struct	rest_response * create_occi_os_security_rule(char * g, char * protocol,int from, int to, char * iprange );
+public struct	rest_response * create_occi_os_security_rule(char * g, char * protocol,char * from, char * to, char * iprange );
 public struct	rest_response * list_occi_os_security_rules(char * g);
 public struct	rest_response * get_occi_os_security_rule( char * id );
 public struct	rest_response * delete_occi_os_security_rule(char * id );
 public struct	rest_response * delete_occi_os_security_group(char * g);
-public struct	rest_response * create_occi_os_secure_compute(char * machine, char * system, char * g);
+public struct	rest_response * create_occi_os_secure_compute(char * machine, char * system, char * mptr, char * sptr, char * g, char * z);
 public struct	rest_response * allocate_occi_os_floating_ip(char * id);
 public struct	rest_response * release_occi_os_floating_ip(char * id);
 public	int	check_keystone_authorization();

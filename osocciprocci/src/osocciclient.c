@@ -667,7 +667,8 @@ curl -v -X POST localhost:8787/compute/
 -H 'Category: cirros-0.3.0-x86_64-blank; scheme="http://schemas.openstack.org/template/os#"; class="mixin"'
 */
 
-public struct	rest_response * create_occi_os_compute(char * machine, char * system, char * machineschema, char * systemschema)
+public struct	rest_response * create_occi_os_compute(
+		char * machine, char * system, char * machineschema, char * systemschema )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
@@ -907,14 +908,10 @@ public	struct rest_response * create_occi_os_security_group(char * g)
 	-H 'X-OCCI-Attribute: occi.network.security.range = "0.0.0.0/24"'
 */
 
-public	struct rest_response * create_occi_os_security_rule(char * g, char * protocol,int from, int to, char * iprange )
+public	struct rest_response * create_occi_os_security_rule(char * g, char * protocol,char * from, char * to, char * iprange )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
-	char	vfrom[64];
-	char	vto[64];
-	sprintf(vfrom,"%u",from);
-	sprintf(vto,"%u",to);
 	if (!( hptr = occi_os_headers( (char *) 0, OcciConfig.requestocci ) ))
 		return( occi_os_failure( hptr ));
 	else if (!( hptr = occi_os_add_mixin( hptr, g, _OCCI_OS_SECURITY )))
@@ -923,9 +920,9 @@ public	struct rest_response * create_occi_os_security_rule(char * g, char * prot
 		return( occi_os_failure( hptr ) );
 	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.protocol",protocol) ))
 		return( occi_os_failure( hptr ));
-	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.from",vfrom) ))
+	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.from",from) ))
 		return( occi_os_failure( hptr ));
-	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.to",vto) ))
+	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.to",to) ))
 		return( occi_os_failure( hptr ));
 	else if (!( hptr = occi_os_add_attribute(hptr, "occi.network.security.range",iprange) ))
 		return( occi_os_failure( hptr ));
@@ -1060,7 +1057,8 @@ public	struct rest_response * delete_occi_os_security_group(char * g)
 	-H 'Category: my_grp; scheme="http://www.mystuff.org/sec#"; class="mixin"'
 */
 
-public	struct rest_response * create_occi_os_secure_compute( char * machine, char* system, char * g )
+public	struct rest_response * create_occi_os_secure_compute( 
+		char * machine, char * system, char * machineschema, char * systemschema, char * g, char * z )
 {
 	struct rest_header * hptr=(struct rest_header *) 0;
 	char * url;
