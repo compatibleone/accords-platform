@@ -80,17 +80,17 @@ public	struct	pa_response *	pa_list_hosted_services();
 /* --------------- */
 /* affinity groups */
 /* --------------- */
-public	struct	pa_response *	pa_create_affinity_group( char * filename );
-public	struct	pa_response *	pa_retrieve_affinity_group( char * filename );
-public	struct	pa_response *	pa_update_affinity_group( char * filename );
-public	struct	pa_response *	pa_delete_affinity_group( char * filename );
-public	struct	pa_response *	pa_list_affinity_groups();
+//public	struct	pa_response *	pa_create_affinity_group( char * filename );
+//public	struct	pa_response *	pa_retrieve_affinity_group( char * filename );
+//public	struct	pa_response *	pa_update_affinity_group( char * filename );
+//public	struct	pa_response *	pa_delete_affinity_group( char * filename );
+//public	struct	pa_response *	pa_list_affinity_groups();
 
-public	char * pa_create_affinity_group_request(
-	char * name,
-	char * label, 
-	char * description,
-	char * location );
+//public	char * pa_create_affinity_group_request(
+//	char * name,
+//	char * label, 
+//	char * description,
+//	char * location );
 
 /* ------------ */
 /* certificates */
@@ -114,26 +114,23 @@ public	struct	pa_response *	pa_get_server	( char * id );
 public	struct	pa_response *	pa_update_server( char * id, char * filename );
 public	struct	pa_response *	pa_delete_server( char * id );
 
-public	char * pa_create_server_request(
-	char * name, char * label, char * description, 
-	char * location, char * group );
 
 /* ------- */
 /* flavors */
 /* ------- */
-public	struct	pa_response *	pa_list_flavors();
-public	struct	pa_response *	pa_get_flavor  ( char * id );
+//public	struct	pa_response *	pa_list_flavors();
+//public	struct	pa_response *	pa_get_flavor  ( char * id );
 
 /* ------ */
 /* images */
 /* ------ */
-public	struct	pa_response *	pa_list_images  ();
-public	struct	pa_response *	pa_create_image( char * filename );
-public	struct	pa_response *	pa_get_image    ( char * id );
-public	struct	pa_response *	pa_delete_image ( char * id );
+//public	struct	pa_response *	pa_list_images  ();
+//public	struct	pa_response *	pa_create_image( char * filename );
+//public	struct	pa_response *	pa_get_image    ( char * id );
+//public	struct	pa_response *	pa_delete_image ( char * id );
 	
-public	char * pa_create_image_request(
-	char * identity, char * server );
+//public	char * pa_create_image_request(
+//	char * identity, char * server );
 
 /* ---------- */
 /* operations */
@@ -148,10 +145,6 @@ public	struct	pa_response *	pa_create_deployment( char * filename, char * server
 public	struct	pa_response *	pa_get_deployment( char * server, char * slot);
 public	struct	pa_response *	pa_delete_deployment( char * server, char * slot );
 
-public	char * pa_create_deployment_request(
-	char * name, char * label, char * image, 
-	char * configuration );
-
 /* ------------- */
 /* subscriptions */
 /* ------------- */
@@ -162,28 +155,28 @@ public	struct 	pa_response * 	liberate_pa_response( struct pa_response * rptr );
 /* ----------------------- */
 /* trafic manager profiles */
 /* ----------------------- */
-public	struct	pa_response *	pa_list_WATM_profiles();
+//public	struct	pa_response *	pa_list_WATM_profiles();
 
 /* ---------------------------------- */
 /* trafic manager profile definitions */
 /* ---------------------------------- */
-public	struct	pa_response *	pa_list_WATM_definitions(char * profile );
+//public	struct	pa_response *	pa_list_WATM_definitions(char * profile );
 
 /* ---------------- */
 /* storage services */
 /* ---------------- */
-public	struct	pa_response *	pa_create_storage_service( char * filename );
-public	struct	pa_response *	pa_retrieve_storage_service( char * filename );
-public	struct	pa_response *	pa_update_storage_service( char * filename );
-public	struct	pa_response *	pa_delete_storage_service( char * filename );
-public	struct	pa_response *	pa_list_storage_services();
+//public	struct	pa_response *	pa_create_storage_service( char * filename );
+//public	struct	pa_response *	pa_retrieve_storage_service( char * filename );
+//public	struct	pa_response *	pa_update_storage_service( char * filename );
+//public	struct	pa_response *	pa_delete_storage_service( char * filename );
+//public	struct	pa_response *	pa_list_storage_services();
 
-public	char * pa_create_storage_service_request(
-	char * name,
-	char * label, 
-	char * description,
-	char * group,
-	char * location );
+//public	char * pa_create_storage_service_request(
+//	char * name,
+//	char * label, 
+//	char * description,
+//	char * group,
+//	char * location );
 
 #endif	/* _pa_client_h */
 	/* ------------ */

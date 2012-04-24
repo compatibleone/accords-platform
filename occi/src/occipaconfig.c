@@ -24,6 +24,10 @@
 
 #include "paconfig.h"
 
+/*!
+ * This file handles the occi kinds through which other ACCORDS components contact this procci. 
+ */
+
 /*	----------------------------	*/
 /*	o c c i _ p a _ c o n f i g 	*/
 /*	----------------------------	*/

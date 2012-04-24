@@ -101,16 +101,16 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			pa_result( pa_list_deployments(p3) );
 		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
 			pa_result( pa_list_certificates(p3) );
-		else if (!( strcasecmp( p2, "GROUPS" ) ))
-			pa_result( pa_list_affinity_groups() );
-		else if (!( strcasecmp( p2, "STORAGE" ) ))
-			pa_result( pa_list_storage_services() );
+//		else if (!( strcasecmp( p2, "GROUPS" ) ))
+//			pa_result( pa_list_affinity_groups() );
+//		else if (!( strcasecmp( p2, "STORAGE" ) ))
+//			pa_result( pa_list_storage_services() );
 		else if (!( strcasecmp( p2, "OPERATIONS" ) ))
 			pa_result( pa_list_operations(p3,p4) );
-		else if (!( strcasecmp( p2, "PROFILES" ) ))
-			pa_result( pa_list_WATM_profiles() );
-		else if (!( strcasecmp( p2, "DEFINITIONS" ) ))
-			pa_result( pa_list_WATM_definitions(p3) );
+//		else if (!( strcasecmp( p2, "PROFILES" ) ))
+//			pa_result( pa_list_WATM_profiles() );
+//		else if (!( strcasecmp( p2, "DEFINITIONS" ) ))
+//			pa_result( pa_list_WATM_definitions(p3) );
 		else if (!( strcasecmp( p2, "LOCATIONS" ) ))
 			pa_result( pa_list_locations() );
 		else	return( failure(33, p1, p2 ) );
@@ -120,45 +120,35 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-			//if (!( nomfic = pa_create_server_request( p3, p3, p4, p5, p6 ) ))
-			//	return( failure(27,"cannot create","request" ) );
-			//else
-			//{ 	
-				//pa_result( pa_create_server( nomfic ) );
-				pa_result( pa_create_server( p3 ) );
-				return( 0 );
-			//}
+            pa_result( pa_create_server( p3 ) );
+            return( 0 );
 		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 		{
-			if (!( nomfic = pa_create_deployment_request( p3, p3, p4, p5 ) ))
-				return( failure(27,"cannot create","deployment request" ) );
-			else
-			{ 	
-				pa_result( pa_create_deployment( nomfic, p7, p7 ) );
-				return( 0 );
-			}
+            return( failure(27,"cannot create","deployment request" ) );
 		}
 		else if  (!( strcasecmp( p2, "GROUP" ) ))
 		{
-			if (!( nomfic = pa_create_affinity_group_request( p3, p3, p4, p5 ) ))
 				return( failure(27,"cannot create","affinity group request" ) );
-			else
-			{ 	
-				pa_result( pa_create_affinity_group( nomfic ) );
-				return( 0 );
-			}
+//			if (!( nomfic = pa_create_affinity_group_request( p3, p3, p4, p5 ) ))
+//				return( failure(27,"cannot create","affinity group request" ) );
+//			else
+//			{ 	
+//				pa_result( pa_create_affinity_group( nomfic ) );
+//				return( 0 );
+//			}
 		}
 
 		else if  (!( strcasecmp( p2, "STORAGE" ) ))
 		{
-			if (!( nomfic = pa_create_storage_service_request( p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","storage service request" ) );
-			else
-			{ 	
-				pa_result( pa_create_storage_service( nomfic ) );
-				return( 0 );
-			}
+			//if (!( nomfic = pa_create_storage_service_request( p3, p3, p4, p5, p6 ) ))
+			//	return( failure(27,"cannot create","storage service request" ) );
+			//else
+			//{ 	
+			//	pa_result( pa_create_storage_service( nomfic ) );
+			//	return( 0 );
+			//}
 		}
 
 	}
@@ -172,28 +162,20 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			pa_result( pa_get_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
 			pa_result( pa_get_server( p3 ) );
-		else if (!( strcasecmp( p2, "FLAVOR" ) ))
-			pa_result( pa_get_flavor( p3 ) );
-		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			pa_result( pa_get_image( p3 ) );
-		else if (!( strcasecmp( p2, "GROUP" ) ))
-			pa_result( pa_retrieve_affinity_group( p3 ) );
-		else if (!( strcasecmp( p2, "STORAGE") ))
-			pa_result( pa_retrieve_storage_service( p3 ) );
+//		else if (!( strcasecmp( p2, "FLAVOR" ) ))
+//			pa_result( pa_get_flavor( p3 ) );
+//		else if (!( strcasecmp( p2, "IMAGE" ) ))
+//			pa_result( pa_get_image( p3 ) );
+//		else if (!( strcasecmp( p2, "GROUP" ) ))
+//			pa_result( pa_retrieve_affinity_group( p3 ) );
+//		else if (!( strcasecmp( p2, "STORAGE") ))
+//			pa_result( pa_retrieve_storage_service( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
 	else if (!( strcasecmp(p1,"UPDATE" ) ))
 	{
-		if (!( p2 ))
-			return( failure(33, "missing", "parameter" ));
-		else if (!( strcasecmp( p2, "HOST" ) ))
-		{
-			if (!( nomfic = pa_create_server_request( p2, p3, p4, personality, resource ) ))
-				pa_result( pa_update_server( p4, nomfic ) );
-		}
-		else	return( failure(33, p1, p2 ) );
-		return( 0 );
+        return( failure(33, "not", "supported" ));
 	}
 	else if (!( strcasecmp(p1,"DELETE" ) ))
 	{
@@ -203,12 +185,12 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			pa_result( pa_delete_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
 			pa_result( pa_delete_server( p3 ) );
-		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			pa_result( pa_delete_image( p3 ) );
-		else if (!( strcasecmp( p2, "GROUP" ) ))
-			pa_result( pa_delete_affinity_group( p3 ) );
-		else if (!( strcasecmp( p2, "STORAGE" ) ))
-			pa_result( pa_delete_storage_service( p3 ) );
+//		else if (!( strcasecmp( p2, "IMAGE" ) ))
+//			pa_result( pa_delete_image( p3 ) );
+//		else if (!( strcasecmp( p2, "GROUP" ) ))
+//			pa_result( pa_delete_affinity_group( p3 ) );
+//		else if (!( strcasecmp( p2, "STORAGE" ) ))
+//			pa_result( pa_delete_storage_service( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -220,15 +202,15 @@ private	int	pa_command(int argc, char * argv[] )
 	int	status;
 	int	argi=1;
 	char *	aptr;
-	char *	user="ijm";
-	char *	pass="4362355f-fd84-47c7-a1ca-582a368ddc50";
-	char *	host="https://management.core.windows.net/";
-	char *	thost="https://127.0.0.1:8080/";
-	char *  other="https://windows.azure.com/";
+	char *	user="demo";
+	char *	pass="demo";
+	char *	host="parameter-host-not-given";
+	char *	thost="parameter-thost-not-given";
+	char *  other="parameter-other-not-given";
 	char *	agent="CO-PACLIENT/1.0";
 	char *	version="2011-10-01";
 	char * 	subscription="f346740d-e45e-42e9-80b8-4865f3a855d1";
-	char *	namespace="http://schemas.microsoft.com/windowsazure";
+	char *	namespace="parameter-namespace-not-given";
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[argi++] ))

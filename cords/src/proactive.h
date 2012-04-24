@@ -2,6 +2,9 @@
 #ifndef	_proactive_h
 #define	_proactive_h
 
+/*!
+ * This is the structure that is exchanged whenever a ProActive node is requested. 
+ */
 struct	proactive
 {
 	char *	id;
@@ -11,7 +14,7 @@ struct	proactive
 	char *	image;
 	char *	profile;
 
-	char *	number;
+	char *	number; // uuid of the request? 
 	char *	access;
 	char *	rootpass;
 	char *	reference;
