@@ -832,7 +832,7 @@ public	char * os_create_security_group_request( char * nptr )
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
 		fprintf(h,"<security_group name=%c%s%c>\n",0x0022,nptr,0x0022);
-		fprintf(h,"<description>OpenStack Security Group : %s</description>\n",nptr);
+		fprintf(h,"<description>Security Group For %s</description>\n",nptr);
 		fprintf(h,"</security_group>\n");
 		fclose(h);
 		return( filename );

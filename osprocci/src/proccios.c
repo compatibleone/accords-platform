@@ -879,7 +879,7 @@ private	void	release_floating_address( struct openstack * pptr )
 }
 
 /*	----------------------------------------------------------------	*/
-/*		r e l e a s e _f l o a t i n g _ a d d r e s s			*/
+/*		r e m o v e _f l o a t i n g _ a d d r e s s			*/
 /*	----------------------------------------------------------------	*/
 private	void	remove_floating_address( struct openstack * pptr )
 {
@@ -892,6 +892,21 @@ private	void	remove_floating_address( struct openstack * pptr )
 	}
 	if ( pptr->floating )
 		pptr->floating = liberate( pptr->floating );
+	return;
+}
+
+/*	----------------------------------------------------------------	*/
+/*		r e m o v e _s e c u r i t y _ g r o u p    			*/
+/*	----------------------------------------------------------------	*/
+private	void	remove_security_group( struct openstack * pptr )
+{
+	struct	os_response * osptr;
+	if ( pptr->group )
+	{
+		if ((osptr = os_delete_security_group( pptr->group )) != (struct os_response *) 0)
+			osptr = liberate_os_response( osptr );
+		pptr->group = liberate( pptr->group );
+	}
 	return;
 }
 
@@ -1096,15 +1111,17 @@ private	struct	rest_response * start_openstack(
 			if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
 			{
 				release_floating_address( pptr );
-				remove_floating_address( pptr );
 				if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
 				{
+					remove_floating_address( pptr );
+					remove_security_group( pptr );
 					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
 				}
-
+				remove_floating_address( pptr );
 			}
+
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
@@ -1352,10 +1369,11 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ------------------------------------------- */
 		/* ensure release of the allocated floating IP */
 		/* ------------------------------------------- */
-		if ( pptr->floatingid )
-		{
-			remove_floating_address( pptr );
-		}
+		remove_floating_address( pptr );
+		/* ------------------------------------------- */
+		/* ensure release of the server security group */
+		/* ------------------------------------------- */
+		remove_security_group( pptr );
 		return( osptr );
 	}
 }
