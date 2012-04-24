@@ -1312,17 +1312,51 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 {
 	int	status;
 	struct	os_response * osptr;
+
 	if ((status = use_openstack_configuration( pptr->profile )) != 0)
 		return((struct os_response *) 0);
 	else
 	{
+		/* ------------------------------------------ */
+		/* disconnect the floating IP from the server */
+		/* ------------------------------------------ */
 		if ( pptr->floatingid )
 		{
 			occi_flush_client( pptr->floating, _COSACS_PORT );
 			release_floating_address( pptr );
+		}
+		/* ------------------------------------------ */
+		/* launch the deletion of the server instance */
+		/* ------------------------------------------ */
+		if ((osptr=os_delete_server( pptr->number )) != (struct os_response *) 0)
+		{
+			/* ----------------------------- */
+			/* await server instance removal */
+			/* ----------------------------- */
+			do
+			{
+				if (!( osptr ))
+					break;
+				else if (!( osptr->response ))
+					break;
+				else if ( osptr->response->status > 299 )
+					break;
+				else
+				{
+					sleep(1);
+					osptr = liberate_os_response( osptr );
+				}
+			}
+			while ((osptr=os_get_server( pptr->number )) != (struct os_response *) 0);
+		}
+		/* ------------------------------------------- */
+		/* ensure release of the allocated floating IP */
+		/* ------------------------------------------- */
+		if ( pptr->floatingid )
+		{
 			remove_floating_address( pptr );
 		}
-		return( os_delete_server( pptr->number ) );
+		return( osptr );
 	}
 }
 
