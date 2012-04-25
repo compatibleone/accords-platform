@@ -26,7 +26,6 @@
 #include "firewall.h"
 #include "import.h"
 #include "storage.h"
-#include "agreement.h"
 #include "infrastructure.h"
 #include "package.h"
 #include "system.h"
@@ -95,6 +94,13 @@
 #include "ipaddress.h"
 #include "domain.h"
 #include "iprange.h"
+
+#include "agreement.h"
+#include "terms.h"
+#include "term.h"
+#include "variable.h"
+#include "guarantee.h" 
+#include "business.h"
 
 #include "xlink.h"
 

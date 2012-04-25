@@ -31,7 +31,6 @@
 #include "security.c"
 #include "authorise.c"
 #include "package.c"
-#include "agreement.c"
 
 #include "script.c"
 #include "file.c"
@@ -97,6 +96,13 @@
 #include "algorithm.c"
 #include "placement.c"
 #include "quota.c"
+
+#include "agreement.c"
+#include "terms.c"
+#include "term.c"
+#include "variable.c"
+#include "guarantee.c" 
+#include "business.c"
 
 #include "ipaddress.c"
 #include "domain.c"

@@ -4,8 +4,14 @@
 
 #include "cords.h"
 
-public struct occi_category * occi_cords_import_builder(char *a,char * b);
 public struct occi_category * occi_cords_agreement_builder(char *a,char * b);
+public struct occi_category * occi_cords_terms_builder(char *a,char * b);
+public struct occi_category * occi_cords_term_builder(char *a,char * b);
+public struct occi_category * occi_cords_variable_builder(char *a,char * b);
+public struct occi_category * occi_cords_guarantee_builder(char *a,char * b);
+public struct occi_category * occi_cords_business_builder(char *a,char * b);
+
+public struct occi_category * occi_cords_import_builder(char *a,char * b);
 public struct occi_category * occi_cords_schedule_builder(char *a,char * b);
 public struct occi_category * occi_cords_interface_builder(char *a,char * b);
 public struct occi_category * occi_cords_session_builder(char *a,char * b);
@@ -142,5 +148,12 @@ const static struct {
 	{ "ipaddress", occi_cords_ipaddress_builder },
 	{ "domain", occi_cords_domain_builder },
 	{ "iprange", occi_cords_iprange_builder },
+	{ "agreement",occi_cords_agreement_builder },
+	{ "terms",occi_cords_terms_builder },
+	{ "term",occi_cords_term_builder },
+	{ "variable",occi_cords_variable_builder },
+	{ "guarantee", occi_cords_guarantee_builder },
+	{ "business",occi_cords_business_builder }
+
 };
 #endif

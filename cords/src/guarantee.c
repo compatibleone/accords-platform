@@ -19,17 +19,17 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _agreement_c_
-#define _agreement_c_
+#ifndef _guarantee_c_
+#define _guarantee_c_
 
 #include "element.h"
 
-#include "agreement.h"
+#include "guarantee.h"
 
 /*	------------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ a g r e e m e n t 	*/
+/*	l i b e r a t e _ c o r d s _ g u a r a n t e e 	*/
 /*	------------------------------------------------	*/
-public struct cords_agreement * liberate_cords_agreement(struct cords_agreement * sptr)
+public struct cords_guarantee * liberate_cords_guarantee(struct cords_guarantee * sptr)
 {
 	if ( sptr )
 	{
@@ -39,41 +39,38 @@ public struct cords_agreement * liberate_cords_agreement(struct cords_agreement 
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
-		if ( sptr->initiator )
-			 sptr->initiator = liberate(sptr->initiator);
-		if ( sptr->responder )
-			 sptr->responder = liberate(sptr->responder);
-		if ( sptr->serviceprovider )
-			 sptr->serviceprovider = liberate(sptr->serviceprovider);
-		if ( sptr->expiration )
-			 sptr->expiration = liberate(sptr->expiration);
-		if ( sptr->templateid )
-			 sptr->templateid = liberate(sptr->templateid);
-		if ( sptr->templatename )
-			 sptr->templatename = liberate(sptr->templatename);
+		if ( sptr->obligated )
+			 sptr->obligated = liberate(sptr->obligated);
+		if ( sptr->service )
+			 sptr->service = liberate(sptr->service);
+		if ( sptr->scope )
+			 sptr->scope = liberate(sptr->scope);
+		if ( sptr->condition )
+			 sptr->condition = liberate(sptr->condition);
+		if ( sptr->objective )
+			 sptr->objective = liberate(sptr->objective);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_agreement *) 0);
+	return((struct cords_guarantee *) 0);
 
 }
 
 /*	------------------------------------------	*/
-/*	r e s e t _ c o r d s _ a g r e e m e n t 	*/
+/*	r e s e t _ c o r d s _ g u a r a n t e e 	*/
 /*	------------------------------------------	*/
-public struct cords_agreement * reset_cords_agreement(struct cords_agreement * sptr)
+public struct cords_guarantee * reset_cords_guarantee(struct cords_guarantee * sptr)
 {
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
-		sptr->initiator = (char*) 0;
-		sptr->responder = (char*) 0;
-		sptr->serviceprovider = (char*) 0;
-		sptr->expiration = (char*) 0;
-		sptr->templateid = (char*) 0;
-		sptr->templatename = (char*) 0;
-		sptr->links =  0;
+		sptr->obligated = (char*) 0;
+		sptr->service = (char*) 0;
+		sptr->scope = (char*) 0;
+		sptr->condition = (char*) 0;
+		sptr->objective = (char*) 0;
+		sptr->values =  0;
 		sptr->status =  0;
 	}
 	return(sptr);
@@ -81,20 +78,20 @@ public struct cords_agreement * reset_cords_agreement(struct cords_agreement * s
 }
 
 /*	------------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ a g r e e m e n t 	*/
+/*	a l l o c a t e _ c o r d s _ g u a r a n t e e 	*/
 /*	------------------------------------------------	*/
-public struct cords_agreement * allocate_cords_agreement()
+public struct cords_guarantee * allocate_cords_guarantee()
 {
-	struct cords_agreement * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_agreement ) ) ))
+	struct cords_guarantee * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_guarantee ) ) ))
 		return( sptr );
-	else	return( reset_cords_agreement(sptr) );
+	else	return( reset_cords_guarantee(sptr) );
 }
 
 /*	------------------------------------------	*/
-/*	x m l i n _ c o r d s _ a g r e e m e n t 	*/
+/*	x m l i n _ c o r d s _ g u a r a n t e e 	*/
 /*	------------------------------------------	*/
-public int xmlin_cords_agreement(struct cords_agreement * sptr,struct xml_element * eptr)
+public int xmlin_cords_guarantee(struct cords_guarantee * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -113,33 +110,29 @@ public int xmlin_cords_agreement(struct cords_agreement * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"initiator") ))
+		else if (!( strcmp(wptr->name,"obligated") ))
 		{
-			if ( wptr->value ) { sptr->initiator = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->obligated = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"responder") ))
+		else if (!( strcmp(wptr->name,"service") ))
 		{
-			if ( wptr->value ) { sptr->responder = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"serviceprovider") ))
+		else if (!( strcmp(wptr->name,"scope") ))
 		{
-			if ( wptr->value ) { sptr->serviceprovider = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->scope = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"expiration") ))
+		else if (!( strcmp(wptr->name,"condition") ))
 		{
-			if ( wptr->value ) { sptr->expiration = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->condition = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"templateid") ))
+		else if (!( strcmp(wptr->name,"objective") ))
 		{
-			if ( wptr->value ) { sptr->templateid = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->objective = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"templatename") ))
+		else if (!( strcmp(wptr->name,"values") ))
 		{
-			if ( wptr->value ) { sptr->templatename = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"links") ))
-		{
-			if ( wptr->value ) { sptr->links = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->values = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"status") ))
 		{
@@ -151,9 +144,9 @@ public int xmlin_cords_agreement(struct cords_agreement * sptr,struct xml_elemen
 }
 
 /*	--------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ a g r e e m e n t 	*/
+/*	r e s t _ o c c i _ c o r d s _ g u a r a n t e e 	*/
 /*	--------------------------------------------------	*/
-public int rest_occi_cords_agreement(FILE * fh,struct cords_agreement * sptr,char * prefix, char * nptr)
+public int rest_occi_cords_guarantee(FILE * fh,struct cords_guarantee * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -162,16 +155,15 @@ public int rest_occi_cords_agreement(FILE * fh,struct cords_agreement * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.initiator='%s'\r\n",prefix,nptr,(sptr->initiator?sptr->initiator:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.responder='%s'\r\n",prefix,nptr,(sptr->responder?sptr->responder:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.serviceprovider='%s'\r\n",prefix,nptr,(sptr->serviceprovider?sptr->serviceprovider:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.expiration='%s'\r\n",prefix,nptr,(sptr->expiration?sptr->expiration:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.templateid='%s'\r\n",prefix,nptr,(sptr->templateid?sptr->templateid:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.templatename='%s'\r\n",prefix,nptr,(sptr->templatename?sptr->templatename:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.links='%u'\r\n",prefix,nptr,sptr->links);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.obligated='%s'\r\n",prefix,nptr,(sptr->obligated?sptr->obligated:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.condition='%s'\r\n",prefix,nptr,(sptr->condition?sptr->condition:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.objective='%s'\r\n",prefix,nptr,(sptr->objective?sptr->objective:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.values='%u'\r\n",prefix,nptr,sptr->values);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 
 }
 
-#endif	/* _agreement_c_ */
+#endif	/* _guarantee_c_ */

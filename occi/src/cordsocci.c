@@ -28,7 +28,6 @@
 #include "document.h"
 
 #include "occiimport.c"
-#include "occiagreement.c"
 #include "occiaccount.c"
 #include "occiaction.c"
 #include "occinode.c"
@@ -86,6 +85,13 @@
 #include "occialgorithm.c"
 #include "occiplacement.c"
 #include "occiquota.c"
+
+#include "occiagreement.c"
+#include "occiterms.c"
+#include "occiterm.c"
+#include "occivariable.c"
+#include "occiguarantee.c" 
+#include "occibusiness.c"
 
 #include "occiipaddress.c"
 #include "occidomain.c"

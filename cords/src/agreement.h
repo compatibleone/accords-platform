@@ -1,15 +1,22 @@
-#ifndef	cords_agreement_h
-#define	cords_agreement_h
+
+#ifndef	_cords_agreement_h
+#define	_cords_agreement_h
 
 struct	cords_agreement
 {
-	char *	id;
-	char *	name;
-	char *	description;
-	char *	created;
-	int	terms;
-	int	status;
+	char * 	id;		
+	char * 	name;		
+	char * 	description;	
+	char * 	initiator;	
+	char * 	responder;	
+	char * 	serviceprovider; 
+	char * 	expiration;	
+	char * 	templateid;	
+	char * 	templatename;	
+	int	links;		
+	int	status;		
 };
 
-#endif
+#endif	
+
 

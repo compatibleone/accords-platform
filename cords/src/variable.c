@@ -1,0 +1,139 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
+#ifndef _variable_c_
+#define _variable_c_
+
+#include "element.h"
+
+#include "variable.h"
+
+/*	----------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ v a r i a b l e 	*/
+/*	----------------------------------------------	*/
+public struct cords_variable * liberate_cords_variable(struct cords_variable * sptr)
+{
+	if ( sptr )
+	{
+		if ( sptr->id )
+			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
+		if ( sptr->description )
+			 sptr->description = liberate(sptr->description);
+		if ( sptr->metric )
+			 sptr->metric = liberate(sptr->metric);
+		if ( sptr->location )
+			 sptr->location = liberate(sptr->location);
+		sptr = liberate( sptr );
+	}
+	return((struct cords_variable *) 0);
+
+}
+
+/*	----------------------------------------	*/
+/*	r e s e t _ c o r d s _ v a r i a b l e 	*/
+/*	----------------------------------------	*/
+public struct cords_variable * reset_cords_variable(struct cords_variable * sptr)
+{
+	if ( sptr )
+	{
+		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
+		sptr->description = (char*) 0;
+		sptr->metric = (char*) 0;
+		sptr->location = (char*) 0;
+		sptr->status =  0;
+	}
+	return(sptr);
+
+}
+
+/*	----------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ v a r i a b l e 	*/
+/*	----------------------------------------------	*/
+public struct cords_variable * allocate_cords_variable()
+{
+	struct cords_variable * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_variable ) ) ))
+		return( sptr );
+	else	return( reset_cords_variable(sptr) );
+}
+
+/*	----------------------------------------	*/
+/*	x m l i n _ c o r d s _ v a r i a b l e 	*/
+/*	----------------------------------------	*/
+public int xmlin_cords_variable(struct cords_variable * sptr,struct xml_element * eptr)
+{
+	struct xml_element * wptr;
+	if (!( eptr )) return(0);
+	if (!( sptr )) return(0);
+	for ( wptr=eptr->first; wptr != (struct xml_element *) 0; wptr=wptr->next)
+	{
+		if (!( strcmp(wptr->name,"id") ))
+		{
+			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"description") ))
+		{
+			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"metric") ))
+		{
+			if ( wptr->value ) { sptr->metric = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"location") ))
+		{
+			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"status") ))
+		{
+			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+		}
+	}
+	return(0);
+
+}
+
+/*	------------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ v a r i a b l e 	*/
+/*	------------------------------------------------	*/
+public int rest_occi_cords_variable(FILE * fh,struct cords_variable * sptr,char * prefix, char * nptr)
+{
+	struct xml_element * wptr;
+	if (!( sptr )) return(0);
+	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
+	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	return(0);
+
+}
+
+#endif	/* _variable_c_ */

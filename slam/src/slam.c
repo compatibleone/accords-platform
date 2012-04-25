@@ -17,8 +17,8 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_broker_c
-#define	_broker_c
+#ifndef	_slam_c
+#define	_slam_c
 
 #include "standard.h"
 #include "broker.h"
@@ -28,8 +28,10 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "occiresolver.h"
+#include "cordslang.h"
 
-struct	accords_configuration Broker = {
+struct	accords_configuration Slam = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -41,22 +43,22 @@ struct	accords_configuration Broker = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"broker.xml",
+	"slam.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(Broker.debug);		}
-public	int	check_verbose()		{	return(Broker.verbose);		}
-public	char *	default_publisher()	{	return(Broker.publisher);	}
-public	char *	default_operator()	{	return(Broker.operator);	}
-public	char *	default_tls()		{	return(Broker.tls);		}
+public	int	check_debug()		{	return(Slam.debug);		}
+public	int	check_verbose()		{	return(Slam.verbose);		}
+public	char *	default_publisher()	{	return(Slam.publisher);		}
+public	char *	default_operator()	{	return(Slam.operator);		}
+public	char *	default_tls()		{	return(Slam.tls);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
 	{
-		printf("\n***(%u) failure %u",getpid(),e);
+		printf("\n*** failure %u",e);
 		if ( m1 )
 			printf(" : %s",m1);
 		if ( m2 )
@@ -67,14 +69,14 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*			b r o k e r _ l o a d 		*/
+/*	 	   s l a m _ l o a d 			*/
 /*	---------------------------------------------	*/
-/*	this function loads broker    configuration	*/
+/*	this function loads slam  configuration		*/
 /*	from the xml configuration file.		*/
 /*	---------------------------------------------	*/  
-private	void	broker_load()
+private	void	slam_load()
 {
-	load_accords_configuration( &Broker, "broker" );
+	load_accords_configuration( &Slam, "slam" );
 	return;
 }
 
@@ -82,8 +84,8 @@ private	void	broker_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Broker : Version 1.0a.0.05");
-	printf("\n   Beta Version : 04/04/2012");
+	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.01");
+	printf("\n   Beta Version : 25/04/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -93,9 +95,9 @@ private	int	banner()
 }
 
 /*	------------------------------------------------------------------	*/
-/*			b r o k e r _ i n i t i a l i s e			*/
+/*			s l a m _ i n i t i a l i s e			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_server * broker_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * slam_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -108,13 +110,13 @@ private	struct rest_server * broker_initialise(  void * v,struct rest_server * s
 }
 
 /*	------------------------------------------------------------------	*/
-/*			b r o k e r _ a u t h o r i s e 			*/
+/*			s l a m _ a u t h o r i s e 			*/
 /*	------------------------------------------------------------------	*/
-private	int	broker_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	slam_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, Broker.user ) )
+	if ( strcmp( username, Slam.user ) )
 		return(0);
-	else if ( strcmp( password, Broker.password ) )
+	else if ( strcmp( password, Slam.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -124,31 +126,30 @@ private	int	broker_authorise(  void * v,struct rest_client * cptr, char * userna
 }
 
 /*	------------------------------------------------------------------	*/
-/*			b r o k e r _ e x t e n s i o n 			*/
+/*			s l a m _ e x t e n s i o n 			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_extension * broker_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * slam_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
 
 /*	------------------------------------------------------------------	*/
-/* 	  actions and methods required for the broker service category		*/
+/* 	  actions and methods required for the slam instance category		*/
 /*	------------------------------------------------------------------	*/
-#include "brokerservice.c"		
-#include "brokerplan.c"		
 
 /*	------------------------------------------------------------------	*/
-/*			b r o k e r _ o p e r a t i o n				*/
+/*			s l a m _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
-private	int	broker_operation( char * nptr )
+private	int	slam_operation( char * nptr )
 {
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_broker.xml");
+	set_autosave_cords_xlink_name("links_slam.xml");
 
-	if (!( optr = occi_cords_action_builder( Broker.domain, "action" ) ))
+
+	if (!( optr = occi_cords_agreement_builder( Slam.domain, "agreement" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -156,7 +157,7 @@ private	int	broker_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = broker_plan_builder( Broker.domain,"plan" ) ))
+	if (!( optr = occi_cords_terms_builder( Slam.domain, "terms" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -164,7 +165,14 @@ private	int	broker_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_provider_builder( Broker.domain,"provider" ) ))
+	if (!( optr = occi_cords_term_builder( Slam.domain, "term" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_cords_variable_builder( Slam.domain, "variable" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -172,55 +180,46 @@ private	int	broker_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_profile_builder( Broker.domain,"profile" ) ))
+	if (!( optr = occi_cords_guarantee_builder( Slam.domain, "guarantee" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback = (void *) 0;
 
-	if (!( optr = broker_service_builder( Broker.domain,"service" ) ))
+	if (!( optr = occi_cords_business_builder( Slam.domain, "business" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->callback = (void *) 0;
 
-	if (!( optr = occi_cords_instance_builder( Broker.domain,"instance" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
+	rest_initialise_log(Slam.monitor);
 
-	if ( Broker.autopub ) optr->access   |= _OCCI_AUTO_PUBLISH;
-
-	rest_initialise_log(Broker.monitor);
-
-	if (!( Broker.identity ))
-		return( occi_server(  nptr, Broker.restport, Broker.tls, Broker.threads, first, (char *) 0 ) );
+	if (!( Slam.identity ))
+		return( occi_server(  nptr, Slam.restport, Slam.tls, Slam.threads, first,(char *) 0 ) );
 	else
 	{
-		initialise_occi_publisher( Broker.publisher, (char*) 0, (char *) 0, (char *) 0);
+		initialise_occi_publisher( Slam.publisher, (char*) 0, (char *) 0, (char *) 0);
 		return( publishing_occi_server(
-			Broker.user, Broker.password,
-			Broker.identity,  nptr, 
-			Broker.restport, Broker.tls, 
-			Broker.threads, first ) );
+			Slam.user, Slam.password,
+			Slam.identity,  nptr, 
+			Slam.restport, Slam.tls, 
+			Slam.threads, first ) );
 	}
 }
 
 /*	------------------------------------------------------------------	*/
-/*				b r o k e r 					*/
+/*				s l a m 					*/
 /*	------------------------------------------------------------------	*/
-private	int	broker(int argc, char * argv[] )
+private	int	slam(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	broker_load();
+	slam_load();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -231,10 +230,10 @@ private	int	broker(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				Broker.verbose=1;
+				Slam.verbose=1;
 				continue;
 			case	'd'	:
-				Broker.debug = 0xFFFF;
+				Slam.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -244,7 +243,7 @@ private	int	broker(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = broker_operation(aptr) ))
+		else if (!( status = slam_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -258,11 +257,11 @@ public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
 		return( banner() );
-	else	return( broker( argc, argv ) );
+	else	return( slam( argc, argv ) );
 }
 
 
 	/* --------- */
-#endif	/* _broker_c */
+#endif	/* _slam_c */
 	/* --------- */
 

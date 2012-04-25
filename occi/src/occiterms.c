@@ -19,54 +19,54 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _agreement_c_
-#define _agreement_c_
+#ifndef _terms_c_
+#define _terms_c_
 
-#include "agreement.h"
+#include "terms.h"
 
-/*	----------------------------------------	*/
-/*	o c c i _ c o r d s _ a g r e e m e n t 	*/
-/*	----------------------------------------	*/
+/*	--------------------------------	*/
+/*	o c c i _ c o r d s _ t e r m s 	*/
+/*	--------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct cords_agreement * allocate_cords_agreement();
-struct cords_agreement * liberate_cords_agreement(struct cords_agreement * optr);
-private pthread_mutex_t list_cords_agreement_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * cords_agreement_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * cords_agreement_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_cords_agreement_node() { return( cords_agreement_first ); }
+struct cords_terms * allocate_cords_terms();
+struct cords_terms * liberate_cords_terms(struct cords_terms * optr);
+private pthread_mutex_t list_cords_terms_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * cords_terms_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * cords_terms_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_cords_terms_node() { return( cords_terms_first ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_cords_agreement_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_terms_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		cords_agreement_first = nptr->next;
+		cords_terms_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		cords_agreement_last = nptr->previous;
+		cords_terms_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_cords_agreement_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_cords_agreement_control );
-	nptr = ll_drop_cords_agreement_node( nptr );
-	pthread_mutex_unlock( &list_cords_agreement_control );
+private struct occi_kind_node * drop_cords_terms_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_terms_control );
+	nptr = ll_drop_cords_terms_node( nptr );
+	pthread_mutex_unlock( &list_cords_terms_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_cords_agreement_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_terms_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
-	for ( nptr = cords_agreement_first;
+	struct cords_terms * pptr;
+	for ( nptr = cords_terms_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -75,64 +75,64 @@ private struct occi_kind_node * ll_locate_cords_agreement_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_cords_agreement_node(char * id) {
+private struct occi_kind_node * locate_cords_terms_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_agreement_control );
-	nptr = ll_locate_cords_agreement_node(id);
-	pthread_mutex_unlock( &list_cords_agreement_control );
+	pthread_mutex_lock( &list_cords_terms_control );
+	nptr = ll_locate_cords_terms_node(id);
+	pthread_mutex_unlock( &list_cords_terms_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_cords_agreement_node(int mode) {
+private struct occi_kind_node * ll_add_cords_terms_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_cords_agreement()))
+		if (!( nptr->contents = allocate_cords_terms()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = cords_agreement_last ))
-				cords_agreement_first = nptr;
+			if (!( nptr->previous = cords_terms_last ))
+				cords_terms_first = nptr;
 			else	nptr->previous->next = nptr;
-			cords_agreement_last = nptr;
+			cords_terms_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_cords_agreement_node(int mode) {
+private struct occi_kind_node * add_cords_terms_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_cords_agreement_control );
-	nptr = ll_add_cords_agreement_node( mode );
-	pthread_mutex_unlock( &list_cords_agreement_control );
+	pthread_mutex_lock( &list_cords_terms_control );
+	nptr = ll_add_cords_terms_node( mode );
+	pthread_mutex_unlock( &list_cords_terms_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_cords_agreement_name="cords_agreement.xml";
-private void autoload_cords_agreement_nodes() {
-	char * fn=autosave_cords_agreement_name;	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+private char*autosave_cords_terms_name="cords_terms.xml";
+private void autoload_cords_terms_nodes() {
+	char * fn=autosave_cords_terms_name;	struct occi_kind_node * nptr;
+	struct cords_terms * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"cords_agreements")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_termss")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "cords_agreement" ) ) continue;
-			else if (!( nptr = add_cords_agreement_node(0))) break;
+			else if ( strcmp( vptr->name, "cords_terms" ) ) continue;
+			else if (!( nptr = add_cords_terms_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
@@ -140,20 +140,10 @@ private void autoload_cords_agreement_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "initiator" )) != (struct xml_atribut *) 0)
-				pptr->initiator = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "responder" )) != (struct xml_atribut *) 0)
-				pptr->responder = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "serviceprovider" )) != (struct xml_atribut *) 0)
-				pptr->serviceprovider = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "expiration" )) != (struct xml_atribut *) 0)
-				pptr->expiration = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "templateid" )) != (struct xml_atribut *) 0)
-				pptr->templateid = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "templatename" )) != (struct xml_atribut *) 0)
-				pptr->templatename = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "links" )) != (struct xml_atribut *) 0)
-				pptr->links = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
+				pptr->type = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "terms" )) != (struct xml_atribut *) 0)
+				pptr->terms = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
 				pptr->status = document_atribut_value(aptr);
 			}
@@ -165,21 +155,21 @@ private void autoload_cords_agreement_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_cords_agreement_name(char * fn) {
-	autosave_cords_agreement_name = fn;	return;
+public  void set_autosave_cords_terms_name(char * fn) {
+	autosave_cords_terms_name = fn;	return;
 }
-public  void autosave_cords_agreement_nodes() {
-	char * fn=autosave_cords_agreement_name;	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+public  void autosave_cords_terms_nodes() {
+	char * fn=autosave_cords_terms_name;	struct occi_kind_node * nptr;
+	struct cords_terms * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_cords_agreement_control );
+	pthread_mutex_lock( &list_cords_terms_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<cords_agreements>\n");
-	for ( nptr = cords_agreement_first;
+	fprintf(h,"<cords_termss>\n");
+	for ( nptr = cords_terms_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<cords_agreement\n");
+		fprintf(h,"<cords_terms\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
@@ -189,46 +179,31 @@ public  void autosave_cords_agreement_nodes() {
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," initiator=%c",0x0022);
-		fprintf(h,"%s",(pptr->initiator?pptr->initiator:""));
+		fprintf(h," type=%c",0x0022);
+		fprintf(h,"%s",(pptr->type?pptr->type:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," responder=%c",0x0022);
-		fprintf(h,"%s",(pptr->responder?pptr->responder:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," serviceprovider=%c",0x0022);
-		fprintf(h,"%s",(pptr->serviceprovider?pptr->serviceprovider:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," expiration=%c",0x0022);
-		fprintf(h,"%s",(pptr->expiration?pptr->expiration:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," templateid=%c",0x0022);
-		fprintf(h,"%s",(pptr->templateid?pptr->templateid:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," templatename=%c",0x0022);
-		fprintf(h,"%s",(pptr->templatename?pptr->templatename:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," links=%c",0x0022);
-		fprintf(h,"%u",pptr->links);
+		fprintf(h," terms=%c",0x0022);
+		fprintf(h,"%u",pptr->terms);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," status=%c",0x0022);
 		fprintf(h,"%u",pptr->status);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</cords_agreements>\n");
+	fprintf(h,"</cords_termss>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_cords_agreement_control );
+	pthread_mutex_unlock( &list_cords_terms_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_cords_agreement_field(
+private void set_cords_terms_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -238,20 +213,10 @@ private void set_cords_agreement_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
-		if (!( strcmp( nptr, "initiator" ) ))
-			pptr->initiator = allocate_string(vptr);
-		if (!( strcmp( nptr, "responder" ) ))
-			pptr->responder = allocate_string(vptr);
-		if (!( strcmp( nptr, "serviceprovider" ) ))
-			pptr->serviceprovider = allocate_string(vptr);
-		if (!( strcmp( nptr, "expiration" ) ))
-			pptr->expiration = allocate_string(vptr);
-		if (!( strcmp( nptr, "templateid" ) ))
-			pptr->templateid = allocate_string(vptr);
-		if (!( strcmp( nptr, "templatename" ) ))
-			pptr->templatename = allocate_string(vptr);
-		if (!( strcmp( nptr, "links" ) ))
-			pptr->links = atoi(vptr);
+		if (!( strcmp( nptr, "type" ) ))
+			pptr->type = allocate_string(vptr);
+		if (!( strcmp( nptr, "terms" ) ))
+			pptr->terms = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
 			pptr->status = atoi(vptr);
 		}
@@ -261,23 +226,23 @@ private void set_cords_agreement_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct cords_agreement * filter_cords_agreement_info(
+private struct cords_terms * filter_cords_terms_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct cords_agreement * pptr;
-		if (!( pptr = allocate_cords_agreement()))
+	struct cords_terms * pptr;
+		if (!( pptr = allocate_cords_terms()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_agreement_field) ))
-		return( liberate_cords_agreement(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_terms_field) ))
+		return( liberate_cords_terms(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_cords_agreement_filter(
-	struct cords_agreement * pptr,struct cords_agreement * fptr) {
+private int pass_cords_terms_filter(
+	struct cords_terms * pptr,struct cords_terms * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -299,49 +264,14 @@ private int pass_cords_agreement_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
-	if (( fptr->initiator )
-	&&  (strlen( fptr->initiator ) != 0)) {
-		if (!( pptr->initiator ))
+	if (( fptr->type )
+	&&  (strlen( fptr->type ) != 0)) {
+		if (!( pptr->type ))
 			return(0);
-		else if ( strcmp(pptr->initiator,fptr->initiator) != 0)
-			return(0);
-		}
-	if (( fptr->responder )
-	&&  (strlen( fptr->responder ) != 0)) {
-		if (!( pptr->responder ))
-			return(0);
-		else if ( strcmp(pptr->responder,fptr->responder) != 0)
+		else if ( strcmp(pptr->type,fptr->type) != 0)
 			return(0);
 		}
-	if (( fptr->serviceprovider )
-	&&  (strlen( fptr->serviceprovider ) != 0)) {
-		if (!( pptr->serviceprovider ))
-			return(0);
-		else if ( strcmp(pptr->serviceprovider,fptr->serviceprovider) != 0)
-			return(0);
-		}
-	if (( fptr->expiration )
-	&&  (strlen( fptr->expiration ) != 0)) {
-		if (!( pptr->expiration ))
-			return(0);
-		else if ( strcmp(pptr->expiration,fptr->expiration) != 0)
-			return(0);
-		}
-	if (( fptr->templateid )
-	&&  (strlen( fptr->templateid ) != 0)) {
-		if (!( pptr->templateid ))
-			return(0);
-		else if ( strcmp(pptr->templateid,fptr->templateid) != 0)
-			return(0);
-		}
-	if (( fptr->templatename )
-	&&  (strlen( fptr->templatename ) != 0)) {
-		if (!( pptr->templatename ))
-			return(0);
-		else if ( strcmp(pptr->templatename,fptr->templatename) != 0)
-			return(0);
-		}
-	if (( fptr->links ) && ( pptr->links != fptr->links )) return(0);
+	if (( fptr->terms ) && ( pptr->terms != fptr->terms )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
 }
@@ -349,10 +279,10 @@ private int pass_cords_agreement_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_occi_response(
+private struct rest_response * cords_terms_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct cords_agreement * pptr)
+	struct cords_terms * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
@@ -364,25 +294,10 @@ private struct rest_response * cords_agreement_occi_response(
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.initiator=%s",optr->domain,optr->id,pptr->initiator);
+	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.responder=%s",optr->domain,optr->id,pptr->responder);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.serviceprovider=%s",optr->domain,optr->id,pptr->serviceprovider);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.expiration=%s",optr->domain,optr->id,pptr->expiration);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.templateid=%s",optr->domain,optr->id,pptr->templateid);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.templatename=%s",optr->domain,optr->id,pptr->templatename);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.links=%u",optr->domain,optr->id,pptr->links);
+	sprintf(cptr->buffer,"%s.%s.terms=%u",optr->domain,optr->id,pptr->terms);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
@@ -398,37 +313,37 @@ private struct rest_response * cords_agreement_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_get_item(
+private struct rest_response * cords_terms_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_cords_agreement_nodes();
-	return( cords_agreement_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_terms_nodes();
+	return( cords_terms_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_post_link(
+private struct rest_response * cords_terms_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -438,16 +353,16 @@ private struct rest_response * cords_agreement_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_post_mixin(
+private struct rest_response * cords_terms_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	char * reqhost;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -457,7 +372,7 @@ private struct rest_response * cords_agreement_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_post_action(
+private struct rest_response * cords_terms_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -465,10 +380,10 @@ private struct rest_response * cords_agreement_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -484,26 +399,26 @@ private struct rest_response * cords_agreement_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_post_item(
+private struct rest_response * cords_terms_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_cords_agreement_node(1)))
+	if (!( nptr = add_cords_terms_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_agreement_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_terms_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_cords_agreement_nodes();
+	autosave_cords_terms_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -515,37 +430,37 @@ private struct rest_response * cords_agreement_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_put_item(
+private struct rest_response * cords_terms_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_agreement_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_terms_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_cords_agreement_nodes();
-	return( cords_agreement_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_terms_nodes();
+	return( cords_terms_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_head_item(
+private struct rest_response * cords_terms_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	struct cords_terms * pptr;
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -555,20 +470,20 @@ private struct rest_response * cords_agreement_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_delete_item(
+private struct rest_response * cords_terms_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct cords_agreement * pptr;
+	struct cords_terms * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_cords_agreement_node(id)))
+	if (!( nptr = locate_cords_terms_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_cords_agreement_node( nptr );
-	autosave_cords_agreement_nodes();
+	drop_cords_terms_node( nptr );
+	autosave_cords_terms_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -577,25 +492,25 @@ private struct rest_response * cords_agreement_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_get_list(
+private struct rest_response * cords_terms_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct cords_agreement * pptr;
-	struct cords_agreement * fptr;
+	struct cords_terms * pptr;
+	struct cords_terms * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_cords_agreement_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_cords_terms_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = cords_agreement_first;
+	for ( sptr = cords_terms_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_cords_agreement_filter( pptr, fptr ) ))
+		if (!( pass_cords_terms_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -609,7 +524,7 @@ private struct rest_response * cords_agreement_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * cords_agreement_delete_all(
+private struct rest_response * cords_terms_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -617,26 +532,26 @@ private struct rest_response * cords_agreement_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct cords_agreement * pptr;
-	struct cords_agreement * fptr;
+	struct cords_terms * pptr;
+	struct cords_terms * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_cords_agreement_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_cords_terms_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=cords_agreement_first;
+	nptr=cords_terms_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_cords_agreement_filter( pptr, fptr ) ))) {
+		||  (!( pass_cords_terms_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_cords_agreement_node( nptr );
+			drop_cords_terms_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_cords_agreement_nodes();
+	autosave_cords_terms_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -645,7 +560,7 @@ private struct rest_response * cords_agreement_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_agreement_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_terms_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -660,16 +575,16 @@ private struct rest_response * occi_cords_agreement_get(void * vptr, struct rest
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_agreement_get_list( optr, cptr, rptr, aptr ) );
+		return( cords_terms_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_agreement_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_agreement_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_terms_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -684,14 +599,14 @@ private struct rest_response * occi_cords_agreement_head(void * vptr, struct res
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_agreement_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_agreement_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_terms_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -706,24 +621,24 @@ private struct rest_response * occi_cords_agreement_post(void * vptr, struct res
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( cords_agreement_post_item( optr, cptr, rptr, aptr ) );
+		return( cords_terms_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( cords_agreement_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( cords_agreement_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( cords_agreement_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_agreement_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_terms_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -738,14 +653,14 @@ private struct rest_response * occi_cords_agreement_put(void * vptr, struct rest
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_agreement_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_cords_agreement_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_terms_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -760,68 +675,58 @@ private struct rest_response * occi_cords_agreement_delete(void * vptr, struct r
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( cords_agreement_delete_all( optr, cptr, rptr, aptr ) );
+		return( cords_terms_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( cords_agreement_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_terms_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_cords_agreement_mt( struct rest_interface * iptr )
+private void	redirect_occi_cords_terms_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_cords_agreement_get;
-	iptr->post = occi_cords_agreement_post;
-	iptr->put = occi_cords_agreement_put;
-	iptr->delete = occi_cords_agreement_delete;
-	iptr->head = occi_cords_agreement_head;
+	iptr->get = occi_cords_terms_get;
+	iptr->post = occi_cords_terms_post;
+	iptr->put = occi_cords_terms_put;
+	iptr->delete = occi_cords_terms_delete;
+	iptr->head = occi_cords_terms_head;
 	return;
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_cords_agreement */
-public struct occi_category * occi_cords_agreement_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_cords_terms */
+public struct occi_category * occi_cords_terms_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource cords_agreement";
+	char * f="CompatibleOne OCCI resource cords_terms";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_cords_agreement_mt(optr->interface);
+		redirect_occi_cords_terms_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "initiator",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "responder",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "serviceprovider",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "expiration",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "templateid",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "templatename",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "links",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "terms",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
-		autoload_cords_agreement_nodes();
+		autoload_cords_terms_nodes();
 		return(optr);
 	}
 
 }
 
-/*	--------------------------------------------------------	*/
-/*	c o r d s _ a g r e e m e n t _ o c c i _ h e a d e r s 	*/
-/*	--------------------------------------------------------	*/
-public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement * sptr)
+/*	------------------------------------------------	*/
+/*	c o r d s _ t e r m s _ o c c i _ h e a d e r s 	*/
+/*	------------------------------------------------	*/
+public struct rest_header *  cords_terms_occi_headers(struct cords_terms * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -836,7 +741,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"cords_agreement; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"cords_terms; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -847,7 +752,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.name='%s'\r\n",(sptr->name?sptr->name:""));
+	sprintf(buffer,"occi.cords_terms.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -858,7 +763,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.description='%s'\r\n",(sptr->description?sptr->description:""));
+	sprintf(buffer,"occi.cords_terms.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -869,7 +774,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.initiator='%s'\r\n",(sptr->initiator?sptr->initiator:""));
+	sprintf(buffer,"occi.cords_terms.type='%s'\r\n",(sptr->type?sptr->type:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -880,7 +785,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.responder='%s'\r\n",(sptr->responder?sptr->responder:""));
+	sprintf(buffer,"occi.cords_terms.terms='%u'\r\n",sptr->terms);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -891,66 +796,11 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.serviceprovider='%s'\r\n",(sptr->serviceprovider?sptr->serviceprovider:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_agreement.expiration='%s'\r\n",(sptr->expiration?sptr->expiration:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_agreement.templateid='%s'\r\n",(sptr->templateid?sptr->templateid:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_agreement.templatename='%s'\r\n",(sptr->templatename?sptr->templatename:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_agreement.links='%u'\r\n",sptr->links);
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_agreement.status='%u'\r\n",sptr->status);
+	sprintf(buffer,"occi.cords_terms.status='%u'\r\n",sptr->status);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _agreement_c_ */
+#endif	/* _terms_c_ */

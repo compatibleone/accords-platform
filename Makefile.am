@@ -48,6 +48,9 @@ endif
 if ENABLE_COSCHED
 SUBDIRS += cosched
 endif
+if ENABLE_SLAM
+SUBDIRS += slam
+endif
 if ENABLE_COES
 SUBDIRS += coes
 endif

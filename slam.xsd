@@ -1,0 +1,83 @@
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Compatible One Service Level Agreement Description Schema Version 2.08
+			Provisionary Version 25th April 2012
+			Enforced by the ACCORDS Parser
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/cordstypes.xsd"/>
+
+	<xsd:element name="agreement" type="cordsAgreement"/>
+
+	<xsd:complexType name="cordsAgreement">
+		<xsd:element name="terms" type="cordsTerms" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="initiator" type="xsd:string"/>
+		<xsd:attribute name="responder" type="xsd:string"/>
+		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="expiration" type="xsd:string"/>
+		<xsd:attribute name="template" type="xsd:string"/>
+		<xsd:attribute name="templatename" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsTerms">
+		<xsd:element name="term" type="cordsTerm" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsTerm">
+		<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
+		<xsd:element name="guarantee" type="cordsGuarantee" minOccurs="0" maxOccurs="1"/>
+		<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="identity" type="xsd:string"/>
+		<xsd:attribute name="payload" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsVariable">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="metric" type="xsd:string"/>
+		<xsd:attribute name="location" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsGuarantee">
+		<xsd:element name="business" type="cordsBusiness" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="obligated" type="xsd:string"/>
+		<xsd:attribute name="service" type="xsd:string"/>
+		<xsd:attribute name="scope" type="xsd:string"/>
+		<xsd:attribute name="condition" type="xsd:string"/>
+		<xsd:attribute name="objective" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsBusiness">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+</xsd:schema>
+
+

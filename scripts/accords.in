@@ -156,6 +156,10 @@ _co_start() {
     run-azprocci &
     sleep 1
 
+    echo "Starting accords sla services"
+    run-slam &
+    sleep 1
+
     echo "Starting accords software configuration services"
     run-cosacs &
     sleep 1
@@ -240,6 +244,7 @@ _co_status() {
 
 _co_stop() {
     _stop_service cosacs
+    _stop_service slam
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -325,6 +330,10 @@ _run_testosocci() {
     testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
+_run_slam() {
+    slam --config $target CO-SLAM/1.0
+}
+
 _run_parser() {
     parser --config $target CO-PARSER/1.0
 }
@@ -365,6 +374,7 @@ _make_security_files() {
 	_mksecs osocciprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
+	_mksecs slam 1
 	_mksecs command
     
 	_mksect testcp 1
@@ -435,6 +445,7 @@ _accords_config() {
 		_mkcert osocciprocci
 		_mkcert onprocci
 		_mkcert azprocci
+		_mkcert slam
 		_mkcert cosacs
 	
 		_mkcert testcp
@@ -468,6 +479,7 @@ _accords_config() {
     _mkcfg coips
     _mkcfg coees 
     _mkcfg cosched
+    _mkcfg slam
     _mkcosacs cosacs
 
     echo "</accords>" >> $target
@@ -706,6 +718,9 @@ case `basename $0` in
 	;;
     run-testosocci)
 	_run_testosocci $*
+	;;
+    run-slam)
+	_run_slam $*
 	;;
     run-parser)
 	_run_parser $*
