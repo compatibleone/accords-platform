@@ -1,0 +1,74 @@
+
+<?xml version="1.0" encoding="UTF8"?>
+<agreement 
+	name="testsla1" 
+	xmlns="http://www.compatibleone.fr/schemes/slam.xsd"
+	description="first test of SLA schema controlled document"
+	initiator="jamie"
+	responder="accords"
+	provider="agreementResponder"
+	expiration="never"
+	template="none"
+	template="none">
+
+<terms name="requirements" type="all">
+	<term name="term1" type="description">
+		<manifest name="smalltestfw">
+			<node name="smalltestfw1" type="simple" access="public" scope="normal" provider="openstack" >
+				<infrastructure name="smalltestfw">
+					<compute name="smalltestfw" architecture="x86_64" cores="1" memory="1G" speed="1G"/>
+					<storage name="smalltestfw" size="10G"/>
+					<network name="nova" label="ethernet" vlan="100M">
+						<port name="cosacs" protocol="tcp" from="8286" to="8286"/>
+						<port name="ssh" protocol="tcp" from="22" to="22"/>
+					</network>
+				</infrastructure>
+				<image name="smalltestfw">
+					<system name="debian"/>
+				</image>
+			</node>
+			<configuration name="smalltestfw"/>
+			<interface name="smalltestfw"/>
+			<account name="test"/>
+			<security name="smalltestfw"/>
+		</manifest>
+	</term>
+</terms>
+
+<terms name="guarantees" type="all">
+	<term name="term2" type="guarantee">
+		<guarantee 
+			name="g1"
+			obligated="agreementResponder"
+			service="term1"
+			condition="active"
+			objective="80%">
+			<business name="fine"/>
+			<business name="lawsuit"/>
+		</guarantee>
+	</term>
+</terms>
+
+</agreement>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
