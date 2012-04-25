@@ -33,7 +33,7 @@
 
 struct	accords_configuration Ezvm = {
 	0,0, 
-	0,0,0,
+	0,0,0,0,
 	(char *) 0,
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,

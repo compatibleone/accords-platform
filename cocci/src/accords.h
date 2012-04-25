@@ -29,6 +29,7 @@ struct	accords_configuration
 	int	verbose;		/* activate verbose messages		*/
 	int	debug;			/* activate debug messages		*/
 	int	threads;		/* allow use of threads			*/
+	int	ipv6;			/* require use of IP V6			*/
 
 	char *  tls;			/* security configuration filename 	*/
 	char *	identity;		/* identity for publication of service	*/

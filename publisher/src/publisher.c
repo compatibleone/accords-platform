@@ -54,7 +54,7 @@ private	struct rest_response * publisher_delete_item(
 
 struct	accords_configuration Publisher = {
 	0,0,
-	0,0,0,
+	0,0,0,0,
 	(char *) 0,
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,

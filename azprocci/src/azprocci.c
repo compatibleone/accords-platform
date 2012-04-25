@@ -31,7 +31,7 @@
 
 struct	accords_configuration WazProcci = {
 	0,0,
-	0,0,0,
+	0,0,0,0,
 	(char *) 0,
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,

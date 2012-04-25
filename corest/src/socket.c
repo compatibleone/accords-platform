@@ -7,6 +7,25 @@ extern	int	check_debug();
 
 private	pthread_mutex_t socket_control = PTHREAD_MUTEX_INITIALIZER;
 
+private	_socket_type=AF_INET;
+
+public	void	set_socket_ipv6()
+{
+	_socket_type=AF_INET6;
+	return;
+}
+	
+public	void	set_socket_ipv4()
+{
+	_socket_type=AF_INET;
+	return;
+}
+	
+public	int	get_socket_type()
+{
+	return( _socket_type );
+}
+
 /*	------------------------------------------	*/
 /*		s o c k e t _ s e l e c t		*/
 /*	------------------------------------------	*/
@@ -143,7 +162,7 @@ public	int	socket_connect( int h, char * u,int port )
 	{
 		printf( "socket_connect(%u,%s,%u)\n",h,u,port);
 	}
-	address.sin_family = AF_INET;
+	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);
 	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
@@ -155,7 +174,7 @@ public	int	socket_connect( int h, char * u,int port )
 		return( 0 );
 	else 	
 	{
-		server.sin_family = AF_INET;
+		server.sin_family = get_socket_type();
 		memcpy(tempxfer, hp->h_addr_list[0],4);
 		memcpy(&server.sin_addr.s_addr,tempxfer,4);
 		server.sin_port = htons(port);
@@ -187,7 +206,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 	{
 		printf( "socket_connect(%u,%s,%u)\n",h,u,port);
 	}
-	address.sin_family = AF_INET;
+	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);
 	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
@@ -199,7 +218,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 		return( 0 );
 	else 	
 	{
-		server.sin_family = AF_INET;
+		server.sin_family = get_socket_type();
 		memcpy(tempxfer, hp->h_addr_list[0],4);
 		memcpy(&server.sin_addr.s_addr,tempxfer,4);
 		server.sin_port = htons(port);
@@ -233,7 +252,7 @@ public	int	socket_listen( int h, int port, int max )
 	if ( check_debug() & _DEBUG_SOCKET ) 
 		printf( "socket_listen(%u,%u,%u)\n",h,port,max);
 
-	address.sin_family = AF_INET;
+	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(port);
 	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) {

@@ -35,7 +35,7 @@
 
 struct	accords_configuration Conets = {
 	0,0,
-	0,0,0,
+	0,0,0,0,
 	(char *) 0,
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,

@@ -46,6 +46,10 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		configuration->verbose = 1;
 	else if (!( strcmp( aptr, "debug" ) ))
 		configuration->debug = 1;
+	else if (!( strcmp( aptr, "ipv6" ) ))
+		configuration->ipv6 = 1;
+	else if (!( strcmp( aptr, "ipv4" ) ))
+		configuration->ipv6 = 0;
 	else if (!( strcmp( aptr, "config" ) ))
 	{
 		configuration->config = allocate_string( argv[++argi] );
@@ -90,6 +94,8 @@ public	void	accords_configuration_options()
 	printf("\n   --threads                  activate thread handlers");
 	printf("\n   __config     <filename>    specify configuration filename ");
 	printf("\n   --tls        <filename>    specify tls configuration filename ");
+	printf("\n   --ipv4                     activate use of IP V4 ( default ) ");
+	printf("\n   --ipv6                     activate use of IP V6 ( default ) ");
 	printf("\n   --resthost   <url>         specify rest server host url");
 	printf("\n   --restport   <number>      specify rest server port");
 	printf("\n   --chathost   <url>         specify chat server host url");
@@ -148,6 +154,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 				configuration->operator = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "verbose")) != (struct xml_atribut *) 0)
 				configuration->verbose = document_atribut_value( aptr );
+			if ((aptr = document_atribut( eptr, "ipv6")) != (struct xml_atribut *) 0)
+				configuration->ipv6 = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "debug")) != (struct xml_atribut *) 0)
 				configuration->debug = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "threads")) != (struct xml_atribut *) 0)
@@ -213,6 +221,10 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 				( security ? "https" : "http" )
 				);
 		}
+		if ( configuration->ipv6 )
+			set_socket_ipv6();
+		else	set_socket_ipv4();
+
 	}
 	else if ( configuration->verbose )
 		printf("   Failed to load configuration section : %s, from : %s \n",section,configuration->config);
