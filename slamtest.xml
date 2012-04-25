@@ -41,10 +41,9 @@
 			name="g1"
 			obligated="agreementResponder"
 			service="term1"
-			condition="active"
+			condition="available"
 			objective="80%">
-			<business name="fine"/>
-			<business name="lawsuit"/>
+			<business name="important"/>
 		</guarantee>
 	</term>
 </terms>
