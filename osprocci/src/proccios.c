@@ -910,6 +910,46 @@ private	void	remove_security_group( struct openstack * pptr )
 	return;
 }
 
+/*	------------------------------------------------------------------	*/
+/*		r e s o l v e _ o p e n s t a c k _ f i r e w a l l		*/
+/*	------------------------------------------------------------------	*/
+private	char *	resolve_openstack_firewall( struct openstack * pptr )
+{
+	struct	os_response *	osptr;
+	struct	data_element * fptr;
+	struct	data_element * dptr;
+	char *	vptr;
+	/* -------------------------- */
+	/* resolve the security group */
+	/* -------------------------- */
+	if (!( pptr->firewall ))
+		return((char *) 0);
+	else if (!(osptr = os_list_security_groups()))
+		return((char *) 0);
+	else if (!( fptr = json_element( osptr->jsonroot, "security_groups" )))
+		return((char *) 0);
+
+	for ( 	dptr=fptr->first;
+		dptr != (struct data_element *) 0;
+		dptr = dptr->next )
+	{
+		if (!( vptr = json_atribut( dptr, "name" ) ))
+			continue;
+		else if ( strcmp( vptr, pptr->firewall ) )
+			continue;
+		else if (!( vptr = json_atribut( dptr, "id" ) ))
+			continue;
+		else
+		{
+			if ( pptr->group ) pptr->group = liberate( pptr->group );
+			pptr->group = allocate_string( vptr );
+			osptr = liberate_os_response( osptr );
+			return( pptr->group );
+		}					
+	}
+	return( (char *) 0 );
+}
+
 /*	----------------------------------------------------------------	*/
 /*		b u i l d _ o p e n s t a c k _ f i r e w a l l			*/
 /*	----------------------------------------------------------------	*/
@@ -936,10 +976,15 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 		return(0);
 	else if (!( pptr->firewall ))
 		return(0);
+	else if (( rulegroup = resolve_openstack_firewall( pptr )) != (char *) 0)
+		return( 0 );
 	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( 0 );
-	else
 	{
+
+		/* -------------------------- */
+		/* create the security group  */
+		/* -------------------------- */
 		for (	eptr = first_standard_message_link( firewall.message );
 			eptr != (struct occi_element *) 0;
 			eptr = next_standard_message_link( eptr ) )
@@ -957,7 +1002,7 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 			/* --------------------------------------- */
 			if (!( started++ ))
 			{
-				if (!( filename = os_create_security_group_request( pptr->id )))
+				if (!( filename = os_create_security_group_request( pptr->firewall )))
 					return(0);
 				else if (!( osptr = os_create_security_group( filename ) ))
 				{
@@ -1115,7 +1160,6 @@ private	struct	rest_response * start_openstack(
 				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
 				{
 					remove_floating_address( pptr );
-					remove_security_group( pptr );
 					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
 				}
@@ -1370,10 +1414,6 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ensure release of the allocated floating IP */
 		/* ------------------------------------------- */
 		remove_floating_address( pptr );
-		/* ------------------------------------------- */
-		/* ensure release of the server security group */
-		/* ------------------------------------------- */
-		remove_security_group( pptr );
 		return( osptr );
 	}
 }
