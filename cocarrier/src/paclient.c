@@ -281,9 +281,9 @@ public char * pa_java_procci_call(char * specific_parameters)
     if      (!(javaprocci = getenv("PA_PROCCI_PATH"))){
         fprintf(stderr, "Environment variable PA_PROCCI_PATH not defined...");
         return NULL;
-    }else if(!(general_parameters = allocate(100 + strlen(Wpa.host) + strlen(Wpa.user) + strlen(Wpa.password)))){
+    }else if(!(general_parameters = allocate(100 + strlen(Wpa.user) + strlen(Wpa.password)))){
         return NULL;
-    }else if(sprintf(general_parameters, " --rm-url %s --sched-url %s --user %s --pass %s ", Wpa.host, Wpa.host, Wpa.user, Wpa.password)<0){
+    }else if(sprintf(general_parameters, " --user %s --pass %s ", Wpa.user, Wpa.password)<0){
         return NULL;
     }else if((all_command = allocate(strlen(javaprocci) + strlen(general_parameters) + strlen(specific_parameters) + 16))==0){
         return NULL;
@@ -595,7 +595,7 @@ public	struct	pa_response *	pa_list_servers	( )
     struct pa_response* result = (struct pa_response*) NULL;
     if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
         return NULL;
-    }else if (!(raw_list = pa_java_procci_call("-l"))){
+    }else if (!(raw_list = pa_java_procci_call("--list-nodes"))){ // Parameters for java layer. 
         fprintf(stderr, "Problem making call to the java layer...\n");
         free(result);
         return NULL;
@@ -634,21 +634,19 @@ public	struct	pa_response *	pa_list_servers	( )
 
 
 
+/*	------------------------------------------------------------	*/
+/*			p a _ c r e a t e _ s e r v e r                         */
+/*	------------------------------------------------------------	*/
 /*! 
- * Lock a ProActive node using as parameters the file given.  */
-public	struct	pa_response *	pa_create_server( char * name )
+ * Lock a ProActive node using as parameters the constraints given.  */
+public	struct	pa_response *	pa_create_server(int physical_memory)
 {
     char * filename = NULL;
     char * raw_list = NULL;
     char command[1024];
 
     struct pa_response* result = (struct pa_response*) NULL;
-    if (name != NULL){
-        sprintf(command,"-g %s" , name ); 
-    }else{
-        fprintf(stderr, "Invalid name for the server...\n");
-        return NULL;
-    }
+    sprintf(command,"--get-node --physical_memory %d" , physical_memory); // Parameters for java layer. 
 
     if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
         return NULL;
@@ -849,8 +847,9 @@ public	struct	pa_response *	pa_update_server(  char * id, char * filename )
 }
 
 /*	------------------------------------------------------------	*/
-/*			p a _ d e l e t e _ s e r v e r 		*/
+/*			p a _ d e l e t e _ s e r v e r                         */
 /*	------------------------------------------------------------	*/
+/*! Unlock one ProActive node from the Scheduler/RM. */
 public	struct	pa_response *	pa_delete_server(  char * id )
 {
     char * filename = NULL;
@@ -858,8 +857,8 @@ public	struct	pa_response *	pa_delete_server(  char * id )
     char command[1024];
 
     struct pa_response* result = (struct pa_response*) NULL;
-    if (id != NULL){
-        sprintf(command,"-d %s" , id ); 
+    if (id != NULL){    // Check valid id. 
+        sprintf(command,"--release-node %s" , id );  // Build command to call. 
     }else{
         fprintf(stderr, "Invalid name for the server...\n");
         return NULL;
@@ -867,11 +866,11 @@ public	struct	pa_response *	pa_delete_server(  char * id )
 
     if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
         return NULL;
-    }else if (!(raw_list = pa_java_procci_call(command))){
+    }else if (!(raw_list = pa_java_procci_call(command))){ // Call the java layer with the "delete" command. 
         fprintf(stderr, "Problem making call to the java layer...\n");
         free(result);
         return NULL;
-    }else{
+    }else{      // Prepare the result to return. 
         result->nature = _TEXT_JSON;
         result->content = raw_list;
         result->xmlroot = NULL;

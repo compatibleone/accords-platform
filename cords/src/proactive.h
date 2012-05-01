@@ -7,17 +7,17 @@
  */
 struct	proactive
 {
-	char *	id;
+	char *	id;         // Internal id? 
 
-	char *	name;
+	char *	name;       // Name given to the ProActive node. 
 	char *	flavor;
 	char *	image;
 	char *	profile;
 
-	char *	number; // uuid of the request? 
+	char *	number;     // uuid of the ProActive node request? 
 	char *	access;
-	char *	rootpass;
-	char *	reference;
+	char *	rootpass;   // administrator pass to access the ProActive node once it is locked. 
+	char *	reference;  // host id. 
 	char *	publicaddr;
 	char *	privateaddr;
 
@@ -26,6 +26,7 @@ struct	proactive
 	int	when;
 
 	int	status;
+
 };
 
 #endif	
