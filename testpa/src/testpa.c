@@ -120,7 +120,14 @@ private	int	pa_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-            pa_result( pa_create_server( p3 ) );
+            if (p3 ==NULL)
+                return( failure(27,"invalid int value","no node with that physical memory available" ) );
+
+            int physical_memory = atoi(p3); 
+            if (atoi == 0){
+                return( failure(27,"invalid int value","no node with that physical memory available" ) );
+            }
+            pa_result( pa_create_server(physical_memory) ); // Parameters are contraints for the new ProActive node: ram, ...
             return( 0 );
 		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))

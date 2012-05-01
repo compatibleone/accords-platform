@@ -146,15 +146,16 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
-/*! This function fills in the struct proactive* given usign the information that lies into 
- * the pa_response structure. */
-private	int	connect_proactive_server( struct pa_response * rptr,struct proactive * pptr )
+/*! This function fills in the struct proactive* given by usign the information that lies into 
+ * the pa_response structure + calling the server to get info about the ProActive node. 
+ * It also frees some proactive* structure fields. */
+private	int	connect_proactive_server( struct pa_response * server_created,struct proactive * server_data )
 {
 	struct	pa_response * zptr;
 	struct	pa_response * yptr;
-	char *	vptr;
+	char *	vptr; // Auxiliar variable. 
     // MMM check it.
-	if (!( pptr ))
+	if (!( server_data ))
 		return( 118 );
 	else
 	{
@@ -164,30 +165,34 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		/* available at this point and cannot be retrieved by	*/
 		/* any other means so it must not be lost.		*/ 
 		/* ---------------------------------------------------- */
-		if ( pptr->number ) 
-			pptr->number = liberate( pptr->number );
 
-		if ( pptr->rootpass ) 
-			pptr->rootpass = liberate( pptr->rootpass );
+        // If the analysed pointers were pointing to something, free that something. 
+		if ( server_data->number ) 
+			server_data->number = liberate( server_data->number );
 
-		if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
+		if ( server_data->rootpass ) 
+			server_data->rootpass = liberate( server_data->rootpass );
+
+        // Filling in the server_data structure given. 
+		if (!( vptr = json_atribut( server_created->jsonroot, "id") )) // Obtaining the ID of the operation. 
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		else if (!( pptr->number = allocate_string(vptr)))
+		else if (!( server_data->number = allocate_string(vptr))) // Putting the ID of the ProActive node in proactive*->number.
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		else if (!( vptr = json_atribut( rptr->jsonroot, "adminPass") ))
+
+		else if (!( vptr = json_atribut( server_created->jsonroot, "adminPass") )) // Obtaining the adminPass to access the ProActive node. 
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		else if (!( pptr->rootpass  = allocate_string(vptr)))
+		else if (!( server_data->rootpass  = allocate_string(vptr))) // Putting the adminPass of the ProActive node in proactive*->rootpass.
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
 		autosave_proactive_nodes();
@@ -196,83 +201,91 @@ private	int	connect_proactive_server( struct pa_response * rptr,struct proactive
 		/* the final identification information to complete the  */
 		/* proactive provisioning request.			 */
 		/* ----------------------------------------------------- */
-		yptr = rptr;
+		yptr = server_created;
 		zptr = (struct pa_response *) 0;
 		while (1)
 		{
-			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
+			if (!( vptr = json_atribut( yptr->jsonroot, "status" ))) // Get the status of the node. 
 			{
-				reset_structure_proactive_server( pptr );
+				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
-			else if (!( strcmp( vptr, "BUILD" )))
+			else if (!( strcmp( vptr, "PREPARING" )))                   // Check if the node is in Pending status, if so wait and re-ask. 
 			{
 				sleep(1);
 				if ( zptr )
 					zptr = liberate_pa_response( zptr );
-				if (!( zptr = pa_get_server( pptr->number )))
+				if (!( zptr = pa_get_server( server_data->number ))) // Here re-connect to the server and get UP-TO-DATE info about the ProActive node to check status. 
 				{
-					reset_structure_proactive_server( pptr );
+					reset_structure_proactive_server( server_data );
 					return( 555 );
 				}
 				else	yptr = zptr;
 			}
-			else if (!( strcmp( vptr, "ACTIVE" )))
+			else if (!( strcmp( vptr, "RUNNING" )))                  // Check if the node is in Running (correct) status, if so, exit the loop. 
 				break;
+			else if (!( strcmp( vptr, "IDLE" )))                  // Check if the node is in Finished status (which is not correct). 
+            {
+                reset_structure_proactive_server( server_data );
+                return( 555 );
+            }
 		}
-		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
-		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
+		if ( server_data->hostname ) server_data->hostname = liberate( server_data->hostname );
+		if ( server_data->reference ) server_data->reference = liberate( server_data->reference );
+		if ( server_data->publicaddr ) server_data->publicaddr = liberate( server_data->publicaddr );
+		if ( server_data->privateaddr ) server_data->privateaddr = liberate( server_data->privateaddr );
+		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))    // Get the hostId. 
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		else if (!( pptr->reference = allocate_string(vptr)))
+		else if (!( server_data->reference = allocate_string(vptr)))       // Put the hostId in the reference field. 
 		{
-			reset_structure_proactive_server( pptr );
+			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
+		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0) // Get the "private" json field. 
 		{
-			if (!( pptr->privateaddr  = allocate_string(vptr)))
+			if (!( server_data->privateaddr  = allocate_string(vptr)))               // Put in privateaddr the private ip address. 
 			{
-				reset_structure_proactive_server( pptr );
+				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0)
+		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0) // Get the "public" json field. 
 		{
-			if (!( pptr->publicaddr  = allocate_string(vptr)))
+			if (!( server_data->publicaddr  = allocate_string(vptr)))               // Put in proactive*->publicaddr the public ip address of the ProActive node. 
 			{
-				reset_structure_proactive_server( pptr );
+				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
 		}
-		if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
-		{
-			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
+		if (( server_data->publicaddr ) && ( strlen( server_data->publicaddr ) != 0))     // Check if there is a way of accessing the node (either publicip, or hostname).
+		{                                                                   // and put it in the hostname field. 
+			if (!( server_data->hostname = allocate_string( server_data->publicaddr ) ))
 			{
-				reset_structure_proactive_server( pptr );
+				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
 		}
-		else if (( pptr->privateaddr ) && ( strlen( pptr->privateaddr ) != 0))
+		else if (( server_data->privateaddr ) && ( strlen( server_data->privateaddr ) != 0)) // Same as before, but with the privateip. 
 		{
-			if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
+			if (!( server_data->hostname = allocate_string( server_data->privateaddr ) ))
 			{
-				reset_structure_proactive_server( pptr );
+				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
 		}
-		pptr->when = time((long *) 0);
-		pptr->status = _OCCI_RUNNING;
+		server_data->when = time((long *) 0);
+		server_data->status = _OCCI_RUNNING;
 		autosave_proactive_nodes();
 		return(0);
 	}
 }
 
+/*	----------------------------------------*/
+/* 	     s t a r t _ p r o a c t i v e	    */
+/*	----------------------------------------*/
 /*! 
  * This function locks one ProActive node. */
 private	struct	rest_response * start_proactive(
@@ -283,35 +296,41 @@ private	struct	rest_response * start_proactive(
 		void * vptr )               // It is void* , but is casted to a struct proactive* since the request comes
                                     // from the occiserver, which receives something generic (related maybe to OpenStack, or OpenNebula, or any other).
 {
-	struct	pa_response * osptr;
-	struct	proactive * pptr;
+	struct	pa_response * server_created;
+	struct	proactive * server_constraints;
 	int		status;
 	char	*	filename;
 	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
-	if (!( pptr = vptr ))                                                       // Can't provide null.
+    int physical_memory_constraint = 10;                                        // A contraint to apply to the node requested (>10MiB of RAM).
+	if (!( server_constraints = vptr ))                                                       // Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
+	else if ( server_constraints->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( server_constraints->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
 		return( rest_html_response( aptr, status, "Not Found" ) );
     // could be used 
-		//pptr->id, pptr->image, pptr->flavor, personality, resource ) ))
+		//server_constraints->id, here there is a file with details about the kind of required node. 
+        //server_constraints->image, image for the node, not valid now. 
+        //server_constraints->flavor, flavor of the node, not valid now. 
+        //personality, personality of the node, not considered now. 
+        //resource ) )) kind of resource of the node. 
         //    char * name,
         //    char * label,
         //    char * description,
         //    char * location,
         //    char * group )
         //
-	else if (!( osptr = pa_create_server( pptr->id)))                           // Request of a node. 
+	else if (!( server_created = pa_create_server(
+                    physical_memory_constraint)))                           // Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_proactive_server( osptr, pptr );
-		osptr = liberate_pa_response( osptr );
+		status = connect_proactive_server( server_created, server_constraints );
+		server_created = liberate_pa_response( server_created );
 		if (!( status ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );

@@ -174,6 +174,8 @@ private void autoload_proactive_nodes() {
 public  void set_autosave_proactive_name(char * fn) {
 	autosave_proactive_name = fn;	return;
 }
+
+/*! Save in a file all current information about locked ProActive nodes. */
 public  void autosave_proactive_nodes() {
 	char * fn=autosave_proactive_name;	struct occi_kind_node * nptr;
 	struct proactive * pptr;
