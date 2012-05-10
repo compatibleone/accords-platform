@@ -7,7 +7,10 @@
 <infrastructure name=":model">
 	<compute name=":model" architecture="x86" cores="1" memory="1G" speed="1G"/>
 	<storage name=":model" size="10G"/>
-	<network name="PUB_Compatible" label="ethernet" vlan="100M"/1>
+	<network name="PUB_Compatible" label="ethernet" vlan="100M">
+		<port name="cosacs" protocol="tcp" from="8286" to="8286" range="0.0.0.0/0"/>
+		<port name="ssh" protocol="tcp" from="22" to="22" range="0.0.0.0/0"/>
+	</network>
 </infrastructure>
 
 </import>
