@@ -1112,7 +1112,7 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
 
 	if (!( filename = os_create_server_request( 
-		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->group, pptr->zone ) ))
+	pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
