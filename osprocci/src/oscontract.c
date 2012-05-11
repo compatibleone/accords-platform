@@ -361,17 +361,21 @@ public	int	create_openstack_contract(
 		if (!( pptr->access = allocate_string( vptr ) ))
 			return( terminate_openstack_contract( 1127, &contract ) );
 	}
+	/* -------------------------------- */
+	/* recover the firewall description */
+	/* -------------------------------- */
+	if (( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_FIREWALL )) != (char * ) 0)
+	{
+		if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
+			return( terminate_openstack_contract( 1171, &contract ) );
+		else if (!( pptr->firewall = allocate_string( contract.firewall.id ) ))
+			return( terminate_openstack_contract( 1172, &contract ) );
+	}
+
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
-	if (!( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
-		_CORDS_NODE, _CORDS_FIREWALL ) ))
-		return( terminate_openstack_contract( 1171, &contract ) );
-	else if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
-		return( terminate_openstack_contract( 1172, &contract ) );
-	else if (!( pptr->firewall = allocate_string( contract.firewall.id ) ))
-		return( terminate_openstack_contract( 1172, &contract ) );
-
 	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_openstack_contract( 1171, &contract ) );

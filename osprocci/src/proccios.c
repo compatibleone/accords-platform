@@ -434,6 +434,11 @@ private	int	resolve_os_v11_addresses( struct os_response * yptr, struct openstac
 					reset_openstack_server( pptr );
 					return( 27 );
 				}
+				else if (!( pptr->privateaddr  = allocate_string(vptr)))
+				{
+					reset_openstack_server( pptr );
+					return( 27 );
+				}
 				if ( check_debug() )
 				{
 					rest_log_message("*** OS PROCCI Instance PUBLIC IP ***");
