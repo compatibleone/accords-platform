@@ -75,6 +75,8 @@ public struct occi_category * occi_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
 public struct occi_category * occi_cords_agency_builder(char *a,char * b);
 
+public struct occi_category * occi_deltacloud_builder(char *a,char * b);
+public struct occi_category * occi_cords_dcconfig_builder(char *a,char * b);
 public struct occi_category * occi_openstack_builder(char *a,char * b);
 public struct occi_category * occi_cords_osconfig_builder(char *a,char * b);
 public struct occi_category * occi_opennebula_builder(char *a,char * b);

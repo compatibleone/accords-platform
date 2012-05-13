@@ -303,6 +303,15 @@ AM_CONDITIONAL([ENABLE_SLAM], [test "$enable_slam" = "yes"])
 AC_SUBST([CFLAGS_SLAM], [-I\${abs_top_srcdir}/slam/src])
 AC_SUBST([PATH_SLAM], [${abs_top_srcdir}/slam/src])
 
+AC_ARG_ENABLE([dcprocci],
+      [AS_HELP_STRING([--disable-dcprocci],
+		      [Disable dcprocci @<:@default=enable@:>@])],
+      [],
+      [enable_dcprocci=yes])
+AM_CONDITIONAL([ENABLE_DCPROCCI], [test "$enable_dcprocci" = "yes"])
+AC_SUBST([CFLAGS_DCPROCCI], [-I\${abs_top_srcdir}/dcprocci/src])
+AC_SUBST([PATH_DCPROCCI], [${abs_top_srcdir}/dcprocci/src])
+
 AC_ARG_ENABLE([onprocci],
       [AS_HELP_STRING([--disable-onprocci],
 		      [Disable onprocci @<:@default=enable@:>@])],
@@ -410,6 +419,7 @@ AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
+AC_CONFIG_FILES([dcprocci/Makefile dcprocci/src/Makefile])
 AC_CONFIG_FILES([command/Makefile command/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
 AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
@@ -453,6 +463,7 @@ echo "    - cosacs                   : $enable_cosacs"
 echo "    - coips                    : $enable_coips"
 echo "    - cosched                  : $enable_cosched"
 echo "    - osprocci                 : $enable_osprocci"
+echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - testosocci               : $enable_testosocci"

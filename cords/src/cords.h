@@ -86,6 +86,8 @@
 
 #include "openstack.h"
 #include "osconfig.h"
+#include "deltacloud.h"
+#include "dcconfig.h"
 #include "opennebula.h"
 #include "onconfig.h"
 #include "windowsazure.h"

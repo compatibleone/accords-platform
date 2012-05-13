@@ -25,8 +25,12 @@
 #include "occi.h"
 #include "cords.h"
 #include "document.h"
+
 #include "occiopenstack.c"
 #include "occiosconfig.c"
+
+#include "occideltacloud.c"
+#include "occidcconfig.c"
 
 #include "occiopennebula.c"
 #include "occionconfig.c"

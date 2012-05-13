@@ -93,6 +93,9 @@ endif
 if ENABLE_AZPROCCI
 SUBDIRS += azprocci
 endif
+if ENABLE_DCPROCCI
+SUBDIRS += dcprocci
+endif
 if ENABLE_COMMAND
 SUBDIRS += command
 endif

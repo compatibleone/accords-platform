@@ -83,6 +83,9 @@
 #include "osconfig.c"
 #include "openstack.c"
 
+#include "dcconfig.c"
+#include "deltacloud.c"
+
 #include "onconfig.c"
 #include "opennebula.c"
 

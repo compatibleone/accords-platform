@@ -204,6 +204,8 @@ co-stop() {
     sleep 1
     killall onprocci
     sleep 1
+    killall dcprocci
+    sleep 1
     killall osocciprocci
     sleep 1
     killall testosocci
@@ -291,6 +293,10 @@ _run-onprocci() {
 
 _run-osprocci() {
     /usr/local/bin/osprocci --config $target CO-OSPROCCI/1.0
+}
+
+_run-dcprocci() {
+    /usr/local/bin/dcprocci --config $target CO-DCPROCCI/1.0
 }
 
 _run-osocciprocci() {
