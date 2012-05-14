@@ -1,4 +1,22 @@
-
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 #ifndef	_dcclient_h
 #define	_dcclient_h
 
@@ -37,6 +55,7 @@ public struct rest_response * dc_list_images();
 public struct rest_response * dc_get_image(char * id);
 
 // POST /api/images
+public char * dc_create_image_message( char * instance, char * name, char * description );
 public struct rest_response * dc_create_image(char * filename);
 
 // DELETE /api/images/:id
@@ -57,6 +76,7 @@ public struct rest_response * dc_get_instance(char * id);
 public struct rest_response * dc_instance_action(char * id, char * action);
 
 // POST /api/instances
+public char * dc_create_instance_message( char * name, char * profile, char * image, char * firewall, char * zone );
 public struct rest_response * dc_create_instance( char * filename );
 
 // DELETE /api/instances/:id
@@ -70,6 +90,7 @@ public struct rest_response * dc_list_keys();
 public struct rest_response * dc_get_key(char * id);
 
 // POST /api/keys
+public char * dc_create_key_message( char * name );
 public struct rest_response * dc_create_key(char * filename);
 
 // DELETE /api/keys/:id
@@ -83,12 +104,14 @@ public struct rest_response * dc_list_firewalls();
 public struct rest_response * dc_get_firewall(char * id);
 
 // POST /api/firewalls
+public char * dc_create_firewall_message( char * name, char * description );
 public struct rest_response * dc_create_firewall(char * filename);
 
 // DELETE /api/firewalls/:id
 public struct rest_response * dc_delete_firewall(char * id);
 
 // POST /api/firewalls/:id/rules
+public char * dc_create_rule_message( char * proto, char * from, char * to, char * range );
 public struct rest_response * dc_create_rule(char * id, char * filename);
 
 // DELETE /api/firewalls/:id/:rule_id
@@ -102,7 +125,7 @@ public struct rest_response * dc_list_addresses();
 public struct rest_response * dc_get_address(char * id);
 
 // POST /api/addresses
-public struct rest_response * dc_create_address(char * filename);
+public struct rest_response * dc_create_address();
 
 
 // DELETE /api/addresses/:id
@@ -123,6 +146,7 @@ public struct rest_response * dc_list_loadbalancers();
 public struct rest_response * dc_get_loadbalancer(char * id);
 
 // POST /api/load_balancers
+public char * dc_create_loadbalancer_message( char * name, char * profile, char * image, char * firewall, char * zone );
 public struct rest_response * dc_create_loadbalancer(char * filename);
 
 // DELETE /api/load_balancers/:id

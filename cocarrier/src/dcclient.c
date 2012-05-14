@@ -1,3 +1,22 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 #ifndef	_dcclient_c
 #define	_dcclient_c
 
@@ -6,6 +25,9 @@
 // ---------------------------------------
 #include "dcclient.h"
 #include "restclient.h"
+
+#define	_CORDS_NULL "(null)"
+#define	_CORDS_NONE "none"
 
 struct	dc_api_configuration
 {
@@ -31,8 +53,24 @@ private struct dc_api_configuration DeltaCloudConfig =
 	0
 };
 
+/*	------------------------------------------------	*/
+/*		d c _ v a l i d _ s t r i n g			*/
+/*	------------------------------------------------	*/
+private	int	dc_valid_string( char * vptr )
+{
+	if (!( vptr ))
+		return( 0 );
+	else if (!( strlen( vptr ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NULL ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, _CORDS_NONE ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
 /*	------------------------------------------------------------	*/
-/*	 l i b e r a t e _ d c _ a p i _ c o n f i g u r a t i o n		*/
+/*	 l i b e r a t e _ d c _ a p i _ c o n f i g u r a t i o n	*/
 /*	------------------------------------------------------------	*/
 public	int	liberate_dc_api_configuration(int status)
 {
@@ -55,7 +93,7 @@ public	int	liberate_dc_api_configuration(int status)
 }
 
 /*	------------------------------------------------------------	*/
-/*		s e t _ d c _ a p i _ c o n f i g u r a t i o n			*/
+/*		s e t _ d c _ a p i _ c o n f i g u r a t i o n		*/
 /*	------------------------------------------------------------	*/
 public	int	set_dc_api_configuration( char * host, int port, char * user, char * password, char * tenant, char * agent, char * tls )
 {
@@ -85,7 +123,7 @@ public	int	set_dc_api_configuration( char * host, int port, char * user, char * 
 }
 
 /*	------------------------------------------------------------	*/
-/*			d c _ a p i _ f a i l u r e 					*/
+/*			d c _ a p i _ f a i l u r e 			*/
 /*	------------------------------------------------------------	*/
 private struct rest_response * dc_api_failure( struct rest_header * hptr )
 {
@@ -94,7 +132,7 @@ private struct rest_response * dc_api_failure( struct rest_header * hptr )
 }
 
 /*	------------------------------------------------------------	*/
-/*			d c _ a u t h e n t i c a t e 				*/
+/*			d c _ a u t h e n t i c a t e 			*/
 /*	------------------------------------------------------------	*/
 public	struct	rest_header   *	dc_authenticate	( )
 {
@@ -117,6 +155,28 @@ public	struct	rest_header   *	dc_authenticate	( )
 	else	return((hptr->next->previous = hptr));
 }
 
+/*	------------------------------------------------------------	*/
+/*			d c _ c o n t e n t _ t y p e			*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header   *	dc_content_type( struct rest_header * hptr, char * filename )
+{
+	struct	rest_header * wptr;
+	struct	rest_header * root;
+	if (!( filename ))
+		return( hptr );
+	else
+	{
+		root = hptr->next;
+		if (!( root->next = rest_create_header( "Content-Type", "application/x-www-form-urlencoded" ) ))
+			return( hptr );
+		else
+		{
+		 	root->next->previous = root;
+			return( hptr );
+		}
+	}
+}
+
 // ---------------------------------------
 // REST API INTERFACE FUNCTION
 // ---------------------------------------
@@ -126,7 +186,7 @@ private struct rest_response * dc_get_request(char * nptr)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s?format=xml",nptr);
+	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
 	if (!( hptr = dc_authenticate()))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_get_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, hptr ) );
@@ -139,7 +199,7 @@ private struct rest_response * dc_delete_request(char * nptr)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s?format=xml",nptr);
+	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
 	if (!( hptr = dc_authenticate()))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_delete_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, hptr ) );
@@ -152,8 +212,10 @@ private struct rest_response * dc_post_request(char * nptr,char * filename)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s?format=xml",nptr);
+	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
 	if (!( hptr = dc_authenticate()))
+		return( dc_api_failure( hptr ) );
+	else if (!( hptr = dc_content_type( hptr, filename ) ))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_post_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, filename, hptr ) );
 }
@@ -231,6 +293,33 @@ public struct rest_response * dc_get_image(char * id)
 }
 
 // ---------------------------------------
+// CREATE IMAGE MESSAGE
+// ---------------------------------------
+public char * dc_create_image_message( char * instance, char * name, char * description )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+
+		fprintf(h,"instance_id=%s",instance);
+
+		if ( dc_valid_string(name) )
+			fprintf(h,"&name=%s",name);
+
+		if ( dc_valid_string(description) )
+			fprintf(h,"&description=%s",description);
+
+		fclose(h);
+		return( filename );
+	}
+}
+
+// ---------------------------------------
 // POST /api/images
 // ---------------------------------------
 public struct rest_response * dc_create_image(char * filename) 
@@ -291,6 +380,39 @@ public struct rest_response * dc_instance_action(char * id, char * action)
 }
 
 // ---------------------------------------
+// CREATE INSTANCE PARAMETERS
+// ---------------------------------------
+public char * dc_create_instance_message( char * name, char * profile, char * image, char * firewall, char * zone )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+
+		fprintf(h,"image_id=%s",image);
+
+		if ( dc_valid_string(name) )
+			fprintf(h,"&name=%s",name);
+
+		if ( dc_valid_string(profile) )
+			fprintf(h,"&hwp_id=%s",profile);
+
+		if ( dc_valid_string(firewall) )
+			fprintf(h,"&firewalls1=%s",firewall);
+
+		if ( dc_valid_string(zone) )
+			fprintf(h,"&realm_id=%s",zone);
+
+		fclose(h);
+		return( filename );
+	}
+}
+
+// ---------------------------------------
 // POST /api/instances
 // ---------------------------------------
 public struct rest_response * dc_create_instance( char * filename ) 
@@ -328,6 +450,25 @@ public struct rest_response * dc_get_key(char * id)
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/keys/%s",id);
 	return(dc_get_request(buffer));
+}
+
+// ---------------------------------------
+// CREATE KEY MESSAGE
+// ---------------------------------------
+public char * dc_create_key_message( char * name )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"name=%s",name);
+		fclose(h);
+		return( filename );
+	}
 }
 
 // ---------------------------------------
@@ -371,6 +512,29 @@ public struct rest_response * dc_get_firewall(char * id)
 }
 
 // ---------------------------------------
+// CREATE FIREWALL MESSAGE
+// ---------------------------------------
+public char * dc_create_firewall_message( char * name, char * description )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"name=%s",name);
+
+		if ( dc_valid_string(description) )
+			fprintf(h,"&description=%s",description);
+
+		fclose(h);
+		return( filename );
+	}
+}
+
+// ---------------------------------------
 // POST /api/firewalls
 // ---------------------------------------
 public struct rest_response * dc_create_firewall(char * filename) 
@@ -388,6 +552,29 @@ public struct rest_response * dc_delete_firewall(char * id)
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/firewalls/%s",id);
 	return(dc_delete_request(buffer));
+}
+
+// ---------------------------------------
+// CREATE RULE MESSAGE
+// ---------------------------------------
+public char * dc_create_rule_message( char * proto, char * from, char * to, char * range )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"protocol=%s",proto);
+		fprintf(h,"&port_from=%s",from);
+		fprintf(h,"&port_to=%s",to);
+		fprintf(h,"&ip_address1=%s",range);
+
+		fclose(h);
+		return( filename );
+	}
 }
 
 // ---------------------------------------
@@ -433,11 +620,11 @@ public struct rest_response * dc_get_address(char * id)
 // ---------------------------------------
 // POST /api/addresses
 // ---------------------------------------
-public struct rest_response * dc_create_address(char * filename) 
+public struct rest_response * dc_create_address()
 { 
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/addresses");
-	return(dc_post_request(buffer,filename));
+	return(dc_post_request(buffer,(char *) 0));
 }
 
 // ---------------------------------------
@@ -486,6 +673,30 @@ public struct rest_response * dc_get_loadbalancer(char * id)
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/load_balancers/%s",id);
 	return(dc_get_request(buffer));
+}
+
+// ---------------------------------------
+// CREATE LOADBALANCER MESSAGE
+// ---------------------------------------
+public char * dc_create_loadbalancer_message( char * name, char * realm, char * protocol, char * port1, char * port2 )
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"name_id=%s",name);
+		fprintf(h,"&realm_id=%s",realm);
+		fprintf(h,"&listener_protocol=%s",protocol);
+		fprintf(h,"&listener_balancer_port=%s",port1);
+		fprintf(h,"&listener_instance_port=%s",port2);
+
+		fclose(h);
+		return( filename );
+	}
 }
 
 // ---------------------------------------
