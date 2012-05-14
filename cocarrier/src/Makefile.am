@@ -13,6 +13,7 @@ EXTRA_DIST = dataelement.c dataelement.h \
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     osclient.c osclient.h \
     onclient.c onclient.h \
+    dcclient.c dcclient.h \
     json.c json.h 
 
 libcocarrier_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_CORDS) 
