@@ -7,7 +7,7 @@ dnl autoconf version
 AC_PREREQ(2.59)
 
 dnl mandatory stuff
-AC_INIT([accords], [1.0], [compatible-accords@ow2.org])
+AC_INIT([accords], [2.0], [compatible-accords@ow2.org])
 
 dnl check host and target
 AC_CANONICAL_BUILD
