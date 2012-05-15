@@ -26,7 +26,10 @@
 #define	_DC_BUFFERSIZE 1024
 
 public	int	liberate_dc_occi_configuration(int status);
-public	int	set_dc_occi_configuration( char * host, int port, char * user, char * password, char * tenant, char * agent, char * tls );
+public	int	dc_api_configuration( 
+			char * host, 
+			char * user, char * password, 
+			char * tenant, char * agent, char * tls );
 
 // 1. API
 // GET /api
@@ -183,6 +186,33 @@ public struct rest_response * dc_attach_storage(char * id,char * server);
 // POST /api/storage_volumes/:id/detach
 public struct rest_response * dc_detach_storage(char * id);
 
+// 4.3 Blob Storage
+// GET /api/buckets
+public struct rest_response * dc_list_buckets();
+// GET /api/buckets/:id
+public struct rest_response * dc_get_bucket(char * id);
+// POST /api/buckets
+public char * dc_create_bucket_message(char * name, char * location);
+public struct rest_response * dc_create_bucket(char * filename);
+// DELETE /api/buckets/:id
+public struct rest_response * dc_delete_bucket(char * id);
+
+// GET /api/buckets/:bucket_id/:blob_id
+public struct rest_response * dc_get_blob_info(char * bucket, char * blob);
+// GET /api/buckets/:bucket_id/:blob_id/content
+public struct rest_response * dc_get_blob_content(char * bucket, char * blob);
+
+// PUT /api/buckets/:bucket_id/:blob_id
+public struct rest_response * dc_update_blob(char * bucket, char * blob, char * filename);
+// POST /api/buckets/:bucket_id
+public struct rest_response * dc_create_blob(char * bucket, char *filename);
+
+// DELETE /api/buckets/:bucket_id/:blob_id
+public struct rest_response * dc_delete_blob(char * bucket, char * blob);
+// POST /api/buckets/:bucket_id/:blob_id
+public struct rest_response * dc_update_blob_info(char * bucket, char * blob);
+
 	/* ----------- */
 #endif	/* _dcclient_h */
 	/* ----------- */
+

@@ -38,7 +38,6 @@ struct	dc_api_configuration
 	char *	user;
 	char *	password;
 	char *	host;
-	int	port;
 };
 
 private struct dc_api_configuration DeltaCloudConfig = 
@@ -88,14 +87,13 @@ public	int	liberate_dc_api_configuration(int status)
 		DeltaCloudConfig.tenant = liberate( DeltaCloudConfig.tenant );
 	if ( DeltaCloudConfig.authorization )
 		DeltaCloudConfig.authorization = liberate( DeltaCloudConfig.authorization );
-	DeltaCloudConfig.port = 0;
 	return(status);
 }
 
 /*	------------------------------------------------------------	*/
-/*		s e t _ d c _ a p i _ c o n f i g u r a t i o n		*/
+/*		   d c _ a p i _ c o n f i g u r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	int	set_dc_api_configuration( char * host, int port, char * user, char * password, char * tenant, char * agent, char * tls )
+public	int	dc_api_configuration( char * host, char * user, char * password, char * tenant, char * agent, char * tls )
 {
 	liberate_dc_api_configuration(0);
 
@@ -118,7 +116,6 @@ public	int	set_dc_api_configuration( char * host, int port, char * user, char * 
 		if (!( DeltaCloudConfig.tls = allocate_string( tls ) ))
 			return( liberate_dc_api_configuration(27) );
 
-	DeltaCloudConfig.port = port;
 	return( 0 );	
 }
 
@@ -186,7 +183,7 @@ private struct rest_response * dc_get_request(char * nptr)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
+	sprintf(url,"%s%s?format=xml",DeltaCloudConfig.host,nptr);
 	if (!( hptr = dc_authenticate()))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_get_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, hptr ) );
@@ -199,7 +196,7 @@ private struct rest_response * dc_delete_request(char * nptr)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
+	sprintf(url,"%s%s?format=xml",DeltaCloudConfig.host,nptr);
 	if (!( hptr = dc_authenticate()))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_delete_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, hptr ) );
@@ -212,12 +209,27 @@ private struct rest_response * dc_post_request(char * nptr,char * filename)
 {
 	char	url[_DC_BUFFERSIZE];
 	struct rest_header * hptr=(struct rest_header *) 0;
-	sprintf(url,"%s:%u%s?format=xml",DeltaCloudConfig.host,DeltaCloudConfig.port,nptr);
+	sprintf(url,"%s%s?format=xml",DeltaCloudConfig.host,nptr);
 	if (!( hptr = dc_authenticate()))
 		return( dc_api_failure( hptr ) );
 	else if (!( hptr = dc_content_type( hptr, filename ) ))
 		return( dc_api_failure( hptr ) );
 	else	return( rest_client_post_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, filename, hptr ) );
+}
+
+// ---------------------------------------
+// REST PUT REQUEST URL
+// ---------------------------------------
+private struct rest_response * dc_put_request(char * nptr,char * filename)
+{
+	char	url[_DC_BUFFERSIZE];
+	struct rest_header * hptr=(struct rest_header *) 0;
+	sprintf(url,"%s%s?format=xml",DeltaCloudConfig.host,nptr);
+	if (!( hptr = dc_authenticate()))
+		return( dc_api_failure( hptr ) );
+	else if (!( hptr = dc_content_type( hptr, filename ) ))
+		return( dc_api_failure( hptr ) );
+	else	return( rest_client_put_request( url, DeltaCloudConfig.tls, DeltaCloudConfig.agent, filename, hptr ) );
 }
 
 // ---------------------------------------
@@ -718,7 +730,7 @@ public char * dc_create_loadbalancer_message( char * name, char * realm, char * 
 		return( liberate( filename ) );
 	else
 	{
-		fprintf(h,"name_id=%s",name);
+		fprintf(h,"name=%s",name);
 		fprintf(h,"&realm_id=%s",realm);
 		fprintf(h,"&listener_protocol=%s",protocol);
 		fprintf(h,"&listener_balancer_port=%s",port1);
@@ -827,7 +839,7 @@ public char * dc_create_storage_message(char * name, char * size, char * realm)
 		return( liberate( filename ) );
 	else
 	{
-		fprintf(h,"name_id=%s",name);
+		fprintf(h,"name=%s",name);
 		fprintf(h,"&capacity=%s",realm);
 		fprintf(h,"&realm_id=%s",realm);
 		fclose(h);
@@ -889,6 +901,127 @@ public struct rest_response * dc_detach_storage(char * id)
 	return(dc_post_request(buffer,(char *) 0));
 }
 
+// ---------------------------------------
+// 4.3 Blob Storage
+// ---------------------------------------
+// GET /api/buckets
+// ---------------------------------------
+public struct rest_response * dc_list_buckets()
+{
+	return(dc_get_request("/api/buckets"));
+}
+
+// ---------------------------------------
+// GET /api/buckets/:id
+// ---------------------------------------
+public struct rest_response * dc_get_bucket(char * id)
+{ 
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s",id);
+	return(dc_delete_request(buffer));
+}
+
+
+// ---------------------------------------
+// CREATE BUCKET MESSAGE
+// ---------------------------------------
+public char * dc_create_bucket_message(char * name, char * location)
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"name=%s",name);
+		fprintf(h,"&location=%s",location);
+		fclose(h);
+		return( filename );
+	}
+}
+
+// ---------------------------------------
+// POST /api/buckets
+// ---------------------------------------
+public struct rest_response * dc_create_bucket(char * filename)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets");
+	return(dc_post_request(buffer,filename));
+}
+
+// ---------------------------------------
+// DELETE /api/buckets/:id
+// ---------------------------------------
+public struct rest_response * dc_delete_bucket(char * id)
+{ 
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s",id);
+	return(dc_delete_request(buffer));
+}
+
+
+// ---------------------------------------
+// GET /api/buckets/:bucket_id/:blob_id
+// ---------------------------------------
+public struct rest_response * dc_get_blob_info(char * bucket, char * blob)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s/%s",bucket,blob);
+	return(dc_get_request(buffer));
+}
+
+// ---------------------------------------
+// GET /api/buckets/:bucket_id/:blob_id/content
+// ---------------------------------------
+public struct rest_response * dc_get_blob_content(char * bucket, char * blob)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s/%s/content",bucket,blob);
+	return(dc_get_request(buffer));
+}
+
+// ---------------------------------------
+// PUT /api/buckets/:bucket_id/:blob_id
+// ---------------------------------------
+public struct rest_response * dc_update_blob(char * bucket, char * blob, char * filename)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s/%s",bucket,blob);
+	return(dc_put_request(buffer,filename));
+}
+
+// ---------------------------------------
+// POST /api/buckets/:bucket_id
+// ---------------------------------------
+public struct rest_response * dc_create_blob(char * bucket, char *filename)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s",bucket);
+	return(dc_post_request(buffer,filename));
+}
+
+// ---------------------------------------
+// DELETE /api/buckets/:bucket_id/:blob_id
+// ---------------------------------------
+public struct rest_response * dc_delete_blob(char * bucket, char * blob)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s/%s",bucket,blob);
+	return(dc_delete_request(buffer));
+}
+
+// ---------------------------------------
+// POST /api/buckets/:bucket_id/:blob_id
+// ---------------------------------------
+public struct rest_response * dc_update_blob_info(char * bucket, char * blob)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/buckets/%s/%s",bucket,blob);
+	return(dc_post_request(buffer,(char *) 0));
+}
 
 	/* ----------- */
 #endif	/* _dcclient_c */

@@ -60,6 +60,8 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_list_addresses() ) );
 		else if (!( strcmp( subject, "firewalls" ) ))
 			return( dc_result( dc_list_firewalls() ) );
+		else if (!( strcmp( subject, "buckets" ) ))
+			return( dc_result( dc_list_buckets() ) );
 		else if (!( strcmp( subject, "loadbalancers" ) ))
 			return( dc_result( dc_list_loadbalancers() ) );
 		else	return( failure( 35, subject ) );
@@ -83,6 +85,10 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_get_address(option) ) );
 		else if (!( strcmp( subject, "firewall" ) ))
 			return( dc_result( dc_get_firewall(option) ) );
+		else if (!( strcmp( subject, "bucket" ) ))
+			return( dc_result( dc_get_bucket(option) ) );
+		else if (!( strcmp( subject, "blob" ) ))
+			return( dc_result( dc_get_blob_info(option,option2) ) );
 		else if (!( strcmp( subject, "loadbalancer" ) ))
 			return( dc_result( dc_get_loadbalancer(option) ) );
 		else	return( failure( 35, subject ) );
@@ -125,6 +131,10 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_delete_firewall(option) ) );
 		else if (!( strcmp( subject, "rule" ) ))
 			return( dc_result( dc_delete_rule(option,option2) ) );
+		else if (!( strcmp( subject, "bucket" ) ))
+			return( dc_result( dc_delete_bucket(option) ) );
+		else if (!( strcmp( subject, "blob" ) ))
+			return( dc_result( dc_delete_blob(option,option2) ) );
 		else if (!( strcmp( subject, "loadbalancer" ) ))
 			return( dc_result( dc_delete_loadbalancer(option) ) );
 		else	return( failure( 35, subject ) );
@@ -235,6 +245,16 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 			return( 46 );
 		else 	return( dc_result( dc_create_firewall( filename ) ) );
 	}
+	else if (!( strcmp( subject, "bucket" ) ))
+	{
+		if (!( filename = dc_create_bucket_message( args[0], args[1] ) ))
+			return( 46 );
+		else 	return( dc_result( dc_create_bucket( filename ) ) );
+	}
+	else if (!( strcmp( subject, "blob" ) ))
+	{
+		return( dc_result( dc_update_blob( args[0], args[1], args[2] ) ) );
+	}
 	else if (!( strcmp( subject, "address" ) ))
 	{
 		return( dc_result( dc_create_address() ) );
@@ -245,7 +265,6 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 private int	dc_test_main( int argc, char * argv[] )
 {
 	char *	host=(char *) 0;
-	int	port=80;
 	char *	user=(char *) 0;
 	char * 	tenant=(char *) 0;
 	char *	agent="deltacloud-client/1.0";
@@ -260,7 +279,7 @@ private int	dc_test_main( int argc, char * argv[] )
 			break;
 		else if ( *aptr != '-' )
 		{
-			set_dc_api_configuration( host, port, user, password, tenant, agent,tls );
+			dc_api_configuration( host, user, password, tenant, agent,tls );
 			if (!( command ))
 				command = aptr;
 			else if (!( subject ))
@@ -286,11 +305,6 @@ private int	dc_test_main( int argc, char * argv[] )
 				tenant = argv[argi++];
 			else if (!( strcmp(aptr,"tls" )))
 				tls = argv[argi++];
-			else if (!( strcmp(aptr,"port" )))
-			{
-				port = atoi(argv[argi]);
-				argi++;
-			}
 			else if (!( strcmp( aptr, "verbose" ) ))
 				verbose =1;
 			else if (!( strcmp( aptr, "debug" ) ))
@@ -323,7 +337,8 @@ private int dc_test_banner()
 	printf("\n   --verbose                   activate information messages ");
 	printf("\n   --debug                     activate debug messages \n");
 	printf("\n   Methods:\n");
-	printf("\n   list   [ features | profiles | storage | images | servers | keys | addresses | firewalls | loadbalancers ]");
+	printf("\n   list   [ features | profiles | images | servers | keys | addresses | firewalls | loadbalancers ]");
+	printf("\n   list   [ storage | buckets ] ");
 	printf("\n   get    [ profile | storage | image | server | key | addresse | firewall | loadbalancer ] {id} ");
 	printf("\n   delete [ storage | image | server | key | addresse | firewall | rule | loadbalancer ] {id} ");
 	printf("\n   create server name image profile firewall realm ");
@@ -333,7 +348,13 @@ private int dc_test_banner()
 	printf("\n   create storage name capacity realm ");
 	printf("\n   create rule firewall proto from to range ");
 	printf("\n   create key name ");
-	printf("\n   create address \n");
+	printf("\n   create address ");
+	printf("\n   get    bucket id ");
+	printf("\n   get    blob   bucketid blobid ");
+	printf("\n   create bucket name location ");
+	printf("\n   create blob   bucketid blobid filename ");
+	printf("\n   delete bucket id "); 
+	printf("\n   delete blob   bucketid blobid \n");
 	printf("\n   Actions:\n");
 	printf("\n   start        server id ");
 	printf("\n   stop         server id ");
