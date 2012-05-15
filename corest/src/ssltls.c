@@ -624,7 +624,6 @@ ENGINE *setup_engine(const char *engine)
 		ENGINE_free(e);
 		return NULL;
 	      }
-	    printf("engine: %s OK\n", engine);
 	    /* Free our "structural" reference. */
 	    ENGINE_free(e);
 	  }
@@ -767,7 +766,6 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 			return( 0 );
 		      }    
 
-		    printf("load key from token, SslKeyFile = %s\n", SslKeyFile);
 		    pkey = ENGINE_load_private_key(e, SslKeyFile, NULL, NULL);
 		    if (!pkey) 
 		      {
@@ -776,7 +774,6 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 			ENGINE_free(e);
 			return( 0 );
 		      }
-		    printf("key loaded from token\n");
 		    if (!(oof = SSL_CTX_use_PrivateKey(cptr->context,pkey)))
 		      {
 			tls_show_errors( "SSL_CTX_use_PrivateKey" );
