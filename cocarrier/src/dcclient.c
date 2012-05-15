@@ -48,8 +48,7 @@ private struct dc_api_configuration DeltaCloudConfig =
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
-	(char *) 0,
-	0
+	(char *) 0
 };
 
 /*	------------------------------------------------	*/

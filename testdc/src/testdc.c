@@ -370,9 +370,16 @@ private int dc_test_banner()
 
 public int	main( int argc, char * argv[] )
 {
+	int	status;
 	if ( argc == 1 )
 		return( dc_test_banner() );
-	else	return( dc_test_main(argc, argv) );
+	else if (!( status = dc_test_main(argc, argv) ))
+		return(status);
+	else
+	{
+		printf("**failure(%u,%s)**\n",status,argv[0]);
+		return(0);
+	}
 }
 
 #endif 	/* _testdc_c */
