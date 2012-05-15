@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BUILD_DIR=build
-TAR_DIR="accords-1.0"
+TAR_DIR="accords-2.0"
 TAR_NAME="${TAR_DIR}.tar.gz"
 TMP_SOURCE=$(mktemp)
 TMP_DEST=$(mktemp)
