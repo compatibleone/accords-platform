@@ -111,9 +111,12 @@ public	int	dc_api_configuration( char * host, char * user, char * password, char
 	if ( agent )
 		if (!( DeltaCloudConfig.agent = allocate_string( agent ) ))
 			return( liberate_dc_api_configuration(27) );
-	if ( tls )
-		if (!( DeltaCloudConfig.tls = allocate_string( tls ) ))
-			return( liberate_dc_api_configuration(27) );
+
+	if (!( tls ))
+		DeltaCloudConfig.tls = (char *) 0;
+	else if ((DeltaCloudConfig.tls = allocate_string(tls)) != (char *) 0)
+		if ( (!( strlen( DeltaCloudConfig.tls ) )) || ( *(DeltaCloudConfig.tls) == '0' ) )
+			DeltaCloudConfig.tls = liberate( DeltaCloudConfig.tls );
 
 	return( 0 );	
 }

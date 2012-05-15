@@ -36,10 +36,11 @@ private	struct	dc_config * use_deltacloud_configuration( char * sptr )
 	if (!( pptr = resolve_deltacloud_configuration( sptr )))
 	 	return( pptr );
 	else if (!( 
-	 	dc_api_configuration( 
+	 	dc_api_configuration(
+			pptr->host,  
 			pptr->user, pptr->password, 
-			pptr->host, pptr->namespace, _CORDS_OS_AGENT, pptr->tls ) ))
-			return((struct dc_config *) 0);
+			pptr->namespace, _CORDS_OS_AGENT, pptr->tls ) ))
+		return( pptr );
 	else	return( pptr );
 }
 
@@ -114,7 +115,7 @@ private	int	set_default_deltacloud(struct occi_category * optr, void * vptr)
 public	struct	occi_category * build_deltacloud_configuration( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_osconfig_builder( domain, "deltacloud_configuration" ) ))
+	if (!( optr = occi_dc_config_builder( domain, "deltacloud_configuration" ) ))
 		return( optr );
 	else if (!( optr = occi_add_action( optr,"current","",set_default_deltacloud)))
 		return( optr );
