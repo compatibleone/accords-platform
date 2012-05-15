@@ -124,5 +124,5 @@ if ENABLE_TESTRESOLVER
 SUBDIRS += testresolver
 endif
 
-EXTRA_DIST = README INSTALL NEWS ChangeLog
+EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd
 
