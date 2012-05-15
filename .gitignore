@@ -109,3 +109,6 @@ scripts/run-osprocci
 scripts/run-parser
 scripts/run-procci
 scripts/run-publisher
+dcprocci/src/dcprocci
+scripts/run-cosched
+scripts/run-ezvm

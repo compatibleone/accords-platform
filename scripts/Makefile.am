@@ -17,7 +17,7 @@ aliases = \
 	run-fileserver run-onprocci run-osprocci run-parser run-procci run-cosched run-publisher \
 	accords-config
 
-EXTRA_DIST = accords.in
+EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
