@@ -30,7 +30,7 @@ private	int	dc_result( struct rest_response* rptr )
 	return( 0 );
 }
 
-private	int	dc_operation( char * host, char * user, char * password, char * command, char * subject, char * option )
+private	int	dc_operation( char * host, char * user, char * password, char * command, char * subject, char * option, char * option2 )
 {
 	if (!( host ))
 		return( 30 );
@@ -50,6 +50,8 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_list_profiles() ) );
 		else if (!( strcmp( subject, "images" ) ))
 			return( dc_result( dc_list_images() ) );
+		else if (!( strcmp( subject, "storage" ) ))
+			return( dc_result( dc_list_storage() ) );
 		else if (!( strcmp( subject, "servers" ) ))
 			return( dc_result( dc_list_instances() ) );
 		else if (!( strcmp( subject, "keys" ) ))
@@ -71,6 +73,8 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_get_profile(option) ) );
 		else if (!( strcmp( subject, "image" ) ))
 			return( dc_result( dc_get_image(option) ) );
+		else if (!( strcmp( subject, "storage" ) ))
+			return( dc_result( dc_get_storage(option) ) );
 		else if (!( strcmp( subject, "server" ) ))
 			return( dc_result( dc_get_instance(option) ) );
 		else if (!( strcmp( subject, "key" ) ))
@@ -109,6 +113,8 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( failure( 36, "option") );
 		else if (!( strcmp( subject, "image" ) ))
 			return( dc_result( dc_delete_image(option) ) );
+		else if (!( strcmp( subject, "storage" ) ))
+			return( dc_result( dc_delete_storage(option) ) );
 		else if (!( strcmp( subject, "server" ) ))
 			return( dc_result( dc_delete_instance(option) ) );
 		else if (!( strcmp( subject, "key" ) ))
@@ -117,11 +123,61 @@ private	int	dc_operation( char * host, char * user, char * password, char * comm
 			return( dc_result( dc_delete_address(option) ) );
 		else if (!( strcmp( subject, "firewall" ) ))
 			return( dc_result( dc_delete_firewall(option) ) );
+		else if (!( strcmp( subject, "rule" ) ))
+			return( dc_result( dc_delete_rule(option,option2) ) );
 		else if (!( strcmp( subject, "loadbalancer" ) ))
 			return( dc_result( dc_delete_loadbalancer(option) ) );
 		else	return( failure( 35, subject ) );
-
 	}
+
+	else if (!( strcmp( command, "start" ) ))
+	{
+		if (!( strcmp( subject, "server" ) ))
+			return( dc_result( dc_start_instance(option) ) );
+	}
+
+	else if (!( strcmp( command, "stop" ) ))
+	{
+		if (!( strcmp( subject, "server" ) ))
+			return( dc_result( dc_stop_instance(option) ) );
+	}
+
+	else if (!( strcmp( command, "attach" ) ))
+	{
+		if (!( strcmp( subject, "storage" ) ))
+			return( dc_result( dc_attach_storage(option,option2) ) );
+	}
+
+	else if (!( strcmp( command, "detach" ) ))
+	{
+		if (!( strcmp( subject, "storage" ) ))
+			return( dc_result( dc_detach_storage(option) ) );
+	}
+
+	else if (!( strcmp( command, "register" ) ))
+	{
+		if (!( strcmp( subject, "loadbalancer" ) ))
+			return( dc_result( dc_register_loadbalancer(option,option2) ) );
+	}
+
+	else if (!( strcmp( command, "unregister" ) ))
+	{
+		if (!( strcmp( subject, "loadbalancer" ) ))
+			return( dc_result( dc_unregister_loadbalancer(option,option2) ) );
+	}
+
+	else if (!( strcmp( command, "associate" ) ))
+	{
+		if (!( strcmp( subject, "address" ) ))
+			return( dc_result( dc_associate_address(option,option2) ) );
+	}
+
+	else if (!( strcmp( command, "disassociate" ) ))
+	{
+		if (!( strcmp( subject, "address" ) ))
+			return( dc_result( dc_disassociate_address(option) ) );
+	}
+
 	else	return( failure( 37, command ) );
 
 	return(0);
@@ -167,6 +223,12 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 			return( 46 );
 		else 	return( dc_result( dc_create_image( filename ) ) );
 	}
+	else if (!( strcmp( subject, "storage" ) ))
+	{
+		if (!( filename = dc_create_storage_message( args[0], args[1], args[2] ) ))
+			return( 46 );
+		else 	return( dc_result( dc_create_storage( filename ) ) );
+	}
 	else if (!( strcmp( subject, "firewall" ) ))
 	{
 		if (!( filename = dc_create_firewall_message( args[0], args[1] ) ))
@@ -205,11 +267,11 @@ private int	dc_test_main( int argc, char * argv[] )
 			{
 				subject = aptr;
 				if (!( strcmp( command, "list" ) ))
-					return( dc_operation( host, user, password, command, subject, (char *) 0 ) );
+					return( dc_operation( host, user, password, command, subject, (char *) 0,(char *) 0 ) );
 				else if (!( strcmp( command, "create" ) ))
 					return( dc_create_command( subject, argi, argc, argv ) );
 			}
-			else	return( dc_operation( host, user, password, command, subject, aptr) );
+			else	return( dc_operation( host, user, password, command, subject, aptr, argv[argi]) );
 		}
 		else if ( *(aptr+1) = '-' )
 		{
@@ -260,17 +322,27 @@ private int dc_test_banner()
 	printf("\n   --tls      {filename}       specify traansport layer security ");
 	printf("\n   --verbose                   activate information messages ");
 	printf("\n   --debug                     activate debug messages \n");
-	printf("\n   Syntax:\n");
-	printf("\n   list   [ features | profiles | images | servers | keys | addresses | firewalls | loadbalancers ]");
-	printf("\n   get               [ profile  | image  | server  | key  | addresse  | firewall  | loadbalancer  ] {id} ");
-	printf("\n   delete                       [ image  | server  | key  | addresse  | firewall  | loadbalancer  ] {id} ");
+	printf("\n   Methods:\n");
+	printf("\n   list   [ features | profiles | storage | images | servers | keys | addresses | firewalls | loadbalancers ]");
+	printf("\n   get    [ profile | storage | image | server | key | addresse | firewall | loadbalancer ] {id} ");
+	printf("\n   delete [ storage | image | server | key | addresse | firewall | rule | loadbalancer ] {id} ");
 	printf("\n   create server name image profile firewall realm ");
 	printf("\n   create loadbalancer name realm protocol port1 port2 ");
 	printf("\n   create image instance name description ");
 	printf("\n   create firewall name description ");
+	printf("\n   create storage name capacity realm ");
 	printf("\n   create rule firewall proto from to range ");
 	printf("\n   create key name ");
-	printf("\n   create address ");
+	printf("\n   create address \n");
+	printf("\n   Actions:\n");
+	printf("\n   start        server id ");
+	printf("\n   stop         server id ");
+	printf("\n   attach       storage id server ");
+	printf("\n   detach       storage id ");
+	printf("\n   register     loadbalancer id server ");
+	printf("\n   unregister   loadbalancer id server ");
+	printf("\n   associate    address id server ");
+	printf("\n   disassociate address id ");
 	printf("\n\n");
 	return( 0 );
 }

@@ -82,6 +82,12 @@ public struct rest_response * dc_create_instance( char * filename );
 // DELETE /api/instances/:id
 public struct rest_response * dc_delete_instance( char * id );
 
+// START /api/instances/:id
+public struct rest_response * dc_start_instance( char * id );
+
+// STOP /api/instances/:id
+public struct rest_response * dc_stop_instance( char * id );
+
 // 3.6 Keys
 // GET /api/keys
 public struct rest_response * dc_list_keys();
@@ -135,7 +141,7 @@ public struct rest_response * dc_delete_address(char * id);
 public struct rest_response * dc_associate_address(char * id, char * server);
 
 // POST /api/addresses/:id/disassociate
-public struct rest_response * dc_disassociate_address(char * id, char * server);
+public struct rest_response * dc_disassociate_address(char * id);
 
 // 3.9 Load Balancers
 
@@ -153,10 +159,29 @@ public struct rest_response * dc_create_loadbalancer(char * filename);
 public struct rest_response * dc_delete_loadbalancer(char * id);
 
 // POST /api/load_balancers/:id/register
-public struct rest_response * dc_register_loadbalancer(char * id, char * filename);
+public struct rest_response * dc_register_loadbalancer(char * id, char * server);
 
 // POST /api/load_balancers/:id/unregister
-public struct rest_response * dc_unregister_loadbalancer(char * id, char * filename);
+public struct rest_response * dc_unregister_loadbalancer(char * id, char * server);
+
+// 4.1 Storage Volumes
+
+// GET /api/storage_volumes
+public struct rest_response * dc_list_storage();
+
+// GET /api/storage_volumes/:id
+public struct rest_response * dc_get_storage(char * id);
+
+// POST /api/storage_volumes
+public char * dc_create_storage_message(char * name, char * size, char * realm);
+public struct rest_response * dc_create_storage(char * filename);
+
+// DELETE /api/storage_volumes/:id
+public struct rest_response * dc_delete_storage(char * id);
+// POST /api/storage_volumes/:id/attach
+public struct rest_response * dc_attach_storage(char * id,char * server);
+// POST /api/storage_volumes/:id/detach
+public struct rest_response * dc_detach_storage(char * id);
 
 	/* ----------- */
 #endif	/* _dcclient_h */

@@ -380,6 +380,23 @@ public struct rest_response * dc_instance_action(char * id, char * action)
 }
 
 // ---------------------------------------
+// START /api/instances/:id
+// ---------------------------------------
+public struct rest_response * dc_start_instance( char * id )
+{
+	return( dc_instance_action( id, "start" ) );
+}
+
+// ---------------------------------------
+// STOP /api/instances/:id
+// ---------------------------------------
+public struct rest_response * dc_stop_instance( char * id )
+{
+	return( dc_instance_action( id, "stop" ) );
+}
+
+
+// ---------------------------------------
 // CREATE INSTANCE PARAMETERS
 // ---------------------------------------
 public char * dc_create_instance_message( char * name, char * profile, char * image, char * firewall, char * zone )
@@ -640,19 +657,32 @@ public struct rest_response * dc_delete_address(char * id)
 // ---------------------------------------
 // POST /api/addresses/:id/associate
 // ---------------------------------------
-public struct rest_response * dc_associate_address(char * id, char * filename) 
+public struct rest_response * dc_associate_address(char * id, char * server) 
 { 
+	FILE *	h;
+	char * filename;
+	struct	rest_response * rptr=(struct rest_response *) 0;
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/addresses/%s/associate",id);
-	return(dc_post_request(buffer,filename));
+	if (( filename = rest_temporary_filename("form")) != (char *) 0)
+	{
+		if (( h = fopen( filename, "wa" )) != (FILE *) 0)
+		{
+			fprintf(h,"instance_id=%s",server);
+			fclose(h);
+			rptr = dc_post_request(buffer,filename);
+		}
+		filename = liberate( filename );
+	}
+	return( rptr );
 }
 
 // POST /api/addresses/:id/disassociate
-public struct rest_response * dc_disassociate_address(char * id, char * filename) 
+public struct rest_response * dc_disassociate_address(char * id)
 { 
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/addresses/%s/disassociate",id);
-	return(dc_post_request(buffer,filename));
+	return(dc_post_request(buffer,(char *) 0));
 }
 
 // ---------------------------------------
@@ -722,22 +752,143 @@ public struct rest_response * dc_delete_loadbalancer(char * id)
 // ---------------------------------------
 // POST /api/load_balancers/:id/register
 // ---------------------------------------
-public struct rest_response * dc_register_loadbalancer(char * id,char * filename) 
+public struct rest_response * dc_register_loadbalancer(char * id,char * server) 
 { 
+	FILE *	h;
+	char * filename;
+	struct	rest_response * rptr=(struct rest_response *) 0;
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/load_balancers/%s/register",id);
-	return(dc_post_request(buffer,filename));
+	if (( filename = rest_temporary_filename("form")) != (char *) 0)
+	{
+		if (( h = fopen( filename, "wa" )) != (FILE *) 0)
+		{
+			fprintf(h,"instance_id=%s",server);
+			fclose(h);
+			rptr = dc_post_request(buffer,filename);
+		}
+		filename = liberate( filename );
+	}
+	return( rptr );
 }
 
 // ---------------------------------------
 // POST /api/load_balancers/:id/unregister
 // ---------------------------------------
-public struct rest_response * dc_unregister_loadbalancer(char * id,char * filename) 
+public struct rest_response * dc_unregister_loadbalancer(char * id,char * server) 
 { 
+	FILE *	h;
+	char * filename;
+	struct	rest_response * rptr=(struct rest_response *) 0;
 	char buffer[_DC_BUFFERSIZE];
 	sprintf(buffer,"/api/load_balancers/%s/unregister",id);
+	if (( filename = rest_temporary_filename("form")) != (char *) 0)
+	{
+		if (( h = fopen( filename, "wa" )) != (FILE *) 0)
+		{
+			fprintf(h,"instance_id=%s",server);
+			fclose(h);
+			rptr = dc_post_request(buffer,filename);
+		}
+		filename = liberate( filename );
+	}
+	return( rptr );
+}
+
+// ---------------------------------------
+// GET /api/storage_volumes
+// ---------------------------------------
+public struct rest_response * dc_list_storage()
+{ 
+	return(dc_get_request("/api/storage_volumes"));
+}
+
+
+// ---------------------------------------
+// GET /api/storage_volumes/:id
+// ---------------------------------------
+public struct rest_response * dc_get_storage(char * id)
+{
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/storage_volumes/%s",id);
+	return(dc_get_request(buffer));
+}
+
+// ---------------------------------------
+// CREATE STORAGE MESSAGE
+// ---------------------------------------
+public char * dc_create_storage_message(char * name, char * size, char * realm)
+{
+	char *	filename;
+	FILE *	h;
+	if (!( filename = rest_temporary_filename("form")))
+		return( filename );
+	else if (!( h = fopen( filename, "wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"name_id=%s",name);
+		fprintf(h,"&capacity=%s",realm);
+		fprintf(h,"&realm_id=%s",realm);
+		fclose(h);
+		return( filename );
+	}
+}
+
+
+// ---------------------------------------
+// POST /api/storage_volumes
+// ---------------------------------------
+public struct rest_response * dc_create_storage(char * filename)
+{ 
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/storage_volumes");
 	return(dc_post_request(buffer,filename));
 }
+
+// ---------------------------------------
+// DELETE /api/storage_volumes/:id
+// ---------------------------------------
+public struct rest_response * dc_delete_storage(char * id)
+{ 
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/storage_volumes/%s",id);
+	return(dc_delete_request(buffer));
+}
+
+// ---------------------------------------
+// POST /api/storage_volumes/:id/attach
+// ---------------------------------------
+public struct rest_response * dc_attach_storage(char * id,char * server)
+{ 
+	FILE *	h;
+	char * filename;
+	struct	rest_response * rptr=(struct rest_response *) 0;
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/storage_volumes/%s/attach",id);
+	if (( filename = rest_temporary_filename("form")) != (char *) 0)
+	{
+		if (( h = fopen( filename, "wa" )) != (FILE *) 0)
+		{
+			fprintf(h,"instance_id=%s",server);
+			fclose(h);
+			rptr = dc_post_request(buffer,filename);
+		}
+		filename = liberate( filename );
+	}
+	return( rptr );
+}
+
+// ---------------------------------------
+// POST /api/storage_volumes/:id/detach
+// ---------------------------------------
+public struct rest_response * dc_detach_storage(char * id)
+{ 
+	char buffer[_DC_BUFFERSIZE];
+	sprintf(buffer,"/api/storage_volumes/%s/detach",id);
+	return(dc_post_request(buffer,(char *) 0));
+}
+
 
 	/* ----------- */
 #endif	/* _dcclient_c */
