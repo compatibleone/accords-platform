@@ -89,6 +89,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/testaz
 %attr(0755,root,root) %{_bindir}/testcb
 %attr(0755,root,root) %{_bindir}/testcp
+%attr(0755,root,root) %{_bindir}/testdc
 %attr(0755,root,root) %{_bindir}/teston
 %attr(0755,root,root) %{_bindir}/testos
 %attr(0755,root,root) %{_bindir}/testresolver
