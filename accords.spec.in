@@ -118,6 +118,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/run-parser
 %attr(0755,root,root) %{_bindir}/run-procci
 %attr(0755,root,root) %{_bindir}/run-publisher
+%attr(0755,root,root) %{_bindir}/run-coees
+%attr(0755,root,root) %{_bindir}/run-coips
+%attr(0755,root,root) %{_bindir}/run-cosacs
+%attr(0755,root,root) %{_bindir}/run-dcprocci
+%attr(0755,root,root) %{_bindir}/run-osocciprocci
+%attr(0755,root,root) %{_bindir}/run-slam
+%attr(0755,root,root) %{_bindir}/run-testosocci
 %{_libdir}/libcocarrier.so.0
 %{_libdir}/libcocarrier.so.0.0.0
 %{_libdir}/libcocci.so.0
