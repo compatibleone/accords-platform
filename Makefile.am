@@ -99,6 +99,9 @@ endif
 if ENABLE_COMMAND
 SUBDIRS += command
 endif
+if ENABLE_TESTDC
+SUBDIRS += testdc
+endif
 if ENABLE_TESTOS
 SUBDIRS += testos
 endif

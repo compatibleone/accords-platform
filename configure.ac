@@ -7,7 +7,7 @@ dnl autoconf version
 AC_PREREQ(2.59)
 
 dnl mandatory stuff
-AC_INIT([accords], [1.0], [compatible-accords@ow2.org])
+AC_INIT([accords], [2.0], [compatible-accords@ow2.org])
 
 dnl check host and target
 AC_CANONICAL_BUILD
@@ -345,6 +345,14 @@ AC_ARG_ENABLE([testos],
 AM_CONDITIONAL([ENABLE_TESTOS], [test "$enable_testos" = "yes"])
 AC_SUBST([CFLAGS_TESTOS], [-I\${abs_top_srcdir}/testos/src])
 
+AC_ARG_ENABLE([testdc],
+      [AS_HELP_STRING([--disable-testdc],
+		      [Disable testdc @<:@default=enable@:>@])],
+      [],
+      [enable_testdc=yes])
+AM_CONDITIONAL([ENABLE_TESTDC], [test "$enable_testdc" = "yes"])
+AC_SUBST([CFLAGS_TESTDC], [-I\${abs_top_srcdir}/testdc/src])
+
 AC_ARG_ENABLE([teston],
       [AS_HELP_STRING([--disable-teston],
 		      [Disable teston @<:@default=enable@:>@])],
@@ -421,6 +429,7 @@ AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
 AC_CONFIG_FILES([dcprocci/Makefile dcprocci/src/Makefile])
 AC_CONFIG_FILES([command/Makefile command/src/Makefile])
+AC_CONFIG_FILES([testdc/Makefile testdc/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
 AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
 AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
@@ -471,6 +480,7 @@ echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"
 echo "    - command                  : $enable_command"
 echo "    - testos                   : $enable_testos"
+echo "    - testdc                   : $enable_testdc"
 echo "    - teston                   : $enable_teston"
 echo "    - testcp                   : $enable_testcp"
 echo "    - testcb                   : $enable_testcb"
