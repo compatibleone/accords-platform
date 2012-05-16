@@ -10,7 +10,7 @@
 #
 
 bin_PROGRAMS = dcprocci
-EXTRA_DIST = proccidc.c
+EXTRA_DIST = proccidc.c dcmethod.c dcaction.c dccontract.c
 
 dcprocci_SOURCES = dcprocci.c 
 
