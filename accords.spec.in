@@ -16,7 +16,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		accords
 Version:	_VERSION
-Release:	2
+Release:	8.0
 License:	GPL
 Group:		%{group}
 URL:		http://www.compatibleone.org

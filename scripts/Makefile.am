@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
-dist_pkgsysconf_DATA=cords_user.xml
+dist_pkgsysconf_DATA=cords_user.xml accords.ini
 
 scripts=accords
 
