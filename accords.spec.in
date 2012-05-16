@@ -64,7 +64,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/cords_user.xml
 %attr(0755,root,root) %{_bindir}/accords
-%attr(0755,root,root) %{_bindir}/aliases
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/broker
 %attr(0755,root,root) %{_bindir}/coes
@@ -94,6 +93,30 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/testos
 %attr(0755,root,root) %{_bindir}/testresolver
 %attr(0755,root,root) %{_bindir}/testosocci
+## links against accords
+%attr(0755,root,root) %{_bindir}/accords-config
+%attr(0755,root,root) %{_bindir}/co-broker
+%attr(0755,root,root) %{_bindir}/co-command
+%attr(0755,root,root) %{_bindir}/co-parser
+%attr(0755,root,root) %{_bindir}/co-resolver
+%attr(0755,root,root) %{_bindir}/co-start
+%attr(0755,root,root) %{_bindir}/co-status
+%attr(0755,root,root) %{_bindir}/co-stop
+%attr(0755,root,root) %{_bindir}/run-azprocci
+%attr(0755,root,root) %{_bindir}/run-broker
+%attr(0755,root,root) %{_bindir}/run-coes
+%attr(0755,root,root) %{_bindir}/run-comons
+%attr(0755,root,root) %{_bindir}/run-conets
+%attr(0755,root,root) %{_bindir}/run-coobas
+%attr(0755,root,root) %{_bindir}/run-cosched
+%attr(0755,root,root) %{_bindir}/run-coss
+%attr(0755,root,root) %{_bindir}/run-ezvm
+%attr(0755,root,root) %{_bindir}/run-fileserver
+%attr(0755,root,root) %{_bindir}/run-onprocci
+%attr(0755,root,root) %{_bindir}/run-osprocci
+%attr(0755,root,root) %{_bindir}/run-parser
+%attr(0755,root,root) %{_bindir}/run-procci
+%attr(0755,root,root) %{_bindir}/run-publisher
 %{_libdir}/libcocarrier.so.0
 %{_libdir}/libcocarrier.so.0.0.0
 %{_libdir}/libcocci.so.0
