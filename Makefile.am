@@ -126,3 +126,15 @@ endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd
 
+SPEC=$(PACKAGE).spec
+SPEC_DIR:=$(shell rpm -E '%{_specdir}')
+SOURCE_DIR:=$(shell rpm -E '%{_sourcedir}')
+
+spec:
+	cp $(SPEC).in $(SPEC)
+	sed -ri -e "s|_VERSION|$(VERSION)|g" $(SPEC)
+
+dist-srpm: dist-gzip spec
+	cp $(SPEC) $(SPEC_DIR)
+	cp $(distdir).tar.gz $(SOURCE_DIR)
+	rpmbuild -bs $(SPEC_DIR)/$(SPEC)
