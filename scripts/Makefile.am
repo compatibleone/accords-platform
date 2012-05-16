@@ -44,7 +44,7 @@ install-exec-local: accords.in Makefile
 	  test -f ./accords.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}accords.in >$(DESTDIR)$(bindir)/accords
 	chmod 755 $(DESTDIR)$(bindir)/accords
-	for alias in aliases; do \
+	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
 
