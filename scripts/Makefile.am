@@ -24,12 +24,14 @@ CLEANFILES = $(scripts) $(aliases)
 localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COES):$(PATH_COMONS):$(PATH_CONETS):$(PATH_COOBAS):$(PATH_COSS):$(PATH_EZVM):$(PATH_FILESERVER):$(PATH_ONPROCCI):$(PATH_OSPROCCI):$(PATH_PARSER):$(PATH_PROCCI):$(PATH_COSCHED):$(PATH_PUBLISHER):$(builddir)
 localedit = sed \
         -e 's|@sitepath[@]|$(localpath)|g' \
+	-e 's|@bindir[@]|$(bindir)|g' \
         -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g'
 
 # Edit for normal run (installed)
 installpath = $(pkglibexecdir)
 installedit = sed \
         -e 's|@sitepath[@]|$(installpath)|g' \
+	-e 's|@bindir[@]|$(bindir)|g' \
         -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g'
 
 all-local: $(scripts)
@@ -59,5 +61,5 @@ accords: Makefile
 	rm -f $@ $@.tmp
 	srcdir=''; \
 	  test -f ./$@.in || srcdir=$(srcdir)/; \
-	  $(localedit) $${srcdir}$@.in >$@.tmp
+	  $(installedit) $${srcdir}$@.in >$@.tmp
 	mv $@.tmp $@

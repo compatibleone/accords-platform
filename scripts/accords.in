@@ -81,126 +81,126 @@ _co_start() {
     echo "Starting ACCORDS"
 
     echo "Starting accords publication services"
-    ./run-publisher &
+    @bindir@/grun-publisher &
     sleep 1
 
     echo "Starting accords file services"
-    ./run-fileserver & 
+    @bindir@/grun-fileserver &
     sleep 1
     
     echo "Starting accords security services"
-    ./run-coss &
+    @bindir@/grun-coss &
     sleep 1
 
     echo "Starting accords monitoring services"
-    ./run-comons &
+    @bindir@/grun-comons &
     sleep 1
     
     echo "Starting accords accounting services"
-    ./run-coobas &
+    @bindir@/grun-coobas &
     sleep 1
     
     echo "Starting accords networking services"
-    ./run-conets &
+    @bindir@/grun-conets &
     sleep 1
 
     echo "Starting accords elasticity services"
-    ./run-coes &
+    @bindir@/grun-coes &
     sleep 1
     
     echo "Starting accords energy efficiency services"
-    ./run-coees &
+    @bindir@/grun-coees &
     sleep 1
     
     echo "Starting accords image storage services"
-    ./run-ezvm &
+    @bindir@/grun-ezvm &
     sleep 1
 
     echo "Starting accords image production services"
-    ./run-coips &
+    @bindir@/grun-coips &
     sleep 1
 
     echo "Starting accords parser services"
-    ./run-parser &
+    @bindir@/grun-parser &
     sleep 1
 
     echo "Starting accords broker services"
-    ./run-broker &
+    @bindir@/grun-broker &
     sleep 1
 
     echo "Starting accords procci services"
-    ./run-procci &
+    @bindir@/grun-procci &
     sleep 1
 
     echo "Starting accords scheduling services"
-    ./run-cosched &
+    @bindir@/grun-cosched &
     sleep 1
 
     echo "Starting accords open stack services"
-    ./run-osprocci &
+    @bindir@/grun-osprocci &
     sleep 1
 
     echo "Starting accords test occi open stack server"
-    ./run-testosocci &
+    @bindir@/grun-testosocci &
     sleep 1
 
     echo "Starting accords occi open stack services"
-    ./run-osocciprocci &
+    @bindir@/grun-osocciprocci &
     sleep 1
 
     echo "Starting accords open nebula services"
-    ./run-onprocci &
+    @bindir@/grun-onprocci &
     sleep 1
     
     echo "Starting accords windows azure services"
-    ./run-azprocci &
+    @bindir@/grun-azprocci &
     sleep 1
 
     echo "Starting accords delta cloud services"
-    ./run-dcprocci &
+    @bindir@/grun-dcprocci &
     sleep 1
 
     echo "Starting accords sla services"
-    ./run-slam &
+    @bindir@/grun-slam &
     sleep 1
 
     echo "Starting accords software configuration services"
-    ./run-cosacs &
+    @bindir@/grun-cosacs &
     sleep 1
 
     echo "ACCORDS ready"
-    ./co-status
+    @bindir@/gco-status
 }
 
 _co_broker() {
     if [ -z "$tls" ]; then
-	/usr/local/bin/testcb --publisher "$publisher" --verbose plan_$1.xml
+	@bindir@/testcb --publisher "$publisher" --verbose plan_$1.xml
     else
-	/usr/local/bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+	@bindir@/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
     fi
 } 
 
 _co_command() {
     if [ -z "$tls" ]; then
-	/usr/local/bin/command --publisher "$publisher" $*
+	@bindir@/command --publisher "$publisher" $*
     else
-	/usr/local/bin/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+	@bindir@/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
     fi
 }
 
 _co_parser() {
     if [ -z "$tls" ]; then
-	/usr/local/bin/testcp --publisher "$publisher" --verbose $2 $1.xml
+	@bindir@/testcp --publisher "$publisher" --verbose $2 $1.xml
     else
-	/usr/local/bin/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
+	@bindir@/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
     fi
 }
 
 _co_resolver() {
     if [ -z "$tls" ]; then
-	/usr/local/bin/testresolver --publisher "$publisher" $*
+	@bindir@/testresolver --publisher "$publisher" $*
     else
-	/usr/local/bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+	@bindir@/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
     fi
 }
 
@@ -272,94 +272,94 @@ _co_stop() {
 }
 
 _run_azprocci() {
-    /usr/local/bin/azprocci --config $target CO-AZPROCCI/1.0
+    @bindir@/azprocci --config $target CO-AZPROCCI/1.0
 } 
 
 _run_broker() {
-    /usr/local/bin/broker --config $target CO-BROKER/1.0
+    @bindir@/broker --config $target CO-BROKER/1.0
 } 
 
 _run_coes() {
-    /usr/local/bin/coes --config $target CO-ES/1.0
+    @bindir@/coes --config $target CO-ES/1.0
 } 
 
 _run_coees() {
-    /usr/local/bin/coees --config $target CO-EES/1.0
+    @bindir@/coees --config $target CO-EES/1.0
 } 
 
 _run_comons() {
-    /usr/local/bin/comons --config $target CO-MONS/1.0
+    @bindir@/comons --config $target CO-MONS/1.0
 }
 
 _run_conets() {
-    /usr/local/bin/conets --config $target CO-NETS/1.0
+    @bindir@/conets --config $target CO-NETS/1.0
 }
 
 _run_coobas() {
-    /usr/local/bin/coobas --config $target CO-BAS/1.0
+    @bindir@/coobas --config $target CO-BAS/1.0
 }
 
 _run_cosacs() {
-    /usr/local/bin/cosacs --config $target CO-SACS/1.0
+    @bindir@/cosacs --config $target CO-SACS/1.0
 }
 
 _run_coss() {
-    /usr/local/bin/coss --config $target CO-SS/1.0
+    @bindir@/coss --config $target CO-SS/1.0
 }
 
 _run_ezvm() {
-    /usr/local/bin/ezvm --config $target CO-EZVM/1.0
+    @bindir@/ezvm --config $target CO-EZVM/1.0
 }
 
 _run_coips() {
-    /usr/local/bin/coips --config $target CO-IPS/1.0
+    @bindir@/coips --config $target CO-IPS/1.0
 }
 
 _run_fileserver() {
-    /usr/local/bin/fileserver --config $target CO-FS/1.0
+    @bindir@/fileserver --config $target CO-FS/1.0
 }
 
 _run_onprocci() {
-    /usr/local/bin/onprocci --config $target CO-ONPROCCI/1.0
+    @bindir@/onprocci --config $target CO-ONPROCCI/1.0
 }
 
 _run_osprocci() {
-    /usr/local/bin/osprocci --config $target CO-OSPROCCI/1.0
+    @bindir@/osprocci --config $target CO-OSPROCCI/1.0
 }
 
 _run_osocciprocci() {
-    /usr/local/bin/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+    @bindir@/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
 _run_testosocci() {
-    /usr/local/bin/testosocci --config $target CO-TESTOSOCCI/1.0
+    @bindir@/testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
 _run_slam() {
-    /usr/local/bin/slam --config $target CO-SLAM/1.0
+    @bindir@/slam --config $target CO-SLAM/1.0
 }
 
 _run_dcprocci() {
-    /usr/local/bin/dcprocci --config $target CO-DCPROCCI/1.0
+    @bindir@/dcprocci --config $target CO-DCPROCCI/1.0
 }
 
 _run_parser() {
-    /usr/local/bin/parser --config $target CO-PARSER/1.0
+    @bindir@/parser --config $target CO-PARSER/1.0
 }
 
 _run_procci() {
-    /usr/local/bin/procci --config $target CO-PROCCI/1.0
+    @bindir@/procci --config $target CO-PROCCI/1.0
 }
 _run_cosched() {
-    /usr/local/bin/cosched --config $target CO-SCHED/1.0
+    @bindir@/cosched --config $target CO-SCHED/1.0
 }
  
 _run_publisher() {
-    /usr/local/bin/publisher --config $target CO-PUB/1.0
+    @bindir@/publisher --config $target CO-PUB/1.0
 }
 
 _run_fileserver() {
-    /usr/local/bin/fileserver --config $target CO-FS/1.0
+    @bindir@/fileserver --config $target CO-FS/1.0
 }
 
 _make_security_files() {
