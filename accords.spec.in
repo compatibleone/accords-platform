@@ -62,6 +62,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root,0755)
 %dir %{_sysconfdir}/accords
+%config %{_sysconfdir}/accords/accords.ini
 %config %{_sysconfdir}/accords/cords_user.xml
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/azprocci
