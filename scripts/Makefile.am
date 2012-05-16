@@ -13,9 +13,10 @@ scripts=accords
 
 aliases = \
 	co-start co-broker co-command co-parser co-resolver co-status co-stop \
-	run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm \
-	run-fileserver run-onprocci run-osprocci run-parser run-procci run-cosched run-publisher \
-	accords-config
+	run-azprocci run-broker run-coes run-coees run-coips run-comons run-conets run-coobas \
+	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci \
+	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
+	run-cosacs accords-config
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in
 CLEANFILES = $(scripts) $(aliases)
@@ -33,6 +34,9 @@ installedit = sed \
         -e 's|@sitepath[@]|$(installpath)|g' \
 	-e 's|@bindir[@]|$(bindir)|g' \
         -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g'
+
+setaliases = sed \
+	-e 's|@aliases[@]|$(aliases)|g'
 
 all-local: $(scripts)
 	chmod 755 accords
@@ -61,5 +65,5 @@ accords: Makefile
 	rm -f $@ $@.tmp
 	srcdir=''; \
 	  test -f ./$@.in || srcdir=$(srcdir)/; \
-	  $(installedit) $${srcdir}$@.in >$@.tmp
+	  $(installedit) $${srcdir}$@.in | $(setaliases) >$@.tmp
 	mv $@.tmp $@
