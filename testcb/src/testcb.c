@@ -43,6 +43,9 @@ struct	cords_broker_config
 
 private	int	debug=0;
 private	int	verbose=0;
+private	char *	zone=(char *) 0;
+private	char *	operator=(char *) 0;
+private	char *	security=(char *) 0;
 public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(Cb.publisher);	}
@@ -173,6 +176,21 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 					Cb.host = argv[argi++];
 					continue;
 				}
+				else if (!( strcmp( aptr, "zone" ) ))
+				{
+					zone = argv[argi++];
+					continue;
+				}
+				else if (!( strcmp( aptr, "operator" ) ))
+				{
+					operator = argv[argi++];
+					continue;
+				}
+				else if (!( strcmp( aptr, "security" ) ))
+				{
+					security = argv[argi++];
+					continue;
+				}
 				else if (!( strcmp( aptr, "agent" ) ))
 				{
 					Cb.agent = argv[argi++];
@@ -227,8 +245,8 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.a.0.02 ");
-	printf("\n   Beta Version 04/03/2012 \n");
+	printf("\n   Cords Broker : Version 1.0.a.0.03 ");
+	printf("\n   Beta Version 16/05/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
@@ -236,6 +254,9 @@ private	int	test_cords_broker_banner(char * n)
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --result <filename>  specify the output plan filename ");
+	printf("\n   --zone <zone>        specify required provisioning zone ");
+	printf("\n   --operator <name>    specify required operator name ");
+	printf("\n   --security <type>    specify required security level");
 	printf("\n   --verbose            activate verbose messages ");
 	printf("\n   --debug              activate debug messages \n");
 	printf("\n   Example : \n");

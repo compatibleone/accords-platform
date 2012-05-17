@@ -263,14 +263,14 @@ private char *	build_application_node(char * image, char * provider )
 /* ------------------------- */
 /* negotiate the contracts   */
 /* ------------------------- */
-private	char *	negotiate_application_contract(char * node)
+private	char *	negotiate_application_contract(char * node,struct cords_placement_criteria * selector)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("coips:negotiate_application_contract");
 	if (!( document = cords_instance_node(
-		node, node, _CORDS_CONTRACT_AGENT, default_tls(), "coips", "coips", "coips") ))
+		selector, node, node, _CORDS_CONTRACT_AGENT, default_tls(), "coips", "coips", "coips") ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -476,7 +476,9 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	struct	occi_response * zptr;
 	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
+	struct	cords_placement_criteria selector;
 
+	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
 	/* ---------------------------------------- */
 	/* check first for packages to be installed */
@@ -509,7 +511,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	aptr->status = 2;
 
-	if (!( contract = negotiate_application_contract(node)))
+	if (!( contract = negotiate_application_contract(node,&selector)))
 		return( 801 );
 
 

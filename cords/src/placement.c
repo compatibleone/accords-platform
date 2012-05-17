@@ -49,6 +49,10 @@ public struct cords_placement * liberate_cords_placement(struct cords_placement 
 			 sptr->opinion = liberate(sptr->opinion);
 		if ( sptr->zone )
 			 sptr->zone = liberate(sptr->zone);
+		if ( sptr->security )
+			 sptr->security = liberate(sptr->security);
+		if ( sptr->operator )
+			 sptr->operator = liberate(sptr->operator);
 		if ( sptr->solution )
 			 sptr->solution = liberate(sptr->solution);
 		sptr = liberate( sptr );
@@ -72,6 +76,8 @@ public struct cords_placement * reset_cords_placement(struct cords_placement * s
 		sptr->price = (char*) 0;
 		sptr->opinion = (char*) 0;
 		sptr->zone = (char*) 0;
+		sptr->security = (char*) 0;
+		sptr->operator = (char*) 0;
 		sptr->solution = (char*) 0;
 		sptr->status =  0;
 	}
@@ -132,6 +138,14 @@ public int xmlin_cords_placement(struct cords_placement * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->zone = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"security") ))
+		{
+			if ( wptr->value ) { sptr->security = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"operator") ))
+		{
+			if ( wptr->value ) { sptr->operator = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"solution") ))
 		{
 			if ( wptr->value ) { sptr->solution = allocate_string(wptr->value); }
@@ -162,6 +176,8 @@ public int rest_occi_cords_placement(FILE * fh,struct cords_placement * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.opinion='%s'\r\n",prefix,nptr,(sptr->opinion?sptr->opinion:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.solution='%s'\r\n",prefix,nptr,(sptr->solution?sptr->solution:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);

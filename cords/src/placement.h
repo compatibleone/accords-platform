@@ -10,6 +10,8 @@ struct	cords_placement
 	char	*	price;
 	char 	*	opinion;
 	char	*	zone;
+	char 	*	security;
+	char 	*	operator;
 	char 	*	solution;
 	int		status;
 };

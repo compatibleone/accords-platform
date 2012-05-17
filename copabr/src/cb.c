@@ -1175,7 +1175,8 @@ private	struct	occi_request  * cords_add_provider_attribute(
 /*	this function provides linkage to COES placement engine		*/
 /*	for the selection of the provider to be used by broker		*/		
 /*	---------------------------------------------------------	*/
-private	char *	cords_coes_operation( char * provider, char * node, char * agent, char * tls )
+private	char *	cords_coes_operation( struct cords_placement_criteria * selector, 
+	/* char * provider ,  char * node, */ char * agent, char * tls )
 {
 	struct	occi_client 	* kptr;
 	struct	occi_request	* qptr;
@@ -1211,8 +1212,8 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , provider ) ))
-			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , node     ) )))
+			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , selector->provider ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , selector->node     ) )))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1267,7 +1268,7 @@ private	char *	cords_coes_operation( char * provider, char * node, char * agent,
 /*	----------------------------------------------------------	*/
 /*		c o r d s _ s e l e c t _ p r o v i d e r		*/
 /*	----------------------------------------------------------	*/
-private	char *	cords_select_provider( char * provider, char * node, char * agent, char * tls )
+private	char *	cords_select_provider( struct cords_placement_criteria * selector, char * agent, char * tls )
 {
 	struct	occi_response 	* zptr;
 	struct	occi_response 	* yptr;
@@ -1277,13 +1278,13 @@ private	char *	cords_select_provider( char * provider, char * node, char * agent
 	/* ------------------------------------------------------ */
 	/* allow the COES elastic placement engine to do its work */
 	/* ------------------------------------------------------ */
-	if (( solution = cords_coes_operation( provider, node, agent, tls )) != (char *) 0)
+	if (( solution = cords_coes_operation( selector, agent, tls )) != (char *) 0)
 		return( solution );
 	
 	/* ------------------------------------------------------ */
 	/* attempt to resolve agencys of the "provider" category */
 	/* ------------------------------------------------------ */
-	else if (!( zptr = occi_resolver( provider, agent ) ))
+	else if (!( zptr = occi_resolver( selector->provider, agent ) ))
 		return( (char *) 0 );
 
 	/* ------------------------------------------------------ */
@@ -1300,6 +1301,32 @@ private	char *	cords_select_provider( char * provider, char * node, char * agent
 		else 	return( allocate_string( eptr->value ) );
 	}
 	return((char *) 0);
+}
+
+/*	--------------------------------------------------------	*/
+/*	    r e s e t _ p l a c e m e n t _ c r i t e r i a		*/
+/*	--------------------------------------------------------	*/
+private	void	reset_placement_criteria( struct cords_placement_criteria * selector )
+{
+	selector->node		=
+	selector->price		=
+	selector->opinion	=
+	selector->provider	=
+	selector->operator	=
+	selector->zone		=
+	selector->security	=
+	selector->algorithm	= (char *) 0;	
+	return;
+}
+
+/*	--------------------------------------------------------	*/
+/*	      s e t _ p l a c e m e n t _ c r i t e r i a		*/
+/*	--------------------------------------------------------	*/
+private	void	set_placement_criteria( struct cords_placement_criteria * selector, char * provider, char * node )
+{
+	selector->node		= node;
+	selector->provider	= provider;
+	return;
 }
 
 /*	--------------------------------------------------------	*/
@@ -1345,8 +1372,12 @@ private	char * 	cords_contract_provider(
 	/* ----------------------------------- */
 	/* select a provider for this category */
 	/* ----------------------------------- */
-	else if (!( zptr = cords_select_provider( cptr->value, id, agent, tls ) ))
-		return( zptr );
+	else 
+	{
+		set_placement_criteria( &App->selector, cptr->value, id );
+		if (!( zptr = cords_select_provider( &App->selector, agent, tls ) ))
+			return( zptr );
+	}
 
 	/* --------------------------------- */
 	/* create the client and the request */
@@ -2343,6 +2374,7 @@ private	struct	xml_element * 	cords_instance_contract(
 /*	that will ne added to the service of the parent manifest	*/
 /*	-------------------------------------------------------		*/
 public	struct	xml_element * cords_instance_node( 
+		struct cords_placement_criteria * selector,
 		char * host,
 		char * id,
 		char * agent,
@@ -2358,28 +2390,11 @@ public	struct	xml_element * cords_instance_node(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	struct	cords_node_descriptor App = {
-		_SCOPE_NORMAL | _ACCESS_PRIVATE,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(char *) 0,
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0, 
-		(struct	occi_response *) 0,
-		(struct	occi_response *) 0
-	};
+	struct	cords_node_descriptor App;
+
+	memset( &App, 0, sizeof( struct cords_node_descriptor ));
+	memcpy( &App.selector, selector, sizeof( struct cords_placement_criteria ) );
+	App.scope = _SCOPE_NORMAL | _ACCESS_PRIVATE;
 
 	if ( check_verbose() )	printf("   CORDS Node \n");
 
@@ -2594,29 +2609,14 @@ public	char *	cords_manifest_broker(
 {
 	int	status;
 	char	*	id;
+	struct	cords_placement_criteria CpC;
 	struct	occi_element * eptr;
 	struct	xml_atribut * aptr;
 	struct	xml_element  * mptr;
-	struct cords_provisioning CbC = {
-		(char *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(char *) 0,
-		(struct occi_response *) 0,
-		(struct xml_element *) 0,
-		0
-		};
+	struct cords_provisioning CbC; 
+
+	memset(&CbC,0, sizeof( struct cords_provisioning ) );
+	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 1 : Preparation \n", agent);
@@ -2692,7 +2692,7 @@ public	char *	cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
+		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else	
 		{
