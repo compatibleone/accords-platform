@@ -26,6 +26,18 @@
 
 #define	_BROKER_PROVIDER_CONTRACT	1
 
+struct	cords_placement_criteria
+{
+	char *		node;		/* node description		*/
+	char *		price;		/* by price			*/
+	char *		opinion;	/* by opinion			*/
+	char *		provider;	/* by provider type		*/
+	char *		operator;	/* by named operator		*/
+	char *		zone;		/* by geographical zone		*/
+	char *		security;	/* by security considerations	*/
+	char *		algorithm;	/* the placement algorithm	*/
+};
+
 struct	cords_provisioning
 {
 	char			* planID;
@@ -75,6 +87,9 @@ struct	cords_node_descriptor
 	struct	occi_response 	* system;	/* the system from the image				*/
 	struct	occi_response 	* package;	/* the package from the image				*/
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/
+
+	struct	cords_placement_criteria selector;
+
 };
 
 public	int	cords_initialise_broker_operator( 
@@ -99,6 +114,7 @@ public	char *	cords_manifest_broker(
 public	int	get_provisioning_status();
 
 public	struct	xml_element * cords_instance_node( 
+		struct cords_placement_criteria * selector,
 		char * host,
 		char * id,
 		char * agent,
