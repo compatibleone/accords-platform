@@ -28,23 +28,35 @@ target=/etc/accords/accords.xml
 
 prog=accords
 lockfile=/var/lock/subsys/$prog
+pidbase=/var/run/$prog
 
 daemons="publisher fileserver coss comons coobas conets coes coees ezvm coips parser broker procci cosched osprocci testosocci osocciprocci onprocci azprocci dcprocci slam cosacs"
 
 start_daemon() {
 	name=$1
 	server=$2
+	pidfile=$pidbase.$name.pid
 	[ -x /usr/bin/$name ] || return 1
-	daemon "/usr/bin/$name --config $target $server &"
-	sleep 1
+	daemon --pidfile $pidfile "/usr/bin/$name --config $target $server &"
 	RETVAL=$?
+	sleep 1
+	pid="$(__pids_pidof "$name")"
+	echo $pid >$pidfile
 	return $RETVAL
+}
+
+status_daemon() {
+	name=$1
+	pidfile=$pidbase.$name.pid
+	status -p $pidfile $name
 }
 
 stop_daemon() {
 	name=$1
-	killproc $name
+	pidfile=$pidbase.$name.pid
+	killproc -p $pidfile $name
 	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f $pidfile
 	return $RETVAL
 }
 
@@ -176,6 +188,15 @@ stop() {
 	return $RETVAL
 }
 
+status_daemons() {
+	[ "$EUID" != "0" ] && exit 4
+
+	for d in $daemons; do
+		status_daemon $d
+		echo 
+	done;
+}
+
 # See how we were called.
 case "$1" in
   start)
@@ -185,7 +206,7 @@ case "$1" in
 	stop
 	;;
   status)
-	status $prog
+	status_daemons
 	;;
   restart|force-reload)
 	stop
