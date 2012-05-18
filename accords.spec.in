@@ -64,6 +64,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/accords.ini
 %config %{_sysconfdir}/accords/cords_user.xml
+%attr(0755,root,root) %{_sysconfdir}/init.d/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/broker
