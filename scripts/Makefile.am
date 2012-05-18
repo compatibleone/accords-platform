@@ -53,7 +53,7 @@ install-exec-local: accords.in Makefile accords.init
 	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
-	install -p -m 0755 accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
+	install -p -m 0755 -D accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
 
 uninstall-local:
 	for alias in $(aliases); do \
