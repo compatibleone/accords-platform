@@ -32,20 +32,25 @@ struct	cords_broker_config
 	char *	agent;
 	char *	result;
 	char *	tls;
+	char *	sla;
+	char *	zone;
+	char *	operator;
+	char *	security;
 } Cb = 	{
 	(char * ) 0,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_BROKER_AGENT,
 	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
 	(char *) 0
 	};
 
 private	int	debug=0;
 private	int	verbose=0;
-private	char *	zone=(char *) 0;
-private	char *	operator=(char *) 0;
-private	char *	security=(char *) 0;
 public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(Cb.publisher);	}
@@ -178,17 +183,22 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 				}
 				else if (!( strcmp( aptr, "zone" ) ))
 				{
-					zone = argv[argi++];
+					Cb.zone = argv[argi++];
+					continue;
+				}
+				else if (!( strcmp( aptr, "sla" ) ))
+				{
+					Cb.sla = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "operator" ) ))
 				{
-					operator = argv[argi++];
+					Cb.operator = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "security" ) ))
 				{
-					security = argv[argi++];
+					Cb.security = argv[argi++];
 					continue;
 				}
 				else if (!( strcmp( aptr, "agent" ) ))
@@ -245,8 +255,8 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.a.0.03 ");
-	printf("\n   Beta Version 16/05/2012 \n");
+	printf("\n   Cords Broker : Version 1.0.a.0.04 ");
+	printf("\n   Beta Version 23/05/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
