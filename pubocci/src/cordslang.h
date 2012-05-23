@@ -107,6 +107,9 @@
 #define	_CORDS_PLACEMENT	"placement"
 #define	_CORDS_SOLUTION 	"solution"
 #define	_CORDS_PLAN		"plan"
+#define	_CORDS_AGREEMENT	"agreement"
+#define	_CORDS_TERMS		"terms"
+#define	_CORDS_TERM		"term"
 #define	_CORDS_SERVICE		"service"
 
 #define	_CORDS_OPENSTACK	"openstack"

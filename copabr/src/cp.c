@@ -418,7 +418,7 @@ public	int	cords_resolve_location( struct occi_response * zptr, struct xml_eleme
 /*	plans resulting from a parsed manifest will repalce 	*/
 /*	a previous version.					*/
 /*	-----------------------------------------------------	*/
-private	int	cords_resolve_last_location( struct occi_response * zptr, struct xml_element * document )
+public	int	cords_resolve_last_location( struct occi_response * zptr, struct xml_element * document )
 {
 	char			* vptr;
 	struct	xml_atribut	* aptr;
