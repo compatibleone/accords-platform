@@ -1,0 +1,22 @@
+
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="test3" xmlns="file:///tmp/manifest.xsd">
+
+	<description>test 3 : proactive small compute</description>
+
+	<node name="test3" type="simple" access="public" scope="normal" provider="openstack" >
+		<infrastructure name="test3">
+			<compute name="test3" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="test3" size="20G"/>
+			<network name="test3" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="test3">
+			<system name="ubuntu"/>
+			<package name="test1"/>
+		</image>
+	</node>
+	<configuration name="test3"/>
+	<account name="test"/>
+	<security name="test3"/>
+</manifest>
+

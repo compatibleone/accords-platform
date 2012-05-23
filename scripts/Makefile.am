@@ -14,9 +14,10 @@ scripts=accords
 aliases = \
 	co-start co-broker co-command co-parser co-resolver co-status co-stop \
 	run-azprocci run-broker run-coes run-coees run-coips run-comons run-conets run-coobas \
-	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci \
+	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
 	run-cosacs accords-config
+	
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in
 CLEANFILES = $(scripts) $(aliases)
