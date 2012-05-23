@@ -75,7 +75,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-parser run-procci run-cosched run-publisher accords-config"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-cosched run-publisher accords-config"
 
 _co_start() {
     echo "Starting ACCORDS"
@@ -138,6 +138,10 @@ _co_start() {
 
     echo "Starting accords open stack services"
     run-osprocci &
+    sleep 1
+
+    echo "Starting accords proactive services"
+    run-paprocci &
     sleep 1
 
     echo "Starting accords test occi open stack server"
@@ -244,6 +248,7 @@ _co_stop() {
     _stop_service osocciprocci
     _stop_service testosocci
     _stop_service osprocci
+    _stop_service paprocci
     _stop_service azprocci
     _stop_service cosched
     _stop_service procci
@@ -317,6 +322,10 @@ _run_osprocci() {
     osprocci --config $target CO-OSPROCCI/1.0
 }
 
+_run_paprocci() {
+    paprocci --config $target CO-PAPROCCI/1.0
+}
+
 _run_osocciprocci() {
     osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
@@ -361,6 +370,7 @@ _make_security_files() {
 	_mksecs procci 1
 	_mksecs cosched 1
 	_mksecs osprocci 1
+	_mksecs paprocci 1
 	_mksecs testosocci 1
 	_mksecs osocciprocci 1
 	_mksecs onprocci 1
@@ -368,6 +378,7 @@ _make_security_files() {
 	_mksecs command
     
 	_mksect testcp 1
+	_mksect testpa 1
 	_mksect testcb 1
 	_mksect teston 1
 	_mksect testos 1
@@ -434,12 +445,14 @@ _accords_config() {
 		_mkcert testosocci
 		_mkcert osocciprocci
 		_mkcert onprocci
+		_mkcert paprocci
 		_mkcert azprocci
 		_mkcert cosacs
 	
 		_mkcert testcp
 		_mkcert testcb
 		_mkcert testos
+		_mkcert testpa
 		_mkcert teston
 		_mkcert testresolver
 		_mkcert command
@@ -459,6 +472,7 @@ _accords_config() {
     _mkcfg broker 
     _mkcfg procci 
     _mkcfg osprocci  
+    _mkcfg paprocci  
     _mkcfg testosocci
     _mkcfg osocciprocci  
     _mkcfg onprocci
@@ -661,6 +675,9 @@ case `basename $0` in
 	;;
     co-stop)
 	_co_stop $*
+	;;
+    run-paprocci) 
+	_run_paprocci $*
 	;;
     run-azprocci) 
 	_run_azprocci $*

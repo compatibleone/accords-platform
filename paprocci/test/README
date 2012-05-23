@@ -1,0 +1,4 @@
+These files allow to have a quick running environment for ProActive procci tests. 
+Just run:
+
+	$ source init.sh

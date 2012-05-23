@@ -14,7 +14,7 @@ scripts=accords
 aliases = \
 	co-start co-broker co-command co-parser co-resolver co-status co-stop \
 	run-azprocci run-broker run-coes run-comons run-conets run-coobas run-coss run-ezvm \
-	run-fileserver run-onprocci run-osprocci run-parser run-procci run-cosched run-publisher \
+	run-fileserver run-onprocci run-paprocci run-osprocci run-parser run-procci run-cosched run-publisher \
 	accords-config
 
 EXTRA_DIST = accords.in

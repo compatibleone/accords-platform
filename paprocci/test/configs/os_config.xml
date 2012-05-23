@@ -1,0 +1,17 @@
+<os_configs>
+<os_config
+id='test16-os-config'
+description='CompatibleOne Hands On Subscription Account : test16'
+name='coips'
+user='test16'
+password='apassword'
+domain='prologue'
+agent='OsProcci/1.0'
+host='http://94.143.114.137:5000/v2.0/'
+version='v1.1'
+authenticate=''
+base=''
+tls='0'
+current='0'
+/>
+</os_configs>
