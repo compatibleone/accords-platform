@@ -3,7 +3,7 @@
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			Compatible One Resource and Request Description Schema Version 2.08
-			Provisionary Version 28th March 2012
+			Provisionary Version 24th May 2012
 			Aligned with the CORDS Reference Manual
 			Enforced by the ACCORDS Parser
 		</xsd:documentation>
@@ -21,7 +21,8 @@
 		<xsd:element name="system" type="cordsSystem" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element name="compute" type="cordsCompute" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element name="network" type="cordsNetwork" minOccurs="0"  maxOccurs="unbounded"/>
-		<xsd:element name="storage" type="cordsStorage" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element name="network" type="cordsPort" minOccurs="0"  maxOccurs="unbounded"/>
+		<xsd:element name="port" type="cordsStorage" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element name="user" type="cordsUser" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>

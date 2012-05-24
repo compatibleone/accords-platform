@@ -24,6 +24,7 @@
 #define	_XSD_COMPLEX "xsd:complexType"
 #define	_XSD_ATRIBUT "xsd:attribute"
 #define	_XSD_SEQUENCE "xsd:sequence"
+#define	_XSD_SEQUENCE "xsd:choice"
 #define	_XSD_MAXOCCURS "maxOccurs"
 #define	_XSD_MINOCCURS "minOccurs"
 #define	_XSD_UNBOUNDED "unbounded"

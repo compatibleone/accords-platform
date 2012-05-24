@@ -4,7 +4,7 @@
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			Compatible One Service Level Agreement Description Schema Version 2.08
-			Provisionary Version 25th April 2012
+			Provisionary Version 24th May 2012
 			Enforced by the ACCORDS Parser
 		</xsd:documentation>
 	</xsd:annotation>
@@ -38,9 +38,11 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsTerm">
-		<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
-		<xsd:element name="guarantee" type="cordsGuarantee" minOccurs="0" maxOccurs="1"/>
-		<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:choice>
+			<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="guarantee" type="cordsGuarantee" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>

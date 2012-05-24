@@ -85,6 +85,9 @@ public	struct	xml_element * first_xsd_element( struct xml_element * xsd )
 		return( xsd->first );
 	else if (!( strcmp( xsd->first->name, _XSD_SEQUENCE ) ))
 		xsd = xsd->first;
+	else if (!( strcmp( xsd->first->name, _XSD_CHOICE ) ))
+		xsd = xsd->first;
+
 	if (!( xsd ))
 		return(xsd);
 	else	return( xsd->first );
@@ -136,6 +139,8 @@ public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 	else if (!( xsd->first ))
 		return( xsd->first );
 	else if (!( strcmp( xsd->first->name, _XSD_SEQUENCE ) ))
+		xsd = xsd->first;
+	else if (!( strcmp( xsd->first->name, _XSD_CHOICE ) ))
 		xsd = xsd->first;
 
 	for (	wptr = document_element( xsd, _XSD_ELEMENT );
