@@ -15,7 +15,7 @@ struct	cords_quota
 	int	offered;
 	int	reserved;
 	int	consumed;
-	int	status;
+	int	state;
 };
 
 #endif	

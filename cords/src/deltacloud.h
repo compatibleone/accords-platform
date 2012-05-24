@@ -37,7 +37,7 @@ struct	deltacloud
 
 	int	when;
 
-	int	status;
+	int	state;
 };
 
 #endif	

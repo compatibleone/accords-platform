@@ -286,7 +286,7 @@ private	struct rest_response * choose_placement(
 	int	status;
 	if (!( pptr = vptr ))
 		return(0);
-	else if ( pptr->status > 0 )
+	else if ( pptr->state > 0 )
 		return(0);
 	else if ((status = create_placement_solution(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( rest_html_response( aptr, status, "PLACEMENT FAILURE" ) );

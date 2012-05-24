@@ -11,7 +11,7 @@ struct	cords_port
 	char *	range;
 	char *	from;
 	char *	to;
-	int	status;
+	int	state;
 };
 
 #endif	

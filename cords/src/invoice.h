@@ -14,7 +14,7 @@ struct	cords_invoice
 	char *	rate;
 	char *	document;
 	int	transactions;
-	int	status;
+	int	state;
 };
 
 #endif

@@ -723,6 +723,11 @@ public	struct occi_response * cords_retrieve_category(
 	if ( check_debug() )
 		printf("cords_retrieve_category(%s,%s)\n",document->name,id);
 
+	if (!( strncmp( id, "http", strlen("http") )))
+		return( occi_simple_get( id, agent, tls ) );
+	else if (!( strncmp( id, "https", strlen("https")) ))
+		return( occi_simple_get( id, agent, tls ) );
+
 	if (!( aptr = occi_resolver( document->name, agent ) ))
 		return((struct occi_response *) 0);
 
@@ -2131,6 +2136,8 @@ private	int	cords_parser_atribut_action(
 	/* ---------------------------- */
 	/* invoke cordscript expression */
 	/* ---------------------------- */
+	if ( xptr )
+		printf("invoke cordscript:(%s)\n",xptr);
 	if (!( eptr = cordscript_parse_statement( xptr ) ))
 		return(0);
 	else
@@ -2408,6 +2415,59 @@ private	struct	xml_atribut *	cords_domain_name( struct xml_atribut * aptr, char 
 }
 
 /*	---------------------------------------------------	*/
+/*	    c o r d s _ i n t e g r a t e _ f i e l d s		*/
+/*	---------------------------------------------------	*/
+private	struct occi_response * cords_integrate_fields(
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * domain, char * agent, char * tls )
+{
+	char	buffer[2048];
+	struct	xml_atribut * aptr;
+	struct	occi_element * eptr;
+	
+	char *	nptr;
+	char *	vptr;
+	if (!( aptr = document_atribut( document, _CORDS_ID )))
+		return( zptr );
+	sprintf(buffer,"%s.%s.",domain,document->name);
+	for (	eptr = zptr->first;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		/* ----------------------------- */
+		/* detect an OCCI Attribute name */
+		/* ----------------------------- */
+		if (!( nptr = eptr->name ))
+			continue;
+		else if ( strncmp( eptr->name, buffer,strlen(buffer) ) )
+			continue;
+		else	nptr += strlen(buffer);
+
+		/* -------------------------- */
+		/* Avoid empty or null values */
+		/* -------------------------- */
+		if (!( eptr->value ))
+			continue;
+		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+			continue;
+		else if (( aptr = document_atribut( document, nptr )) != (struct xml_atribut *) 0)
+			continue;
+
+		/* --------------------------------------- */
+		/* add the attribut to the output document */
+		/* --------------------------------------- */
+		printf("integrate_field(%s,%s)\n",nptr,eptr->value);
+		if (!( vptr = occi_unquoted_value( eptr->value ) ))
+			continue;
+		else if (!( aptr = document_add_atribut( document, nptr, vptr ) ))
+			continue;
+		else	vptr = liberate( vptr );
+	}
+	return( zptr );
+}
+
+/*	---------------------------------------------------	*/
 /*		c o r d s _ p a r s e _ e l e m e n t		*/
 /*	---------------------------------------------------	*/
 /*	this function performs the major decisional work of 	*/
@@ -2443,6 +2503,7 @@ private	int 	ll_cords_parse_element(
 	struct	xml_atribut *	aptr;
 	struct	xml_element *	iptr;
 	struct	occi_response *	zptr;
+	struct	occi_response *	yptr;
 	char		*	vptr;
 
 	/* --------------------- */
@@ -2466,6 +2527,11 @@ private	int 	ll_cords_parse_element(
 		/* ------------------------------- */
 		if (!( zptr = cords_retrieve_category( document, aptr->value, agent,tls ) ))
 			return(cords_append_error(document,705,"retrieving category"));
+		/* ----------------------------------- */
+		/* integrate retrieved instance fields */
+		/* ----------------------------------- */
+		else if (!( zptr = cords_integrate_fields( document, zptr, "occi", agent, tls ) ))
+			return(cords_append_error(document,705,"integrating category"));
 	}
 	else
 	{
@@ -2487,6 +2553,28 @@ private	int 	ll_cords_parse_element(
 			/* ------------------------------- */
 			if (!( zptr = cords_resolve_category( document, aptr, agent,tls ) ))
 				return(cords_append_error(document,705,"resolving category by name"));
+
+	  	 	else if (!(status = cords_resolve_location( zptr, document )))
+			{
+				/* ------------------------------------------ */
+				/* retrieve the instance and integrate fields */
+				/* ------------------------------------------ */
+				if (!( aptr = document_atribut( document, _CORDS_ID )))
+					return(cords_append_error(document,705,"resolving category id"));
+				else if (( yptr = cords_retrieve_category( document, aptr->value, agent,tls )) != (struct occi_response *) 0)
+					if (!( yptr = cords_integrate_fields( document, yptr, "occi", agent, tls ) ))
+						return(cords_append_error(document,705,"integrating category"));
+			}
+			else
+			{
+				/* ----------------------------- */
+				/* attempt to create an instance */
+				/* ----------------------------- */
+				if (!( zptr = cords_create_category( document, agent,tls )))
+					return(cords_append_error(document,706,"creating category"));
+				else if ((status = cords_resolve_location( zptr, document )) != 0)
+					return(cords_append_error(document,status,"resolving location"));
+			}
 		}
 		else
 		{
@@ -2511,18 +2599,18 @@ private	int 	ll_cords_parse_element(
 					continue;
 				else	break;
 			}
-		}
 
-		if ((!( zptr ))
-	        ||  ((status = cords_resolve_location( zptr, document )) != 0))
-		{
-			/* ----------------------------- */
-			/* attempt to create an instance */
-			/* ----------------------------- */
-			if (!( zptr = cords_create_category( document, agent,tls )))
-				return(cords_append_error(document,706,"creating category"));
-			else if ((status = cords_resolve_location( zptr, document )) != 0)
-				return(cords_append_error(document,status,"resolving location"));
+			if ((!( zptr ))
+		        ||  ((status = cords_resolve_location( zptr, document )) != 0))
+			{
+				/* ----------------------------- */
+				/* attempt to create an instance */
+				/* ----------------------------- */
+				if (!( zptr = cords_create_category( document, agent,tls )))
+					return(cords_append_error(document,706,"creating category"));
+				else if ((status = cords_resolve_location( zptr, document )) != 0)
+					return(cords_append_error(document,status,"resolving location"));
+			}
 		}
 	}
 

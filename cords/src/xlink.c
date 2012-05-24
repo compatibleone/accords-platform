@@ -55,7 +55,7 @@ public struct cords_xlink * reset_cords_xlink(struct cords_xlink * sptr)
 		sptr->id = (char*) 0;
 		sptr->source = (char*) 0;
 		sptr->target = (char*) 0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -94,9 +94,9 @@ public int xmlin_cords_xlink(struct cords_xlink * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -115,7 +115,7 @@ public int rest_occi_cords_xlink(FILE * fh,struct cords_xlink * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.source='%s'\r\n",prefix,nptr,(sptr->source?sptr->source:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

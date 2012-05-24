@@ -8,7 +8,7 @@ struct	cords_variable
 	char * 	description;
 	char * 	metric;
 	char * 	location;
-	int	status;	
+	int	state;	
 };
 
 #endif	

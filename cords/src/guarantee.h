@@ -13,7 +13,7 @@ struct	cords_guarantee
 	char * 	condition;	
 	char * 	objective;	
 	int	values;		
-	int	status;		
+	int	state;		
 				
 };
 

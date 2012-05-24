@@ -7,7 +7,7 @@ struct	cords_zone
 	char *	name;
 	char *	description;
 	char *	price;
-	int	status;
+	int	state;
 };
 
 #endif	

@@ -161,7 +161,7 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if ( pptr->status )
+	else if ( pptr->state )
 		return( 0 );
 	else if (!( pptr->operation ))
 		return( 0 );
@@ -207,7 +207,7 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 			else
 			{
 				pptr->completed = time((long *) 0);
-				pptr->status++;
+				pptr->state++;
 				zptr = occi_remove_response( zptr );
 				return(0);
 			}

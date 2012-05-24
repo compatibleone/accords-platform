@@ -23,7 +23,7 @@ struct	windowsazure
 
 	int	when;
 
-	int	status;
+	int	state;
 };
 
 #endif	

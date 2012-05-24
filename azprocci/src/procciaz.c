@@ -79,7 +79,7 @@ private	int	reset_windowsazure_server( struct windowsazure * pptr )
 		pptr->rootpass  = allocate_string("");
 		pptr->publicaddr = allocate_string("");
 		pptr->privateaddr = allocate_string("");
-		pptr->status = _OCCI_IDLE;
+		pptr->state = _OCCI_IDLE;
 	}
 	return(0);
 }
@@ -263,7 +263,7 @@ private	int	connect_windowsazure_server( struct az_response * rptr,struct window
 			}
 		}
 		pptr->when = time((long *) 0);
-		pptr->status = _OCCI_RUNNING;
+		pptr->state = _OCCI_RUNNING;
 		autosave_windowsazure_nodes();
 		return(0);
 	}
@@ -287,7 +287,7 @@ private	struct	rest_response * start_windowsazure(
 	char 	*	resource=_CORDS_LAUNCH_CFG;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )
+	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
@@ -326,7 +326,7 @@ private	struct	rest_response * save_windowsazure(
 	char	*	filename;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
@@ -362,7 +362,7 @@ private	struct	rest_response * stop_windowsazure(
 	struct	windowsazure * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
@@ -370,7 +370,7 @@ private	struct	rest_response * stop_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		if ( pptr->status != _OCCI_IDLE )
+		if ( pptr->state != _OCCI_IDLE )
 		{
 			reset_windowsazure_server( pptr );
 			pptr->when = time((long *) 0);
@@ -398,10 +398,10 @@ private	struct	rest_response * restart_windowsazure(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
-		if ( pptr->status == _OCCI_SUSPENDED )
+		if ( pptr->state == _OCCI_SUSPENDED )
 		{
 			pptr->when = time((long *) 0);
-			pptr->status = _OCCI_RUNNING;
+			pptr->state = _OCCI_RUNNING;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -424,10 +424,10 @@ private	struct	rest_response * suspend_windowsazure(
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	{
-		if ( pptr->status == _OCCI_RUNNING )
+		if ( pptr->state == _OCCI_RUNNING )
 		{
 			pptr->when = time((long *) 0);
-			pptr->status = _OCCI_SUSPENDED;
+			pptr->state = _OCCI_SUSPENDED;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

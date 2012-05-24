@@ -4,7 +4,7 @@
 struct	cords_script
 {
 	char *	id;
-	int	status;
+	int	state;
 	char *	name;
 	char *	syntax;
 	char *	identifier;

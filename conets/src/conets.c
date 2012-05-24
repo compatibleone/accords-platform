@@ -190,7 +190,7 @@ private	struct rest_response * build_firewall(
 	struct	standard_node * nptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Incorrect Request" ) );
-	else if ( pptr->status > 0 )
+	else if ( pptr->state > 0 )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( pptr->node ))
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -237,7 +237,7 @@ private	struct rest_response * build_firewall(
 				fptr = next_standard_message_link( fptr ) )
 				add_firewall_port( pptr, buffer, fptr );			
 		}
-		pptr->status = 1;
+		pptr->state = 1;
 		nptr = drop_standard_node( nptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

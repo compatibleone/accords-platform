@@ -357,7 +357,7 @@ private	struct	rest_response * start_occi_openstack(
 
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )
+	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
@@ -502,7 +502,7 @@ private	struct	rest_response * start_occi_openstack(
 		/* indicate that the machine is running and set start time */
 		/* ------------------------------------------------------- */
 		pptr->when = time((long *) 0);
-		pptr->status = _OCCI_RUNNING;
+		pptr->state = _OCCI_RUNNING;
 		status = 0;
 		if (!( status ))
 		{
@@ -532,7 +532,7 @@ private	struct	rest_response * save_occi_openstack(
 	char	reference[1024];
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
@@ -565,7 +565,7 @@ private	struct	rest_response * snapshot_occi_openstack(
 	struct	os_config * kptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
@@ -599,7 +599,7 @@ private	struct	rest_response * stop_occi_openstack(
 	char	reference[1024];
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
@@ -626,7 +626,7 @@ private	struct	rest_response * stop_occi_openstack(
 		 	return( rest_html_response( aptr, 801, "Bad Request (DELETE COMPUTE)" ) );
 		else	qptr = liberate_rest_response( qptr );
 
-		pptr->status = _OCCI_IDLE;
+		pptr->state = _OCCI_IDLE;
 		pptr->when = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
 

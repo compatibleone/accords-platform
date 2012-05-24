@@ -9,7 +9,7 @@ struct	cords_terms
 	char * description;
 	char * type;	
 	int	terms;	
-	int	status;	
+	int	state;	
 };
 
 #endif

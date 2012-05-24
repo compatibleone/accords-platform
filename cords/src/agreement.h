@@ -14,7 +14,7 @@ struct	cords_agreement
 	char * 	templateid;	
 	char * 	templatename;	
 	int	links;		
-	int	status;		
+	int	state;		
 };
 
 #endif	

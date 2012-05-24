@@ -26,7 +26,7 @@
 			default="cordscript: plan.new(id.value,name.value);"
 			/>
 		<xsd:attribute name="zone" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsSecurity">
@@ -34,7 +34,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="level" type="xsd:string"/>
 		<xsd:attribute name="scheme" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsAccount">
@@ -47,7 +47,7 @@
 		<xsd:attribute name="security" type="xsd:string"/>
 		<xsd:attribute name="legal" type="xsd:string"/>
 		<xsd:attribute name="users" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsUser">
@@ -56,7 +56,7 @@
 		<xsd:attribute name="password" type="xsd:string"/>
 		<xsd:attribute name="role" type="xsd:string"/>
 		<xsd:attribute name="authorization" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsConfiguration">
@@ -66,7 +66,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="actions" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsInterface">
@@ -76,7 +76,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="actions" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsAction">
@@ -84,7 +84,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="expression" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsNode">
@@ -118,7 +118,7 @@
 			type="xsd:string"
 			default="simple" 
 			/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 
 		<xsd:attribute 	
 			name="cordscript" 
@@ -144,7 +144,7 @@
 		<xsd:attribute name="compute" type="xsd:string"/>
 		<xsd:attribute name="network" type="xsd:string"/>
 		<xsd:attribute name="storage" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsCompute">
@@ -155,7 +155,7 @@
 		<xsd:attribute name="cores" type="xsd:integer"/>
 		<xsd:attribute name="speed" type="xsd:integer"/>
 		<xsd:attribute name="memory" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsNetwork">
@@ -166,14 +166,14 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="label" type="xsd:string"/>
 		<xsd:attribute name="vlan" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsStorage">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="size" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsImage">
@@ -189,7 +189,7 @@
 			type="xsd:string"
 			default="cordscript: application.new(id.value,provider.value); application.build();"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsSystem">
@@ -202,7 +202,7 @@
 		<xsd:attribute name="requirement" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
 		<xsd:attribute name="license" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsPackage">
@@ -220,7 +220,7 @@
 		<xsd:attribute name="requirement" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
 		<xsd:attribute name="license" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsFirewall">
@@ -229,7 +229,7 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsPort">
@@ -239,25 +239,25 @@
 		<xsd:attribute name="from" type="xsd:string"/>
 		<xsd:attribute name="to" type="xsd:string"/>
 		<xsd:attribute name="range" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsError">
 		<xsd:attribute name="code" type="xsd:integer"/>
 		<xsd:attribute name="message" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsWarning">
 		<xsd:attribute name="code" type="xsd:integer"/>
 		<xsd:attribute name="message" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsChoice">
 		<xsd:attribute name="code" type="xsd:integer"/>
 		<xsd:attribute name="message" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 </xsd:schema>

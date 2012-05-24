@@ -10,7 +10,7 @@ struct	cords_parameter
 	char	*	name;
 	char	*	value;
 	int		type;
-	int		status;
+	int		state;
 };
 
 

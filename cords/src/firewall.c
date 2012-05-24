@@ -68,7 +68,7 @@ public struct cords_firewall * reset_cords_firewall(struct cords_firewall * sptr
 		sptr->network = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->ports =  0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -127,9 +127,9 @@ public int xmlin_cords_firewall(struct cords_firewall * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->ports = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -153,7 +153,7 @@ public int rest_occi_cords_firewall(FILE * fh,struct cords_firewall * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.network='%s'\r\n",prefix,nptr,(sptr->network?sptr->network:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.ports='%u'\r\n",prefix,nptr,sptr->ports);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

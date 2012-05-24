@@ -11,7 +11,7 @@ struct	cords_term
 	char *	identity;
 	char *	payload;
 	int	elements;
-	int	status;	
+	int	state;	
 };
 
 #endif	

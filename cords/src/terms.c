@@ -59,7 +59,7 @@ public struct cords_terms * reset_cords_terms(struct cords_terms * sptr)
 		sptr->description = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->terms =  0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -106,9 +106,9 @@ public int xmlin_cords_terms(struct cords_terms * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->terms = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -129,7 +129,7 @@ public int rest_occi_cords_terms(FILE * fh,struct cords_terms * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.terms='%u'\r\n",prefix,nptr,sptr->terms);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

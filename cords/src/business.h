@@ -6,7 +6,7 @@ struct	cords_business
 	char *	id;
 	char *	name;
 	char *	description;
-	int	status;
+	int	state;
 };
 
 #endif

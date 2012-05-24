@@ -4,7 +4,7 @@
 struct	cords_file
 {
 	char *	id;
-	int	status;
+	int	state;
 	int	length;
 	char *	name;
 	char *	type;

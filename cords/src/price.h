@@ -13,7 +13,7 @@ struct	cords_price
 	char	*	rate;
 	char	*	units;
 	char 	*	period;
-	int		status;
+	int		state;
 };
 
 #endif

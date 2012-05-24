@@ -11,7 +11,7 @@ struct	cords_tarif
 	char *	rate;
 	char *	taxe;
 	char *	nature;
-	int	status;
+	int	state;
 };
 
 #endif

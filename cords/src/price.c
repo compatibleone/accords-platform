@@ -73,7 +73,7 @@ public struct cords_price * reset_cords_price(struct cords_price * sptr)
 		sptr->rate = (char*) 0;
 		sptr->units = (char*) 0;
 		sptr->period = (char*) 0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -136,9 +136,9 @@ public int xmlin_cords_price(struct cords_price * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->period = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -163,7 +163,7 @@ public int rest_occi_cords_price(FILE * fh,struct cords_price * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rate='%s'\r\n",prefix,nptr,(sptr->rate?sptr->rate:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.units='%s'\r\n",prefix,nptr,(sptr->units?sptr->units:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.period='%s'\r\n",prefix,nptr,(sptr->period?sptr->period:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

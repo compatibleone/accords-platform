@@ -12,7 +12,7 @@ struct	cords_firewall
 	char *	network;
 	char *	image;
 	int	ports;
-	int	status;
+	int	state;
 };
 
 #endif	

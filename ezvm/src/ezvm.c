@@ -150,7 +150,7 @@ private	struct rest_response * build_vm(
 	int	status;
 	if (!( pptr = vptr ))
 		return(0);
-	else if ( pptr->status != 0 )
+	else if ( pptr->state != 0 )
 		return(0);
 	else if (!( pptr->image ))
 		return(0);
@@ -167,7 +167,7 @@ private	struct rest_response * build_vm(
 	}
 	else
 	{
-		pptr->status = zptr->response->status;
+		pptr->state = zptr->response->status;
 		aptr = rest_html_response( aptr, zptr->response->status, zptr->response->message );
 		zptr = occi_remove_response( zptr );
 		return( aptr );
@@ -189,7 +189,7 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if ( pptr->status )
+	else if ( pptr->state )
 		return(0);
 	else if (!( pptr->image ))
 		return(0);

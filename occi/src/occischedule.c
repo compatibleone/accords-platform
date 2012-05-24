@@ -152,8 +152,8 @@ private void autoload_cords_schedule_nodes() {
 				pptr->completed = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "priority" )) != (struct xml_atribut *) 0)
 				pptr->priority = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
-				pptr->status = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
+				pptr->state = document_atribut_value(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -205,8 +205,8 @@ public  void autosave_cords_schedule_nodes() {
 		fprintf(h," priority=%c",0x0022);
 		fprintf(h,"%u",pptr->priority);
 		fprintf(h,"%c",0x0022);
-		fprintf(h," status=%c",0x0022);
-		fprintf(h,"%u",pptr->status);
+		fprintf(h," state=%c",0x0022);
+		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
@@ -245,8 +245,8 @@ private void set_cords_schedule_field(
 			pptr->completed = atoi(vptr);
 		if (!( strcmp( nptr, "priority" ) ))
 			pptr->priority = atoi(vptr);
-		if (!( strcmp( nptr, "status" ) ))
-			pptr->status = atoi(vptr);
+		if (!( strcmp( nptr, "state" ) ))
+			pptr->state = atoi(vptr);
 		}
 	return;
 }
@@ -304,7 +304,7 @@ private int pass_cords_schedule_filter(
 	if (( fptr->started ) && ( pptr->started != fptr->started )) return(0);
 	if (( fptr->completed ) && ( pptr->completed != fptr->completed )) return(0);
 	if (( fptr->priority ) && ( pptr->priority != fptr->priority )) return(0);
-	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
 
@@ -344,7 +344,7 @@ private struct rest_response * cords_schedule_occi_response(
 	sprintf(cptr->buffer,"%s.%s.priority=%u",optr->domain,optr->id,pptr->priority);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -767,7 +767,7 @@ public struct occi_category * occi_cords_schedule_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "priority",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		autoload_cords_schedule_nodes();
 		return(optr);
@@ -892,7 +892,7 @@ public struct rest_header *  cords_schedule_occi_headers(struct cords_schedule *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_schedule.status='%u'\r\n",sptr->status);
+	sprintf(buffer,"occi.cords_schedule.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);

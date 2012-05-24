@@ -37,7 +37,7 @@ struct	openstack
 
 	int	when;
 
-	int	status;
+	int	state;
 };
 
 #endif	

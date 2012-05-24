@@ -7,7 +7,7 @@ struct	cords_xlink
 	char	*	id;
 	char	*	source;
 	char	*	target;
-	int		status;
+	int		state;
 };
 
 #endif	

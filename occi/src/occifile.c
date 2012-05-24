@@ -136,8 +136,8 @@ private void autoload_cords_file_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
-				pptr->status = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
+				pptr->state = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "length" )) != (struct xml_atribut *) 0)
 				pptr->length = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
@@ -173,8 +173,8 @@ public  void autosave_cords_file_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," status=%c",0x0022);
-		fprintf(h,"%u",pptr->status);
+		fprintf(h," state=%c",0x0022);
+		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," length=%c",0x0022);
 		fprintf(h,"%u",pptr->length);
@@ -209,8 +209,8 @@ private void set_cords_file_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
-		if (!( strcmp( nptr, "status" ) ))
-			pptr->status = atoi(vptr);
+		if (!( strcmp( nptr, "state" ) ))
+			pptr->state = atoi(vptr);
 		if (!( strcmp( nptr, "length" ) ))
 			pptr->length = atoi(vptr);
 		if (!( strcmp( nptr, "name" ) ))
@@ -250,7 +250,7 @@ private int pass_cords_file_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
-	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	if (( fptr->length ) && ( pptr->length != fptr->length )) return(0);
 	if (( fptr->name )
 	&&  (strlen( fptr->name ) != 0)) {
@@ -288,7 +288,7 @@ private struct rest_response * cords_file_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.length=%u",optr->domain,optr->id,pptr->length);
@@ -707,7 +707,7 @@ public struct occi_category * occi_cords_file_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_cords_file_mt(optr->interface);
-		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "length",0,0) ))
 			return(optr);
@@ -752,7 +752,7 @@ public struct rest_header *  cords_file_occi_headers(struct cords_file * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_file.status='%u'\r\n",sptr->status);
+	sprintf(buffer,"occi.cords_file.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

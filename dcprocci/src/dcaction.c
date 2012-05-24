@@ -70,7 +70,7 @@ private	struct	rest_response * start_deltacloud(
 	struct	rest_response * zptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 400, "Invalid Request" ) );
-	else if ( pptr->status != _OCCI_IDLE )
+	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( kptr = use_deltacloud_configuration( pptr->profile )))
 	 	return( rest_html_response( aptr, 400, "Incorrect Configuration" ) );
@@ -89,7 +89,7 @@ private	struct	rest_response * start_deltacloud(
 	else
 	{
 		liberate( filename );
-		pptr->status = _OCCI_RUNNING;
+		pptr->state = _OCCI_RUNNING;
 		zptr = liberate_rest_response( zptr );
 		if (!( status ))
 		{
@@ -117,7 +117,7 @@ private	struct	rest_response * stop_deltacloud(
 	struct	dc_config *  kptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 400, "Invalid Request" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( kptr = use_deltacloud_configuration( pptr->profile )))
 	 	return( rest_html_response( aptr, 400, "Incorrect Configuration" ) );
@@ -138,7 +138,7 @@ private	struct	rest_response * save_deltacloud(
 	struct	dc_config *  kptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 400, "Invalid Request" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( kptr = use_deltacloud_configuration( pptr->profile )))
 	 	return( rest_html_response( aptr, 400, "Incorrect Configuration" ) );
@@ -159,7 +159,7 @@ private	struct	rest_response * snapshot_deltacloud(
 	struct	dc_config *  kptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 400, "Invalid Request" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( kptr = use_deltacloud_configuration( pptr->profile )))
 	 	return( rest_html_response( aptr, 400, "Incorrect Configuration" ) );

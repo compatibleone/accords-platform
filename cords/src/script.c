@@ -1,3 +1,23 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _script_c_
 #define _script_c_
@@ -37,7 +57,7 @@ public struct cords_script * reset_cords_script(struct cords_script * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
-		sptr->status =  0;
+		sptr->state =  0;
 		sptr->name = (char*) 0;
 		sptr->syntax = (char*) 0;
 		sptr->identifier = (char*) 0;
@@ -73,9 +93,9 @@ public int xmlin_cords_script(struct cords_script * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"name") ))
 		{
@@ -112,7 +132,7 @@ public int rest_occi_cords_script(FILE * fh,struct cords_script * sptr,char * pr
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.syntax='%s'\r\n",prefix,nptr,(sptr->syntax?sptr->syntax:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.identifier='%s'\r\n",prefix,nptr,(sptr->identifier?sptr->identifier:""));

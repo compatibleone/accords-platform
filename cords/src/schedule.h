@@ -12,7 +12,7 @@ struct	cords_schedule
 	int	started;
 	int	completed;
 	int 	priority;
-	int	status;
+	int	state;
 };
 
 #endif

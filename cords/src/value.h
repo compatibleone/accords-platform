@@ -7,7 +7,7 @@ struct	cords_value
 	int	nature;
 	char *	source;
 	char *	value;
-	int	status;
+	int	state;
 };
 
 #endif

@@ -63,7 +63,7 @@ public struct cords_schedule * reset_cords_schedule(struct cords_schedule * sptr
 		sptr->started =  0;
 		sptr->completed =  0;
 		sptr->priority =  0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -126,9 +126,9 @@ public int xmlin_cords_schedule(struct cords_schedule * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->priority = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -153,7 +153,7 @@ public int rest_occi_cords_schedule(FILE * fh,struct cords_schedule * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.started='%u'\r\n",prefix,nptr,sptr->started);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.completed='%u'\r\n",prefix,nptr,sptr->completed);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.priority='%u'\r\n",prefix,nptr,sptr->priority);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

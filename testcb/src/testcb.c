@@ -35,7 +35,6 @@ struct	cords_broker_config
 	char *	zone;
 	char *	operator;
 	char *	security;
-	int	sla;
 } Cb = 	{
 	(char * ) 0,
 	_CORDS_DEFAULT_PUBLISHER,
@@ -45,8 +44,7 @@ struct	cords_broker_config
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
-	(char *) 0,
-	0
+	(char *) 0
 	};
 
 private	int	debug=0;
@@ -82,37 +80,14 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 }
 
 /*	-----------------------------------------------------	*/
-/*	  l l _ c o r d s _ b r o k e r _ o p e r a t i o n	*/
-/*	-----------------------------------------------------	*/
-private	int	ll_cords_broker_operation( char * filename )
-{
-	struct	xml_element * dptr;
-	struct	xml_element * eptr;
-	struct	xml_atribut * aptr;
-	char *	nptr;
-	char	nameplan[512];
-	int	status;
-	if (!(nptr = Cb.result))
-		sprintf((nptr=nameplan),"instance_%s",filename);
-	if (!( Cb.host ))
-		return( failure(1,"requires","publication host"));
-	else if (!( Cb.agent ))
-		return( failure(2,"requires","parser agent name"));
-	else if (!( filename ))
-		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = document_parse_file( filename ) ))
-		return( failure(4,"parse error",filename));
-	else if (!( eptr = document_element( dptr, _CORDS_MANIFEST ) ))
-		return( failure(5,"expected manifest document",filename));
-	else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
-		return( failure(6,"failure resolving plan",filename));
-	else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
-		return( failure(status,"failure provisioning plan",aptr->value));
-	else	return( 0 );
-}
-
-/*	-----------------------------------------------------	*/
 /*	   l l _ s l a _ b r o k e r _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+/*	this function will provision an instance of service	*/
+/*	as described by the input document which will provide 	*/
+/*	plan identifier that will be used to resolve to the	*/
+/*	manifest description of the service. The operation	*/
+/*	can be initated on either a manifest document type or	*/
+/*	for the new agreement document type under sla control	*/
 /*	-----------------------------------------------------	*/
 private	int	ll_sla_broker_operation( char * filename )
 {
@@ -127,6 +102,9 @@ private	int	ll_sla_broker_operation( char * filename )
 	char	nameplan[512];
 	int	status;
 
+	/* ------------------- */
+	/* validate parameters */
+	/* ------------------- */
 	if (!(nptr = Cb.result))
 		sprintf((nptr=nameplan),"instance_%s",filename);
 	if (!( Cb.host ))
@@ -135,12 +113,32 @@ private	int	ll_sla_broker_operation( char * filename )
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
+
+	/* -------------------------- */
+	/* process the input document */
+	/* -------------------------- */
 	else if (!( dptr = document_parse_file( filename ) ))
 		return( failure(4,"parse error",filename));
+
+	/* ----------------------------- */
+	/* detect manifest document type */
+	/* ----------------------------- */
+	if (( eptr = document_element( dptr, _CORDS_MANIFEST )) != (struct xml_element *) 0)
+	{
+		if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
+			return( failure(6,"failure resolving plan",filename));
+		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
+			return( failure(status,"failure provisioning plan",aptr->value));
+		else	return( 0 );
+	}
+
+	/* ------------------------------ */
+	/* detect agreement document type */
+	/* ------------------------------ */
 	else if (!( fptr = document_element( dptr, _CORDS_AGREEMENT ) ))
-		return( failure(5,"expected agreement document",filename));
+		return( failure(5,"expected manifest or agreement document",filename));
 	else if (!( tptr = document_element( fptr, _CORDS_TERMS ) ))
-		return( failure(5,"expected agreement document",filename));
+		return( failure(5,"missing agreement terms",filename));
 	else
 	{
 		for ( 	eptr = (struct xml_element *) 0,
@@ -157,7 +155,7 @@ private	int	ll_sla_broker_operation( char * filename )
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
 		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
-			return( failure(status,"failure provisioning plan",aptr->value));
+			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
 }
@@ -181,9 +179,7 @@ private	int	test_cords_broker_operation( char * filename )
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	if ( Cb.sla )
-		status = ll_sla_broker_operation( filename );
-	else 	status = ll_cords_broker_operation( filename );
+	status = ll_sla_broker_operation( filename );
 
 	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
 
@@ -237,11 +233,6 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 				else if (!( strcmp( aptr, "zone" ) ))
 				{
 					Cb.zone = argv[argi++];
-					continue;
-				}
-				else if (!( strcmp( aptr, "sla" ) ))
-				{
-					Cb.sla = 1;
 					continue;
 				}
 				else if (!( strcmp( aptr, "operator" ) ))
@@ -317,7 +308,6 @@ private	int	test_cords_broker_banner(char * n)
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --result <filename>  specify the output plan filename ");
-	printf("\n   --sla                specify the sla agreement document ");
 	printf("\n   --zone <zone>        specify required provisioning zone ");
 	printf("\n   --operator <name>    specify required operator name ");
 	printf("\n   --security <type>    specify required security level");

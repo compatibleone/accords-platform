@@ -13,7 +13,7 @@ struct	cords_placement
 	char 	*	security;
 	char 	*	operator;
 	char 	*	solution;
-	int		status;
+	int		state;
 };
 
 #endif

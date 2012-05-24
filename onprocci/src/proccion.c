@@ -177,7 +177,7 @@ private	int	reset_opennebula_server( struct opennebula * pptr )
 		pptr->hostname = allocate_string("");
 		pptr->publicaddr = allocate_string("");
 		pptr->privateaddr = allocate_string("");
-		pptr->status = _OCCI_IDLE;
+		pptr->state = _OCCI_IDLE;
 	}
 	return(0);
 }
@@ -300,7 +300,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		/* The instance is ready for use ( or more or less ) */
 		/* ------------------------------------------------- */
 		pptr->when = time((long *) 0);
-		pptr->status = _OCCI_RUNNING;
+		pptr->state = _OCCI_RUNNING;
 		if ( check_debug() )
 		{
 			rest_log_message("*** ON PROCCI Instance is UP and RUNNING ***");
@@ -335,7 +335,7 @@ private	struct	rest_response * start_opennebula(
 	char		reference[512];
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )
+	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
@@ -492,7 +492,7 @@ private	struct	rest_response * save_opennebula(
 	char	*	filename;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 1401, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 1402, "Contract Not Active" ) );
 
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
@@ -552,7 +552,7 @@ private	struct	rest_response * snapshot_opennebula(
 	char	*	filename;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 1401, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 1402, "Contract Not Active" ) );
 
 	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
@@ -612,13 +612,13 @@ private	struct	rest_response * stop_opennebula(
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status == _OCCI_IDLE )
+	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(osptr = stop_opennebula_provisioning( pptr )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
-		if ( pptr->status == _OCCI_IDLE )
+		if ( pptr->state == _OCCI_IDLE )
 			return( rest_html_response( aptr, 200, "OK" ) );
 		{
 			reset_opennebula_server( pptr );

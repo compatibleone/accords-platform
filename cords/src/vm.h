@@ -8,7 +8,7 @@ struct	cords_vm
 	char *	provider;
 	char *	application;
 	char *	price;
-	int	status;
+	int	state;
 };
 
 #endif

@@ -55,7 +55,7 @@ public struct cords_application * reset_cords_application(struct cords_applicati
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
-		sptr->status =  0;
+		sptr->state =  0;
 		sptr->image = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->price = (char*) 0;
@@ -93,9 +93,9 @@ public int xmlin_cords_application(struct cords_application * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"image") ))
 		{
@@ -140,7 +140,7 @@ public int rest_occi_cords_application(FILE * fh,struct cords_application * sptr
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));

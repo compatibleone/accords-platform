@@ -3,7 +3,7 @@
 struct	cords_application
 {
 	char	*	id;
-	int		status;
+	int		state;
 	char	*	image;
 	char	*	provider;
 	char	*	price;

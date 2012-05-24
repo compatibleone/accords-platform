@@ -28,7 +28,7 @@ struct	opennebula
 	char *	group;
 	char *	configuration;
 	int	when;
-	int	status;
+	int	state;
 };
 
 #endif	

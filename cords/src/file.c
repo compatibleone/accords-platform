@@ -55,7 +55,7 @@ public struct cords_file * reset_cords_file(struct cords_file * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
-		sptr->status =  0;
+		sptr->state =  0;
 		sptr->length =  0;
 		sptr->name = (char*) 0;
 		sptr->type = (char*) 0;
@@ -90,9 +90,9 @@ public int xmlin_cords_file(struct cords_file * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"length") ))
 		{
@@ -125,7 +125,7 @@ public int rest_occi_cords_file(FILE * fh,struct cords_file * sptr,char * prefix
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.length='%u'\r\n",prefix,nptr,sptr->length);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));

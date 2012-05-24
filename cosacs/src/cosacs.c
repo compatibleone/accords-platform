@@ -155,7 +155,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* ----------------------------------- */
 	/* first mark this script item as done */
 	/* ----------------------------------- */
-	pptr->status = 1;
+	pptr->state = 1;
 
 	/* ------------------------------------ */
 	/* generate the list of meta data items */
@@ -166,7 +166,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	{
 		if (!( mptr = (struct cords_metadata *) kptr->contents ))
 			continue;
-		else if ( mptr->status )
+		else if ( mptr->state )
 			continue;
 		else if (!( mptr->name ))
 			continue;
@@ -192,7 +192,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 			if ( mptr->value )
 				fprintf(h,"export %s=%c%s%c\n",mptr->name,0x0022,mptr->value,0x0022);
 			else	fprintf(h,"export %s=\n",mptr->name);
-			mptr->status = 1;
+			mptr->state = 1;
 			metadatas++;
 		}
 	}
@@ -214,7 +214,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	{
 		if (!( sptr = (struct cords_script *) kptr->contents ))
 			continue;
-		else if ( sptr->status )
+		else if ( sptr->state )
 			continue;
 		else if (!( sptr->syntax ))
 			continue;
@@ -251,7 +251,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 			if ( execmode )
 				fprintf(h,"%s&\n",sptr->syntax);
 			else	fprintf(h,"%s\n",sptr->syntax);
-			sptr->status = 1;
+			sptr->state = 1;
 			scripts++;
 		}
 	}

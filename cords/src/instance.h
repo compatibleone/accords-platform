@@ -8,7 +8,7 @@ struct	cords_instance
 	char *	name;
 	char *	description;
 	char *	common;
-	int	status;
+	int	state;
 };
 
 #endif

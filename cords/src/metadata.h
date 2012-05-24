@@ -4,7 +4,7 @@
 struct	cords_metadata
 {
 	char *	id;
-	int	status;
+	int	state;
 	char *	name;
 	char *	value;
 	char *	target;
