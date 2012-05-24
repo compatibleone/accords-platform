@@ -1,0 +1,6 @@
+<cords_computes>
+<cords_compute
+ id="9c613094-992f-4fd7-b33c-22bae50fd801" name="test3" architecture="x86" cores="2" speed="2G" memory="2G" hostname="" state="0" />
+<cords_compute
+ id="85da739a-216c-451a-8187-249bdfb077ac" name="coips:model" architecture="x86" cores="1" speed="1G" memory="1G" hostname="" state="0" />
+</cords_computes>

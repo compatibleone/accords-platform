@@ -1,0 +1,30 @@
+<cords_contracts>
+<cords_contract
+ id="03f625b8-e06c-4ee6-861c-01dd8b220f32" name="test3" node="http://127.0.0.1:8094/node/1766cbfa-591f-47ef-aa8c-5c0f6b458d7c" provider="http://127.0.0.1:8096/proactive/c0e26c72-e57b-4739-87ae-5254a201c5e7" profile="proactive" reference="" hostname="" rootpass="" price="" access="public" common="" scope="normal" type="simple" service="" when="0" state="0" />
+<cords_contract
+ id="dbdffa55-f5a6-4fcb-b695-c3819aa7097d" name="test3" node="http://127.0.0.1:8094/node/1766cbfa-591f-47ef-aa8c-5c0f6b458d7c" provider="http://127.0.0.1:8096/proactive/2f6a0307-3f27-4b8d-a5f1-88277b43913c" profile="proactive" reference="" hostname="" rootpass="" price="" access="public" common="" scope="normal" type="simple" service="" when="0" state="0" />
+<cords_contract
+ id="1362baa5-27e2-49d5-8fd6-0aeca67b1b2c" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/a4cf5afb-fe38-4e5f-997e-b8e181067828" provider="http://127.0.0.1:8096/proactive/477fb200-4fec-4cee-91c6-1865bd91fac2" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1336652773" state="1" />
+<cords_contract
+ id="e491b670-9d30-472a-9a6c-81f8ba6e1e8f" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/661a360f-58a8-4efe-a67d-be25236354b0" provider="http://127.0.0.1:8096/proactive/cde4396d-fb17-4cd9-91c7-e91de7db5557" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1336655636" state="1" />
+<cords_contract
+ id="b9aa92f1-b973-4904-ae9b-25b31e5c73c8" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/467f23df-27d8-4808-a3e4-2818c58bdde4" provider="http://127.0.0.1:8096/proactive/0e4d60e2-3b7f-480c-8264-1f1f35a3a513" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1336657599" state="1" />
+<cords_contract
+ id="c5bf4e16-2f0c-4386-8864-24232c9c4023" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/e3ead49d-e0eb-43ba-b861-e1b02b0da697" provider="http://127.0.0.1:8096/proactive/16b8a284-8c93-48eb-a41e-8c2c7df3362e" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1336659007" state="1" />
+<cords_contract
+ id="4e7c21c8-2511-4c2d-bbb3-6657abad90bc" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/aac12481-f71a-4c32-a6f5-acb72075dd2f" provider="http://127.0.0.1:8095/openstack/296dee52-f542-4b09-96c4-88454a5d4808" profile="openstack" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337612266" state="1" />
+<cords_contract
+ id="6803b9c1-352c-424b-b4d2-034aa6ce1201" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/bf952ce1-d338-4959-9ea7-8fc3427d7ee7" provider="http://127.0.0.1:8095/openstack/1ffc5cdc-48ff-48f4-a78a-b7cd7de1caab" profile="openstack" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337764085" state="1" />
+<cords_contract
+ id="cf8efb55-25e8-4e40-84b9-412987831d36" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/af786364-c73c-4405-956f-1ddccf82c9fc" provider="http://127.0.0.1:8096/proactive/11a9c403-da28-491c-867b-65a48950345b" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337784403" state="1" />
+<cords_contract
+ id="713c9ed3-0f57-4c5a-87e2-eaefc45f751b" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/526a675f-3235-457d-b8d1-02533fbb42d8" provider="http://127.0.0.1:8096/proactive/c74c9267-d565-4a32-ad24-1b4b4f9493d6" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337815705" state="1" />
+<cords_contract
+ id="fdcbc150-1fd3-4001-82bd-1dfe16e2fa1d" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/509bd437-1a39-456f-b6af-34208309598c" provider="http://127.0.0.1:8096/proactive/db72431d-11c0-45a0-8d08-edb3e1162759" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337821130" state="1" />
+<cords_contract
+ id="066cc905-6884-47cd-ae64-3fb80d12443d" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/253c8cfa-c539-47bc-bc59-d9e98ccc38f5" provider="http://127.0.0.1:8096/proactive/f8caf685-d3d9-4565-993c-2103817e6ded" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337821184" state="1" />
+<cords_contract
+ id="1c6314bf-5ea4-4d08-8e20-99bbfac96ccc" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/6a3ce232-ba25-4125-a897-a03cf97157a4" provider="http://127.0.0.1:8096/proactive/5ce59bb6-e93d-47d6-9c61-5417d5973dc8" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337821253" state="1" />
+<cords_contract
+ id="412ee2bd-7787-4350-8cf0-c151be5c94d8" name="5b94c7d4-13c5-4428-b974-e3d9e53dfd48" node="http://127.0.0.1:8094/node/4d9233a0-6e3d-472a-a62c-c53f0e2fd586" provider="http://127.0.0.1:8096/proactive/e275009c-cd02-4d17-b183-697c081e6260" profile="proactive" reference="(null)" hostname="(null)" rootpass="(null)" price="" access="private" common="" scope="normal" type="simple" service="" when="1337821499" state="1" />
+</cords_contracts>
