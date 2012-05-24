@@ -152,8 +152,8 @@ private void autoload_cords_agreement_nodes() {
 				pptr->templateid = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "templatename" )) != (struct xml_atribut *) 0)
 				pptr->templatename = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "links" )) != (struct xml_atribut *) 0)
-				pptr->links = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "termss" )) != (struct xml_atribut *) 0)
+				pptr->termss = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -207,8 +207,8 @@ public  void autosave_cords_agreement_nodes() {
 		fprintf(h," templatename=%c",0x0022);
 		fprintf(h,"%s",(pptr->templatename?pptr->templatename:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," links=%c",0x0022);
-		fprintf(h,"%u",pptr->links);
+		fprintf(h," termss=%c",0x0022);
+		fprintf(h,"%u",pptr->termss);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -250,8 +250,8 @@ private void set_cords_agreement_field(
 			pptr->templateid = allocate_string(vptr);
 		if (!( strcmp( nptr, "templatename" ) ))
 			pptr->templatename = allocate_string(vptr);
-		if (!( strcmp( nptr, "links" ) ))
-			pptr->links = atoi(vptr);
+		if (!( strcmp( nptr, "termss" ) ))
+			pptr->termss = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -341,7 +341,7 @@ private int pass_cords_agreement_filter(
 		else if ( strcmp(pptr->templatename,fptr->templatename) != 0)
 			return(0);
 		}
-	if (( fptr->links ) && ( pptr->links != fptr->links )) return(0);
+	if (( fptr->termss ) && ( pptr->termss != fptr->termss )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -382,7 +382,7 @@ private struct rest_response * cords_agreement_occi_response(
 	sprintf(cptr->buffer,"%s.%s.templatename=%s",optr->domain,optr->id,pptr->templatename);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.links=%u",optr->domain,optr->id,pptr->links);
+	sprintf(cptr->buffer,"%s.%s.termss=%u",optr->domain,optr->id,pptr->termss);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -808,7 +808,7 @@ public struct occi_category * occi_cords_agreement_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "templatename",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "links",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "termss",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -935,7 +935,7 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_agreement.links='%u'\r\n",sptr->links);
+	sprintf(buffer,"occi.cords_agreement.termss='%u'\r\n",sptr->termss);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

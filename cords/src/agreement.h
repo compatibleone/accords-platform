@@ -13,7 +13,7 @@ struct	cords_agreement
 	char * 	expiration;	
 	char * 	templateid;	
 	char * 	templatename;	
-	int	links;		
+	int	termss;		
 	int	state;		
 };
 

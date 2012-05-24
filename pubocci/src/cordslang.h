@@ -68,6 +68,7 @@
 #define	_CORDS_SCOPE		"scope"
 #define	_CORDS_CREATED		"created"
 #define	_CORDS_VALIDATION	"validation"
+#define	_CORDS_INITIATOR	"initiator"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

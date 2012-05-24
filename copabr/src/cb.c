@@ -117,6 +117,10 @@ private	char * 	cords_terminate_provisioning(
 		pptr->reqID = liberate( pptr->reqID );
 	if ( pptr->manifest )
 		pptr->manifest = occi_remove_response( pptr->manifest );
+	if ( pptr->slaID )
+		pptr->slaID = liberate( pptr->slaID );
+	if ( pptr->sla )
+		pptr->sla = occi_remove_response( pptr->sla );
 	if ( pptr->planID )
 		pptr->planID = liberate( pptr->planID );
 	if ( pptr->namePlan )
@@ -2613,6 +2617,49 @@ public	char *	cords_service_broker(
 	char * 	tls, 
 	struct xml_element ** root )
 {
+	int	status;
+	char	*	id;
+	struct	cords_placement_criteria CpC;
+	struct	occi_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_element  * mptr;
+	struct cords_provisioning CbC; 
+
+	memset(&CbC,0, sizeof( struct cords_provisioning ) );
+	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
+
+	if ( check_verbose() )
+		printf("   CORDS Service Broker ( %s ) Phase 1 : Preparation \n", agent);
+
+	/* -------------------------------------------------- */
+	/* retrieve the manifestinformation instance and name */
+	/* -------------------------------------------------- */
+	if (!( CbC.reqID  = allocate_string( manifest ) ))
+		return( cords_terminate_provisioning( 900, &CbC ) );
+	else if (!( CbC.manifest = cords_retrieve_instance( host, CbC.reqID, agent, tls )))
+		return( cords_terminate_provisioning( 910, &CbC ) );
+
+	/* -------------------------------------------------- */
+	/* retrieve the S.L.A   information instance and name */
+	/* -------------------------------------------------- */
+	if (!( CbC.slaID  = allocate_string( sla ) ))
+		return( cords_terminate_provisioning( 920, &CbC ) );
+	else if (!( CbC.sla = cords_retrieve_instance( host, CbC.slaID, agent, tls )))
+		return( cords_terminate_provisioning( 930, &CbC ) );
+
+	/* -------------------------------------------------- */
+	/* retrieve the account information instance and name */
+	/* -------------------------------------------------- */
+	if (( CbC.accID  = occi_extract_atribut( CbC.sla, Operator.domain, _CORDS_AGREEMENT, _CORDS_INITIATOR ))
+			!= (char *) 0)
+	{
+		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent, tls )))
+			return( cords_terminate_provisioning( 905, &CbC ) );
+		else if (!( CbC.accName  = occi_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+			return( cords_terminate_provisioning( 905, &CbC ) );
+	}
+
+
 	return( service );
 }
 

@@ -45,6 +45,8 @@ struct	cords_provisioning
 	struct	occi_response 	* plan;
 	char			* reqID;
 	struct	occi_response 	* manifest;
+	char			* slaID;
+	struct	occi_response 	* sla;
 	char			* accID;
 	char			* accName;
 	struct	occi_response 	* account;

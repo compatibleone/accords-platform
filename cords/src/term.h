@@ -10,7 +10,6 @@ struct	cords_term
 	char * 	type;	
 	char *	identity;
 	char *	payload;
-	int	elements;
 	int	state;	
 };
 

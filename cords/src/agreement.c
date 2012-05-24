@@ -73,7 +73,7 @@ public struct cords_agreement * reset_cords_agreement(struct cords_agreement * s
 		sptr->expiration = (char*) 0;
 		sptr->templateid = (char*) 0;
 		sptr->templatename = (char*) 0;
-		sptr->links =  0;
+		sptr->termss =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -137,9 +137,9 @@ public int xmlin_cords_agreement(struct cords_agreement * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->templatename = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"links") ))
+		else if (!( strcmp(wptr->name,"termss") ))
 		{
-			if ( wptr->value ) { sptr->links = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->termss = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -168,7 +168,7 @@ public int rest_occi_cords_agreement(FILE * fh,struct cords_agreement * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.expiration='%s'\r\n",prefix,nptr,(sptr->expiration?sptr->expiration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.templateid='%s'\r\n",prefix,nptr,(sptr->templateid?sptr->templateid:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.templatename='%s'\r\n",prefix,nptr,(sptr->templatename?sptr->templatename:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.links='%u'\r\n",prefix,nptr,sptr->links);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.termss='%u'\r\n",prefix,nptr,sptr->termss);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

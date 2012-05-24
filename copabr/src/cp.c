@@ -2004,7 +2004,7 @@ private	int	cords_resolve_cordscript_instance(
 	else if (!( vptr = occi_unquoted_value( bptr->value )))
 		return(0);
 
-	else if (!( yptr = cords_retrieve_named_instance_list( mptr, buffer, vptr, agent,tls ) ))
+	if (!( yptr = cords_retrieve_named_instance_list( mptr, buffer, vptr, agent,tls ) ))
 		return( 0 );
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent,tls )))
 	{
@@ -2136,8 +2136,7 @@ private	int	cords_parser_atribut_action(
 	/* ---------------------------- */
 	/* invoke cordscript expression */
 	/* ---------------------------- */
-	if (( check_debug() )
-	&&  ( xptr ))
+	if (( xptr ) && ( check_debug() ))
 	{
 		printf("invoke cordscript:(%s)\n",xptr);
 	}
