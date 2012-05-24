@@ -25,7 +25,7 @@
 		<xsd:attribute name="expiration" type="xsd:string"/>
 		<xsd:attribute name="template" type="xsd:string"/>
 		<xsd:attribute name="templatename" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsTerms">
@@ -34,7 +34,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsTerm">
@@ -47,7 +47,7 @@
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="identity" type="xsd:string"/>
 		<xsd:attribute name="payload" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsVariable">
@@ -56,7 +56,7 @@
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="metric" type="xsd:string"/>
 		<xsd:attribute name="location" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsGuarantee">
@@ -69,14 +69,14 @@
 		<xsd:attribute name="scope" type="xsd:string"/>
 		<xsd:attribute name="condition" type="xsd:string"/>
 		<xsd:attribute name="objective" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsBusiness">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
-		<xsd:attribute name="status" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 </xsd:schema>
