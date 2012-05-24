@@ -2136,8 +2136,11 @@ private	int	cords_parser_atribut_action(
 	/* ---------------------------- */
 	/* invoke cordscript expression */
 	/* ---------------------------- */
-	if ( xptr )
+	if (( check_debug() )
+	&&  ( xptr ))
+	{
 		printf("invoke cordscript:(%s)\n",xptr);
+	}
 	if (!( eptr = cordscript_parse_statement( xptr ) ))
 		return(0);
 	else
@@ -2457,7 +2460,10 @@ private	struct occi_response * cords_integrate_fields(
 		/* --------------------------------------- */
 		/* add the attribut to the output document */
 		/* --------------------------------------- */
-		printf("integrate_field(%s,%s)\n",nptr,eptr->value);
+		if ( check_debug() )
+		{
+			printf("integrate_field(%s,%s)\n",nptr,eptr->value);
+		}
 		if (!( vptr = occi_unquoted_value( eptr->value ) ))
 			continue;
 		else if (!( aptr = document_add_atribut( document, nptr, vptr ) ))

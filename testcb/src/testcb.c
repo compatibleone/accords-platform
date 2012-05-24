@@ -80,6 +80,115 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 }
 
 /*	-----------------------------------------------------	*/
+/*	   c o r d s _ i n s t a n c e _ a g r e e m e n t	*/
+/*	-----------------------------------------------------	*/
+private	int	cords_instance_agreement( char * host, char * sla, char * manifest, char * plan,  char * agent, char * result )
+{
+	struct	occi_response * zptr;
+	char	*	planv;
+	char 	*	slav;
+	char  	*	manv;
+	char 	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request* qptr;
+	struct	occi_element* dptr;
+	struct	occi_response* yptr;
+	char	buffer[1024];
+
+	/* ------------------- */
+	/* prepare environment */
+	/* ------------------- */
+	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
+
+	/* ------------------- */
+	/* validate parameters */
+	/* ------------------- */
+	if (!( manv = occi_unquoted_value( manifest )))
+		return(531);
+	else if (!( slav = occi_unquoted_value( sla  )))
+		return(532);
+	else if (!( planv = occi_unquoted_value( plan )))
+		return(533);
+
+	/* ------------------------------------------- */
+	/* resolve a service category instance manager */
+	/* ------------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
+		return(478);
+
+	/* ------------------------------------------ */
+	/* url for service category instance creation */ 
+	/* ------------------------------------------ */
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_SERVICE);
+		liberate( ihost );
+	}
+
+	/* ------------------------------------------ */
+	/* create the SLA controlled service instance */
+	/* ------------------------------------------ */
+	if (!( kptr = occi_create_client( buffer, agent, default_tls() ) ))
+		return(546);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return(550);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.service.plan"  	, planv ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.manifest"   	, manv  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.sla"  		, slav 	) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(551);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(552);
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(553);
+	}
+	/* -------------------------------------- */
+	/* duplicate the host before the clean up */
+	/* -------------------------------------- */
+	else if (!( ihost = allocate_string( ihost ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(554);
+	}
+	else
+	{
+		/* ------------------------------- */
+		/* clean up after service creation */
+		/* ------------------------------- */
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+	
+		/* -------------------------------- */
+		/* start the SLA controlled service */
+		/* -------------------------------- */
+		if (!( zptr =  cords_invoke_action( ihost, _CORDS_START, agent, default_tls() ) ))
+			return(503);
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			return( 0 );
+		}
+	}
+}
+
+/*	-----------------------------------------------------	*/
 /*	   l l _ s l a _ b r o k e r _ o p e r a t i o n	*/
 /*	-----------------------------------------------------	*/
 /*	this function will provision an instance of service	*/
@@ -98,6 +207,8 @@ private	int	ll_sla_broker_operation( char * filename )
 	struct	xml_element * tptr;
 	struct	xml_element * xptr;
 	struct	xml_atribut * aptr;
+	struct	xml_atribut * gptr;
+	struct	xml_atribut * mptr;
 	char *	nptr;
 	char	nameplan[512];
 	int	status;
@@ -137,6 +248,8 @@ private	int	ll_sla_broker_operation( char * filename )
 	/* ------------------------------ */
 	else if (!( fptr = document_element( dptr, _CORDS_AGREEMENT ) ))
 		return( failure(5,"expected manifest or agreement document",filename));
+	else if (!( gptr = document_atribut( fptr, _CORDS_ID ) ))
+		return( failure(5,"missing agreement identifier",filename));
 	else if (!( tptr = document_element( fptr, _CORDS_TERMS ) ))
 		return( failure(5,"missing agreement terms",filename));
 	else
@@ -152,9 +265,11 @@ private	int	ll_sla_broker_operation( char * filename )
 		}
 		if (!( eptr ))
 			return( failure(5,"missing manifest element",filename));
+		else if (!( mptr = document_atribut( eptr, _CORDS_ID ) ))
+			return( failure(5,"missing manifest identifier",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( Cb.host, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}

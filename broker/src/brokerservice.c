@@ -22,6 +22,7 @@
 
 #include "occiresolver.h"
 #include "cp.h"
+#include "cb.h"
 #include "cordslang.h"
 
 					/* ---------------------------------------------------- */
@@ -518,6 +519,28 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 }
 
 /*	-------------------------------------------	*/
+/* 	  c r e a t e _ s e r v i c e _ g r a p h 	*/
+/*	-------------------------------------------	*/
+private	int	create_service_graph(struct occi_category * optr, struct cords_service * pptr )
+{
+	char *	result;
+	/* --------------------------------------------- */
+	/* attempt to build a new service instance graph */
+	/* --------------------------------------------- */
+	if (!(result = cords_service_broker(
+			_DEFAULT_PUBLISHER,
+			pptr->id,
+			pptr->name,
+			pptr->manifest,
+			pptr->sla,
+			_CORDS_BROKER_AGENT,
+			default_tls(), 
+			(struct xml_element **) 0 ) ))
+		return( 0 );
+	else	return( 0 );
+}
+
+/*	-------------------------------------------	*/
 /* 	      c r e a t e _ s e r v i c e  		*/
 /*	-------------------------------------------	*/
 private	int	create_service(struct occi_category * optr, void * vptr)
@@ -528,7 +551,13 @@ private	int	create_service(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return( 0 ); 
+	else if (!( pptr->sla ))
+		return(0);
+	else if (!( strlen( pptr->sla ) ))
+		return(0);
+	else if (!( strcmp( pptr->sla, _CORDS_NULL ) ))
+		return(0);
+	else	return( create_service_graph( optr, pptr ) ); 
 }
 
 /*	-------------------------------------------	*/

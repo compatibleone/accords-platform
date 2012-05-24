@@ -9,10 +9,11 @@ struct	cords_service
 	char *	manifest;
 	char *	plan;
 	char *	account;
+	char *	sla;
 	char *	price;
+	char *	session;
 	int	when;
 	int	contracts;
-	char *	session;
 	int	state;
 };
 

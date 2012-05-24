@@ -1691,7 +1691,7 @@ private	char *	cords_instance_service( char * host, char * planid, char * agent,
 		service = (char *) 0;
 	else if (!( manifest = occi_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_MANIFEST ) ))
 		service = (char *) 0;
-	else	service = cords_manifest_broker( host, plan, name, manifest, agent, tls, root );
+	else	service = cords_manifest_broker(host, plan, name, manifest, agent, tls, root );
 
 	/* ----------------------------- */
 	/* liberate response and strings */
@@ -2600,12 +2600,28 @@ private	int	cords_recover_results(struct xml_element * document, char * agent, c
 	return( 0 );
 }
 
+/*	-------------------------------------------------------		*/
+/*		c o r d s _ r e q u e s t _ b r o k e r			*/
+/*	-------------------------------------------------------		*/
+public	char *	cords_service_broker(
+	char * 	host, 
+	char * 	service,
+	char * 	servicename,
+	char * 	manifest, 
+	char *	sla,
+	char * 	agent, 
+	char * 	tls, 
+	struct xml_element ** root )
+{
+	return( service );
+}
 
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ r e q u e s t _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
 public	char *	cords_manifest_broker(
-	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls, struct xml_element ** root )
+	char * 	host, 
+	char * plan, char * nameplan, char * manifest, char * agent, char * tls, struct xml_element ** root )
 {
 	int	status;
 	char	*	id;
@@ -2671,6 +2687,9 @@ public	char *	cords_manifest_broker(
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 2 : Provisioning \n",agent);
 
+	/* ---------------------------------- */
+	/* build the service control document */
+	/* ---------------------------------- */
 	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.accID, CbC.accID ) ))
 		return( cords_terminate_provisioning( 909, &CbC ) );
 

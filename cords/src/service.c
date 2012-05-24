@@ -43,6 +43,8 @@ public struct cords_service * liberate_cords_service(struct cords_service * sptr
 			 sptr->plan = liberate(sptr->plan);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
+		if ( sptr->sla )
+			 sptr->sla = liberate(sptr->sla);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->session )
@@ -65,10 +67,11 @@ public struct cords_service * reset_cords_service(struct cords_service * sptr)
 		sptr->manifest = (char*) 0;
 		sptr->plan = (char*) 0;
 		sptr->account = (char*) 0;
+		sptr->sla = (char*) 0;
 		sptr->price = (char*) 0;
+		sptr->session = (char*) 0;
 		sptr->when =  0;
 		sptr->contracts =  0;
-		sptr->session = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -116,9 +119,17 @@ public int xmlin_cords_service(struct cords_service * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"sla") ))
+		{
+			if ( wptr->value ) { sptr->sla = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"session") ))
+		{
+			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
@@ -127,10 +138,6 @@ public int xmlin_cords_service(struct cords_service * sptr,struct xml_element * 
 		else if (!( strcmp(wptr->name,"contracts") ))
 		{
 			if ( wptr->value ) { sptr->contracts = atoi(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"session") ))
-		{
-			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -155,10 +162,11 @@ public int rest_occi_cords_service(FILE * fh,struct cords_service * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.manifest='%s'\r\n",prefix,nptr,(sptr->manifest?sptr->manifest:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.plan='%s'\r\n",prefix,nptr,(sptr->plan?sptr->plan:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.sla='%s'\r\n",prefix,nptr,(sptr->sla?sptr->sla:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contracts='%u'\r\n",prefix,nptr,sptr->contracts);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

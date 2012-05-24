@@ -111,6 +111,16 @@ public	char *	cords_manifest_broker(
 	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls,
 	struct xml_element ** root );
 
+public	char *	cords_service_broker(
+	char * 	host, 
+	char * 	service,
+	char * 	servicename,
+	char * 	manifest, 
+	char *	sla,
+	char * 	agent, 
+	char * 	tls, 
+	struct xml_element ** root );
+
 public	int	get_provisioning_status();
 
 public	struct	xml_element * cords_instance_node( 
