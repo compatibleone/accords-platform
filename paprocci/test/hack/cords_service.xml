@@ -1,0 +1,6 @@
+<cords_services>
+<cords_service
+ id="d1fcdff7-b8df-4e24-afe9-72ffd3727fc0" name="test3" manifest="http://127.0.0.1:8092/manifest/0fa02dfc-5d65-48b1-b8fb-87cc870b17cd" plan="5f3cc936-622b-43c8-a166-21e3612ace96" account="http://127.0.0.1:8091/account/b75ff456-1e76-40e7-bde2-b35981573222" price="" when="1336133108" contracts="1" session="" state="1" />
+<cords_service
+ id="a5b83373-6a11-47aa-a9e9-86bc832062b7" name="test3" manifest="http://127.0.0.1:8092/manifest/0fa02dfc-5d65-48b1-b8fb-87cc870b17cd" plan="5f3cc936-622b-43c8-a166-21e3612ace96" account="http://127.0.0.1:8091/account/b75ff456-1e76-40e7-bde2-b35981573222" price="" when="1336133138" contracts="1" session="" state="1" />
+</cords_services>

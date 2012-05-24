@@ -1,0 +1,6 @@
+<cords_infrastructures>
+<cords_infrastructure
+ id="490f98d0-edd3-45e5-8a67-a81e0385cad0" name="test3" compute="http://127.0.0.1:8094/compute/9c613094-992f-4fd7-b33c-22bae50fd801" network="http://127.0.0.1:8094/network/f8589b6f-ec4a-4a00-9e50-4c1ead694f9d" storage="http://127.0.0.1:8094/storage/30e20c3c-adcc-4812-ba9b-9e71c7e67fc2" state="0" />
+<cords_infrastructure
+ id="3224c874-a4dd-4254-8e13-7b3a9bc3cdbe" name="coips:model" compute="http://127.0.0.1:8094/compute/85da739a-216c-451a-8187-249bdfb077ac" network="http://127.0.0.1:8094/network/143d1df7-a179-44b6-a28b-d889d1718ce1" storage="http://127.0.0.1:8094/storage/9be6a3f1-15f2-4207-8483-ad24131e14be" state="0" />
+</cords_infrastructures>
