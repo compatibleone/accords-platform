@@ -7,9 +7,6 @@ echo '$ source init.sh'
 
 echo Root directory is $BASEDIR
 
-echo REMEMBER TO DO 
-echo 'export LD_LIBRARY_PATH=/usr/local/lib'
-
 echo Copying xsd files locally...
 cp xsds/* /tmp/
 
@@ -22,4 +19,11 @@ cp configs/* $BASEDIR/scripts
 echo Copying manifests...
 cp manifests/* $BASEDIR/scripts
 
+echo Copying hacks...
+cp hack/* $BASEDIR/scripts
+
 echo Done.
+
+echo REMEMBER TO DO 
+echo 'export LD_LIBRARY_PATH=/usr/local/lib'
+
