@@ -102,7 +102,7 @@ public 	struct	occi_element * cords_first_link( struct occi_response * zptr );
 public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
 
 public	struct	xml_element  * cords_build_service( 
-	char * 	name, char * plan, char * manifest, char * account, char * tarification );
+	char * 	name, char * plan, char * manifest, char * sla, char * account, char * tarification );
 
 public	struct	xml_element * 	cords_build_contract( 
 	char * 	node, 	char * name, char * provider );
@@ -117,6 +117,7 @@ public	char *	cords_service_broker(
 	char * 	host, 
 	char * 	service,
 	char * 	servicename,
+	char *	plan,
 	char * 	manifest, 
 	char *	sla,
 	char * 	agent, 

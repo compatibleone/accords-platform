@@ -524,19 +524,34 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 private	int	create_service_graph(struct occi_category * optr, struct cords_service * pptr )
 {
 	char *	result;
+	char *	host;
+	char	buffer[1024];
+
+	/* ------------------------------------------- */
+	/* check parameters and build full instance ID */
+	/* ------------------------------------------- */
+	if (!( pptr ))
+		return(118);
+	else if (!( pptr->id ))
+		return(118);
+	else if (!( host = default_identity()))
+		return(118);
+	else	sprintf(buffer,"%s/%s/%s",host,_CORDS_SERVICE,pptr->id);
+
 	/* --------------------------------------------- */
 	/* attempt to build a new service instance graph */
 	/* --------------------------------------------- */
 	if (!(result = cords_service_broker(
 			_DEFAULT_PUBLISHER,
-			pptr->id,
+			buffer,
 			pptr->name,
+			pptr->plan,
 			pptr->manifest,
 			pptr->sla,
 			_CORDS_BROKER_AGENT,
 			default_tls(), 
 			(struct xml_element **) 0 ) ))
-		return( 0 );
+		return( 999 );
 	else	return( 0 );
 }
 

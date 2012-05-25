@@ -2496,7 +2496,7 @@ public	struct	xml_element * cords_instance_node(
 /*	-------------------------------------------------------		*/
 public	struct	xml_element * 	cords_build_service(
 	char * plan, 	char * name, 
-	char * manifest,
+	char * manifest, char * sla,
 	char * account,	char * tarif)
 {
 	struct	xml_element * eptr;
@@ -2508,14 +2508,16 @@ public	struct	xml_element * 	cords_build_service(
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NAME , name ) ))
 		return(document_drop( eptr ));
-	else if (!( aptr = document_add_atribut( eptr, _CORDS_PLAN , plan ) ))
-		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_MANIFEST , manifest ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_ACCOUNT , account ) ))
 		return(document_drop( eptr ));
-	else if (!( aptr = document_add_atribut( eptr, _CORDS_TARIFICATION , tarif ) ))
+	else if ((plan) && (!( aptr = document_add_atribut( eptr, _CORDS_PLAN , plan ) )))
 		return(document_drop( eptr ));
+	else if ((tarif) && (!( aptr = document_add_atribut( eptr, _CORDS_TARIFICATION , tarif ) )))
+		return(document_drop( eptr ));
+	else if (( sla ) && (!( aptr = document_add_atribut( eptr, _CORDS_SLA, sla ) )))
+		return( eptr );
 	else	return( eptr );
 }
 
@@ -2611,6 +2613,7 @@ public	char *	cords_service_broker(
 	char * 	host, 
 	char * 	service,
 	char * 	servicename,
+	char *	plan,
 	char * 	manifest, 
 	char *	sla,
 	char * 	agent, 
@@ -2636,6 +2639,10 @@ public	char *	cords_service_broker(
 	/* -------------------------------------------------- */
 	/* retrieve the manifestinformation instance and name */
 	/* -------------------------------------------------- */
+	if (!( CbC.planID  = allocate_string( plan ) ))
+		return( cords_terminate_provisioning( 900, &CbC ) );
+	if (!( CbC.namePlan  = allocate_string( servicename ) ))
+		return( cords_terminate_provisioning( 900, &CbC ) );
 	if (!( CbC.reqID  = allocate_string( manifest ) ))
 		return( cords_terminate_provisioning( 900, &CbC ) );
 	else if (!( CbC.manifest = cords_retrieve_instance( host, CbC.reqID, agent, tls )))
@@ -2660,6 +2667,34 @@ public	char *	cords_service_broker(
 		else if (!( CbC.accName  = occi_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 			return( cords_terminate_provisioning( 905, &CbC ) );
 	}
+
+	/* ----------------------------------- */
+	/* retrieve the configuration instance */
+	/* ----------------------------------- */
+	if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
+		return( cords_terminate_provisioning( 907, &CbC ) );
+	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
+		return( cords_terminate_provisioning( 908, &CbC ) );
+
+	/* ------------------------------- */
+	/* retrieve the interface instance */
+	/* ------------------------------- */
+	if (( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_INTERFACE)) != (char *) 0)
+		if (!( CbC.interface = cords_retrieve_instance( host, CbC.interID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
+
+	/* -------------------------------------- */
+	/* build the service description document */
+	/* -------------------------------------- */
+	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.accID ) ))
+		return( cords_terminate_provisioning( 909, &CbC ) );
+
+	/* ------------------------ */
+	/* add the service identity */
+	/* ------------------------ */
+	else if (!( aptr = document_add_atribut( CbC.document, _CORDS_ID, service ) ))
+		return( cords_terminate_provisioning( 910, &CbC ) );
 
 	/* --------------------------------------- */
 	/* instance the contracts for this service */
@@ -2686,10 +2721,18 @@ public	char *	cords_service_broker(
 		}
 	}
 
-	/* -------------------------------- */
-	/* need to handle the configuration */
-	/* and the interface actions still  */
-	/* -------------------------------- */
+	/* -------------------------------------------- */
+	/* perform configuration instruction processing */
+	/* -------------------------------------------- */
+	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
+		return( cords_terminate_provisioning( status, &CbC ) );
+	
+	/* -------------------------------------------- */
+	/* perform interface methods action  processing */
+	/* -------------------------------------------- */
+	if (( CbC.interface )
+	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
 
 	return( service );
 }
@@ -2768,7 +2811,7 @@ public	char *	cords_manifest_broker(
 	/* ---------------------------------- */
 	/* build the service control document */
 	/* ---------------------------------- */
-	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.accID, CbC.accID ) ))
+	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.accID ) ))
 		return( cords_terminate_provisioning( 909, &CbC ) );
 
 	else if (!( CbC.instance = cords_create_category( CbC.document, agent, tls ) ))

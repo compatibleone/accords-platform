@@ -69,6 +69,7 @@
 #define	_CORDS_CREATED		"created"
 #define	_CORDS_VALIDATION	"validation"
 #define	_CORDS_INITIATOR	"initiator"
+#define	_CORDS_SLA		"sla"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

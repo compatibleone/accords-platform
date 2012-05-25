@@ -51,6 +51,7 @@ public	int	check_verbose()		{	return(Broker.verbose);		}
 public	char *	default_publisher()	{	return(Broker.publisher);	}
 public	char *	default_operator()	{	return(Broker.operator);	}
 public	char *	default_tls()		{	return(Broker.tls);		}
+public	char *	default_identity()	{	return(Broker.identity);	}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

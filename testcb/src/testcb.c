@@ -82,9 +82,10 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 /*	-----------------------------------------------------	*/
 /*	   c o r d s _ i n s t a n c e _ a g r e e m e n t	*/
 /*	-----------------------------------------------------	*/
-private	int	cords_instance_agreement( char * host, char * sla, char * manifest, char * plan,  char * agent, char * result )
+private	int	cords_instance_agreement( char * host, char * name, char * sla, char * manifest, char * plan,  char * agent, char * result )
 {
 	struct	occi_response * zptr;
+	char	*	namev;
 	char	*	planv;
 	char 	*	slav;
 	char  	*	manv;
@@ -108,6 +109,8 @@ private	int	cords_instance_agreement( char * host, char * sla, char * manifest, 
 	else if (!( slav = occi_unquoted_value( sla  )))
 		return(532);
 	else if (!( planv = occi_unquoted_value( plan )))
+		return(533);
+	else if (!( namev = occi_unquoted_value( name )))
 		return(533);
 
 	/* ------------------------------------------- */
@@ -137,6 +140,7 @@ private	int	cords_instance_agreement( char * host, char * sla, char * manifest, 
 	}
 	else if ((!(dptr=occi_request_element(qptr,"occi.service.plan"  	, planv ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.service.manifest"   	, manv  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.name"   	, namev ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.service.sla"  		, slav 	) )))
 	{
 		qptr = occi_remove_request( qptr );
@@ -178,7 +182,9 @@ private	int	cords_instance_agreement( char * host, char * sla, char * manifest, 
 		/* -------------------------------- */
 		/* start the SLA controlled service */
 		/* -------------------------------- */
-		if (!( zptr =  cords_invoke_action( ihost, _CORDS_START, agent, default_tls() ) ))
+		sprintf(buffer,"http://%s",ihost);
+		ihost = liberate( ihost );
+		if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
 			return(503);
 		else
 		{
@@ -209,6 +215,7 @@ private	int	ll_sla_broker_operation( char * filename )
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * gptr;
 	struct	xml_atribut * mptr;
+	struct	xml_atribut * pptr;
 	char *	nptr;
 	char	nameplan[512];
 	int	status;
@@ -267,9 +274,11 @@ private	int	ll_sla_broker_operation( char * filename )
 			return( failure(5,"missing manifest element",filename));
 		else if (!( mptr = document_atribut( eptr, _CORDS_ID ) ))
 			return( failure(5,"missing manifest identifier",filename));
+		else if (!( pptr = document_atribut( eptr, _CORDS_ID ) ))
+			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( Cb.host, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( Cb.host, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
