@@ -2618,12 +2618,14 @@ public	char *	cords_service_broker(
 	struct xml_element ** root )
 {
 	int	status;
-	char	*	id;
+	char *	id;
 	struct	cords_placement_criteria CpC;
+	struct	occi_response * zptr;
 	struct	occi_element * eptr;
 	struct	xml_atribut * aptr;
 	struct	xml_element  * mptr;
-	struct cords_provisioning CbC; 
+	struct	xml_atribut  * nptr;
+	struct  cords_provisioning CbC; 
 
 	memset(&CbC,0, sizeof( struct cords_provisioning ) );
 	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
@@ -2659,6 +2661,35 @@ public	char *	cords_service_broker(
 			return( cords_terminate_provisioning( 905, &CbC ) );
 	}
 
+	/* --------------------------------------- */
+	/* instance the contracts for this service */
+	/* --------------------------------------- */
+	for (	eptr=cords_first_link( CbC.manifest );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
+			return( cords_terminate_provisioning( 913, &CbC ) );
+		else if (!( nptr = document_atribut( mptr, _CORDS_ID ) ))
+			return( cords_terminate_provisioning( 914, &CbC ) );
+		else if (!( zptr =  cords_create_link( service, nptr->value,  agent, tls ) ))
+			return( cords_terminate_provisioning( 915, &CbC ) );
+		{
+			zptr = occi_remove_response( zptr );
+			id = liberate( id );
+			CbC.nodes++;
+			continue;
+		}
+	}
+
+	/* -------------------------------- */
+	/* need to handle the configuration */
+	/* and the interface actions still  */
+	/* -------------------------------- */
 
 	return( service );
 }
@@ -2745,7 +2776,7 @@ public	char *	cords_manifest_broker(
 
 	else if ((status = cords_resolve_location( CbC.instance, CbC.document )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
-	else if (!( aptr = document_atribut( CbC.document, "id" )))
+	else if (!( aptr = document_atribut( CbC.document, _CORDS_ID )))
 		return( cords_terminate_provisioning( 911, &CbC ) );
 	else if (!( CbC.instID = occi_unquoted_value( aptr->value ) ))
 		return( cords_terminate_provisioning( 912, &CbC ) );

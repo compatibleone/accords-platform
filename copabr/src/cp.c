@@ -1072,7 +1072,11 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 			continue;
 		else if (!(bptr = document_atribut( eptr, _CORDS_ID )))
 			return( cords_append_error(document,701,"unresolved element") );
-		else if (!( zptr = cords_create_link( aptr->value, bptr->value, agent, tls ) ))
+
+		if (!( count ))
+			cords_remove_links( document, agent, tls );
+
+		if (!( zptr = cords_create_link( aptr->value, bptr->value, agent, tls ) ))
 			return( cords_append_error(eptr,703,"creating link") );
 		else
 		{
@@ -2299,7 +2303,6 @@ private	int	cords_terminate_xsd(
 		/* ------------------------------------- */
 		/* locate the first max occurs unbounded */
 		/* ------------------------------------- */
-		status = cords_remove_links(dptr,agent,tls);
 
 		for ( 	eptr=first_xsd_element( wptr );
 			eptr != (struct xml_element *) 0;
@@ -2329,6 +2332,7 @@ private	int	cords_terminate_xsd(
 						continue;
 					else if (!( nptr = occi_unquoted_value( nptr ) ))
 						continue;
+
 					else if ((status = cords_add_links(dptr,nptr,agent,tls)) != 0)
 					{
 						liberate( nptr );
@@ -2344,7 +2348,6 @@ private	int	cords_terminate_xsd(
 				}
 				else	liberate(vptr);
 			}
-			/* if ( linked ) break; */
 		}
 
 		
