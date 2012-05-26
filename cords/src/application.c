@@ -41,6 +41,12 @@ public struct cords_application * liberate_cords_application(struct cords_applic
 			 sptr->provider = liberate(sptr->provider);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
+		if ( sptr->url )
+			 sptr->url = liberate(sptr->url);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
+		if ( sptr->provision )
+			 sptr->provision = liberate(sptr->provision);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_application *) 0);
@@ -59,6 +65,9 @@ public struct cords_application * reset_cords_application(struct cords_applicati
 		sptr->image = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->price = (char*) 0;
+		sptr->url = (char*) 0;
+		sptr->account = (char*) 0;
+		sptr->provision = (char*) 0;
 		sptr->created =  0;
 		sptr->started =  0;
 		sptr->completed =  0;
@@ -109,6 +118,18 @@ public int xmlin_cords_application(struct cords_application * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"url") ))
+		{
+			if ( wptr->value ) { sptr->url = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"provision") ))
+		{
+			if ( wptr->value ) { sptr->provision = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"created") ))
 		{
 			if ( wptr->value ) { sptr->created = atoi(wptr->value); }
@@ -144,6 +165,9 @@ public int rest_occi_cords_application(FILE * fh,struct cords_application * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.url='%s'\r\n",prefix,nptr,(sptr->url?sptr->url:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.provision='%s'\r\n",prefix,nptr,(sptr->provision?sptr->provision:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%u'\r\n",prefix,nptr,sptr->created);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.started='%u'\r\n",prefix,nptr,sptr->started);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.completed='%u'\r\n",prefix,nptr,sptr->completed);

@@ -144,6 +144,12 @@ private void autoload_cords_application_nodes() {
 				pptr->provider = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "url" )) != (struct xml_atribut *) 0)
+				pptr->url = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "provision" )) != (struct xml_atribut *) 0)
+				pptr->provision = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
 				pptr->created = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "started" )) != (struct xml_atribut *) 0)
@@ -191,6 +197,15 @@ public  void autosave_cords_application_nodes() {
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," url=%c",0x0022);
+		fprintf(h,"%s",(pptr->url?pptr->url:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," provision=%c",0x0022);
+		fprintf(h,"%s",(pptr->provision?pptr->provision:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," created=%c",0x0022);
 		fprintf(h,"%u",pptr->created);
 		fprintf(h,"%c",0x0022);
@@ -232,6 +247,12 @@ private void set_cords_application_field(
 			pptr->provider = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "url" ) ))
+			pptr->url = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "provision" ) ))
+			pptr->provision = allocate_string(vptr);
 		if (!( strcmp( nptr, "created" ) ))
 			pptr->created = atoi(vptr);
 		if (!( strcmp( nptr, "started" ) ))
@@ -293,6 +314,27 @@ private int pass_cords_application_filter(
 		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
+	if (( fptr->url )
+	&&  (strlen( fptr->url ) != 0)) {
+		if (!( pptr->url ))
+			return(0);
+		else if ( strcmp(pptr->url,fptr->url) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
+	if (( fptr->provision )
+	&&  (strlen( fptr->provision ) != 0)) {
+		if (!( pptr->provision ))
+			return(0);
+		else if ( strcmp(pptr->provision,fptr->provision) != 0)
+			return(0);
+		}
 	if (( fptr->created ) && ( pptr->created != fptr->created )) return(0);
 	if (( fptr->started ) && ( pptr->started != fptr->started )) return(0);
 	if (( fptr->completed ) && ( pptr->completed != fptr->completed )) return(0);
@@ -322,6 +364,15 @@ private struct rest_response * cords_application_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.url=%s",optr->domain,optr->id,pptr->url);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.provision=%s",optr->domain,optr->id,pptr->provision);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.created=%u",optr->domain,optr->id,pptr->created);
@@ -748,6 +799,12 @@ public struct occi_category * occi_cords_application_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "url",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "provision",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "started",0,0) ))
@@ -825,6 +882,39 @@ public struct rest_header *  cords_application_occi_headers(struct cords_applica
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_application.price='%s'\r\n",(sptr->price?sptr->price:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_application.url='%s'\r\n",(sptr->url?sptr->url:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_application.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_application.provision='%s'\r\n",(sptr->provision?sptr->provision:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

@@ -43,6 +43,7 @@ struct	accords_configuration TestOsOcci = {
 	"xmpp",  8000,
 	"domain",
 	"testosocci.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -81,8 +82,8 @@ private	void	test_os_occi_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Test OCCI Server : Version 1.0a.0.01");
-	printf("\n   Beta Version : 06/04/2012");
+	printf("\n   CompatibleOne Test OCCI Server : Version 1.0a.0.02");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

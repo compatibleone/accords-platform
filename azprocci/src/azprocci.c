@@ -42,6 +42,7 @@ struct	accords_configuration WazProcci = {
 	"xmpp",  8000,
 	"domain",
 	"azprocci.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -80,9 +81,9 @@ private	void	azprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Windows Azure Procci : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue ");
+	printf("\n   CompatibleOne Windows Azure Procci : Version 1.0a.0.04");
+	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");

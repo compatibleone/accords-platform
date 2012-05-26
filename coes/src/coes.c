@@ -43,6 +43,7 @@ struct	accords_configuration Coes = {
 	"xmpp",  8000,
 	"domain",
 	"coes.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -83,8 +84,8 @@ private	void	coes_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.06");
-	printf("\n   Beta Version : 05/03/2012");
+	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.08");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -153,7 +154,12 @@ private	char *	resolve_placement( char * provider, char * zone, char * agent, ch
 	/* ------------------------------------------------------ */
 	if ( zone )
 	{
-		if (!( zptr = occi_resolve_by_zone( provider, zone, agent ) ))
+		if (!( strcmp( zone, "any" ) ))
+		{
+			if (!( zptr = occi_resolver( provider, agent ) ))
+				return( (char *) 0 );
+		}
+		else if (!( zptr = occi_resolve_by_zone( provider, zone, agent ) ))
 			return( (char *) 0 );
 	}
 	else if (!( zptr = occi_resolver( provider, agent ) ))

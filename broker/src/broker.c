@@ -42,6 +42,7 @@ struct	accords_configuration Broker = {
 	"xmpp",  8000,
 	"domain",
 	"broker.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -83,8 +84,8 @@ private	void	broker_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Broker : Version 1.0a.0.05");
-	printf("\n   Beta Version : 04/04/2012");
+	printf("\n   CompatibleOne Request Broker : Version 1.0a.0.06");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

@@ -37,6 +37,10 @@ public struct cords_variable * liberate_cords_variable(struct cords_variable * s
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->condition )
+			 sptr->condition = liberate(sptr->condition);
+		if ( sptr->value )
+			 sptr->value = liberate(sptr->value);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->metric )
@@ -58,6 +62,8 @@ public struct cords_variable * reset_cords_variable(struct cords_variable * sptr
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->condition = (char*) 0;
+		sptr->value = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->metric = (char*) 0;
 		sptr->location = (char*) 0;
@@ -96,6 +102,14 @@ public int xmlin_cords_variable(struct cords_variable * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"condition") ))
+		{
+			if ( wptr->value ) { sptr->condition = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"value") ))
+		{
+			if ( wptr->value ) { sptr->value = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"description") ))
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
@@ -128,6 +142,8 @@ public int rest_occi_cords_variable(FILE * fh,struct cords_variable * sptr,char 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.condition='%s'\r\n",prefix,nptr,(sptr->condition?sptr->condition:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));

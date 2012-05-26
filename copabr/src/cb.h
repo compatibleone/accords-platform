@@ -30,6 +30,7 @@ struct	cords_placement_criteria
 {
 	char *		node;		/* node description		*/
 	char *		price;		/* by price			*/
+	char *		energy;		/* by energy			*/
 	char *		opinion;	/* by opinion			*/
 	char *		provider;	/* by provider type		*/
 	char *		operator;	/* by named operator		*/

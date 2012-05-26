@@ -63,6 +63,8 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		configuration->publisher = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "identity" ) ))
 		configuration->identity = allocate_string( argv[++argi] );
+	else if (!( strcmp( aptr, "zone" ) ))
+		configuration->zone = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "user" ) ))
 		configuration->user = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "password" ) ))
@@ -103,6 +105,7 @@ public	void	accords_configuration_options()
 	printf("\n   --publisher  <url>         specify url of publisher");
 	printf("\n   --operator   <name>        specify name of operator");
 	printf("\n   --identity   <url>         specify url for publication ");
+	printf("\n   --zone       <name>        specify location zone   ");
 	printf("\n   --user       <name>        specify user log name   ");
 	printf("\n   --password   <value>       specify user password   ");
 	return;
@@ -187,6 +190,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 			{
 				if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 					configuration->domain = document_atribut_string( aptr );
+				if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
+					configuration->zone = document_atribut_string( aptr );
 			}
 		}
 		document = document_drop( document );

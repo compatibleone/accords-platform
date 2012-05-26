@@ -50,6 +50,7 @@ struct	accords_configuration Coips = {
 	"xmpp",  8000,
 	"domain",
 	"coips.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -88,8 +89,8 @@ private	void	coips_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Image Production Services : Version 1.0a.0.01");
-	printf("\n   Beta Version : 07/02/2012");
+	printf("\n   CompatibleOne Image Production Services : Version 1.0a.0.02");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -513,7 +514,10 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 
 	if (!( contract = negotiate_application_contract(node,&selector)))
 		return( 801 );
-
+	else if (!( aptr->provision = allocate_string( contract ) ))
+		return( 802 );
+	else if (!( aptr->account = allocate_string( _COIPS_ACCOUNT ) ))
+		return( 803 );
 
 	/* ------------------------- */
 	/* provision the contract    */

@@ -50,6 +50,7 @@ struct	accords_configuration Cosched = {
 	"xmpp",  8000,
 	"domain",
 	"cosched.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -88,8 +89,8 @@ private	void	cosched_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Job Scheduling Services : Version 1.0a.0.01");
-	printf("\n   Beta Version : 21/02/2012");
+	printf("\n   CompatibleOne Job Scheduling Services : Version 1.0a.0.02");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

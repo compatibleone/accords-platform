@@ -1179,7 +1179,8 @@ private	struct	occi_request  * cords_add_provider_attribute(
 /*	this function provides linkage to COES placement engine		*/
 /*	for the selection of the provider to be used by broker		*/		
 /*	---------------------------------------------------------	*/
-private	char *	cords_coes_operation( struct cords_placement_criteria * selector, 
+private	char *	cords_coes_operation( 
+	struct cords_placement_criteria * selector, 
 	/* char * provider ,  char * node, */ char * agent, char * tls )
 {
 	struct	occi_client 	* kptr;
@@ -1223,7 +1224,57 @@ private	char *	cords_coes_operation( struct cords_placement_criteria * selector,
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!( yptr = occi_client_post( kptr, qptr ) ))
+
+			if (( selector->algorithm )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", selector->algorithm ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->zone )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.zone", selector->zone ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->energy )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.energy", selector->energy ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->opinion )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.opinion", selector->opinion ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->security )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.security", selector->security ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->operator )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.operator", selector->operator ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (( selector->price )
+			&&  (!(dptr=occi_request_element(qptr,"occi.placement.price", selector->price ) )))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			if (!( yptr = occi_client_post( kptr, qptr ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -2606,8 +2657,165 @@ private	int	cords_recover_results(struct xml_element * document, char * agent, c
 	return( 0 );
 }
 
+/*	-------------------------------------------------	*/
+/*	c o r d s _ p l a c e m e n t _ c o n d i t i o n	*/
+/*	-------------------------------------------------	*/
+private	int	cords_placement_condition(
+		struct cords_placement_criteria * placement,
+		char * nptr, char * vptr )
+{
+	if (!( strcmp( nptr, "occi.placement.algorithm" ) ))
+		placement->algorithm = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.operator" ) ))
+		placement->operator = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.zone" ) ))
+		placement->zone = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.opinion" ) ))
+		placement->opinion = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.energy" ) ))
+		placement->energy = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.security" ) ))
+		placement->security = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.price" ) ))
+		placement->price = allocate_string( vptr );
+	return( 0 );
+}
+
+/*	-------------------------------------------------	*/
+/*	 c o r d s _ a n a l y s e _ c o n d i t i o n s	*/
+/*	-------------------------------------------------	*/
+/* 	this function retrieves placement conditions from	*/
+/*	the sla terms defined conditions block.			*/
+/*	-------------------------------------------------	*/
+private	int	cords_analyse_conditions( 
+		char * host,
+		char * termsid,
+		struct occi_response * zptr,
+		struct cords_placement_criteria * placement,
+		char * agent, char * tls )
+{
+	struct	occi_element * eptr;
+	struct	occi_element * fptr;
+	char *	id;
+	char *	vid;
+	char *	vptr;
+	char *	nptr;
+	struct	occi_response * aptr;
+	struct	occi_response * bptr;
+	int	status=0;
+
+	if (!( zptr )) 	
+		return(0);
+
+	/* ------------------------------------------------------- */
+	/* for all "term" elements attached to the "terms" section */
+	/* ------------------------------------------------------- */
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+			return( 908 );
+		else
+		{
+			/* ---------------------------------------------------------- */
+			/* for all "variable" elements attached to the "term" section */
+			/* ---------------------------------------------------------- */
+			for (	fptr=cords_first_link( aptr );
+				fptr != (struct occi_element *) 0;
+				fptr = fptr->next )
+			{
+				if (!( fptr->value ))
+					continue;
+				else if (!( vid =  occi_unquoted_link( fptr->value ) ))
+					continue;
+				else if (!( bptr = cords_retrieve_instance( host, vid, agent, tls ) ))
+					return( 908 );
+				else
+				{
+					/* --------------------------------------------------- */
+					/* extract name and values and set the criteria fields */
+					/* --------------------------------------------------- */
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, _CORDS_NAME )) != (char *) 0)
+					{
+						if (( vptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
+						{
+							cords_placement_condition(placement, nptr, vptr );
+						}
+					}
+					bptr = occi_remove_response( bptr );
+					vid = liberate( vid );
+				}
+			}
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+		}
+	}
+	return( 0 );
+}
+
+/*	-------------------------------------------------	*/
+/*	c o r d s _ r e t r i e v e _ c o n d i t i o n s	*/
+/*	-------------------------------------------------	*/
+/* 	this function retrieves placement conditions from	*/
+/*	the sla terms defined conditions block.			*/
+/*	-------------------------------------------------	*/
+private	int	cords_retrieve_conditions( 
+		char * host,
+		char * slaid, 
+		struct occi_response * zptr,
+		struct cords_placement_criteria * placement,
+		char * agent, char * tls )
+{
+	struct	occi_element * eptr;
+	char *	id;
+	char *	vptr;
+	struct	occi_response * aptr;
+	int	status=0;
+
+	if (!( zptr )) 	
+		return(0);
+
+	/* -------------------------------------------- */
+	/* for all "terms" attached to the sla instance */
+	/* -------------------------------------------- */
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		/* ------------------------- */
+		/* retrieve the terms record */
+		/* ------------------------- */
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+			return( 908 );
+		else if (!( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )))
+			continue;
+		else if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
+		{
+			status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+			return( status );
+		}
+		else	continue;
+	}
+	return( 0 );
+}
+
 /*	-------------------------------------------------------		*/
-/*		c o r d s _ r e q u e s t _ b r o k e r			*/
+/*		c o r d s _ s e r v i c e _ b r o k e r			*/
+/*	-------------------------------------------------------		*/
+/*	this function provides SLA driven service brokering for		*/
+/*	fine control over the placement engine and sla accounts		*/
+/*	handling over manifest described resources.			*/
 /*	-------------------------------------------------------		*/
 public	char *	cords_service_broker(
 	char * 	host, 
@@ -2655,6 +2863,8 @@ public	char *	cords_service_broker(
 		return( cords_terminate_provisioning( 920, &CbC ) );
 	else if (!( CbC.sla = cords_retrieve_instance( host, CbC.slaID, agent, tls )))
 		return( cords_terminate_provisioning( 930, &CbC ) );
+	else if ((status = cords_retrieve_conditions( host, CbC.slaID, CbC.sla, &CpC, agent, tls )) != 0)
+		return( cords_terminate_provisioning( 907, &CbC ) );
 
 	/* -------------------------------------------------- */
 	/* retrieve the account information instance and name */

@@ -44,6 +44,7 @@ struct	accords_configuration Cosacs = {
 	"xmpp",  8000,
 	"domain",
 	"cosacs.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -82,8 +83,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.04");
-	printf("\n   Beta Version : 21/03/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.05");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

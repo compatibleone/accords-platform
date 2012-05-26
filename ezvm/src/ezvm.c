@@ -44,6 +44,7 @@ struct	accords_configuration Ezvm = {
 	"xmpp",  8000,
 	"domain",
 	"ezvm.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -82,8 +83,8 @@ private	void	ezvm_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ezvm : Version 1.0a.0.01");
-	printf("\n   Beta Version : 07/01/2012");
+	printf("\n   CompatibleOne Ezvm : Version 1.0a.0.02");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

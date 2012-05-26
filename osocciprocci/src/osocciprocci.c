@@ -43,6 +43,7 @@ struct	accords_configuration OsOcciProcci = {
 	"xmpp",  8000,
 	"domain",
 	"OsOcciProcci.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -81,8 +82,8 @@ private	void	OsOcciProcci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Open Stack OsOcciProcci : Version 1.0a.0.02");
-	printf("\n   Beta Version : 19/04/2012");
+	printf("\n   CompatibleOne Open Stack OsOcciProcci : Version 1.0a.0.03");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

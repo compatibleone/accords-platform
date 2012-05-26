@@ -44,6 +44,7 @@ struct	accords_configuration Slam = {
 	"xmpp",  8000,
 	"domain",
 	"slam.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -84,8 +85,8 @@ private	void	slam_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.01");
-	printf("\n   Beta Version : 25/04/2012");
+	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.02");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

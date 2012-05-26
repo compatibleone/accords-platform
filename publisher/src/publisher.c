@@ -65,6 +65,7 @@ struct	accords_configuration Publisher = {
 	"xmpp",  8000,
 	"domain",
 	"publisher.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -133,8 +134,8 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	---------------------------------------------	*/ 
 private	int	banner()
 {
-	printf("\n   CO-PUB : CompatibleOne Service Publisher : Version 1.0b.0.02");
-	printf("\n   Beta Version : 28/03/2012");
+	printf("\n   CO-PUB : CompatibleOne Service Publisher : Version 1.0b.0.03");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

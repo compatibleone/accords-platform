@@ -70,6 +70,8 @@
 #define	_CORDS_VALIDATION	"validation"
 #define	_CORDS_INITIATOR	"initiator"
 #define	_CORDS_SLA		"sla"
+#define	_CORDS_VARIABLE		"variable"
+#define	_CORDS_CONDITIONS	"conditions"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

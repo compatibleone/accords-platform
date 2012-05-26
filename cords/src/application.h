@@ -7,6 +7,9 @@ struct	cords_application
 	char	*	image;
 	char	*	provider;
 	char	*	price;
+	char 	*	url;
+	char 	*	account;
+	char 	*	provision;
 	int		created;
 	int		started;
 	int		completed;

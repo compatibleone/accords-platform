@@ -43,6 +43,7 @@ struct	accords_configuration
 	int	chatport;		/* xmpp chat host prot			*/
 	char *	domain;			/* category domain			*/
 	char *	config;			/* configuration file			*/
+	char *	zone;			/* location of host			*/
 
 	struct	occi_category *	firstcat;
 	struct	occi_category *	lastcat;

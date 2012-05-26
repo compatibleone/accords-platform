@@ -42,6 +42,7 @@ struct	accords_configuration OnProcci = {
 	"xmpp",  8000,
 	"domain",
 	"onprocci.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -80,8 +81,8 @@ private	void	onprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne OpenNebula Procci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 21/03/2012");
+	printf("\n   CompatibleOne OpenNebula Procci : Version 1.0a.0.05");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

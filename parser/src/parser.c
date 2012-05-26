@@ -42,6 +42,7 @@ struct	accords_configuration Parser = {
 	"xmpp",  8000,
 	"domain",
 	"parser.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -80,8 +81,8 @@ private	void	parser_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Parser : Version 1.0a.0.05");
-	printf("\n   Beta Version : 28/03/2012");
+	printf("\n   CompatibleOne Request Parser : Version 1.0a.0.06");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

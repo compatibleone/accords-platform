@@ -45,6 +45,7 @@ struct	accords_configuration CooBas = {
 	"xmpp",  8000,
 	"domain",
 	"coobas.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -85,8 +86,8 @@ private	void	coobas_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.04");
-	printf("\n   Beta Version : 02/01/2012");
+	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.05");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();

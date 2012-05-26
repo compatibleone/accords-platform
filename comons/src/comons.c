@@ -44,6 +44,7 @@ struct	accords_configuration Comons = {
 	"xmpp",  8000,
 	"domain",
 	"comons.xml",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -84,8 +85,8 @@ private	void	comons_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.04");
-	printf("\n   Beta Version : 02/02/2012");
+	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.05");
+	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
