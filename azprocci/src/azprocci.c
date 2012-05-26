@@ -52,6 +52,7 @@ public	int	check_verbose()		{	return(WazProcci.verbose);	}
 public	char *	default_publisher()	{	return(WazProcci.publisher);	}
 public	char *	default_tls()		{	return(WazProcci.tls);		}
 public	char *	default_operator()	{	return(WazProcci.operator);	}
+public	char *	default_zone()		{	return(WazProcci.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

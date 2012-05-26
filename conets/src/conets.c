@@ -56,7 +56,10 @@ static char * conets_agent;
 public	int	check_debug()			{	return(Conets.debug);			}
 public	int	check_verbose()			{	return(Conets.verbose);			}
 public	char *	default_publisher()		{	return(Conets.publisher);		}
+public	char *	default_operator()		{	return(Conets.operator);		}
+public	char *	default_identity()		{	return(Conets.identity);		}
 public	char *	default_tls()			{	return(Conets.tls);			}
+public	char *	default_zone()			{	return(Conets.zone);			}
 
 /*	-----------------------------------------------------------------	*/
 /* 	 i p a d d r e s s  O C C I  i n t e r f a c e  f u n c t i o n s	*/

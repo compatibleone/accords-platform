@@ -32,6 +32,8 @@ struct	cords_parser_config
 	char *	agent;
 	char *	result;
 	char *	tls;
+	char *	zone;
+	char *	operator;
 	int	xsd;
 } Cp = 	{
 	(char *) 0,
@@ -40,6 +42,8 @@ struct	cords_parser_config
 	_CORDS_PARSER_AGENT,
 	(char *) 0,
 	(char *) 0,
+	"europe",
+	"accords",
 	1
 	};
 
@@ -50,6 +54,8 @@ public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(Cp.publisher);	}
 public	char *	default_tls()		{	return(Cp.tls);		}
+public	char *	default_operator()	{	return(Cp.operator);	}
+public	char *	default_zone()		{	return(Cp.zone);	}
 
 public	int 	failure( int v, char * mptr, char * aptr )
 {

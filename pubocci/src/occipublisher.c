@@ -43,17 +43,6 @@ private	struct	occi_publisher Publisher = {
 	};
 
 /*	---------------------------------------------------------	*/
-/*		d e f a u l t _ o p e r a t o r				*/
-/*	---------------------------------------------------------	*/
-/*	this is a temporary measure and will be provided by the		*/
-/*	configuration of a service provider module.			*/
-/*	---------------------------------------------------------	*/
-private	char *	default_operator()
-{
-	return("accords");
-}
-
-/*	---------------------------------------------------------	*/
 /*		d e f a u l t _ c o n n e c t i o n			*/
 /*	---------------------------------------------------------	*/
 /*	this is a temporary measure and will be provided by the		*/
@@ -558,6 +547,7 @@ public	int	publish_occi_category(
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",Publisher.room	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category->id 	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.operator",default_operator() )))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.zone",default_zone() )))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.price",category->price)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.why",url 		))))
 	{

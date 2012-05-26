@@ -54,6 +54,7 @@ public	int	check_verbose()		{	return(Comons.verbose);		}
 public	char *	default_publisher()	{	return(Comons.publisher);	}
 public	char *	default_operator()	{	return(Comons.operator);	}
 public	char *	default_tls()		{	return(Comons.tls);		}
+public	char *	default_zone()		{	return(Comons.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

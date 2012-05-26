@@ -53,6 +53,7 @@ public	int	check_verbose()		{	return(TestOsOcci.verbose);		}
 public	char *	default_publisher()	{	return(TestOsOcci.publisher);	}
 public	char *	default_operator()	{	return(TestOsOcci.operator);	}
 public	char *	default_tls()		{	return(TestOsOcci.tls);		}
+public	char *	default_zone()		{	return(TestOsOcci.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

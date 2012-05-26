@@ -53,6 +53,7 @@ public	char *	default_publisher()	{	return(Broker.publisher);	}
 public	char *	default_operator()	{	return(Broker.operator);	}
 public	char *	default_tls()		{	return(Broker.tls);		}
 public	char *	default_identity()	{	return(Broker.identity);	}
+public	char *	default_zone()		{	return(Broker.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

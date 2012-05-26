@@ -29,11 +29,15 @@ private	int	price=0;
 private	char *	tls=(char *) 0;
 private	char *	publisher=_CORDS_DEFAULT_PUBLISHER;
 private	char *	agent="CO-TEST-RESOLVER";
+private	char *	operator="accords";
+private	char *	zone="europe";
 
 public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(publisher);	}
 public	char *	default_tls()		{	return(tls);		}
+public	char *	default_zone()		{	return(zone);		}
+public	char *	default_operator()	{	return(operator);	}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

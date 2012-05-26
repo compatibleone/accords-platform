@@ -80,7 +80,10 @@ public	int	check_debug()		{	return(Publisher.debug);		}
 /*	---------------------------------------------	*/  
 public	int	check_verbose()		{	return(Publisher.verbose);		}
 public	char *	default_publisher()	{	return((char *) 0);			}
+public	char *	default_identity()	{	return((char *) 0);			}
+public	char *	default_operator()	{	return(Publisher.operator);		}
 public	char *	default_tls()		{	return(Publisher.tls);			}
+public	char *	default_zone()		{	return(Publisher.zone);			}
 
 /*	-------------------------------------------------	*/  
 /*	r e t r i e v e _ m a s t e r _ p u b l i s h e r	*/

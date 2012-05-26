@@ -52,6 +52,7 @@ public	int	check_verbose()		{	return(OnProcci.verbose);	}
 public	char *	default_publisher()	{	return(OnProcci.publisher);	}
 public	char *	default_operator()	{	return(OnProcci.operator);	}
 public	char *	default_tls()		{	return(OnProcci.tls);		}
+public	char *	default_zone()		{	return(OnProcci.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

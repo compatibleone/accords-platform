@@ -53,6 +53,7 @@ public	int	check_verbose()		{	return(Coes.verbose);		}
 public	char *	default_publisher()	{	return(Coes.publisher);		}
 public	char *	default_operator()	{	return(Coes.operator);		}
 public	char *	default_tls()		{	return(Coes.tls);		}
+public	char *	default_zone()		{	return(Coes.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -384,6 +385,9 @@ private	int	coes_operation( char * nptr )
 	last = optr;
 	optr->callback  = &placement_interface;
 
+	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
+		return( 28 );
+
 	if (!( optr = occi_cords_connection_builder( Coes.domain, "connection" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -408,9 +412,6 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
-
-	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
-		return( 28 );
 
 	rest_initialise_log( Coes.monitor );
 

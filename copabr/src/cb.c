@@ -1289,11 +1289,29 @@ private	char *	cords_coes_operation(
 			}
 			else
 			{
+				/* ------------------------------ */
+				/* build the placement identifier */
+				/* ------------------------------ */
+				if (!( tls ))
+					sprintf(buffer,"http://%s",id);
+				else	sprintf(buffer,"https://%s",id);
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
-				if (!( yptr = occi_simple_get( id, agent, tls ) ))
+
+				/* --------------------------- */
+				/* invoke the placement choice */
+				/* --------------------------- */
+				if (!( yptr = cords_invoke_action( buffer, _CORDS_CHOOSE, agent, tls ) ))
 					continue;
+				/* --------------------- */
+				/* retrieve the solution */
+				/* --------------------- */
+				else if (!( yptr = occi_simple_get( buffer, agent, tls ) ))
+					continue;
+				/* ------------------------- */
+				/* detect solution available */
+				/* ------------------------- */
 				else if (!( result = occi_extract_atribut( 
 					yptr, Operator.domain, 
 					_CORDS_PLACEMENT, _CORDS_SOLUTION ))) 
@@ -1301,18 +1319,11 @@ private	char *	cords_coes_operation(
 					yptr = occi_remove_response( yptr );
 					continue;
 				}
-				else 
+				else
 				{
+					result = allocate_string( result );
 					yptr = occi_remove_response( yptr );
-					if (!( result = allocate_string( result )))
-						return( result );
-					else if (!( yptr = cords_invoke_action( result, _CORDS_CHOOSE, agent, tls ) ))
-						return( liberate( result ) );
-					else
-					{
-						yptr = occi_remove_response( yptr );
-						return( result );
-					}
+					return( result );
 				}
 			}
 		}

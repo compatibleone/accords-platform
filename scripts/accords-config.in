@@ -34,7 +34,7 @@ fi
 nethsm=
 tls=
 # -------------------------------------
-
+zone="europe"
 trace=1
 threads=1
 verbose=0

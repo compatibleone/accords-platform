@@ -32,8 +32,12 @@ private	int	debug=0;
 
 private	char *	agent="CO-COMMAND/1.0";
 private	char *	publisher=(char *) 0;
+private	char *	operator="accords";
+private	char *	zone="europe";
 private	char *	tls=(char *) 0;
 
+public	char *	default_operator()	{	return( operator );	}
+public	char *	default_zone()		{	return( zone );		}
 public	char *	default_publisher()	{	return( publisher );	}
 public	char *	default_tls()		{	return( tls );		}
 public	int	check_verbose()		{	return( verbose );	}

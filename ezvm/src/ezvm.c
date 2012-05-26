@@ -54,6 +54,7 @@ public	int	check_verbose()		{	return(Ezvm.verbose);		}
 public	char *	default_publisher()	{	return(Ezvm.publisher);	}
 public	char *	default_operator()	{	return(Ezvm.operator);	}
 public	char *	default_tls()		{	return(Ezvm.tls);		}
+public	char *	default_zone()		{	return(Ezvm.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

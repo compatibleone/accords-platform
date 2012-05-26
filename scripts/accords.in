@@ -37,7 +37,7 @@ fi
 nethsm=
 tls=
 # -------------------------------------
-
+zone="europe"
 trace=1
 threads=1
 verbose=0
@@ -594,7 +594,7 @@ _mkpub() {
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$trace"'" >> $target
     _mktls ${module}
-    echo "    <domain name='"$domain"'/>" >> $target
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 
@@ -614,7 +614,7 @@ _mkmon() {
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$trace"'" >> $target
     _mktls ${module}
-    echo "    <domain name='"$domain"'/>" >> $target
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 
@@ -633,7 +633,7 @@ _mkcosacs() {
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$trace"'" >> $target
     _mktls ${module}
-    echo "    <domain name='"$domain"'/>" >> $target
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 
@@ -653,7 +653,7 @@ _mkcfg() {
     echo "         password='"$password"'" >> $target
     echo "         monitor='"$monitor"'" >> $target
     _mktls ${module}
-    echo "    <domain name='"$domain"'/>" >> $target
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
 }
 

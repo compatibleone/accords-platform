@@ -52,6 +52,7 @@ public	int	check_verbose()		{	return(Coss.verbose);		}
 public	char *	default_publisher()	{	return(Coss.publisher);		}
 public	char *	default_operator()	{	return(Coss.operator);		}
 public	char *	default_tls()		{	return(Coss.tls);		}
+public	char *	default_zone()		{	return(Coss.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

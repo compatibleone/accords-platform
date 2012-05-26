@@ -55,6 +55,7 @@ public	int	check_verbose()		{	return(CooBas.verbose);		}
 public	char *	default_publisher()	{	return(CooBas.publisher);	}
 public	char *	default_operator()	{	return(CooBas.operator);	}
 public	char *	default_tls()		{	return(CooBas.tls);		}
+public	char *	default_zone()		{	return(CooBas.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

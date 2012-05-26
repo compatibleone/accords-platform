@@ -37,12 +37,16 @@ struct	fileserver_configuration Fs = {
 	"http",  80,
 	"domain",
 	"fileserver.xml",
+	"accords",
+	"europe"
 	};
 
 public	int	check_debug()		{	return(Fs.debug);		}
 public	int	check_verbose()		{	return(Fs.verbose);		}
 public	char *	default_publisher()	{	return(Fs.publisher);		}
 public	char *	default_tls()		{	return(Fs.tls);			}
+public	char *	default_operator()	{	return(Fs.operator);		}
+public	char *	default_zone()		{	return(Fs.zone);		}
 
 
 public	int	failure( int e, char * m1, char * m2 )

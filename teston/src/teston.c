@@ -25,12 +25,16 @@
 private	int	debug=0;
 private	int	verbose=1;
 private	char *	tls=(char *) 0;
+private	char *	zone="europe";
+private	char *	operator="europe";
 private	char *	publisher=(char *) 0;
 
 public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(publisher);	}
 public	char *	default_tls()		{	return(tls);		}
+public	char *	default_zone()		{	return(zone);		}
+public	char *	default_operator()	{	return(operator);	}
 
 /* ------------------------------------------------------------------------------------ */
 /*					f a i l u r e					*/

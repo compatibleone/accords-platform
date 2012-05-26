@@ -24,7 +24,8 @@ struct	fileserver_configuration
 
 	char *	domain;
 	char *	config;
-
+	char *	operator;
+	char *	zone;
 };
 
 

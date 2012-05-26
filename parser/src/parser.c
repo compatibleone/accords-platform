@@ -52,6 +52,7 @@ public	int	check_verbose()		{	return(Parser.verbose);		}
 public	char *	default_publisher()	{	return(Parser.publisher);	}
 public	char *	default_operator()	{	return(Parser.operator);	}
 public	char *	default_tls()		{	return(Parser.tls);		}
+public	char *	default_zone()		{	return(Parser.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {

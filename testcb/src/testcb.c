@@ -53,6 +53,8 @@ public	int	check_debug()		{	return(debug);		}
 public	int	check_verbose()		{	return(verbose);	}
 public	char *	default_publisher()	{	return(Cb.publisher);	}
 public	char *	default_tls()		{	return(Cb.tls);		}
+public	char *	default_operator()	{	return(Cb.operator);	}
+public	char *	default_zone()		{	return(Cb.zone);	}
 
 public	int 	failure( int v, char * mptr, char * aptr )
 {
