@@ -138,6 +138,8 @@ private void autoload_cords_variable_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "property" )) != (struct xml_atribut *) 0)
+				pptr->property = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "condition" )) != (struct xml_atribut *) 0)
 				pptr->condition = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "value" )) != (struct xml_atribut *) 0)
@@ -180,6 +182,9 @@ public  void autosave_cords_variable_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," property=%c",0x0022);
+		fprintf(h,"%s",(pptr->property?pptr->property:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," condition=%c",0x0022);
 		fprintf(h,"%s",(pptr->condition?pptr->condition:""));
 		fprintf(h,"%c",0x0022);
@@ -221,6 +226,8 @@ private void set_cords_variable_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "property" ) ))
+			pptr->property = allocate_string(vptr);
 		if (!( strcmp( nptr, "condition" ) ))
 			pptr->condition = allocate_string(vptr);
 		if (!( strcmp( nptr, "value" ) ))
@@ -269,6 +276,13 @@ private int pass_cords_variable_filter(
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
+	if (( fptr->property )
+	&&  (strlen( fptr->property ) != 0)) {
+		if (!( pptr->property ))
+			return(0);
+		else if ( strcmp(pptr->property,fptr->property) != 0)
 			return(0);
 		}
 	if (( fptr->condition )
@@ -323,6 +337,9 @@ private struct rest_response * cords_variable_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.property=%s",optr->domain,optr->id,pptr->property);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.condition=%s",optr->domain,optr->id,pptr->condition);
@@ -749,6 +766,8 @@ public struct occi_category * occi_cords_variable_builder(char * a,char * b) {
 		redirect_occi_cords_variable_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "property",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "condition",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "value",0,0) ))
@@ -797,6 +816,17 @@ public struct rest_header *  cords_variable_occi_headers(struct cords_variable *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_variable.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_variable.property='%s'\r\n",(sptr->property?sptr->property:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

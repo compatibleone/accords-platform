@@ -2751,7 +2751,7 @@ private	int	cords_analyse_conditions(
 					/* --------------------------------------------------- */
 					/* extract name and values and set the criteria fields */
 					/* --------------------------------------------------- */
-					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, _CORDS_NAME )) != (char *) 0)
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, _CORDS_PROPERTY )) != (char *) 0)
 					{
 						if (( vptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
 						{

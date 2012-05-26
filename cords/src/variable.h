@@ -5,6 +5,7 @@ struct	cords_variable
 {
 	char * 	id;	
 	char * 	name;	
+	char *	property;
 	char *	condition;
 	char *	value;
 	char * 	description;
