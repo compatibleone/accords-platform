@@ -1,4 +1,10 @@
-These files allow to have a quick running environment for ProActive procci tests. 
+README TEST
+****** ****
+
+This file will guide you towards a quick running example of Accords (the CompatibleOne platform) using as a service provider the ProActive Parallel Suite. 
+
 Just run:
 
-	$ source init.sh
+	$ place-files-for-demo.sh
+
+and follow the instructions.

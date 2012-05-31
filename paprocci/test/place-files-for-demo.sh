@@ -15,6 +15,8 @@ cp to-scripts/* $BASEDIR/scripts
 
 echo Done.
 
-echo REMEMBER TO DO 
+echo NOW PROCEED AS FOLLOWS 
 echo 'export LD_LIBRARY_PATH=/usr/local/lib'
-
+echo 'cd ../../scripts'
+echo './clean.sh'
+echo 'export PA_PROCCI_PATH=<corresponding path of java-proactive-procci>'
