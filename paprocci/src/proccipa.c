@@ -296,23 +296,25 @@ private	struct	rest_response * start_proactive(
 		void * vptr )               // It is void* , but is casted to a struct proactive* since the request comes
                                     // from the occiserver, which receives something generic (related maybe to OpenStack, or OpenNebula, or any other).
 {
-	struct	pa_response * server_created;
-	struct	proactive * server_constraints;
+	struct	pa_response * paptr;
+	struct	proactive * pptr;
 	int		status;
+    //char    *   idptr;
+    char        reference[512];
 	char	*	filename;
 	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
     int physical_memory_constraint = 10;                                        // A contraint to apply to the node requested (>10MiB of RAM).
-	if (!( server_constraints = vptr ))                                                       // Can't provide null.
+	if (!( pptr = vptr ))                                                       // Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( server_constraints->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
+	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( server_constraints->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
 		return( rest_html_response( aptr, status, "Not Found" ) );
     // could be used 
-		//server_constraints->id, here there is a file with details about the kind of required node. 
-        //server_constraints->image, image for the node, not valid now. 
-        //server_constraints->flavor, flavor of the node, not valid now. 
+		//pptr->id, here there is a file with details about the kind of required node. 
+        //pptr->image, image for the node, not valid now. 
+        //pptr->flavor, flavor of the node, not valid now. 
         //personality, personality of the node, not considered now. 
         //resource ) )) kind of resource of the node. 
         //    char * name,
@@ -321,7 +323,7 @@ private	struct	rest_response * start_proactive(
         //    char * location,
         //    char * group )
         //
-	else if (!( server_created = pa_create_server(
+	else if (!( paptr = pa_create_server(
                     physical_memory_constraint)))                           // Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
@@ -329,12 +331,80 @@ private	struct	rest_response * start_proactive(
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_proactive_server( server_created, server_constraints );
-		server_created = liberate_pa_response( server_created );
-		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	}
+		status = connect_proactive_server( paptr, pptr );
+		paptr = liberate_pa_response( paptr );
+		//if (!( status ))
+		//	return( rest_html_response( aptr, 200, "OK" ) );
+		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+
+        /*****COSACS*******/ 
+
+        sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
+        /* --------------------------------- */
+        /* retrieve crucial data from server */
+        /* --------------------------------- */
+        //if (!( status = connect_openstack_server( osptr, pptr ) ))
+        //{
+            /* -------------------------------------------- */
+            /* attempt to associate the floating IP address */
+            /* -------------------------------------------- */
+            //if ( pptr->floating )
+            //   if ((status = associate_server_address( pptr )) != 0 )
+            //        return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
+
+            /* ---------------------------- */
+            /* launch the COSACS operations */
+            /* ---------------------------- */
+            cosacs_metadata_instructions( 
+                    pptr->hostname, _CORDS_CONFIGURATION,
+                    reference, WpaProcci.publisher );
+
+            /* ------------------------------------- */
+            /* release the public IP if not required */
+            /* ------------------------------------- */
+            //if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
+            //{
+            //    release_floating_address( pptr );
+            //    if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+            //    if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
+            //    {
+            //        reset_openstack_server( pptr );
+            //        return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
+            //    }
+            //}
+            /* ----------------------- */
+            /* create server meta data */
+            /* ----------------------- */
+            //if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
+            //    return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
+
+            //else if (!( metafilename = os_create_metadata_request( personality ) ))
+            //    return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
+            //else if (!( metaptr = os_create_metadata( idptr, metafilename )))
+            //    return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
+            //else
+            //{
+            //    metaptr = liberate_os_response( metaptr );
+            //    liberate( metafilename );
+        //    }
+        //}
+        //osptr = liberate_os_response( osptr );
+        if (!( status ))
+        {
+
+            return( rest_html_response( aptr, 200, "OK" ) );
+        //    if (!( os_valid_price( pptr->price ) ))
+        //        return( rest_html_response( aptr, 200, "OK" ) );
+        //    else if ( occi_send_transaction( _CORDS_PROACTIVE, pptr->price, "action=start", pptr->account, reference ) )
+        //        return( rest_html_response( aptr, 200, "OK" ) );
+        //    else    return( rest_html_response( aptr, 200, "OK" ) );
+        }
+        else
+        {    
+            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+        }
+    }
+
 
 }
 

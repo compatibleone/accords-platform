@@ -8,19 +8,10 @@ echo '$ source init.sh'
 echo Root directory is $BASEDIR
 
 echo Copying xsd files locally...
-cp xsds/* /tmp/
-
-echo Copying xml files locally...
-cp xmls/* $BASEDIR 
+cp to-tmp/* /tmp/
 
 echo Copying config files...
-cp configs/* $BASEDIR/scripts
-
-echo Copying manifests...
-cp manifests/* $BASEDIR/scripts
-
-echo Copying hacks...
-cp hack/* $BASEDIR/scripts
+cp to-scripts/* $BASEDIR/scripts
 
 echo Done.
 

@@ -1,0 +1,317 @@
+<accords>
+<publisher
+    publisher=''
+    operator='accords'
+    identity=''
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8086'/>
+    <security
+         user='service-publisher'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</publisher>
+<coss
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8087'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8087'/>
+    <security
+         user='service-coss'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</coss>
+<comons
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8088'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8088'/>
+    <security
+         user='service-comons'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</comons>
+<coes
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8089'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8089'/>
+    <security
+         user='service-coes'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</coes>
+<conets
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8090'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8090'/>
+    <security
+         user='service-conets'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</conets>
+<coobas
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8091'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8091'/>
+    <security
+         user='service-coobas'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</coobas>
+<parser
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8092'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8092'/>
+    <security
+         user='service-parser'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</parser>
+<broker
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8093'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8093'/>
+    <security
+         user='service-broker'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</broker>
+<procci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8094'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8094'/>
+    <security
+         user='service-procci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</procci>
+<osprocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8095'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8095'/>
+    <security
+         user='service-osprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</osprocci>
+<paprocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8096'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8096'/>
+    <security
+         user='service-paprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</paprocci>
+<testosocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8097'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8097'/>
+    <security
+         user='service-testosocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</testosocci>
+<osocciprocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8098'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8098'/>
+    <security
+         user='service-osocciprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</osocciprocci>
+<onprocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8099'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8099'/>
+    <security
+         user='service-onprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</onprocci>
+<azprocci
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8100'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8100'/>
+    <security
+         user='service-azprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</azprocci>
+<fileserver
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8101'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8101'/>
+    <security
+         user='service-fileserver'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</fileserver>
+<ezvm
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8102'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8102'/>
+    <security
+         user='service-ezvm'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</ezvm>
+<coips
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8103'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8103'/>
+    <security
+         user='service-coips'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</coips>
+<coees
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8104'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8104'/>
+    <security
+         user='service-coees'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</coees>
+<cosched
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8105'
+    verbose='1'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8105'/>
+    <security
+         user='service-cosched'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</cosched>
+<cosacs
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:9999'
+    verbose='1'
+    debug='1'
+    threads='1'>
+    <rest host='127.0.0.1' port='9999'/>
+    <security
+         user='service-cosacs'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi'/>
+</cosacs>
+</accords>
