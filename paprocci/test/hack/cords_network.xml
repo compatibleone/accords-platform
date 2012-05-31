@@ -1,6 +1,0 @@
-<cords_networks>
-<cords_network
- id="f8589b6f-ec4a-4a00-9e50-4c1ead694f9d" name="test3" label="ethernet" vlan="100M" state="0" />
-<cords_network
- id="143d1df7-a179-44b6-a28b-d889d1718ce1" name="PUB_Compatible" label="ethernet" vlan="100M" state="0" />
-</cords_networks>

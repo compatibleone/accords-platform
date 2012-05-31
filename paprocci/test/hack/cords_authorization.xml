@@ -1,6 +1,0 @@
-<cords_authorizations>
-<cords_authorization
- id="e1a8aa2b-e29a-4e30-87d3-4cd71f4880bb" account="" user="http://127.0.0.1:8087/user/b949011b-brok-400c-b6a7-c3f8a17f0ee6" pass="" from="0" till="0" ttl="0" state="0" />
-<cords_authorization
- id="918af32d-a502-47e3-a186-b9f792658fae" account="" user="http://127.0.0.1:8087/user/b949011b-pars-400c-b6a7-c3f8a17f0ee6" pass="" from="0" till="0" ttl="0" state="0" />
-</cords_authorizations>

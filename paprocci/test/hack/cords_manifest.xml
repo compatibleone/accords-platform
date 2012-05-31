@@ -1,4 +1,0 @@
-<cords_manifests>
-<cords_manifest
- id="0fa02dfc-5d65-48b1-b8fb-87cc870b17cd" name="test3" plan="http://127.0.0.1:8093/plan/f01db223-e62f-4472-b02f-ad52b82d7126" nodes="1" configuration="http://127.0.0.1:8092/configuration/51d4f09c-125b-4119-88ca-8c204857fe72" interface="" account="http://127.0.0.1:8091/account/b75ff456-1e76-40e7-bde2-b35981573222" security="http://127.0.0.1:8087/security/778c9a93-0cea-428d-aaea-6096a0f49999" zone="" description="" state="0" />
-</cords_manifests>

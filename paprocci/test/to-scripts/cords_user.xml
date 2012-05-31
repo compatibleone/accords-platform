@@ -37,4 +37,6 @@
  id="b949011b-brok-400c-b6a7-c3f8a17f0ee6" name="test-broker" password="co-system" role="" authorization="" when="0" state="0" />
 <cords_user
  id="b949011b-comp-400c-b6a7-c3f8a17f0ee6" name="service-compo" password="co-system" role="" authorization="" when="0" state="0" />
+<cords_user
+ id="b949011b-comp-400c-b6a7-c3f8a17f0ee7" name="admin" password="admin" role="administrator" authorization="" when="0" state="0" />
 </cords_users>
