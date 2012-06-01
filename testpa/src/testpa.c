@@ -25,8 +25,12 @@ private	int	debug=0;
 private	int	verbose=0;
 private	char *	tls=(char *) 0;
 private	char *	publisher=(char *) 0;
-public	int	check_debug()	{	return(debug);		}
-public	int	check_verbose()	{	return(verbose);	}
+private        char *  operator="accords";
+private        char *  zone="europe";
+public char *  default_operator()      {       return(operator);       }
+public char *  default_zone()          {       return(zone);           }
+public int     check_debug()           {       return(debug);          }
+public int     check_verbose()         {       return(verbose);        }
 public	char *	default_publisher()	{	return(publisher);	}
 public	char *	default_tls()		{	return(tls);		}
 

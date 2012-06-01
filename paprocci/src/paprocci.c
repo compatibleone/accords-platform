@@ -31,7 +31,7 @@
 
 struct	accords_configuration WpaProcci = {
 	0,0,
-	0,0,0,
+	0,0,0,0,
 	(char *) 0,
 	(char *) 0,
 	_CORDS_DEFAULT_PUBLISHER,
@@ -42,6 +42,7 @@ struct	accords_configuration WpaProcci = {
 	"xmpp",  8000,
 	"domain",
 	"paprocci.xml",
+    "europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -51,6 +52,7 @@ public	int	check_verbose()		{	return(WpaProcci.verbose);	}
 public	char *	default_publisher()	{	return(WpaProcci.publisher);	}
 public	char *	default_tls()		{	return(WpaProcci.tls);		}
 public	char *	default_operator()	{	return(WpaProcci.operator);	}
+public	char *	default_zone()	    {	return(WpaProcci.zone);	}
 
 /*!
  * Called in any case of failure in this procci. */
