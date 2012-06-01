@@ -182,7 +182,7 @@ private	int	price_based_placement(
 	struct	occi_response 	* zptr;
 	if (!( strcmp( pptr->price, "any" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
-	else if (!( zptr = occi_resolve_by_price( pptr->provider, pptr->price, agent ) ))
+	else if (!( zptr = occi_resolve_by_price( pptr->provider,  pptr->price, agent ) ))
 		return( 48 );
 	else if (!( pptr->solution = select_placement( zptr ) ))
 		return( 30 );
@@ -241,7 +241,9 @@ private	int	zone_based_placement(
 		char * tls )
 {
 	struct	occi_response 	* zptr;
-	if (!( strcmp( zone, "any" ) ))
+	if (!( pptr->zone ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->zone, "any" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( zptr = occi_resolve_by_zone( pptr->provider, pptr->zone, agent ) ))
 		return( 48 );
@@ -260,7 +262,9 @@ private	int	operator_based_placement(
 		char * tls )
 {
 	struct	occi_response 	* zptr;
-	if (!( strcmp( zone, "any" ) ))
+	if (!( pptr->operator ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->operator, "any" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( zptr = occi_resolve_by_operator( pptr->provider, pptr->operator, agent ) ))
 		return( 48 );
@@ -279,7 +283,9 @@ private	int	score_based_placement(
 		char * tls )
 {
 	struct	occi_response 	* zptr;
-	if (!( strcmp( zone, "any" ) ))
+	if (!( pptr->opinion ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->opinion, "any" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( zptr = occi_resolve_by_score( pptr->provider, pptr->opinion, agent ) ))
 		return( 48 );

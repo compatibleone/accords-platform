@@ -55,6 +55,8 @@ public struct cords_placement * liberate_cords_placement(struct cords_placement 
 			 sptr->operator = liberate(sptr->operator);
 		if ( sptr->solution )
 			 sptr->solution = liberate(sptr->solution);
+		if ( sptr->energy )
+			 sptr->energy = liberate(sptr->energy);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_placement *) 0);
@@ -79,6 +81,7 @@ public struct cords_placement * reset_cords_placement(struct cords_placement * s
 		sptr->security = (char*) 0;
 		sptr->operator = (char*) 0;
 		sptr->solution = (char*) 0;
+		sptr->energy = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -150,6 +153,10 @@ public int xmlin_cords_placement(struct cords_placement * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->solution = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"energy") ))
+		{
+			if ( wptr->value ) { sptr->energy = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -179,6 +186,7 @@ public int rest_occi_cords_placement(FILE * fh,struct cords_placement * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.solution='%s'\r\n",prefix,nptr,(sptr->solution?sptr->solution:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.energy='%s'\r\n",prefix,nptr,(sptr->energy?sptr->energy:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

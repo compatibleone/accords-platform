@@ -156,6 +156,8 @@ private void autoload_cords_placement_nodes() {
 				pptr->operator = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "solution" )) != (struct xml_atribut *) 0)
 				pptr->solution = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "energy" )) != (struct xml_atribut *) 0)
+				pptr->energy = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -215,6 +217,9 @@ public  void autosave_cords_placement_nodes() {
 		fprintf(h," solution=%c",0x0022);
 		fprintf(h,"%s",(pptr->solution?pptr->solution:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," energy=%c",0x0022);
+		fprintf(h,"%s",(pptr->energy?pptr->energy:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -259,6 +264,8 @@ private void set_cords_placement_field(
 			pptr->operator = allocate_string(vptr);
 		if (!( strcmp( nptr, "solution" ) ))
 			pptr->solution = allocate_string(vptr);
+		if (!( strcmp( nptr, "energy" ) ))
+			pptr->energy = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -362,6 +369,13 @@ private int pass_cords_placement_filter(
 		else if ( strcmp(pptr->solution,fptr->solution) != 0)
 			return(0);
 		}
+	if (( fptr->energy )
+	&&  (strlen( fptr->energy ) != 0)) {
+		if (!( pptr->energy ))
+			return(0);
+		else if ( strcmp(pptr->energy,fptr->energy) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -406,6 +420,9 @@ private struct rest_response * cords_placement_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.solution=%s",optr->domain,optr->id,pptr->solution);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.energy=%s",optr->domain,optr->id,pptr->energy);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -835,6 +852,8 @@ public struct occi_category * occi_cords_placement_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "solution",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "energy",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		autoload_cords_placement_nodes();
@@ -972,6 +991,17 @@ public struct rest_header *  cords_placement_occi_headers(struct cords_placement
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_placement.solution='%s'\r\n",(sptr->solution?sptr->solution:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_placement.energy='%s'\r\n",(sptr->energy?sptr->energy:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
