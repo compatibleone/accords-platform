@@ -92,6 +92,9 @@
 #include "azconfig.c"
 #include "windowsazure.c"
 
+#include "paconfig.c"
+#include "proactive.c"
+
 #include "monitor.c"
 #include "event.c"
 #include "report.c"

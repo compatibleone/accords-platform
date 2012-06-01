@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="test3" xmlns="file:///tmp/manifest.xsd">
+
+	<node name="test3" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="test3">
+			<compute name="test3" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="test3" size="20G"/>
+			<network name="test3" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="test3">
+			<system name="ubuntu"/>
+                </image>
+	</node>
+        <configuration name="test3">
+          <action name="gonow" expression="test3.fork('bash /home/cone/bin/start.sh');"/>
+        </configuration>
+	<account name="test"/>
+	<security name="test3"/>
+</manifest>
+

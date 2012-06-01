@@ -38,6 +38,8 @@
 #include "occiwindowsazure.c"
 #include "occiazconfig.c"
 
+#include "occiproactive.c"
+#include "occipaconfig.c"
 
 	/* ------------- */
 #endif	/* _oson_occi_c */

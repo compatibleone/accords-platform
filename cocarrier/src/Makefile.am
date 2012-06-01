@@ -12,6 +12,7 @@ EXTRA_DIST = dataelement.c dataelement.h \
 
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     osclient.c osclient.h \
+    paclient.c paclient.h \
     onclient.c onclient.h \
     dcclient.c dcclient.h \
     json.c json.h 

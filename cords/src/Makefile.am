@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 lib_LTLIBRARIES = libcords.la
-EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
+EXTRA_DIST = account.c azconfig.h paconfig.h cordselements.h instruction.c \
 	node.c package.c publication.h placement.c placement.h tarif.c \
 	account.h carrier.c cords.h instruction.h \
 	node.h package.h report.c tarif.h \
@@ -22,11 +22,11 @@ EXTRA_DIST = account.c azconfig.h cordselements.h instruction.c \
 	openstack.c price.c security.h value.c algorithm.h constraint.c \
 	event.c manifest.c openstack.h price.h service.c value.h \
 	appliance.c constraint.h event.h manifest.h operation.c profile.c \
-	service.h windowsazure.c appliance.h contract.c image.c monitor.c \
-	optimise.c profile.h storage.c windowsazure.h authorise.c \
+	service.h windowsazure.c proactive.c appliance.h contract.c image.c monitor.c \
+	optimise.c profile.h storage.c windowsazure.h proactive.h authorise.c \
 	contract.h image.h monitor.h optimise.h provider.c storage.h xlink.c \
 	authorise.h infrastructure.c network.c osconfig.c provider.h system.c \
-	xlink.h azconfig.c infrastructure.h network.h osconfig.h publication.c \
+	xlink.h azconfig.c paconfig.c infrastructure.h network.h osconfig.h publication.c \
 	system.h iprange.c iprange.h instance.c instance.h operator.h operator.c \
 	vm.c vm.h port.h firewall.h import.h agreement.h schedule.h metadata.h \
 	file.h script.h interface.h session.h consumer.h connection.h stream.h \

@@ -1,0 +1,6 @@
+<pa_configs>
+<pa_config
+ id="test-pa-config" name="coips" description="CompatibleOne ProActive account." user="demo" password="demo" authenticate="" agent="PaProcci/1.0" host="localhost" version="v1.1" namespace="namespace" base="" subscription="" certificate="" tls="0" current="0" />
+<pa_config
+ id="test-pa-config2" name="test" description="CompatibleOne ProActive account." user="demo" password="demo" authenticate="" agent="PaProcci/1.0" host="localhost" version="v1.1" namespace="namespace" base="" subscription="" certificate="" tls="0" current="0" />
+</pa_configs>
