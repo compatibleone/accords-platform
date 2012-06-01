@@ -134,41 +134,12 @@ private	struct rest_extension * coes_extension( void * v,struct rest_server * sp
 	return( xptr );
 }
 
-/*	-------------------------------------------------------------------	*/
-/*			r e s o l v e _ p l a c e m e n t			*/
-/*	-------------------------------------------------------------------	*/
-/*	this is the rudimentary placement algorithm on the first come basis	*/
-/*	and will be extended to take into consideration zone and price info	*/
-/*	-------------------------------------------------------------------	*/
-private	char *	resolve_placement( char * provider, char * zone, char * agent, char * tls )
+/*	-----------------------------------------------------------	*/
+/*			s e l e c t _ p l a c e m e n t			*/
+/*	-----------------------------------------------------------	*/
+private	char *	select_placement( struct occi_response * zptr )
 {
-/*	------------------------------------------------------------------	*/
-/* 	  actions and methods required for the coes instance category		*/
-/*	------------------------------------------------------------------	*/
-	struct	occi_response 	* zptr;
-	struct	occi_response 	* yptr;
 	struct	occi_element 	* eptr;
-	char			* solution;
-
-	/* ------------------------------------------------------ */
-	/* attempt to resolve agencys of the "provider" category */
-	/* ------------------------------------------------------ */
-	if ( zone )
-	{
-		if (!( strcmp( zone, "any" ) ))
-		{
-			if (!( zptr = occi_resolver( provider, agent ) ))
-				return( (char *) 0 );
-		}
-		else if (!( zptr = occi_resolve_by_zone( provider, zone, agent ) ))
-			return( (char *) 0 );
-	}
-	else if (!( zptr = occi_resolver( provider, agent ) ))
-		return( (char *) 0 );
-	
-	/* ------------------------------------------------------ */
-	/*  scan the list to find their list of providers offered  */
-	/* ------------------------------------------------------ */
 	for (	eptr = zptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
@@ -183,6 +154,23 @@ private	char *	resolve_placement( char * provider, char * zone, char * agent, ch
 }
 
 /*	-----------------------------------------------------------	*/
+/*			d e f a u l t _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	default_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	occi_response 	* zptr;
+	if (!( zptr = occi_resolver( pptr->provider, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
+}
+
+/*	-----------------------------------------------------------	*/
 /*		p r i c e _ b a s e d _ p l a c e m e n t		*/
 /*	-----------------------------------------------------------	*/
 private	int	price_based_placement(
@@ -191,19 +179,94 @@ private	int	price_based_placement(
 		char * agent,
 		char * tls )
 {
-	return( 30 );
+	struct	occi_response 	* zptr;
+	if (!( strcmp( pptr->price, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_price( pptr->provider, pptr->price, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
 }
 
 /*	-----------------------------------------------------------	*/
-/*		l o c a t i o n _ b a s e d _ p l a c e m e n t		*/
+/*		s e c u r i t y _ b a s e d _ p l a c e m e n t		*/
 /*	-----------------------------------------------------------	*/
-private	int	location_based_placement(
+private	int	security_based_placement(
 		struct occi_category * optr, 
 		struct cords_placement * pptr,
 		char * agent,
 		char * tls )
 {
-	return( 30 );
+	struct	occi_response 	* zptr;
+	if (!( pptr->security ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->security, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_security( pptr->provider, pptr->security, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		e n e r g y _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	energy_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	occi_response 	* zptr;
+	if (!( pptr->energy ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->energy, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_energy( pptr->provider, pptr->energy, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		  z o n e _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	zone_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	occi_response 	* zptr;
+	if (!( strcmp( zone, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_zone( pptr->provider, pptr->zone, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		o p e r a t o r _ b a s e d _ p l a c e m e n t		*/
+/*	-----------------------------------------------------------	*/
+private	int	operator_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	occi_response 	* zptr;
+	if (!( strcmp( zone, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_operator( pptr->provider, pptr->operator, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
 }
 
 /*	-----------------------------------------------------------	*/
@@ -215,21 +278,14 @@ private	int	score_based_placement(
 		char * agent,
 		char * tls )
 {
-	return( 30 );
-}
-
-/*	-----------------------------------------------------------	*/
-/*			d e f a u l t _ p l a c e m e n t		*/
-/*	-----------------------------------------------------------	*/
-private	int	default_placement(
-		struct occi_category * optr, 
-		struct cords_placement * pptr,
-		char * agent,
-		char * tls )
-{
-	if (!(pptr->solution = resolve_placement( pptr->provider, pptr->zone, agent, tls )))
-		return(30);
-	else	return(0);
+	struct	occi_response 	* zptr;
+	if (!( strcmp( zone, "any" ) ))
+		return( default_placement( optr, pptr, agent, tls ) );
+	else if (!( zptr = occi_resolve_by_score( pptr->provider, pptr->opinion, agent ) ))
+		return( 48 );
+	else if (!( pptr->solution = select_placement( zptr ) ))
+		return( 30 );
+	else	return( 0  );
 }
 
 /*	--------------------------------------------------	*/
@@ -271,8 +327,14 @@ private	int	create_placement_solution(
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( strcmp( pptr->algorithm, "price" ) ))
 		return( price_based_placement( optr, pptr, agent, tls ) );
-	else if (!( strcmp( pptr->algorithm, "location" ) ))
-		return( location_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "zone" ) ))
+		return( zone_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "energy" ) ))
+		return( energy_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "security" ) ))
+		return( security_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "operator" ) ))
+		return( operator_based_placement( optr, pptr, agent, tls ) );
 	else if (!( strcmp( pptr->algorithm, "scoring" ) ))
 		return( score_based_placement( optr, pptr, agent, tls ) );
 	else	return( 78 );

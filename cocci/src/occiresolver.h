@@ -29,6 +29,12 @@ public	int	initialise_occi_resolver( char * host, char * room, char * publicatio
 public	int	terminate_occi_resolver();
 public	int	occi_resolver_default();
 public	struct	occi_response * occi_resolver( char * category, char * agent );
+
+public	struct	occi_response * occi_resolve_by_operator( char * category, char * operator, char * agent );
+public	struct	occi_response * occi_resolve_by_score( char * category, char * score, char * agent );
+public	struct	occi_response * occi_resolve_by_security( char * category, char * security, char * agent );
+public	struct	occi_response * occi_resolve_by_price( char * category, char * price, char * agent );
+public	struct	occi_response * occi_resolve_by_energy( char * category, char * energy, char * agent );
 public	struct	occi_response * occi_resolve_by_zone( char * category, char * zone, char * agent );
 
 public	char *	occi_resolve_category_provider( char * category, char * agent, char * tls );

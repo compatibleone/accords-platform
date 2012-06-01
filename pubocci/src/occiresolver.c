@@ -214,7 +214,7 @@ public	int	occi_resolver_default()
 /*	an equiry to the publication service manager to retrieve	*/
 /*	list of current potential candidate targets.			*/
 /*	---------------------------------------------------------	*/
-private	struct	occi_response * occi_resolver_operation( char * category, char * zone, char * agent )
+private	struct	occi_response * occi_resolver_operation( char * category, char * element, char * criteria, char * agent )
 {
 	struct	occi_resolved_agency *pptr=(struct occi_resolved_agency*) 0;
 	struct	occi_element 	*	tptr=(struct occi_element*) 0;
@@ -250,7 +250,7 @@ private	struct	occi_response * occi_resolver_operation( char * category, char * 
 		cptr = occi_remove_client( cptr );
 		return((struct occi_response * )0);
 	}
-	else if ((zone) && (!( eptr = occi_request_element( rptr, "occi.publication.zone",zone ))))
+	else if ((criteria) && (!( eptr = occi_request_element( rptr, element ,criteria ))))
 	{
 		rptr = occi_remove_request( rptr );
 		cptr = occi_remove_client( cptr );
@@ -378,7 +378,7 @@ private	struct	occi_response * occi_resolver_operation( char * category, char * 
 /*	---------------------------------------------------------	*/
 public	struct	occi_response * occi_resolver( char * category, char * agent )
 {
-	return( occi_resolver_operation( category, (char *) 0, agent ) );
+	return( occi_resolver_operation( category, (char *) 0, (char *) 0, agent ) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -393,7 +393,57 @@ public	struct	occi_response * occi_resolve_by_zone( char * category, char * zone
 {
 	if (!( zone ))
 		return( occi_resolver( category, agent ) );
-	else	return( occi_resolver_operation( category, zone, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.zone", zone, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ o p e r a t o r		*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_operator( char * category, char * operator, char * agent )
+{
+	if (!( operator ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.operator",operator, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ s e c u r i t y		*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_security( char * category, char * security, char * agent )
+{
+	if (!( security ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.security",security, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ p r i c e 		*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_price( char * category, char * price, char * agent )
+{
+	if (!( price ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.price",price, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ e n e r g y 		*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_energy( char * category, char * energy, char * agent )
+{
+	if (!( energy ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.energy",energy, agent ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ b y _ s c o r e		*/
+/*	---------------------------------------------------------	*/
+public	struct	occi_response * occi_resolve_by_score( char * category, char * score, char * agent )
+{
+	if (!( score ))
+		return( occi_resolver( category, agent ) );
+	else	return( occi_resolver_operation( category, "occi.publication.opinion",score, agent ) );
 }
 
 /*	-------------------------------------------------------------		*/
