@@ -3,7 +3,7 @@
     publisher=''
     operator='accords'
     identity=''
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8086'/>
@@ -12,13 +12,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </publisher>
 <coss
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8087'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8087'/>
@@ -27,13 +27,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </coss>
 <comons
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8088'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8088'/>
@@ -42,13 +42,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </comons>
 <coes
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8089'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8089'/>
@@ -57,13 +57,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </coes>
 <conets
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8090'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8090'/>
@@ -72,13 +72,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </conets>
 <coobas
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8091'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8091'/>
@@ -87,13 +87,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </coobas>
 <parser
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8092'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8092'/>
@@ -102,13 +102,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </parser>
 <broker
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8093'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8093'/>
@@ -117,13 +117,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </broker>
 <procci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8094'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8094'/>
@@ -132,13 +132,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </procci>
 <osprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8095'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8095'/>
@@ -147,13 +147,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </osprocci>
 <paprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8096'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8096'/>
@@ -162,13 +162,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </paprocci>
 <testosocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8097'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8097'/>
@@ -177,13 +177,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </testosocci>
 <osocciprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8098'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8098'/>
@@ -192,13 +192,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </osocciprocci>
 <onprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8099'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8099'/>
@@ -207,13 +207,13 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </onprocci>
 <azprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8100'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8100'/>
@@ -222,89 +222,119 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </azprocci>
-<fileserver
+<dcprocci
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:8101'
-    verbose='1'
+    verbose='0'
     debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='8101'/>
+    <security
+         user='service-dcprocci'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi' zone='europe'/>
+</dcprocci>
+<fileserver
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8102'
+    verbose='0'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8102'/>
     <security
          user='service-fileserver'
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </fileserver>
 <ezvm
     publisher='http://127.0.0.1:8086'
     operator='accords'
-    identity='127.0.0.1:8102'
-    verbose='1'
+    identity='127.0.0.1:8103'
+    verbose='0'
     debug='0'
     threads='1'>
-    <rest host='127.0.0.1' port='8102'/>
+    <rest host='127.0.0.1' port='8103'/>
     <security
          user='service-ezvm'
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </ezvm>
 <coips
     publisher='http://127.0.0.1:8086'
     operator='accords'
-    identity='127.0.0.1:8103'
-    verbose='1'
+    identity='127.0.0.1:8104'
+    verbose='0'
     debug='0'
     threads='1'>
-    <rest host='127.0.0.1' port='8103'/>
+    <rest host='127.0.0.1' port='8104'/>
     <security
          user='service-coips'
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </coips>
 <coees
     publisher='http://127.0.0.1:8086'
     operator='accords'
-    identity='127.0.0.1:8104'
-    verbose='1'
+    identity='127.0.0.1:8105'
+    verbose='0'
     debug='0'
     threads='1'>
-    <rest host='127.0.0.1' port='8104'/>
+    <rest host='127.0.0.1' port='8105'/>
     <security
          user='service-coees'
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </coees>
 <cosched
     publisher='http://127.0.0.1:8086'
     operator='accords'
-    identity='127.0.0.1:8105'
-    verbose='1'
+    identity='127.0.0.1:8106'
+    verbose='0'
     debug='0'
     threads='1'>
-    <rest host='127.0.0.1' port='8105'/>
+    <rest host='127.0.0.1' port='8106'/>
     <security
          user='service-cosched'
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </cosched>
+<slam
+    publisher='http://127.0.0.1:8086'
+    operator='accords'
+    identity='127.0.0.1:8107'
+    verbose='0'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8107'/>
+    <security
+         user='service-slam'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi' zone='europe'/>
+</slam>
 <cosacs
     publisher='http://127.0.0.1:8086'
     operator='accords'
     identity='127.0.0.1:9999'
-    verbose='1'
-    debug='1'
+    verbose='0'
+    debug='0'
     threads='1'>
     <rest host='127.0.0.1' port='9999'/>
     <security
@@ -312,6 +342,6 @@
          password='co-system'
          monitor='1'
          tls=''/>
-    <domain name='occi'/>
+    <domain name='occi' zone='europe'/>
 </cosacs>
 </accords>
