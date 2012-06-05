@@ -639,14 +639,14 @@ public	struct	pa_response *	pa_list_servers	( )
 /*	------------------------------------------------------------	*/
 /*! 
  * Lock a ProActive node using as parameters the constraints given.  */
-public	struct	pa_response *	pa_create_server(int physical_memory)
+public	struct	pa_response *	pa_create_server()
 {
     char * filename = NULL;
     char * raw_list = NULL;
     char command[1024];
 
     struct pa_response* result = (struct pa_response*) NULL;
-    sprintf(command,"--get-node --physical_memory %d" , physical_memory); // Parameters for java layer. 
+    sprintf(command,"--get-cosacs "); // Parameters for java layer. 
 
     if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
         return NULL;

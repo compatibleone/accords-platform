@@ -304,7 +304,6 @@ private	struct	rest_response * start_proactive(
 	char	*	filename;
 	char 	*	personality="";
 	char 	*	resource=_CORDS_LAUNCH_CFG;
-    int physical_memory_constraint = 10;                                        // A contraint to apply to the node requested (>10MiB of RAM).
 	if (!( pptr = vptr ))                                                       // Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
@@ -323,8 +322,7 @@ private	struct	rest_response * start_proactive(
         //    char * location,
         //    char * group )
         //
-	else if (!( paptr = pa_create_server(
-                    physical_memory_constraint)))                           // Request of a node using constraints. 
+	else if (!( paptr = pa_create_server()))                           // Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
