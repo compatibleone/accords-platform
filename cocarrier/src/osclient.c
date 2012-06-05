@@ -1175,15 +1175,18 @@ public	char * os_create_server_request(
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
-		if ( os_valid_string( group ) )
-		{
-			fprintf(h,"\tsecurity_group=%c%s%c\n",0x0022,group,0x0022);
-		}			
 		if ( os_valid_string( zone ) )
 		{
 			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
 		}			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
+
+		if ( os_valid_string( group ) )
+		{
+			fprintf(h,"\t<security_groups>\n");
+			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);
+			fprintf(h,"\t</security_groups>\n");
+		}			
 
 		/* ----------------------------- */
 		/* generate meta data statements */
