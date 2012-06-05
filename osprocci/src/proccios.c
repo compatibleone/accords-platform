@@ -982,7 +982,11 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 	else if (!( pptr->firewall ))
 		return(0);
 	else if (( rulegroup = resolve_openstack_firewall( pptr )) != (char *) 0)
+	{
+		if ( pptr->group ) pptr->group = liberate( pptr->group );
+		pptr->group = allocate_string( rulegroup );
 		return( 0 );
+	}
 	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( 0 );
 	{
@@ -1117,7 +1121,7 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
 
 	if (!( filename = os_create_server_request( 
-	pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
+		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->group, pptr->zone ) ))
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	else if (!( osptr = os_create_server( filename )))
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
