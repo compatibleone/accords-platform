@@ -152,9 +152,9 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="architecture" type="xsd:string"/>
 		<xsd:attribute name="hostname" type="xsd:string"/>
-		<xsd:attribute name="cores" type="xsd:integer"/>
-		<xsd:attribute name="speed" type="xsd:integer"/>
-		<xsd:attribute name="memory" type="xsd:integer"/>
+		<xsd:attribute name="cores" type="xsd:string"/>
+		<xsd:attribute name="speed" type="xsd:string"/>
+		<xsd:attribute name="memory" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -172,7 +172,7 @@
 	<xsd:complexType name="cordsStorage">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="size" type="xsd:integer"/>
+		<xsd:attribute name="size" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -243,19 +243,19 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsError">
-		<xsd:attribute name="code" type="xsd:integer"/>
+		<xsd:attribute name="code" type="xsd:string"/>
 		<xsd:attribute name="message" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsWarning">
-		<xsd:attribute name="code" type="xsd:integer"/>
+		<xsd:attribute name="code" type="xsd:string"/>
 		<xsd:attribute name="message" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsChoice">
-		<xsd:attribute name="code" type="xsd:integer"/>
+		<xsd:attribute name="code" type="xsd:string"/>
 		<xsd:attribute name="message" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>

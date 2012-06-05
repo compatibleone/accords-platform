@@ -51,6 +51,9 @@ endif
 if ENABLE_SLAM
 SUBDIRS += slam
 endif
+if ENABLE_EXAMPLE
+SUBDIRS += example
+endif
 if ENABLE_COES
 SUBDIRS += coes
 endif
