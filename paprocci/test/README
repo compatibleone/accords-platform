@@ -5,6 +5,6 @@ This file will guide you towards a quick running example of Accords (the Compati
 
 Just run:
 
-	$ place-files-for-demo.sh
+	$ ./pademo_place_files.sh
 
 and follow the instructions.

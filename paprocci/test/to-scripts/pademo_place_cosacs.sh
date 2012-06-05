@@ -6,10 +6,11 @@ cd ../cosacs/
 make
 ./build.cosacs.tarball 
 rm -fr /home/cosacs/* 
-mkdir -p /home/cosacs/rest
 mv cosacstarball.tgz /home/cosacs/
 cd /home/cosacs/
 tar -xvf cosacstarball.tgz 
+./install-cosacs
+chmod 777 /home/cosacs/rest
 cd -
 cd ../scripts/
 
