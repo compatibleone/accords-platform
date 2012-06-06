@@ -95,7 +95,7 @@ private	int	banner()
 }
 
 /*	------------------------------------------------------------------	*/
-/*			e z v m _ i n i t i a l i s e			*/
+/*			e z v m _ i n i t i a l i s e				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_server * ezvm_initialise(  void * v,struct rest_server * sptr )
 {
@@ -110,7 +110,7 @@ private	struct rest_server * ezvm_initialise(  void * v,struct rest_server * spt
 }
 
 /*	------------------------------------------------------------------	*/
-/*			e z v m _ a u t h o r i s e 			*/
+/*			e z v m _ a u t h o r i s e 				*/
 /*	------------------------------------------------------------------	*/
 private	int	ezvm_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
@@ -126,7 +126,7 @@ private	int	ezvm_authorise(  void * v,struct rest_client * cptr, char * username
 }
 
 /*	------------------------------------------------------------------	*/
-/*			e z v m _ e x t e n s i o n 			*/
+/*			e z v m _ e x t e n s i o n 					*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_extension * ezvm_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
@@ -149,30 +149,49 @@ private	struct rest_response * build_vm(
 {
 	struct	cords_vm * pptr;
 	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	char *	sptr;
 	int	status;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if ( pptr->state != 0 )
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( pptr->image ))
-		return(0);
+		return( rest_html_response( aptr, 400, "incorrect image" ) );
 	else if (!( pptr->provider ))
-		return(0);
+		return( rest_html_response( aptr, 400, "incorrect provider" ) );
 	else if (!( pptr->application ))
-		return(0);
+		return( rest_html_response( aptr, 400, "incorrect application" ) );
 	else if (!( zptr = cords_invoke_action( pptr->application, _CORDS_BUILD, _CORDS_BROKER_AGENT, default_tls() ) ))
-		return(0);
+		return( rest_html_response( aptr, 400, "build failure" ) );
 	else if (!( zptr->response ))
 	{
 		zptr = occi_remove_response( zptr );
-		return(0);
+		return( rest_html_response( aptr, 400, "build failure" ) );
+	}
+	else if (( pptr->state = zptr->response->status) > 299 )
+	{
+		zptr = occi_remove_response( zptr );
+		return( rest_html_response( aptr, pptr->state, "build failure" ) );
 	}
 	else
 	{
-		pptr->state = zptr->response->status;
-		aptr = rest_html_response( aptr, zptr->response->status, zptr->response->message );
 		zptr = occi_remove_response( zptr );
-		return( aptr );
+		if (!( zptr = occi_simple_get( pptr->application, _CORDS_BROKER_AGENT, default_tls() ) ))
+			return( rest_html_response( aptr, 440, "build failure" ) );
+		else if (!( sptr = occi_extract_atribut( zptr, "occi", _CORDS_APPLICATION, "url" )))
+		{
+			zptr = occi_remove_response( zptr );
+			return( rest_html_response( aptr, 441, "build failure" ) );
+		}
+		else if (!( pptr->url = allocate_string( sptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return( rest_html_response( aptr, 500, "build failure" ) );
+		}
+		else	autosave_cords_vm_nodes();
+		zptr = occi_remove_response( zptr );
+		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
@@ -181,10 +200,12 @@ private	struct rest_response * build_vm(
 /*	-------------------------------------------	*/
 private	int	create_cords_vm(struct occi_category * optr, void * vptr)
 {
+	char 	buffer[2048];
 	struct	occi_element *	root=(struct occi_element *) 0;
 	struct	occi_element *	last=(struct occi_element *) 0;
 	struct	occi_element *	eptr=(struct occi_element *) 0;
 	struct	occi_response * zptr=(struct occi_response*) 0;
+	char *	sptr;
 	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;
 	if (!( nptr = vptr ))
@@ -212,10 +233,20 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr)
 
 	if (!( zptr = cords_create_instance( _CORDS_APPLICATION, _CORDS_CONTRACT_AGENT, root, default_tls() ) ))
 		return( 0 );
-	else	
+	else if (!( sptr = occi_extract_location( zptr ) ))
 	{
 		zptr = occi_remove_response( zptr );
-		return( 0 );			
+		return(0);
+	}
+	else
+	{
+		sprintf(buffer,"http://%s",sptr);
+		if ( pptr->application ) pptr->application = liberate( pptr->application );
+		pptr->application = allocate_string( buffer );
+		zptr = occi_remove_response( zptr );
+		if ( pptr->application )
+			return(0);
+		else	return(27);
 	}
 }
 

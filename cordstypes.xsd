@@ -185,9 +185,9 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="system" type="xsd:string"/>
 		<xsd:attribute 	
-			name="application" 
+			name="vm" 
 			type="xsd:string"
-			default="cordscript: application.new(id.value,provider.value); application.build();"/>
+			default="cordscript: vm.new(id.value,provider.value); vm.build();"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>

@@ -34,6 +34,7 @@ struct	openstack
 	char *	group;
 	char *	zone;
 	char *	hostname;
+	char *	workload;
 
 	int	when;
 

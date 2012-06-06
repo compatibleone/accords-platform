@@ -20,6 +20,7 @@ struct	windowsazure
 
 	char *	firewall;
 	char *	hostname;
+	char *	workload;
 
 	int	when;
 

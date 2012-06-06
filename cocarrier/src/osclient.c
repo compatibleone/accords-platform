@@ -1119,7 +1119,43 @@ public	struct	os_response *	os_delete_metadata( char * id, char * name )
 	else	return( rptr );
 }
 
-#include "eucahack.c"
+			/* -------------------------------------- */
+#include "eucahack.c"	/* this was necessary for the CO POC 1 V1 */
+			/* -------------------------------------- */
+
+/*	------------------------------------------------------------	*/
+/*		o s _ b u i l d _ i m a g e _ r e f e r e n c e		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_build_image_reference( char * nptr )
+{
+	char	buffer[4096];
+	if (!( nptr ))
+		return( nptr );
+	else if (!( strncmp( nptr, Os.base, strlen( Os.base ) ) ))
+		return( allocate_string( nptr ) );
+	else
+	{
+		sprintf(buffer,"%s/images/%s",Os.base,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	    o s _ b u i l d _ f l a v o r _ r e f e r e n c e		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_build_flavor_reference( char * nptr )
+{
+	char	buffer[4096];
+	if (!( nptr ))
+		return( nptr );
+	else if (!( strncmp( nptr, Os.base, strlen( Os.base ) ) ))
+		return( allocate_string( nptr ) );
+	else
+	{
+		sprintf(buffer,"%s/flavors/%s",Os.base,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
 
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/

@@ -67,6 +67,8 @@ public struct deltacloud * liberate_deltacloud(struct deltacloud * sptr)
 			 sptr->floating = liberate(sptr->floating);
 		if ( sptr->floatingid )
 			 sptr->floatingid = liberate(sptr->floatingid);
+		if ( sptr->workload )
+			 sptr->workload = liberate(sptr->workload);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
@@ -109,6 +111,7 @@ public struct deltacloud * reset_deltacloud(struct deltacloud * sptr)
 		sptr->accessip = (char*) 0;
 		sptr->floating = (char*) 0;
 		sptr->floatingid = (char*) 0;
+		sptr->workload = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->firewall = (char*) 0;
@@ -211,6 +214,10 @@ public int xmlin_deltacloud(struct deltacloud * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->floatingid = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"workload") ))
+		{
+			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"publicaddr") ))
 		{
 			if ( wptr->value ) { sptr->publicaddr = allocate_string(wptr->value); }
@@ -274,6 +281,7 @@ public int rest_occi_deltacloud(FILE * fh,struct deltacloud * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.accessip='%s'\r\n",prefix,nptr,(sptr->accessip?sptr->accessip:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floating='%s'\r\n",prefix,nptr,(sptr->floating?sptr->floating:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floatingid='%s'\r\n",prefix,nptr,(sptr->floatingid?sptr->floatingid:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));

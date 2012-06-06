@@ -8,7 +8,7 @@ struct	cords_image
 	char *	name;
 	char *	system;
 	char *	price;
-	char *	application;
+	char *	vm;
 	char *	created;
 	char *	updated;
 	int	packages;

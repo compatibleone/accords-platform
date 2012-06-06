@@ -24,18 +24,6 @@
 #include "occiresolver.h"
 #include "cp.h"
 
-#define	_MAX_PROVIDERS	6
-
-private	char *	occi_providers[_MAX_PROVIDERS] = {
-	(char *) _CORDS_OPENSTACK,
-	(char *) _CORDS_OPENNEBULA,
-	(char *) _CORDS_WINDOWSAZURE,
-	(char *) _CORDS_PROACTIVE,
-	(char *) _CORDS_SLAPOS,
-	(char *) "amazon"
-	};
-
-
 /*	---------------------------------------------------------	*/
 /*	r e t r i e v e _ p r o v i d e r _ i n f o r m a t i o n	*/
 /*	---------------------------------------------------------	*/
@@ -81,6 +69,12 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 		{
 			if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 			if (!( pptr->reference = occi_unquoted_value( fptr->value ) ))
+				return( 400 );
+		}
+		else if (!( strcmp( sptr,"workload" ) ))
+		{
+			if ( pptr->workload ) pptr->workload = liberate( pptr->workload );
+			if (!( pptr->workload = occi_unquoted_value( fptr->value ) ))
 				return( 400 );
 		}
 	}
@@ -350,6 +344,24 @@ private	struct	rest_response * suspend_contract(
 }
 
 /*	-------------------------------------------	*/
+/*		r e s e t _ c o n t r a c t		*/
+/*	-------------------------------------------	*/
+private	void	reset_contract( struct cords_contract * pptr )
+{
+	if (pptr->reference) pptr->reference = liberate( pptr->reference );
+	if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
+	if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
+	if (pptr->workload ) pptr->workload  = liberate( pptr->workload  );
+	pptr->reference = allocate_string("");
+	pptr->rootpass  = allocate_string("");
+	pptr->hostname  = allocate_string("");
+	pptr->workload  = allocate_string("");
+	pptr->when  = time((long*) 0);
+	pptr->state = _OCCI_IDLE;
+	return;
+}
+
+/*	-------------------------------------------	*/
 /* 	   	s t o p _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * stop_contract(
@@ -381,14 +393,7 @@ private	struct	rest_response * stop_contract(
 				cords_invoke_action( pptr->service, _CORDS_STOP, 
 					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
-			if (pptr->reference) pptr->reference = liberate( pptr->reference );
-			if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
-			if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
-			pptr->reference =allocate_string("");
-			pptr->rootpass  =allocate_string("");
-			pptr->hostname  =allocate_string("");
-			pptr->when  = time((long*) 0);
-			pptr->state = _OCCI_IDLE;
+			reset_contract( pptr );
 			autosave_cords_contract_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -422,6 +427,7 @@ private	struct	rest_response * save_contract(
 			{
 				cords_invoke_action( pptr->provider, _CORDS_SAVE, 
 					_CORDS_CONTRACT_AGENT, default_tls() );
+				retrieve_provider_information( pptr );
 			}
 			else if ( pptr->service )
 			{
@@ -467,6 +473,7 @@ private	struct	rest_response * snapshot_contract(
 			{
 				cords_invoke_action( pptr->service, _CORDS_SNAPSHOT, 
 					_CORDS_CONTRACT_AGENT, default_tls() );
+				retrieve_provider_information( pptr );
 			}
 			pptr->when  = time((long*) 0);
 			autosave_cords_contract_nodes();

@@ -33,9 +33,7 @@
 #include "cordslang.h"
 #include "cp.h"
 #include "cb.h"
-
-#define	_COIPS_MODEL "coips:model"
-#define _COIPS_ACCOUNT "coips"
+#include "coips.h"
 
 struct	accords_configuration Coips = {
 	0,0,
@@ -90,8 +88,8 @@ private	void	coips_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Image Production Services : Version 1.0a.0.02");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Image Production Services : Version 1.0a.0.03");
+	printf("\n   Beta Version : 06/06/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -374,10 +372,10 @@ private	void 	stop_application_provisioning(  char * contract )
 }
 
 
-/* ------------------------- */
-/* Delete Provisioning 	     */
-/* ------------------------- */
-private	void	delete_application_provisioning(  char * contract )
+/* -------------------------- */
+/* Delete Negotiated Contract */
+/* -------------------------- */
+private	void	delete_application_contract(  char * contract )
 {
 	if ( check_debug() ) rest_log_message("coips:delete_server");
 	occi_simple_delete( contract, _CORDS_SERVICE_AGENT, default_tls() );
@@ -403,12 +401,27 @@ private void	delete_application_node(  char * node )
 /* ------------------------- */
 /* Update Image name 	     */
 /* ------------------------- */
-private	void	update_ezvm_image( struct cords_application * aptr )
+private	char *	update_ezvm_image( char * contract, struct cords_application * aptr )
 {
+	char 	buffer[2048];
+	char 			* result=(char *) 0;
+	struct	occi_response 	* zptr=(struct occi_response *) 0;
+	char *	vptr;
+
 	if ( check_debug() ) rest_log_message("coips:update_ezvm");
-	/* TODO */
+
+	if (!( zptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
+		result = (char *) 0;
+	else if (!( vptr = occi_extract_atribut( zptr, "occi", _CORDS_CONTRACT, "workload" )))
+		result = (char *) 0;
+	else if (!( aptr->url = allocate_string( vptr ) ))
+		result = (char *) 0;
+	else	result = aptr->url;		
+	if ( zptr )	zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:update_ezvm:done");
-	return;
+	sprintf(buffer,"COIPS:EZVM:URL(%s,%s)",aptr->id,(result?result:"(null)"));
+	rest_log_message( buffer );	
+	return( result );
 }
 
 
@@ -468,12 +481,13 @@ private	struct occi_element * 	first_application_package_link( struct occi_respo
 /*	------------------------------------------------------------------	*/
 private	int	ll_build_application( struct occi_category * optr, struct cords_application * aptr)
 {
-	char *	node;
-	char *	contract;
-	char *	linkvalue;
-	char *	package;
-	char *	cosacs=(char *) 0;
-	char *	vptr;
+	int	returnValue=0;
+	char *	node 	  = (char *) 0;
+	char *	contract  = (char *) 0;
+	char *	linkvalue = (char *) 0;
+	char *	package   = (char *) 0;
+	char *	cosacs	  = (char *) 0;
+	char *	vptr	  = (char *) 0;
 	int	packages=0;
 	struct	occi_response * zptr;
 	struct	occi_response * wptr;
@@ -482,55 +496,78 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
+	/* ---------------------- */
+	/* check if already built */
+	/* ---------------------- */
+	if ( aptr->state & _COIPS_IMAGE_OK )
+	{
+		return( 0 );
+	}
+	else	aptr->state = 0;
+
+	/* ---------------------------- */
+	/* locate the image description */
+	/* ---------------------------- */
+	if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
+		return( 800 );
+	else if (!( zptr->response ))
+		return( 800 );
+	else if ( zptr->response->status > 299 )
+		return( 800 + (zptr->response->status-200) );
+
 	/* ---------------------------------------- */
 	/* check first for packages to be installed */
 	/* ---------------------------------------- */
-	if (!( zptr = occi_simple_get( aptr->image, _CORDS_SERVICE_AGENT, default_tls() ) ))
-	{
-		aptr->state = 10;
-		return( 0 );
-	}
 	else if (!( eptr = first_application_package_link( zptr ) ))
 	{
 		zptr = occi_remove_response( zptr );
-		aptr->state = 10;
+		aptr->state = _COIPS_IMAGE_OK;
 		return( 0 );
 	}
+
+	/* ------------------------- */
+	/* start the build operation */
+	/* ------------------------- */
+	aptr->state |= _COIPS_BUILD_OPERATION;
+
+	if ( check_debug() ) rest_log_message("coips:build_application");
 
 	/* ------------------------- */
 	/* build a provisioning node */
 	/* ------------------------- */
-
-	if ( check_debug() ) rest_log_message("coips:build_application");
-
-	aptr->state = 1;
-
 	if (!( node = build_application_node(aptr->image, aptr->provider) ))
-		return( 800 );
+		returnValue =  800;
+	else	aptr->state |= _COIPS_NODE_BUILT;
 
 	/* ------------------------- */
 	/* negotiate the contracts   */
 	/* ------------------------- */
-	aptr->state = 2;
-
-	if (!( contract = negotiate_application_contract(node,&selector)))
-		return( 801 );
-	else if (!( aptr->provision = allocate_string( contract ) ))
-		return( 802 );
-	else if (!( aptr->account = allocate_string( _COIPS_ACCOUNT ) ))
-		return( 803 );
+	if ( aptr->state & _COIPS_NODE_BUILT )
+	{	
+		if (!( contract = negotiate_application_contract(node,&selector)))
+			returnValue =  801;
+		else if (!( aptr->provision = allocate_string( contract ) ))
+			returnValue =  802;
+		else if (!( aptr->account = allocate_string( _COIPS_ACCOUNT ) ))
+			returnValue =  803;
+		else 	aptr->state |= _COIPS_CONTRACT_NEGOTIATED;
+	}
 
 	/* ------------------------- */
 	/* provision the contract    */
 	/* ------------------------- */
-	aptr->state = 3;
-
-	if (!( contract = provision_application_contract(contract)))
-		return( 801 );
-	
-	else 
+	if ( aptr->state & _COIPS_CONTRACT_NEGOTIATED )
 	{
-		aptr->state = 4;
+		if (!( contract = provision_application_contract(contract)))
+			returnValue = 804;
+		else 	aptr->state |= _COIPS_CONTRACT_PROVISIONED;
+	}
+
+	/* ---------------------------------- */
+	/* install the collection of packages */
+	/* ---------------------------------- */
+	if ( aptr->state & _COIPS_CONTRACT_PROVISIONED )
+	{
 		/* ------------------------- */
 		/* For Each Package 	     */
 		/* ------------------------- */
@@ -554,11 +591,20 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 					/* retrieve the cosacs address */
 					/* --------------------------- */
 					if (!( wptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
-						return( 803 );
+					{
+						returnValue = 805;
+						break;
+					}
 					else if (!( vptr = occi_extract_atribut( wptr, "occi","contract", "hostname" )))
-						return( 804 );
+					{
+						returnValue = 806;
+						break;
+					}
 					else if (!( cosacs = allocate_string( vptr ) ))
-						return( 805 );
+					{
+						returnValue = 807;
+						break;
+					}
 					else	
 					{
 						wptr = occi_remove_response( wptr );
@@ -566,7 +612,10 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 					}
 				}
 				if (!( package = install_application_package( cosacs, linkvalue ) ))
-					return( 806 );
+				{
+					returnValue = 808;
+					break;
+				}
 				else
 				{
 					linkvalue = liberate( linkvalue );
@@ -574,44 +623,62 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 				}
 			}
 		}
-		zptr = occi_remove_response( zptr );
-		occi_flush_client( cosacs, _COSACS_PORT );
-		if ( cosacs ) cosacs = liberate( cosacs );
+		if (!( returnValue ))
+		{
+			aptr->state |= _COIPS_PACKAGES_INSTALLED;
+			zptr = occi_remove_response( zptr );
+			occi_flush_client( cosacs, _COSACS_PORT );
+			if ( cosacs ) cosacs = liberate( cosacs );
+		}
 	}
 
-	/* ------------------------- */
-	/* Save Image 		     */
-	/* ------------------------- */
-	aptr->state = 5;
-	save_application_image( contract );
-
-	/* ------------------------- */
-	/* Stop Provisioning 	     */
-	/* ------------------------- */
-	aptr->state = 6;
-	stop_application_provisioning( contract );
-
-	/* ------------------------- */
-	/* Delete Provisioning 	     */
-	/* ------------------------- */
-	aptr->state = 7;
-	delete_application_provisioning( contract );
-
-	/* ------------------------- */
-	/* Delete Provisioning 	     */
-	/* ------------------------- */
-	aptr->state = 8;
-	delete_application_node( node );
+	/* ----------------------------- */
+	/* Save Image if Correctly Built */
+	/* ----------------------------- */
+	if ( aptr->state & _COIPS_PACKAGES_INSTALLED )
+	{
+		save_application_image( contract );
+		aptr->state |= _COIPS_IMAGE_CREATED;
+	}
 
 	/* ------------------------- */
 	/* Update Image name 	     */
 	/* ------------------------- */
-	aptr->state = 9;
-	update_ezvm_image( aptr );
+	if ( aptr->state & _COIPS_IMAGE_CREATED )
+		if ((vptr = update_ezvm_image( contract, aptr )) != (char *) 0)
+			aptr->state |= _COIPS_IMAGE_OK;
 
-	aptr->state = 10;
+	/* -------------------------------- */
+	/* Stop Provisioning if Provisioned */
+	/* -------------------------------- */
+	if ( aptr->state & _COIPS_CONTRACT_PROVISIONED )
+	{
+		stop_application_provisioning( contract );
+		aptr->state &= ~_COIPS_CONTRACT_PROVISIONED;
+	}
+
+	/* ----------------------------- */
+	/* Delete Contract if Negotiated */
+	/* ----------------------------- */
+	if ( aptr->state & _COIPS_CONTRACT_NEGOTIATED )
+	{
+		delete_application_contract( contract );
+		aptr->state &= ~ _COIPS_CONTRACT_NEGOTIATED;
+	}
+
+	/* ---------------------- */
+	/* Delete Node if Created */
+	/* ---------------------- */
+	if ( aptr->state & _COIPS_NODE_BUILT )
+	{
+		delete_application_node( node );
+		aptr->state &= ~_COIPS_NODE_BUILT;
+	}
+
+	aptr->state &= ~_COIPS_BUILD_OPERATION;
 	if ( check_debug() ) rest_log_message("coips:build_application:done");
-	return(0);
+
+	return( returnValue );
 }
 
 
@@ -629,9 +696,7 @@ private	struct rest_response * build_application(
 	char	buffer[1024];
 	int	status;
 	if (!( pptr = vptr ))
-		return(0);
-	else if ( pptr->state > 0 )
-		return(0);
+		return( rest_html_response( aptr, 400, "OK" ) );
 	else
 	{
 		pptr->started = time((long *) 0);
@@ -640,12 +705,14 @@ private	struct rest_response * build_application(
 			pptr->completed = time((long *) 0);
 			pptr->duration  = (pptr->completed - pptr->started);
 			sprintf(buffer,"Application Build Failure Phase #%u",pptr->state);
+			autosave_cords_application_nodes();
 			return( rest_html_response( aptr, status, buffer ) );
 		}
 		else
 		{
 			pptr->completed = time((long *) 0);
 			pptr->duration  = (pptr->completed - pptr->started);
+			autosave_cords_application_nodes();
 			return( rest_html_response( aptr, 200, "OK" ) );
 		}
 	}

@@ -265,6 +265,7 @@ private	int	reset_openstack_server( struct openstack * pptr )
 	{
 		if ( pptr->number ) pptr->number = liberate( pptr->number );
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		if ( pptr->workload ) pptr->workload = liberate( pptr->workload );
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
@@ -1115,25 +1116,43 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, status, "Server Failure : Access Address" ) );
 
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
-		return( rest_html_response( aptr, 4002, "Server Failure : Configuration Instructions" ) );
-
+	{
+		release_floating_address( pptr );
+		return( rest_html_response( aptr, 4001, "Server Failure : Configuration Instructions" ) );
+	}
 	if ((status = build_openstack_firewall( pptr )) != 0)
+	{
+		release_floating_address( pptr );
 		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
-
+	}
+	else if (!( pptr->workload = os_build_image_reference( pptr->image ) ))
+	{
+		release_floating_address( pptr );
+		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
+	}
 	if (!( filename = os_create_server_request( 
 		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
+	{
+		release_floating_address( pptr );
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
+	}
 	else if (!( osptr = os_create_server( filename )))
+	{
+		release_floating_address( pptr );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
+	}
 	else if (!( osptr->response ))
+	{
+		release_floating_address( pptr );
 	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
+	}
 	else if ( osptr->response->status >= 400 )
 	{
+		release_floating_address( pptr );
 		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
 		osptr = liberate_os_response( osptr );
 		return( aptr );
 	}
-
 	else
 	{
 		liberate( filename );
@@ -1200,7 +1219,11 @@ private	struct	rest_response * start_openstack(
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		else  	return( rest_html_response( aptr, 4256, "Server Failure : Connect Open Stack" ) );
+		else  	
+		{
+			release_floating_address( pptr );
+			return( rest_html_response( aptr, 4256, "Server Failure : Connect Open Stack" ) );
+		}
 	}
 
 }
@@ -1269,6 +1292,8 @@ private	struct	rest_response * snapshot_openstack(
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( hptr->value ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( pptr->workload = os_build_image_reference( hptr->value ) ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( inumber = os_image_number( hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
@@ -1324,7 +1349,7 @@ private	struct	rest_response * save_openstack(
 	/* image production services COIPS. 				*/
 	/* ------------------------------------------------------------ */
 	/* the name field is : the name of the contract and is the same */
-	/* all contracts of the same original node description.		*/
+	/* for all contracts of the same original node description.	*/
 	/* the number     is :	the current server instance number	*/
 	/* ------------------------------------------------------------ */
 	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
@@ -1338,6 +1363,8 @@ private	struct	rest_response * save_openstack(
 	else if (!( hptr = rest_resolve_header( osptr->response->first, _HTTP_LOCATION ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( hptr->value ))
+		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if (!( pptr->workload = os_build_image_reference( hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( inumber = os_image_number( hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );

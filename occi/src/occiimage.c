@@ -142,8 +142,8 @@ private void autoload_cords_image_nodes() {
 				pptr->system = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
-				pptr->application = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "vm" )) != (struct xml_atribut *) 0)
+				pptr->vm = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
 				pptr->created = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "updated" )) != (struct xml_atribut *) 0)
@@ -188,8 +188,8 @@ public  void autosave_cords_image_nodes() {
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," application=%c",0x0022);
-		fprintf(h,"%s",(pptr->application?pptr->application:""));
+		fprintf(h," vm=%c",0x0022);
+		fprintf(h,"%s",(pptr->vm?pptr->vm:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," created=%c",0x0022);
 		fprintf(h,"%s",(pptr->created?pptr->created:""));
@@ -230,8 +230,8 @@ private void set_cords_image_field(
 			pptr->system = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
-		if (!( strcmp( nptr, "application" ) ))
-			pptr->application = allocate_string(vptr);
+		if (!( strcmp( nptr, "vm" ) ))
+			pptr->vm = allocate_string(vptr);
 		if (!( strcmp( nptr, "created" ) ))
 			pptr->created = allocate_string(vptr);
 		if (!( strcmp( nptr, "updated" ) ))
@@ -292,11 +292,11 @@ private int pass_cords_image_filter(
 		else if ( strcmp(pptr->price,fptr->price) != 0)
 			return(0);
 		}
-	if (( fptr->application )
-	&&  (strlen( fptr->application ) != 0)) {
-		if (!( pptr->application ))
+	if (( fptr->vm )
+	&&  (strlen( fptr->vm ) != 0)) {
+		if (!( pptr->vm ))
 			return(0);
-		else if ( strcmp(pptr->application,fptr->application) != 0)
+		else if ( strcmp(pptr->vm,fptr->vm) != 0)
 			return(0);
 		}
 	if (( fptr->created )
@@ -339,7 +339,7 @@ private struct rest_response * cords_image_occi_response(
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.application=%s",optr->domain,optr->id,pptr->application);
+	sprintf(cptr->buffer,"%s.%s.vm=%s",optr->domain,optr->id,pptr->vm);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.created=%s",optr->domain,optr->id,pptr->created);
@@ -764,7 +764,7 @@ public struct occi_category * occi_cords_image_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "vm",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
 			return(optr);
@@ -842,7 +842,7 @@ public struct rest_header *  cords_image_occi_headers(struct cords_image * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_image.application='%s'\r\n",(sptr->application?sptr->application:""));
+	sprintf(buffer,"occi.cords_image.vm='%s'\r\n",(sptr->vm?sptr->vm:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

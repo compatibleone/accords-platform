@@ -116,6 +116,8 @@ public	struct	os_response *	os_delete_address( char * id );
 public	struct	os_response *	os_delete_security_group( char * id );
 public	struct	os_response *	os_delete_security_rule( char * id );
 
+public	char *	os_build_image_reference( char * nptr );
+public	char *	os_build_flavor_reference( char * nptr );
 public	struct os_response * liberate_os_response( struct os_response * rptr );	
 
 
