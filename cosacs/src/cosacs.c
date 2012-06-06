@@ -138,6 +138,38 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 
 /*	-------------------------------------------	*/
+/* 		s t a r t _ p r o b e			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * start_probe(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_probe * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 		s t o p _ p r o b e			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * stop_probe(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_probe * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-------------------------------------------	*/
 /* 	      c o s a c s _ l a u n c h			*/
 /*	-------------------------------------------	*/
 public	struct	occi_kind_node * occi_first_cords_metadata_node();
@@ -400,6 +432,9 @@ private	int	cosacs_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_cosacs.xml");
 
+	/* -------------------------------------------------------------------- */
+	/* add the metadata category manager for envirnment variable definition */
+	/* -------------------------------------------------------------------- */
 	if (!( optr = occi_cords_metadata_builder( Cosacs.domain, "metadata" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -416,6 +451,9 @@ private	int	cosacs_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
+	/* ---------------------------------------------------------------- */
+	/* add the script category manager for script definition and launch */
+	/* ---------------------------------------------------------------- */
 	if (!( optr = occi_cords_script_builder( Cosacs.domain, "script" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -424,6 +462,9 @@ private	int	cosacs_operation( char * nptr )
 	last = optr;
 	optr->callback  = &cords_script_interface;
 
+	/* ----------------------------------------------------------- */
+	/* add the monitoring probe category for monitoring operations */
+	/* ----------------------------------------------------------- */
 	if (!( optr = occi_cords_probe_builder( Cosacs.domain, "probe" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -432,6 +473,19 @@ private	int	cosacs_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
+	/* ---------------------------------------- */
+	/* addition of the probe management methods */
+	/* for data collection and delivery control */
+	/* ---------------------------------------- */
+	if (!( optr = occi_add_action( optr,"start","",start_probe)))
+		return( 28 );
+
+	else if (!( optr = occi_add_action( optr,"stop","",stop_probe)))
+		return( 28 );
+
+	/* ------------------------------------------ */
+	/* start the COSACS server message processing */
+	/* ------------------------------------------ */
 	rest_initialise_log(Cosacs.monitor);
 
 	return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first,(char *) 0 ) );
