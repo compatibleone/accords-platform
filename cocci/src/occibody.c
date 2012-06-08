@@ -55,6 +55,8 @@ private	char *	occi_content_length( struct rest_header * hptr, char * filename )
 /*	------------------------------------------------------------	*/
 /*	  		o c c i _ j s o n _ b o d y 			*/
 /*	------------------------------------------------------------	*/
+/*	this function generates the new style JSON OCCI body message	*/
+/*	------------------------------------------------------------	*/
 private	char *	occi_json_body( 
 		struct occi_category * cptr,
 		struct rest_header  * hptr )
@@ -139,6 +141,94 @@ private	char *	occi_json_body(
 }
 
 /*	------------------------------------------------------------	*/
+/*	  	   o c c i _ o l d _ j s o n _ b o d y 			*/
+/*	------------------------------------------------------------	*/
+/*	this function generates an old format JSON OCCI body message	*/
+/*	------------------------------------------------------------	*/
+private	char *	occi_old_json_body( 
+		struct occi_category * cptr,
+		struct rest_header  * hptr )
+{
+	FILE *	h;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	nptr;
+	int	attributs=0;
+	int	locations=0;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	if (!( filename = rest_temporary_filename( "json" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+		fprintf(h,"{\n");
+		while ( hptr )
+		{
+			if (!( hptr->name ))
+				hptr = hptr->next;
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+			{
+				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				hptr = hptr->next;
+			}
+			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
+			{
+				contentlength = hptr;
+				hptr = hptr->next;
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			{
+				if (!( locations++ ))
+					fprintf(h,"[\n");
+				else	fprintf(h,",\n");
+				fprintf(h,"\t%c%s%c",0x0022,hptr->value,0x0022);
+				hptr = occi_consume_header( hptr );
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			{
+				if (!( attributs++ ))
+				{
+					fprintf(h,"%ckind%c :{\n",0x0022,0x0022);
+					fprintf(h,"\t%cterm%c: %c%s%c,\n",0x0022,0x0022,0x0022,cptr->id,0x0022);
+					fprintf(h,"\t%cscheme%c: %c%s%c,\n",0x0022,0x0022,0x0022,cptr->scheme,0x0022);
+					fprintf(h,"\t%cclass%c: %c%s%c\n\t},",0x0022,0x0022,0x0022,"kind",0x0022);
+					fprintf(h,"attributes { \n" );
+				}
+				else	fprintf(h,",\n");
+				strcpy((nptr = vptr = buffer),hptr->value);
+				while ( *vptr )
+				{
+					if ( *vptr == '=' )
+					{
+						*(vptr++) = 0;
+						break;
+					}
+					else if ( *(vptr++) == '.' )
+						nptr = vptr;
+				}
+				fprintf(h,"\t%c%s.%s.%s%c : %c%s%c",0x0022,cptr->domain,cptr->id,nptr,0x0022,0x0022,vptr,0x0022);
+				hptr = occi_consume_header( hptr );
+			}
+			else	hptr = hptr->next;
+		}
+
+		if ( attributs )
+			fprintf(h,"\t}\n");
+		else if ( locations )
+			fprintf(h,"\t]\n");
+
+		fprintf(h,"}\n");
+		fclose(h);
+		return( occi_content_length(contentlength, filename ));
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*	  		o c c i _ h t m l _ s t y l e 			*/
 /*	------------------------------------------------------------	*/
 private	void	occi_html_style( FILE * h, char * filename )
@@ -202,6 +292,7 @@ private	char *	occi_html_body(
 		struct rest_header  * hptr )
 {
 	FILE *	h;
+	char *	prefix;
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
@@ -214,7 +305,11 @@ private	char *	occi_html_body(
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
-	if (!( filename = rest_temporary_filename( "html" ) ))
+
+	if (!( prefix = rest_http_prefix() ))
+		return( prefix );
+
+	else if (!( filename = rest_temporary_filename( "html" ) ))
 		return( filename );
 
 	else if (!( h = fopen(filename,"w")))
@@ -255,7 +350,7 @@ private	char *	occi_html_body(
 					fprintf(h,"<tr><th><a href='/%s/'>/%s/</a></th></tr><tr><td><div align=center><table>\n",cptr->id,cptr->id);
 				}
 				if (!(xptr = occi_category_id( hptr->value )))
-					fprintf(h,"<tr><th><a href='http://%s'>http://%s</a></th></tr>\n",hptr->value,hptr->value);
+					fprintf(h,"<tr><th><a href='%s://%s'>%s://%s</a></th></tr>\n",prefix,hptr->value,prefix,hptr->value);
 				else
 				{
 					fprintf(h,"<tr><th><a href='%s'>%s</a></th></tr>\n",xptr, xptr );
@@ -594,24 +689,42 @@ private	int	accept_string_includes( char * sptr, char * tptr )
 /*	---------------------------------------------------	*/
 /*		o c c i _ r e s p o n s e _ b o d y  		*/
 /*	---------------------------------------------------	*/
+/*								*/
+/*	This function is called from two different places:	*/
+/*								*/
+/*	First is called from the OCCI Client to prepare the 	*/
+/*	POST and PUT methods which provide attribute values	*/
+/*								*/
+/*	Second called from the OCCI Server to prepare the 	*/
+/*	response message after the request has been handled	*/
+/*								*/
+/*	---------------------------------------------------	*/
 public	char * occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr )
 {
 	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
 		return( occi_text_body( cptr, hptr ) );
+
 	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
 		return( occi_html_body( cptr, hptr ) );
+
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_PHP  ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_PHP ) )))
 		return( occi_php_body(  cptr, hptr ) );
+
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_JSON ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_JSON  ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_JSON ) )))
 		return( occi_json_body(  cptr, hptr ) );
+
+	else if (!( strcasecmp( accepts, _OCCI_OLD_JSON ) ))
+		return( occi_old_json_body(  cptr, hptr ) );
+
 	else if ((!( strcasecmp( accepts, _OCCI_MIME_XML  ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_XML   ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_XML  ) )))
 		return( occi_xml_body(  cptr, hptr  ) );
+
 	else	return( occi_text_body( cptr, hptr ) );
 }
 

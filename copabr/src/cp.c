@@ -722,7 +722,7 @@ public	struct occi_response * cords_retrieve_category(
 
 	if ( check_debug() )
 		printf("cords_retrieve_category(%s,%s)\n",document->name,id);
-
+	
 	if (!( strncmp( id, "http", strlen("http") )))
 		return( occi_simple_get( id, agent, tls ) );
 	else if (!( strncmp( id, "https", strlen("https")) ))
@@ -1340,7 +1340,7 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 		}
 		else
 		{
-			sprintf(buffer,"http://%s",host);
+			sprintf(buffer,"%s://%s",rest_http_prefix(),host);
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );
 			if (!( zptr = cords_invoke_action( buffer, "build", agent, tls ) ))
@@ -2056,7 +2056,7 @@ private	int	cords_new_cordscript_instance(
 	}
 	else
 	{
-		sprintf(buffer,"http://%s",vptr);
+		sprintf(buffer,"%s://%s",rest_http_prefix(),vptr);
 		if ( aptr->value ) aptr->value = liberate( aptr->value );
 		aptr->value = allocate_string( buffer );
 		zptr = occi_remove_response( zptr );

@@ -99,7 +99,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_PROBE);
+	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_PROBE);
 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -156,7 +156,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_METADATA);
+	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_METADATA);
 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -231,7 +231,7 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/%s/","http",host,_COSACS_PORT,_CORDS_SCRIPT);
+	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_SCRIPT);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */

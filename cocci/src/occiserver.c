@@ -41,6 +41,7 @@
 #include "occiclient.h"
 #include "occiresolver.h"
 #include "occibody.h"
+#include "json.h"
 
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
@@ -468,6 +469,259 @@ private	struct rest_response *	occi_content_type(
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*		o c c i _ t e x t _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_text_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ h t m l _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_html_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ x m l _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_xml_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ p h p _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_php_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ j s o n _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_json_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	struct	rest_header * eptr;
+	char	*	nptr;
+	char	*	vptr;
+	char	*	domain;
+	char 	*	category;
+	struct	data_element * dptr;
+	struct	data_element * root;
+	struct	data_element * cptr;
+	struct	data_element * bptr;
+	char	buffer[2048];
+
+	if (!( dptr = json_parse_file( rptr->body ) ))
+		return( rptr );
+	else	root = dptr;
+	/* ------------------------------------------ */
+	/* step over the first one : its the filename */
+	/* ------------------------------------------ */
+	if (!( dptr = dptr->first ))
+	{
+		drop_data_element( root );
+		return( rptr );
+	}
+	else if (!( domain = dptr->name ))
+	{
+		drop_data_element( root );
+		return( rptr );
+	}
+	else if (!( dptr = dptr->first ))
+	{
+		drop_data_element( root );
+		return( rptr );
+	}
+	else if (!( category = dptr->name ))
+	{
+		drop_data_element( root );
+		return( rptr );
+	}
+	else
+	{
+		for (	cptr = dptr->first;
+			cptr != (struct data_element *) 0;
+			cptr = cptr->next )
+		{
+			if (!( cptr->name ))
+				continue;
+			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
+				continue;
+			else if (!( strcmp( nptr, "location" ) ))
+			{
+				for (	bptr = cptr->first;
+					bptr != (struct data_element *) 0;
+					bptr = bptr->next )
+				{
+					if (!( vptr = occi_unquoted_value( bptr->value ) ))
+						break;
+					else if (!(eptr=rest_request_header(rptr,optr->id,vptr)))
+						break;
+					else	liberate( vptr );
+				}
+				liberate( nptr );
+				break;					
+			}
+			else if (!( vptr = occi_unquoted_value( cptr->value ) ))
+				continue;
+			else
+			{
+				sprintf(buffer,"%s.%s.%s",domain,category,nptr);
+				if (!(eptr=rest_request_header(rptr,buffer,vptr)))
+					break;
+				else
+				{
+					liberate( nptr );
+					liberate( vptr );
+					continue;
+				}
+			}
+		}
+		drop_data_element( root );
+		return( rptr );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*	   o c c i _ o l d _ j s o n _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_old_json_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	struct	rest_header * eptr;
+	char	*	nptr;
+	char	*	vptr;
+	struct	data_element * dptr;
+	struct	data_element * root;
+	struct	data_element * cptr;
+	struct	data_element * bptr;
+
+	if (!( dptr = json_parse_file( rptr->body ) ))
+		return( rptr );
+	else	root = dptr;
+
+	/* ------------------------------------------ */
+	/* step over the first one : its the filename */
+	/* ------------------------------------------ */
+	if (!( dptr = dptr->first ))
+	{
+		drop_data_element( root );
+		return( rptr );
+	}
+	else
+	{
+		for (	cptr = dptr->first;
+			cptr != (struct data_element *) 0;
+			cptr = cptr->next )
+		{
+			if (!( cptr->name ))
+				continue;
+			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
+				continue;
+			else if (!( strcmp( nptr, "location" ) ))
+			{
+				for (	bptr = cptr->first;
+					bptr != (struct data_element *) 0;
+					bptr = bptr->next )
+				{
+					if (!( vptr = occi_unquoted_value( bptr->value ) ))
+						break;
+					else if (!(eptr=rest_request_header(rptr,optr->id,vptr)))
+						break;
+					else	liberate( vptr );
+				}
+				liberate( nptr );
+				break;					
+			}
+			else if (!( strncmp( nptr, "occi.core", strlen("occi.core") ) ))
+			{
+				if (!( vptr = occi_unquoted_value( cptr->value )))
+					continue;
+				else if (!(eptr=rest_request_header(rptr,nptr,vptr)))
+					break;
+				else
+				{
+					liberate( nptr );
+					liberate( vptr );
+					continue;
+				}
+			}
+			else if (!( strcmp( nptr, "attributes" ) ))
+			{
+				liberate( nptr );
+				for (	bptr = cptr->first;
+					bptr != (struct data_element *) 0;
+					bptr = bptr->next )
+				{
+					if (!( bptr->name ))
+						continue;
+					else if (!( nptr = occi_unquoted_value( bptr->name )))
+						continue;
+					else if (!( vptr = occi_unquoted_value( bptr->value )))
+						continue;
+					else if (!(eptr=rest_request_header(rptr,nptr,vptr)))
+						break;
+					else
+					{
+						liberate( nptr );
+						liberate( vptr );
+						continue;
+					}
+				}
+			}
+		}
+		drop_data_element( root );
+		return( rptr );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		    o c c i _ r e q u e s t _ b o d y 			*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return( rptr );
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( rptr );
+	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_OCCI ) ))
+		return( occi_text_request_body( optr, rptr ) );
+	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_PHP ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_PHP  ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_PHP ) )))
+		return( occi_php_request_body( optr, rptr ) );
+	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
+		return( occi_json_request_body( optr, rptr ) );
+	else if (!( strcasecmp( hptr->value, _OCCI_OLD_JSON ) ))
+		return( occi_old_json_request_body( optr, rptr ) );
+	else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
+		return( occi_xml_request_body( optr, rptr ) );
+	else	return( rptr );
+}
 
 /*	---------------------------------------------------------	*/
 /*			o c c i _ i n v o k e _ g e t			*/
@@ -507,8 +761,10 @@ private	struct rest_response * occi_invoke_post(
 	struct	rest_interface * iptr;
 	if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
+	else if (!( rptr = occi_request_body(optr, rptr) ))
+		return( occi_failure(cptr,  400, "Bad Request : Incorrect Body" ) );
 	else
-	{	
+	{
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->post )	aptr = (*iptr->post)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
@@ -531,6 +787,8 @@ private	struct rest_response * occi_invoke_put(
 	struct	rest_interface * iptr;
 	if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
+	else if (!( rptr = occi_request_body(optr, rptr) ))
+		return( occi_failure(cptr,  400, "Bad Request : Incorrect Body" ) );
 	else
 	{	
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);

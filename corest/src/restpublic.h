@@ -99,6 +99,8 @@ public struct rest_header *
 public struct rest_header * 	
 	rest_request_header(struct rest_request * rptr, char * nptr, char * vptr );
 
+public	char *	
+	rest_http_prefix();
 
 #endif	/* _restpublic_h */
 	/* ------------- */

@@ -83,7 +83,7 @@ public int is_ip_available(char *ip, char * agent, char * tls, char * version)
 		eptr2 != (struct occi_element*) 0;
 		eptr2 = eptr2->next )
 		{
-                 sprintf(buffer2,"%s%s","http://",eptr2->value);
+                 sprintf(buffer2,"%s%s%s",rest_http_prefix(),"://",eptr2->value);
                  if (!( aaptr2 = occi_simple_get( buffer2, (char *)agent, (char *)tls ) ) )
 		 { 
                   aaptr2 = occi_remove_response( aaptr2 );
@@ -422,7 +422,7 @@ public char * retrieve_domain(char * attribval, char * agent, char * tls)
 		eptr2 != (struct occi_element*) 0;
 		eptr2 = eptr2->next )
 		{
-                sprintf(buffer2,"%s%s","http://",eptr2->value);
+                sprintf(buffer2,"%s%s%s",rest_http_prefix(),"://",eptr2->value);
                 if (!( aaptr2 = occi_simple_get( buffer2, agent, tls ) ) )
 		{ 
                  aaptr2 = occi_remove_response( aaptr2 );
@@ -498,7 +498,7 @@ public char * retrieve_iprange(char * version, char * type, char * agent, char *
 		eptr2 != (struct occi_element*) 0;
 		eptr2 = eptr2->next )
 		{
-                sprintf(buffer2,"%s%s","http://",eptr2->value);
+                sprintf(buffer2,"%s%s%s","://",rest_http_prefix(),eptr2->value);
                 if (!( aaptr2 = occi_simple_get( buffer2, agent, tls ) ) )
 		{ 
                  aaptr2 = occi_remove_response( aaptr2 );

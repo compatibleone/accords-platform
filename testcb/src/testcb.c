@@ -184,7 +184,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 		/* -------------------------------- */
 		/* start the SLA controlled service */
 		/* -------------------------------- */
-		sprintf(buffer,"http://%s",ihost);
+		sprintf(buffer,"%s://%s",rest_http_prefix(),ihost);
 		ihost = liberate( ihost );
 		if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
 			return(503);

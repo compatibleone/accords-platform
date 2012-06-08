@@ -104,6 +104,8 @@ public	char *	default_operator();
 
 #define	_OCCI_MIME_PHP		"text/php"
 
+#define	_OCCI_OLD_JSON		"application/json:occi"	/* houssems messy JSON */
+
 #define	_OCCI_OCCI_JSON		"application/json+occi"
 #define	_OCCI_APP_JSON		"application/json"
 #define	_OCCI_TEXT_JSON		"text/json"

@@ -240,7 +240,7 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr)
 	}
 	else
 	{
-		sprintf(buffer,"http://%s",sptr);
+		sprintf(buffer,"%s://%s",rest_http_prefix(),sptr);
 		if ( pptr->application ) pptr->application = liberate( pptr->application );
 		pptr->application = allocate_string( buffer );
 		zptr = occi_remove_response( zptr );

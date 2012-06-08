@@ -71,6 +71,24 @@ public	int	rest_thread_control(int new_value)
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ h t t p _ p r e f i x 		*/
+/*	------------------------------------------------	*/
+public	char *	rest_http_prefix()
+{
+	char *	prefix;
+	if (!( prefix = default_tls() ))
+		prefix = "http";
+	else if (!( strlen( prefix ) ))
+		prefix = "http";
+	else if (!( strcmp( prefix, "(none)" )))
+		prefix = "http";
+	else if (!( strcmp( prefix, "(null)" )))
+		prefix = "http";
+	else	prefix = "https";
+	return( prefix );
+} 
+
+/*	------------------------------------------------	*/
 /*		r e s t _ o p e n _ s e r v e r			*/
 /*	------------------------------------------------	*/
 private	struct rest_server * 	rest_open_server( int port, char * tls, int max, struct rest_interface * iptr )	

@@ -163,7 +163,7 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 		printf(" Category=%s",category);
 		printf(" Item=%s } \n ",item);
 	}
-	sprintf(buffer,"http://%s:%u/%s/%s",host,_COSACS_PORT,category,item);
+	sprintf(buffer,"%s://%s:%u/%s/%s",rest_http_prefix(),host,_COSACS_PORT,category,item);
 
 	if ( verbose )
 		printf("   %s %s\n",command,buffer);
