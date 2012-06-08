@@ -45,6 +45,8 @@ public struct rest_request * liberate_rest_request(struct rest_request * sptr)
 			 sptr->version = liberate(sptr->version);
 		if ( sptr->body )
 			 sptr->body = liberate(sptr->body);
+		if ( sptr->host )
+			 sptr->host = liberate(sptr->host);
 		sptr = liberate( sptr );
 	}
 	return((struct rest_request *) 0);
@@ -66,6 +68,7 @@ public struct rest_request * reset_rest_request(struct rest_request * sptr)
 		sptr->version = (char*) 0;
 		sptr->type =  0;
 		sptr->body = (char*) 0;
+		sptr->host = (char*) 0;
 	}
 	return(sptr);
 

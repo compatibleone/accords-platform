@@ -715,42 +715,55 @@ public	struct	occi_response *	occi_create_old_json_response(
 	if (!( dptr = json_parse_file( zptr->body ) ))
 		return( aptr );
 	else	root = dptr;
-	/* ------------------------------------------ */
-	/* step over the first one : its the filename */
-	/* ------------------------------------------ */
-	if (!( dptr = dptr->first ))
+
+	for (	cptr = dptr->first;
+		cptr != (struct data_element *) 0;
+		cptr = cptr->next )
 	{
-		drop_data_element( root );
-		return( aptr );
-	}
-	else
-	{
-		for (	cptr = dptr->first;
-			cptr != (struct data_element *) 0;
-			cptr = cptr->next )
+		if (!( cptr->name ))
+			continue;
+		else if (!( nptr = occi_unquoted_value( cptr->name ) ))
+			continue;
+		else if (!( strcmp( nptr, "location" ) ))
 		{
-			if (!( cptr->name ))
-				continue;
-			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
-				continue;
-			else if (!( strcmp( nptr, "location" ) ))
+			for (	bptr = cptr->first;
+				bptr != (struct data_element *) 0;
+				bptr = bptr->next )
 			{
-				for (	bptr = cptr->first;
-					bptr != (struct data_element *) 0;
-					bptr = bptr->next )
-				{
-					if (!( vptr = occi_unquoted_value( bptr->value ) ))
-						break;
-					else if (!(eptr=occi_response_element(aptr,rptr->name,vptr)))
-						break;
-					else	liberate( vptr );
-				}
-				liberate( nptr );
-				break;					
+				if (!( vptr = occi_unquoted_value( bptr->value ) ))
+					break;
+				else if (!(eptr=occi_response_element(aptr,rptr->name,vptr)))
+					break;
+				else	liberate( vptr );
 			}
-			else if (!( strncmp( nptr, "occi.core", strlen("occi.core") ) ))
+			liberate( nptr );
+			break;					
+		}
+		else if (!( strncmp( nptr, "occi.core", strlen("occi.core") ) ))
+		{
+			if (!( vptr = occi_unquoted_value( cptr->value )))
+				continue;
+			else if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+				break;
+			else
 			{
-				if (!( vptr = occi_unquoted_value( cptr->value )))
+				liberate( nptr );
+				liberate( vptr );
+				continue;
+			}
+		}
+		else if (!( strcmp( nptr, "attributes" ) ))
+		{
+			liberate( nptr );
+			for (	bptr = cptr->first;
+				bptr != (struct data_element *) 0;
+				bptr = bptr->next )
+			{
+				if (!( bptr->name ))
+					continue;
+				else if (!( nptr = occi_unquoted_value( bptr->name )))
+					continue;
+				else if (!( vptr = occi_unquoted_value( bptr->value )))
 					continue;
 				else if (!(eptr=occi_response_element(aptr,nptr,vptr)))
 					break;
@@ -761,33 +774,10 @@ public	struct	occi_response *	occi_create_old_json_response(
 					continue;
 				}
 			}
-			else if (!( strcmp( nptr, "attributes" ) ))
-			{
-				liberate( nptr );
-				for (	bptr = cptr->first;
-					bptr != (struct data_element *) 0;
-					bptr = bptr->next )
-				{
-					if (!( bptr->name ))
-						continue;
-					else if (!( nptr = occi_unquoted_value( bptr->name )))
-						continue;
-					else if (!( vptr = occi_unquoted_value( bptr->value )))
-						continue;
-					else if (!(eptr=occi_response_element(aptr,nptr,vptr)))
-						break;
-					else
-					{
-						liberate( nptr );
-						liberate( vptr );
-						continue;
-					}
-				}
-			}
 		}
-		drop_data_element( root );
-		return( aptr );
 	}
+	drop_data_element( root );
+	return( aptr );
 }
 
 /*	------------------------------------------------------------	*/
@@ -1204,6 +1194,7 @@ private	struct	occi_client * occi_analyse_categories( struct occi_client * cptr,
 	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_PLAIN ) ))
 		return( occi_analyse_text_categories( cptr, rptr ) );
 	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_OLD_JSON  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
 		return( occi_analyse_json_categories( cptr, rptr ) );

@@ -1340,7 +1340,7 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 		}
 		else
 		{
-			sprintf(buffer,"%s://%s",rest_http_prefix(),host);
+			rest_add_http_prefix(buffer,1024,host);
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );
 			if (!( zptr = cords_invoke_action( buffer, "build", agent, tls ) ))
@@ -2056,7 +2056,7 @@ private	int	cords_new_cordscript_instance(
 	}
 	else
 	{
-		sprintf(buffer,"%s://%s",rest_http_prefix(),vptr);
+		rest_add_http_prefix(buffer,1024,vptr);
 		if ( aptr->value ) aptr->value = liberate( aptr->value );
 		aptr->value = allocate_string( buffer );
 		zptr = occi_remove_response( zptr );

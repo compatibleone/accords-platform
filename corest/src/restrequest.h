@@ -11,6 +11,7 @@ struct	rest_request
 	char			* version;
 	int			type;
 	char			* body;
+	char			* host;
 };
 
 #endif

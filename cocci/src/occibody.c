@@ -84,7 +84,7 @@ private	char *	occi_json_body(
 				hptr = hptr->next;
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
-				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				rest_replace_header( hptr, _OCCI_OCCI_JSON );
 				hptr = hptr->next;
 			}
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
@@ -173,7 +173,7 @@ private	char *	occi_old_json_body(
 				hptr = hptr->next;
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
-				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				rest_replace_header( hptr, _OCCI_OLD_JSON );
 				hptr = hptr->next;
 			}
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
@@ -184,7 +184,7 @@ private	char *	occi_old_json_body(
 			else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
 			{
 				if (!( locations++ ))
-					fprintf(h,"[\n");
+					fprintf(h," %clocation%c : [\n",0x0022,0x0022);
 				else	fprintf(h,",\n");
 				fprintf(h,"\t%c%s%c",0x0022,hptr->value,0x0022);
 				hptr = occi_consume_header( hptr );
@@ -193,11 +193,11 @@ private	char *	occi_old_json_body(
 			{
 				if (!( attributs++ ))
 				{
-					fprintf(h,"%ckind%c :{\n",0x0022,0x0022);
-					fprintf(h,"\t%cterm%c: %c%s%c,\n",0x0022,0x0022,0x0022,cptr->id,0x0022);
-					fprintf(h,"\t%cscheme%c: %c%s%c,\n",0x0022,0x0022,0x0022,cptr->scheme,0x0022);
-					fprintf(h,"\t%cclass%c: %c%s%c\n\t},",0x0022,0x0022,0x0022,"kind",0x0022);
-					fprintf(h,"attributes { \n" );
+					fprintf(h,"%ckind%c : {\n",0x0022,0x0022);
+					fprintf(h,"\t%cterm%c : %c%s%c,\n",0x0022,0x0022,0x0022,cptr->id,0x0022);
+					fprintf(h,"\t%cscheme%c : %c%s%c,\n",0x0022,0x0022,0x0022,cptr->scheme,0x0022);
+					fprintf(h,"\t%cclass%c : %c%s%c\n\t},\n",0x0022,0x0022,0x0022,"kind",0x0022);
+					fprintf(h,"\t%cattributes%c : {\n",0x0022,0x0022 );
 				}
 				else	fprintf(h,",\n");
 				strcpy((nptr = vptr = buffer),hptr->value);
@@ -222,7 +222,8 @@ private	char *	occi_old_json_body(
 		else if ( locations )
 			fprintf(h,"\t]\n");
 
-		fprintf(h,"}\n");
+		fprintf(h,"}\n");		
+
 		fclose(h);
 		return( occi_content_length(contentlength, filename ));
 	}

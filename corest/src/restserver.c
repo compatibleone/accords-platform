@@ -31,6 +31,7 @@
 #include "restlog.h"
 #include "tlsload.h"
 
+public	char *	default_tls();
 private	struct	rest_server * rest_liberate_server( struct rest_server * rptr );
 private	struct	rest_server * rest_allocate_server();
 private	struct	rest_client * rest_new_client(struct rest_server * sptr);
@@ -87,6 +88,19 @@ public	char *	rest_http_prefix()
 	else	prefix = "https";
 	return( prefix );
 } 
+
+/*	------------------------------------------------	*/
+/*	    r e s t _ a d d _ h t t p _ p r e f i x 		*/
+/*	------------------------------------------------	*/
+public	void	rest_add_http_prefix(char * buffer, int buflen, char * host )
+{
+	if (!( strncmp(host,"http:",strlen("http:")) ))
+		strcpy(buffer,host);
+	else if (!( strncmp(host,"https:",strlen("https:")) ))
+		strcpy(buffer,host);
+	else	sprintf(buffer,"%s://%s",rest_http_prefix(),host);
+	return;
+}
 
 /*	------------------------------------------------	*/
 /*		r e s t _ o p e n _ s e r v e r			*/
@@ -540,16 +554,25 @@ public	struct	rest_header * add_response_header(struct rest_response * aptr )
 }
 
 /*	------------------------------------------------	*/
-/*	   r e s t _ r eq u e s t _ h o s t 			*/
+/*	   r e s t _ r e q u e s t _ h o s t 			*/
 /*	------------------------------------------------	*/
 public	char * 	rest_request_host( struct rest_request * rptr )
 {
+	char 	buffer[2048];
 	struct	rest_header * hptr;
 	if (!( rptr ))
 		return((char *) 0);
+	else if ( rptr->host )
+		return( rptr->host );
 	else if (!( hptr = rest_resolve_header( rptr->first, "Host" ) ))
 		return((char *) 0);
-	else	return( hptr->value );
+	else if (!( hptr->value ))
+		return((char *) 0);
+	else
+	{
+		rest_add_http_prefix(buffer,2048,hptr->value);
+		return( (rptr->host = allocate_string( buffer ) ) );
+	}
 }
 
 /*	------------------------------------------------	*/
@@ -1148,12 +1171,18 @@ private	char *	rest_content_extension( char * sptr )
 		return( "html" );
 	if ((!( strcmp( sptr, "text/json" 	)))
 	||  (!( strcmp( sptr, "application/json" 	)))
+	||  (!( strcmp( sptr, "application/json+occi" 	)))
+	||  (!( strcmp( sptr, "application/json:occi" 	)))
 	||  (!( strcmp( sptr, "x-application/json"))))
 		return( "json" );
 	if ((!( strcmp( sptr, "text/xml" 	)))
 	||  (!( strcmp( sptr, "application/xml" 	)))
 	||  (!( strcmp( sptr, "x-application/xml"))))
 		return( "xml" );
+	if ((!( strcmp( sptr, "text/php" 	)))
+	||  (!( strcmp( sptr, "application/php" 	)))
+	||  (!( strcmp( sptr, "x-application/php"))))
+		return( "php" );
 	if ((!( strcmp( sptr, "text/occi" 	)))
 	||  (!( strcmp( sptr, "application/occi" 	)))
 	||  (!( strcmp( sptr, "x-application/occi"))))

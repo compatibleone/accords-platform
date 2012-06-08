@@ -99,6 +99,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
+
 	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_PROBE);
 
 	if ( prefix )

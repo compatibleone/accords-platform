@@ -102,6 +102,9 @@ public struct rest_header *
 public	char *	
 	rest_http_prefix();
 
+public	void	
+	rest_add_http_prefix(char * buffer, int buflen, char * host );
+
 #endif	/* _restpublic_h */
 	/* ------------- */
 

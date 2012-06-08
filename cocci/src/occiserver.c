@@ -375,9 +375,10 @@ private	struct rest_response * occi_get_capacities(
 		ctptr = hptr->value;
 	else	ctptr = _OCCI_MIME_OCCI;
 
-	if ((!( strcasecmp( ctptr, _OCCI_OCCI_JSON ) ))
-	||  (!( strcasecmp( ctptr, _OCCI_APP_JSON  ) ))
-	||  (!( strcasecmp( ctptr, _OCCI_TEXT_JSON ) )))
+	if  ((!( strcasecmp( ctptr, _OCCI_OCCI_JSON ) ))
+	||   (!( strcasecmp( ctptr, _OCCI_APP_JSON  ) ))
+	||   (!( strcasecmp( ctptr, _OCCI_OLD_JSON  ) ))
+	||   (!( strcasecmp( ctptr, _OCCI_TEXT_JSON ) )))
 	{
 		if (!( mptr = occi_json_capacities( optr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
@@ -386,7 +387,7 @@ private	struct rest_response * occi_get_capacities(
 
 		sprintf(clbuff,"%u",strlen(mptr));
 
-		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_MIME_JSON) ))
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, clbuff )))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );

@@ -466,7 +466,7 @@ private	int	master_create_publication( struct publication * pptr )
 		eptr = occi_remove_elements( eptr );
 		return(0);
 	}
-	else	sprintf(buffer,"%s://%s",rest_http_prefix(),host);
+	else	rest_add_http_prefix(buffer,1024,host);
 	if (!( pptr->remote = allocate_string( buffer ) ))
 	{
 		zptr = occi_remove_response( zptr );	
