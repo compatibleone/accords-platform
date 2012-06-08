@@ -9,6 +9,8 @@ rm -f links_*
 rm -f plan_*
 rm -f proactive.xml
 rm -f rest/*
+rm -f service/*
+rm -f security/*
 rm -f publication.xml
 rm -f co-log
 echo Done. 

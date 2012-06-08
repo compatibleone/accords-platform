@@ -234,7 +234,7 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 		if ( server_data->reference ) server_data->reference = liberate( server_data->reference );
 		if ( server_data->publicaddr ) server_data->publicaddr = liberate( server_data->publicaddr );
 		if ( server_data->privateaddr ) server_data->privateaddr = liberate( server_data->privateaddr );
-		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))    // Get the hostId. 
+		if (!( vptr = json_atribut( yptr->jsonroot, "hostname") ))    // Get the hostname. 
 		{
 			reset_structure_proactive_server( server_data );
 			return( 27 );
@@ -244,7 +244,7 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0) // Get the "private" json field. 
+		if (( vptr = json_atribut( yptr->jsonroot, "privateip")) != (char *) 0) // Get the "private" json field. 
 		{
 			if (!( server_data->privateaddr  = allocate_string(vptr)))               // Put in privateaddr the private ip address. 
 			{
@@ -252,7 +252,7 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 				return( 27 );
 			}
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0) // Get the "public" json field. 
+		if (( vptr = json_atribut( yptr->jsonroot, "publicip")) != (char *) 0) // Get the "public" json field. 
 		{
 			if (!( server_data->publicaddr  = allocate_string(vptr)))               // Put in proactive*->publicaddr the public ip address of the ProActive node. 
 			{
