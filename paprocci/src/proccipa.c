@@ -143,6 +143,22 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 //	}
 //}
 
+
+/*! Check if the output of the pa_delete_server function was correct. */
+private	int	check_output_pa_delete_server( struct pa_response * server_created)
+{
+	char *	vptr; // Auxiliar variable. 
+
+    // Checking that the field error is not there. 
+    if (vptr = json_atribut( server_created->jsonroot, "error")) // Obtaining the error of the operation (if present, there was an error). 
+    {
+        fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
+        return( 27 );
+    }
+
+    return (0); 
+
+}
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
@@ -172,6 +188,14 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 
 		if ( server_data->rootpass ) 
 			server_data->rootpass = liberate( server_data->rootpass );
+
+        // Checking that the field error is not there. 
+		if (vptr = json_atribut( server_created->jsonroot, "error")) // Obtaining the error of the operation (if present, there was an error). 
+		{
+            fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
+			reset_structure_proactive_server( server_data );
+			return( 27 );
+		}
 
         // Filling in the server_data structure given. 
 		if (!( vptr = json_atribut( server_created->jsonroot, "id") )) // Obtaining the ID of the operation. 
@@ -329,12 +353,13 @@ private	struct	rest_response * start_proactive(
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_proactive_server( paptr, pptr );
+		status = connect_proactive_server( paptr, pptr ); // Returns 0 if everything okay.
 		paptr = liberate_pa_response( paptr );
-		//if (!( status ))
-		//	return( rest_html_response( aptr, 200, "OK" ) );
-		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
-
+		if (status) // If something went wrong (status != 0)
+        {
+            fprintf(stderr, "Something went wrong connecting to proactive %d...\n", status);
+            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+        }
         /*****COSACS*******/ 
 
         sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
@@ -387,7 +412,7 @@ private	struct	rest_response * start_proactive(
         //    }
         //}
         //osptr = liberate_os_response( osptr );
-        if (!( status ))
+        if (!( status ))  
         {
 
             return( rest_html_response( aptr, 200, "OK" ) );
@@ -475,6 +500,9 @@ private	struct	rest_response * stop_proactive(
 			pptr->when = time((long *) 0);
 			osptr = liberate_pa_response( osptr );
 		}
+        if (check_output_pa_delete_server(osptr) != 0){ // If something went wrong...
+            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+        }
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
