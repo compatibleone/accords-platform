@@ -26,10 +26,10 @@
 
 #include "agency.h"
 
-/*	------------------------------	*/
-/*	l i b e r a t e _ a g e n c y 	*/
-/*	------------------------------	*/
-public struct agency * liberate_agency(struct agency * sptr)
+/*	------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ a g e n c y 	*/
+/*	------------------------------------------	*/
+public struct cords_agency * liberate_cords_agency(struct cords_agency * sptr)
 {
 	if ( sptr )
 	{
@@ -53,14 +53,14 @@ public struct agency * liberate_agency(struct agency * sptr)
 			 sptr->password = liberate(sptr->password);
 		sptr = liberate( sptr );
 	}
-	return((struct agency *) 0);
+	return((struct cords_agency *) 0);
 
 }
 
-/*	------------------------	*/
-/*	r e s e t _ a g e n c y 	*/
-/*	------------------------	*/
-public struct agency * reset_agency(struct agency * sptr)
+/*	------------------------------------	*/
+/*	r e s e t _ c o r d s _ a g e n c y 	*/
+/*	------------------------------------	*/
+public struct cords_agency * reset_cords_agency(struct cords_agency * sptr)
 {
 	if ( sptr )
 	{
@@ -82,21 +82,21 @@ public struct agency * reset_agency(struct agency * sptr)
 
 }
 
-/*	------------------------------	*/
-/*	a l l o c a t e _ a g e n c y 	*/
-/*	------------------------------	*/
-public struct agency * allocate_agency()
+/*	------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ a g e n c y 	*/
+/*	------------------------------------------	*/
+public struct cords_agency * allocate_cords_agency()
 {
-	struct agency * sptr;
-	if (!( sptr = allocate( sizeof( struct agency ) ) ))
+	struct cords_agency * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_agency ) ) ))
 		return( sptr );
-	else	return( reset_agency(sptr) );
+	else	return( reset_cords_agency(sptr) );
 }
 
-/*	------------------------	*/
-/*	x m l i n _ a g e n c y 	*/
-/*	------------------------	*/
-public int xmlin_agency(struct agency * sptr,struct xml_element * eptr)
+/*	------------------------------------	*/
+/*	x m l i n _ c o r d s _ a g e n c y 	*/
+/*	------------------------------------	*/
+public int xmlin_cords_agency(struct cords_agency * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -160,10 +160,10 @@ public int xmlin_agency(struct agency * sptr,struct xml_element * eptr)
 
 }
 
-/*	--------------------------------	*/
-/*	r e s t _ o c c i _ a g e n c y 	*/
-/*	--------------------------------	*/
-public int rest_occi_agency(FILE * fh,struct agency * sptr,char * prefix, char * nptr)
+/*	--------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ a g e n c y 	*/
+/*	--------------------------------------------	*/
+public int rest_occi_cords_agency(FILE * fh,struct cords_agency * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);

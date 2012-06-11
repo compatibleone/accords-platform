@@ -35,7 +35,7 @@
 /* 	f u n c t i o n   p r o t o t y p e s	*/
 /*	-------------------------------------	*/
 
-private	int	launch_publication( struct publication * pptr, struct rest_client * cptr );
+private	int	launch_publication( struct cords_publication * pptr, struct rest_client * cptr );
 
 private	struct rest_response * publisher_delete_all( 
 		struct rest_client * cptr, 
@@ -102,7 +102,7 @@ public	char *	retrieve_master_publisher()
 /*	-----------------------------------------------------	*/  
 /*	r e t r i e v e _ r e m o t e _ p u b l i c a t i o n	*/
 /*	-----------------------------------------------------	*/  
-public	char *	retrieve_remote_publication(struct publication * pptr)		
+public	char *	retrieve_remote_publication(struct cords_publication * pptr)		
 {
 	if (!( pptr->remote ))
 		return((char *) 0 );
@@ -223,14 +223,14 @@ private	struct	rest_response * suspend_publication(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
 	{
 		pptr->when = 0;
 		pptr->state = _OCCI_SUSPENDED;
-		autosave_publication_nodes("publication.xml");
+		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -245,7 +245,7 @@ private	struct	rest_response * restart_publication(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -253,7 +253,7 @@ private	struct	rest_response * restart_publication(
 		pptr->uptime = 0;
 		pptr->when = time((long*) 0);
 		pptr->state = _OCCI_RUNNING;
-		autosave_publication_nodes("publication.xml");
+		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -261,7 +261,7 @@ private	struct	rest_response * restart_publication(
 /*	--------------------------------------------------------	*/
 /*		b u i l d _ m a s t e r _ i n s t a n c e		*/
 /*	--------------------------------------------------------	*/
-private	struct occi_element * build_master_instance( struct publication * pptr )
+private	struct occi_element * build_master_instance( struct cords_publication * pptr )
 {
 	struct	occi_element * root=(struct occi_element *) 0;
 	struct	occi_element * eptr=(struct occi_element *) 0;
@@ -353,7 +353,7 @@ private	struct occi_element * build_master_instance( struct publication * pptr )
 /*	--------------------------------------------------------	*/
 /*		s t o r e _ m a s t e r _ i n s t a n c e		*/
 /*	--------------------------------------------------------	*/
-private	int	store_master_instance( struct publication * pptr, struct occi_response * zptr )
+private	int	store_master_instance( struct cords_publication * pptr, struct occi_response * zptr )
 {
 	struct	occi_element * eptr;
 	char *	vptr;
@@ -441,7 +441,7 @@ private	int	store_master_instance( struct publication * pptr, struct occi_respon
 /*	-------------------------------------------------	*/
 /* 	m a s t e r _ c r e a t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------------	*/
-private	int	master_create_publication( struct publication * pptr )
+private	int	master_create_publication( struct cords_publication * pptr )
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	struct occi_element * eptr=(struct occi_element *) 0;
@@ -488,7 +488,7 @@ private	int	create_publication(struct occi_category * optr, void * vptr)
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	struct	occi_kind_node * nptr;
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -505,7 +505,7 @@ private	int	create_publication(struct occi_category * optr, void * vptr)
 /*	-----------------------------------------------------	*/
 /* 	m a s t e r _ r e t r i e v e _ p u b l i c a t i o n 	*/
 /*	-----------------------------------------------------	*/
-private	int	master_retrieve_publication( struct publication * pptr )
+private	int	master_retrieve_publication( struct cords_publication * pptr )
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	char * master;
@@ -532,7 +532,7 @@ private	int	master_retrieve_publication( struct publication * pptr )
 private	int	retrieve_publication(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -546,7 +546,7 @@ private	int	retrieve_publication(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------------	*/
 /* 	m a s t e r _ u p d a t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------------	*/
-private	int	master_update_publication( struct publication * pptr )
+private	int	master_update_publication( struct cords_publication * pptr )
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	struct occi_element  * eptr=(struct occi_element *) 0;
@@ -577,7 +577,7 @@ private	int	master_update_publication( struct publication * pptr )
 private	int	update_publication(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -592,7 +592,7 @@ private	int	update_publication(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------------	*/
 /* 	m a s t e r _ d e l e t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------------	*/
-private	int	master_delete_publication( struct publication * pptr )
+private	int	master_delete_publication( struct cords_publication * pptr )
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	char * master;
@@ -616,7 +616,7 @@ private	int	master_delete_publication( struct publication * pptr )
 private	int	delete_publication(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	publication * pptr;
+	struct	cords_publication * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -700,7 +700,7 @@ private	struct	occi_interface	enquiry_interface = {
 private	int	create_agency(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -719,7 +719,7 @@ private	int	create_agency(struct occi_category * optr, void * vptr)
 private	int	retrieve_agency(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -737,7 +737,7 @@ private	int	retrieve_agency(struct occi_category * optr, void * vptr)
 private	int	update_agency(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -751,7 +751,7 @@ private	int	update_agency(struct occi_category * optr, void * vptr)
 private	int	delete_agency(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -776,14 +776,14 @@ private	struct	rest_response * stop_agency(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
 	{
 		pptr->start = 0;
 		pptr->state = 0;
-		autosave_agency_nodes("agency.xml");
+		autosave_cords_agency_nodes("agency.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -798,7 +798,7 @@ private	struct	rest_response * start_agency(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	agency * pptr;
+	struct	cords_agency * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -806,7 +806,7 @@ private	struct	rest_response * start_agency(
 		pptr->uptime = 0;
 		pptr->start = time((long*) 0);
 		pptr->state = 1;
-		autosave_agency_nodes("agency.xml");
+		autosave_cords_agency_nodes("agency.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -822,7 +822,7 @@ private	int	publisher_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_publisher.xml");
 
-	if (!( optr = occi_publication_builder( Publisher.domain,"publication" ) ))
+	if (!( optr = occi_cords_publication_builder( Publisher.domain,"publication" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

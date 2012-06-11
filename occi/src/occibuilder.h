@@ -71,7 +71,7 @@ public struct occi_category * occi_cords_tarif_builder(char *a,char * b);
 public struct occi_category * occi_cords_user_builder(char *a,char * b);
 public struct occi_category * occi_cords_xlink_builder(char *a,char * b);
 
-public struct occi_category * occi_publication_builder(char *a,char * b);
+public struct occi_category * occi_cords_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
 public struct occi_category * occi_cords_agency_builder(char *a,char * b);
 
@@ -138,7 +138,7 @@ const static struct {
 	{ "tarif", occi_cords_tarif_builder },
 	{ "user", occi_cords_user_builder },
 	{ "xlink", occi_cords_xlink_builder },
-	{ "publication", occi_publication_builder },
+	{ "publication", occi_cords_publication_builder },
 	{ "enquiry", occi_cords_enquiry_builder },
 	{ "agency", occi_cords_agency_builder },
 	{ "openstack", occi_openstack_builder },
