@@ -1,11 +1,29 @@
 #!/bin/bash
+
 # ProActive wrapper for COSACS module.
+
+# Functions
+control_c(){
+  echo Signal sent from Scheduler...
+  COSACS_PID=`ps -ef | grep cosacs.xml | grep -v grep | tee log_cosacs_found.txt  | awk {'print $2'} | sort -n | head -1`
+  # Check if COSACS_PID exists. 
+  if [ "x$COSACS_PID" = "x" ]; then 
+    echo Signal: no COSACS running... 
+  else
+    kill $COSACS_PID
+  fi
+  rm -f /home/cosacs/lock
+}
+
 CURRDIR=`dirname $0`
-# Needs to be added the mechanism of lock-file (containing the PID of COSACS when running).
 
-touch $CURRDIR/lock
+# Trapping the signals
+trap control_c SIGINT
+trap control_c SIGTERM
 
-$CURRDIR/run-cosacs &
+touch /home/cosacs/lock
+
+/home/cosacs/run-cosacs &
 
 COSACS_PID=`ps -ef | grep cosacs.xml | grep -v grep | tee log_cosacs_found.txt  | awk {'print $2'} | sort -n | head -1`
 
@@ -18,11 +36,11 @@ echo No COSACS running... Exiting...
 exit 0;
 fi
 
-echo $COSACS_PID > $CURRDIR/lock
+echo $COSACS_PID > /home/cosacs/lock
 
 echo Waiting for COSACS to be killed to remove the lock file... 
 strace -p $COSACS_PID 
 
 echo COSACS was killed, removing lock file...
-rm -f $CURRDIR/lock
+rm -f /home/cosacs/lock
 
