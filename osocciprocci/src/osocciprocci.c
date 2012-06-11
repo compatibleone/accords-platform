@@ -30,6 +30,13 @@
 #include "occibuilder.h"
 #include "cordslang.h"
 
+#include "osconfig.h"
+#include "openstack.h"
+#include "openstack.c"
+#include "occiopenstack.c"
+#include "osconfig.c"
+#include "occiosconfig.c"
+
 struct	accords_configuration OsOcciProcci = {
 	0,0,
 	0,0,0,0,
@@ -206,7 +213,7 @@ private	struct	occi_category * build_occi_openstack_configuration( char * domain
 {
 	struct	occi_category * optr;
 
-	if (!( optr = occi_cords_osconfig_builder( domain, "occi_openstack_configuration" ) ))
+	if (!( optr = occi_os_config_builder( domain, "occi_openstack_configuration" ) ))
 		return( optr );
 #ifdef	_OS_OCCI_PROCCI_ACTIONS
 	else if (!( optr = occi_add_action( optr,"current","",set_default_openstack)))

@@ -26,21 +26,6 @@
 #include "cords.h"
 #include "document.h"
 
-#include "occiopenstack.c"
-#include "occiosconfig.c"
-
-#include "occideltacloud.c"
-#include "occidcconfig.c"
-
-#include "occiopennebula.c"
-#include "occionconfig.c"
-
-#include "occiwindowsazure.c"
-#include "occiazconfig.c"
-
-#include "occiproactive.c"
-#include "occipaconfig.c"
-
 	/* ------------- */
 #endif	/* _oson_occi_c */
 	/* ------------- */

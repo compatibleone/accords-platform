@@ -75,16 +75,6 @@ public struct occi_category * occi_cords_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
 public struct occi_category * occi_cords_agency_builder(char *a,char * b);
 
-public struct occi_category * occi_deltacloud_builder(char *a,char * b);
-public struct occi_category * occi_dc_config_builder(char *a,char * b);
-public struct occi_category * occi_openstack_builder(char *a,char * b);
-public struct occi_category * occi_cords_osconfig_builder(char *a,char * b);
-public struct occi_category * occi_opennebula_builder(char *a,char * b);
-public struct occi_category * occi_cords_onconfig_builder(char *a,char * b);
-
-public struct occi_category * occi_windowsazure_builder(char *a,char * b);
-public struct occi_category * occi_cords_azconfig_builder(char *a,char * b);
-
 public struct occi_category * occi_cords_ipaddress_builder(char *a,char * b);
 public struct occi_category * occi_cords_domain_builder(char *a,char * b);
 public struct occi_category * occi_cords_iprange_builder(char *a,char * b);
@@ -141,12 +131,6 @@ const static struct {
 	{ "publication", occi_cords_publication_builder },
 	{ "enquiry", occi_cords_enquiry_builder },
 	{ "agency", occi_cords_agency_builder },
-	{ "openstack", occi_openstack_builder },
-	{ "osconfig", occi_cords_osconfig_builder },
-	{ "opennebula", occi_opennebula_builder },
-	{ "onconfig", occi_cords_onconfig_builder },
-	{ "windowsazure", occi_windowsazure_builder },
-	{ "azconfig", occi_cords_azconfig_builder },
 	{ "ipaddress", occi_cords_ipaddress_builder },
 	{ "domain", occi_cords_domain_builder },
 	{ "iprange", occi_cords_iprange_builder },

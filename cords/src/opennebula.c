@@ -294,4 +294,4 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 
 }
 
-#endif	/* _opennebula_c_ */
+#endif	/* _opennebula_copennebula_c_ */

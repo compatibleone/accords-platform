@@ -294,4 +294,4 @@ public int rest_occi_deltacloud(FILE * fh,struct deltacloud * sptr,char * prefix
 
 }
 
-#endif	/* _deltacloud_c_ */
+#endif	/* _deltacloud_cdeltacloud_c_ */

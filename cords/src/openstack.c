@@ -294,4 +294,4 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 
 }
 
-#endif	/* _openstack_c_ */
+#endif	/* _openstack_copenstack_c_ */

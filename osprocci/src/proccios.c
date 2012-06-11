@@ -1787,7 +1787,7 @@ private	int	set_default_openstack(struct occi_category * optr, void * vptr)
 public	struct	occi_category * build_openstack_configuration( char * domain )
 {
 	struct	occi_category * optr;
-	if (!( optr = occi_cords_osconfig_builder( domain, "openstack_configuration" ) ))
+	if (!( optr = occi_os_config_builder( domain, "openstack_configuration" ) ))
 		return( optr );
 	else if (!( optr = occi_add_action( optr,"current","",set_default_openstack)))
 		return( optr );

@@ -29,6 +29,13 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
+#include "osconfig.h"
+#include "openstack.h"
+#include "openstack.c"
+#include "occiopenstack.c"
+#include "osconfig.c"
+#include "occiosconfig.c"
+
 struct	accords_configuration OsProcci = {
 	0,0,
 	0,0,0,0,

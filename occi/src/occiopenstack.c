@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _openstack_c_
-#define _openstack_c_
+#ifndef _occiopenstack_c_
+#define _occiopenstack_c_
 
 #include "openstack.h"
 
@@ -1403,4 +1403,4 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 
 }
 
-#endif	/* _openstack_c_ */
+#endif	/* _occiopenstack_c_ */

@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _opennebula_c_
-#define _opennebula_c_
+#ifndef _occiopennebula_c_
+#define _occiopennebula_c_
 
 #include "opennebula.h"
 
@@ -1403,4 +1403,4 @@ public struct rest_header *  opennebula_occi_headers(struct opennebula * sptr)
 
 }
 
-#endif	/* _opennebula_c_ */
+#endif	/* _occiopennebula_c_ */

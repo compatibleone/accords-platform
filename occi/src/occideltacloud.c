@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _deltacloud_c_
-#define _deltacloud_c_
+#ifndef _occideltacloud_c_
+#define _occideltacloud_c_
 
 #include "deltacloud.h"
 
@@ -1403,4 +1403,4 @@ public struct rest_header *  deltacloud_occi_headers(struct deltacloud * sptr)
 
 }
 
-#endif	/* _deltacloud_c_ */
+#endif	/* _occideltacloud_c_ */

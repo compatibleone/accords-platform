@@ -29,6 +29,13 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
+#include "dcconfig.h"
+#include "deltacloud.h"
+#include "deltacloud.c"
+#include "occideltacloud.c"
+#include "dcconfig.c"
+#include "occidcconfig.c"
+
 struct	accords_configuration DcProcci = {
 	0,0,
 	0,0,0,0,

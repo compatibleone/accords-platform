@@ -214,4 +214,4 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 
 }
 
-#endif	/* _windowsazure_c_ */
+#endif	/* _windowsazure_cwindowsazure_c_ */

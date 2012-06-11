@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _proactive_c_
-#define _proactive_c_
+#ifndef _occiproactive_c_
+#define _occiproactive_c_
 
 #include "proactive.h"
 
@@ -1073,4 +1073,4 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 
 }
 
-#endif	/* _proactive_c_ */
+#endif	/* _occiproactive_c_ */

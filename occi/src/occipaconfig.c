@@ -19,14 +19,10 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _paconfig_c_
-#define _paconfig_c_
+#ifndef _occipaconfig_c_
+#define _occipaconfig_c_
 
 #include "paconfig.h"
-
-/*!
- * This file handles the occi kinds through which other ACCORDS components contact this procci. 
- */
 
 /*	----------------------------	*/
 /*	o c c i _ p a _ c o n f i g 	*/
@@ -861,7 +857,7 @@ private void	redirect_occi_pa_config_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_pa_config */
-public struct occi_category * occi_cords_paconfig_builder(char * a,char * b) {
+public struct occi_category * occi_pa_config_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -1083,4 +1079,4 @@ public struct rest_header *  pa_config_occi_headers(struct pa_config * sptr)
 
 }
 
-#endif	/* _paconfig_c_ */
+#endif	/* _occipaconfig_c_ */

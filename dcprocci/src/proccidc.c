@@ -84,8 +84,8 @@ public	struct	occi_category * build_deltacloud( char * domain )
 private	int	set_default_deltacloud(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
-	struct	os_config * pptr;
-	struct	os_config * wptr;
+	struct	dc_config * pptr;
+	struct	dc_config * wptr;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -96,7 +96,7 @@ private	int	set_default_deltacloud(struct occi_category * optr, void * vptr)
 			nptr = nptr->previous;
 		while ( nptr )
 		{
-			if ((wptr = nptr->contents) != (struct os_config*) 0)
+			if ((wptr = nptr->contents) != (struct dc_config*) 0)
 				wptr->current = 0,
 			nptr = nptr->next;
 		}

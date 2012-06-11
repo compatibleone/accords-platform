@@ -84,17 +84,6 @@
 #include "agency.h"
 #include "operator.h"
 
-#include "openstack.h"
-#include "osconfig.h"
-#include "deltacloud.h"
-#include "dcconfig.h"
-#include "opennebula.h"
-#include "onconfig.h"
-#include "windowsazure.h"
-#include "proactive.h"
-#include "azconfig.h"
-#include "paconfig.h"
-
 #include "ipaddress.h"
 #include "domain.h"
 #include "iprange.h"

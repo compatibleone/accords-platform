@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _windowsazure_c_
-#define _windowsazure_c_
+#ifndef _occiwindowsazure_c_
+#define _occiwindowsazure_c_
 
 #include "windowsazure.h"
 
@@ -1103,4 +1103,4 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 
 }
 
-#endif	/* _windowsazure_c_ */
+#endif	/* _occiwindowsazure_c_ */

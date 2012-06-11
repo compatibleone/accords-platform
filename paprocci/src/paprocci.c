@@ -29,6 +29,13 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
+#include "paconfig.h"
+#include "proactive.h"
+#include "proactive.c"
+#include "occiproactive.c"
+#include "paconfig.c"
+#include "occipaconfig.c"
+
 struct	accords_configuration WpaProcci = {
 	0,0,
 	0,0,0,0,

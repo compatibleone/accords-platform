@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _dcconfig_c_
-#define _dcconfig_c_
+#ifndef _occidcconfig_c_
+#define _occidcconfig_c_
 
 #include "dcconfig.h"
 
@@ -1019,4 +1019,4 @@ public struct rest_header *  dc_config_occi_headers(struct dc_config * sptr)
 
 }
 
-#endif	/* _dcconfig_c_ */
+#endif	/* _occidcconfig_c_ */
