@@ -7,7 +7,7 @@
 typedef struct ele
 {
  char value[256];
- struct el *prev,*next;
+ struct ele *prev,*next;
 }elemm;
 
 typedef struct
@@ -19,8 +19,6 @@ typedef struct
 void resetListe(listcc *l);
 void addBacke(listcc *l, char *val);
 void addFronte(listcc *l, char *val);
-//char *retBack(listc *l);
-//char *retFront(listc *l);
 void liberateListe(listcc *l);
 
 void strConcat(char str1[], char str2[],char c);

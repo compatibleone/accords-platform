@@ -33,7 +33,9 @@
 #include "occibuilder.h"
 #include "list.h"
 #include "../../pyaccords/pysrc/crudinterf.h"
+#include "../../pyaccords/pysrc/categaction.h"
 
+char cords_action[12][256]={"start","stop","restart","snapshot","save","suspend","softboot","hardboot","resize","confirm","revert"}; 
 struct accords_configuration moduleConfig;
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName)
@@ -58,7 +60,7 @@ void fillInAccordsConfiguration(struct accords_configuration *componentModule, c
         componentModule->chatport=8000;                        /* xmpp chat host prot                  */
         componentModule->domain="domain";                      /* category domain                      */
         componentModule->config=configFile;                    /* configuration file                   */
-
+        componentModule->zone="europe";
         componentModule->firstcat=(struct occi_category *) 0;
         componentModule->lastcat=(struct  occi_category *) 0;
 
@@ -87,6 +89,11 @@ public	char *	default_operator()
 public	char *	default_tls()		
 {	
         return(moduleConfig.tls);		
+}
+
+public	char *	default_zone()
+{	
+   return(OsProcci.zone);		
 }
 
 public	int	failure( int e, char * m1, char * m2 )
@@ -156,6 +163,22 @@ private	struct rest_extension * module_extension( void * v,struct rest_server * 
 {
 	return( xptr );
 }
+/******************************************************************************************************************/
+/*      Function to call occi category action for the category specified in name variable                        */
+/******************************************************************************************************************/
+struct rest_response * callocciCategoryAction(const char *name)
+{
+  int i;
+   for (i = 0; i < (sizeof(occiCategoryAction_map) / sizeof(occiCategoryAction_map[0])); i++) 
+   {
+     if (!strcmp(occiCategoryAction_map[i].name, name)) 
+     {
+       return occiCategoryAction_map[i].func;
+     }
+  }
+
+  return (struct occi_category *) 0;
+}
 
 /******************************************************************************************************************/
 /*      Function to call occi category builder for the category specified in name variable                        */
@@ -195,46 +218,47 @@ struct occi_interface * callocciCategoryInterface(const char *name)
 /*			module _ o p e r a t i o n				                                  */
 /******************************************************************************************************************/
 private	int	module_operation( char * nptr, struct accords_configuration *componentModule, char *moduleName, 
-listc categoryName,int dim)
+listc categoryName,listc categoryAct,int dim)
 {
         char xlinkModule[256];
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
-        char **nameCat;
-        int  *listCat;
+        
         int i;
         struct occi_interface categoryInterface;
-
-        nameCat = (char**) malloc(sizeof (char*) * dim);
-        for(i = 0; i < dim; i++)
-              nameCat[i] = (char*) malloc(sizeof (char) * 256);
-       
-        listCat = (int*) malloc(sizeof (int) * dim);
+        int indice;
         
-        i=0;
+        char categoryAction[256];
+
         elem *pelem = categoryName.first;    
         while(pelem)
         {       
-          nameCat[i]= pelem->value;     
-          pelem = pelem->next; 
-          i++;   
-        }
-
-        sprintf(xlinkModule,"links_%s.xml",moduleName);
-        xlinkModule[strlen(xlinkModule)]=0;
-	set_autosave_cords_xlink_name(xlinkModule);
-       
-        for(i=0;i<dim;i++)
-        {
-	  if (!( optr = callocciCategoryBuilder( nameCat[i],componentModule->domain,nameCat[i]) ))
+          sprintf(xlinkModule,"links_%s.xml",moduleName);
+          xlinkModule[strlen(xlinkModule)]=0;
+	  set_autosave_cords_xlink_name(xlinkModule);
+      
+	  if (!( optr = callocciCategoryBuilder( pelem->value,componentModule->domain,pelem->value) ))
 		   return( 27 );
 	  else if (!( optr->previous = last ))
 		first = optr;
 	  else	optr->previous->next = optr;
 	  last = optr;
-	  optr->callback = callocciCategoryInterface(nameCat[i]);
-        }
+	  optr->callback = callocciCategoryInterface(pelem->value);
+          
+          elem *pelemact=categoryAct.first;
+          indice=atoi(pelemact->value);
+         
+          for(i=0;i<indice;i++)
+          {
+               sprintf(categoryAction,"%s_action%d",pelem->value,i);
+               if (!( optr = occi_add_action( optr,cords_action[i],"",callocciCategoryAction(categoryAction))))
+		   return( optr );
+          }  
+           
+           pelemact=pelemact->next;
+           pelem=pelem->next;  
+         }
        
 	rest_initialise_log( componentModule->monitor );
        
@@ -257,19 +281,16 @@ listc categoryName,int dim)
 /*	------------------------------------------------------------------	*/
 /*				Module 				        	*/
 /*	------------------------------------------------------------------	*/
-private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
+private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,char * categoryActionNumberList)
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
         char * token;
-        char * tokeni;
-        listc  categoryLst;
-        //listc  categoryInt;
-        int dim=0;
-       // struct accords_configuration moduleConfig;
-        
        
+        listc  categoryLst;
+        listc  categoryAct;  
+        int dim=0;
         if ( argc == 1 )
         {
 		return( banner() );
@@ -286,6 +307,15 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
               token=strtok(NULL, " ");
            }
            
+           resetList(&categoryAct);
+           token= strtok(categoryActionNumberList," ");
+           for(; token != NULL ;)
+           {
+              dim++;
+              addBack(&categoryAct,token);
+              token=strtok(NULL, " ");
+           }
+
            //loud configuration module
            fillInAccordsConfiguration( &moduleConfig,moduleName);
            load_accords_configuration( &moduleConfig, moduleName );
@@ -314,7 +344,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
 			status = 30;
 			break;
 		}
-		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst,dim) ))
+		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst,categoryAct,dim) ))
 			continue;
 		else	break;
 	  }

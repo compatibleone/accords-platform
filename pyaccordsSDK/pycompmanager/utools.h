@@ -23,8 +23,10 @@
 #define PYCODEV_DIR "pyaccordsSDK/pycompdev/"
 #define LISTCATEG_FILE "pyaccords/pysrc/listcateg.h"
 #define LIB_PYCOMPDEV "pycompdev"
+#define PY_ACT_STRUCT "pyaccords/pysrc/categaction.h"
+#define PY_ACT_LIST "pyaccords/pysrc/listaction.h"
 
-int insertCategory(char pathf[], char categoryName[]);
+int insertCategory(char pathf[], char categoryName[],int indice);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
 int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice);
 int enTete(char pathf[]);

@@ -29,7 +29,7 @@
 /* categoryName: char * the name of the category                                                                  */
 /* return 1 if successfully inserted                                                                              */
 /******************************************************************************************************************/
-int insertCategory(char pathf[], char categoryName[])
+int insertCategory(char pathf[], char categoryName[],int indice)
 {
  char cordsh[TAILLE];
  char cordshname[TAILLE];
@@ -43,6 +43,14 @@ int insertCategory(char pathf[], char categoryName[])
  char pyintname[TAILLE];
  char pyListcateg[TAILLE];
  char pyListcategname[TAILLE];
+ char pylistactionname[TAILLE];
+ char pylistaction[TAILLE];
+ 
+ if(indice==1)
+ {
+  sprintf(pylistactionname,"#include \"%sAction.c\"",categoryName);
+  sprintf(pylistaction,"%s/%s",pathf,PY_ACT_LIST);
+ }
 
  sprintf(pyListcategname,"#include \"%s.h\"",categoryName);
  sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
@@ -70,6 +78,9 @@ int insertCategory(char pathf[], char categoryName[])
  insertInFile(pyint,pyintname,categoryName,0);
 
  insertInFile(pyListcateg,pyListcategname,categoryName,0);
+ 
+ if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0);
+
  return 1;
 }
 

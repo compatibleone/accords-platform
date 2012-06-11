@@ -30,8 +30,10 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
  char * categoryAttributes;         
  char * pathf;          
  char * categoryName;
- if (! PyArg_ParseTuple( args,"sss",&categoryName, &categoryAttributes,&pathf)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,pathf);
+ char * categoryActions;
+
+ if (! PyArg_ParseTuple( args,"ssss",&categoryName, &categoryAttributes,&categoryActions,&pathf)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,pathf);
  if(dim <= 0) return NULL;
  
  return Py_BuildValue("i", dim);
@@ -44,9 +46,9 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   char *categoryName;
   char * pathf;
   int a;
-
-  if (! PyArg_ParseTuple( args,"ss",&categoryName,&pathf)) return NULL;
-  a=deleteCategory(pathf,categoryName);
+  int indice;
+  if (! PyArg_ParseTuple( args,"sis",&categoryName,&indice,&pathf)) return NULL;
+  a=deleteCategory(pathf,categoryName,indice);
   return Py_BuildValue("i",a);
 
 }
@@ -57,9 +59,9 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  char * pathf;          
  char * moduleName;
  char * categoryNameList;
- 
- if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&pathf)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList,pathf);
+ char * categoryActionNumberList; 
+ if (! PyArg_ParseTuple( args,"ssss",&moduleName,&categoryNameList,&categoryActionNumberList,&pathf)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList,categoryActionNumberList,pathf);
 
  return Py_BuildValue("i", a);
 

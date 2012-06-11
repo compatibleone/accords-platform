@@ -65,7 +65,7 @@ int deleteModule(char moduleName[],char pathf[])
 /* categoryName: char * the name of the category                                                       */
 /* return 1 if succeeded                                                                               */
 /*******************************************************************************************************/
-int deleteCategory(char pathf[], char categoryName[])
+int deleteCategory(char pathf[], char categoryName[],int indice)
 {
  char cordsh[TAILLE];
  char cordshname[TAILLE];
@@ -87,9 +87,24 @@ int deleteCategory(char pathf[], char categoryName[])
  char pathpystruct[TAILLE];
  char pathpystructname[TAILLE];
 
- 
+ char pathactc[TAILLE];
+ char pathactpy[TAILLE];
+ char pathactpyi[TAILLE];
+
  char pyListcateg[TAILLE];
  char pyListcategname[TAILLE];
+
+ char pathactcname[256];
+ char pathactclist[256];
+
+ char pathactstructname[256];
+ char pathactstruct[256];
+ 
+ sprintf(pathactcname,"%sAction.c",categoryName);
+ sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
+
+ sprintf(pathactstructname,"%s_action",categoryName);
+ sprintf(pathactstruct,"%s/%s",pathf,PY_ACT_STRUCT);
 
  sprintf(pyListcategname,"%s.h",categoryName);
  sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
@@ -99,6 +114,10 @@ int deleteCategory(char pathf[], char categoryName[])
  sprintf(pathpycl,"%s/%s/%s/%sClass.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
  sprintf(pathpyp,"%s/%s/%sInterface.py",pathf,PYACCORDS,categoryName);
  sprintf(pathpyi,"%s/%s/%s/%s.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
+
+ sprintf(pathactc,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSS,categoryName);
+ sprintf(pathactpy,"%s/%s/%sAction.py",pathf,PYACCORDS,categoryName);
+ sprintf(pathactpyi,"%s/%s/%s/%sAct.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
 
  sprintf(pyincname,"%sInterface.c",categoryName);
  sprintf(pyinc,"%s/%s",pathf,PY_CRUD_INCLUDE);
@@ -125,39 +144,63 @@ int deleteCategory(char pathf[], char categoryName[])
  
  if( remove( pathfh) != 0 )
  {
-   printf( "Error in delete category:No such category name\n" );
+   printf( "Error in delete category (CORDS_SRC H):No such category name\n" );
    return 0;
  }
  if( remove( pathfc) != 0 )
  {
-  printf( "Error in delete category:No such category name\n" );
+  printf( "Error in delete category (CORDS_SRC C):No such category name\n" );
   return 0;
  }
  if( remove( occipath) != 0 )
  {
-  printf( "Error in delete category:No such category name\n" );
+  printf( "Error in delete category (OCCI_PATH):No such category name\n" );
   return 0;
  }
 
  if( remove( pathpyc) != 0 )
  {
-   printf( "Error in delete category:No such category name\n" );
+   printf( "Error in delete category (INTERFACE C):No such category name\n" );
    return 0;
  }
  if( remove( pathpyi) != 0 )
  {
-  printf( "Error in delete category:No such category name\n" );
+  printf( "Error in delete category (CATEGORY PY):No such category name\n" );
   return 0;
  }
  if( remove( pathpyp) != 0 )
  {
-  printf( "Error in delete category:No such category name\n" );
+  printf( "Error in delete category (INTERFACE PY):No such category name\n" );
   return 0;
  }
  if( remove( pathpycl) != 0 )
  {
-  printf( "Error in delete category:No such category name\n" );
+  printf( "Error in delete category( CLASS PY):No such category name\n" );
   return 0;
+ }
+ 
+ if(indice==1)
+ {
+  if( remove( pathactc) != 0 )
+  {
+   printf( "Error in delete category( ACTION C):No such file name\n" );
+   return 0;
+  }
+ 
+  if( remove( pathactpyi) != 0 )
+  {
+   printf( "Error in delete category( ACTION PYI):No such file name\n" );
+   return 0;
+  }
+ 
+  if( remove( pathactpy) != 0 )
+  {
+   printf( "Error in delete category( ACTION PY):No such file name\n" );
+   return 0;
+  }
+  
+  deleteInFile(pathactclist,pathactcname); 
+  deleteInFile(pathactstruct,pathactstructname); 
  }
 
  deleteInFile(cordsh,cordshname);
@@ -169,8 +212,8 @@ int deleteCategory(char pathf[], char categoryName[])
  deleteInFile(pathpystruct,pathpystructname);
 
  deleteInFile(pyListcateg,pyListcategname); 
-
-  return 1;
+ 
+ return 1;
 }
 
 
@@ -181,7 +224,7 @@ int deleteCategory(char pathf[], char categoryName[])
 /* pathf: (char*) a path name for the directory project                                                          */
 /* return 1 if succeeded                                                                                         */
 /*****************************************************************************************************************/
-int generateAccordsCategory(char *categoryName,char *categoryAttributes, char pathf[])
+int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,char pathf[])
 {
  FILE *f;
  char *token=NULL;
@@ -189,12 +232,14 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char pa
  char pathff[TAILLE];
  listc categoryAtr;
  listc categoryAtrB;
+ listc categoryAct;
  char occipath[TAILLE];
  char categoryAttributesB[256]="id";
+ int indice=0;
  
  sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
  sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);
- 
+ if(categoryActions[0]!='\0') indice=1;
 //create category.h file
  if((f=fopen(pathff,"w"))==NULL)
  {
@@ -227,9 +272,8 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char pa
    //create occicategory.c file
    createCategoryOcciFile(categoryName,categoryAtr,dim,occipath);
    // inserte include files
-   insertCategory(pathf,categoryName);
-   
-   //generate interface files
+   insertCategory(pathf,categoryName,indice);
+   //for generating category interface files
    resetList(&categoryAtrB);
    token= strtok(categoryAttributes," ");
    for(;token != NULL;)
@@ -237,13 +281,319 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char pa
     addBack(&categoryAtrB,token);
     token=strtok(NULL," ");
    }
+   
    generateCategoryPySourcefile(categoryName,categoryAtrB,pathf);
    generateCategoryInterfaceCfile(categoryName,categoryAtrB,pathf);
    generateCategoryInterfceStructFile(pathf);
+
+   //for generating category actions files
+   if(indice==1)
+   {
+    resetList(&categoryAct);
+    token= strtok(categoryActions," ");
+    for(;token != NULL;)
+    {
+     addBack(&categoryAct,token);
+     token=strtok(NULL," ");
+    }
   
+    generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,pathf);
+    generateCategoryActionPyfile(categoryName,categoryAtrB,categoryAct,pathf);
+    generateCategoryActionStruct(categoryName,categoryAct,pathf);
+   }
    return dim;
  }
 }
+/**************************************************************************************************/
+/* function to generate category Action struct file                                               */
+/**************************************************************************************************/
+int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf[])
+{
+  FILE *fIn;
+  FILE *fOut;
+  char name[256];
+  int a=0;
+  int i=0;
+  char line[256];
+  char strcats[2];
+
+  sprintf(name,"%s/%s",pathf,PY_ACT_STRUCT);
+  if((fIn=fopen(name,"r"))==NULL)
+  {
+   printf("Error in generate category Action struct file: No such file or directory\n");
+   return 0;
+  }
+  if((fOut=fopen("text.tmp","w"))==NULL)
+  {
+   fclose(fIn);
+   printf("Error in generate category Action struct file :No such file or directory\n");
+   return 0;
+  }
+ 
+  while(fgets(line,sizeof(line), fIn))
+  {
+    line[strlen(line)]=0;
+    if(searchWord(categoryName,line)==1)
+    {
+     a=1;
+     fprintf(fOut,"%s",line);
+    }
+    else
+    {
+     str_sub(line,0,1,strcats);
+     if((strcmp(strcats,"};"))==0) break;
+     else fprintf(fOut,"%s",line);
+
+    }
+  }
+  
+  if(a==0)
+  {
+     elem *pelem=categoryAct.first;
+     while(pelem)
+     {
+      fprintf(fOut,"\t{\"%s_action%d\", %s_action%d },\n",categoryName,i,categoryName,i); 
+      pelem = pelem->next;
+      i++;
+     }
+  }
+  
+  fprintf(fOut,"};\n");
+  fprintf(fOut,"#endif\n");
+  fclose(fIn);
+  fclose(fOut);
+  rename("text.tmp",name);
+  return 1;
+}
+/**************************************************************************************************/
+/* Function to generate category Actions C file                                                   */
+/**************************************************************************************************/
+int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categoryAct,char pathf[])
+{
+ FILE * f;
+ int count=0;
+ char name[256];
+
+ sprintf(name,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSS,categoryName);
+ if((f=fopen(name,"w"))==NULL)
+ {
+   printf("Error generateCategoryActionsCfile: No such file or directory\n");
+   return 0;
+ }
+ else
+ {
+    fprintf(f,"/********************************************************************************************************/\n");
+    fprintf(f,"/* Hamid MEDAJHED (c) Prologue                                                            */\n");
+    fprintf(f,"/********************************************************************************************************/\n");
+    fprintf(f,"#include \"../../occi/src/occi.h\"\n");
+    fprintf(f,"#include \"ctools.h\"\n");
+    fprintf(f,"#include <Python.h>\n\n");
+  
+    elem *pelem = categoryAct.first;
+    while (pelem)
+    {  
+       fprintf(f,"//            category %s action  \n",pelem->value);
+       fprintf(f,"struct rest_response * %s_action%d(\n",categoryName,count);
+       fprintf(f,"\tstruct occi_category * optr,\n"); 
+       fprintf(f,"\tstruct rest_client * cptr,\n"); 
+       fprintf(f,"\tstruct rest_request * rptr,\n"); 
+       fprintf(f,"\tstruct rest_response * aptr,\n"); 
+       fprintf(f,"\tvoid * vptr )\n");
+       fprintf(f,"{\n");
+       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+       fprintf(f,"\tchar sendstr[256]=\" \";\n");
+       fprintf(f,"\tchar strtmp[256]=\" \";\n");
+       fprintf(f,"\tchar status[256];\n");
+       fprintf(f,"\tchar message[256];\n");
+       fprintf(f,"\tchar * response;\n");
+       fprintf(f,"\tchar * token;\n");
+       fprintf(f,"\tFILE * exp_file;\n");
+       fprintf(f,"\tlistcc restResponse;\n");
+       fprintf(f,"\tPyObject *main_module, *global_dict, *cbFunc, *result;\n\n");
+
+       fprintf(f,"\tif (!( pptr = vptr ))\n");
+       fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Invalid Action\" ) );\n");
+       fprintf(f,"\telse{\n");
+       elem *pelemm = categoryAtr.first;
+       fprintf(f,"\t\tif(!(pptr->%s))strcpy(sendstr,\" \");\n",pelemm->value);
+       fprintf(f,"\t\telse if(pptr->%s[0]=='\\0') strcpy(sendstr,\" \");\n",pelemm->value);
+       fprintf(f,"\t\telse strcpy(sendstr,pptr->%s);\n",pelemm->value);
+       pelemm=pelemm->next;
+       while(pelemm)
+       {
+        fprintf(f,"\t\tif(!(pptr->%s)){\n",pelemm->value);
+        fprintf(f,"\t\t\tstrcpy(strtmp,\" \");\n");
+        fprintf(f,"\t\t\tstrConcat(sendstr,strtmp,',');\n");
+        fprintf(f,"\t\t}\n");
+        fprintf(f,"\t\telse if(pptr->%s[0]=='\\0'){\n",pelemm->value);
+        fprintf(f,"\t\t\tstrcpy(strtmp,\" \");\n");
+        fprintf(f,"\t\t\tstrConcat(sendstr,strtmp,',');\n");
+        fprintf(f,"\t\t}\n");
+        fprintf(f,"\t\telse strConcat(sendstr,pptr->%s,',');\n",pelemm->value);
+        pelemm=pelemm->next;
+       }
+       fprintf(f,"\t\t//           python interface\n");
+       fprintf(f,"\t\texp_file = fopen(\"%s/%s/%s/%sAct.py\", \"r\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+       fprintf(f,"\t\tif(!exp_file) printf(\"error in %sAction.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
+       fprintf(f,"\t\tPy_Initialize();\n");
+       fprintf(f,"\t\tPyRun_SimpleFile(exp_file, \"%s/%s/%s/%sAct.py\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+       fprintf(f,"\t\tmain_module = PyImport_AddModule(\"__main__\");\n");
+       fprintf(f,"\t\tglobal_dict = PyModule_GetDict(main_module);\n");
+       fprintf(f,"\t\tcbFunc = PyDict_GetItemString(global_dict,\"%s\");\n",pelem->value);
+       fprintf(f,"\t\tif(!cbFunc) printf(\"error in %sAction.c :no python function\\n\");\n",categoryName);
+       fprintf(f,"\t\tresult=PyObject_CallFunction(cbFunc,\"s\",sendstr);\n");
+       fprintf(f,"\t\tresponse=PyString_AsString( result );\n"); 
+       fprintf(f,"\t\tPy_Finalize();\n\n");
+       fprintf(f,"\t\tresetListe(&restResponse);\n");
+
+       fprintf(f,"\t\ttoken= strtok(response,\",\");\n");
+       fprintf(f,"\t\tfor(; token != NULL ;)\n");
+       fprintf(f,"\t\t{\n");
+       fprintf(f,"\t\t\taddBacke(&restResponse,token);\n");
+       fprintf(f,"\t\t\ttoken=strtok(NULL, \",\");\n");
+       fprintf(f,"\t\t}\n");
+       fprintf(f,"\t\telemm *pelem = restResponse.first;\n");
+       fprintf(f,"\t\tif(pelem){\n");
+       fprintf(f,"\t\t\tstrcpy(status , pelem->value);\n");
+       fprintf(f,"\t\tpelem = pelem->next;\n");
+       fprintf(f,"\t\t}\n");
+       fprintf(f,"\t\tif(pelem){\n");
+       fprintf(f,"\t\t\tstrcpy(message, pelem->value);\n");
+       fprintf(f,"\t\tpelem = pelem->next;\n");
+       fprintf(f,"\t\t}\n");
+       fprintf(f,"\t\treturn( rest_html_response( aptr, status, message ) );\n");
+       fprintf(f,"\t}\n");
+       fprintf(f,"}\n");
+       count++;
+       pelem=pelem->next;
+    }
+    fclose(f);
+  }
+ return 1;
+}
+
+/*******************************************************************************************************************/
+/* function to generate python category Actions source file                                                        */
+/*******************************************************************************************************************/
+int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc categoryAct,char pathf[])
+{
+ FILE * f;
+ char name1[256];
+ char name2[256];
+ int j,i=0;
+ char listAtr[256]="(l[0]";
+ char lista[256];
+ char listResult[256]="[";
+ char listr[256];
+ char strm[256];
+
+ sprintf(name1,"%s/%s/%s/%sAct.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
+ sprintf(name2,"%s/%s/%sAction.py",pathf,PYACCORDS,categoryName);
+ 
+  elem *pelemm=categoryAtr.first;
+  i=0;
+  while(pelemm)
+  {
+        pelemm=pelemm->next;
+        i++;
+  }
+
+ if((f=fopen(name1,"w"))==NULL)
+  {
+   printf("Error generateCategoryActPyfile: No such file or directory\n");
+   return 0;
+  }
+  else
+  {
+   fprintf(f,"#!/usr/bin/env python\n");
+   fprintf(f,"# -*- coding: latin-1 -*-\n");
+   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
+   fprintf(f,"import sys\n");
+   fprintf(f,"sys.path.append(\"%s/%s\")\n",pathf,PYACCORDS);
+   fprintf(f,"from %sAction import *\n",categoryName);
+   fprintf(f,"from actionClass import *\n\n",categoryName);
+
+
+   for(j=1;j<i;j++)
+   {
+    sprintf(lista,"l[%d]",j);
+    strConcat(listAtr,lista,',');
+   }
+   strConcat(listAtr,")",' ');
+   elem *pelemmm=categoryAtr.first;
+   sprintf(strm,"str(resCateg.%s)",pelemmm->value);
+   strConcat(listResult,strm,' ');
+   pelemmm=pelemmm->next;
+   while(pelemmm)
+   {
+     
+     sprintf(listr,"str(resCateg.%s)",pelemmm->value);
+     strConcat(listResult,listr,',');
+     pelemmm=pelemmm->next;
+   }
+   free(pelemmm);
+   strConcat(listResult,"]",' ');
+
+   elem *pelemact=categoryAct.first;
+   while(pelemact)
+   {
+     fprintf(f,"def %s(categStr):\n",pelemact->value);
+     fprintf(f,"\tl=categStr.split(\",\")\n");
+     fprintf(f,"\tcategoryAtr = C%s%s\n",categoryName,listAtr);
+     fprintf(f,"\tresCateg = %s_%s(categoryAtr)\n",categoryName,pelemact->value);
+     fprintf(f,"\trestResp = [str(restCateg.status),str(restCateg.message)]");//%s\n",listResult);
+     fprintf(f,"\trestResponse = \",\".join(restResp)\n");
+     fprintf(f,"\treturn restResponse\n\n");
+     pelemact=pelemact->next;
+   }
+   fclose(f);
+  }
+ 
+  if((f=fopen(name2,"w"))==NULL)
+  {
+   printf("Error generateCategoryActionPyfile: No such file or directory\n");
+   return 0;
+  }
+  else
+  {
+   fprintf(f,"#!/usr/bin/env python\n");
+   fprintf(f,"# -*- coding: latin-1 -*-\n");
+   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
+   fprintf(f,"# Implementation of category actions\n");
+   fprintf(f,"import sys\n");
+   fprintf(f,"import %s\n",LIB_PYCOMPDEV); 
+   fprintf(f,"sys.path.append(\"%s/%s/%s\")\n",pathf,PYACCORDS,PYACCORDSS);
+   fprintf(f,"from %sClass import *\n",categoryName);
+   fprintf(f,"from actionClass import *\n");
+   fprintf(f,"\"\"\" Note:respAction is a python class to describe the occi response with the status and the message\n"); 
+   fprintf(f,"\t%s is a python class to interface the accords category :%s.\n",categoryName,categoryName);
+   fprintf(f,"\t-Attributes of this category are members of this class.\n");
+   fprintf(f,"\t-List of attributes:\n\n");
+   elem *pelemm1=categoryAtr.first;
+   while(pelemm1)
+   {
+        fprintf(f,"\t\t- %s \n",pelemm1->value);
+        pelemm1=pelemm1->next;
+   }
+   free(pelemm1);
+   fprintf(f,"\"\"\"\n\n");
+  
+   elem *pelemaction=categoryAct.first;
+   while(pelemaction)
+   {
+     fprintf(f,"def %s_%s(%s):\n",categoryName,pelemaction->value,categoryName);
+     fprintf(f,"\tresponse=respAction(\"200\",\"ok\")\n");
+     fprintf(f,"\t\"\"\"Implement here your function\"\"\"\n\n");
+     fprintf(f,"\treturn response\n\n");//categoryName);
+     pelemaction=pelemaction->next;
+   }
+   fclose(f);
+  }
+  
+ return 0;
+
+}
+
 /**************************************************************************************************/
 /* Function to generate category interface membership file                                        */
 /**************************************************************************************************/
@@ -278,7 +628,6 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       fprintf(f,"\tchar sendstr[256];\n");
       fprintf(f,"\tchar strtmp[256];\n");
       fprintf(f,"\tchar * response;\n");
-      fprintf(f,"\tint dim=0;\n");
       fprintf(f,"\tchar * token;\n");
       fprintf(f,"\tFILE * exp_file;\n");
       fprintf(f,"\tlistcc categoryAtr;\n");
@@ -290,18 +639,21 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       fprintf(f,"\t\treturn(0);\n\n");
 
       elem *pelem = categoryAtr.first;
-      fprintf(f,"\tif(pptr->%s[0]=='\\0') strcpy(sendstr,\" \");\n",pelem->value);
+      fprintf(f,"\tif(!(pptr->%s)) strcpy(sendstr,\" \");\n",pelem->value);
+      fprintf(f,"\telse if(pptr->%s[0]=='\\0') strcpy(sendstr,\" \");\n",pelem->value);
       fprintf(f,"\telse strcpy(sendstr,pptr->%s);\n",pelem->value);
-      fprintf(f,"\tdim++;\n");
       pelem=pelem->next;
       while(pelem)
       {
-        fprintf(f,"\tif(pptr->%s[0]=='\\0'){\n",pelem->value);
+        fprintf(f,"\tif(!(pptr->%s)){\n",pelem->value);
+        fprintf(f,"\t\tstrcpy(strtmp,\" \");\n");
+        fprintf(f,"\t\tstrConcat(sendstr,strtmp,',');\n");
+        fprintf(f,"\t}\n");
+        fprintf(f,"\telse if(pptr->%s[0]=='\\0'){\n",pelem->value);
         fprintf(f,"\t\tstrcpy(strtmp,\" \");\n");
         fprintf(f,"\t\tstrConcat(sendstr,strtmp,',');\n");
         fprintf(f,"\t}\n");
         fprintf(f,"\telse strConcat(sendstr,pptr->%s,',');\n",pelem->value);
-        fprintf(f,"\tdim++;\n");
         pelem=pelem->next;
         i++;
       }
@@ -335,14 +687,13 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       while(pelemm)
       {
         fprintf(f,"\tif(pelem){\n");
-        fprintf(f,"\t\tstrcpy(pptr->%s , pelem->value);\n",pelemm->value);
+        fprintf(f,"\t\tpptr->%s = pelem->value;\n",pelemm->value);
         if(k<i)fprintf(f,"\t\tpelem = pelem->next;\n");
         fprintf(f,"\t}\n");
         pelemm=pelemm->next;
 	k++;
       }
      free(pelemm);
-     fprintf(f,"\tfree(pelem);\n");
      fprintf(f,"\treturn 1;\n");
      fprintf(f,"}\n\n\n"); 
      k=0;
@@ -462,7 +813,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
  {
   fprintf(f,"#!/usr/bin/env python\n");
   fprintf(f,"# -*- coding: latin-1 -*-\n");
-  fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n\n");
+  fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
   fprintf(f,"class C%s:\n",categoryName);
   fprintf(f,"\t\"\"\"Class to define the %s category structure\"\"\"\n",categoryName);
 
@@ -499,7 +850,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   {
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
-   fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n");
+   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n");
    fprintf(f,"import sys\n");
    fprintf(f,"sys.path.append(\"%s/%s\")\n",pathf,PYACCORDS);
    fprintf(f,"from %sInterface import *\n\n",categoryName);
@@ -548,6 +899,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n");
+   fprintf(f,"# Implementation of category CRUD functions\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import %s\n",LIB_PYCOMPDEV); 
    fprintf(f,"sys.path.append(\"%s/%s/%s\")\n",pathf,PYACCORDS,PYACCORDSS);
@@ -1514,7 +1866,7 @@ int  enTete(char pathf[])
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
 /*****************************************************************************************************************/
-int generateModuleFile(char * moduleName, char * categoryNameList, char * pathf)
+int generateModuleFile(char * moduleName, char * categoryNameList,char *categoryActionNumberList,char * pathf)
 {
    char pathfd[TAILLE];
    char pathff[TAILLE];
@@ -1543,7 +1895,7 @@ int generateModuleFile(char * moduleName, char * categoryNameList, char * pathf)
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule( argc , sys.argv , \"%s\" ,\"%s\")\n",LIB_PYCOMPDEV,moduleName, categoryNameList);
+      fprintf(f,"\treturn %s.launchModule( argc , sys.argv , \"%s\" ,\"%s\",\"%s\")\n",LIB_PYCOMPDEV,moduleName, categoryNameList,categoryActionNumberList);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);

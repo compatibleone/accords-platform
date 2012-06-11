@@ -3,4 +3,6 @@
 
 
 
+#include "amconfigInterface.c"
+#include "ec2amazonInterface.c"
 #endif
