@@ -1,22 +1,35 @@
-﻿Hamid Medjahed & Elyes Zekri
-Prologue©
+﻿HOW TO INSTALL AND USE PyACCORDS SDK
+
+By Hamid Medjahed & Elyes Zekri
+Prologue
 
 
+#Install pycompmanager
 
-#install pycompmanager
 cd /accords-platform/pyaccordsSDK/pycompmanager
 python setup.py install
 
-#generate a category
+
+
+#Generate an OCCI category
+
 python
 >>>import pycompmanager
->>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, “/home/accords-platform/”)
->>>pycompmanager.commit()
+>>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2",“/home/accords-platform/”)
+>>>pycompmanager.commit(/home/accords/platform/")
 
-#generate an ACCORDS component
-python
->>>import pycompmanager
->>>pycompmanager.generateComponent(“myComponent”, “categ1 categ2”, “/home/accords-platform/”)
 
-#launch the component
-python mycomponent.py –config config_file.xml CO-MYCOMPO-AGENT/1.0
+#Remove an existing OCCI category (where '1' indicated that the categories contains ACTIONS)
+
+>>>pycompmanager.removeCategory("myCategory", 1,"/home/accords-platform")
+
+
+#Generate an ACCORDS component/OCCI Server (where '2' indicates the category action number)
+
+>>>pycompmanager.generateComponent(“myComponent”, “myCategory”, "2", “/home/accords-platform/”)
+
+
+
+#Launching the component
+
+python mycomponent.py --config config_file.xml CO-MYCOMPO-AGENT/1.0
