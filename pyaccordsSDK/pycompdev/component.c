@@ -93,7 +93,7 @@ public	char *	default_tls()
 
 public	char *	default_zone()
 {	
-   return(OsProcci.zone);		
+   return(moduleConfig.zone);		
 }
 
 public	int	failure( int e, char * m1, char * m2 )
