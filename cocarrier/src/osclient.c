@@ -895,6 +895,31 @@ public	char * os_create_address_request( char * address )
 }
 			
 /*	------------------------------------------------------------	*/
+/*	     o s _ r e m o v e _  a d d r e s s _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * os_remove_address_request( char * address )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<removeFloatingIp xmlns=%c%s%c>\n",0x0022,Os.namespace,0x0022);
+		fprintf(h,"<address>%s</address>\n",address);
+		fprintf(h,"</addFloatingIp>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+			
+/*	------------------------------------------------------------	*/
 /*	   o s _ c r e a t e _  m e t a d a t a _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 public	char * 	os_create_metadata_request( char * personality )

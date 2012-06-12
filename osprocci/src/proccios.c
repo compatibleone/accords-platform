@@ -870,6 +870,40 @@ private	int	associate_server_address( struct openstack * pptr )
 	}
 }
 
+/*	------------------------------------------------------------------	*/
+/*		  d i s a s s o c i a t e _ s e r v e r _ a d d r e s s		*/
+/*	------------------------------------------------------------------	*/
+/*	the server is up and running, an address has been attributed and 	*/
+/*	now we must noe disconnect the address from the server			*/
+/*	------------------------------------------------------------------	*/
+private	int	disassociate_server_address( struct openstack * pptr )
+{
+	int	iterate=30;
+	char *	nomfic;
+	char *	vptr;
+	struct	os_response * osptr;
+	if (!( pptr ))
+		return( 1001 );
+	else if (!( os_valid_address( pptr->floating ) ))
+		return( 1002 );
+	else if (!( nomfic = os_remove_address_request( pptr->floating ) ))
+		return( 1003 );
+	else if (!( osptr = os_server_address( nomfic, pptr->number ) ))
+		return( 1004 );
+	else
+	{
+		osptr = liberate_os_response( osptr );
+		nomfic = liberate( nomfic );
+		if (!( osptr = os_get_address( pptr->floatingid ) ))
+			return( 1005 );
+		else
+		{
+			osptr = liberate_os_response( osptr );
+				return( 0 );
+		}
+	}
+}
+
 /*	----------------------------------------------------------------	*/
 /*		r e l e a s e _f l o a t i n g _ a d d r e s s			*/
 /*	----------------------------------------------------------------	*/
@@ -1183,6 +1217,17 @@ private	struct	rest_response * start_openstack(
 			/* ------------------------------------- */
 			if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
 			{
+				/* -------------------------------- */
+				/* disassociate address from server */
+				/* -------------------------------- */
+				if ( disassociate_server_address( pptr ) != 0 )
+				{
+					reset_openstack_server( pptr );
+				 	return( rest_html_response( aptr, 4088, "Server Failure : Address removal failure" ) );
+				}
+				/* ------------------------ */
+				/* then release the address */
+				/* ------------------------ */
 				release_floating_address( pptr );
 				if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
