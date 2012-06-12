@@ -1292,9 +1292,7 @@ private	char *	cords_coes_operation(
 				/* ------------------------------ */
 				/* build the placement identifier */
 				/* ------------------------------ */
-				if (!( tls ))
-					sprintf(buffer,"http://%s",id);
-				else	sprintf(buffer,"https://%s",id);
+				rest_add_http_prefix( buffer, 1024, id );
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );

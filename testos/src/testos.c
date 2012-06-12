@@ -112,7 +112,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
 			os_result( ( detail ? os_list_security_group_details() : os_list_security_groups()) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_list_metadata( p3 ) );
+			os_result( os_list_server_metadata( p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -133,7 +133,17 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( failure(27,"cannot create snapshot","request" ) );
 		else
 		{ 	
-			os_result( os_create_image( nomfic, p3 ) );
+			os_result( os_create_image( nomfic, p3, 0 ) );
+			return( 0 );
+		}
+	}
+	else if (!( strcasecmp(p1,"PUBLICVM" ) ))
+	{
+		if (!( nomfic = os_create_image_request( p2, p3 ) ))
+			return( failure(27,"cannot create public vm image","request" ) );
+		else
+		{ 	
+			os_result( os_create_image( nomfic, p3, 1 ) );
 			return( 0 );
 		}
 	}
@@ -153,7 +163,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( failure(27,"cannot create","request" ) );
 		else
 		{ 	
-			os_result( os_create_metadata( p2, nomfic ) );
+			os_result( os_create_server_metadata( p2, nomfic ) );
 			return( 0 );
 		}
 	}
@@ -187,6 +197,27 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"GLANCE" ) ))
+	{
+		if (!( p2 ))
+			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "PUBLIC" ) ))
+			os_result( os_glance_access( p3, 1 ) );
+		else if (!( strcasecmp( p2, "PRIVATE" ) ))
+			os_result( os_glance_access( p3, 0 ) );
+		else	return( failure(33, p1, p2 ) );
+		return(0);
+	}
+
+	else if (!( strcasecmp(p1,"HEAD" ) ))
+	{
+		if (!( p2 ))
+			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "GLANCE" ) ))
+			os_result( os_head_glance( p3 ) );
+		else	return( failure(33, p1, p2 ) );
+		return(0);
+	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
@@ -197,12 +228,14 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_get_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_get_image( p3 ) );
+		else if (!( strcasecmp( p2, "GLANCE" ) ))
+			os_result( os_get_glance( p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_get_address( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			os_result( os_get_security_group( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_get_metadata( p3, p4 ) );
+			os_result( os_get_server_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -216,7 +249,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		{
 			if ((!( p3 )) || (!( p4 )) || (!( p5 )))
 				return( failure(33,p1,p2) );
-			else	os_result( os_update_metadata( p3, p4, p5 ) );
+			else	os_result( os_update_server_metadata( p3, p4, p5 ) );
 		}
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
@@ -238,7 +271,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else if (!( strcasecmp( p2, "RULE" ) ))
 			os_result( os_delete_security_rule( p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_delete_metadata( p3, p4 ) );
+			os_result( os_delete_server_metadata( p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -329,8 +362,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.01");
-	printf("\n   Beta Version 22/04/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.02");
+	printf("\n   Beta Version 12/06/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -340,11 +373,15 @@ private	int	os_banner()
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
+	printf("\n   PUBLICVM <name> <server> ");
+	printf("\n   GLANCE PUBLIC <id> ");
+	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GROUP | METADATA ] <id> [ <name> ] ");
+	printf("\n   HEAD   [ GLANCE ] <id> ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
 	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");

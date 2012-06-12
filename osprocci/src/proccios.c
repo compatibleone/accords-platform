@@ -1247,7 +1247,7 @@ private	struct	rest_response * start_openstack(
 
 			else if (!( metafilename = os_create_metadata_request( personality ) ))
 			 	return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
-			else if (!( metaptr = os_create_metadata( idptr, metafilename )))
+			else if (!( metaptr = os_create_server_metadata( idptr, metafilename )))
 			 	return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
 			else
 			{
@@ -1327,7 +1327,7 @@ private	struct	rest_response * snapshot_openstack(
 	/* ------------------------------------------------------------ */
 	else if (!( filename = os_create_image_request( pptr->id, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = os_create_image( filename, pptr->number ) ))
+	else if (!( osptr = os_create_image( filename, pptr->number, 0 ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( osptr->response ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1399,7 +1399,7 @@ private	struct	rest_response * save_openstack(
 	/* ------------------------------------------------------------ */
 	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = os_create_image( filename, pptr->number ) ))
+	else if (!( osptr = os_create_image( filename, pptr->number, 1 ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( osptr->response ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1435,6 +1435,12 @@ private	struct	rest_response * save_openstack(
 				if ( pptr->original ) 
 					pptr->original = liberate( pptr->original );
 				pptr->original = allocate_string( pptr->image );
+				/* -------------------------------------------- */
+				/* its a save operation and MUST be made public */
+				/* -------------------------------------------- */
+				if ((osptr = os_glance_access( inumber, 1 )) != (struct os_response *) 0)
+					osptr = liberate_os_response( osptr );
+
 			}
 			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 			if (!( os_valid_price( pptr->price ) ))

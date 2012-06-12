@@ -89,8 +89,8 @@ private	void	osprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Open Stack OsProcci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Open Stack OsProcci : Version 1.0a.0.05");
+	printf("\n   Beta Version : 12/06/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

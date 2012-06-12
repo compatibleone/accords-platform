@@ -81,7 +81,8 @@ public	struct	os_response *
 public	struct	os_response *	os_list_servers	( );
 public	struct	os_response *	os_list_flavors( );
 public	struct	os_response *	os_list_images  ( );
-public	struct	os_response *	os_list_metadata( char * id );
+public	struct	os_response *	os_list_server_metadata( char * id );
+public	struct	os_response *	os_list_image_metadata( char * id );
 public	struct	os_response *	os_list_image_details();
 public	struct	os_response *	os_list_flavor_details();
 public	struct	os_response *	os_list_server_details();
@@ -92,7 +93,7 @@ public	struct	os_response *	os_list_security_group_details	( );
 
 public	struct	os_response *	os_create_flavor( char * filename );
 public	struct	os_response *	os_create_server( char * filename );
-public	struct	os_response *	os_create_image( char * filename, char * serverid );
+public	struct	os_response *	os_create_image( char * filename, char * serverid, int ispublic );
 public	struct	os_response *	os_create_address();
 public	struct	os_response *	os_server_address( char * filename, char * serverid );
 public	struct	os_response *	os_create_security_group(char * filename);
@@ -101,18 +102,26 @@ public	struct	os_response *	os_create_security_rule(char * filename);
 public	struct	os_response *	os_get_server	( char * id );
 public	struct	os_response *	os_get_flavor  ( char * id );
 public	struct	os_response *	os_get_image    ( char * id );
+
+public	struct	os_response *	os_get_glance	(  char * id );
+public	struct	os_response *	os_glance_access(  char * id, int ispublic );
+public	struct	os_response *	os_head_glance	(  char * id );
 public	struct	os_response *	os_get_address( char * id );
-public	struct	os_response *	os_get_metadata( char * id, char * name );
+public	struct	os_response *	os_get_server_metadata( char * id, char * name );
+public	struct	os_response *	os_get_image_metadata( char * id, char * name );
 public	struct	os_response *	os_get_security_group( char * id );
 
 public	struct	os_response *	os_update_server( char * id, char * filename );
-public	struct	os_response *	os_update_metadata( char * id, char * name, char * value );
-public	struct	os_response *	os_create_metadata( char * id, char * values );
+public	struct	os_response *	os_update_server_metadata( char * id, char * name, char * value );
+public	struct	os_response *	os_update_image_metadata( char * id, char * name, char * value );
+public	struct	os_response *	os_create_server_metadata( char * id, char * values );
+public	struct	os_response *	os_create_image_metadata( char * id, char * values );
 
 public	struct	os_response *	os_delete_server( char * id );
 public	struct	os_response *	os_delete_image ( char * id );
 public	struct	os_response *	os_delete_flavor( char * id );
-public	struct	os_response *	os_delete_metadata( char * id, char * name );
+public	struct	os_response *	os_delete_server_metadata( char * id, char * name );
+public	struct	os_response *	os_delete_image_metadata( char * id, char * name );
 public	struct	os_response *	os_delete_address( char * id );
 public	struct	os_response *	os_delete_security_group( char * id );
 public	struct	os_response *	os_delete_security_rule( char * id );
