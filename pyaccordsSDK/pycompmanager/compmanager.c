@@ -35,7 +35,7 @@ int commitPlatform(char pathf[])
  char pysetupCommand[256];
  
  sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
- sprintf(makeCommand,"cd %s && su -c  \"make clean && sudo make && sudo make install\" root",pathf);
+ sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
 
  a= system(makeCommand);
  if(a!=0) return 0;
@@ -210,7 +210,7 @@ int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
   deleteInFile(cordsh,cordshname);
   //deleteInFile(occibuilder,occibuildername);
  }
-  if(flag==0)deleteInFile(cordsbase,cordsbasename);
+ deleteInFile(cordsbase,cordsbasename);
  deleteInFile(occicords,occicordsname);
  
  deleteInFile(pyinc,pyincname);
@@ -627,6 +627,7 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
   fprintf(f,"/********************************************************************************************************/\n");
   fprintf(f,"#include \"../../occi/src/occi.h\"\n");
   fprintf(f,"#include \"ctools.h\"\n");
+  fprintf(f,"#include \"listcateg.h\"\n");
   fprintf(f,"#include <Python.h>\n\n");
   for(j=0;j<4;j++)
   {
