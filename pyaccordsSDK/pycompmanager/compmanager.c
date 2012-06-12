@@ -34,8 +34,8 @@ int commitPlatform(char pathf[])
  char makeCommand[256];
  char pysetupCommand[256];
  
- sprintf(pysetupCommand,"cd %s/%s && sudo python setup.py install",pathf,PYCODEV_DIR);
- sprintf(makeCommand,"cd %s && sudo make clean && sudo make && sudo make install",pathf);
+ sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
+ sprintf(makeCommand,"cd %s && su -c  \"make clean && sudo make && sudo make install\" root",pathf);
 
  a= system(makeCommand);
  if(a!=0) return 0;
@@ -65,11 +65,12 @@ int deleteModule(char moduleName[],char pathf[])
 /* categoryName: char * the name of the category                                                       */
 /* return 1 if succeeded                                                                               */
 /*******************************************************************************************************/
-int deleteCategory(char pathf[], char categoryName[],int indice)
+int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
 {
  char cordsh[TAILLE];
  char cordshname[TAILLE];
  char occibuilder[TAILLE];
+ char occibuilderb[TAILLE];
  char occibuildername[TAILLE];
  char cordsbase[TAILLE];
  char cordsbasename[TAILLE];
@@ -132,6 +133,7 @@ int deleteCategory(char pathf[], char categoryName[],int indice)
  
  sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
  sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
+ sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
  
  sprintf(cordshname,"%s.h",categoryName);
  sprintf(occibuildername,"_%s_",categoryName);
@@ -203,9 +205,12 @@ int deleteCategory(char pathf[], char categoryName[],int indice)
   deleteInFile(pathactstruct,pathactstructname); 
  }
 
- deleteInFile(cordsh,cordshname);
- deleteInFile(occibuilder,occibuildername);
- deleteInFile(cordsbase,cordsbasename);
+ if(flag==0)
+ {
+  deleteInFile(cordsh,cordshname);
+  //deleteInFile(occibuilder,occibuildername);
+ }
+  if(flag==0)deleteInFile(cordsbase,cordsbasename);
  deleteInFile(occicords,occicordsname);
  
  deleteInFile(pyinc,pyincname);
@@ -213,6 +218,9 @@ int deleteCategory(char pathf[], char categoryName[],int indice)
 
  deleteInFile(pyListcateg,pyListcategname); 
  
+ deleteInFile(occibuilderb,occibuildername);
+ 
+
  return 1;
 }
 
@@ -224,7 +232,7 @@ int deleteCategory(char pathf[], char categoryName[],int indice)
 /* pathf: (char*) a path name for the directory project                                                          */
 /* return 1 if succeeded                                                                                         */
 /*****************************************************************************************************************/
-int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,char pathf[])
+int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag,char pathf[])
 {
  FILE *f;
  char *token=NULL;
@@ -267,12 +275,13 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
    fprintf(f,"\n");
    fprintf(f,"#endif");
    fclose(f);
+  
    //create category.c file
    createCategoryCordsCfile(categoryName,categoryAtr,dim,pathff); 
    //create occicategory.c file
    createCategoryOcciFile(categoryName,categoryAtr,dim,occipath);
    // inserte include files
-   insertCategory(pathf,categoryName,indice);
+   insertCategory(pathf,categoryName,indice,flag);
    //for generating category interface files
    resetList(&categoryAtrB);
    token= strtok(categoryAttributes," ");
