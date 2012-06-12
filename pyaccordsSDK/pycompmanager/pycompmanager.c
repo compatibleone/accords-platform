@@ -31,11 +31,12 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
  char * pathf;          
  char * categoryName;
  char * categoryActions;
+ int flag;
 
- if (! PyArg_ParseTuple( args,"ssss",&categoryName, &categoryAttributes,&categoryActions,&pathf)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,pathf);
+ if (! PyArg_ParseTuple( args,"sssis",&categoryName, &categoryAttributes,&categoryActions,&flag,&pathf)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag,pathf);
  if(dim <= 0) return NULL;
- 
+ printf(" %s OCCI category is created\n",categoryName); 
  return Py_BuildValue("i", dim);
 
 }
@@ -47,8 +48,10 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   char * pathf;
   int a;
   int indice;
-  if (! PyArg_ParseTuple( args,"sis",&categoryName,&indice,&pathf)) return NULL;
-  a=deleteCategory(pathf,categoryName,indice);
+  int flag;
+  if (! PyArg_ParseTuple( args,"siis",&categoryName,&indice,&flag,&pathf)) return NULL;
+  a=deleteCategory(pathf,categoryName,indice,flag);
+  printf("%s OCCI category is removed\n",categoryName);
   return Py_BuildValue("i",a);
 
 }
@@ -62,7 +65,7 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  char * categoryActionNumberList; 
  if (! PyArg_ParseTuple( args,"ssss",&moduleName,&categoryNameList,&categoryActionNumberList,&pathf)) return NULL;
  a=generateModuleFile(moduleName,categoryNameList,categoryActionNumberList,pathf);
-
+ printf(" %s component is created\n",moduleName);
  return Py_BuildValue("i", a);
 
 }
@@ -77,7 +80,7 @@ static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
  if (! PyArg_ParseTuple( args,"ss",&moduleName,&pathf)) return NULL;
  
  a=deleteModule(moduleName,pathf);
-
+ printf(" %s component is removed\n",moduleName);
  return Py_BuildValue("i", a);
 
 }
@@ -90,7 +93,7 @@ static PyObject *pycompmanager_commit(PyObject *self, PyObject *args)
  if (! PyArg_ParseTuple( args,"s", &pathf)) return NULL;
  
  a=commitPlatform(pathf);
-
+ printf("changes are committed\n");
  return Py_BuildValue("i", a);
 
 }

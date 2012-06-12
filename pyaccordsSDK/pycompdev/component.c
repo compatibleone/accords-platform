@@ -34,6 +34,7 @@
 #include "list.h"
 #include "../../pyaccords/pysrc/crudinterf.h"
 #include "../../pyaccords/pysrc/categaction.h"
+#include "listoccibuilder.h"
 
 char cords_action[12][256]={"start","stop","restart","snapshot","save","suspend","softboot","hardboot","resize","confirm","revert"}; 
 struct accords_configuration moduleConfig;

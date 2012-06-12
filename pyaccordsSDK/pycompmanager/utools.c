@@ -29,11 +29,12 @@
 /* categoryName: char * the name of the category                                                                  */
 /* return 1 if successfully inserted                                                                              */
 /******************************************************************************************************************/
-int insertCategory(char pathf[], char categoryName[],int indice)
+int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 {
  char cordsh[TAILLE];
  char cordshname[TAILLE];
  char occibuilder[TAILLE];
+ char occibuilderb[TAILLE];
  char occibuildername[TAILLE];
  char cordsbase[TAILLE];
  char cordsbasename[TAILLE];
@@ -56,7 +57,8 @@ int insertCategory(char pathf[], char categoryName[],int indice)
  sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
 
  sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
- sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
+ if(flag==0) sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
+ sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
  
  sprintf(cordshname,"#include \"%s.h\"",categoryName);
  sprintf(occibuildername,"public struct occi_category * occi_cords_%s_builder(char * a,char *b);",categoryName);
@@ -70,16 +72,21 @@ int insertCategory(char pathf[], char categoryName[],int indice)
  sprintf(pyint,"%s/%s",pathf,PY_CRUD_INCLUDE);
  sprintf(pyintname,"#include \"%sInterface.c\"",categoryName);
  
- insertInFile(cordsh,cordshname,categoryName,0);
- insertInFile(occibuilder,occibuildername,categoryName,1);
- insertInFile(cordsbase,cordsbasename,categoryName,0);
+
+
+ if(flag==0)insertInFile(cordsh,cordshname,categoryName,0);
+ //if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1);
+ insertInFile(occibuilderb,occibuildername,categoryName,1);
+
+ if(flag==0) insertInFile(cordsbase,cordsbasename,categoryName,0);
  insertInFile(occicords,occicordsname,categoryName,0);
 
  insertInFile(pyint,pyintname,categoryName,0);
 
  insertInFile(pyListcateg,pyListcategname,categoryName,0);
- 
+
  if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0);
+
 
  return 1;
 }
@@ -97,8 +104,9 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
   FILE *fIn;
   FILE *fOut;
   char line[TAILLE];
-  char strcats[6];
+  char strcats[10];
   listc categoryN;
+  
 
   if(indice==1)
   {
@@ -110,12 +118,14 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    printf("Error inserInFile: No such file or directory\n");
    return 0;
   }
+
   if((fOut=fopen("text.tmp","w"))==NULL)
   {
    fclose(fIn);
    printf("Error inserInFile :No such file or directory\n");
    return 0;
   }
+
  
   while(fgets(line,sizeof(line), fIn))
   {
@@ -150,6 +160,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
        else
        {
         str_sub(line,0,5,strcats);
+        strcats[strlen(strcats)]=0;
         if((strcmp(strcats,"#endif"))==0) break;
         else fprintf(fOut,"%s",line);
        }
@@ -167,16 +178,19 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    fprintf(fOut,"\tconst char *name;\n");
    fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
    fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
+
+
    elem *pelem = categoryN.first;
    while(pelem)
    {          
      fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
      pelem = pelem->next;
    }
+   
    free(pelem);
    fprintf(fOut,"};\n");
   }
- 
+  
   fprintf(fOut,"#endif\n");
   fclose(fIn);
   fclose(fOut);
@@ -234,7 +248,7 @@ int deleteInFile(char pathf[],char categoryName[])
 /*****************************************************************************************************************/
 char *getCategoryName(char strCt[],char * tok,int p)
 {
- char *token;
+ char *token=NULL;
  int i=0;
  char *result=NULL;
  token= strtok(strCt,tok);
