@@ -13,11 +13,11 @@ cd /accords-platform/pyaccordsSDK/pycompmanager
       
 python setup.py install
       
-      
- 
-      
+     
+
+       
 #Generate an OCCI category
-#the 4th argument is the provisionning flag indicating if the category is a category related to a cloud provider (1) or to Accords platform (0).
+#the 4th argument is the provisionning flag indicating if the category is a category related to a cloud provider (1) or to Accords platform (0)
       
 python
       
