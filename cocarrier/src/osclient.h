@@ -54,6 +54,7 @@ public	char * os_create_meta_request( char * key, char * value );
 public	char * os_create_image_request(char * identity, char * server );
 public	char * os_create_flavor_request(char * identity, char * ram, char * cpus, char * disk );
 public	char * os_create_address_request( char * address );
+public	char * os_remove_address_request( char * address );
 public	char * os_create_security_group_request( char * name );
 public	char * os_create_security_rule_request( char * name, char * protocol, char * from, char * to, char * cidr );
 

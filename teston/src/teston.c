@@ -159,6 +159,10 @@ private	struct	on_response * on_post_object(
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
+		if ((!( strcmp( p7, "none" ) ))
+		||  (!( strcmp( p7, "any"  ) )))
+			p7 = (char *) 0;
+
 		if (!( filename = on_create_compute_request( p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
 			return((struct on_response *) 0);
 		else	return( on_post_request( "/compute", filename ) );
