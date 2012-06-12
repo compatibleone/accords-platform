@@ -78,7 +78,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  //if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1);
  insertInFile(occibuilderb,occibuildername,categoryName,1);
 
- if(flag==0) insertInFile(cordsbase,cordsbasename,categoryName,0);
+ insertInFile(cordsbase,cordsbasename,categoryName,0);
  insertInFile(occicords,occicordsname,categoryName,0);
 
  insertInFile(pyint,pyintname,categoryName,0);
