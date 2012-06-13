@@ -136,6 +136,10 @@ _run_parser() {
     start_daemon parser CO-PARSER/1.0
 }
 
+_run_paprocci() {
+    start_daemon paprocci CO-PAPROCCI/1.0
+}
+
 _run_procci() {
     start_daemon procci CO-PROCCI/1.0
 }
