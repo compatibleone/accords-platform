@@ -550,7 +550,7 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
      fprintf(f,"\tl=categStr.split(\",\")\n");
      fprintf(f,"\tcategoryAtr = C%s%s\n",categoryName,listAtr);
      fprintf(f,"\tresCateg = %s_%s(categoryAtr)\n",categoryName,pelemact->value);
-     fprintf(f,"\trestResp = [str(restCateg.status),str(restCateg.message)]");//%s\n",listResult);
+     fprintf(f,"\trestResp = [str(restCateg.status),str(restCateg.message)]\n");//%s\n",listResult);
      fprintf(f,"\trestResponse = \",\".join(restResp)\n");
      fprintf(f,"\treturn restResponse\n\n");
      pelemact=pelemact->next;
