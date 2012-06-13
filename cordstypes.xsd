@@ -19,6 +19,7 @@
 		<xsd:attribute name="interface" type="xsd:string"/>
 		<xsd:attribute name="security" type="xsd:string"/>
 		<xsd:attribute name="account" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="nodes" type="xsd:integer"/>
 		<xsd:attribute 
 			name="plan" 

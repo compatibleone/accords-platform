@@ -24,9 +24,14 @@
 #include "csp.h"
 #include "cpxsd.h"
 
+private	int	force_update=0;
+
+public	void	set_force(int v) { force_update = v; }
+
 private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
 
 #include "cpxsd.c"
+
 
 
 /*	---------------------------------------------------	*/
@@ -2434,6 +2439,8 @@ private	struct occi_response * cords_integrate_fields(
 	char *	nptr;
 	char *	vptr;
 	if (!( aptr = document_atribut( document, _CORDS_ID )))
+		return( zptr );
+	else if ( force_update )
 		return( zptr );
 	sprintf(buffer,"%s.%s.",domain,document->name);
 	for (	eptr = zptr->first;
