@@ -7,7 +7,7 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
-dist_pkgsysconf_DATA=cords_user.xml
+dist_pkgsysconf_DATA=cords_user.xml accords.ini
 
 scripts=accords
 
@@ -19,7 +19,7 @@ aliases = \
 	run-cosacs accords-config
 	
 
-EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in
+EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in accords.init
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
@@ -45,7 +45,7 @@ all-local: $(scripts)
 	  ln -fs accords $$alias; \
 	done
 
-install-exec-local: accords.in Makefile
+install-exec-local: accords.in Makefile accords.init
 	mkdir -p $(DESTDIR)$(bindir)
 	srcdir=''; \
 	  test -f ./accords.in || srcdir=$(srcdir)/; \
@@ -54,12 +54,14 @@ install-exec-local: accords.in Makefile
 	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
+	install -p -m 0755 -D accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
 
 uninstall-local:
 	for alias in $(aliases); do \
 	  rm -f $(DESTDIR)$(bindir)/$$alias; \
 	done
 	rm -f $(DESTDIR)$(bindir)/accords
+	rm -f $(DESTDIR)$(sysconfdir)/init.d/accords
 
 accords: accords.in
 accords: Makefile

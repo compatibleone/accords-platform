@@ -16,7 +16,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		accords
 Version:	_VERSION
-Release:	2
+Release:	9.0
 License:	GPL
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -62,7 +62,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root,0755)
 %dir %{_sysconfdir}/accords
+%config %{_sysconfdir}/accords/accords.ini
 %config %{_sysconfdir}/accords/cords_user.xml
+%attr(0755,root,root) %{_sysconfdir}/init.d/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/broker
