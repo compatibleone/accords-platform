@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = example
-EXTRA_DIST = contract.c exampleprocci.c occiexampleprocci.c
+EXTRA_DIST = contract.c contract.h exampleprocci.c exampleprocci.h occiexampleprocci.c
 
 example_SOURCES = example.c 
 
