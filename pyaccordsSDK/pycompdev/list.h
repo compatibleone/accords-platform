@@ -7,7 +7,7 @@
 
 typedef struct el
 {
- char value[256];
+ char value[1024];
  struct el *prev,*next;
 }elem;
 

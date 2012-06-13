@@ -9,7 +9,7 @@
 #include "list.h"
 
 
-#define TAILLE 256
+#define TAILLE 1024
 #define CORDS_SRC "cords/src"
 #define INCLUDE_CORDS_H "cords/src/cords.h"
 #define INCLUDE_OCCI_BUILDER "occi/src/occibuilder.h"

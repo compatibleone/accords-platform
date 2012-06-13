@@ -75,7 +75,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 
 
  if(flag==0)insertInFile(cordsh,cordshname,categoryName,0);
- //if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1);
+ if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1);
  insertInFile(occibuilderb,occibuildername,categoryName,1);
 
  insertInFile(cordsbase,cordsbasename,categoryName,0);
@@ -307,11 +307,11 @@ int getLineNumber(char pathf[])
 { 
    FILE* fp = fopen (pathf, "r" );
    unsigned long count = 0;
-   char line[256];
+   char line[1024];
 
    if (fp != NULL)
    {      
-      while (fgets(line,256,fp) != NULL)
+      while (fgets(line,1024,fp) != NULL)
       {
          if (line[0]=='p')
          {

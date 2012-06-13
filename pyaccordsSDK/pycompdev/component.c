@@ -36,12 +36,12 @@
 #include "../../pyaccords/pysrc/categaction.h"
 #include "listoccibuilder.h"
 
-char cords_action[12][256]={"start","stop","restart","snapshot","save","suspend","softboot","hardboot","resize","confirm","revert"}; 
+char cords_action[12][1024]={"start","stop","restart","snapshot","save","suspend","softboot","hardboot","resize","confirm","revert"}; 
 struct accords_configuration moduleConfig;
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName)
 {
-        char configFile[256];
+        char configFile[1024];
         sprintf(configFile,"%s.xml",moduleName);
         componentModule->monitor=0;                            /* monitoring information options       */
         componentModule->autopub=0;                            /* auto publication mechanisms          */
@@ -221,7 +221,7 @@ struct occi_interface * callocciCategoryInterface(const char *name)
 private	int	module_operation( char * nptr, struct accords_configuration *componentModule, char *moduleName, 
 listc categoryName,listc categoryAct,int dim)
 {
-        char xlinkModule[256];
+        char xlinkModule[1024];
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
@@ -230,7 +230,7 @@ listc categoryName,listc categoryAct,int dim)
         struct occi_interface categoryInterface;
         int indice;
         
-        char categoryAction[256];
+        char categoryAction[1024];
 
         elem *pelem = categoryName.first;    
         while(pelem)

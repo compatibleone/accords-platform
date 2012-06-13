@@ -31,8 +31,8 @@ int commitPlatform(char pathf[])
 {
 
  int a,b;
- char makeCommand[256];
- char pysetupCommand[256];
+ char makeCommand[1024];
+ char pysetupCommand[1024];
  
  sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
  sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
@@ -95,11 +95,11 @@ int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
  char pyListcateg[TAILLE];
  char pyListcategname[TAILLE];
 
- char pathactcname[256];
- char pathactclist[256];
+ char pathactcname[1024];
+ char pathactclist[1024];
 
- char pathactstructname[256];
- char pathactstruct[256];
+ char pathactstructname[1024];
+ char pathactstruct[1024];
  
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
@@ -208,7 +208,7 @@ int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
  if(flag==0)
  {
   deleteInFile(cordsh,cordshname);
-  //deleteInFile(occibuilder,occibuildername);
+  deleteInFile(occibuilder,occibuildername);
  }
  deleteInFile(cordsbase,cordsbasename);
  deleteInFile(occicords,occicordsname);
@@ -242,7 +242,7 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  listc categoryAtrB;
  listc categoryAct;
  char occipath[TAILLE];
- char categoryAttributesB[256]="id";
+ char categoryAttributesB[1024]="id";
  int indice=0;
  
  sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
@@ -320,10 +320,10 @@ int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf
 {
   FILE *fIn;
   FILE *fOut;
-  char name[256];
+  char name[1024];
   int a=0;
   int i=0;
-  char line[256];
+  char line[1024];
   char strcats[2];
 
   sprintf(name,"%s/%s",pathf,PY_ACT_STRUCT);
@@ -381,7 +381,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
 {
  FILE * f;
  int count=0;
- char name[256];
+ char name[1024];
 
  sprintf(name,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSS,categoryName);
  if((f=fopen(name,"w"))==NULL)
@@ -410,10 +410,10 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\tvoid * vptr )\n");
        fprintf(f,"{\n");
        fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       fprintf(f,"\tchar sendstr[256]=\" \";\n");
-       fprintf(f,"\tchar strtmp[256]=\" \";\n");
-       fprintf(f,"\tchar status[256];\n");
-       fprintf(f,"\tchar message[256];\n");
+       fprintf(f,"\tchar sendstr[1024]=\" \";\n");
+       fprintf(f,"\tchar strtmp[1024]=\" \";\n");
+       fprintf(f,"\tchar status[1024];\n");
+       fprintf(f,"\tchar message[1024];\n");
        fprintf(f,"\tchar * response;\n");
        fprintf(f,"\tchar * token;\n");
        fprintf(f,"\tFILE * exp_file;\n");
@@ -487,14 +487,14 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
 int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc categoryAct,char pathf[])
 {
  FILE * f;
- char name1[256];
- char name2[256];
+ char name1[1024];
+ char name2[1024];
  int j,i=0;
- char listAtr[256]="(l[0]";
- char lista[256];
- char listResult[256]="[";
- char listr[256];
- char strm[256];
+ char listAtr[1024]="(l[0]";
+ char lista[1024];
+ char listResult[1024]="[";
+ char listr[1024];
+ char strm[1024];
 
  sprintf(name1,"%s/%s/%s/%sAct.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
  sprintf(name2,"%s/%s/%sAction.py",pathf,PYACCORDS,categoryName);
@@ -611,7 +611,7 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
  FILE * f;
  int j,i=0;
  int k=0;
- char name[256];
+ char name[1024];
  char funcName[4][20]={"create","retrieve","update","delete"};
  
  sprintf(name,"%s/%s/%s/%sInterface.c",pathf,PYACCORDS,PYACCORDSS,categoryName);
@@ -635,8 +635,8 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       fprintf(f,"{\n");
       fprintf(f,"\tstruct occi_kind_node * nptr;\n");
       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-      fprintf(f,"\tchar sendstr[256];\n");
-      fprintf(f,"\tchar strtmp[256];\n");
+      fprintf(f,"\tchar sendstr[1024];\n");
+      fprintf(f,"\tchar strtmp[1024];\n");
       fprintf(f,"\tchar * response;\n");
       fprintf(f,"\tchar * token;\n");
       fprintf(f,"\tFILE * exp_file;\n");
@@ -722,12 +722,12 @@ int generateCategoryInterfceStructFile(char pathf[])
 {
  FILE * f;
  FILE * h;
- char categoryTmp[256];
- char categoryName[256];
- char strtmp[256];
- char line[256];
- char name1[256];
- char name2[256];
+ char categoryTmp[1024];
+ char categoryName[1024];
+ char strtmp[1024];
+ char line[1024];
+ char name1[1024];
+ char name2[1024];
  listc categoryList;
  sprintf(name1,"%s/%s",pathf,LISTCATEG_FILE);
  sprintf(name2,"%s/%s/%s/crudinterf.h",pathf,PYACCORDS,PYACCORDSS); 
@@ -801,15 +801,15 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
  FILE * f;
  int j,i=0;
  char funcName[4][20]={"create","retrieve","update","delete"}; 
- char classAtr[256]="def __init__( self";
- char listAtr[256]="(l[0]";
- char lista[256];
- char listResult[256]="[";
- char listr[256];
- char name1[256];
- char name2[256];
- char name3[256];
- char strm[256];
+ char classAtr[1024]="def __init__( self";
+ char listAtr[1024]="(l[0]";
+ char lista[1024];
+ char listResult[1024]="[";
+ char listr[1024];
+ char name1[1024];
+ char name2[1024];
+ char name3[1024];
+ char strm[1024];
  
  sprintf(name1,"%s/%s/%s/%sClass.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
  sprintf(name2,"%s/%s/%s/%s.py",pathf,PYACCORDS,PYACCORDSS,categoryName);
@@ -951,8 +951,8 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
 /*******************************************************************************************************************/
 int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,char pathf[])
 {
- char pathfc[256];
- char pathfcc[256];
+ char pathfc[1024];
+ char pathfcc[1024];
  char **nameAtr; 
  FILE *f;
  int i;
@@ -1705,8 +1705,8 @@ int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,c
 /***************************************************************************************************************************/
 int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim,char pathf[])
 {
- char pathfc[256];
- char pathfcc[256];
+ char pathfc[1024];
+ char pathfcc[1024];
  char **nameAtr; 
  FILE *f;
  int i;
