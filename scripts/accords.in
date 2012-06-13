@@ -493,8 +493,15 @@ _accords_config() {
 	fi
     fi
 
+    echo "Creating Accords Port Configuration : ports.xml"
+
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ports.xml
+    echo "<import name=\"accords-ports\" xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> ports.xml
+    echo "<network name=\"accords-platform\">" >> ports.xml
+
     echo "Creating Accords Global Configuration File: $target"
-    echo "<accords>" > $target
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $target
+    echo "<accords>" >> $target
 
     _mkpub publisher
     _mkmon coss 
@@ -522,6 +529,8 @@ _accords_config() {
     _mkcosacs cosacs
 
     echo "</accords>" >> $target
+    echo "</network>" >> ports.xml
+    echo "</import>" >> ports.xml
 }
 
 ###
@@ -622,6 +631,7 @@ _mkpub() {
     _mktls ${module}
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
+    echo "<port name=\"${module}\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
 }
 
 _mkmon() {
@@ -642,6 +652,7 @@ _mkmon() {
     _mktls ${module}
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
 }
 
 _mkcosacs() {
@@ -661,6 +672,7 @@ _mkcosacs() {
     _mktls ${module}
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\"8286\" to=\"8286\"/>" >> ports.xml
 }
 
 _mkcfg() {
@@ -681,6 +693,7 @@ _mkcfg() {
     _mktls ${module}
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
 }
 
 if test "`basename $0`" != "accords-config"; then
