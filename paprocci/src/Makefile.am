@@ -8,8 +8,7 @@
 #
 
 bin_PROGRAMS = paprocci
-EXTRA_DIST = certificate.c certificate.h \
-	proccipa.c
+EXTRA_DIST = proccipa.c
 
 paprocci_SOURCES = paprocci.c
 
