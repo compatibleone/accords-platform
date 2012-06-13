@@ -17,7 +17,7 @@ aliases = \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
 	run-cosacs accords-config
-	
+
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in accords.init
 CLEANFILES = $(scripts) $(aliases)
@@ -54,7 +54,7 @@ install-exec-local: accords.in Makefile accords.init
 	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
-	install -p -m 0755 -D accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
+	install -p -m 0755 -D $(srcdir)/accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
 
 uninstall-local:
 	for alias in $(aliases); do \
