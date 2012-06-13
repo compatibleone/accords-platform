@@ -133,7 +133,7 @@ if ENABLE_TESTRESOLVER
 SUBDIRS += testresolver
 endif
 
-EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd
+EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd accords.spec.in
 
 SPEC=$(PACKAGE).spec
 SPEC_DIR:=$(shell rpm -E '%{_specdir}')
