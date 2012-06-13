@@ -16,7 +16,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		accords
 Version:	_VERSION
-Release:	9.0
+Release:	10.0
 License:	GPL
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -79,12 +79,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/cosacs
 %attr(0755,root,root) %{_bindir}/cosched
 %attr(0755,root,root) %{_bindir}/dcprocci
+%attr(0755,root,root) %{_bindir}/example
 %attr(0755,root,root) %{_bindir}/ezvm
 %attr(0755,root,root) %{_bindir}/fileserver
 %attr(0755,root,root) %{_bindir}/onprocci
 %attr(0755,root,root) %{_bindir}/osprocci
 %attr(0755,root,root) %{_bindir}/osocciprocci
 %attr(0755,root,root) %{_bindir}/parser
+%attr(0755,root,root) %{_bindir}/paprocci
 %attr(0755,root,root) %{_bindir}/procci
 %attr(0755,root,root) %{_bindir}/publisher
 %attr(0755,root,root) %{_bindir}/slam
@@ -92,10 +94,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/testcb
 %attr(0755,root,root) %{_bindir}/testcp
 %attr(0755,root,root) %{_bindir}/testdc
+%attr(0755,root,root) %{_bindir}/testosocci
 %attr(0755,root,root) %{_bindir}/teston
 %attr(0755,root,root) %{_bindir}/testos
+%attr(0755,root,root) %{_bindir}/testpa
 %attr(0755,root,root) %{_bindir}/testresolver
-%attr(0755,root,root) %{_bindir}/testosocci
 ## links against accords
 %attr(0755,root,root) %{_bindir}/accords-config
 %attr(0755,root,root) %{_bindir}/co-broker
@@ -118,6 +121,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/run-onprocci
 %attr(0755,root,root) %{_bindir}/run-osprocci
 %attr(0755,root,root) %{_bindir}/run-parser
+%attr(0755,root,root) %{_bindir}/run-paprocci
 %attr(0755,root,root) %{_bindir}/run-procci
 %attr(0755,root,root) %{_bindir}/run-publisher
 %attr(0755,root,root) %{_bindir}/run-coees
