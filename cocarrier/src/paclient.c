@@ -304,10 +304,10 @@ public char * pa_java_procci_call(char * specific_parameters)
         ssize_t bytes_read = getdelim(&result, &size, '\0',  pf);
         if(bytes_read != -1){
             // ok
-            fprintf(stderr, "----- raw call stdout: %s", result);
+            fprintf(stderr, "Java-Procci stdout: %s", result);
         }else{
             result = NULL;
-            fprintf(stderr, "----- raw call stdout: <empty>");
+            fprintf(stderr, "Java-Procci stdout: <empty>");
         }
 
         if (pclose(pf) !=0){
@@ -661,7 +661,6 @@ public	struct	pa_response *	pa_create_server()
         if (!(filename = put_jsonstring_in_file(raw_list))){
             fprintf(stderr, "Problem putting the json in a file...\n");
         }else{
-            fprintf(stderr, "Filename: %s\n", filename);
             result->jsonroot = json_parse_file(filename);
             result->response = NULL;
         }

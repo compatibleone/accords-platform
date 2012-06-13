@@ -494,15 +494,15 @@ private	struct	rest_response * stop_proactive(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
+        if (check_output_pa_delete_server(osptr) != 0){ // If something went wrong...
+            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+        }
 		if ( pptr->status != _OCCI_IDLE )
 		{
 			reset_structure_proactive_server( pptr );
 			pptr->when = time((long *) 0);
 			osptr = liberate_pa_response( osptr );
 		}
-        if (check_output_pa_delete_server(osptr) != 0){ // If something went wrong...
-            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
-        }
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
