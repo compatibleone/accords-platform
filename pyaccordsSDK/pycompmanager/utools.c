@@ -74,18 +74,18 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  
 
 
- if(flag==0)insertInFile(cordsh,cordshname,categoryName,0);
- if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1);
- insertInFile(occibuilderb,occibuildername,categoryName,1);
+ if(flag==0)insertInFile(cordsh,cordshname,categoryName,0,flag);
+ if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1,flag);
+ insertInFile(occibuilderb,occibuildername,categoryName,1,flag);
 
- insertInFile(cordsbase,cordsbasename,categoryName,0);
- insertInFile(occicords,occicordsname,categoryName,0);
+ insertInFile(cordsbase,cordsbasename,categoryName,0,flag);
+ insertInFile(occicords,occicordsname,categoryName,0,flag);
 
- insertInFile(pyint,pyintname,categoryName,0);
+ insertInFile(pyint,pyintname,categoryName,0,flag);
 
- insertInFile(pyListcateg,pyListcategname,categoryName,0);
+ insertInFile(pyListcateg,pyListcategname,categoryName,0,flag);
 
- if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0);
+ if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0,flag);
 
 
  return 1;
@@ -98,7 +98,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 /* indoice: int  to select a processing                                                                             */
 /* retutn 1 if successfully done                                                                                    */
 /********************************************************************************************************************/
-int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice)
+int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag)
 {
   int a=0;
   FILE *fIn;
@@ -177,7 +177,8 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    fprintf(fOut,"const static struct {\n");
    fprintf(fOut,"\tconst char *name;\n");
    fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
-   fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
+   if (flag==0) fprintf(fOut,"} occiCategoryBuilder2_map[]={\n");
+   else  fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
 
 
    elem *pelem = categoryN.first;
@@ -191,7 +192,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    fprintf(fOut,"};\n");
   }
   
-  fprintf(fOut,"#endif\n");
+  fprintf(fOut,"#endif\n\n\n\n\n");
   fclose(fIn);
   fclose(fOut);
   rename("text.tmp",pathf);

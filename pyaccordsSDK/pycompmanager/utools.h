@@ -29,7 +29,7 @@
 
 int insertCategory(char pathf[], char categoryName[],int indice,int flag);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
-int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice);
+int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag);
 int enTete(char pathf[]);
 char *getCategoryName(char strCt[],char *tok,int p);
 int getLineNumber(char pathf[]);
