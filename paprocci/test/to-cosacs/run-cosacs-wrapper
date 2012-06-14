@@ -33,6 +33,7 @@ echo COSACS_PID is $COSACS_PID
 if [ "x$COSACS_PID" = "x" ]; then 
 #if [ -z "${COSACS_PID+xxx}" ]; then 
 echo No COSACS running... Exiting...
+rm -f /home/cosacs/lock
 exit 0;
 fi
 
