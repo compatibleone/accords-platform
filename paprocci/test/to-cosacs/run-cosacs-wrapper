@@ -12,7 +12,7 @@ control_c(){
   else
     kill $COSACS_PID
   fi
-  rm -f /home/cosacs/lock
+  rm -f /home/cosacs/lock-`hostname`
 }
 
 CURRDIR=`dirname $0`
@@ -21,7 +21,7 @@ CURRDIR=`dirname $0`
 trap control_c SIGINT
 trap control_c SIGTERM
 
-touch /home/cosacs/lock
+touch /home/cosacs/lock-`hostname`
 
 /home/cosacs/run-cosacs &
 
@@ -33,15 +33,15 @@ echo COSACS_PID is $COSACS_PID
 if [ "x$COSACS_PID" = "x" ]; then 
 #if [ -z "${COSACS_PID+xxx}" ]; then 
 echo No COSACS running... Exiting...
-rm -f /home/cosacs/lock
+rm -f /home/cosacs/lock-`hostname`
 exit 0;
 fi
 
-echo $COSACS_PID > /home/cosacs/lock
+echo $COSACS_PID > /home/cosacs/lock-`hostname`
 
 echo Waiting for COSACS to be killed to remove the lock file... 
 strace -p $COSACS_PID 
 
 echo COSACS was killed, removing lock file...
-rm -f /home/cosacs/lock
+rm -f /home/cosacs/lock-`hostname`
 

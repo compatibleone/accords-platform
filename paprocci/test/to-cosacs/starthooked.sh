@@ -5,14 +5,15 @@
 # the COSACS process is still there (by checking the LOCKFILE present). 
 # Otherwise the target process is killed. 
 
+CURRDIR=`dirname $0`
 TARGET=$@ # This is the target process, the one that will end once COSACS ends. 
-LOCKFILE=/home/cosacs/lock  
+LOCKFILE=$CURRDIR/lock-`hostname`
 
 # Check if COSACS_PID exists. 
 if [ -e $LOCKFILE ]; then
-  echo COSACS running... 
+  echo 'COSACS running (lockfile found)... '
 else
-echo No COSACS running... Exiting...
+  echo 'No COSACS running (no lockfile found)... Exiting...'
   exit 0;
 fi
 
@@ -27,6 +28,6 @@ echo Launched target $TARGET with PID $TARGET_PID
 echo Waiting for COSACS to be killed to kill the target process... 
 inotifywait -e delete $LOCKFILE
 
-echo COSACS was killed, killing the target process...
+echo 'COSACS was killed (lockfile was erased), killing the target process...'
 kill -9 $TARGET_PID
 
