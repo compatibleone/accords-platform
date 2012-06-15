@@ -246,6 +246,7 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
+
 	if (!( eptr = json_element( cptr->images->jsonroot, "images" )))
 		return((char *) 0);
 
@@ -257,10 +258,16 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 		return((char *) 0);
 	else	request.name = vptr;
 
+	rest_log_message( "os_contract system :");
+	rest_log_message( request.name );
+
 	if (!( vptr = occi_extract_atribut( cptr->image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_NAME ) ))
 		return((char *) 0);
 	else	request.other = vptr;
+
+	rest_log_message( "os_contract image :");
+	rest_log_message( request.other );
 
 	memset( &best, 0, sizeof( struct os_image_infos ));
 
@@ -287,6 +294,8 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 		else
 		{
 			liberate( iname );
+			rest_log_message("os_contract perfect match");
+			rest_log_message( vptr );
 			return( allocate_string( vptr ) );
 		}
 	}
@@ -314,13 +323,22 @@ private	char *	resolve_contract_image( struct cords_os_contract * cptr )
 		{
 			best.id = image.id;
 			best.name = image.name;
+			rest_log_message("os_contract found match");
+			rest_log_message( image.name );
+			rest_log_message( image.id );
 			break;
 		}		
 		else	continue;
 	}
 	if (!( best.id ))
 		return( best.id );
-	else 	return(allocate_string( best.id ));
+	else
+	{
+		rest_log_message("os_contract best match");
+		rest_log_message( best.name );
+		rest_log_message( best.id );
+		return(allocate_string( best.id ));
+	}
 }
 
 /*	-----------------------------------------------------------------	*/

@@ -2934,6 +2934,13 @@ public	char *	cords_service_broker(
 			return( cords_terminate_provisioning( 915, &CbC ) );
 		{
 			zptr = occi_remove_response( zptr );
+			/* ----------------------- */
+			/* add to list of contracts */
+			/* ----------------------- */
+			if (!( mptr->previous = CbC.document->last ))
+				CbC.document->first = mptr;
+			else 	mptr->previous->next = mptr;
+			CbC.document->last = mptr;
 			id = liberate( id );
 			CbC.nodes++;
 			continue;
