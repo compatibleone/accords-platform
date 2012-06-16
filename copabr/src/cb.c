@@ -45,6 +45,7 @@ private	struct	xml_element * 	cords_instance_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan );
 
 private	struct	xml_element * 	cords_complete_contract(
@@ -1513,6 +1514,8 @@ private	struct	xml_element * 	cords_add_provider(
 /*	---------------------------------------------------------	*/
 private	void 	cords_terminate_instance_node( struct cords_node_descriptor * dptr )
 {
+	if ( dptr->account )	dptr->account = liberate( dptr->account );
+	if ( dptr->accountName) dptr->accountName = liberate( dptr->accountName );
 	if ( dptr->nameApp )	dptr->nameApp = liberate( dptr->nameApp );
 	if ( dptr->typeApp )	dptr->typeApp = liberate( dptr->typeApp );
 	if ( dptr->accessApp )	dptr->accessApp = liberate( dptr->accessApp );
@@ -1735,7 +1738,13 @@ public	struct	xml_element * 	cords_build_contract(
 /*	----------------------------------------------------------	*/
 /*	builds a nested service instance graph for complex nodes	*/
 /*	----------------------------------------------------------	*/
-private	char *	cords_instance_service( char * host, char * planid, char * agent, char * tls, struct xml_element ** root )
+private	char *	cords_instance_service( 
+	char * host, 
+	char * planid, 
+	char * agent, 
+	char * tls, 
+	char * sla,
+	struct xml_element ** root )
 {
 	struct	occi_response * zptr=(struct occi_response *) 0;
 	char *	service=(char *) 0;
@@ -1755,7 +1764,7 @@ private	char *	cords_instance_service( char * host, char * planid, char * agent,
 		service = (char *) 0;
 	else if (!( manifest = occi_extract_atribut( zptr, Operator.domain, _CORDS_PLAN, _CORDS_MANIFEST ) ))
 		service = (char *) 0;
-	else	service = cords_manifest_broker(host, plan, name, manifest, agent, tls, root );
+	else	service = cords_manifest_broker(host, plan, name, manifest, agent, tls, sla, root );
 
 	/* ----------------------------- */
 	/* liberate response and strings */
@@ -1777,7 +1786,8 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
-	char * namePlan )
+	char *	sla,
+	char * 	namePlan )
 {
 	int	status;
 	struct	xml_element 	*	xroot=(struct xml_element *) 0;
@@ -1789,7 +1799,7 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	/* ----------------------------------------------------------- */
 	/* not a simple type node so instance a service graph for node */
 	/* ----------------------------------------------------------- */
-	if (!( service = cords_instance_service( host, App->typeApp, agent, tls, &xroot ) ))
+	if (!( service = cords_instance_service( host, App->typeApp, agent, tls, sla, &xroot ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -1847,6 +1857,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	int	status;
@@ -2161,6 +2172,7 @@ private	char * 	cords_build_simple_common(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	struct	xml_element * document;
@@ -2169,7 +2181,7 @@ private	char * 	cords_build_simple_common(
 	/* ----------------------------------- */
 	/* build a new simple service contract */
 	/* ----------------------------------- */
-	if (!( document = cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) ))
+	if (!( document = cords_instance_simple_contract( App, host, id, agent, tls, sla, namePlan ) ))
 		return((char *) 0);
 
 	else if (!( document = cords_complete_contract( App, document, agent, tls ) ))
@@ -2208,6 +2220,7 @@ private	struct	xml_element * 	cords_simple_private_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	struct	xml_element * document;
@@ -2218,7 +2231,7 @@ private	struct	xml_element * 	cords_simple_private_common_contract(
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
 	if (!( common = occi_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
-		if (!( common = cords_build_simple_common( App, host, id, agent, tls, namePlan ) ))
+		if (!( common = cords_build_simple_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
 	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
@@ -2233,6 +2246,7 @@ private	char *	cords_build_complex_common(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	struct	xml_element * document;
@@ -2242,7 +2256,7 @@ private	char *	cords_build_complex_common(
 	/* ----------------------------------- */
 	/* build a new simple service contract */
 	/* ----------------------------------- */
-	if (!( document = cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) ))
+	if (!( document = cords_instance_complex_contract( App, host, id, agent, tls,sla, namePlan ) ))
 		return((char *) 0);
 
 	else if (!( document = cords_complete_contract( App, document, agent, tls ) ))
@@ -2282,7 +2296,8 @@ private	struct	xml_element * 	cords_complex_private_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
-	char * namePlan )
+	char *	sla,
+	char * 	namePlan )
 {
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
@@ -2291,7 +2306,7 @@ private	struct	xml_element * 	cords_complex_private_common_contract(
 	/* retrieve the common instance from the node */
 	/* ------------------------------------------ */
 	if (!( common = occi_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
-		if (!( common = cords_build_complex_common( App, host, id, agent, tls, namePlan ) ))
+		if (!( common = cords_build_complex_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
 	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
@@ -2306,13 +2321,14 @@ private	struct	xml_element * 	cords_complex_public_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * 	namePlan )
 {
 	char * 	common=(char *) 0;
 	int	location=0;
 	if (!( common = cords_resolve_public_common(App,host,id,agent, tls,&location) ))
 	{
-		if (!( common = cords_build_complex_common( App, host, id, agent, tls, namePlan ) ))
+		if (!( common = cords_build_complex_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 		else if (!( common = allocate_string( common ) ))
 			return( (struct xml_element *) 0 );
@@ -2329,13 +2345,14 @@ private	struct	xml_element * 	cords_simple_public_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	char * 	common=(char *) 0;
 	int	location=0;
 	if (!( common = cords_resolve_public_common(App,host,id,agent, tls,&location) ))
 	{
-		if (!( common = cords_build_simple_common( App, host, id, agent, tls, namePlan ) ))
+		if (!( common = cords_build_simple_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 		else if (!( common = allocate_string( common ) ))
 			return( (struct xml_element *) 0 );
@@ -2408,6 +2425,7 @@ private	struct	xml_element * 	cords_instance_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * namePlan )
 {
 	/* ----------------------------------------------------------------- */
@@ -2416,18 +2434,18 @@ private	struct	xml_element * 	cords_instance_contract(
 	if (!( strcmp( App->typeApp, _CORDS_SIMPLE ) ))
 	{
 		if (!( App->scope & _SCOPE_COMMON ))
-			return( cords_instance_simple_contract( App, host, id, agent, tls, namePlan ) );
+			return( cords_instance_simple_contract( App, host, id, agent, tls, sla, namePlan ) );
 		else if ( App->scope & _ACCESS_PRIVATE )
-			return( cords_simple_private_common_contract( App, host, id, agent, tls, namePlan ) );
-		else	return( cords_simple_public_common_contract( App, host, id, agent, tls, namePlan ) );
+			return( cords_simple_private_common_contract( App, host, id, agent, tls, sla, namePlan ) );
+		else	return( cords_simple_public_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 	}
 	else
 	{
 		if (!( App->scope & _SCOPE_COMMON ))
-			return( cords_instance_complex_contract( App, host, id, agent, tls, namePlan ) );
+			return( cords_instance_complex_contract( App, host, id, agent, tls, sla, namePlan ) );
 		else if ( App->scope & _ACCESS_PRIVATE )
-			return( cords_complex_private_common_contract( App, host, id, agent, tls, namePlan ) );
-		else	return( cords_complex_public_common_contract( App, host, id, agent, tls, namePlan ) );
+			return( cords_complex_private_common_contract( App, host, id, agent, tls, sla, namePlan ) );
+		else	return( cords_complex_public_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 	}
 }
 
@@ -2443,6 +2461,7 @@ public	struct	xml_element * cords_instance_node(
 		char * id,
 		char * agent,
 		char * tls,
+		char * sla,
 		char * namePlan,
 		char * account,
 		char * accountName )
@@ -2452,7 +2471,6 @@ public	struct	xml_element * cords_instance_node(
 	struct	xml_element 	*	xptr;
 	struct	xml_element 	* 	document=(struct xml_element *) 0;
 	struct	xml_atribut	*	aptr;
-	char 			*	service;
 
 	struct	cords_node_descriptor App;
 
@@ -2468,6 +2486,11 @@ public	struct	xml_element * cords_instance_node(
 	if (!( App.node = cords_retrieve_instance( host, id, agent, tls)))
 		return((struct xml_element *) 0);
 	else if (!( App.account = allocate_string( account ) ))
+	{
+		cords_terminate_instance_node( &App );
+		return((struct xml_element *) 0);
+	}
+	else if (!( App.accountName = allocate_string( accountName ) ))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -2508,7 +2531,7 @@ public	struct	xml_element * cords_instance_node(
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
 	}
-	else if (!( App.profile = cords_resolve_profile( App.node, ( accountName ? accountName : namePlan ) )))
+	else if (!( App.profile = cords_resolve_profile( App.node, ( App.accountName ? App.accountName : namePlan ) )))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -2537,7 +2560,7 @@ public	struct	xml_element * cords_instance_node(
 	/* ---------------------------------------------------- */
 	/* instance or share the service contract for this node */
 	/* ---------------------------------------------------- */
-	if (!( document = cords_instance_contract( &App, host, id, agent, tls, namePlan ) ))
+	if (!( document = cords_instance_contract( &App, host, id, agent, tls, sla, namePlan ) ))
 		return( document );
 	else 
 	{
@@ -2820,6 +2843,60 @@ private	int	cords_retrieve_conditions(
 }
 
 /*	-------------------------------------------------------		*/
+/*	     c o r d s _ b r o k e r i g _ a c c o u n t		*/
+/*	-------------------------------------------------------		*/
+private	char *	cords_brokering_account(
+	struct  cords_provisioning * CbC,
+	struct	cords_placement_criteria * CpC,
+	char *	host, 
+	char * 	sla, 
+	char * 	agent, 
+	char * 	tls )
+{
+	int	status;
+
+	if (!( sla ))
+	{
+		/* -------------------------------------------------- */
+		/* retrieve the account information instance and name */
+		/* -------------------------------------------------- */
+		if (( CbC->accID  = occi_extract_atribut( CbC->manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
+				!= (char *) 0)
+		{
+			if (!( CbC->account = cords_retrieve_instance( host, CbC->accID, agent, tls )))
+				return( cords_terminate_provisioning( 905, CbC ) );
+			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+				return( cords_terminate_provisioning( 905, CbC ) );
+		}
+	}
+	else
+	{
+		/* -------------------------------------------------- */
+		/* retrieve the S.L.A   information instance and name */
+		/* -------------------------------------------------- */
+		if (!( CbC->slaID  = allocate_string( sla ) ))
+			return( cords_terminate_provisioning( 920, CbC ) );
+		else if (!( CbC->sla = cords_retrieve_instance( host, CbC->slaID, agent, tls )))
+			return( cords_terminate_provisioning( 930, CbC ) );
+		else if ((status = cords_retrieve_conditions( host, CbC->slaID, CbC->sla, CpC, agent, tls )) != 0)
+			return( cords_terminate_provisioning( 907, CbC ) );
+	
+		/* -------------------------------------------------- */
+		/* retrieve the account information instance and name */
+		/* -------------------------------------------------- */
+		if (( CbC->accID  = occi_extract_atribut( CbC->sla, Operator.domain, _CORDS_AGREEMENT, _CORDS_INITIATOR ))
+				!= (char *) 0)
+		{
+			if (!( CbC->account = cords_retrieve_instance( host, CbC->accID, agent, tls )))
+				return( cords_terminate_provisioning( 905, CbC ) );
+			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+				return( cords_terminate_provisioning( 905, CbC ) );
+		}
+	}
+	return("OK");
+}
+
+/*	-------------------------------------------------------		*/
 /*		c o r d s _ s e r v i c e _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
 /*	this function provides SLA driven service brokering for		*/
@@ -2865,33 +2942,18 @@ public	char *	cords_service_broker(
 	else if (!( CbC.manifest = cords_retrieve_instance( host, CbC.reqID, agent, tls )))
 		return( cords_terminate_provisioning( 910, &CbC ) );
 
-	/* -------------------------------------------------- */
-	/* retrieve the S.L.A   information instance and name */
-	/* -------------------------------------------------- */
-	if (!( CbC.slaID  = allocate_string( sla ) ))
-		return( cords_terminate_provisioning( 920, &CbC ) );
-	else if (!( CbC.sla = cords_retrieve_instance( host, CbC.slaID, agent, tls )))
-		return( cords_terminate_provisioning( 930, &CbC ) );
-	else if ((status = cords_retrieve_conditions( host, CbC.slaID, CbC.sla, &CpC, agent, tls )) != 0)
-		return( cords_terminate_provisioning( 907, &CbC ) );
-
-	/* -------------------------------------------------- */
-	/* retrieve the account information instance and name */
-	/* -------------------------------------------------- */
-	if (( CbC.accID  = occi_extract_atribut( CbC.sla, Operator.domain, _CORDS_AGREEMENT, _CORDS_INITIATOR ))
-			!= (char *) 0)
-	{
-		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent, tls )))
-			return( cords_terminate_provisioning( 905, &CbC ) );
-		else if (!( CbC.accName  = occi_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
-			return( cords_terminate_provisioning( 905, &CbC ) );
-	}
+	/* ----------------------------------------------- */
+	/* handle the account from the sla or the manifest */
+	/* ----------------------------------------------- */
+	if (!( id = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
+		return( id );
 
 	/* ----------------------------------- */
 	/* retrieve the configuration instance */
 	/* ----------------------------------- */
-	if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
+	else if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
 		return( cords_terminate_provisioning( 907, &CbC ) );
+
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
 
@@ -2926,7 +2988,7 @@ public	char *	cords_service_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
+		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else if (!( nptr = document_atribut( mptr, _CORDS_ID ) ))
 			return( cords_terminate_provisioning( 914, &CbC ) );
@@ -2968,7 +3030,7 @@ public	char *	cords_service_broker(
 /*	-------------------------------------------------------		*/
 public	char *	cords_manifest_broker(
 	char * 	host, 
-	char * plan, char * nameplan, char * manifest, char * agent, char * tls, struct xml_element ** root )
+	char * plan, char * nameplan, char * manifest, char * agent, char * tls, char * sla, struct xml_element ** root )
 {
 	int	status;
 	char	*	id;
@@ -2993,17 +3055,11 @@ public	char *	cords_manifest_broker(
 	else if (!( CbC.manifest = cords_retrieve_instance( host, CbC.reqID, agent, tls )))
 		return( cords_terminate_provisioning( 904, &CbC ) );
 
-	/* -------------------------------------------------- */
-	/* retrieve the account information instance and name */
-	/* -------------------------------------------------- */
-	if (( CbC.accID  = occi_extract_atribut( CbC.manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
-			!= (char *) 0)
-	{
-		if (!( CbC.account = cords_retrieve_instance( host, CbC.accID, agent, tls )))
-			return( cords_terminate_provisioning( 905, &CbC ) );
-		else if (!( CbC.accName  = occi_extract_atribut( CbC.account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
-			return( cords_terminate_provisioning( 905, &CbC ) );
-	}
+	/* ----------------------------------------------- */
+	/* handle the account from the sla or the manifest */
+	/* ----------------------------------------------- */
+	if (!( id = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
+		return( id );
 
 	/* ---------------------------------------- */
 	/* retrieve the security procedure instance */
@@ -3058,7 +3114,7 @@ public	char *	cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, CbC.namePlan, CbC.accID, CbC.accName ) ))
+		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else	
 		{

@@ -270,7 +270,7 @@ private	char *	negotiate_application_contract(char * node,struct cords_placement
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("coips:negotiate_application_contract");
 	if (!( document = cords_instance_node(
-		selector, node, node, _CORDS_CONTRACT_AGENT, default_tls(), "coips", "coips", "coips") ))
+		selector, node, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, "coips", "coips", "coips") ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{

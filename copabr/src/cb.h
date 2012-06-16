@@ -72,6 +72,7 @@ struct	cords_node_descriptor
 {
 	int			scope;
 	char 			* account;	/* account for which service is engaged			*/
+	char 			* accountName;	/* name of account for which service is engaged		*/
 	char			* nameApp;
 	char 			* typeApp;
 	char			* scopeApp;	/* the node scope : normal/common 			*/
@@ -111,7 +112,7 @@ public	struct	xml_element * 	cords_build_contract(
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 
 public	char *	cords_manifest_broker(
-	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls,
+	char * 	host, char * plan, char * nameplan, char * manifest, char * agent, char * tls, char * sla,
 	struct xml_element ** root );
 
 public	char *	cords_service_broker(
@@ -133,6 +134,7 @@ public	struct	xml_element * cords_instance_node(
 		char * id,
 		char * agent,
 		char * tls,
+		char * sla,
 		char * namePlan,
 		char * account,
 		char * accountName );
