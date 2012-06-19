@@ -93,21 +93,3 @@ def ec2_start(accesskey, secretkey, zone, identity, amiID, flavour):
 	ec2=ec2_connect(accesskey, secretkey, zone)
 	return ec2_create_server(ec2,identity,amiID, flavour)
 
-'''
-def main():
-	#ec2=ec2_connect('AKIAJ2IKM6O55O7PPOIQ', 'IOKhyz1V+AqFlKpPiIH0msdns5yXoYC0WqKa4RP6', 'europe')
-	#print ec2	
-	#image=ec2_resolve_image(ec2,'ami-023f0d11')
-	
-	#print image
-	#msg=ec2_create_server(ec2, "amazon", "ami-03c2f677", "t1.micro")
-        #print msg	
-	#images=ec2_list_images(ec2)
-	#certif=ec2_create_certificate(ec2,'certif1','/home/ezekri/')
-	#print certif
-	#ec2_create_server(ec2, 'server1', 'ami-023f0d76' , 't1.micro', 'certif1')
-	
-
-if __name__=="__main__":
-	main()
-'''
