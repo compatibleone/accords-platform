@@ -99,4 +99,6 @@
 #include "domain.c"
 #include "iprange.c"
 
+#include "amazonEc2.c"
+#include "ec2config.c"
 #endif

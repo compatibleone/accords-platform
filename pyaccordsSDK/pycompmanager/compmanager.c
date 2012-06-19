@@ -27,13 +27,15 @@
 /*******************************************************************************************************/
 /*Function to commit accords platform                                                                  */
 /*******************************************************************************************************/
-int commitPlatform(char pathf[])
+int commitPlatform()
 {
 
  int a,b;
  char makeCommand[1024];
  char pysetupCommand[1024];
+ char pathf[1024];
  
+ spcpy(pathf,PYPATH);
  sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
  sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
 
@@ -48,9 +50,11 @@ int commitPlatform(char pathf[])
 /*******************************************************************************************************/
 /* Function to remove a component                                                                      */
 /*******************************************************************************************************/
-int deleteModule(char moduleName[],char pathf[])
+int deleteModule(char moduleName[])
 {
  char pathff[TAILLE];
+ char pathf[1024];
+ strcpy(pathf,PYPATH);
  sprintf(pathff,"rm -r %s/%s",pathf,moduleName);
  if (system(pathff)!= 0 )
  {
@@ -65,7 +69,7 @@ int deleteModule(char moduleName[],char pathf[])
 /* categoryName: char * the name of the category                                                       */
 /* return 1 if succeeded                                                                               */
 /*******************************************************************************************************/
-int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
+int deleteCategory(char categoryName[],int indice,int flag)
 {
  char cordsh[TAILLE];
  char cordshname[TAILLE];
@@ -101,6 +105,9 @@ int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
  char pathactstructname[1024];
  char pathactstruct[1024];
  
+ char pathf[1024];
+
+ strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
 
@@ -232,7 +239,7 @@ int deleteCategory(char pathf[], char categoryName[],int indice,int flag)
 /* pathf: (char*) a path name for the directory project                                                          */
 /* return 1 if succeeded                                                                                         */
 /*****************************************************************************************************************/
-int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag,char pathf[])
+int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag)
 {
  FILE *f;
  char *token=NULL;
@@ -244,7 +251,9 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  char occipath[TAILLE];
  char categoryAttributesB[1024]="id";
  int indice=0;
+ char pathf[1024];
  
+ strcpy(pathf,PYPATH);
  sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
  sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);
  if(categoryActions[0]!='\0') indice=1;
@@ -414,6 +423,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\tchar strtmp[1024]=\" \";\n");
        fprintf(f,"\tchar status[1024];\n");
        fprintf(f,"\tchar message[1024];\n");
+       fprintf(f,"\tchar srcdir[1024];\n");
        fprintf(f,"\tchar * response;\n");
        fprintf(f,"\tchar * token;\n");
        fprintf(f,"\tFILE * exp_file;\n");
@@ -442,10 +452,11 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
         pelemm=pelemm->next;
        }
        fprintf(f,"\t\t//           python interface\n");
-       fprintf(f,"\t\texp_file = fopen(\"%s/%s/%s/%sAct.py\", \"r\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+       fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc/%sAct.py\",PYPATH);\n",categoryName);
+       fprintf(f,"\t\texp_file = fopen(srcdir, \"r\");\n");
        fprintf(f,"\t\tif(!exp_file) printf(\"error in %sAction.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
        fprintf(f,"\t\tPy_Initialize();\n");
-       fprintf(f,"\t\tPyRun_SimpleFile(exp_file, \"%s/%s/%s/%sAct.py\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+       fprintf(f,"\t\tPyRun_SimpleFile(exp_file, srcdir);\n");
        fprintf(f,"\t\tmain_module = PyImport_AddModule(\"__main__\");\n");
        fprintf(f,"\t\tglobal_dict = PyModule_GetDict(main_module);\n");
        fprintf(f,"\t\tcbFunc = PyDict_GetItemString(global_dict,\"%s\");\n",pelem->value);
@@ -518,7 +529,9 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
    fprintf(f,"import sys\n");
-   fprintf(f,"sys.path.append(\"%s/%s\")\n",pathf,PYACCORDS);
+   fprintf(f,"import pypacksrc\n");
+   fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords\"\n");
+   fprintf(f,"sys.path.append(srcdirectory)\n");
    fprintf(f,"from %sAction import *\n",categoryName);
    fprintf(f,"from actionClass import *\n\n",categoryName);
 
@@ -571,7 +584,11 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
    fprintf(f,"# Implementation of category actions\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import %s\n",LIB_PYCOMPDEV); 
-   fprintf(f,"sys.path.append(\"%s/%s/%s\")\n",pathf,PYACCORDS,PYACCORDSS);
+   fprintf(f,"import pypacksrc\n");
+   fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords/pysrc/\"\n");
+   fprintf(f,"srcdirectoryc=pypacksrc.srcpydir+\"/cocarrier/src/\"\n");
+   fprintf(f,"sys.path.append(srcdirectory)\n");
+   fprintf(f,"sys.path.append(srcdirectoryc)\n");
    fprintf(f,"from %sClass import *\n",categoryName);
    fprintf(f,"from actionClass import *\n");
    fprintf(f,"\"\"\" Note:respAction is a python class to describe the occi response with the status and the message\n"); 
@@ -637,6 +654,7 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
       fprintf(f,"\tchar sendstr[1024];\n");
       fprintf(f,"\tchar strtmp[1024];\n");
+      fprintf(f,"\tchar srcdir[1024];\n");
       fprintf(f,"\tchar * response;\n");
       fprintf(f,"\tchar * token;\n");
       fprintf(f,"\tFILE * exp_file;\n");
@@ -670,10 +688,11 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       i++;
       free(pelem);
       fprintf(f,"\t//           python interface\n");
-      fprintf(f,"\texp_file = fopen(\"%s/%s/%s/%s.py\", \"r\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+      fprintf(f,"\tsprintf(srcdir,\"%%s/pyaccords/pysrc/%s.py\",PYPATH);\n",categoryName);
+      fprintf(f,"\texp_file = fopen(srcdir, \"r\");\n");
       fprintf(f,"\tif(!exp_file) printf(\"error in %sInterface.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
       fprintf(f,"\tPy_Initialize();\n");
-      fprintf(f,"\tPyRun_SimpleFile(exp_file, \"%s/%s/%s/%s.py\");\n",pathf,PYACCORDS,PYACCORDSS,categoryName);
+      fprintf(f,"\tPyRun_SimpleFile(exp_file, srcdir);\n");
       fprintf(f,"\tmain_module = PyImport_AddModule(\"__main__\");\n");
       fprintf(f,"\tglobal_dict = PyModule_GetDict(main_module);\n");
       fprintf(f,"\tcbFunc = PyDict_GetItemString(global_dict,\"%s\");\n",funcName[j]);
@@ -862,7 +881,9 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"# Hamid MEDJAHED (c) Prologue\n");
    fprintf(f,"import sys\n");
-   fprintf(f,"sys.path.append(\"%s/%s\")\n",pathf,PYACCORDS);
+   fprintf(f,"import pypacksrc\n");
+   fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords\"\n");
+   fprintf(f,"sys.path.append(srcdirectory)\n");
    fprintf(f,"from %sInterface import *\n\n",categoryName);
 
 
@@ -911,8 +932,10 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
    fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n");
    fprintf(f,"# Implementation of category CRUD functions\n");
    fprintf(f,"import sys\n");
-   fprintf(f,"import %s\n",LIB_PYCOMPDEV); 
-   fprintf(f,"sys.path.append(\"%s/%s/%s\")\n",pathf,PYACCORDS,PYACCORDSS);
+   fprintf(f,"import %s\n",LIB_PYCOMPDEV);
+   fprintf(f,"import pypacksrc\n");
+   fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords/pysrc/\"\n");
+   fprintf(f,"sys.path.append(srcdirectory)\n");
    fprintf(f,"from %sClass import *\n",categoryName);
    fprintf(f,"\"\"\" Note: %s is a python class to interface the accords category :%s.\n",categoryName,categoryName);
    fprintf(f,"\t-Attributes of this category are members of this class.\n");
@@ -1876,12 +1899,14 @@ int  enTete(char pathf[])
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
 /*****************************************************************************************************************/
-int generateModuleFile(char * moduleName, char * categoryNameList,char *categoryActionNumberList,char * pathf)
+int generateModuleFile(char * moduleName, char * categoryNameList,char *categoryActionNumberList)
 {
    char pathfd[TAILLE];
    char pathff[TAILLE];
+   char pathf[1024];
    FILE *f;
-
+   
+   strcpy(pathf,PYPATH);
    sprintf(pathfd,"%s/%s",pathf,moduleName);
    if(mkdir(pathfd,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)==-1)
    {

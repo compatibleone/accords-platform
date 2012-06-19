@@ -7,8 +7,13 @@ Prologue
        
        
        
+#Define root password with passwd before calling ./autogen.sh
+
+
+
 #Install pycompmanager
        
+
 cd /accords-platform/pyaccordsSDK/pycompmanager
       
 python setup.py install

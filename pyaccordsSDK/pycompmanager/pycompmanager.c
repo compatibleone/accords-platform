@@ -28,13 +28,12 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
 {
  int dim;
  char * categoryAttributes;         
- char * pathf;          
  char * categoryName;
  char * categoryActions;
  int flag;
 
- if (! PyArg_ParseTuple( args,"sssis",&categoryName, &categoryAttributes,&categoryActions,&flag,&pathf)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag,pathf);
+ if (! PyArg_ParseTuple( args,"sssi",&categoryName, &categoryAttributes,&categoryActions,&flag)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag);
  if(dim <= 0) return NULL;
  printf(" %s OCCI category is created\n",categoryName); 
  return Py_BuildValue("i", dim);
@@ -45,12 +44,11 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
 static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
 {
   char *categoryName;
-  char * pathf;
   int a;
   int indice;
   int flag;
-  if (! PyArg_ParseTuple( args,"siis",&categoryName,&indice,&flag,&pathf)) return NULL;
-  a=deleteCategory(pathf,categoryName,indice,flag);
+  if (! PyArg_ParseTuple( args,"sii",&categoryName,&indice,&flag)) return NULL;
+  a=deleteCategory(categoryName,indice,flag);
   printf("%s OCCI category is removed\n",categoryName);
   return Py_BuildValue("i",a);
 
@@ -59,12 +57,11 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
 static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
 {
  int a;          
- char * pathf;          
  char * moduleName;
  char * categoryNameList;
  char * categoryActionNumberList; 
- if (! PyArg_ParseTuple( args,"ssss",&moduleName,&categoryNameList,&categoryActionNumberList,&pathf)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList,categoryActionNumberList,pathf);
+ if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&categoryActionNumberList)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList,categoryActionNumberList);
  printf(" %s component is created\n",moduleName);
  return Py_BuildValue("i", a);
 
@@ -74,12 +71,11 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
 static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
 {
  int a;          
- char * pathf;          
  char * moduleName;
  
- if (! PyArg_ParseTuple( args,"ss",&moduleName,&pathf)) return NULL;
+ if (! PyArg_ParseTuple( args,"s",&moduleName)) return NULL;
  
- a=deleteModule(moduleName,pathf);
+ a=deleteModule(moduleName);
  printf(" %s component is removed\n",moduleName);
  return Py_BuildValue("i", a);
 
@@ -87,12 +83,11 @@ static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
 
 static PyObject *pycompmanager_commit(PyObject *self, PyObject *args)
 {
- int a;          
- char * pathf;          
+ int a;                 
  
- if (! PyArg_ParseTuple( args,"s", &pathf)) return NULL;
+ if (! PyArg_ParseTuple( args,"")) return NULL;
  
- a=commitPlatform(pathf);
+ a=commitPlatform();
  printf("changes are committed\n");
  return Py_BuildValue("i", a);
 

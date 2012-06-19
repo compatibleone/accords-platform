@@ -80,6 +80,8 @@ public struct occi_category * occi_cords_domain_builder(char *a,char * b);
 public struct occi_category * occi_cords_iprange_builder(char *a,char * b);
 
 
+public struct occi_category * occi_cords_amazonEc2_builder(char * a,char *b);
+public struct occi_category * occi_cords_ec2config_builder(char * a,char *b);
 const static struct {
 	const char *name;
 	public struct occi_category * (*func)(char *a,char * b);
@@ -152,6 +154,7 @@ const static struct {
 	{ "ipaddress", occi_cords_ipaddress_builder },
 	{ "domain", occi_cords_domain_builder },
 	{ "iprange", occi_cords_iprange_builder },
+	{ "amazonEc2", occi_cords_amazonEc2_builder },
+	{ "ec2config", occi_cords_ec2config_builder },
 };
 #endif
-

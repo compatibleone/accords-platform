@@ -22,7 +22,7 @@
 /* ---------------------------------------------------------------------------- */
 #ifndef	_COMPONENT_c
 #define	_COMPONENT_c
-
+ 
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"

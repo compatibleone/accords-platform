@@ -35,7 +35,7 @@ EXTRA_DIST = account.c azconfig.h paconfig.h cordselements.h instruction.c \
 	metadata.c metric.c port.c probe.c quota.c schedule.c script.c session.c \
 	stream.c dcconfig.c terms.c variable.h variable.c business.h zone.h \
 	guarantee.h term.h deltacloud.h term.c guarantee.c business.c deltacloud.c \
-	dcconfig.h terms.h zone.c proactive.c paconfig.c proactive.h paconfig.h
+	dcconfig.h terms.h
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c
 libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI)

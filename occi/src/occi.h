@@ -46,6 +46,7 @@ public	char *	occi_http_link( struct occi_category * optr, char * target, char *
 #define	_CORDS_PARSER_AGENT 	"CO-RDS-PARSER/1.0"
 #define	_CORDS_OS_AGENT 	"CO-RDS-OS/1.0"
 #define	_CORDS_ON_AGENT 	"CO-RDS-ON/1.0"
+#define	_CORDS_EC2_AGENT 	"CO-RDS-EC2/1.0"
 #define	_CORDS_AZ_AGENT 	"CO-RDS-AZ/1.0"
 #define	_CORDS_PA_AGENT 	"CO-RDS-PA/1.0"
 #define	_CORDS_SG_AGENT 	"CO-RDS-SG/1.0"

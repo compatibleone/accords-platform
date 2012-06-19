@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "list.h"
-
+#include "../../pyaccords/pysrc/pypath.h"
 
 #define TAILLE 1024
 #define CORDS_SRC "cords/src"

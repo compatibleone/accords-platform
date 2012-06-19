@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="xwikios" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+	<node name="amazon" type="simple" access="public" scope="normal" provider="amazonEc2" >
+		<infrastructure name="amazon">
+			<compute name="amazon" architecture="x86_64" cores="1" memory="1G" speed="1G"/>
+			<storage name="amazon" size="10G"/>
+			<network name="amazon" label="ethernet" vlan="100M">
+			</network>
+		</infrastructure>
+		<image name="amazon">
+			<system name="ami-03c2f677"/>
+		</image>
+	</node>
+	<configuration name="amazon">
+	</configuration>
+	<interface name="amazon"/>
+	<account name="amazon"/>
+	<security name="amazon"/>
+</manifest>
+
