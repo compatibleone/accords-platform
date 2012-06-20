@@ -20,6 +20,4 @@ sed -i "4i\#define PYPATH \"$PWD\"" pyaccords/pysrc/pypath.h
 sed -i '/srcpydir/d' pyaccords/pysrc/pypacksrc/pypacksrc.py
 sed -i "4i\srcpydir=\"$PWD\"" pyaccords/pysrc/pypacksrc/pypacksrc.py
 
-su -c "python pyaccords/pysrc/pypacksrc/setup.py install" root
-
 exit 0

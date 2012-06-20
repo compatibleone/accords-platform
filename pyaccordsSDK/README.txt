@@ -7,14 +7,15 @@ Prologue
        
        
        
-#Define root password with passwd before calling ./autogen.sh
+#Define root password with passwd before calling 
+
+
 
 
 
 #Install pycompmanager
        
-
-cd /accords-platform/pyaccordsSDK/pycompmanager
+cd /ACCORDS_PLATFORM_PATH/pyaccordsSDK/pycompmanager
       
 python setup.py install
       
@@ -28,22 +29,22 @@ python
       
 >>>import pycompmanager
       
->>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2", 0, “/home/accords-platform/”)
+>>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2", 0)
       
->>>pycompmanager.commit(/home/accords/platform/")
+>>>pycompmanager.commit()
       
       
       
 #Remove an existing OCCI category (where '1' indicates that the category contains at least one action)
 # the 3rd argument is the provisionning flag       
       
->>>pycompmanager.removeCategory("myCategory", 1, 0,"/home/accords-platform")
+>>>pycompmanager.removeCategory("myCategory", 1, 0)
       
 
       
 #Generate an ACCORDS component/OCCI Server (where '2' indicates the category action number)
             
->>>pycompmanager.generateComponent(“myComponent”, “myCategory”, "2", “/home/accords-platform/”)
+>>>pycompmanager.generateComponent(“myComponent”, “myCategory”, "2")
       
             
   
