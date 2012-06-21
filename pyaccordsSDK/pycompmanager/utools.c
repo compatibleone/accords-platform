@@ -177,7 +177,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    fprintf(fOut,"const static struct {\n");
    fprintf(fOut,"\tconst char *name;\n");
    fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
-   if (flag==0) fprintf(fOut,"} occiCategoryBuilder2_map[]={\n");
+   if (flag==0) fprintf(fOut,"} occiCategoryBuilder_map2[]={\n");
    else  fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
 
 
@@ -192,7 +192,8 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    fprintf(fOut,"};\n");
   }
   
-  fprintf(fOut,"#endif\n\n\n\n\n");
+  fprintf(fOut,"#endif\n\n\n");
+  fprintf(fOut,"\n");
   fclose(fIn);
   fclose(fOut);
   rename("text.tmp",pathf);

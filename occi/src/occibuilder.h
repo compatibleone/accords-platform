@@ -83,7 +83,7 @@ public struct occi_category * occi_cords_iprange_builder(char *a,char * b);
 const static struct {
 	const char *name;
 	public struct occi_category * (*func)(char *a,char * b);
-} occiCategoryBuilderb_map[]={
+} occiCategoryBuilder_map2[]={
 	{ "agreement", occi_cords_agreement_builder },
 	{ "terms", occi_cords_terms_builder },
 	{ "term", occi_cords_term_builder },
@@ -154,3 +154,4 @@ const static struct {
 	{ "iprange", occi_cords_iprange_builder },
 };
 #endif
+
