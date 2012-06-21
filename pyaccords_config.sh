@@ -6,4 +6,4 @@ python setup.py install
 cd -
 cd pyaccordsSDK/pycompdev
 python setup.py install
-cd-
+cd -
