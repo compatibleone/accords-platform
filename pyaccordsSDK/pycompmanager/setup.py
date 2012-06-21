@@ -1,9 +1,8 @@
 from distutils.core import setup, Extension
-
-
+ 
 module1 = Extension('pycompmanager', 
-                     sources = ['pyaccordsSDK/pycompmanager/pycompmanager.c','pyaccordsSDK/pycompmanager/compmanager.c','pyaccordsSDK/pycompmanager/list.c','pyaccordsSDK/pycompmanager/utools.c'],
-                     depends = ['pyaccordsSDK/pycompmanager/compmanager.h','pyaccordsSDK/pycompmanager/list.c'],
+                     sources = ['pycompmanager.c','compmanager.c','list.c','utools.c'],
+                     depends = ['compmanager.h','list.c'],
                    )
 setup (name = 'pycompmanager',
         version = '1.0',
