@@ -123,7 +123,8 @@
 #define	_CORDS_SLAPOS		"slapos"
 #define	_CORDS_PROACTIVE	"proactive"
 #define	_CORDS_DELTACLOUD	"deltacloud"
-
+#define _CORDS_EC2		"amazonEc2"
+	
 #define	_CORDS_EVENT		"event"
 #define	_CORDS_MONITOR		"monitor"
 #define	_CORDS_REPORT		"report"

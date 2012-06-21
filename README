@@ -32,7 +32,7 @@ installed on your platform before launching your build script.
 	AUTOCONF
 	AUTOMAKE
 	AUTOTOOLS
-
+	PYTHON-DEV
 	MAKE
 
 	GCC
@@ -63,6 +63,14 @@ INSTALLATION
 
 To install all files, run (as root):
 # make install
+
+
+PYACCORDSSDK CONFIGURATION
+--------------------------
+
+To configure the PyAccordsSDK path, run the following (as root):
+# ./pyaccrods_config.sh
+
 
 OPERATION
 ---------
