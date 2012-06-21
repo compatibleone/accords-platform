@@ -1,5 +1,6 @@
 from distutils.core import setup, Extension
- 
+
+
 module1 = Extension('pycompdev', 
                      sources = ['pyaccordsSDK/pycompdev/pycompdev.c','pyaccordsSDK/pycompdev/list.c','pyaccords/pysrc/ctools.c'],
                      depends = ['pyaccordsSDK/pycompdev/component.c','pyaccordsSDK/pycompdev/list.c'],
