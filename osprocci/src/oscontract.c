@@ -30,6 +30,7 @@ struct	cords_vector
 
 struct	cords_os_contract
 {
+	struct	os_subscription * subscription;
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
@@ -87,6 +88,9 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 		cptr->flavors = liberate_os_response( cptr->flavors );
 	if ( cptr->images  )
 		cptr->images  = liberate_os_response( cptr->images  );
+	if ( cptr->subscription )
+		cptr->subscription = os_liberate_subscription( cptr->subscription );
+
 	return( status );
 }
 
@@ -135,7 +139,7 @@ private	int	os_normalise_value( char * sptr, int normal )
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ f l a v o r 			*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
+private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct cords_os_contract * cptr )
 {
 	struct	os_compute_infos	request;
 	struct	os_compute_infos	flavor;
@@ -236,7 +240,7 @@ private	char *	resolve_contract_flavor( struct cords_os_contract * cptr )
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_image( struct cords_os_contract * cptr )
+private	char *	resolve_contract_image( struct	os_subscription * subptr, struct cords_os_contract * cptr )
 {
 	struct	os_image_infos	request;
 	struct	os_image_infos	image;
@@ -350,15 +354,20 @@ public	int	create_openstack_contract(
 		char * agent,
 		char * tls )
 {
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	cords_os_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
 	int	status;
 	char *	vptr;
 
-	if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	if (!(subptr = use_openstack_configuration( pptr->profile )))
 		return( status );
-	else	memset( &contract, 0, sizeof( struct cords_os_contract ));
+	else
+	{
+		memset( &contract, 0, sizeof( struct cords_os_contract ));
+		contract.subscription = subptr;
+	}
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -423,9 +432,9 @@ public	int	create_openstack_contract(
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-	else if (!( contract.flavors = os_list_flavor_details() ))
+	else if (!( contract.flavors = os_list_flavor_details(subptr) ))
 		return( terminate_openstack_contract( 1180, &contract ) );
-	else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
+	else if (!( pptr->flavor = resolve_contract_flavor(subptr, &contract ) ))
 		return( terminate_openstack_contract( 1181, &contract ) );
 		
 
@@ -447,9 +456,9 @@ public	int	create_openstack_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = os_list_image_details() ))
+	else if (!( contract.images = os_list_image_details(subptr) ))
 		return( terminate_openstack_contract( 1186, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+	else if (!( pptr->image = resolve_contract_image( subptr, &contract ) ))
 		return( terminate_openstack_contract( 1187, &contract ) );
 	else if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_openstack_contract( 1188, &contract ) );
@@ -473,7 +482,10 @@ public	int	delete_openstack_contract(
 		char * tls )
 {
 	struct	os_response * osptr;
-	if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
+	struct	os_subscription * subptr;
+	if (!(subptr = use_openstack_configuration( pptr->profile )))
+		return(0);
+	else if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
 		osptr = liberate_os_response( osptr );
 	if (!( pptr->image ))
 		return( 0 );
@@ -483,7 +495,8 @@ public	int	delete_openstack_contract(
 		return( 0 );
 	else
 	{
-		os_delete_image( pptr->image );
+		os_delete_image( subptr, pptr->image );
+		subptr = os_liberate_subscription( subptr );
 		return(0);
 	}
 }

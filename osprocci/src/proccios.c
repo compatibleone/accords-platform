@@ -246,12 +246,12 @@ private	char *	openstack_instructions( char * contract, char * result, char * na
 /*	--------------------------------------------------------	*/
 /* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
 /*	--------------------------------------------------------	*/
-private	int	use_openstack_configuration( char * sptr )
+private	struct os_subscription * use_openstack_configuration( char * sptr )
 {
 	struct	os_config * pptr;
 
 	if (!( pptr = resolve_os_configuration( sptr )))
-	 	return( 404 );
+	 	return((struct os_subscription *) 0);
 
 	else 	return( os_initialise_client( 
 			pptr->user, pptr->password, pptr->namespace,
@@ -288,7 +288,10 @@ private	int	reset_openstack_server( struct openstack * pptr )
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ o p e n s t a c k _ i m a g e  		*/
 /*	--------------------------------------------------------	*/
-private	int	connect_openstack_image( struct os_response * rptr,struct openstack * pptr )
+private	int	connect_openstack_image( 
+		struct os_subscription * subptr, 
+		struct os_response * rptr,
+		struct openstack * pptr )
 {
 	struct	os_response * zptr;
 	struct	os_response * yptr;
@@ -331,7 +334,7 @@ private	int	connect_openstack_image( struct os_response * rptr,struct openstack 
 				sleep(1);
 				if ( zptr )
 					zptr = liberate_os_response( zptr );
-				if (!( zptr = os_get_image( pptr->image )))
+				if (!( zptr = os_get_image( subptr, pptr->image )))
 				{
 					reset_openstack_server( pptr );
 					return( 555 );
@@ -458,7 +461,10 @@ private	int	resolve_os_v11_addresses( struct os_response * yptr, struct openstac
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ o p e n s t a c k _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
-private	int	connect_openstack_server( struct os_response * rptr,struct openstack * pptr )
+private	int	connect_openstack_server( 
+		struct os_subscription * subptr, 
+		struct os_response * rptr,
+		struct openstack * pptr )
 {
 	char *	version;
 	struct	os_response * zptr;
@@ -532,7 +538,7 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
 			{
 				if ( zptr ) zptr = liberate_os_response( zptr );
-				if (!( zptr = os_get_server( pptr->number )))
+				if (!( zptr = os_get_server( subptr, pptr->number )))
 				{
 					reset_openstack_server( pptr );
 					return( 27 );
@@ -549,7 +555,7 @@ private	int	connect_openstack_server( struct os_response * rptr,struct openstack
 				sleep(1);
 				if ( zptr )
 					zptr = liberate_os_response( zptr );
-				if (!( zptr = os_get_server( pptr->number )))
+				if (!( zptr = os_get_server( subptr, pptr->number )))
 				{
 					reset_openstack_server( pptr );
 					return( 555 );
@@ -747,12 +753,12 @@ private	int	conets_access_address( struct openstack * pptr )
 /*	------------------------------------------------------------------	*/
 /*			 n o v a _ a c c e s s _ a d d r e s s			*/
 /*	------------------------------------------------------------------	*/
-private	int	nova_access_address( struct openstack * pptr )
+private	int	nova_access_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response	*	rptr;
 	char *	vptr;
 	char *	wptr;
-	if (!( rptr = os_create_address() ))
+	if (!( rptr = os_create_address(subptr) ))
 		return( 118 );
 	else if (!( vptr = json_atribut( rptr->jsonroot, "ip" )))
 		return( 118 );
@@ -806,13 +812,13 @@ private	int	os_use_conets( struct openstack * pptr )
 /*	--------------------------------------------------------------------	*/
 /*		o s _ r e s o l v e _ a c c e s s _ a d d r e s s		*/
 /*	--------------------------------------------------------------------	*/
-private	int	os_resolve_access_address( struct openstack * pptr )
+private	int	os_resolve_access_address(  struct os_subscription * subptr, struct openstack * pptr )
 {
 	if (!( pptr ))
 		return( 0 );
 	else if ( os_use_conets( pptr ) )
 		return( conets_access_address( pptr ) );
-	else	return( nova_access_address( pptr ) );
+	else	return( nova_access_address(subptr, pptr ) );
 }
 
 
@@ -823,7 +829,9 @@ private	int	os_resolve_access_address( struct openstack * pptr )
 /*	now we must attribute this addresse to this serrver and wait until	*/
 /*	it is ready ...								*/
 /*	------------------------------------------------------------------	*/
-private	int	associate_server_address( struct openstack * pptr )
+private	int	associate_server_address( 
+		struct os_subscription * subptr, 
+		struct openstack * pptr )
 {
 	int	iterate=30;
 	char *	nomfic;
@@ -833,9 +841,9 @@ private	int	associate_server_address( struct openstack * pptr )
 		return( 1001 );
 	else if (!( os_valid_address( pptr->floating ) ))
 		return( 1002 );
-	else if (!( nomfic = os_create_address_request( pptr->floating ) ))
+	else if (!( nomfic = os_create_address_request( subptr, pptr->floating ) ))
 		return( 1003 );
-	else if (!( osptr = os_server_address( nomfic, pptr->number ) ))
+	else if (!( osptr = os_server_address( subptr,nomfic, pptr->number ) ))
 		return( 1004 );
 	else
 	{
@@ -843,7 +851,7 @@ private	int	associate_server_address( struct openstack * pptr )
 		nomfic = liberate( nomfic );
 		while (iterate)
 		{
-			if (!( osptr = os_get_address( pptr->floatingid ) ))
+			if (!( osptr = os_get_address( subptr,pptr->floatingid ) ))
 				return( 1005 );
 			else if (!( vptr = json_atribut( osptr->jsonroot, "instance_id") ))
 			{
@@ -878,7 +886,7 @@ private	int	associate_server_address( struct openstack * pptr )
 /*	the server is up and running, an address has been attributed and 	*/
 /*	now we must noe disconnect the address from the server			*/
 /*	------------------------------------------------------------------	*/
-private	int	disassociate_server_address( struct openstack * pptr )
+private	int	disassociate_server_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	int	iterate=30;
 	char *	nomfic;
@@ -888,15 +896,15 @@ private	int	disassociate_server_address( struct openstack * pptr )
 		return( 1001 );
 	else if (!( os_valid_address( pptr->floating ) ))
 		return( 1002 );
-	else if (!( nomfic = os_remove_address_request( pptr->floating ) ))
+	else if (!( nomfic = os_remove_address_request( subptr,pptr->floating ) ))
 		return( 1003 );
-	else if (!( osptr = os_server_address( nomfic, pptr->number ) ))
+	else if (!( osptr = os_server_address( subptr,nomfic, pptr->number ) ))
 		return( 1004 );
 	else
 	{
 		osptr = liberate_os_response( osptr );
 		nomfic = liberate( nomfic );
-		if (!( osptr = os_get_address( pptr->floatingid ) ))
+		if (!( osptr = os_get_address( subptr,pptr->floatingid ) ))
 			return( 1005 );
 		else
 		{
@@ -909,12 +917,12 @@ private	int	disassociate_server_address( struct openstack * pptr )
 /*	----------------------------------------------------------------	*/
 /*		r e l e a s e _f l o a t i n g _ a d d r e s s			*/
 /*	----------------------------------------------------------------	*/
-private	void	release_floating_address( struct openstack * pptr )
+private	void	release_floating_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response * osptr;
 	if ( pptr->floatingid )
 	{
-		if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
+		if ((osptr = os_delete_address( subptr, pptr->floatingid )) != (struct os_response *) 0)
 			osptr = liberate_os_response( osptr );
 	}
 	return;
@@ -923,12 +931,12 @@ private	void	release_floating_address( struct openstack * pptr )
 /*	----------------------------------------------------------------	*/
 /*		r e m o v e _f l o a t i n g _ a d d r e s s			*/
 /*	----------------------------------------------------------------	*/
-private	void	remove_floating_address( struct openstack * pptr )
+private	void	remove_floating_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response * osptr;
 	if ( pptr->floatingid )
 	{
-		if ((osptr = os_delete_address( pptr->floatingid )) != (struct os_response *) 0)
+		if ((osptr = os_delete_address( subptr,pptr->floatingid )) != (struct os_response *) 0)
 			osptr = liberate_os_response( osptr );
 		pptr->floatingid = liberate( pptr->floatingid );
 	}
@@ -940,12 +948,12 @@ private	void	remove_floating_address( struct openstack * pptr )
 /*	----------------------------------------------------------------	*/
 /*		r e m o v e _s e c u r i t y _ g r o u p    			*/
 /*	----------------------------------------------------------------	*/
-private	void	remove_security_group( struct openstack * pptr )
+private	void	remove_security_group(struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response * osptr;
 	if ( pptr->group )
 	{
-		if ((osptr = os_delete_security_group( pptr->group )) != (struct os_response *) 0)
+		if ((osptr = os_delete_security_group( subptr,pptr->group )) != (struct os_response *) 0)
 			osptr = liberate_os_response( osptr );
 		pptr->group = liberate( pptr->group );
 	}
@@ -955,7 +963,7 @@ private	void	remove_security_group( struct openstack * pptr )
 /*	------------------------------------------------------------------	*/
 /*		r e s o l v e _ o p e n s t a c k _ f i r e w a l l		*/
 /*	------------------------------------------------------------------	*/
-private	char *	resolve_openstack_firewall( struct openstack * pptr )
+private	char *	resolve_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response *	osptr;
 	struct	data_element * fptr;
@@ -966,7 +974,7 @@ private	char *	resolve_openstack_firewall( struct openstack * pptr )
 	/* -------------------------- */
 	if (!( pptr->firewall ))
 		return((char *) 0);
-	else if (!(osptr = os_list_security_groups()))
+	else if (!(osptr = os_list_security_groups(subptr)))
 		return((char *) 0);
 	else if (!( fptr = json_element( osptr->jsonroot, "security_groups" )))
 		return((char *) 0);
@@ -995,7 +1003,7 @@ private	char *	resolve_openstack_firewall( struct openstack * pptr )
 /*	----------------------------------------------------------------	*/
 /*		b u i l d _ o p e n s t a c k _ f i r e w a l l			*/
 /*	----------------------------------------------------------------	*/
-private	int	build_openstack_firewall( struct openstack * pptr )
+private	int	build_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
 {
 	char *	filename;
 	struct	os_response *	osptr;
@@ -1018,7 +1026,7 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 		return(0);
 	else if (!( pptr->firewall ))
 		return(0);
-	else if (( rulegroup = resolve_openstack_firewall( pptr )) != (char *) 0)
+	else if (( rulegroup = resolve_openstack_firewall( subptr,pptr )) != (char *) 0)
 	{
 		if ( pptr->group ) pptr->group = liberate( pptr->group );
 		pptr->group = allocate_string( rulegroup );
@@ -1048,9 +1056,9 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 			/* --------------------------------------- */
 			if (!( started++ ))
 			{
-				if (!( filename = os_create_security_group_request( pptr->firewall )))
+				if (!( filename = os_create_security_group_request( subptr,pptr->firewall )))
 					return(0);
-				else if (!( osptr = os_create_security_group( filename ) ))
+				else if (!( osptr = os_create_security_group( subptr,filename ) ))
 				{
 					liberate( filename );
 					return(0);
@@ -1091,9 +1099,9 @@ private	int	build_openstack_firewall( struct openstack * pptr )
 			/* add the rule to the security group */
 			/* ---------------------------------- */
 			if (!( filename = os_create_security_rule_request( 
-					pptr->group, ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
+					subptr,pptr->group, ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
 				return(0);
-			else if (!( osptr = os_create_security_rule( filename ) ))
+			else if (!( osptr = os_create_security_rule( subptr,filename ) ))
 			{
 				liberate( filename );
 				return(0);
@@ -1122,6 +1130,7 @@ private	struct	rest_response * start_openstack(
 		void * vptr )
 {
 	char		* idptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	os_response * osptr;
 	struct	os_response * metaptr;
 	struct	openstack * pptr;
@@ -1137,7 +1146,7 @@ private	struct	rest_response * start_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
 
 	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
@@ -1148,43 +1157,43 @@ private	struct	rest_response * start_openstack(
 
 	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-	if (( status = os_resolve_access_address( pptr )) != 0)
+	if (( status = os_resolve_access_address( subptr, pptr )) != 0)
 		return( rest_html_response( aptr, status, "Server Failure : Access Address" ) );
 
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr, pptr );
 		return( rest_html_response( aptr, 4001, "Server Failure : Configuration Instructions" ) );
 	}
-	if ((status = build_openstack_firewall( pptr )) != 0)
+	if ((status = build_openstack_firewall(subptr, pptr )) != 0)
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr, pptr );
 		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
 	}
-	else if (!( pptr->workload = os_build_image_reference( pptr->image ) ))
+	else if (!( pptr->workload = os_build_image_reference( subptr, pptr->image ) ))
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr,pptr );
 		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
 	}
 	if (!( filename = os_create_server_request( 
-		pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
+		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr,pptr );
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	}
-	else if (!( osptr = os_create_server( filename )))
+	else if (!( osptr = os_create_server( subptr, filename )))
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr,pptr );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
 	}
 	else if (!( osptr->response ))
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr,pptr );
 	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
 	}
 	else if ( osptr->response->status >= 400 )
 	{
-		release_floating_address( pptr );
+		release_floating_address( subptr,pptr );
 		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
 		osptr = liberate_os_response( osptr );
 		return( aptr );
@@ -1195,13 +1204,13 @@ private	struct	rest_response * start_openstack(
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		if (!( status = connect_openstack_server( osptr, pptr ) ))
+		if (!( status = connect_openstack_server( subptr, osptr, pptr ) ))
 		{
 			/* -------------------------------------------- */
 			/* attempt to associate the floating IP address */
 			/* -------------------------------------------- */
 			if ( pptr->floating )
-				if ((status = associate_server_address( pptr )) != 0 )
+				if ((status = associate_server_address( subptr, pptr )) != 0 )
 				 	return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
 
 			/* ---------------------------- */
@@ -1222,7 +1231,7 @@ private	struct	rest_response * start_openstack(
 				/* -------------------------------- */
 				/* disassociate address from server */
 				/* -------------------------------- */
-				if ( disassociate_server_address( pptr ) != 0 )
+				if ( disassociate_server_address( subptr, pptr ) != 0 )
 				{
 					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4088, "Server Failure : Address removal failure" ) );
@@ -1230,15 +1239,15 @@ private	struct	rest_response * start_openstack(
 				/* ------------------------ */
 				/* then release the address */
 				/* ------------------------ */
-				release_floating_address( pptr );
+				release_floating_address( subptr, pptr );
 				if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 				if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
 				{
-					remove_floating_address( pptr );
+					remove_floating_address( subptr, pptr );
 					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
 				}
-				remove_floating_address( pptr );
+				remove_floating_address( subptr, pptr );
 			}
 
 			/* ----------------------- */
@@ -1247,9 +1256,9 @@ private	struct	rest_response * start_openstack(
 			if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
 			 	return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
 
-			else if (!( metafilename = os_create_metadata_request( personality ) ))
+			else if (!( metafilename = os_create_metadata_request( subptr, personality ) ))
 			 	return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
-			else if (!( metaptr = os_create_server_metadata( idptr, metafilename )))
+			else if (!( metaptr = os_create_server_metadata( subptr, idptr, metafilename )))
 			 	return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
 			else
 			{
@@ -1268,7 +1277,7 @@ private	struct	rest_response * start_openstack(
 		}
 		else  	
 		{
-			release_floating_address( pptr );
+			release_floating_address( subptr, pptr );
 			return( rest_html_response( aptr, 4256, "Server Failure : Connect Open Stack" ) );
 		}
 	}
@@ -1305,6 +1314,7 @@ private	struct	rest_response * snapshot_openstack(
 		void * vptr )
 {
 	char	reference[512];
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	rest_header * hptr;
 	struct	os_response * osptr;
 	int		status;
@@ -1315,7 +1325,7 @@ private	struct	rest_response * snapshot_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	/* ------------------------------------------------------------	*/
 	/* here we will launch a snapshot of the current server image 	*/
@@ -1327,9 +1337,9 @@ private	struct	rest_response * snapshot_openstack(
 	/* the id field is the best choice for this since it is unique	*/
 	/* the number   is the current server instance number		*/
 	/* ------------------------------------------------------------ */
-	else if (!( filename = os_create_image_request( pptr->id, pptr->number ) ))
+	else if (!( filename = os_create_image_request( subptr, pptr->id, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = os_create_image( filename, pptr->number, 0 ) ))
+	else if (!( osptr = os_create_image( subptr,filename, pptr->number, 0 ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( osptr->response ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1339,7 +1349,7 @@ private	struct	rest_response * snapshot_openstack(
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( hptr->value ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( pptr->workload = os_build_image_reference( hptr->value ) ))
+	else if (!( pptr->workload = os_build_image_reference( subptr, hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( inumber = os_image_number( hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1349,10 +1359,10 @@ private	struct	rest_response * snapshot_openstack(
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
 		osptr = liberate_os_response( osptr );
-		if (!( osptr = os_get_image( inumber ) ))
+		if (!( osptr = os_get_image( subptr, inumber ) ))
 		 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 
-		status = connect_openstack_image( osptr, pptr );
+		status = connect_openstack_image( subptr,osptr, pptr );
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
 		{
@@ -1377,6 +1387,7 @@ private	struct	rest_response * save_openstack(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	rest_header * hptr;
 	char	reference[512];
 	struct	os_response * osptr;
@@ -1388,7 +1399,7 @@ private	struct	rest_response * save_openstack(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	/* ------------------------------------------------------------	*/
 	/* here we will launch a snapshot of the current server image 	*/
@@ -1399,9 +1410,9 @@ private	struct	rest_response * save_openstack(
 	/* for all contracts of the same original node description.	*/
 	/* the number     is :	the current server instance number	*/
 	/* ------------------------------------------------------------ */
-	else if (!( filename = os_create_image_request( pptr->name, pptr->number ) ))
+	else if (!( filename = os_create_image_request( subptr,pptr->name, pptr->number ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = os_create_image( filename, pptr->number, 1 ) ))
+	else if (!( osptr = os_create_image( subptr,filename, pptr->number, 1 ) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( osptr->response ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1411,7 +1422,7 @@ private	struct	rest_response * save_openstack(
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( hptr->value ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( pptr->workload = os_build_image_reference( hptr->value ) ))
+	else if (!( pptr->workload = os_build_image_reference( subptr, hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else if (!( inumber = os_image_number( hptr->value ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -1421,10 +1432,10 @@ private	struct	rest_response * save_openstack(
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
 		osptr = liberate_os_response( osptr );
-		if (!( osptr = os_get_image( inumber ) ))
+		if (!( osptr = os_get_image( subptr, inumber ) ))
 		 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 
-		status = connect_openstack_image( osptr, pptr );
+		status = connect_openstack_image( subptr,osptr, pptr );
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
 		{
@@ -1440,7 +1451,7 @@ private	struct	rest_response * save_openstack(
 				/* -------------------------------------------- */
 				/* its a save operation and MUST be made public */
 				/* -------------------------------------------- */
-				if ((osptr = os_glance_access( inumber, 1 )) != (struct os_response *) 0)
+				if ((osptr = os_glance_access( subptr, inumber, 1 )) != (struct os_response *) 0)
 					osptr = liberate_os_response( osptr );
 
 			}
@@ -1462,8 +1473,9 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 {
 	int	status;
 	struct	os_response * osptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 
-	if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return((struct os_response *) 0);
 	else
 	{
@@ -1473,12 +1485,12 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		if ( pptr->floatingid )
 		{
 			occi_flush_client( pptr->floating, _COSACS_PORT );
-			release_floating_address( pptr );
+			release_floating_address( subptr,pptr );
 		}
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
-		if ((osptr=os_delete_server( pptr->number )) != (struct os_response *) 0)
+		if ((osptr=os_delete_server( subptr,pptr->number )) != (struct os_response *) 0)
 		{
 			/* ----------------------------- */
 			/* await server instance removal */
@@ -1497,12 +1509,12 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 					osptr = liberate_os_response( osptr );
 				}
 			}
-			while ((osptr=os_get_server( pptr->number )) != (struct os_response *) 0);
+			while ((osptr=os_get_server( subptr, pptr->number )) != (struct os_response *) 0);
 		}
 		/* ------------------------------------------- */
 		/* ensure release of the allocated floating IP */
 		/* ------------------------------------------- */
-		remove_floating_address( pptr );
+		remove_floating_address( subptr, pptr );
 		return( osptr );
 	}
 }
@@ -1518,6 +1530,7 @@ private	struct	rest_response * stop_openstack(
 		void * vptr )
 {
 	char	reference[512];
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	os_response * osptr;
 	int		status;
 	struct	openstack * pptr;
@@ -1552,10 +1565,11 @@ private	struct	rest_response * restart_openstack(
 		void * vptr )
 {
 	int	status;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
@@ -1579,10 +1593,11 @@ private	struct	rest_response * suspend_openstack(
 		void * vptr )
 {
 	int	status;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ((status = use_openstack_configuration( pptr->profile )) != 0)
+	else if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	{
 		if ( pptr->state == _OCCI_RUNNING )
@@ -1605,6 +1620,7 @@ private	struct	rest_response * softboot_openstack(
 		void * vptr )
 {
 	struct	openstack * pptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else	return( rest_html_response( aptr, 200, "OK" ) );
@@ -1621,6 +1637,7 @@ private	struct	rest_response * hardboot_openstack(
 		void * vptr )
 {
 	struct	openstack * pptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else	return( rest_html_response( aptr, 200, "OK" ) );
@@ -1653,6 +1670,7 @@ private	struct	rest_response * resize_openstack(
 		void * vptr )
 {
 	struct	openstack * pptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else	return( rest_html_response( aptr, 200, "OK" ) );
@@ -1669,6 +1687,7 @@ private	struct	rest_response * confirm_openstack(
 		void * vptr )
 {
 	struct	openstack * pptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else	return( rest_html_response( aptr, 200, "OK" ) );
@@ -1685,6 +1704,7 @@ private	struct	rest_response * revert_openstack(
 		void * vptr )
 {
 	struct	openstack * pptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else	return( rest_html_response( aptr, 200, "OK" ) );
@@ -1698,6 +1718,7 @@ private	struct	rest_response * revert_openstack(
 private	int	create_openstack(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
 	if (!( nptr = vptr ))
 		return(0);
@@ -1728,6 +1749,7 @@ private	int	retrieve_openstack(struct occi_category * optr, void * vptr)
 private	int	update_openstack(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
 	if (!( nptr = vptr ))
 		return(0);
@@ -1742,6 +1764,7 @@ private	int	update_openstack(struct occi_category * optr, void * vptr)
 private	int	delete_openstack(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
 	if (!( nptr = vptr ))
 		return(0);
@@ -1768,6 +1791,7 @@ private	struct	occi_interface	openstack_interface = {
 /*	-------------------------------------------	*/
 public	struct	occi_category * build_openstack( char * domain )
 {
+	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	occi_category * optr;
 	if (!( optr = occi_openstack_builder( domain,_CORDS_OPENSTACK ) ))
 		return( optr );
