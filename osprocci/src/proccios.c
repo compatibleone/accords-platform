@@ -1142,60 +1142,105 @@ private	struct	rest_response * start_openstack(
 	char		reference[512];
 	char 	*	personality;
 	char 	*	resource=_CORDS_LAUNCH_CFG;
+
+	/* --------------------------------- */
+	/* retrieve the instance information */
+	/* --------------------------------- */
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
+
+	/* ------------------------------------- */
+	/* retrieve the subscription information */
+	/* ------------------------------------- */
 	else if (!( subptr = use_openstack_configuration( pptr->profile )))
+	{
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
+	}
 
 	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
 		OsProcci.identity,_CORDS_OPENSTACK,pptr->id,OsProcci.publisher);
 	
 	if (!( personality = allocate_string(buffer) ))
+	{
+		subptr = os_liberate_subscription( subptr );
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, 4000, "Server Failure : Personality" ) );
+	}
 
 	sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
 	if (( status = os_resolve_access_address( subptr, pptr )) != 0)
+	{
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, status, "Server Failure : Access Address" ) );
+	}
 
 	if (!( personality = openstack_instructions( reference, personality, _CORDS_CONFIGURATION ) ))
 	{
 		release_floating_address( subptr, pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, 4001, "Server Failure : Configuration Instructions" ) );
 	}
 	if ((status = build_openstack_firewall(subptr, pptr )) != 0)
 	{
 		release_floating_address( subptr, pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, 4002, "Server Failure : Firewall Preparation" ) );
 	}
 	else if (!( pptr->workload = os_build_image_reference( subptr, pptr->image ) ))
 	{
 		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		reset_openstack_server( pptr );
 		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
 	}
 	if (!( filename = os_create_server_request( 
 		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
 	{
 		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	}
 	else if (!( osptr = os_create_server( subptr, filename )))
 	{
 		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
+		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
 	}
 	else if (!( osptr->response ))
 	{
 		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
+		osptr = liberate_os_response( osptr );
+		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
 	}
 	else if ( osptr->response->status >= 400 )
 	{
 		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
 		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
 		osptr = liberate_os_response( osptr );
+		reset_openstack_server( pptr );
 		return( aptr );
 	}
 	else
@@ -1210,8 +1255,15 @@ private	struct	rest_response * start_openstack(
 			/* attempt to associate the floating IP address */
 			/* -------------------------------------------- */
 			if ( pptr->floating )
+			{
 				if ((status = associate_server_address( subptr, pptr )) != 0 )
+				{
+					subptr = os_liberate_subscription( subptr );
+					personality = liberate( personality );
+					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
+				}
+			}
 
 			/* ---------------------------- */
 			/* launch the COSACS operations */
@@ -1233,6 +1285,8 @@ private	struct	rest_response * start_openstack(
 				/* -------------------------------- */
 				if ( disassociate_server_address( subptr, pptr ) != 0 )
 				{
+					subptr = os_liberate_subscription( subptr );
+					personality = liberate( personality );
 					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4088, "Server Failure : Address removal failure" ) );
 				}
@@ -1245,6 +1299,9 @@ private	struct	rest_response * start_openstack(
 				{
 					remove_floating_address( subptr, pptr );
 					reset_openstack_server( pptr );
+					subptr = os_liberate_subscription( subptr );
+					personality = liberate( personality );
+					reset_openstack_server( pptr );
 				 	return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
 				}
 				remove_floating_address( subptr, pptr );
@@ -1254,12 +1311,29 @@ private	struct	rest_response * start_openstack(
 			/* create server meta data */
 			/* ----------------------- */
 			if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
+			{
+				remove_floating_address( subptr, pptr );
+				subptr = os_liberate_subscription( subptr );
+				personality = liberate( personality );
+				reset_openstack_server( pptr );
 			 	return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
-
+			}
 			else if (!( metafilename = os_create_metadata_request( subptr, personality ) ))
+			{
+				remove_floating_address( subptr, pptr );
+				subptr = os_liberate_subscription( subptr );
+				personality = liberate( personality );
+				reset_openstack_server( pptr );
 			 	return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
+			}
 			else if (!( metaptr = os_create_server_metadata( subptr, idptr, metafilename )))
+			{
+				remove_floating_address( subptr, pptr );
+				subptr = os_liberate_subscription( subptr );
+				personality = liberate( personality );
+				reset_openstack_server( pptr );
 			 	return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
+			}
 			else
 			{
 				metaptr = liberate_os_response( metaptr );
@@ -1269,15 +1343,19 @@ private	struct	rest_response * start_openstack(
 		osptr = liberate_os_response( osptr );
 		if (!( status ))
 		{
-			if (!( os_valid_price( pptr->price ) ))
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else	return( rest_html_response( aptr, 200, "OK" ) );
+			if ( os_valid_price( pptr->price ) )
+				occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference );
+
+			subptr = os_liberate_subscription( subptr );
+			personality = liberate( personality );
+			return( rest_html_response( aptr, 200, "OK" ) );
 		}
 		else  	
 		{
-			release_floating_address( subptr, pptr );
+			remove_floating_address( subptr, pptr );
+			subptr = os_liberate_subscription( subptr );
+			personality = liberate( personality );
+			reset_openstack_server( pptr );
 			return( rest_html_response( aptr, 4256, "Server Failure : Connect Open Stack" ) );
 		}
 	}
