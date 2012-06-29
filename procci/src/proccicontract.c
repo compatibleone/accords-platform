@@ -213,6 +213,40 @@ private	int	is_common_contract( struct cords_contract * pptr )
 	else	return( 1 );
 }
 
+/*	--------------------------------------------	*/
+/*	     i s _ v a l i d _ p r o v i d e r		*/
+/*	--------------------------------------------	*/
+private	int	is_valid_provider( struct cords_contract * pptr )
+{
+	if (!( pptr ))
+		return( 0 );
+	else if (!( pptr->provider ))
+		return( 0 );
+	else if (!( strlen( pptr->provider ) ))
+		return( 0 );
+	else if (!( strcmp( pptr->provider, _CORDS_NULL ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	--------------------------------------------	*/
+/*		i s _ c o m m o n _ s c o p e		*/
+/*	--------------------------------------------	*/
+private	int	is_common_scope( struct cords_contract * pptr )
+{
+	if (!( pptr ))
+		return( 0 );
+	else if (!( pptr->scope ))
+		return( 0 );
+	else if (!( strlen( pptr->scope ) ))
+		return( 0 );
+	else if (!( strcmp( pptr->scope, _CORDS_NULL ) ))
+		return( 0 );
+	else if (!( strcmp( pptr->scope, _CORDS_COMMON ) ))
+		return( 1 );
+	else	return( 0 );
+}
+
 /*	-------------------------------------------	*/
 /* 	       s t a r t _ c o n t r a c t		*/
 /*	-------------------------------------------	*/
@@ -225,6 +259,8 @@ private	struct	rest_response * start_contract(
 {
 	struct	cords_contract * pptr;
 	char	fullid[2048];
+	int	urser=0;
+
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -233,7 +269,7 @@ private	struct	rest_response * start_contract(
 		{
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_START, 
+				cords_invoke_action( pptr->common, _CORDS_START,
 					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
 			else if ((!( pptr->type ))
@@ -252,12 +288,16 @@ private	struct	rest_response * start_contract(
 			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
+			pptr->commons= 1;
 			autosave_cords_contract_nodes();
+		}
+		else if ( is_common_scope( pptr ) )
+		{
+			pptr->commons++;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
-
 
 /*	-------------------------------------------	*/
 /* 	   r e s t a r t _ c o n t r a c t		*/
@@ -377,7 +417,11 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			if ( is_common_contract( pptr ) )
+			if ( pptr->commons )
+				pptr->commons--;
+			if ( pptr->commons )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( is_common_contract( pptr ) )
 			{
 				cords_invoke_action( pptr->common, _CORDS_STOP,
 					_CORDS_CONTRACT_AGENT, default_tls() );

@@ -737,6 +737,30 @@ private	int	cords_interface_instruction(
 
 }
 
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ c o n t r a c t _ p r o p e r t y _ v a l u e	*/
+/*	---------------------------------------------------------	*/
+private	char *	cords_contract_property_value( char * contract, char * propname, char * agent, char * tls )
+{
+	struct	occi_response * zptr;
+	char *	result;
+
+	if (!( zptr = occi_simple_get( contract, agent, tls ) ))
+		return( (char *) 0);
+
+	else if (!( result = occi_extract_atribut( zptr, Operator.domain, _CORDS_CONTRACT, propname ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( (char *) 0);
+	}
+	else
+	{
+		result = allocate_string( result );
+		zptr = occi_remove_response( zptr );
+		return( result );
+	}	
+}
+
 /*	-------------------------------------------------------		*/
 /*	  c o r d s _ a c t i o n _ i n s t r u c t i o n		*/
 /*	-------------------------------------------------------		*/
@@ -769,6 +793,8 @@ private	int	cords_action_instruction(
 	char *	source;
 	char *	symbol;
 	char *	mname;
+	char *	ivalue="";
+	char *	pvalue;
 	char	buffer[2048];
 
 	if (!( lptr = action->lvalue ))
@@ -819,6 +845,7 @@ private	int	cords_action_instruction(
 				continue;
 			else if (!(symbol = cords_resolve_consumer_id( rvalue->prefix, agent, tls ) ))
 				continue;
+			else	ivalue = allocate_string("");
 		}
 		else
 		{
@@ -830,6 +857,9 @@ private	int	cords_action_instruction(
 				continue;
 			else if (!( symbol = allocate_string( rvalue->prefix ) ))
 				continue;
+			else if (!( pvalue = cords_contract_property_value( source, rvalue->value, agent, tls ) ))
+				ivalue = allocate_string("");
+			else	ivalue = pvalue;
 		}
 
 		if (!( kptr = occi_create_client( buffer, agent, tls ) ))
@@ -850,11 +880,12 @@ private	int	cords_action_instruction(
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.method"  	, mname 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.type"  	, "method"  	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.provision" , "" 		) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"  	, "" 		) ))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"  	, ivalue	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, symbol 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.source" 	, source 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, rvalue->value	) )))
 		{
+			liberate( ivalue );
 			qptr = occi_remove_request( qptr );
 			kptr = occi_remove_client( kptr );
 			liberate_cordscript_action( action );
@@ -863,6 +894,7 @@ private	int	cords_action_instruction(
 		}
 		else if (!( yptr = occi_client_post( kptr, qptr ) ))
 		{
+			liberate( ivalue );
 			qptr = occi_remove_request( qptr );
 			kptr = occi_remove_client( kptr );
 			liberate_cordscript_action( action );
@@ -871,6 +903,7 @@ private	int	cords_action_instruction(
 		}
 		else if (!( ihost = occi_extract_location( yptr ) ))
 		{
+			liberate( ivalue );
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
 			kptr = occi_remove_client( kptr );
@@ -880,6 +913,7 @@ private	int	cords_action_instruction(
 		}
 		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
 		{
+			liberate( ivalue );
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
 			kptr = occi_remove_client( kptr );
@@ -889,6 +923,7 @@ private	int	cords_action_instruction(
 		}
 		else
 		{
+			liberate( ivalue );
 			zptr = occi_remove_response( zptr );
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );

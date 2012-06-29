@@ -166,6 +166,8 @@ private void autoload_cords_contract_nodes() {
 				pptr->service = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
 				pptr->firewall = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "commons" )) != (struct xml_atribut *) 0)
+				pptr->commons = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -242,6 +244,9 @@ public  void autosave_cords_contract_nodes() {
 		fprintf(h," firewall=%c",0x0022);
 		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," commons=%c",0x0022);
+		fprintf(h,"%u",pptr->commons);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -299,6 +304,8 @@ private void set_cords_contract_field(
 			pptr->service = allocate_string(vptr);
 		if (!( strcmp( nptr, "firewall" ) ))
 			pptr->firewall = allocate_string(vptr);
+		if (!( strcmp( nptr, "commons" ) ))
+			pptr->commons = atoi(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -439,6 +446,7 @@ private int pass_cords_contract_filter(
 		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
 			return(0);
 		}
+	if (( fptr->commons ) && ( pptr->commons != fptr->commons )) return(0);
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -499,6 +507,9 @@ private struct rest_response * cords_contract_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.commons=%u",optr->domain,optr->id,pptr->commons);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -941,6 +952,8 @@ public struct occi_category * occi_cords_contract_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "commons",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -1135,6 +1148,17 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_contract.firewall='%s'\r\n",(sptr->firewall?sptr->firewall:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.commons='%u'\r\n",sptr->commons);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
