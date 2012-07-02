@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="pademo" xmlns="file:///tmp/manifest.xsd">
+	<node name="webnode" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="painfrastructure2">
+			<compute name="pacompute2" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="pastorage2" size="20G"/>
+			<network name="panetwork2" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="paimage2">
+			<system name="ubuntu"/>
+                </image>
+	</node>
+	<node name="chatnode" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="painfrastructure1">
+			<compute name="pacompute1" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="pastorage1" size="20G"/>
+			<network name="panetwork1" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="paimage1">
+			<system name="ubuntu"/>
+                </image>
+	</node>
+        <configuration name="paconfig">
+          <action name="runweb" expression="webnode.fork('/bin/bash /home/cosacs/startweb.sh');"/>
+          <action name="runchat" expression="chatnode.fork('/bin/bash /home/cosacs/startchat.sh');"/>
+        </configuration>
+	<account name="paaccount"/>
+	<security name="pasecurity"/>
+</manifest>
+

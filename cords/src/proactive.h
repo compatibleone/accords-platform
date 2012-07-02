@@ -14,6 +14,10 @@ struct	proactive
 	char *	image;
 	char *	profile;
 
+	char *	node;
+	char *	price;
+	char *	account;
+
 	char *	number;     // uuid of the ProActive node request? 
 	char *	access;
 	char *	rootpass;   // administrator pass to access the ProActive node once it is locked. 
