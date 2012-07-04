@@ -1,0 +1,56 @@
+module=$1
+target=config-$1.xml
+zone=$2
+thishost=$3
+pubhost=$4
+tls=$5
+if test -z "$thishost"; then
+	resthost=127.0.0.1
+else
+	resthost=${prefix}${thishost}
+fi
+restport=8086
+if test -z "$tls"; then
+	prefix="http://"
+else
+	prefix="https://"
+fi
+if test -z "$pubhost"; then
+	publisher=""
+	identity=""
+else
+	publisher=${prefix}${pubhost}:8086
+	identity=${prefix}${resthost}:${restport}
+fi
+operator=accords
+password=co-system
+domain=occi
+verbose=0
+debug=0
+thread=1
+monitor=1
+
+export restport=$(($restport+1))
+echo "<accords>" > $target
+echo "<"${module} >> $target
+echo "    publisher='"$publisher"'"     >> $target
+echo "    operator='"$operator"'"       >> $target
+echo "    identity='"$identity"'" 	>> $target
+echo "    verbose='"$verbose"'"   	>> $target
+echo "    debug='"$debug"'"       	>> $target
+echo "    threads='"$threads"'>"  	>> $target
+echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+echo "    <security" >> $target
+echo "         user='service-"${module}"'" >> $target
+echo "         password='"$password"'" >> $target
+echo "         monitor='"$monitor"'" >> $target
+if test -z "$tls"; then
+	echo "         tls=''/>" >> $target
+else
+	echo "         tls='"$tls"/"${module}"Tls.xml'/>" >> $target
+fi
+echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+echo "</"${module}">" >> $target
+echo "</accords>" >> $target
+
+

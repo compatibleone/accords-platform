@@ -163,13 +163,18 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 		sprintf(work,"%s_%s",prefix,symbol);
 	else	strcpy(work,symbol);
 
-	/* -------------------------------------- */
-	/* ensure symbol and prefix has no period */
-	/* -------------------------------------- */
+	/* -------------------------------------------------------------------- */
+	/* ensure symbol and prefix has no period, hyphen nor colon in the name */
+	/* -------------------------------------------------------------------- */
 	for (i=0; work[i] != 0; i++)
+	{
 		if (work[i] == '.')
 			work[i]='_';
-
+		else if (work[i] == ':')
+			work[i]='_';
+		else if (work[i] == '-')
+			work[i]='_';
+	}
 	if ( check_debug() )
 		printf("create_cosacs_metadata(%s,%s,%s)\n",buffer,work,value);
 

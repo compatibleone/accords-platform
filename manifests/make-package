@@ -1,0 +1,20 @@
+bash build-package publisher
+bash build-package azprocci
+bash build-package broker
+bash build-package coees
+bash build-package coes
+bash build-package comons
+bash build-package conets
+bash build-package coobas
+bash build-package cosched
+bash build-package coss
+bash build-package dcprocci
+bash build-package ezvm
+bash build-package onprocci
+bash build-package osocciprocci
+bash build-package osprocci
+bash build-package paprocci
+bash build-package parser
+bash build-package procci
+bash build-package slam
+
