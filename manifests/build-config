@@ -4,21 +4,22 @@ zone=$2
 thishost=$3
 pubhost=$4
 tls=$5
-if test -z "$thishost"; then
-	resthost=127.0.0.1
-else
-	resthost=${prefix}${thishost}
-fi
-restport=8086
 if test -z "$tls"; then
 	prefix="http://"
 else
 	prefix="https://"
 fi
+if test -z "$thishost"; then
+	resthost=127.0.0.1
+else
+	resthost=${thishost}
+fi
 if test -z "$pubhost"; then
 	publisher=""
 	identity=""
+	restport=8086
 else
+	restport=8087
 	publisher=${prefix}${pubhost}:8086
 	identity=${prefix}${resthost}:${restport}
 fi
@@ -27,7 +28,7 @@ password=co-system
 domain=occi
 verbose=0
 debug=0
-thread=1
+threads=1
 monitor=1
 
 export restport=$(($restport+1))
