@@ -7,7 +7,7 @@
 		<package 
 			name="debian:coss" 
 			installation="wget http://www.compatibleone.fr/accords-platform/install-coss.sh"
-			configuration="bash install.coss.sh">
+			configuration="bash install-coss.sh">
 			<port name="coss" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
 		</package>
 	</image>
