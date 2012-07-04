@@ -1,19 +1,19 @@
-echo --------------------------------------------------------------
-echo *** production of the compatible one demonstrator packages ***
-echo ***  this should really only be run on a debian platform   ***
-echo --------------------------------------------------------------
-echo validate to proceed only if you really know what you are doing
+echo "--------------------------------------------------------------"
+echo "   production of the compatible one demonstrator packages     "
+echo "    this should really only be run on a debian platform       "
+echo "--------------------------------------------------------------"
+echo "validate to proceed only if you really know what you are doing"
 read var
-echo cleaning packages
+echo "cleaning packages"
 bash make-clean 
-echo building installation scripts
+echo "building installation scripts"
 bash make-install 
-echo building run scripts
+echo "building run scripts"
 bash make-run
-echo building packages
+echo "building packages"
 bash make-package 
-echo transfering to www.compatibleone.fr
+echo "transfering to www.compatibleone.fr"
 scp -P 22100 accords-*.xml accords-*.sh sla*.xml package-*.tgz install-*.sh root@www.compatibleone.fr:/home/accords-platform
 bash make-clean
-echo demonstrator production is up to date on www.compatibleone.fr
+echo "demonstrator production is up to date on www.compatibleone.fr"
 

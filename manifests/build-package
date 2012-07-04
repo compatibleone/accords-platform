@@ -1,8 +1,4 @@
-cp ../accords-platform/*/*/$1 .
+cp /usr/local/bin/$1 .
 tar -czf package-$1.tgz build-config run-$1 $1
 rm run-$1
-rm $1 -f
-
-
-
-
+#rm $1 -f
