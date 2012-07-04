@@ -499,7 +499,7 @@ public struct rest_header * rest_prefix_header( struct rest_header * root, char 
 	struct	rest_header * hptr;
 	if (!( hptr = rest_create_header( nptr, vptr ) ))
 		return( hptr );
-	else if (( hptr->next = root ) != (struct rest_header * ) 0)
+	else if (!( hptr->next = root ))
 		return( hptr );
 	else	return(( root->previous = hptr ));
 }
@@ -512,7 +512,7 @@ public struct rest_header * rest_postfix_header( struct rest_header * foot, char
 	struct	rest_header * hptr;
 	if (!( hptr = rest_create_header( nptr, vptr ) ))
 		return( hptr );
-	else if (( hptr->previous = foot ) != (struct rest_header * ) 0)
+	else if (!( hptr->previous = foot ))
 		return( hptr );
 	else	return(( foot->next = hptr ));
 

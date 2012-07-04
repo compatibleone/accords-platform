@@ -198,6 +198,164 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 }
 
 /*	-----------------------------------------------------	*/
+/*		c l e a n _ c o m m a n d _ l i n e		*/
+/*	-----------------------------------------------------	*/
+private	int	clean_command_line( char * buffer, int length, FILE * h )
+{
+	int	i;
+	if (!( fgets( buffer, length, h ) ))
+		return( 0 );
+	else
+	{
+		for ( i=0; buffer[i] != 0; i++ )
+		{
+			if ( buffer[i] == '\n' )
+				buffer[i] =0;
+			else if ( buffer[i] == '\r' )
+				buffer[i] =0;
+		}
+		return( i );
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*	    o c c i _ s e r v i c e _ o p e r a t i o n		*/
+/*	-----------------------------------------------------	*/
+private	int	occi_service_operation( char * filename, char * body )
+{
+	FILE *	h;
+	int	n;
+	int	i;
+	char	buffer[4096];
+	char *	method=(char *) 0;
+	char *	object=(char *) 0;
+	char *	version=(char *) 0;
+	char *	wptr;
+	char *	xptr;
+	struct	rest_header * root=(struct rest_header * ) 0;
+	struct	rest_header * foot=(struct rest_header * ) 0;
+	struct	rest_header * hptr=(struct rest_header * ) 0;
+	struct	rest_response * rptr;
+
+	if ( verbose )
+		printf("\nOCCI infile=%s\n",filename);
+
+	/* ------------------- */
+	/* open the input file */
+	/* ------------------- */
+	if (!( h = fopen( filename, "r" ) ))
+		return( 0 );
+
+	/* --------------------- */
+	/* read the request line */
+	/* --------------------- */
+	else if (!( clean_command_line( buffer, 4096, h ) ))
+	{
+		fclose(h);
+		return(0);
+	}
+	/* ------------------------ */
+	/* analyse the request line */
+	/* ------------------------ */
+	else
+	{
+		for ( xptr=wptr=buffer; *wptr != 0; wptr++ )
+		{
+			if ( *wptr == ' ' )
+			{
+				*(wptr++) = 0;
+				if (!( method ))
+				{
+					method = allocate_string( xptr );
+					xptr = wptr;
+				}
+				else if (!( object ))
+				{
+					object = allocate_string( xptr );
+					xptr = wptr;
+				}
+				else	break;
+			}
+		}
+		version = allocate_string( xptr );
+		if ( verbose )
+			printf("\nmethod=%s\nobject=%s\nversion=%s\n",
+				(method  ? method : "<null method>"), 
+				(object  ? object : "<null object>"),
+				(version ? version : "<null version>"));
+	}
+	/* ------------------------ */
+	/* read the request headers */
+	/* ------------------------ */
+	while ((n = clean_command_line( buffer, 4096, h )) > 1 )
+	{
+		for ( xptr=wptr=buffer; *wptr != 0; wptr++ )
+			if ( *wptr == ':' )
+				break;
+		if ( *wptr != ':' )
+			break;
+		else
+		{
+			*(wptr++) = 0;
+			while ( *wptr == ' ' )
+				wptr++;
+			if (!( hptr = rest_postfix_header( foot, xptr, wptr ) ))
+				break;
+			else 	foot = hptr;
+			if (!( root ))
+				root = hptr;
+			if ( verbose )
+				printf("header(%s=%s)\n",hptr->name,hptr->value);
+		}
+	}
+
+	if (!( strcasecmp( method, "GET" ) ))
+		rptr = rest_client_get_request( object, tls, agent, root );
+	else if (!( strcasecmp( method, "POST" ) ))
+	 	rptr = rest_client_post_request( object, tls, agent, body, root );
+	else if (!( strcasecmp( method, "DELETE" ) ))
+		rptr = rest_client_delete_request( object, tls, agent, root );
+	else if (!( strcasecmp( method, "PUT" ) ))
+		rptr = rest_client_put_request( object, tls, agent, body, root );
+	else if (!( strcasecmp( method, "HEAD" ) ))
+		rptr = rest_client_head_request( object, tls, agent, root );
+	else	rptr = (struct rest_response *) 0;
+
+	fclose(h);
+
+	if (!( rptr ))
+	{
+		if ( verbose )
+			printf("request failure\n");
+		return(0);
+	}
+	else
+	{
+		sprintf(buffer,"%s.response",filename);
+		if ( verbose )
+			printf("OCCI outfile=%s\n",buffer);
+		if (!( h = fopen( buffer, "w" ) ))
+			return( 0 );
+		else
+		{
+			if ( rptr->status > 299 )
+				fprintf(h,"%s %u %s\r\n",rptr->version,rptr->status,rptr->message);
+			else
+			{
+				for ( 	hptr=rptr->first;
+					hptr != (struct rest_header *) 0;
+					hptr = hptr->next )
+					fprintf(h,"%s: %s\r\n",hptr->name,hptr->value);
+			}
+			fprintf(h,"\r\n");
+			fclose(h);
+			return(0);
+		
+		}
+	}
+}
+
+/*	-----------------------------------------------------	*/
 /*	   c o s a c s _ s e r v i c e _ o p e r a t i o n	*/
 /*	-----------------------------------------------------	*/
 private	int	cosacs_service_operation( char * service, char * syntax )
@@ -300,6 +458,8 @@ private	int	service_operation( char * command, char * service, char * syntax )
 			return( cords_service_delete( id ) );
 		else if (!( strcasecmp( command, "COSACS" ) ))
 			return( cosacs_service_operation( filename, syntax ) );
+		else if (!( strcasecmp( command, "OCCI"  ) ))
+			return( occi_service_operation( filename, syntax ) );
 		else	return( failure( 30,"incorrect command", command ) );
 	}	
 }
@@ -365,8 +525,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.04");
-	printf("\n   Beta Version : 27/02/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.05");
+	printf("\n   Beta Version : 03/07/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START    <service_file> ");
@@ -375,6 +535,7 @@ private	int	banner()
 	printf("\n         command <options> SNAPSHOT <service_file> ");
 	printf("\n         command <options> DELETE   <service_file> ");
 	printf("\n         command <options> COSACS   <service_file> <instruction> ");
+	printf("\n         command <options> OCCI   [body] <request> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");

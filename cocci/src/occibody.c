@@ -705,7 +705,7 @@ public	char * occi_response_body( char * accepts, struct occi_category * cptr, s
 	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
 		return( occi_text_body( cptr, hptr ) );
 
-	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
+	if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
 		return( occi_html_body( cptr, hptr ) );
 
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
