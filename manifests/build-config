@@ -14,13 +14,13 @@ if test -z "$thishost"; then
 else
 	resthost=${thishost}
 fi
+restport=8086
 if test -z "$pubhost"; then
 	publisher=""
 	identity=""
-	restport=8086
 else
-	restport=8087
-	publisher=${prefix}${pubhost}:8086
+	publisher=${prefix}${pubhost}:${restport}
+	export restport=$(($restport+1))
 	identity=${prefix}${resthost}:${restport}
 fi
 operator=accords
@@ -31,7 +31,6 @@ debug=0
 threads=1
 monitor=1
 
-export restport=$(($restport+1))
 echo "<accords>" > $target
 echo "<"${module} >> $target
 echo "    publisher='"$publisher"'"     >> $target
