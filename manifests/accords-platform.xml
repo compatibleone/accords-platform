@@ -1,0 +1,19 @@
+
+<manifest name="accords:platform" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:coss" access="public" type="accords:coss"/>
+<node name="accords:comons" access="public" type="accords:comons"/>
+<node name="accords:coobas" access="public" type="accords:coobas"/>
+<node name="accords:ezvm" access="public" type="accords:evzm"/>
+<node name="accords:slam" access="public" type="accords:slam"/>
+<node name="accords:coes" access="public" type="accords:coes"/>
+<node name="accords:coees" access="public" type="accords:coees"/>
+<node name="accords:cosched" access="public" type="accords:cosched"/>
+<node name="accords:parser" access="public" type="accords:parser"/>
+<node name="accords:broker" access="public" type="accords:broker"/>
+<node name="accords:procci" access="public" type="accords:procci"/>
+<configuration name="accords:platform"/>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+
+

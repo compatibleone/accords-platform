@@ -1,0 +1,22 @@
+<manifest name="accords:comons" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="comons" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:comons">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:comons" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-comons.sh"
+			configuration="bash install-comons.sh">
+			<port name="comons" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:comons">
+	<action expression="comons.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="comons.fork('bash run-comons');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

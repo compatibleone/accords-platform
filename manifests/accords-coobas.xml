@@ -1,0 +1,21 @@
+<manifest name="accords:coobas" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="coobas" access="public" scope="normal" type="simple"provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:coobas">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:coobas" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-coobas.sh"
+			configuration="bash install-coobas.sh">
+			<port name="coobas" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:coobas">
+	<action expression="coobas.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="coobas.fork('bash run-coobas');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>

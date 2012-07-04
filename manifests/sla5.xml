@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<agreement name="sla5" xmlns="http://www.compatibleone.fr/schemes/slam.xsd" initiator="jamie" responder="accords" serviceprovider="responder" description="first test SLA" expiration="never" template="none"> 
+	<terms name="sla5:services" type="sla5:services"> 
+		<term name="sla5:service1"> 
+			<manifest name="accords:platform"> </manifest>
+		</term>
+	</terms>
+	<terms name="sla5:conditions" type="conditions"> 
+		<term name="sla5:condition1"> 
+			<variable name="sla5:v1" property="occi.placement.algorithm" condition="eq" value="zone"> </variable>
+			<variable name="sla5:v2" property="occi.placement.zone" condition="eq" value="europe"> </variable>
+		</term>
+	</terms>
+	<terms name="sla5:guarantees" type="guarantees"> 
+		<term name="sla5:guarantee1"> 
+			<guarantee name="sla5:g1" scope="default"> </guarantee>
+		</term>
+	</terms>
+</agreement>
+

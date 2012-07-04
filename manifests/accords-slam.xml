@@ -1,0 +1,22 @@
+<manifest name="accords:slam" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="slam" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:slam">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:slam" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-slam.sh"
+			configuration="bash install-slam.sh">
+			<port name="slam" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:slam">
+	<action expression="slam.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="slam.fork('bash run-slam');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

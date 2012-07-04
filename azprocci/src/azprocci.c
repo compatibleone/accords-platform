@@ -89,8 +89,8 @@ private	void	azprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Windows Azure Procci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Windows Azure Procci : Version 1.0a.0.05");
+	printf("\n   Beta Version : 03/07/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

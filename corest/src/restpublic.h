@@ -91,6 +91,12 @@ public struct rest_header *
 	rest_create_header( char * nptr, char * vptr );
 
 public struct rest_header * 	
+	rest_prefix_header( struct rest_header * root, char * nptr, char * vptr );
+
+public struct rest_header * 	
+	rest_postfix_header( struct rest_header * foot, char * nptr, char * vptr );
+
+public struct rest_header * 	
 	liberate_rest_header(struct rest_header * hptr);
 
 public struct rest_header * 	

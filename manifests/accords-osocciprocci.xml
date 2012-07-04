@@ -1,0 +1,22 @@
+<manifest name="accords:osocciprocci" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="osocciprocci" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:osocciprocci">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:osocciprocci" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-osocciprocci.sh"
+			configuration="bash install-osocciprocci.sh">
+			<port name="osocciprocci" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:osocciprocci">
+	<action expression="osocciprocci.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="osocciprocci.fork('bash run-osocciprocci');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

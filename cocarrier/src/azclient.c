@@ -28,8 +28,7 @@
 #include "list.h"
 #include "hmac_sha2.h"
 
-
-char subscriptionid[]=" "
+char subscriptionid[]=" ";
 
 private	struct az_config Waz = {
 	(char *) 0,
@@ -702,7 +701,7 @@ public	char * az_create_storage_account_request_body( char * name,char * label,c
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Waz.nameSpace,0x0022);
+		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
 		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		fprintf(h,"\t<Description>%s</Description>\n",description);
@@ -773,7 +772,7 @@ public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<RegenerateKeys xmlns=%c%s%c>\n",0x0022,Waz.nameSpace,0x0022);
+		fprintf(h,"<RegenerateKeys xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
 		fprintf(h,"\tKeyType>%s</KeyType>\n",keytype);
 		fprintf(h,"</RegenerateKeys>\n");
 		fclose(h);
@@ -826,7 +825,7 @@ public	char * az_create_hosted_service_request_body(char * name,char * label,cha
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.nameSpace,0x0022);
+		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
 		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		fprintf(h,"\t<Description>%s</Description>\n",description);
@@ -970,6 +969,39 @@ public	struct	az_response * azure_create_affinitygroups(char * name,char * label
 	return (azure_service_management_request(uri,"POST",filename));
 }
 
+/*	------------------------------------------------------------------	*/
+/*	a z _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t	*/
+/*	------------------------------------------------------------------	*/
+public	char * az_create_affinity_group_request(
+	char * name,
+	char * label,
+	char * description,
+	char * location )
+{
+	char *	filename;
+	FILE *	h;
+	char 	buffer[1024];
+	int	n;
+	n = EncodeBase64( buffer, label,strlen(label));
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<Name>%s</Name>\n",name);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		if ( description )
+			fprintf(h,"\t<Description>%s</Description>\n",description);
+		fprintf(h,"\t<Location>%s</Location>\n",location);
+		fprintf(h,"</CreateAffinityGroup>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
 /*	--------------------------------------------------------------------------- */
 /*	a z _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t_ b o d y	*/
 /*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
@@ -992,7 +1024,7 @@ public	char * az_create_affinity_group_request_body(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Waz.nameSpace,0x0022);
+		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
 		fprintf(h,"\t<Name>%s</Name>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		if ( description )
@@ -1576,45 +1608,45 @@ public char *az_ceate_network_configuration_request_body()
 	   //used in cross-premise network configurations
 	   if(Waz_net.localsitename)
 	   {
-        fprintf(h,"\t\t<LocalNetworkSites>\n");
+        	fprintf(h,"\t\t<LocalNetworkSites>\n");
 
-	    //Required. Specifies the identifier for the local network.
-        fprintf(h,"\t\t\t<LocalNetworkSite name=\"%s\">\n",Waz_net.localsitename);
+	    	//Required. Specifies the identifier for the local network.
+        	fprintf(h,"\t\t\t<LocalNetworkSite name=\"%s\">\n",Waz_net.localsitename);
 
-	    /*-------------------------------------AddressSpace---------------------------------------------*/
-	    //Required. Contains a collection of Classless Inter-Domain Routing (CIDR) identifiers 
-	    //that specify the address space that you will use for your local network site
-        fprintf(h,"\t\t\t\t<AddressSpace>\n");
-	    //Required. Specifies a CIDR identifier that identifies the address space.
-        fprintf(h,"\t\t\t\t\t<AddressPrefix>%s</AddressPrefix>\n",Waz_net.CIDRidentifier);
-        fprintf(h,"\t\t\t\t</AddressSpace>\n");
-	    /*----------------------------------end-AddressSpace---------------------------------------------*/
-	    /*------------------------------------VPNGatewayAddress------------------------------------------*/
-	    //Required. Specifies the IPv4 Address of the VPN Gateway. You can specify only 
-	    //one IP address per local network site.
-        fprintf(h,"\t\t\t\t<VPNGatewayAddress>%s</VPNGatewayAddress>\n",Waz_net.IPV4addressvpngateway);
-	    /*-------------------------------end-VPNGatewayAddress--------------------------------------------*/
-        fprintf(h,"\t\t\t</LocalNetworkSite>\n");    
-        fprintf(h,"\t\t</LocalNetworkSites>\n");
-	   }
-	   /*-------------------------------end-LocalNetworkSite-------------------------------------------*/
+	    	/*-------------------------------------AddressSpace---------------------------------------------*/
+	    	//Required. Contains a collection of Classless Inter-Domain Routing (CIDR) identifiers 
+	    	//that specify the address space that you will use for your local network site
+       		fprintf(h,"\t\t\t\t<AddressSpace>\n");
+		//Required. Specifies a CIDR identifier that identifies the address space.
+        	fprintf(h,"\t\t\t\t\t<AddressPrefix>%s</AddressPrefix>\n",Waz_net.CIDRidentifier);
+        	fprintf(h,"\t\t\t\t</AddressSpace>\n");
+		/*----------------------------------end-AddressSpace---------------------------------------------*/
+		/*------------------------------------VPNGatewayAddress------------------------------------------*/
+		//Required. Specifies the IPv4 Address of the VPN Gateway. You can specify only 
+		//one IP address per local network site.
+        	fprintf(h,"\t\t\t\t<VPNGatewayAddress>%s</VPNGatewayAddress>\n",Waz_net.IPV4addressvpngateway);
+		/*-------------------------------end-VPNGatewayAddress--------------------------------------------*/
+        	fprintf(h,"\t\t\t</LocalNetworkSite>\n");    
+       		fprintf(h,"\t\t</LocalNetworkSites>\n");
+		}
+	   	/*-------------------------------end-LocalNetworkSite-------------------------------------------*/
 
-	   /*----------------------------------------VirtualNetworkSites-----------------------------------*/
-	   //Optional. Contains the collection of your virtual networks. Each virtual network is referred 
-	   //to as a site
-	   if(Waz_net.virtualnetworkname)
-	   {
-        fprintf(h,"\t\t<VirtualNetworkSites>\n");
+	   	/*----------------------------------------VirtualNetworkSites-----------------------------------*/
+	   	//Optional. Contains the collection of your virtual networks. Each virtual network is referred 
+	   	//to as a site
+	   	if(Waz_net.virtualnetworkname)
+	   	{
+        		fprintf(h,"\t\t<VirtualNetworkSites>\n");
 
-	    //Required. Specifies a name for the virtual network. The name must be unique within the subscription
-	    //Required. The name of the affinity group that you want this virtual network site to be associated with.
-        fprintf(h,"\t\t\t<VirtualNetworkSite name=\"%s\" AffinityGroup=\"%s\">\n",Waz_net.virtualnetworkname,Waz_net.affinitygroupname);
+	    		//Required. Specifies a name for the virtual network. The name must be unique within the subscription
+	    		//Required. The name of the affinity group that you want this virtual network site to be associated with.
+        		fprintf(h,"\t\t\t<VirtualNetworkSite name=\"%s\" AffinityGroup=\"%s\">\n",Waz_net.virtualnetworkname,Waz_net.affinitygroupname);
 
-	    //Required. Specifies a friendly identifier for the virtual network
-		//n = EncodeBase64( buffer, Waz_net.label,strlen(Waz_net.label));
-        //fprintf(h,"\t\t\t\t<Label>%s</Label>\n",Waz_net.label);
+	    		//Required. Specifies a friendly identifier for the virtual network
+			//n = EncodeBase64( buffer, Waz_net.label,strlen(Waz_net.label));
+        		//fprintf(h,"\t\t\t\t<Label>%s</Label>\n",Waz_net.label);
 	   
-	    /*--------------------------------------AddressSpace---------------------------------------------*/
+	    		/*--------------------------------------AddressSpace---------------------------------------------*/
 		if(Waz_net.CIDRidentifieras)
 		{
          fprintf(h,"\t\t\t\t<AddressSpace>\n");
@@ -1683,9 +1715,9 @@ public char *az_ceate_network_configuration_request_body()
 }
 
 /*	----------------------------------------------------------------------------	*/
-/*		a z u r e  _ g e t_ n e t w o r k _ c o n f i g u r a t i o n               */
+/*		a z u r e  _ g e t_ n e t w o r k _ c o n f i g u r a t i o n           */
 /*	----------------------------------------------------------------------------	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                     */
+/*   	(c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                 */
 /*	-------------------------------------------------------------------------------	*/
 public	struct	az_response * azure_get_network_configuration()
 {
@@ -1697,7 +1729,7 @@ public	struct	az_response * azure_get_network_configuration()
 
 /*	-------------------------------------------------------------------------	*/
 /*		a z u r e  _ s e r v i c e _ m a n a g e m e n t _ r e q u e s t        */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
+/*  	 (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            	*/
 /*	--------------------------------------------------------------------------	*/
 public	struct	az_response *azure_service_management_request(char *uri,char *method,char *contentBody)
 {
@@ -1706,26 +1738,26 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 	struct	url		*	uptr;
 	char 			*	nptr;
 	char *filename;
-	listh headerParam;
 	char *timedate;
 	char *tls;
 	char base[1024];
 
-	resetListh(&headerParam);
-	if(isCstrg) filename=contentBody;
-	else filename=allocate_string("\n");
+	if(isCstrg) 
+		filename=contentBody;
+	else 	filename=allocate_string("\n");
 
 	sprintf(base,"https://management.core.windows.net/%s",Waz.subscription);
 	Waz.base=allocate_string(base);
 
 	tls=allocate_string("azureTls.xml");
 
-	if (( Waz.version )) haddBack(&headerParam,"x-ms-version",Waz.version);
-	haddBack(&headerParam,"Content-Type","text/xml");
+	if (!( hptr = rest_create_header( "x-ms-version",(Waz.version ? Waz.version : "")) ))
+		return( rptr );
+	else if (!( hptr->next = rest_create_header( "Content-Type","text/xml") ))
+		return( rptr );
+	else	hptr->next->previous = hptr;
 
-	if(!(hptr=headerParam.first))
-		return (rptr);
-	else if (!( uptr = analyse_url( Waz.base )))
+	if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1746,10 +1778,16 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 /*		a z u r e  _ s t o r a g e _ r e q u e s t                  */
 /*   (c) 2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_storage_request(char * myStorageAccount,char * mykeyStorage,char *uri,char *method,char *contentBody)
+public	struct	az_response * azure_storage_request(
+		char * myStorageAccount,
+		char * mykeyStorage,
+		char *uri,
+		char *method,
+		char *contentBody)
 {
+	struct	rest_header 	*	foot=(struct rest_header * ) 0;
+	struct	rest_header 	*	root=(struct rest_header * ) 0;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	struct	rest_header 	*	hptrr=(struct rest_header * ) 0;
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	az_response	*	rptrb=(struct az_response *) 0;
 	struct	url		*	uptr;
@@ -1757,67 +1795,92 @@ public	struct	az_response * azure_storage_request(char * myStorageAccount,char *
 	char *filename;
 	int lengthb=0;
 	char contentL[20]="0";
-	listh headerParam;
+	listc headerParam;
 	char   base[1024];
 	char   urii[1024];
 	char Wazbase[1024];
 	char *timedate;
 
-	filename=allocate_string("\n");
-	if(isBlob)
+	if (!( filename=allocate_string("\n") ))
+		return( rptr );
+
+	else if (isBlob)
 	{
 		sprintf(Wazbase,"blob.%s",_AZ_BASE);
 	}
-	else if(isTable)
+	else if (isTable)
 	{
-	    sprintf(Wazbase,"table.%s",_AZ_BASE);
+		sprintf(Wazbase,"table.%s",_AZ_BASE);
 	}
-	else if(isQue)
+	else if (isQue)
 	{
-	  sprintf(Wazbase,"queue.%s",_AZ_BASE);
+		sprintf(Wazbase,"queue.%s",_AZ_BASE);
 	}
-	Waz.base=allocate_string(Wazbase);
+	else	Wazbase[0] = 0;
 
-	sprintf(base,"http://%s.%s", myStorageAccount,Waz.base);
+	if (!( Waz.base=allocate_string(Wazbase) ))
+		return( rptr );		
+	else	sprintf(base,"http://%s.%s", myStorageAccount,Waz.base);
+
 	sprintf(urii,"/%s",uri);
-	resetListh(&headerParam);
-	
+
 
 	if(isBlobc)
 	{
-	  haddBack(&headerParam,"x-ms-blob-type", "BlockBlob");
-	  filename=az_create_blob_content(contentBody);
-	  lengthb=strlen(contentBody);
-	  sprintf(contentL,"%d",lengthb);
+		if (!(root = rest_create_header("x-ms-blob-type", "BlockBlob")))
+			return( rptr );
+		else	foot = root;
+		filename=az_create_blob_content(contentBody);
+		lengthb=strlen(contentBody);
+		sprintf(contentL,"%d",lengthb);
 	}
 
 	if(timedate=allocate_string(timestamp()))
-	   haddFront(&headerParam,"x-ms-date",timedate);
-	if (( Waz.version ))
-	   haddBack(&headerParam,"x-ms-version",Waz.version);
+	{
+		if (!( hptr = rest_prefix_header(foot, "x-ms-date",timedate) ))
+			return( rptr );
+		else	root = hptr;
+	}
+
+	if (!( hptr = rest_postfix_header( root, "x-ms-version",( Waz.version ? Waz.version : " "))))
+		return( rptr );
+	else	foot = hptr;
 	
-	hptrr=headerParam.first;
-	haddBack(&headerParam,"Authorization",AuthorizationHeader(method, timedate, uri,hptrr, myStorageAccount, mykeyStorage,lengthb,"" , "" ));
+	if (!( hptr = rest_postfix_header(foot, "Authorization", 
+			AuthorizationHeader(method, timedate, uri,root, myStorageAccount, mykeyStorage,lengthb,"" , "" ))))
+		return( rptr );
+	else	foot = hptr;
 	
 	if(lengthb)
 	{
-	 haddBack(&headerParam,"Accept-Charset", "UTF-8");
+		if (!( hptr = rest_postfix_header( foot, "Accept-Charset", "UTF-8") ))
+			return( rptr );
+		else	foot = hptr;
 	}
 
 	if (isTable)
-    {
-      haddBack(&headerParam,"Content-Type","application/atom+xml");
-      haddBack(&headerParam,"DataServiceVersion", "1.0;NetFx");
-      haddBack(&headerParam,"MaxDataServiceVersion", "1.0;NetFx");
-	  if(isTablec)filename= az_create_table_request_body(contentBody);
-    }
-
-	if(strcmp(method,"PUT")==0 || strcmp(method,"DELETE")==0)
 	{
-	 haddBack(&headerParam,"Content-Length",contentL);
+		if (!( hptr = rest_postfix_header( foot,"Content-Type","application/atom+xml")))
+			return( rptr );
+		else	foot = hptr;
+		if (!( hptr = rest_postfix_header( foot,"DataServiceVersion", "1.0;NetFx")))
+			return( rptr );
+		else	foot = hptr;
+		if (!( hptr = rest_postfix_header( foot,"MaxDataServiceVersion", "1.0;NetFx")))
+			return( rptr );
+		else	foot = hptr;
+	  	if(isTablec)
+			filename= az_create_table_request_body(contentBody);
+    	}
+
+	if ((!(strcmp(method,"PUT") )) || (!( strcmp(method,"DELETE") )))
+	{
+		if (!( hptr = rest_postfix_header( foot,"Content-Length",contentL)))
+			return( rptr );
+		else	foot = hptr;
 	}
 	
-	if(!(hptr=headerParam.first))
+	if(!(hptr = root ))
 		return (rptr);
 	else if (!( uptr = analyse_url( base )))
 		return( rptr );
@@ -1904,64 +1967,67 @@ public char* AuthorizationHeader(char *method, char* now, char *uri,struct rest_
 /************************************************************************************************/
 char* getCanonicalizedHeaders(struct rest_header *hptr)
 {
-   char canonicalheaderp[256];
-   char canonicalheadern[256]=" ";
-   char canonicalheaderf[256];
-   char canonicalheader[256];
-   char start[]="";
-   char *rptr;
-   char **tabstr;
-   listc elparam;
-   elem *pelem;
-   int i,l;
-   int count=0;
-   resetList(&elparam);
-   while(hptr)
-   {
-     if(searchWord("x-ms-",hptr->name)==1)
-	 {
-       for(i=0;hptr->value[i]!=0;i++)
-	   {
-	     if(hptr->value[i]=='\r\n') hptr->value[i]=start[0];
-	   }
-	   
-	   sprintf(canonicalheaderp,"%s:%s",hptr->name,hptr->value);
-	   addFront(&elparam,canonicalheaderp);
-	   count++;
-	 }
-	 
-	 hptr=hptr->next;
-   }
-   tabstr=(char**)malloc(count*sizeof(char*));
-   for(l=0;l<count;l++) tabstr[l]=(char*)malloc(256*sizeof(char));
-   pelem=elparam.first;
-   l=0;
+	char canonicalheaderp[256];
+	char canonicalheadern[256]=" ";
+	char canonicalheaderf[256];
+	char canonicalheader[256];
+	char start[]="";
+	char *rptr;
+	char **tabstr;
+	listc elparam;
+	elem *pelem;
+	int i,l;
+	int count=0;
+	resetList(&elparam);
+	while(hptr)
+	{
+		if(searchWord("x-ms-",hptr->name)==1)
+		{
+			for(i=0;hptr->value[i]!=0;i++)
+			{
+			  	if (( hptr->value[i] =='\r' )
+				&&  ( hptr->value[(i+1)] == '\n')) 
+					hptr->value[i]=start[0];
+			}
+			sprintf(canonicalheaderp,"%s:%s",hptr->name,hptr->value);
+			addFront(&elparam,canonicalheaderp);
+			count++;
+	 	}
+	 	 hptr=hptr->next;
+	}
+	tabstr=(char**)malloc(count*sizeof(char*));
+	for(l=0;l<count;l++) 
+		tabstr[l]=(char*)malloc(256*sizeof(char));
+	pelem=elparam.first;
+	l=0;
  
-   while(pelem)
-   {
-	   strcpy(tabstr[l],pelem->value);
-	   pelem=pelem->next;
-	   l++;
-   }
-   tri_iteratif(tabstr,count);
-   
-   for(l=0;l<count;l++)
-   {
-    sprintf(canonicalheaderp,"%s\n",tabstr[l]);
-	sprintf(canonicalheadern,"%s%s",canonicalheadern,canonicalheaderp);
-   }
+	while(pelem)
+	{
+		strcpy(tabstr[l],pelem->value);
+		pelem=pelem->next;
+		l++;
+	}
+	tri_iteratif(tabstr,count);
+	
+	for(l=0;l<count;l++)
+	{
+		sprintf(canonicalheaderp,"%s\n",tabstr[l]);
+		sprintf(canonicalheadern,"%s%s",canonicalheadern,canonicalheaderp);
+	}
 
-   if(canonicalheadern)str_sub(canonicalheadern,1,strlen(canonicalheadern),canonicalheaderf);
-   sprintf(canonicalheader,"%s",canonicalheaderf);
-   rptr=allocate_string(canonicalheader);
-   return rptr;
+	if ( canonicalheadern )
+		str_sub(canonicalheadern,1,strlen(canonicalheadern),canonicalheaderf);
+
+	sprintf(canonicalheader,"%s",canonicalheaderf);
+	rptr=allocate_string(canonicalheader);
+	return rptr;
 }
 
 /************************************************************************************************/
 /* Generate Canonicalized Resource                                                              */
 /*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                            */
 /************************************************************************************************/
-char *getCanonicalizedResource(char *uri,char *myAccountStorage)
+char *	getCanonicalizedResource(char *uri,char *myAccountStorage)
 {
   char CanonicalizedResourcep[256];
   char CanonicalizedResourcepp[256];
@@ -2005,7 +2071,7 @@ char *getCanonicalizedResource(char *uri,char *myAccountStorage)
   else
   {
     sprintf(urif,"/%s/%s",myAccountStorage,uri);
-    return  urif;
+    return(allocate_string(urif));
   }
 
   if(i>=0)
@@ -2173,8 +2239,7 @@ void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
  /* (2)*/
   for (i = start; i <= end; i++)
   {
-   /* (3)*/
-   new_s[i-start] = s[i];
+   /* (3)*/   new_s[i-start] = s[i];
   }
  }
  new_s[end-start+1]=0;
@@ -2210,7 +2275,7 @@ char *timestamp()
 /********************************************************************/
 char *timestampo()
 {
-#ifdef WIN32 || WIN64
+#if WIN32 || WIN64
 	char buf[500];
 	char *tmp;
 	SYSTEMTIME tm;
@@ -2218,10 +2283,10 @@ char *timestampo()
 	sprintf(buf, "%i-%02i-%02iT%02i:%02i:%02i.%03iZ", tm.wYear, tm.wMonth, tm.wDay, tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
     tmp=allocate_string(buf);
 	return tmp;
-#else defined(UNIX)
+#else // defined(UNIX)
 struct tm tm;
 char tmp[120];
-char *tmps
+char *tmps;
 time_t t;
 time(&t);
 localtime_r(&t,&tm); 
@@ -2274,6 +2339,44 @@ public	struct	az_response *	az_list_affinity_groups()
 {
 	return( azure_list_operation( "/affinitygroups" ) );
 }
+
+/*	------------------------------------------------------------------	*/
+/*	a z _ c r e a t e _  s t o r a g e _ s e r v i c e _ r e q u e s t	*/
+/*	------------------------------------------------------------------	*/
+public	char * az_create_storage_service_request(
+	char * name,
+	char * label,
+	char * description,
+	char * location,
+	char * group )
+{
+	char *	filename;
+	FILE *	h;
+	char 	buffer[1024];
+	int	n;
+	n = EncodeBase64( buffer, label,strlen(label));
+
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
+		fprintf(h,"\t<Description>%s</Description>\n",description);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		if ( group )
+			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
+		else if ( location )
+			fprintf(h,"\t<Location>%s</Location>\n",location);
+		fprintf(h,"</CreateStorageServiceInput>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ s t o r a g e _ s e r v i c e 		    */
@@ -2514,6 +2617,42 @@ public	struct	az_response *	az_create_image( char * filename )
 }
 
 /*	------------------------------------------------------------	*/
+/*		a z _ c r e a te _  s e r v e r _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * az_create_server_request(
+	char * name,
+	char * label,
+	char * description,
+	char * location,
+	char * group )
+{
+	char *	filename;
+	FILE *	h;
+	char 	buffer[1024];
+	int	n;
+	n = EncodeBase64( buffer, label,strlen(label));
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		fprintf(h,"\t<Description>%s</Description>\n",description);
+		if ( group )
+			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
+		else if ( location )
+			fprintf(h,"\t<Location>%s</Location>\n",location);
+		fprintf(h,"</CreateHostedService>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*			a z _ c r e a t e _  s e r v e r 		                */
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_create_server( char * filename )
@@ -2667,7 +2806,7 @@ public	struct	az_response *	az_get_flavor(  char * id )
 /******************************************************************************/
 /******************************************************************************/
 /*	------------------------------------------------------------	*/
-/*			a z _ g e t _ i m a g e 			                    */
+/*			a z _ g e t _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_get_image 	(  char * id )
 {
@@ -2699,7 +2838,7 @@ public	struct	az_response *	az_get_image 	(  char * id )
 
 
 /*	------------------------------------------------------------	*/
-/*			a z _ u p d a t e _ s e r v e r 		                */
+/*			a z _ u p d a t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_update_server(  char * id, char * filename )
 {
@@ -2724,13 +2863,12 @@ public	struct	az_response *	az_update_server(  char * id, char * filename )
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
-		return( rptr );
-	}
+		return( rptr );	}
 	else	return( rptr );
 }
 
 /*	------------------------------------------------------------	*/
-/*			a z _ d e l e t e _ s e r v e r 		                */
+/*			a z _ d e l e t e _ s e r v e r 	        */
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_delete_server(  char * id )
 {
@@ -2740,7 +2878,7 @@ public	struct	az_response *	az_delete_server(  char * id )
 }
 
 /*	------------------------------------------------------------	*/
-/*			a z _ d e l e t e _ i m a g e 			                */
+/*			a z _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_delete_image	(  char * id )
 {
@@ -2771,7 +2909,7 @@ public	struct	az_response *	az_delete_image	(  char * id )
 }
 
 /*	------------------------------------------------------------	*/
-/*		a z _ i n i t i a l i s e _ c l i e n t 		            */
+/*		a z _ i n i t i a l i s e _ c l i e n t 	           */
 /*	------------------------------------------------------------	*/
 public	int	az_initialise_client( 
 		char * user, char * password, 
@@ -2789,7 +2927,7 @@ public	int	az_initialise_client(
 		return( 27 );
 	else if (!( Waz.version = allocate_string( version )))
 		return( 27 );
-	else if (!( Waz.nameSpace = allocate_string( ns ) ))
+	else if (!( Waz.namespace = allocate_string( ns ) ))
 		return( 27 );
 	else if (!( Waz.subscription = allocate_string( subscription ) ))
 		return( 27 );
@@ -2804,6 +2942,6 @@ public	int	az_initialise_client(
 }
 
 #endif	/* _az_client_c */
-		/* ------------ */
+	/* ------------ */
 
 

@@ -1,0 +1,22 @@
+<manifest name="accords:ezvm" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="ezvm" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:ezvm">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:ezvm" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-ezvm.sh"
+			configuration="bash install-ezvm.sh">
+			<port name="ezvm" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:ezvm">
+	<action expression="ezvm.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="ezvm.fork('bash run-ezvm');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

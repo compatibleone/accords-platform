@@ -492,6 +492,33 @@ public	struct	rest_header * rest_create_header( char * nptr, char * vptr )
 }
 
 /*	------------------------------------------------	*/
+/*	     r e s t _ p r e f i x _ h e a d e r 		*/
+/*	------------------------------------------------	*/
+public struct rest_header * rest_prefix_header( struct rest_header * root, char * nptr, char * vptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( nptr, vptr ) ))
+		return( hptr );
+	else if (( hptr->next = root ) != (struct rest_header * ) 0)
+		return( hptr );
+	else	return(( root->previous = hptr ));
+}
+
+/*	------------------------------------------------	*/
+/*	     r e s t _ a p p e n d _ h e a d e r 		*/
+/*	------------------------------------------------	*/
+public struct rest_header * rest_postfix_header( struct rest_header * foot, char * nptr, char * vptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( nptr, vptr ) ))
+		return( hptr );
+	else if (( hptr->previous = foot ) != (struct rest_header * ) 0)
+		return( hptr );
+	else	return(( foot->next = hptr ));
+
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ h e a d e r 		*/
 /*	------------------------------------------------	*/
 public	struct	rest_header * rest_response_header(struct rest_response * aptr, char * nptr, char * vptr )

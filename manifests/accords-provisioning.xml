@@ -1,0 +1,14 @@
+
+<manifest name="accords:provisioning" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:osprocci" access="public" type="accords:osprocci"/>
+<node name="accords:onprocci" access="public" type="accords:onprocci"/>
+<node name="accords:azprocci" access="public" type="accords:azprocci"/>
+<node name="accords:paprocci" access="public" type="accords:paprocci"/>
+<node name="accords:dcprocci" access="public" type="accords:dcprocci"/>
+<node name="accords:osocciprocci" access="public" type="accords:osocciprocci"/>
+<configuration name="accords:provisioning"/>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+
+

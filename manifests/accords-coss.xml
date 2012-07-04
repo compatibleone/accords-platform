@@ -1,0 +1,22 @@
+<manifest name="accords:coss" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:coss">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:coss" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-coss.sh"
+			configuration="bash install.coss.sh">
+			<port name="coss" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:coss">
+	<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="coss.fork('bash run-coss');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

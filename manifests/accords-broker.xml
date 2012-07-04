@@ -1,0 +1,22 @@
+<manifest name="accords:broker" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="broker" access="public" scope="normal" type="simple" provider="openstack">
+	<infrastructure name="accords:component"/>
+	<image name="debian:broker">
+		<system name="debian_with_cosacs"/>
+		<package 
+			name="debian:broker" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-broker.sh"
+			configuration="bash install-broker.sh">
+			<port name="broker" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+		</package>
+	</image>
+</node>
+<configuration name="accords:broker">
+	<action expression="broker.configure(accords:publisher.publisher.hostname);"/>
+	<action expression="broker.fork('bash run-broker');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+

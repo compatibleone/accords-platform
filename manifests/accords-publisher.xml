@@ -1,0 +1,29 @@
+
+<manifest name="accords:publisher" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="publisher" access="public" scope="normal" type="simple" provider="openstack">
+<infrastructure name="accords:component">
+	<compute name="accords:component" architecture="x86_64" cores="1" memory="1G" speed="1G"/>
+	<storage name="accords:component" size="10G"/>
+	<network name="accords:component" label="ethernet" vlan="100M">
+		<port name="ssh" protocol="tcp" from="22" to="22"/>
+		<port name="cosacs" protocol="tcp" from="8286" to="8286"/>
+	</network>
+</infrastructure>
+<image name="debian:publisher">
+	<system name="debian_with_cosacs"/>
+	<package 
+		name="debian:publisher" 
+			installation="wget http://www.compatibleone.fr/accords-platform/install-publisher.sh"
+			configuration="bash install-publisher.sh">
+		<port name="publisher" protocol="tcp" from="8086" to="8086" range="0.0.0.0/0"/>
+	</package>
+</image>
+</node>
+<configuration name="accords:publisher">
+	<action expression="publisher.fork('bash run-publisher');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>
+
+
