@@ -1,4 +1,3 @@
-#!sh
 #
 # ----------------------------------------------------
 # Parsing of manifests for the Accords Platform Kernel
