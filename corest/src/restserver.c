@@ -896,7 +896,7 @@ private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )
 	char *	result=(char *) 0;
 	if ( cptr->bytes <= cptr->consumed )
 		return((char *) 0);
-	else if (!( work = allocate( cptr->bytes - cptr->consumed )))
+	else if (!( work = allocate( (cptr->bytes - cptr->consumed) +1 )))
 		return( work );
 	else
 	{
