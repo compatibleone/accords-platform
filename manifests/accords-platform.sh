@@ -13,6 +13,7 @@
 ./co-parser accords-cosched
 ./co-parser accords-slam
 ./co-parser accords-ezvm
+./co-parser accords-coips
 ./co-parser accords-parser
 ./co-parser accords-broker
 ./co-parser accords-procci

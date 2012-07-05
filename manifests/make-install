@@ -10,6 +10,7 @@ bash build-install cosched $1
 bash build-install coss $1
 bash build-install dcprocc $1i
 bash build-install ezvm $1
+bash build-install coips $1
 bash build-install onprocc $1i
 bash build-install osocciproc $1ci
 bash build-install osprocci $1

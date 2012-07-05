@@ -4,6 +4,7 @@
 <node name="accords:comons" access="public" type="accords:comons"/>
 <node name="accords:coobas" access="public" type="accords:coobas"/>
 <node name="accords:ezvm" access="public" type="accords:ezvm"/>
+<node name="accords:coips" access="public" type="accords:coips"/>
 <node name="accords:slam" access="public" type="accords:slam"/>
 <node name="accords:coes" access="public" type="accords:coes"/>
 <node name="accords:coees" access="public" type="accords:coees"/>

@@ -8,6 +8,7 @@ bash build-update conets
 bash build-update cosched
 bash build-update slam
 bash build-update ezvm
+bash build-update coips
 bash build-update broker
 bash build-update parser
 bash build-update procci

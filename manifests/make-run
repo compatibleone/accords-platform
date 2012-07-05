@@ -10,6 +10,7 @@ bash build-run cosched
 bash build-run coss
 bash build-run dcprocci
 bash build-run ezvm
+bash build-run coips
 bash build-run onprocci
 bash build-run osocciprocci
 bash build-run osprocci
