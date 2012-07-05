@@ -346,6 +346,8 @@ private	struct	rest_response * start_proactive(
         //    char * location,
         //    char * group )
         //
+        // resolve_contract_flavor mmm we need to get some contract information here
+        // to select more specifically the nodes we want to use. 
 	else if (!( paptr = pa_create_server()))                           // Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
@@ -469,6 +471,58 @@ private	struct	rest_response * save_proactive(
 			//return( rest_html_response( aptr, 200, "OK" ) );
 		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	//}
+}
+
+/*	--------------------------------------------------------	*/
+/* 	 s t o p  _ p r o a c t i v e _ p r o v i s i o n i n g  	*/
+/*	--------------------------------------------------------	*/
+private	struct pa_response *	stop_proactive_provisioning( struct proactive * pptr )
+{
+	int	status;
+	struct	pa_response * osptr;
+
+	if ((status = use_proactive_configuration( pptr->profile )) != 0)
+		return((struct pa_response *) 0);
+	else
+	{
+		/* ------------------------------------------ */
+		/* disconnect the floating IP from the server */
+		/* ------------------------------------------ */
+		//if ( pptr->floatingid )
+		//{
+		//	occi_flush_client( pptr->floating, _COSACS_PORT );
+		//	release_floating_address( pptr );
+		//}
+		/* ------------------------------------------ */
+		/* launch the deletion of the server instance */
+		/* ------------------------------------------ */
+		if ((osptr=pa_delete_server( pptr->number )) != (struct pa_response *) 0)
+		{
+			/* ----------------------------- */
+			/* await server instance removal */
+			/* ----------------------------- */
+			//do
+			//{
+			//	if (!( osptr ))
+			//		break;
+			//	else if (!( osptr->response ))
+			//		break;
+			//	else if ( osptr->response->status > 299 )
+			//		break;
+			//	else
+			//	{
+			//		sleep(1);
+			//		osptr = liberate_pa_response( osptr );
+			//	}
+			//}
+			//while ((osptr=pa_get_server( pptr->number )) != (struct os_response *) 0);
+		}
+		/* ------------------------------------------- */
+		/* ensure release of the allocated floating IP */
+		/* ------------------------------------------- */
+		//remove_floating_address( pptr );
+		return( osptr );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -656,6 +710,7 @@ private	struct	rest_response * revert_proactive(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+#include "pacontract.c"
 
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ p r o a c t i v e  		*/
@@ -668,7 +723,9 @@ private	int	create_proactive(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else if (!( pptr->node )) // mmm check it
+		return( 0 ); 
+	else	return(create_proactive_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WpaProcci.tls));
 }
 
 /*	-------------------------------------------	*/
