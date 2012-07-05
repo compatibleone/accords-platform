@@ -233,17 +233,19 @@ public	struct	occi_response 	* cords_create_instance(
 		char * category, char * agent, struct occi_element * header, char * tls )
 {
 	char	buffer[4096];
-	struct	occi_element  	* eptr;
-	struct	occi_element  	* fptr;
-	struct	occi_response 	* aptr;
-	struct	occi_response 	* zptr;
-	struct	occi_request 	* rptr;
-	struct	occi_client	* cptr;
+	struct	occi_element  	* eptr=(struct occi_element *) 0;
+	struct	occi_element  	* fptr=(struct occi_element *) 0;
+	struct	occi_response 	* aptr=(struct occi_response *) 0;
+	struct	occi_response 	* zptr=(struct occi_response *) 0;
+	struct	occi_request 	* rptr=(struct occi_request *) 0;
+	struct	occi_client	* cptr=(struct occi_client *) 0;
 
 	if ( check_debug() )
 		printf("cords_create_instance(%s,%s)\n",category,agent);
 
 	if (!( aptr = occi_resolver( category, agent ) ))
+		return((struct occi_response *) 0);
+	else if (!( aptr->first ))
 		return((struct occi_response *) 0);
 
 	for (	eptr = aptr->first;

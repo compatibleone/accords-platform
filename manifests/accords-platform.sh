@@ -9,6 +9,7 @@
 ./co-parser accords-coobas
 ./co-parser accords-coes
 ./co-parser accords-coees
+./co-parser accords-conets
 ./co-parser accords-cosched
 ./co-parser accords-slam
 ./co-parser accords-ezvm
