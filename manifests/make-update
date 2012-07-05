@@ -1,0 +1,21 @@
+bash build-update publisher
+bash build-update coss cords_user.xml
+bash build-update comons
+bash build-update coobas
+bash build-update coes
+bash build-update coees
+bash build-update conets
+bash build-update cosched
+bash build-update slam
+bash build-update ezvm
+bash build-update broker
+bash build-update parser
+bash build-update procci
+bash build-update osprocci os_config.xml
+bash build-update onprocci on_config.xml
+bash build-update azprocci
+bash build-update dcprocci
+bash build-update osocciprocci
+bash build-update paprocci
+
+

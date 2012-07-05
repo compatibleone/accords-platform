@@ -1,20 +1,20 @@
 bash build-package publisher
-bash build-package azprocci
-bash build-package broker
-bash build-package coees
-bash build-package coes
+bash build-package coss cords_user.xml
 bash build-package comons
-bash build-package conets
 bash build-package coobas
+bash build-package coes
+bash build-package coees
+bash build-package conets
 bash build-package cosched
-bash build-package coss
-bash build-package dcprocci
+bash build-package slam
 bash build-package ezvm
-bash build-package onprocci
-bash build-package osocciprocci
-bash build-package osprocci
-bash build-package paprocci
+bash build-package broker
 bash build-package parser
 bash build-package procci
-bash build-package slam
+bash build-package osprocci os_config.xml
+bash build-package onprocci on_config.xml
+bash build-package azprocci
+bash build-package dcprocci
+bash build-package osocciprocci
+bash build-package paprocci
 

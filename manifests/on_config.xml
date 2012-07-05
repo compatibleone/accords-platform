@@ -1,0 +1,14 @@
+<on_configs>
+<on_config
+ id="e2f892e3-7826-5437-8866-9354c95d3a06" name="test" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="jamie" password="6ebe9bbb7e637984b302a3d2f5a941f42758bbac"
+authenticate="" agent="CompatibleOne/OpenStackClient/1.0a.0.01"
+host="http://157.159.249.20:4567" version="v3" namespace="prologue" base="" tls="" current="0" />
+<on_config
+ id="e2f892e3-7826-5437-8866-9354c95d3a06" name="coips" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="jamie" password="6ebe9bbb7e637984b302a3d2f5a941f42758bbac"
+authenticate="" agent="CompatibleOne/OpenStackClient/1.0a.0.01"
+host="http://157.159.249.20:4567" version="v3" namespace="prologue" base="" tls="" current="0" />
+</on_configs>
+
+
