@@ -3050,6 +3050,18 @@ private	char *	cords_brokering_account(
 }
 
 /*	-------------------------------------------------------		*/
+/*		c o r d s _ v a l i d _ i d e n t i f i e r		*/
+/*	-------------------------------------------------------		*/
+private	char *	cords_valid_identifier( char * id )
+{
+	if (!( id ))
+		return( id );
+	else if (!( strlen( id ) ))
+		return((char *) 0);
+	else 	return( id );
+}
+
+/*	-------------------------------------------------------		*/
 /*		c o r d s _ s e r v i c e _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
 /*	this function provides SLA driven service brokering for		*/
@@ -3106,17 +3118,21 @@ public	char *	cords_service_broker(
 	/* ----------------------------------- */
 	else if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
 		return( cords_terminate_provisioning( 907, &CbC ) );
-
+	else if (!( CbC.confID = cords_valid_identifier( CbC.confID ) ))
+		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
 
 	/* ------------------------------- */
 	/* retrieve the interface instance */
 	/* ------------------------------- */
-	if (( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
+	if ((( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
 		_CORDS_MANIFEST,_CORDS_INTERFACE)) != (char *) 0)
+	&& (( CbC.interID = cords_valid_identifier( CbC.interID )) != (char *) 0))
+	{
 		if (!( CbC.interface = cords_retrieve_instance( host, CbC.interID, agent, tls)))
 			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
 
 	/* -------------------------------------- */
 	/* build the service description document */
@@ -3229,16 +3245,21 @@ public	char *	cords_manifest_broker(
 	/* ----------------------------------- */
 	if (!( CbC.confID = occi_extract_atribut( CbC.manifest,Operator.domain,_CORDS_MANIFEST,_CORDS_CONFIGURATION)))
 		return( cords_terminate_provisioning( 907, &CbC ) );
+	else if (!( CbC.confID = cords_valid_identifier( CbC.confID ) ))
+		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
 
 	/* ------------------------------- */
 	/* retrieve the interface instance */
 	/* ------------------------------- */
-	if (( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
+	if ((( CbC.interID = occi_extract_atribut( CbC.manifest,Operator.domain,
 		_CORDS_MANIFEST,_CORDS_INTERFACE)) != (char *) 0)
+	&& (( CbC.interID = cords_valid_identifier( CbC.interID )) != (char *) 0))
+	{
 		if (!( CbC.interface = cords_retrieve_instance( host, CbC.interID, agent, tls)))
 			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 2 : Provisioning \n",agent);
