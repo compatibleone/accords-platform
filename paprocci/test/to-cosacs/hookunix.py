@@ -34,6 +34,6 @@ logger.info('Process is running with PID ' + str(process.pid))
 miscco.block_while_file_exists(lockfile)
 
 logger.info('File deleted. Process will be killed...')
-#os.kill(process.pid, 9)
+os.kill(process.pid, 9)
 logger.info('Done.')
 
