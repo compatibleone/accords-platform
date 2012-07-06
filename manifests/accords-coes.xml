@@ -14,7 +14,7 @@
 </node>
 <configuration name="accords:coes">
 	<action expression="coes.configure(accords:publisher.publisher.hostname);"/>
-	<action expression="coes.fork('bash run-coes);"/>
+	<action expression="coes.fork('bash run-coes');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>
