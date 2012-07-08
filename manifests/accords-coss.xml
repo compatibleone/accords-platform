@@ -9,7 +9,7 @@
 </node>
 <configuration name="accords:coss">
 <action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-coss');"
+<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-coss');"/>
 <action expression="coss.fork('bash run-coss');"/>
 </configuration>
 <security name="accords:security"/>

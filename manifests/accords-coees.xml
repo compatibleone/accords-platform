@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <manifest name="accords:coees" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
-<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+<node name="coees" access="public" scope="normal" type="simple" provider="openstack">
 <infrastructure name="accords:component"/>
 <image name="debian:coees">
 <system name="debian_with_cosacs"/>
 </image>
 </node>
 <configuration name="accords:coees">
-<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-coees');"
-<action expression="coss.fork('bash run-coees');"/>
+<action expression="coees.configure(accords:publisher.publisher.hostname);"/>
+<action expression="coees.system('wget http://www.compatibleone.fr/accords-platform/run-coees');"/>
+<action expression="coees.fork('bash run-coees');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <manifest name="accords:osocciprocci" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
-<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+<node name="osocciprocci" access="public" scope="normal" type="simple" provider="openstack">
 <infrastructure name="accords:component"/>
 <image name="debian:osocciprocci">
 <system name="debian_with_cosacs"/>
 </image>
 </node>
 <configuration name="accords:osocciprocci">
-<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-osocciprocci');"
-<action expression="coss.fork('bash run-osocciprocci');"/>
+<action expression="osocciprocci.configure(accords:publisher.publisher.hostname);"/>
+<action expression="osocciprocci.system('wget http://www.compatibleone.fr/accords-platform/run-osocciprocci');"/>
+<action expression="osocciprocci.fork('bash run-osocciprocci');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>

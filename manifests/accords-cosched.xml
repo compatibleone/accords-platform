@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <manifest name="accords:cosched" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
-<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+<node name="cosched" access="public" scope="normal" type="simple" provider="openstack">
 <infrastructure name="accords:component"/>
 <image name="debian:cosched">
 <system name="debian_with_cosacs"/>
 </image>
 </node>
 <configuration name="accords:cosched">
-<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-cosched');"
-<action expression="coss.fork('bash run-cosched');"/>
+<action expression="cosched.configure(accords:publisher.publisher.hostname);"/>
+<action expression="cosched.system('wget http://www.compatibleone.fr/accords-platform/run-cosched');"/>
+<action expression="cosched.fork('bash run-cosched');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>

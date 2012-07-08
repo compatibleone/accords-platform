@@ -18,12 +18,12 @@
 ./co-parser accords-broker
 ./co-parser accords-procci
 ./co-parser accords-platform
-./co-parser sla5
+./co-parser sla-accords-platform
 #
 # ----------------------------------------------------
 # Brokering of an Accords Platform Kernel Instance
 # ----------------------------------------------------
 #
-./co-broker sla5
+./co-broker sla-accords-platform
 
 

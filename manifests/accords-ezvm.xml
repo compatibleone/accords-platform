@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <manifest name="accords:ezvm" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
-<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+<node name="ezvm" access="public" scope="normal" type="simple" provider="openstack">
 <infrastructure name="accords:component"/>
 <image name="debian:ezvm">
 <system name="debian_with_cosacs"/>
 </image>
 </node>
 <configuration name="accords:ezvm">
-<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-ezvm');"
-<action expression="coss.fork('bash run-ezvm');"/>
+<action expression="ezvm.configure(accords:publisher.publisher.hostname);"/>
+<action expression="ezvm.system('wget http://www.compatibleone.fr/accords-platform/run-ezvm');"/>
+<action expression="ezvm.fork('bash run-ezvm');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>

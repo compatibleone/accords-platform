@@ -10,11 +10,11 @@
 ./co-parser accords-dcprocci
 ./co-parser accords-osocciprocci
 ./co-parser accords-provisioning
-./co-parser sla6
+./co-parser sla-accords-provisioning
 #
 # ----------------------------------------------------
 # Brokering of an Accords Provisioning Procci Instance
 # ----------------------------------------------------
 #
-./co-broker sla6
+./co-broker sla-accords-provisioning
 

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <manifest name="accords:conets" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
-<node name="coss" access="public" scope="normal" type="simple" provider="openstack">
+<node name="conets" access="public" scope="normal" type="simple" provider="openstack">
 <infrastructure name="accords:component"/>
 <image name="debian:conets">
 <system name="debian_with_cosacs"/>
 </image>
 </node>
 <configuration name="accords:conets">
-<action expression="coss.configure(accords:publisher.publisher.hostname);"/>
-<action expression="coss.system('wget http://www.compatibleone.fr/accords-platform/run-conets');"
-<action expression="coss.fork('bash run-conets');"/>
+<action expression="conets.configure(accords:publisher.publisher.hostname);"/>
+<action expression="conets.system('wget http://www.compatibleone.fr/accords-platform/run-conets');"/>
+<action expression="conets.fork('bash run-conets');"/>
 </configuration>
 <security name="accords:security"/>
 <account name="accords:account"/>
