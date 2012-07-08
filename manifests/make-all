@@ -20,7 +20,7 @@ bash make-package
 echo "building update"
 bash make-update 
 echo "transfering to www.compatibleone.fr"
-scp -P 22100 accords-*.xml accords-*.sh sla*.xml package-*.tgz update-*.tgz install-*.sh root@www.compatibleone.fr:/home/accords-platform
+scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform
 bash make-clean
 echo "demonstrator production is up to date on www.compatibleone.fr"
 
