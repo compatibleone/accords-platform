@@ -9,7 +9,7 @@ echo "</image>" >> accords-$1.xml
 echo "</node>" >> accords-$1.xml 
 echo "<configuration name=\"accords:$1\">" >> accords-$1.xml 
 echo "<action expression=\"coss.configure(accords:publisher.publisher.hostname);\"/>" >> accords-$1.xml 
-echo "<action expression=\"coss.system('wget http://www.compatibleone.fr/accords-platform/run-$1');\"" >> accords-$1.xml 
+echo "<action expression=\"coss.system('wget http://www.compatibleone.fr/accords-platform/run-$1');\"/>" >> accords-$1.xml 
 echo "<action expression=\"coss.fork('bash run-$1');\"/>" >> accords-$1.xml 
 echo "</configuration>" >> accords-$1.xml 
 echo "<security name=\"accords:security\"/>" >> accords-$1.xml 
