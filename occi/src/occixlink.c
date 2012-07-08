@@ -37,6 +37,7 @@ private pthread_mutex_t list_cords_xlink_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_link_node * cords_xlink_first = (struct occi_link_node *) 0;
 private struct occi_link_node * cords_xlink_last  = (struct occi_link_node *) 0;
 public struct  occi_link_node * occi_first_link_node() { return( cords_xlink_first ); }
+public struct  occi_link_node * occi_last_link_node() { return( cords_xlink_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
