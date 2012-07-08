@@ -1,11 +1,16 @@
 echo "--------------------------------------------------------------"
 echo "   production of the compatible one demonstrator packages     "
 echo "    this should really only be run on a debian platform       "
+echo "   and must provide the NAME of the provisioning ACCOUNT      "
 echo "--------------------------------------------------------------"
 echo "validate to proceed only if you really know what you are doing"
 read var
 echo "cleaning packages"
 bash make-clean 
+echo "building accords platform manifests"
+bash make-manifest
+echo "building accords platform service level agreements"
+bash make-sla $1
 echo "building installation scripts"
 bash make-install 
 echo "building run scripts"

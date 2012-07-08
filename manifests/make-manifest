@@ -1,0 +1,70 @@
+# bash build-manifest publisher 8086
+# ----------------------------------
+# accords platform base manifest 
+# ----------------------------------
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-platform.xml
+echo "<manifest name=\"accords:platform\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-platform.xml
+bash build-manifest coss 8087
+echo "<node name=\"accords:coss\" scope=normal access=public type=\"accords:coss\"/>" >> accords-platform.xml
+bash build-manifest comons 8087
+echo "<node name=\"accords:comons\" scope=normal access=public type=\"accords:comons\"/>" >> accords-platform.xml
+bash build-manifest coobas 8087
+echo "<node name=\"accords:coobas\" scope=normal access=public type=\"accords:coobas\"/>" >> accords-platform.xml
+bash build-manifest conets 8087
+echo "<node name=\"accords:conets\" scope=normal access=public type=\"accords:conets\"/>" >> accords-platform.xml
+bash build-manifest cosched 8087
+echo "<node name=\"accords:cosched\" scope=normal access=public type=\"accords:cosched\"/>" >> accords-platform.xml
+bash build-manifest coes 8087
+echo "<node name=\"accords:coes\" scope=normal access=public type=\"accords:coes\"/>" >> accords-platform.xml
+bash build-manifest coees 8087
+echo "<node name=\"accords:coees\" scope=normal access=public type=\"accords:coees\"/>" >> accords-platform.xml
+bash build-manifest slam 8087
+echo "<node name=\"accords:slam\" scope=normal access=public type=\"accords:slam\"/>" >> accords-platform.xml
+bash build-manifest ezvm 8087
+echo "<node name=\"accords:ezvm\" scope=normal access=public type=\"accords:ezvm\"/>" >> accords-platform.xml
+bash build-manifest coips 8087
+echo "<node name=\"accords:coips\" scope=normal access=public type=\"accords:coips\"/>" >> accords-platform.xml
+bash build-manifest broker 8087
+echo "<node name=\"accords:broker\" scope=normal access=public type=\"accords:broker\"/>" >> accords-platform.xml
+bash build-manifest parser 8087
+echo "<node name=\"accords:parser\" scope=normal access=public type=\"accords:parser\"/>" >> accords-platform.xml
+bash build-manifest procci 8087
+echo "<node name=\"accords:procci\" scope=normal access=public type=\"accords:procci\"/>" >> accords-platform.xml
+echo "<configuration name=\"accords:platform\"/>" >> accords-platform.xml
+echo "<security name=\"accords:security\"/>" >> accords-platform.xml
+echo "<account name=\"accords:account\"/>" >> accords-platform.xml
+echo "</manifest>" >> accords-platform.xml
+# -----------------------------------------
+# accords platform provisioning extensions
+# -----------------------------------------
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-provisioning.xml
+echo "<manifest name=\"accords:platform\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-provisioning.xml
+bash build-manifest osprocci 8087
+echo "<node name=\"accords:osprocci\" scope=normal access=public type=\"accords:osprocci\"/>" >> accords-provisioning.xml
+bash build-manifest onprocci 8087
+echo "<node name=\"accords:onprocci\" scope=normal access=public type=\"accords:onprocci\"/>" >> accords-provisioning.xml
+bash build-manifest paprocci 8087
+echo "<node name=\"accords:paprocci\" scope=normal access=public type=\"accords:paprocci\"/>" >> accords-provisioning.xml
+bash build-manifest dcprocci 8087
+echo "<node name=\"accords:dcprocci\" scope=normal access=public type=\"accords:dcprocci\"/>" >> accords-provisioning.xml
+bash build-manifest osocciprocci 8087
+echo "<node name=\"accords:osocciprocci\" scope=normal access=public type=\"accords:osocciprocci\"/>" >> accords-provisioning.xml
+bash build-manifest azprocci 8087
+echo "<node name=\"accords:azprocci\" scope=normal access=public type=\"accords:azprocci\"/>" >> accords-provisioning.xml
+echo "<configuration name=\"accords:provisioning\"/>" >> accords-provisioning.xml
+echo "<security name=\"accords:security\"/>" >> accords-provisioning.xml
+echo "<account name=\"accords:account\"/>" >> accords-provisioning.xml
+echo "</manifest>" >> accords-provisioning.xml
+# -----------
+# end of file
+# -----------
+
+
+
+
+
+
+
+
+
+
