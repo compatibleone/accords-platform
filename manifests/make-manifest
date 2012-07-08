@@ -38,7 +38,7 @@ echo "</manifest>" >> accords-platform.xml
 # accords platform provisioning extensions
 # -----------------------------------------
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-provisioning.xml
-echo "<manifest name=\"accords:platform\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-provisioning.xml
+echo "<manifest name=\"accords:provisioning\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-provisioning.xml
 bash build-manifest osprocci 8087
 echo "<node name=\"accords:osprocci\" scope=normal access=public type=\"accords:osprocci\"/>" >> accords-provisioning.xml
 bash build-manifest onprocci 8087
