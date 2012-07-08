@@ -886,6 +886,17 @@ private	struct rest_response * rest_process_request(
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ o o n s u m e _ b y t e		*/
+/*	------------------------------------------------	*/
+private	int	rest_consume_byte( struct rest_client * cptr )
+{
+	while ( cptr->consumed >= cptr->bytes )
+		if ( rest_client_read( cptr ) == -1 )
+			return( -1 );
+	return( cptr->buffer[cptr->consumed++] );
+}
+
+/*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ t o k e n 		*/
 /*	------------------------------------------------	*/
 private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )	
@@ -894,15 +905,13 @@ private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )
 	int	i=0;
 	char *	work;
 	char *	result=(char *) 0;
-	if ( cptr->bytes <= cptr->consumed )
-		return((char *) 0);
-	else if (!( work = allocate( (cptr->bytes - cptr->consumed) +1 )))
+	if (!( work = allocate( (cptr->buffersize+1) )))
 		return( work );
 	else
 	{
-		while ( cptr->consumed < cptr->bytes )
+		while ((c = rest_consume_byte( cptr )) != -1)
 		{
-			if ((c = cptr->buffer[cptr->consumed++]) == '\r')
+			if ( c == '\r' )
 				continue;
 			else if ( c == terminator )
 				break;
@@ -933,9 +942,19 @@ private	char * rest_consume_line( struct rest_client  * cptr )
 /*	------------------------------------------------	*/
 private	char * rest_consume_value( struct rest_client  * cptr )
 {
-	while (( cptr->buffer[cptr->consumed] == ' ' )
-	||     ( cptr->buffer[cptr->consumed] == '\t' ))
-		cptr->consumed++;
+	int	c;
+	while (1)
+	{
+		if ((c = rest_consume_byte( cptr )) == -1)
+			return((char *) 0);
+		else if ( c == ' ' )
+			continue;
+		else if ( c == '\t' )
+			continue;
+		else	break;
+	}
+	/* unget byte */
+	cptr->consumed--;
 	return( rest_consume_token( cptr, '\n' ) );
 }
 
