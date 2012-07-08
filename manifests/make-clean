@@ -3,8 +3,6 @@ rm run-* -f
 rm package-* -f
 rm update-* -f
 rm *.bak -f
-rm accords-*.xml
-rm sla*.xml 
 
 
 
