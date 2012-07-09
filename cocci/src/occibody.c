@@ -302,10 +302,14 @@ private	char *	occi_html_body(
 	char *	wptr;
 	int	attributs=0;
 	int	locations=0;
+	char	id[64];
 	char *	publisher;
+	struct	occi_action * aptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
+
+	id[0] = 0;
 
 	if (!( prefix = rest_http_prefix() ))
 		return( prefix );
@@ -388,7 +392,26 @@ private	char *	occi_html_body(
 						name = vptr;
 				}
 				fprintf(h,"<tr><th>%s</th>",name);
-				fprintf(h,"<td><input type=text name='%s' value='%s'></td></tr>\n",name,vptr);
+				fprintf(h,"<td><input type=text name='%s' value='%s'>\n",name,vptr);
+				/* ---------------------------------------------------------- */
+				/* detect the ID element value and store for eventual actions */
+				/* ---------------------------------------------------------- */
+				if ( name )
+					if (!( strcmp(name,"id") ))
+						strcpy(id,vptr);
+				/* ---------------------------------------------------------- */
+				/* detect an HTTP or HTTPS prefixed string and build url link */
+				/* ---------------------------------------------------------- */
+				if ( vptr )
+				{
+					if ((!( strncmp( vptr, "http://", strlen( "http://" ) ) ))
+					||  (!( strncmp( vptr, "http://", strlen( "http://" ) ) )))
+					{
+						fprintf(h,"<a href='%s'>",vptr);
+						fprintf(h,"...</a>\n");
+					}
+				}
+				fprintf(h,"</td></tr>\n");
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
@@ -413,6 +436,18 @@ private	char *	occi_html_body(
 				else	fprintf(h,"%s<br>",lptr->target);
 			}
 			fprintf(h,"</td></tr>\n");
+			if ((aptr = cptr->firstact) != (struct occi_action *) 0)
+			{
+				fprintf(h,"<tr><th>Actions</th><td>\n");
+				while ( aptr )
+				{
+					fprintf(h,"<div class='action'>");
+					fprintf(h,"<a href='/%s/%s?action=%s'>",cptr->id,id,aptr->name);
+					fprintf(h,"%s</a></div><br>",aptr->name);
+					aptr = aptr->next;
+				}
+				fprintf(h,"</td></tr>\n");
+			}
 			fprintf(h,"</table>\n");
 		}
 		else if ( locations )
