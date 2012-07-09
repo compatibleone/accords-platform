@@ -30,10 +30,16 @@ The Accords platforms depend on the following other tools and libraries which ne
 installed on your platform before launching your build script.
 
 	AUTOCONF
-	AUTOMAKE
-	AUTOTOOLS
+	
+        AUTOMAKE
+	
+        AUTOTOOLS
+	
+        PYTHON-DEV
+	
+        PYTHON-BOTO
 
-	MAKE
+        MAKE
 
 	GCC
 
@@ -63,6 +69,14 @@ INSTALLATION
 
 To install all files, run (as root):
 # make install
+
+
+PYACCORDSSDK CONFIGURATION
+--------------------------
+
+To configure the PyAccordsSDK path, run the following (as root):
+# ./pyaccrods_config.sh
+
 
 OPERATION
 ---------

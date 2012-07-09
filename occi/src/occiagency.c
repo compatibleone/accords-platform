@@ -24,49 +24,49 @@
 
 #include "agency.h"
 
-/*	----------------------	*/
-/*	o c c i _ a g e n c y 	*/
-/*	----------------------	*/
+/*	----------------------------------	*/
+/*	o c c i _ c o r d s _ a g e n c y 	*/
+/*	----------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct agency * allocate_agency();
-struct agency * liberate_agency(struct agency * optr);
-private pthread_mutex_t list_agency_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * agency_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * agency_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_agency_node() { return( agency_first ); }
+struct cords_agency * allocate_cords_agency();
+struct cords_agency * liberate_cords_agency(struct cords_agency * optr);
+private pthread_mutex_t list_cords_agency_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * cords_agency_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * cords_agency_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_cords_agency_node() { return( cords_agency_first ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_agency_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_agency_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		agency_first = nptr->next;
+		cords_agency_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		agency_last = nptr->previous;
+		cords_agency_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_agency_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_agency_control );
-	nptr = ll_drop_agency_node( nptr );
-	pthread_mutex_unlock( &list_agency_control );
+private struct occi_kind_node * drop_cords_agency_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_agency_control );
+	nptr = ll_drop_cords_agency_node( nptr );
+	pthread_mutex_unlock( &list_cords_agency_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_agency_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_agency_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
-	for ( nptr = agency_first;
+	struct cords_agency * pptr;
+	for ( nptr = cords_agency_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -75,64 +75,64 @@ private struct occi_kind_node * ll_locate_agency_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_agency_node(char * id) {
+private struct occi_kind_node * locate_cords_agency_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_agency_control );
-	nptr = ll_locate_agency_node(id);
-	pthread_mutex_unlock( &list_agency_control );
+	pthread_mutex_lock( &list_cords_agency_control );
+	nptr = ll_locate_cords_agency_node(id);
+	pthread_mutex_unlock( &list_cords_agency_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_agency_node(int mode) {
+private struct occi_kind_node * ll_add_cords_agency_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_agency()))
+		if (!( nptr->contents = allocate_cords_agency()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = agency_last ))
-				agency_first = nptr;
+			if (!( nptr->previous = cords_agency_last ))
+				cords_agency_first = nptr;
 			else	nptr->previous->next = nptr;
-			agency_last = nptr;
+			cords_agency_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_agency_node(int mode) {
+private struct occi_kind_node * add_cords_agency_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_agency_control );
-	nptr = ll_add_agency_node( mode );
-	pthread_mutex_unlock( &list_agency_control );
+	pthread_mutex_lock( &list_cords_agency_control );
+	nptr = ll_add_cords_agency_node( mode );
+	pthread_mutex_unlock( &list_cords_agency_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_agency_name="agency.xml";
-private void autoload_agency_nodes() {
-	char * fn=autosave_agency_name;	struct occi_kind_node * nptr;
-	struct agency * pptr;
+private char*autosave_cords_agency_name="cords_agency.xml";
+private void autoload_cords_agency_nodes() {
+	char * fn=autosave_cords_agency_name;	struct occi_kind_node * nptr;
+	struct cords_agency * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"agencys")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_agencys")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "agency" ) ) continue;
-			else if (!( nptr = add_agency_node(0))) break;
+			else if ( strcmp( vptr->name, "cords_agency" ) ) continue;
+			else if (!( nptr = add_cords_agency_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
@@ -169,21 +169,21 @@ private void autoload_agency_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_agency_name(char * fn) {
-	autosave_agency_name = fn;	return;
+public  void set_autosave_cords_agency_name(char * fn) {
+	autosave_cords_agency_name = fn;	return;
 }
-public  void autosave_agency_nodes() {
-	char * fn=autosave_agency_name;	struct occi_kind_node * nptr;
-	struct agency * pptr;
+public  void autosave_cords_agency_nodes() {
+	char * fn=autosave_cords_agency_name;	struct occi_kind_node * nptr;
+	struct cords_agency * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_agency_control );
+	pthread_mutex_lock( &list_cords_agency_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<agencys>\n");
-	for ( nptr = agency_first;
+	fprintf(h,"<cords_agencys>\n");
+	for ( nptr = cords_agency_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<agency\n");
+		fprintf(h,"<cords_agency\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
@@ -225,20 +225,20 @@ public  void autosave_agency_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</agencys>\n");
+	fprintf(h,"</cords_agencys>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_agency_control );
+	pthread_mutex_unlock( &list_cords_agency_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_agency_field(
+private void set_cords_agency_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -275,23 +275,23 @@ private void set_agency_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct agency * filter_agency_info(
+private struct cords_agency * filter_cords_agency_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct agency * pptr;
-		if (!( pptr = allocate_agency()))
+	struct cords_agency * pptr;
+		if (!( pptr = allocate_cords_agency()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_agency_field) ))
-		return( liberate_agency(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_agency_field) ))
+		return( liberate_cords_agency(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_agency_filter(
-	struct agency * pptr,struct agency * fptr) {
+private int pass_cords_agency_filter(
+	struct cords_agency * pptr,struct cords_agency * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -365,10 +365,10 @@ private int pass_agency_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_occi_response(
+private struct rest_response * cords_agency_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct agency * pptr)
+	struct cords_agency * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
@@ -420,37 +420,37 @@ private struct rest_response * agency_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_get_item(
+private struct rest_response * cords_agency_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_agency_nodes();
-	return( agency_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_agency_nodes();
+	return( cords_agency_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_post_link(
+private struct rest_response * cords_agency_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	char * reqhost;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -460,16 +460,16 @@ private struct rest_response * agency_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_post_mixin(
+private struct rest_response * cords_agency_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	char * reqhost;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -479,7 +479,7 @@ private struct rest_response * agency_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_post_action(
+private struct rest_response * cords_agency_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -487,10 +487,10 @@ private struct rest_response * agency_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -506,26 +506,26 @@ private struct rest_response * agency_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_post_item(
+private struct rest_response * cords_agency_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_agency_node(1)))
+	if (!( nptr = add_cords_agency_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_agency_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_agency_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_agency_nodes();
+	autosave_cords_agency_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -537,37 +537,37 @@ private struct rest_response * agency_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_put_item(
+private struct rest_response * cords_agency_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_agency_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_agency_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_agency_nodes();
-	return( agency_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_agency_nodes();
+	return( cords_agency_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_head_item(
+private struct rest_response * cords_agency_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
-	if (!( nptr = locate_agency_node(id)))
+	struct cords_agency * pptr;
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -577,20 +577,20 @@ private struct rest_response * agency_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_delete_item(
+private struct rest_response * cords_agency_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct agency * pptr;
+	struct cords_agency * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_agency_node(id)))
+	if (!( nptr = locate_cords_agency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_agency_node( nptr );
-	autosave_agency_nodes();
+	drop_cords_agency_node( nptr );
+	autosave_cords_agency_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -599,25 +599,25 @@ private struct rest_response * agency_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_get_list(
+private struct rest_response * cords_agency_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct agency * pptr;
-	struct agency * fptr;
+	struct cords_agency * pptr;
+	struct cords_agency * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_agency_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_cords_agency_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = agency_first;
+	for ( sptr = cords_agency_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_agency_filter( pptr, fptr ) ))
+		if (!( pass_cords_agency_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -631,7 +631,7 @@ private struct rest_response * agency_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * agency_delete_all(
+private struct rest_response * cords_agency_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -639,26 +639,26 @@ private struct rest_response * agency_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct agency * pptr;
-	struct agency * fptr;
+	struct cords_agency * pptr;
+	struct cords_agency * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_agency_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_cords_agency_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=agency_first;
+	nptr=cords_agency_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_agency_filter( pptr, fptr ) ))) {
+		||  (!( pass_cords_agency_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_agency_node( nptr );
+			drop_cords_agency_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_agency_nodes();
+	autosave_cords_agency_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -667,7 +667,7 @@ private struct rest_response * agency_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_agency_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_agency_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -682,16 +682,16 @@ private struct rest_response * occi_agency_get(void * vptr, struct rest_client *
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( agency_get_list( optr, cptr, rptr, aptr ) );
+		return( cords_agency_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( agency_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_agency_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_agency_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -706,14 +706,14 @@ private struct rest_response * occi_agency_head(void * vptr, struct rest_client 
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( agency_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_agency_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_agency_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -728,24 +728,24 @@ private struct rest_response * occi_agency_post(void * vptr, struct rest_client 
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( agency_post_item( optr, cptr, rptr, aptr ) );
+		return( cords_agency_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( agency_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( agency_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( agency_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_agency_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_agency_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -760,14 +760,14 @@ private struct rest_response * occi_agency_put(void * vptr, struct rest_client *
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( agency_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_agency_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_agency_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -782,38 +782,38 @@ private struct rest_response * occi_agency_delete(void * vptr, struct rest_clien
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( agency_delete_all( optr, cptr, rptr, aptr ) );
+		return( cords_agency_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( agency_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_agency_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_agency_mt( struct rest_interface * iptr )
+private void	redirect_occi_cords_agency_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_agency_get;
-	iptr->post = occi_agency_post;
-	iptr->put = occi_agency_put;
-	iptr->delete = occi_agency_delete;
-	iptr->head = occi_agency_head;
+	iptr->get = occi_cords_agency_get;
+	iptr->post = occi_cords_agency_post;
+	iptr->put = occi_cords_agency_put;
+	iptr->delete = occi_cords_agency_delete;
+	iptr->head = occi_cords_agency_head;
 	return;
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_agency */
+/* occi category rest instance builder for : occi_cords_agency */
 public struct occi_category * occi_cords_agency_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource agency";
+	char * f="CompatibleOne OCCI resource cords_agency";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_agency_mt(optr->interface);
+		redirect_occi_cords_agency_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "servicename",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
@@ -838,16 +838,16 @@ public struct occi_category * occi_cords_agency_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_agency_nodes();
+		autoload_cords_agency_nodes();
 		return(optr);
 	}
 
 }
 
-/*	--------------------------------------	*/
-/*	a g e n c y _ o c c i _ h e a d e r s 	*/
-/*	--------------------------------------	*/
-public struct rest_header *  agency_occi_headers(struct agency * sptr)
+/*	--------------------------------------------------	*/
+/*	c o r d s _ a g e n c y _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------------------	*/
+public struct rest_header *  cords_agency_occi_headers(struct cords_agency * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -862,7 +862,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"agency; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"cords_agency; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -873,7 +873,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.servicename='%s'\r\n",(sptr->servicename?sptr->servicename:""));
+	sprintf(buffer,"occi.cords_agency.servicename='%s'\r\n",(sptr->servicename?sptr->servicename:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -884,7 +884,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.description='%s'\r\n",(sptr->description?sptr->description:""));
+	sprintf(buffer,"occi.cords_agency.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -895,7 +895,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.identity='%s'\r\n",(sptr->identity?sptr->identity:""));
+	sprintf(buffer,"occi.cords_agency.identity='%s'\r\n",(sptr->identity?sptr->identity:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -906,7 +906,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.port='%s'\r\n",(sptr->port?sptr->port:""));
+	sprintf(buffer,"occi.cords_agency.port='%s'\r\n",(sptr->port?sptr->port:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -917,7 +917,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.domain='%s'\r\n",(sptr->domain?sptr->domain:""));
+	sprintf(buffer,"occi.cords_agency.domain='%s'\r\n",(sptr->domain?sptr->domain:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -928,7 +928,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.publisher='%s'\r\n",(sptr->publisher?sptr->publisher:""));
+	sprintf(buffer,"occi.cords_agency.publisher='%s'\r\n",(sptr->publisher?sptr->publisher:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -939,7 +939,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.user='%s'\r\n",(sptr->user?sptr->user:""));
+	sprintf(buffer,"occi.cords_agency.user='%s'\r\n",(sptr->user?sptr->user:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -950,7 +950,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.password='%s'\r\n",(sptr->password?sptr->password:""));
+	sprintf(buffer,"occi.cords_agency.password='%s'\r\n",(sptr->password?sptr->password:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -961,7 +961,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.process='%u'\r\n",sptr->process);
+	sprintf(buffer,"occi.cords_agency.process='%u'\r\n",sptr->process);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -972,7 +972,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.start='%u'\r\n",sptr->start);
+	sprintf(buffer,"occi.cords_agency.start='%u'\r\n",sptr->start);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -983,7 +983,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.uptime='%u'\r\n",sptr->uptime);
+	sprintf(buffer,"occi.cords_agency.uptime='%u'\r\n",sptr->uptime);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -994,7 +994,7 @@ public struct rest_header *  agency_occi_headers(struct agency * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.agency.state='%u'\r\n",sptr->state);
+	sprintf(buffer,"occi.cords_agency.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);

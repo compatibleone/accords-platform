@@ -91,6 +91,12 @@ public struct rest_header *
 	rest_create_header( char * nptr, char * vptr );
 
 public struct rest_header * 	
+	rest_prefix_header( struct rest_header * root, char * nptr, char * vptr );
+
+public struct rest_header * 	
+	rest_postfix_header( struct rest_header * foot, char * nptr, char * vptr );
+
+public struct rest_header * 	
 	liberate_rest_header(struct rest_header * hptr);
 
 public struct rest_header * 	
@@ -99,6 +105,11 @@ public struct rest_header *
 public struct rest_header * 	
 	rest_request_header(struct rest_request * rptr, char * nptr, char * vptr );
 
+public	char *	
+	rest_http_prefix();
+
+public	void	
+	rest_add_http_prefix(char * buffer, int buflen, char * host );
 
 #endif	/* _restpublic_h */
 	/* ------------- */

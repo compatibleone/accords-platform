@@ -1,0 +1,32 @@
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-$1.xml
+echo "<manifest name=\"accords:$1\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-$1.xml 
+echo "<node name=\"accords:publisher\" access=\"public\" scope=\"common\" type=\"accords:publisher\"/>" >> accords-$1.xml 
+echo "<node name=\"$1\" access=\"public\" scope=\"normal\" type=\"simple\" provider=\"openstack\">" >> accords-$1.xml 
+echo "<infrastructure name=\"accords:component\"/>" >> accords-$1.xml 
+echo "<image name=\"debian:$1\">" >> accords-$1.xml 
+echo "<system name=\"debian_with_cosacs\"/>" >> accords-$1.xml 
+echo "</image>" >> accords-$1.xml 
+echo "</node>" >> accords-$1.xml 
+echo "<configuration name=\"accords:$1\">" >> accords-$1.xml 
+echo "<action expression=\"$1.configure(accords:publisher.publisher.hostname);\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/run-$1');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.fork('bash run-$1');\"/>" >> accords-$1.xml 
+echo "</configuration>" >> accords-$1.xml 
+echo "<security name=\"accords:security\"/>" >> accords-$1.xml 
+echo "<account name=\"accords:account\"/>" >> accords-$1.xml 
+echo "</manifest>" >> accords-$1.xml 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

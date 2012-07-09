@@ -37,6 +37,8 @@ public	char *	default_tls()		{	return(tls);		}
 public	char *	default_operator()	{	return(operator);	}
 public	char *	default_zone()		{	return(zone);		}
 
+private	struct os_subscription * subscription=(struct os_subscription *) 0;
+
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -91,7 +93,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 
 	else if (!( strcasecmp(p1,"ADDRESS" ) ))
 	{
-		os_result( os_create_address() );
+		os_result( os_create_address(subscription) );
 		return( 0 );
 	}
 	else if (!( p2 ))
@@ -102,107 +104,140 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVERS" ) ))
-			os_result( ( detail ? os_list_server_details() : os_list_servers()) );
+			os_result( ( detail ? os_list_server_details(subscription) : os_list_servers(subscription)) );
 		else if (!( strcasecmp( p2, "FLAVORS" ) ))
-			os_result( ( detail ? os_list_flavor_details() : os_list_flavors()) );
+			os_result( ( detail ? os_list_flavor_details(subscription) : os_list_flavors(subscription)) );
 		else if (!( strcasecmp( p2, "IMAGES" ) ))
-			os_result( ( detail ? os_list_image_details() : os_list_images()) );
+			os_result( ( detail ? os_list_image_details(subscription) : os_list_images(subscription)) );
 		else if (!( strcasecmp( p2, "ADDRESSES" ) ))
-			os_result( ( detail ? os_list_floating_ip_details() : os_list_floating_ips()) );
+			os_result( ( detail ? os_list_floating_ip_details(subscription) : os_list_floating_ips(subscription)) );
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
-			os_result( ( detail ? os_list_security_group_details() : os_list_security_groups()) );
+			os_result( ( detail ? os_list_security_group_details(subscription) : os_list_security_groups(subscription)) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_list_metadata( p3 ) );
+			os_result( os_list_server_metadata(subscription, p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
 
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if (!( nomfic = os_create_server_request( p2, p3, p4, p5, personality, resource, group, zone ) ))
+		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
 		{ 	
-			os_result( os_create_server( nomfic ) );
+			os_result( os_create_server(subscription, nomfic ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"SNAPSHOT" ) ))
 	{
-		if (!( nomfic = os_create_image_request( p2, p3 ) ))
+		if (!( nomfic = os_create_image_request(subscription, p2, p3 ) ))
 			return( failure(27,"cannot create snapshot","request" ) );
 		else
 		{ 	
-			os_result( os_create_image( nomfic, p3 ) );
+			os_result( os_create_image(subscription, nomfic, p3, 0 ) );
+			return( 0 );
+		}
+	}
+	else if (!( strcasecmp(p1,"PUBLICVM" ) ))
+	{
+		if (!( nomfic = os_create_image_request(subscription, p2, p3 ) ))
+			return( failure(27,"cannot create public vm image","request" ) );
+		else
+		{ 	
+			os_result( os_create_image(subscription, nomfic, p3, 1 ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"ASSOCIATE" ) ))
 	{
-		if (!( nomfic = os_create_address_request( p2 ) ))
+		if (!( nomfic = os_create_address_request(subscription, p2 ) ))
 			return( failure(27,"cannot create snapshot","request" ) );
 		else
 		{ 	
-			os_result( os_server_address( nomfic, p3 ) );
+			os_result( os_server_address(subscription, nomfic, p3 ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"METADATA" ) ))
 	{
-		if (!( nomfic = os_create_metadata_request( p3 ) ))
+		if (!( nomfic = os_create_metadata_request(subscription, p3 ) ))
 			return( failure(27,"cannot create","request" ) );
 		else
 		{ 	
-			os_result( os_create_metadata( p2, nomfic ) );
+			os_result( os_create_server_metadata(subscription, p2, nomfic ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"GROUP" ) ))
 	{
-		if (!( nomfic = os_create_security_group_request( p2 ) ))
+		if (!( nomfic = os_create_security_group_request(subscription, p2 ) ))
 			return( failure(27,"cannot create","security group request" ) );
 		else
 		{ 	
-			os_result( os_create_security_group( nomfic ) );
+			os_result( os_create_security_group(subscription, nomfic ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"RULE" ) ))
 	{
-		if (!( nomfic = os_create_security_rule_request( p2, p3, p4, p5, "0.0.0.0/0" ) ))
+		if (!( nomfic = os_create_security_rule_request(subscription, p2, p3, p4, p5, "0.0.0.0/0" ) ))
 			return( failure(27,"cannot create","security rule request" ) );
 		else
 		{ 	
-			os_result( os_create_security_rule( nomfic ) );
+			os_result( os_create_security_rule(subscription, nomfic ) );
 			return( 0 );
 		}
 	}
 	else if (!( strcasecmp(p1,"FLAVOR" ) ))
 	{
-		if (!( nomfic = os_create_flavor_request( p2, p3, p4, p5 ) ))
+		if (!( nomfic = os_create_flavor_request( subscription,p2, p3, p4, p5 ) ))
 			return( failure(27,"cannot create","flavor request" ) );
 		else
 		{ 	
-			os_result( os_create_flavor( nomfic ) );
+			os_result( os_create_flavor( subscription,nomfic ) );
 			return( 0 );
 		}
+	}
+	else if (!( strcasecmp(p1,"GLANCE" ) ))
+	{
+		if (!( p2 ))
+			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "PUBLIC" ) ))
+			os_result( os_glance_access( subscription,p3, 1 ) );
+		else if (!( strcasecmp( p2, "PRIVATE" ) ))
+			os_result( os_glance_access( subscription,p3, 0 ) );
+		else	return( failure(33, p1, p2 ) );
+		return(0);
+	}
+
+	else if (!( strcasecmp(p1,"HEAD" ) ))
+	{
+		if (!( p2 ))
+			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "GLANCE" ) ))
+			os_result( os_head_glance( subscription,p3 ) );
+		else	return( failure(33, p1, p2 ) );
+		return(0);
 	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVER" ) ))
-			os_result( os_get_server( p3 ) );
+			os_result( os_get_server( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
-			os_result( os_get_flavor( p3 ) );
+			os_result( os_get_flavor( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			os_result( os_get_image( p3 ) );
+			os_result( os_get_image( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "GLANCE" ) ))
+			os_result( os_get_glance( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
-			os_result( os_get_address( p3 ) );
+			os_result( os_get_address( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
-			os_result( os_get_security_group( p3 ) );
+			os_result( os_get_security_group( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_get_metadata( p3, p4 ) );
+			os_result( os_get_server_metadata( subscription,p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -211,12 +246,12 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVER" ) ))
-			os_result( os_update_server( p4, nomfic ) );
+			os_result( os_update_server( subscription,p4, nomfic ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 		{
 			if ((!( p3 )) || (!( p4 )) || (!( p5 )))
 				return( failure(33,p1,p2) );
-			else	os_result( os_update_metadata( p3, p4, p5 ) );
+			else	os_result( os_update_server_metadata( subscription,p3, p4, p5 ) );
 		}
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
@@ -226,19 +261,19 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVER" ) ))
-			os_result( os_delete_server( p3 ) );
+			os_result( os_delete_server( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			os_result( os_delete_image( p3 ) );
+			os_result( os_delete_image( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
-			os_result( os_delete_address( p3 ) );
+			os_result( os_delete_address( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
-			os_result( os_delete_flavor( p3 ) );
+			os_result( os_delete_flavor( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
-			os_result( os_delete_security_group( p3 ) );
+			os_result( os_delete_security_group( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "RULE" ) ))
-			os_result( os_delete_security_rule( p3 ) );
+			os_result( os_delete_security_rule( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
-			os_result( os_delete_metadata( p3, p4 ) );
+			os_result( os_delete_server_metadata( subscription,p3, p4 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -272,7 +307,7 @@ private	int	os_command(int argc, char * argv[] )
 				return( failure( status, "missing", "--user parameter" ) );
 			else if (!( pass ))
 				return( failure( status, "missing", "--password parameter" ) );
-			else if ((status = os_initialise_client( user, pass, tenant, host, agent, version, tls )) != 0)
+			else if (!(subscription = os_initialise_client( user, pass, tenant, host, agent, version, tls )))
 				return( failure( status, "initialising", "client" ) );
 			else 	return( os_operation( aptr, 
 					( argi < argc ? argv[argi] : (char *) 0 ),
@@ -329,8 +364,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.01");
-	printf("\n   Beta Version 22/04/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.02");
+	printf("\n   Beta Version 12/06/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -340,11 +375,15 @@ private	int	os_banner()
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
+	printf("\n   PUBLICVM <name> <server> ");
+	printf("\n   GLANCE PUBLIC <id> ");
+	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GROUP | METADATA ] <id> [ <name> ] ");
+	printf("\n   HEAD   [ GLANCE ] <id> ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
 	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");

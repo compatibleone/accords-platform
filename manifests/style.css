@@ -1,0 +1,43 @@
+table 	{
+	width: 80%;
+	border-style: none;
+	}
+
+th 	{
+	background-color: #EEFFFF;
+	color: #004444;
+	padding: 2mm;
+	border-style: solid;
+	border-color: #003333;
+	border-width: 1px;
+	}
+
+input 	{
+	border-width: 1px;
+	border-style: solid;
+	width: 14cm;
+	}
+td {
+	padding: 2mm;
+	background-color: #F6FFFF;
+	border-style: none;
+	width: 70%;
+	}
+
+.title {
+	font-size: 18pt;
+	}
+
+.header {
+	font-size: 16pt;
+
+	}
+
+.description {
+	font-size: 12pt;
+	padding: 5mm;
+	border-style: dotted;
+	border-color: #008888;
+	}
+
+

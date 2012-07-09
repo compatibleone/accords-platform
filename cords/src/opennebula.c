@@ -59,6 +59,8 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->access )
 			 sptr->access = liberate(sptr->access);
+		if ( sptr->workload )
+			 sptr->workload = liberate(sptr->workload);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
@@ -105,6 +107,7 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->price = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->access = (char*) 0;
+		sptr->workload = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->profile = (char*) 0;
@@ -195,6 +198,10 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"workload") ))
+		{
+			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"publicaddr") ))
 		{
 			if ( wptr->value ) { sptr->publicaddr = allocate_string(wptr->value); }
@@ -270,6 +277,7 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
@@ -286,4 +294,4 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 
 }
 
-#endif	/* _opennebula_c_ */
+#endif	/* _opennebula_copennebula_c_ */

@@ -2,7 +2,7 @@
 #ifndef	_agency_h
 #define	_agency_h
 
-struct	agency
+struct	cords_agency
 {
 	char	*	id;
 	char	*	servicename;

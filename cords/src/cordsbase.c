@@ -80,21 +80,6 @@
 #include "enquiry.c"
 #include "publication.c"
 
-#include "osconfig.c"
-#include "openstack.c"
-
-#include "dcconfig.c"
-#include "deltacloud.c"
-
-#include "onconfig.c"
-#include "opennebula.c"
-
-#include "azconfig.c"
-#include "windowsazure.c"
-
-#include "paconfig.c"
-#include "proactive.c"
-
 #include "monitor.c"
 #include "event.c"
 #include "report.c"
@@ -114,4 +99,6 @@
 #include "domain.c"
 #include "iprange.c"
 
+#include "amazonEc2.c"
+#include "ec2config.c"
 #endif

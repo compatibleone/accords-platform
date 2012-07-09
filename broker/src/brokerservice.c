@@ -299,6 +299,138 @@ private	int	service_action( char * id, char * action )
 }
 
 
+/*	--------------------------------------------	*/
+/* 	r e v e r s e _ s e r v i c e _ a c t i o n	*/
+/*	--------------------------------------------	*/
+/*	runs the list of linked contracts and sends 	*/
+/*	action requests for processing to each of 	*/
+/*	contracts in turn. configuration instruction	*/
+/*	category instances will be updated at each 	*/
+/*	stage of the operation to provide the newly	*/
+/*	aquired values for use in building following	*/
+/*	contract provisioning instances.		*/
+/*	--------------------------------------------	*/
+/*	The service report file will be updated as a	*/
+/*	result of the operation and will reflect the	*/
+/*	current state of the service and contracts.	*/
+/*	--------------------------------------------	*/
+/*	Optimised Configuration Instruction Proccess	*/
+/*	--------------------------------------------	*/
+private	int	reverse_service_action( char * id, char * action )
+{
+	int	items=0;
+	int	contracts=0;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char			* mptr;
+	char 			* wptr;
+	FILE *			  h;
+	char			buffer[1024];
+
+	/* ------------------------------------------------------ */
+	/* initialise the service report file and generate header */
+	/* ------------------------------------------------------ */
+	if ( generate_service_report )
+	{
+		sprintf(buffer,"service/%s",id);
+
+		if (!( h = fopen(buffer,"w")))
+			return(46);
+
+		fprintf(h,"{ %s: %c%s%c, contracts: [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
+	}
+
+	/* ----------------------------------------------------- */
+	/* for all defined contract nodes of the current service */
+	/* ----------------------------------------------------- */
+	for (	nptr=occi_last_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->previous )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else	liberate( wptr );
+
+		/* --------------------------------------------------- */
+		/* launch / invoke the required action on the contract */
+		/* --------------------------------------------------- */
+
+		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+
+		if ( contracts++ ) fprintf(h,",\n" );
+
+		if ( generate_service_report )
+		{
+			fprintf(h,"{ %s: %c%s%c, attributs: { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
+		}
+
+		/* ------------------------------------------------- */
+		/* retrieve the resulting contract category instance */
+		/* ------------------------------------------------- */
+		if ((zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, "" )) 
+			!= (struct occi_response *) 0)
+		{
+			items=0;
+
+			/* ---------------------------------------------------------- */
+			/* first save each property of the contract category instance */
+			/* to the service report file for use by co-command functions */
+			/* ---------------------------------------------------------- */
+			for ( eptr=zptr->first;
+				eptr != (struct occi_element *) 0;
+				eptr = eptr->next )
+			{
+				if ( generate_service_report )
+				{
+					if ( items++ )
+						fprintf(h,",\n");
+
+					/* ------------------------------------ */
+					/* output information to service report */
+					/* ------------------------------------ */
+					fprintf(h,"%c%s%c: %c%s%c",
+						0x0022,eptr->name,0x0022,
+						0x0022,eptr->value,0x0022);	
+				}
+			}
+
+			/* ---------------------------------------------------------- */
+			/* update configuration instruction values from this contract */
+			/* ---------------------------------------------------------- */
+			update_instruction_values( zptr, lptr->target, _CORDS_SERVICE_AGENT );
+			zptr = occi_remove_response ( zptr );
+			
+		}
+		if ( generate_service_report )
+		{
+			fprintf(h," } }");
+		}
+	}
+
+	if ( generate_service_report )
+	{
+		fprintf(h," ] }\n");
+		fclose(h);
+	}
+
+	return(0);
+}
+
+
 /*	-------------------------------------------	*/
 /* 	        s t a r t _ s e r v i c e
 /*	-------------------------------------------	*/
@@ -461,7 +593,7 @@ private	struct	rest_response * stop_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			service_action( pptr->id, _CORDS_STOP );
+			reverse_service_action( pptr->id, _CORDS_STOP );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
 			autosave_cords_service_nodes();

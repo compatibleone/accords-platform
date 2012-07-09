@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _onconfig_c_
-#define _onconfig_c_
+#ifndef _occionconfig_c_
+#define _occionconfig_c_
 
 #include "onconfig.h"
 
@@ -823,7 +823,7 @@ private void	redirect_occi_on_config_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_on_config */
-public struct occi_category * occi_cords_onconfig_builder(char * a,char * b) {
+public struct occi_category * occi_on_config_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -1019,4 +1019,4 @@ public struct rest_header *  on_config_occi_headers(struct on_config * sptr)
 
 }
 
-#endif	/* _onconfig_c_ */
+#endif	/* _occionconfig_c_ */

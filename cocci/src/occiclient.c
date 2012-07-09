@@ -559,9 +559,42 @@ public	struct	occi_response *	occi_create_xml_response(
 
 	return( aptr );
 }
-
 /*	------------------------------------------------------------	*/
 /*	     o c c i _ c r e a t e _ j s o n _ r e s p o n s e		*/
+/*	------------------------------------------------------------	*/
+/* 	this function expects the JSON message to be formated using	*/
+/*	the new OCCI JSON format in a standard JSON object, as the 	*/
+/*	name of the format implies, and not just as a dummy container 	*/
+/*	for an OCCI message as the old format represented.		*/
+/*									*/
+/* 	{								*/
+/* 		domain : {						*/
+/* 			category : {					*/
+/* 				attribute : value [,] 			*/
+/* 				}					*/
+/* 			}						*/
+/* 	}								*/
+/*									*/
+/*	the equivalent of the occi header fields:			*/
+/*									*/
+/*		occi.core.id=ed3345-edf667-ab8aee31-bcd33		*/
+/*		occi.compute.memory=5;					*/
+/*		occi.compute.speed=2;					*/
+/*		occi.compute.cores=1;					*/
+/*									*/
+/*	would be:							*/
+/*									*/
+/*	{ 								*/
+/*	"occi" : { 							*/
+/*		"core" : { "id" : "ed3345-edf667-ab8aee31-bcd33" } ,	*/
+/*		"compute" : {						*/
+/*			"memory" : 5, 					*/
+/*			"speed"  : 2,					*/
+/*			"cores"  : 1 					*/
+/*			}						*/
+/*		}							*/
+/*	}								*/
+/*									*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_create_json_response( 
 	struct occi_response * aptr,
@@ -582,7 +615,9 @@ public	struct	occi_response *	occi_create_json_response(
 	if (!( dptr = json_parse_file( zptr->body ) ))
 		return( aptr );
 	else	root = dptr;
+	/* ------------------------------------------ */
 	/* step over the first one : its the filename */
+	/* ------------------------------------------ */
 	if (!( dptr = dptr->first ))
 	{
 		drop_data_element( root );
@@ -646,6 +681,106 @@ public	struct	occi_response *	occi_create_json_response(
 }
 
 /*	------------------------------------------------------------	*/
+/*	 o c c i _ c r e a t e _ o l d _ j s o n _ r e s p o n s e 	*/
+/*	------------------------------------------------------------	*/
+/*	this function consume the old, non standard, JSON rendering 	*/
+/*	produced by the pyOCNI library					*/ 
+/*	{								*/
+/*		"occi.core.id" : "value",				*/
+/*		"occi.core.title" : "value",				*/
+/*		"occi.core.summary" : "value",				*/
+/*		"attributes" : 	{					*/
+/*			"occi.compute.memory" : 5,			*/
+/*			"occi.compute.speed" : 2,			*/
+/*			"occi.compute.cores" : 1			*/
+/*			}						*/
+/*	}								*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_create_old_json_response( 
+	struct occi_response * aptr,
+	struct occi_request * rptr, 
+	struct rest_response * zptr )
+{
+	struct	occi_element * eptr;
+	char	*	nptr;
+	char	*	vptr;
+	char	*	domain;
+	char 	*	category;
+	struct	data_element * dptr;
+	struct	data_element * root;
+	struct	data_element * cptr;
+	struct	data_element * bptr;
+	char	buffer[2048];
+
+	if (!( dptr = json_parse_file( zptr->body ) ))
+		return( aptr );
+	else	root = dptr;
+
+	for (	cptr = dptr->first;
+		cptr != (struct data_element *) 0;
+		cptr = cptr->next )
+	{
+		if (!( cptr->name ))
+			continue;
+		else if (!( nptr = occi_unquoted_value( cptr->name ) ))
+			continue;
+		else if (!( strcmp( nptr, "location" ) ))
+		{
+			for (	bptr = cptr->first;
+				bptr != (struct data_element *) 0;
+				bptr = bptr->next )
+			{
+				if (!( vptr = occi_unquoted_value( bptr->value ) ))
+					break;
+				else if (!(eptr=occi_response_element(aptr,rptr->name,vptr)))
+					break;
+				else	liberate( vptr );
+			}
+			liberate( nptr );
+			break;					
+		}
+		else if (!( strncmp( nptr, "occi.core", strlen("occi.core") ) ))
+		{
+			if (!( vptr = occi_unquoted_value( cptr->value )))
+				continue;
+			else if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+				break;
+			else
+			{
+				liberate( nptr );
+				liberate( vptr );
+				continue;
+			}
+		}
+		else if (!( strcmp( nptr, "attributes" ) ))
+		{
+			liberate( nptr );
+			for (	bptr = cptr->first;
+				bptr != (struct data_element *) 0;
+				bptr = bptr->next )
+			{
+				if (!( bptr->name ))
+					continue;
+				else if (!( nptr = occi_unquoted_value( bptr->name )))
+					continue;
+				else if (!( vptr = occi_unquoted_value( bptr->value )))
+					continue;
+				else if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+					break;
+				else
+				{
+					liberate( nptr );
+					liberate( vptr );
+					continue;
+				}
+			}
+		}
+	}
+	drop_data_element( root );
+	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*		 o c c i _ c r e a t e _ r e s p o n s e		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_create_response( 
@@ -684,6 +819,8 @@ public	struct	occi_response *	occi_create_response(
 		     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
 		     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
 			return( occi_create_json_response( aptr, rptr,  zptr ) );
+		else if (!( strcasecmp( hptr->value, _OCCI_OLD_JSON ) ))
+			return( occi_create_old_json_response( aptr, rptr,  zptr ) );
 		else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
 		     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
 		     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
@@ -1057,6 +1194,7 @@ private	struct	occi_client * occi_analyse_categories( struct occi_client * cptr,
 	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_PLAIN ) ))
 		return( occi_analyse_text_categories( cptr, rptr ) );
 	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
+	     ||  (!( strcasecmp( hptr->value, _OCCI_OLD_JSON  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
 		return( occi_analyse_json_categories( cptr, rptr ) );

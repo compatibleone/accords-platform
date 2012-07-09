@@ -208,4 +208,4 @@ public int rest_occi_pa_config(FILE * fh,struct pa_config * sptr,char * prefix, 
 
 }
 
-#endif	/* _paconfig_c_ */
+#endif	/* _paconfig_cpaconfig_c_ */

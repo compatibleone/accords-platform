@@ -1,0 +1,36 @@
+<os_configs>
+<os_config
+ id="e1f892e3-7826-4326-8866-9354b95d3b17" name="coips" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="jamie.marshall" password="aiquahre" 
+authenticate="" agent="CompatibleOne/OpenStackClient/1.0a.0.01"
+host="http://beta.enocloud.com:5000/v2.0" version="v1.1" namespace="prologue" base="" tls="0" current="0" />
+
+<os_config
+ id="e1f892e3-7826-4326-8866-9354b95d3b17" name="test" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="jamie.marshall" password="aiquahre" 
+authenticate="" agent="CompatibleOne/OpenStackClient/1.0a.0.01"
+host="http://beta.enocloud.com:5000/v2.0" version="v1.1" namespace="prologue" base="" tls="0" current="0" />
+
+<os_config
+ id="e1f892e3-7826-4326-8866-9354b95d3b17" name="jamie" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="jamie.marshall" password="aiquahre" 
+authenticate="" agent="Prologue/OpenStackClient/1.0a.0.01"
+host="http://beta.enocloud.com:5000/v2.0" version="v1.1" namespace="prologue" base="" tls="0" current="0" />
+
+<os_config
+ id="e1f892e3-7826-4326-8866-9354b95d3b17" name="fabio" 
+description="Configuration of Account for POC X-Wiki at Nuxeo" user="fabio.mancinelli" password="phiethep" 
+authenticate="" agent="Xwiki/OpenStackClient/1.0a.0.01"
+host="http://beta.enocloud.com:5000/v2.0" version="v1.1" namespace="xwiki" base="" tls="0" current="0" />
+
+</os_configs>
+ 
+
+
+
+
+
+
+
+
+

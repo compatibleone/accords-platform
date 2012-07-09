@@ -44,18 +44,45 @@ struct	os_response
 	struct	rest_response	*	response;
 };
 
+struct	keystone_config
+{
+	char *	requestauth;
+	char *	acceptauth;
+	char *	tenantname;
+	char *	tenantid;
+	char *	host;
+	char *	glance;
+	char *	volume;
+};
+
+struct	os_subscription
+{
+
+
+	struct	os_config 	Os;
+	struct	keystone_config KeyStone;
+};
+
+public	struct	os_subscription * os_allocate_subscription();
+public	struct	os_subscription * os_liberate_subscription(struct os_subscription * sptr);
+
 #define	_OS_NS_COMPUTE_V11	"http://docs.openstack.org/compute/api/v1.1"
 #define	_OS_NS_COMPUTE_V10	"http://docs.rackspacecloud.com/servers/api/v1.0"
 
+public	struct os_subscription * os_initialise_client( 
+		char * user, char * password, char * tenant, 
+		char * host, char * agent, char * version, char * tls );
 public	char * os_create_server_request(
+	struct os_subscription *  sptr, 
 	char * identity, char * flavor, char * image, char * address, char * personality, char * resource, char * group, char * zone );
-public	char * os_create_metadata_request( char * values );
-public	char * os_create_meta_request( char * key, char * value );
-public	char * os_create_image_request(char * identity, char * server );
-public	char * os_create_flavor_request(char * identity, char * ram, char * cpus, char * disk );
-public	char * os_create_address_request( char * address );
-public	char * os_create_security_group_request( char * name );
-public	char * os_create_security_rule_request( char * name, char * protocol, char * from, char * to, char * cidr );
+public	char * os_create_metadata_request(struct os_subscription *  sptr, char * values );
+public	char * os_create_meta_request(struct os_subscription *  sptr, char * key, char * value );
+public	char * os_create_image_request(struct os_subscription *  sptr,char * identity, char * server );
+public	char * os_create_flavor_request(struct os_subscription *  sptr,char * identity, char * ram, char * cpus, char * disk );
+public	char * os_create_address_request(struct os_subscription *  sptr, char * address );
+public	char * os_remove_address_request(struct os_subscription *  sptr, char * address );
+public	char * os_create_security_group_request(struct os_subscription *  sptr, char * name );
+public	char * os_create_security_rule_request(struct os_subscription *  sptr, char * name, char * protocol, char * from, char * to, char * cidr );
 
 public	struct	os_response * 
 	os_client_get_request(
@@ -77,46 +104,57 @@ public	struct	os_response *
 	os_client_put_request(
 		char * target, char * tls, char * agent, char * filename, struct rest_header * hptr );
 
-public	struct	os_response *	os_list_servers	( );
-public	struct	os_response *	os_list_flavors( );
-public	struct	os_response *	os_list_images  ( );
-public	struct	os_response *	os_list_metadata( char * id );
-public	struct	os_response *	os_list_image_details();
-public	struct	os_response *	os_list_flavor_details();
-public	struct	os_response *	os_list_server_details();
-public	struct	os_response *	os_list_floating_ips();
-public	struct	os_response *	os_list_floating_ip_details();
-public	struct	os_response *	os_list_security_groups	( );
-public	struct	os_response *	os_list_security_group_details	( );
+public	struct	os_response *	os_list_servers	(struct os_subscription *  sptr );
+public	struct	os_response *	os_list_flavors(struct os_subscription *  sptr );
+public	struct	os_response *	os_list_images  (struct os_subscription *  sptr );
+public	struct	os_response *	os_list_server_metadata(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_list_image_metadata(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_list_image_details(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_flavor_details(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_server_details(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_floating_ips(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_floating_ip_details(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_security_groups	(struct os_subscription *  sptr );
+public	struct	os_response *	os_list_security_group_details	(struct os_subscription *  sptr );
 
-public	struct	os_response *	os_create_flavor( char * filename );
-public	struct	os_response *	os_create_server( char * filename );
-public	struct	os_response *	os_create_image( char * filename, char * serverid );
-public	struct	os_response *	os_create_address();
-public	struct	os_response *	os_server_address( char * filename, char * serverid );
-public	struct	os_response *	os_create_security_group(char * filename);
-public	struct	os_response *	os_create_security_rule(char * filename);
+public	struct	os_response *	os_create_flavor(struct os_subscription *  sptr, char * filename );
+public	struct	os_response *	os_create_server(struct os_subscription *  sptr, char * filename );
+public	struct	os_response *	os_create_image(struct os_subscription *  sptr, char * filename, char * serverid, int ispublic );
+public	struct	os_response *	os_create_address(struct os_subscription *  sptr);
+public	struct	os_response *	os_server_address(struct os_subscription *  sptr, char * filename, char * serverid );
+public	struct	os_response *	os_create_security_group(struct os_subscription *  sptr,char * filename);
+public	struct	os_response *	os_create_security_rule(struct os_subscription *  sptr,char * filename);
 
-public	struct	os_response *	os_get_server	( char * id );
-public	struct	os_response *	os_get_flavor  ( char * id );
-public	struct	os_response *	os_get_image    ( char * id );
-public	struct	os_response *	os_get_address( char * id );
-public	struct	os_response *	os_get_metadata( char * id, char * name );
-public	struct	os_response *	os_get_security_group( char * id );
+public	struct	os_response *	os_get_server	(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_get_flavor  (struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_get_image    (struct os_subscription *  sptr, char * id );
 
-public	struct	os_response *	os_update_server( char * id, char * filename );
-public	struct	os_response *	os_update_metadata( char * id, char * name, char * value );
-public	struct	os_response *	os_create_metadata( char * id, char * values );
+public	struct	os_response *	os_get_glance	(struct os_subscription *  sptr,  char * id );
+public	struct	os_response *	os_glance_access(struct os_subscription *  sptr,  char * id, int ispublic );
+public	struct	os_response *	os_head_glance	(struct os_subscription *  sptr,  char * id );
+public	struct	os_response *	os_get_address(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_get_server_metadata(struct os_subscription *  sptr, char * id, char * name );
+public	struct	os_response *	os_get_image_metadata(struct os_subscription *  sptr, char * id, char * name );
+public	struct	os_response *	os_get_security_group(struct os_subscription *  sptr, char * id );
 
-public	struct	os_response *	os_delete_server( char * id );
-public	struct	os_response *	os_delete_image ( char * id );
-public	struct	os_response *	os_delete_flavor( char * id );
-public	struct	os_response *	os_delete_metadata( char * id, char * name );
-public	struct	os_response *	os_delete_address( char * id );
-public	struct	os_response *	os_delete_security_group( char * id );
-public	struct	os_response *	os_delete_security_rule( char * id );
+public	struct	os_response *	os_update_server(struct os_subscription *  sptr, char * id, char * filename );
+public	struct	os_response *	os_update_server_metadata(struct os_subscription *  sptr, char * id, char * name, char * value );
+public	struct	os_response *	os_update_image_metadata(struct os_subscription *  sptr, char * id, char * name, char * value );
+public	struct	os_response *	os_create_server_metadata(struct os_subscription *  sptr, char * id, char * values );
+public	struct	os_response *	os_create_image_metadata(struct os_subscription *  sptr, char * id, char * values );
 
-public	struct os_response * liberate_os_response( struct os_response * rptr );	
+public	struct	os_response *	os_delete_server(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_delete_image (struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_delete_flavor(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_delete_server_metadata(struct os_subscription *  sptr, char * id, char * name );
+public	struct	os_response *	os_delete_image_metadata(struct os_subscription *  sptr, char * id, char * name );
+public	struct	os_response *	os_delete_address(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_delete_security_group(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_delete_security_rule(struct os_subscription *  sptr, char * id );
+
+public	char *	os_build_image_reference(struct os_subscription *  sptr, char * nptr );
+public	char *	os_build_flavor_reference(struct os_subscription *  sptr, char * nptr );
+public	struct os_response * liberate_os_response(struct os_response * rptr );	
 
 
 #endif	/* _os_client_h */

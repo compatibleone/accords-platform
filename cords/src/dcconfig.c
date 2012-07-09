@@ -192,4 +192,4 @@ public int rest_occi_dc_config(FILE * fh,struct dc_config * sptr,char * prefix, 
 
 }
 
-#endif	/* _dcconfig_c_ */
+#endif	/* _dcconfig_cdcconfig_c_ */

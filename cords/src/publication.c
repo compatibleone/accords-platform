@@ -26,10 +26,10 @@
 
 #include "publication.h"
 
-/*	----------------------------------------	*/
-/*	l i b e r a t e _ p u b l i c a t i o n 	*/
-/*	----------------------------------------	*/
-public struct publication * liberate_publication(struct publication * sptr)
+/*	----------------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ p u b l i c a t i o n 	*/
+/*	----------------------------------------------------	*/
+public struct cords_publication * liberate_cords_publication(struct cords_publication * sptr)
 {
 	if ( sptr )
 	{
@@ -59,14 +59,14 @@ public struct publication * liberate_publication(struct publication * sptr)
 			 sptr->operator = liberate(sptr->operator);
 		sptr = liberate( sptr );
 	}
-	return((struct publication *) 0);
+	return((struct cords_publication *) 0);
 
 }
 
-/*	----------------------------------	*/
-/*	r e s e t _ p u b l i c a t i o n 	*/
-/*	----------------------------------	*/
-public struct publication * reset_publication(struct publication * sptr)
+/*	----------------------------------------------	*/
+/*	r e s e t _ c o r d s _ p u b l i c a t i o n 	*/
+/*	----------------------------------------------	*/
+public struct cords_publication * reset_cords_publication(struct cords_publication * sptr)
 {
 	if ( sptr )
 	{
@@ -93,21 +93,21 @@ public struct publication * reset_publication(struct publication * sptr)
 
 }
 
-/*	----------------------------------------	*/
-/*	a l l o c a t e _ p u b l i c a t i o n 	*/
-/*	----------------------------------------	*/
-public struct publication * allocate_publication()
+/*	----------------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ p u b l i c a t i o n 	*/
+/*	----------------------------------------------------	*/
+public struct cords_publication * allocate_cords_publication()
 {
-	struct publication * sptr;
-	if (!( sptr = allocate( sizeof( struct publication ) ) ))
+	struct cords_publication * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_publication ) ) ))
 		return( sptr );
-	else	return( reset_publication(sptr) );
+	else	return( reset_cords_publication(sptr) );
 }
 
-/*	----------------------------------	*/
-/*	x m l i n _ p u b l i c a t i o n 	*/
-/*	----------------------------------	*/
-public int xmlin_publication(struct publication * sptr,struct xml_element * eptr)
+/*	----------------------------------------------	*/
+/*	x m l i n _ c o r d s _ p u b l i c a t i o n 	*/
+/*	----------------------------------------------	*/
+public int xmlin_cords_publication(struct cords_publication * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -183,10 +183,10 @@ public int xmlin_publication(struct publication * sptr,struct xml_element * eptr
 
 }
 
-/*	------------------------------------------	*/
-/*	r e s t _ o c c i _ p u b l i c a t i o n 	*/
-/*	------------------------------------------	*/
-public int rest_occi_publication(FILE * fh,struct publication * sptr,char * prefix, char * nptr)
+/*	------------------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ p u b l i c a t i o n 	*/
+/*	------------------------------------------------------	*/
+public int rest_occi_cords_publication(FILE * fh,struct cords_publication * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);

@@ -142,6 +142,8 @@ private void autoload_cords_vm_nodes() {
 				pptr->provider = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
 				pptr->application = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "url" )) != (struct xml_atribut *) 0)
+				pptr->url = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -182,6 +184,9 @@ public  void autosave_cords_vm_nodes() {
 		fprintf(h," application=%c",0x0022);
 		fprintf(h,"%s",(pptr->application?pptr->application:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," url=%c",0x0022);
+		fprintf(h,"%s",(pptr->url?pptr->url:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
@@ -215,6 +220,8 @@ private void set_cords_vm_field(
 			pptr->provider = allocate_string(vptr);
 		if (!( strcmp( nptr, "application" ) ))
 			pptr->application = allocate_string(vptr);
+		if (!( strcmp( nptr, "url" ) ))
+			pptr->url = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -271,6 +278,13 @@ private int pass_cords_vm_filter(
 		else if ( strcmp(pptr->application,fptr->application) != 0)
 			return(0);
 		}
+	if (( fptr->url )
+	&&  (strlen( fptr->url ) != 0)) {
+		if (!( pptr->url ))
+			return(0);
+		else if ( strcmp(pptr->url,fptr->url) != 0)
+			return(0);
+		}
 	if (( fptr->price )
 	&&  (strlen( fptr->price ) != 0)) {
 		if (!( pptr->price ))
@@ -301,6 +315,9 @@ private struct rest_response * cords_vm_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.application=%s",optr->domain,optr->id,pptr->application);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.url=%s",optr->domain,optr->id,pptr->url);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
@@ -719,6 +736,8 @@ public struct occi_category * occi_cords_vm_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "url",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -781,6 +800,17 @@ public struct rest_header *  cords_vm_occi_headers(struct cords_vm * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_vm.application='%s'\r\n",(sptr->application?sptr->application:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_vm.url='%s'\r\n",(sptr->url?sptr->url:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

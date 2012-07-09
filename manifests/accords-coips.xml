@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<manifest name="accords:coips" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<node name="accords:publisher" access="public" scope="common" type="accords:publisher"/>
+<node name="coips" access="public" scope="normal" type="simple" provider="openstack">
+<infrastructure name="accords:component"/>
+<image name="debian:coips">
+<system name="debian_with_cosacs"/>
+</image>
+</node>
+<configuration name="accords:coips">
+<action expression="coips.configure(accords:publisher.publisher.hostname);"/>
+<action expression="coips.system('wget http://www.compatibleone.fr/accords-platform/run-coips');"/>
+<action expression="coips.fork('bash run-coips');"/>
+</configuration>
+<security name="accords:security"/>
+<account name="accords:account"/>
+</manifest>

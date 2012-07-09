@@ -46,6 +46,7 @@ public	char *	occi_http_link( struct occi_category * optr, char * target, char *
 #define	_CORDS_PARSER_AGENT 	"CO-RDS-PARSER/1.0"
 #define	_CORDS_OS_AGENT 	"CO-RDS-OS/1.0"
 #define	_CORDS_ON_AGENT 	"CO-RDS-ON/1.0"
+#define	_CORDS_EC2_AGENT 	"CO-RDS-EC2/1.0"
 #define	_CORDS_AZ_AGENT 	"CO-RDS-AZ/1.0"
 #define	_CORDS_PA_AGENT 	"CO-RDS-PA/1.0"
 #define	_CORDS_SG_AGENT 	"CO-RDS-SG/1.0"
@@ -103,6 +104,8 @@ public	char *	default_operator();
 #define	_OCCI_TEXT_PHP		"text/php"
 
 #define	_OCCI_MIME_PHP		"text/php"
+
+#define	_OCCI_OLD_JSON		"application/json:occi"	/* houssems messy JSON */
 
 #define	_OCCI_OCCI_JSON		"application/json+occi"
 #define	_OCCI_APP_JSON		"application/json"
@@ -185,6 +188,7 @@ public	struct	rest_response * occi_invoke_action(
 		void * pptr );
 
 public	struct	occi_link_node*	occi_first_link_node();
+public	struct	occi_link_node*	occi_last_link_node();
 public	struct  occi_link_node * occi_first_category_link( 
 		char * category, 
 		char * id );

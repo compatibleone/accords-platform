@@ -1,7 +1,7 @@
 #ifndef	_publication_h
 #define	_publication_h
 
-struct	publication
+struct	cords_publication
 {
 	struct	publication	* previous;
 	struct	publication	* next;

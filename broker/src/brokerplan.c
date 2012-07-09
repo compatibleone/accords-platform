@@ -48,7 +48,7 @@ private	struct	rest_response * instance_plan(
 			pptr->name,
 			pptr->manifest,
 			_CORDS_BROKER_AGENT,
-			default_tls(), (struct xml_element **) 0 ) ))
+			default_tls(), (char *) 0, (struct xml_element **) 0 ) ))
 	{
 	 	return( rest_html_response( aptr, get_provisioning_status(), "PROVISIONING FAILURE" ) );
 	}

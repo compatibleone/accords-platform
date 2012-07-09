@@ -1,0 +1,8 @@
+rm install-* -f
+rm run-* -f
+rm package-* -f
+rm update-* -f
+rm *.bak -f
+
+
+

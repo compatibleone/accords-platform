@@ -71,19 +71,9 @@ public struct occi_category * occi_cords_tarif_builder(char *a,char * b);
 public struct occi_category * occi_cords_user_builder(char *a,char * b);
 public struct occi_category * occi_cords_xlink_builder(char *a,char * b);
 
-public struct occi_category * occi_publication_builder(char *a,char * b);
+public struct occi_category * occi_cords_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);
 public struct occi_category * occi_cords_agency_builder(char *a,char * b);
-
-public struct occi_category * occi_deltacloud_builder(char *a,char * b);
-public struct occi_category * occi_dc_config_builder(char *a,char * b);
-public struct occi_category * occi_openstack_builder(char *a,char * b);
-public struct occi_category * occi_cords_osconfig_builder(char *a,char * b);
-public struct occi_category * occi_opennebula_builder(char *a,char * b);
-public struct occi_category * occi_cords_onconfig_builder(char *a,char * b);
-
-public struct occi_category * occi_windowsazure_builder(char *a,char * b);
-public struct occi_category * occi_cords_azconfig_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_ipaddress_builder(char *a,char * b);
 public struct occi_category * occi_cords_domain_builder(char *a,char * b);
@@ -93,13 +83,31 @@ public struct occi_category * occi_cords_iprange_builder(char *a,char * b);
 const static struct {
 	const char *name;
 	public struct occi_category * (*func)(char *a,char * b);
-} occiCategoryBuilder_map[]={
+} occiCategoryBuilder_map2[]={
+	{ "agreement", occi_cords_agreement_builder },
+	{ "terms", occi_cords_terms_builder },
+	{ "term", occi_cords_term_builder },
+	{ "variable", occi_cords_variable_builder },
+	{ "guarantee", occi_cords_guarantee_builder },
+	{ "business", occi_cords_business_builder },
+	{ "import", occi_cords_import_builder },
+	{ "schedule", occi_cords_schedule_builder },
+	{ "interface", occi_cords_interface_builder },
+	{ "session", occi_cords_session_builder },
+	{ "consumer", occi_cords_consumer_builder },
+	{ "connection", occi_cords_connection_builder },
+	{ "stream", occi_cords_stream_builder },
+	{ "probe", occi_cords_probe_builder },
+	{ "metric", occi_cords_metric_builder },
+	{ "alert", occi_cords_alert_builder },
+	{ "quota", occi_cords_quota_builder },
+	{ "port", occi_cords_port_builder },
+	{ "firewall", occi_cords_firewall_builder },
 	{ "application", occi_cords_application_builder },
 	{ "instruction", occi_cords_instruction_builder },
 	{ "instance", occi_cords_instance_builder },
 	{ "value", occi_cords_value_builder },
 	{ "vm", occi_cords_vm_builder },
-	{ "schedule", occi_cords_schedule_builder },
 	{ "metadata", occi_cords_metadata_builder },
 	{ "file", occi_cords_file_builder },
 	{ "script", occi_cords_script_builder },
@@ -138,24 +146,12 @@ const static struct {
 	{ "tarif", occi_cords_tarif_builder },
 	{ "user", occi_cords_user_builder },
 	{ "xlink", occi_cords_xlink_builder },
-	{ "publication", occi_publication_builder },
+	{ "publication", occi_cords_publication_builder },
 	{ "enquiry", occi_cords_enquiry_builder },
 	{ "agency", occi_cords_agency_builder },
-	{ "openstack", occi_openstack_builder },
-	{ "osconfig", occi_cords_osconfig_builder },
-	{ "opennebula", occi_opennebula_builder },
-	{ "onconfig", occi_cords_onconfig_builder },
-	{ "windowsazure", occi_windowsazure_builder },
-	{ "azconfig", occi_cords_azconfig_builder },
 	{ "ipaddress", occi_cords_ipaddress_builder },
 	{ "domain", occi_cords_domain_builder },
 	{ "iprange", occi_cords_iprange_builder },
-	{ "agreement",occi_cords_agreement_builder },
-	{ "terms",occi_cords_terms_builder },
-	{ "term",occi_cords_term_builder },
-	{ "variable",occi_cords_variable_builder },
-	{ "guarantee", occi_cords_guarantee_builder },
-	{ "business",occi_cords_business_builder }
-
 };
 #endif
+

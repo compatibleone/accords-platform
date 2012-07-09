@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _openstack_c_
-#define _openstack_c_
+#ifndef _occiopenstack_c_
+#define _occiopenstack_c_
 
 #include "openstack.h"
 
@@ -180,6 +180,8 @@ private void autoload_openstack_nodes() {
 				pptr->zone = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
+				pptr->workload = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -277,6 +279,9 @@ public  void autosave_openstack_nodes() {
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," workload=%c",0x0022);
+		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -348,6 +353,8 @@ private void set_openstack_field(
 			pptr->zone = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
+		if (!( strcmp( nptr, "workload" ) ))
+			pptr->workload = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -537,6 +544,13 @@ private int pass_openstack_filter(
 		else if ( strcmp(pptr->hostname,fptr->hostname) != 0)
 			return(0);
 		}
+	if (( fptr->workload )
+	&&  (strlen( fptr->workload ) != 0)) {
+		if (!( pptr->workload ))
+			return(0);
+		else if ( strcmp(pptr->workload,fptr->workload) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -618,6 +632,9 @@ private struct rest_response * openstack_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -1074,6 +1091,8 @@ public struct occi_category * occi_openstack_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -1355,6 +1374,17 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.openstack.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.openstack.when='%u'\r\n",sptr->when);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1373,4 +1403,4 @@ public struct rest_header *  openstack_occi_headers(struct openstack * sptr)
 
 }
 
-#endif	/* _openstack_c_ */
+#endif	/* _occiopenstack_c_ */

@@ -34,7 +34,7 @@ void addFront(listc *l, char *val)
 /******************************************************************************/
 /*char *retBack(listc *l)
 {
-   char val[256];
+   char val[1024];
    elem *tmp = l->last;
    if(!tmp) return NULL;
    strcpy(val,tmp->value);
@@ -47,7 +47,7 @@ void addFront(listc *l, char *val)
 /******************************************************************************/
 /*char *retFront(listc *l)
 {
-   char val[256];
+   char val[1024];
    elem *tmp = l->first;
    if(!tmp) return NULL;
    strcpy(val,tmp->value);

@@ -192,4 +192,4 @@ public int rest_occi_os_config(FILE * fh,struct os_config * sptr,char * prefix, 
 
 }
 
-#endif	/* _osconfig_c_ */
+#endif	/* _osconfig_cosconfig_c_ */

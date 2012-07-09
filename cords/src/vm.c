@@ -41,6 +41,8 @@ public struct cords_vm * liberate_cords_vm(struct cords_vm * sptr)
 			 sptr->provider = liberate(sptr->provider);
 		if ( sptr->application )
 			 sptr->application = liberate(sptr->application);
+		if ( sptr->url )
+			 sptr->url = liberate(sptr->url);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		sptr = liberate( sptr );
@@ -60,6 +62,7 @@ public struct cords_vm * reset_cords_vm(struct cords_vm * sptr)
 		sptr->image = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->application = (char*) 0;
+		sptr->url = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->state =  0;
 	}
@@ -104,6 +107,10 @@ public int xmlin_cords_vm(struct cords_vm * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->application = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"url") ))
+		{
+			if ( wptr->value ) { sptr->url = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
@@ -130,6 +137,7 @@ public int rest_occi_cords_vm(FILE * fh,struct cords_vm * sptr,char * prefix, ch
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.application='%s'\r\n",prefix,nptr,(sptr->application?sptr->application:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.url='%s'\r\n",prefix,nptr,(sptr->url?sptr->url:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

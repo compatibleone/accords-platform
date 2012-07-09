@@ -7,12 +7,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "list.h"
+#include "../../pyaccords/pysrc/pypath.h"
 
-
-#define TAILLE 256
+#define TAILLE 1024
 #define CORDS_SRC "cords/src"
 #define INCLUDE_CORDS_H "cords/src/cords.h"
 #define INCLUDE_OCCI_BUILDER "occi/src/occibuilder.h"
+#define INCLUDE_OCCI_PROVIDER_BUILDER "pyaccords/pysrc/listoccibuilder.h"
 #define INCLUDE_CORDS_BASE "cords/src/cordsbase.c"
 #define OCCI_PATH "occi/src"
 #define OCCI_CORDS "occi/src/cordsocci.c"
@@ -23,10 +24,12 @@
 #define PYCODEV_DIR "pyaccordsSDK/pycompdev/"
 #define LISTCATEG_FILE "pyaccords/pysrc/listcateg.h"
 #define LIB_PYCOMPDEV "pycompdev"
+#define PY_ACT_STRUCT "pyaccords/pysrc/categaction.h"
+#define PY_ACT_LIST "pyaccords/pysrc/listaction.h"
 
-int insertCategory(char pathf[], char categoryName[]);
+int insertCategory(char pathf[], char categoryName[],int indice,int flag);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
-int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice);
+int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag);
 int enTete(char pathf[]);
 char *getCategoryName(char strCt[],char *tok,int p);
 int getLineNumber(char pathf[]);

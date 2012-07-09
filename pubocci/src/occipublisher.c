@@ -115,7 +115,7 @@ private	char * 	cords_consumer_publication(
 	}
 	else
 	{
-		sprintf(buffer,"http://%s",ihost);
+		rest_add_http_prefix(buffer,2048,ihost);
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
@@ -186,7 +186,7 @@ private	char * 	cords_provider_publication(
 	}
 	else
 	{
-		sprintf(buffer,"http://%s",ihost);
+		rest_add_http_prefix(buffer,2048,ihost);
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );

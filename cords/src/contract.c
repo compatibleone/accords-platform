@@ -49,6 +49,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->rootpass )
 			 sptr->rootpass = liberate(sptr->rootpass);
+		if ( sptr->workload )
+			 sptr->workload = liberate(sptr->workload);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->access )
@@ -84,6 +86,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->reference = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->rootpass = (char*) 0;
+		sptr->workload = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->common = (char*) 0;
@@ -91,6 +94,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->type = (char*) 0;
 		sptr->service = (char*) 0;
 		sptr->firewall = (char*) 0;
+		sptr->commons =  0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -151,6 +155,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->rootpass = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"workload") ))
+		{
+			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
@@ -178,6 +186,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		else if (!( strcmp(wptr->name,"firewall") ))
 		{
 			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"commons") ))
+		{
+			if ( wptr->value ) { sptr->commons = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
@@ -209,6 +221,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.common='%s'\r\n",prefix,nptr,(sptr->common?sptr->common:""));
@@ -216,6 +229,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.commons='%u'\r\n",prefix,nptr,sptr->commons);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

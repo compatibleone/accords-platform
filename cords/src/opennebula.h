@@ -17,6 +17,7 @@ struct	opennebula
 	char *	price;
 	char *	account;
 	char * 	access;
+	char *	workload;
 	char *	publicaddr;
 	char *	privateaddr;
 	char *	profile;

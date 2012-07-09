@@ -26,9 +26,9 @@
 
 #include "proactive.h"
 
-/*	------------------------------------------	*/
+/*	------------------------------------	*/
 /*	l i b e r a t e _ p r o a c t i v e 	*/
-/*	------------------------------------------	*/
+/*	------------------------------------	*/
 public struct proactive * liberate_proactive(struct proactive * sptr)
 {
 	if ( sptr )
@@ -63,15 +63,17 @@ public struct proactive * liberate_proactive(struct proactive * sptr)
 			 sptr->privateaddr = liberate(sptr->privateaddr);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
+		if ( sptr->workload )
+			 sptr->workload = liberate(sptr->workload);
 		sptr = liberate( sptr );
 	}
 	return((struct proactive *) 0);
 
 }
 
-/*	------------------------------------	*/
+/*	------------------------------	*/
 /*	r e s e t _ p r o a c t i v e 	*/
-/*	------------------------------------	*/
+/*	------------------------------	*/
 public struct proactive * reset_proactive(struct proactive * sptr)
 {
 	if ( sptr )
@@ -91,6 +93,7 @@ public struct proactive * reset_proactive(struct proactive * sptr)
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->hostname = (char*) 0;
+		sptr->workload = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
 	}
@@ -98,9 +101,9 @@ public struct proactive * reset_proactive(struct proactive * sptr)
 
 }
 
-/*	------------------------------------------	*/
+/*	------------------------------------	*/
 /*	a l l o c a t e _ p r o a c t i v e 	*/
-/*	------------------------------------------	*/
+/*	------------------------------------	*/
 public struct proactive * allocate_proactive()
 {
 	struct proactive * sptr;
@@ -109,9 +112,9 @@ public struct proactive * allocate_proactive()
 	else	return( reset_proactive(sptr) );
 }
 
-/*	------------------------------------	*/
+/*	------------------------------	*/
 /*	x m l i n _ p r o a c t i v e 	*/
-/*	------------------------------------	*/
+/*	------------------------------	*/
 public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -179,6 +182,10 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->hostname = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"workload") ))
+		{
+			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -192,9 +199,9 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 
 }
 
-/*	--------------------------------------------	*/
+/*	--------------------------------------	*/
 /*	r e s t _ o c c i _ p r o a c t i v e 	*/
-/*	--------------------------------------------	*/
+/*	--------------------------------------	*/
 public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
@@ -216,10 +223,11 @@ public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 
 }
 
-#endif	/* _proactive_c_ */
+#endif	/* _proactive_cproactive_c_ */

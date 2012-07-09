@@ -98,4 +98,6 @@
 #include "occiiprange.c"
 
 	/* ------------- */
+#include "occiamazonEc2.c"
+#include "occiec2config.c"
 #endif

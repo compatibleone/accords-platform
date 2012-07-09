@@ -31,6 +31,7 @@
 #include "restlog.h"
 #include "tlsload.h"
 
+public	char *	default_tls();
 private	struct	rest_server * rest_liberate_server( struct rest_server * rptr );
 private	struct	rest_server * rest_allocate_server();
 private	struct	rest_client * rest_new_client(struct rest_server * sptr);
@@ -68,6 +69,37 @@ public	int	rest_thread_control(int new_value)
 	int	before=thread_control;
 	thread_control = new_value;
 	return( before );
+}
+
+/*	------------------------------------------------	*/
+/*		r e s t _ h t t p _ p r e f i x 		*/
+/*	------------------------------------------------	*/
+public	char *	rest_http_prefix()
+{
+	char *	prefix;
+	if (!( prefix = default_tls() ))
+		prefix = "http";
+	else if (!( strlen( prefix ) ))
+		prefix = "http";
+	else if (!( strcmp( prefix, "(none)" )))
+		prefix = "http";
+	else if (!( strcmp( prefix, "(null)" )))
+		prefix = "http";
+	else	prefix = "https";
+	return( prefix );
+} 
+
+/*	------------------------------------------------	*/
+/*	    r e s t _ a d d _ h t t p _ p r e f i x 		*/
+/*	------------------------------------------------	*/
+public	void	rest_add_http_prefix(char * buffer, int buflen, char * host )
+{
+	if (!( strncmp(host,"http:",strlen("http:")) ))
+		strcpy(buffer,host);
+	else if (!( strncmp(host,"https:",strlen("https:")) ))
+		strcpy(buffer,host);
+	else	sprintf(buffer,"%s://%s",rest_http_prefix(),host);
+	return;
 }
 
 /*	------------------------------------------------	*/
@@ -460,6 +492,33 @@ public	struct	rest_header * rest_create_header( char * nptr, char * vptr )
 }
 
 /*	------------------------------------------------	*/
+/*	     r e s t _ p r e f i x _ h e a d e r 		*/
+/*	------------------------------------------------	*/
+public struct rest_header * rest_prefix_header( struct rest_header * root, char * nptr, char * vptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( nptr, vptr ) ))
+		return( hptr );
+	else if (!( hptr->next = root ))
+		return( hptr );
+	else	return(( root->previous = hptr ));
+}
+
+/*	------------------------------------------------	*/
+/*	     r e s t _ a p p e n d _ h e a d e r 		*/
+/*	------------------------------------------------	*/
+public struct rest_header * rest_postfix_header( struct rest_header * foot, char * nptr, char * vptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( nptr, vptr ) ))
+		return( hptr );
+	else if (!( hptr->previous = foot ))
+		return( hptr );
+	else	return(( foot->next = hptr ));
+
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ h e a d e r 		*/
 /*	------------------------------------------------	*/
 public	struct	rest_header * rest_response_header(struct rest_response * aptr, char * nptr, char * vptr )
@@ -522,16 +581,25 @@ public	struct	rest_header * add_response_header(struct rest_response * aptr )
 }
 
 /*	------------------------------------------------	*/
-/*	   r e s t _ r eq u e s t _ h o s t 			*/
+/*	   r e s t _ r e q u e s t _ h o s t 			*/
 /*	------------------------------------------------	*/
 public	char * 	rest_request_host( struct rest_request * rptr )
 {
+	char 	buffer[2048];
 	struct	rest_header * hptr;
 	if (!( rptr ))
 		return((char *) 0);
+	else if ( rptr->host )
+		return( rptr->host );
 	else if (!( hptr = rest_resolve_header( rptr->first, "Host" ) ))
 		return((char *) 0);
-	else	return( hptr->value );
+	else if (!( hptr->value ))
+		return((char *) 0);
+	else
+	{
+		rest_add_http_prefix(buffer,2048,hptr->value);
+		return( (rptr->host = allocate_string( buffer ) ) );
+	}
 }
 
 /*	------------------------------------------------	*/
@@ -818,6 +886,17 @@ private	struct rest_response * rest_process_request(
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ o o n s u m e _ b y t e		*/
+/*	------------------------------------------------	*/
+private	int	rest_consume_byte( struct rest_client * cptr )
+{
+	while ( cptr->consumed >= cptr->bytes )
+		if ( rest_client_read( cptr ) == -1 )
+			return( -1 );
+	return( cptr->buffer[cptr->consumed++] );
+}
+
+/*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ t o k e n 		*/
 /*	------------------------------------------------	*/
 private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )	
@@ -826,15 +905,13 @@ private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )
 	int	i=0;
 	char *	work;
 	char *	result=(char *) 0;
-	if ( cptr->bytes <= cptr->consumed )
-		return((char *) 0);
-	else if (!( work = allocate( cptr->bytes - cptr->consumed )))
+	if (!( work = allocate( (cptr->buffersize+1) )))
 		return( work );
 	else
 	{
-		while ( cptr->consumed < cptr->bytes )
+		while ((c = rest_consume_byte( cptr )) != -1)
 		{
-			if ((c = cptr->buffer[cptr->consumed++]) == '\r')
+			if ( c == '\r' )
 				continue;
 			else if ( c == terminator )
 				break;
@@ -865,9 +942,19 @@ private	char * rest_consume_line( struct rest_client  * cptr )
 /*	------------------------------------------------	*/
 private	char * rest_consume_value( struct rest_client  * cptr )
 {
-	while (( cptr->buffer[cptr->consumed] == ' ' )
-	||     ( cptr->buffer[cptr->consumed] == '\t' ))
-		cptr->consumed++;
+	int	c;
+	while (1)
+	{
+		if ((c = rest_consume_byte( cptr )) == -1)
+			return((char *) 0);
+		else if ( c == ' ' )
+			continue;
+		else if ( c == '\t' )
+			continue;
+		else	break;
+	}
+	/* unget byte */
+	cptr->consumed--;
 	return( rest_consume_token( cptr, '\n' ) );
 }
 
@@ -1130,12 +1217,18 @@ private	char *	rest_content_extension( char * sptr )
 		return( "html" );
 	if ((!( strcmp( sptr, "text/json" 	)))
 	||  (!( strcmp( sptr, "application/json" 	)))
+	||  (!( strcmp( sptr, "application/json+occi" 	)))
+	||  (!( strcmp( sptr, "application/json:occi" 	)))
 	||  (!( strcmp( sptr, "x-application/json"))))
 		return( "json" );
 	if ((!( strcmp( sptr, "text/xml" 	)))
 	||  (!( strcmp( sptr, "application/xml" 	)))
 	||  (!( strcmp( sptr, "x-application/xml"))))
 		return( "xml" );
+	if ((!( strcmp( sptr, "text/php" 	)))
+	||  (!( strcmp( sptr, "application/php" 	)))
+	||  (!( strcmp( sptr, "x-application/php"))))
+		return( "php" );
 	if ((!( strcmp( sptr, "text/occi" 	)))
 	||  (!( strcmp( sptr, "application/occi" 	)))
 	||  (!( strcmp( sptr, "x-application/occi"))))

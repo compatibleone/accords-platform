@@ -143,6 +143,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 				{	echo=1; continue;	}
 				else if (!( strcmp( aptr, "xsd" ) ))
 				{	Cp.xsd=0; continue;	}
+				else if (!( strcmp( aptr, "force" ) ))
+				{	set_force(1); continue;	}
 				else if (!( strcmp( aptr, "tls" ) ))
 				{
 					Cp.tls = argv[argi++];
@@ -217,8 +219,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.b.0.01 ");
-	printf("\n   Beta Version 19/03/2012 \n");
+	printf("\n   Cords Parser : Version 1.0.b.0.02 ");
+	printf("\n   Beta Version 13/06/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                dis-activate xsd validation ");
@@ -229,7 +231,9 @@ private	int	test_cords_parser_banner(char * n)
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --result <filename>  specify the output plan filename ");
 	printf("\n   --verbose            activate verbose messages ");
-	printf("\n   --debug              activate debug messages \n");
+	printf("\n   --debug              activate debug messages ");
+	printf("\n   --force              force update of category \n");
+	
 	printf("\n   Example : \n");
 	printf("\n   %s --publisher http://127.0.0.1:8086 cords.xml \n\n",n);
 	return(0);

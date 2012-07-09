@@ -1,0 +1,26 @@
+echo "--------------------------------------------------------------"
+echo "   production of the compatible one demonstrator packages     "
+echo "    this should really only be run on a debian platform       "
+echo "   and must provide the NAME of the provisioning ACCOUNT      "
+echo "--------------------------------------------------------------"
+echo "validate to proceed only if you really know what you are doing"
+read var
+echo "cleaning packages"
+bash make-clean 
+echo "building accords platform manifests"
+bash make-manifest
+echo "building accords platform service level agreements"
+bash make-sla $1
+echo "building installation scripts"
+bash make-install 
+echo "building run scripts"
+bash make-run
+echo "building packages"
+bash make-package 
+echo "building update"
+bash make-update 
+echo "transfering to www.compatibleone.fr"
+scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform
+bash make-clean
+echo "demonstrator production is up to date on www.compatibleone.fr"
+

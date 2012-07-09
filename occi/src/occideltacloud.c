@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _deltacloud_c_
-#define _deltacloud_c_
+#ifndef _occideltacloud_c_
+#define _occideltacloud_c_
 
 #include "deltacloud.h"
 
@@ -168,6 +168,8 @@ private void autoload_deltacloud_nodes() {
 				pptr->floating = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "floatingid" )) != (struct xml_atribut *) 0)
 				pptr->floatingid = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
+				pptr->workload = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicaddr" )) != (struct xml_atribut *) 0)
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
@@ -259,6 +261,9 @@ public  void autosave_deltacloud_nodes() {
 		fprintf(h," floatingid=%c",0x0022);
 		fprintf(h,"%s",(pptr->floatingid?pptr->floatingid:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," workload=%c",0x0022);
+		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," publicaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->publicaddr?pptr->publicaddr:""));
 		fprintf(h,"%c",0x0022);
@@ -336,6 +341,8 @@ private void set_deltacloud_field(
 			pptr->floating = allocate_string(vptr);
 		if (!( strcmp( nptr, "floatingid" ) ))
 			pptr->floatingid = allocate_string(vptr);
+		if (!( strcmp( nptr, "workload" ) ))
+			pptr->workload = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicaddr" ) ))
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
@@ -495,6 +502,13 @@ private int pass_deltacloud_filter(
 		else if ( strcmp(pptr->floatingid,fptr->floatingid) != 0)
 			return(0);
 		}
+	if (( fptr->workload )
+	&&  (strlen( fptr->workload ) != 0)) {
+		if (!( pptr->workload ))
+			return(0);
+		else if ( strcmp(pptr->workload,fptr->workload) != 0)
+			return(0);
+		}
 	if (( fptr->publicaddr )
 	&&  (strlen( fptr->publicaddr ) != 0)) {
 		if (!( pptr->publicaddr ))
@@ -600,6 +614,9 @@ private struct rest_response * deltacloud_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.floatingid=%s",optr->domain,optr->id,pptr->floatingid);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
@@ -1062,6 +1079,8 @@ public struct occi_category * occi_deltacloud_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "floatingid",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "publicaddr",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
@@ -1289,6 +1308,17 @@ public struct rest_header *  deltacloud_occi_headers(struct deltacloud * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.deltacloud.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.deltacloud.publicaddr='%s'\r\n",(sptr->publicaddr?sptr->publicaddr:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1373,4 +1403,4 @@ public struct rest_header *  deltacloud_occi_headers(struct deltacloud * sptr)
 
 }
 
-#endif	/* _deltacloud_c_ */
+#endif	/* _occideltacloud_c_ */

@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _proactive_c_
-#define _proactive_c_
+#ifndef _occiproactive_c_
+#define _occiproactive_c_
 
 #include "proactive.h"
 
@@ -164,6 +164,8 @@ private void autoload_proactive_nodes() {
 				pptr->privateaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
+				pptr->workload = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
@@ -180,8 +182,6 @@ private void autoload_proactive_nodes() {
 public  void set_autosave_proactive_name(char * fn) {
 	autosave_proactive_name = fn;	return;
 }
-
-/*! Save in a file all current information about locked ProActive nodes. */
 public  void autosave_proactive_nodes() {
 	char * fn=autosave_proactive_name;	struct occi_kind_node * nptr;
 	struct proactive * pptr;
@@ -239,6 +239,9 @@ public  void autosave_proactive_nodes() {
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," workload=%c",0x0022);
+		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -294,6 +297,8 @@ private void set_proactive_field(
 			pptr->privateaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
+		if (!( strcmp( nptr, "workload" ) ))
+			pptr->workload = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
@@ -427,6 +432,13 @@ private int pass_proactive_filter(
 		else if ( strcmp(pptr->hostname,fptr->hostname) != 0)
 			return(0);
 		}
+	if (( fptr->workload )
+	&&  (strlen( fptr->workload ) != 0)) {
+		if (!( pptr->workload ))
+			return(0);
+		else if ( strcmp(pptr->workload,fptr->workload) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
@@ -484,6 +496,9 @@ private struct rest_response * proactive_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -924,6 +939,8 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
@@ -934,9 +951,9 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 
 }
 
-/*	--------------------------------------------------	*/
-/*	w i n d o w s p a u r e _ o c c i _ h e a d e r s 	*/
-/*	--------------------------------------------------	*/
+/*	--------------------------------------------	*/
+/*	p r o a c t i v e _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------------	*/
 public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
@@ -1117,6 +1134,17 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.proactive.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.proactive.when='%u'\r\n",sptr->when);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1135,4 +1163,4 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 
 }
 
-#endif	/* _proactive_c_ */
+#endif	/* _occiproactive_c_ */

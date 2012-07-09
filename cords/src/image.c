@@ -41,8 +41,8 @@ public struct cords_image * liberate_cords_image(struct cords_image * sptr)
 			 sptr->system = liberate(sptr->system);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
-		if ( sptr->application )
-			 sptr->application = liberate(sptr->application);
+		if ( sptr->vm )
+			 sptr->vm = liberate(sptr->vm);
 		if ( sptr->created )
 			 sptr->created = liberate(sptr->created);
 		if ( sptr->updated )
@@ -64,7 +64,7 @@ public struct cords_image * reset_cords_image(struct cords_image * sptr)
 		sptr->name = (char*) 0;
 		sptr->system = (char*) 0;
 		sptr->price = (char*) 0;
-		sptr->application = (char*) 0;
+		sptr->vm = (char*) 0;
 		sptr->created = (char*) 0;
 		sptr->updated = (char*) 0;
 		sptr->packages =  0;
@@ -111,9 +111,9 @@ public int xmlin_cords_image(struct cords_image * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"application") ))
+		else if (!( strcmp(wptr->name,"vm") ))
 		{
-			if ( wptr->value ) { sptr->application = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->vm = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"created") ))
 		{
@@ -149,7 +149,7 @@ public int rest_occi_cords_image(FILE * fh,struct cords_image * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.system='%s'\r\n",prefix,nptr,(sptr->system?sptr->system:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.application='%s'\r\n",prefix,nptr,(sptr->application?sptr->application:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.vm='%s'\r\n",prefix,nptr,(sptr->vm?sptr->vm:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%s'\r\n",prefix,nptr,(sptr->created?sptr->created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.updated='%s'\r\n",prefix,nptr,(sptr->updated?sptr->updated:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.packages='%u'\r\n",prefix,nptr,sptr->packages);

@@ -11,7 +11,8 @@ void addBack(listc *l, char *val)
 {
    elem *nouv = malloc(sizeof(elem));
    if(!nouv) exit(EXIT_FAILURE);
-   strcpy(nouv->value,val);
+   strncpy(nouv->value,val,255);
+   nouv->value[255]='\0';
    nouv->prev = l->last;
    nouv->next = NULL;
    if(l->last) l->last->next = nouv;
@@ -23,7 +24,8 @@ void addFront(listc *l, char *val)
 {
    elem *nouv = malloc(sizeof(elem));
    if(!nouv) exit(EXIT_FAILURE);
-   strcpy(nouv->value,val);
+   strncpy(nouv->value,val,1024);
+   nouv->value[1024]='\0';
    nouv->next = l->first;
    nouv->prev = NULL;      
    if(l->first) l->first->prev = nouv;
@@ -34,7 +36,7 @@ void addFront(listc *l, char *val)
 /******************************************************************************/
 /*char *retBack(listc *l)
 {
-   char val[256];
+   char val[1024];
    elem *tmp = l->last;
    if(!tmp) return NULL;
    strcpy(val,tmp->value);
@@ -47,7 +49,7 @@ void addFront(listc *l, char *val)
 /******************************************************************************/
 /*char *retFront(listc *l)
 {
-   char val[256];
+   char val[1024];
    elem *tmp = l->first;
    if(!tmp) return NULL;
    strcpy(val,tmp->value);

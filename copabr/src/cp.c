@@ -24,9 +24,14 @@
 #include "csp.h"
 #include "cpxsd.h"
 
+private	int	force_update=0;
+
+public	void	set_force(int v) { force_update = v; }
+
 private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
 
 #include "cpxsd.c"
+
 
 
 /*	---------------------------------------------------	*/
@@ -228,17 +233,19 @@ public	struct	occi_response 	* cords_create_instance(
 		char * category, char * agent, struct occi_element * header, char * tls )
 {
 	char	buffer[4096];
-	struct	occi_element  	* eptr;
-	struct	occi_element  	* fptr;
-	struct	occi_response 	* aptr;
-	struct	occi_response 	* zptr;
-	struct	occi_request 	* rptr;
-	struct	occi_client	* cptr;
+	struct	occi_element  	* eptr=(struct occi_element *) 0;
+	struct	occi_element  	* fptr=(struct occi_element *) 0;
+	struct	occi_response 	* aptr=(struct occi_response *) 0;
+	struct	occi_response 	* zptr=(struct occi_response *) 0;
+	struct	occi_request 	* rptr=(struct occi_request *) 0;
+	struct	occi_client	* cptr=(struct occi_client *) 0;
 
 	if ( check_debug() )
 		printf("cords_create_instance(%s,%s)\n",category,agent);
 
 	if (!( aptr = occi_resolver( category, agent ) ))
+		return((struct occi_response *) 0);
+	else if (!( aptr->first ))
 		return((struct occi_response *) 0);
 
 	for (	eptr = aptr->first;
@@ -722,7 +729,7 @@ public	struct occi_response * cords_retrieve_category(
 
 	if ( check_debug() )
 		printf("cords_retrieve_category(%s,%s)\n",document->name,id);
-
+	
 	if (!( strncmp( id, "http", strlen("http") )))
 		return( occi_simple_get( id, agent, tls ) );
 	else if (!( strncmp( id, "https", strlen("https")) ))
@@ -1340,7 +1347,7 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 		}
 		else
 		{
-			sprintf(buffer,"http://%s",host);
+			rest_add_http_prefix(buffer,1024,host);
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );
 			if (!( zptr = cords_invoke_action( buffer, "build", agent, tls ) ))
@@ -2056,7 +2063,7 @@ private	int	cords_new_cordscript_instance(
 	}
 	else
 	{
-		sprintf(buffer,"http://%s",vptr);
+		rest_add_http_prefix(buffer,1024,vptr);
 		if ( aptr->value ) aptr->value = liberate( aptr->value );
 		aptr->value = allocate_string( buffer );
 		zptr = occi_remove_response( zptr );
@@ -2434,6 +2441,8 @@ private	struct occi_response * cords_integrate_fields(
 	char *	nptr;
 	char *	vptr;
 	if (!( aptr = document_atribut( document, _CORDS_ID )))
+		return( zptr );
+	else if ( force_update )
 		return( zptr );
 	sprintf(buffer,"%s.%s.",domain,document->name);
 	for (	eptr = zptr->first;

@@ -29,6 +29,13 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
+#include "osconfig.h"
+#include "openstack.h"
+#include "openstack.c"
+#include "occiopenstack.c"
+#include "osconfig.c"
+#include "occiosconfig.c"
+
 struct	accords_configuration OsProcci = {
 	0,0,
 	0,0,0,0,
@@ -82,8 +89,8 @@ private	void	osprocci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Open Stack OsProcci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Open Stack OsProcci : Version 1.0a.0.05");
+	printf("\n   Beta Version : 12/06/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	accords_configuration_options();

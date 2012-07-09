@@ -318,7 +318,7 @@ private	int	create_openstack_contract(
 		/* recover and store the public/private access property */
 		/* ---------------------------------------------------- */
 		if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
-		_CORDS_NODE, _CORDS_ACCESS ) ))
+			_CORDS_NODE, _CORDS_ACCESS ) ))
 			vptr = _CORDS_PUBLIC;
 		if ( pptr->access ) pptr->access = liberate( pptr->access );
 		if (!( pptr->access = allocate_string( vptr ) ))

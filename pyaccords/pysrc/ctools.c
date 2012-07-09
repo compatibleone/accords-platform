@@ -1,3 +1,23 @@
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Hamid MEDJAHED Prologue (hmedjahed@prologue.fr)        */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
+
 #include "ctools.h"
 
 void strConcat(char str1[],char str2[],char c)
@@ -49,33 +69,6 @@ void addFronte(listcc *l, char *val)
    else l->last = nouv;
    l->first = nouv;
 }
-
-/******************************************************************************/
-/*char *retBack(listc *l)
-{
-   char val[256];
-   elem *tmp = l->last;
-   if(!tmp) return NULL;
-   strcpy(val,tmp->value);
-   l->last = tmp->prev;
-   if(l->last) l->last->next = NULL;
-   else l->first = NULL;
-   free(tmp);
-   return val;
-}*/
-/******************************************************************************/
-/*char *retFront(listc *l)
-{
-   char val[256];
-   elem *tmp = l->first;
-   if(!tmp) return NULL;
-   strcpy(val,tmp->value);
-   l->first = tmp->next;
-   if(l->first)l->first->prev = NULL;
-   else l->last = NULL;
-   free(tmp);
-   return val;
-}*/
 /*******************************************************************************/
 void liberateListe(listcc *l)
 {

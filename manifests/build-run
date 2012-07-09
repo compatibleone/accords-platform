@@ -1,0 +1,10 @@
+echo "rm -f update-$1.tgz" > run-$1
+echo "wget http://www.compatibleone.fr/accords-platform/update-$1.tgz" >> run-$1
+echo "tar -xzvf update-$1.tgz" >> run-$1
+echo "export pubhost=\$accords_publisher_publisher_hostname" >> run-$1
+echo "bash build-config $1 europe \$cosacs \$pubhost " >> run-$1
+echo "install -d /home/cosacs/service" >> run-$1
+echo "/usr/local/bin/$1 --config config-$1.xml $1/1.0a" >> run-$1
+chmod +x run-$1
+
+

@@ -31,6 +31,7 @@
 static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
 {                    
  char * categoryNameList;
+ char * categoryActionNumberList;
  char **argv;
  int argc;
  char *moduleName;
@@ -40,13 +41,13 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
  PyObject * strObj;  /* one string in the list */
  int numLines;
  
- if (! PyArg_ParseTuple( args,"iO!ss", &argc,&PyList_Type, &listObj,&moduleName, &categoryNameList)) return NULL;
+ if (! PyArg_ParseTuple( args,"iO!sss", &argc,&PyList_Type, &listObj,&moduleName, &categoryNameList,&categoryActionNumberList)) return NULL;
  numLines = PyList_Size(listObj);
 
  if (numLines < 0)   return NULL;
  argv = (char**) malloc(sizeof (char*) * numLines);
   for(i = 0; i < numLines; i++)
-      argv= (char*) malloc(sizeof (char) * 256);
+      argv= (char*) malloc(sizeof (char) * 1024);
 
  for (i=0; i<numLines; i++)
  {
@@ -56,7 +57,7 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
 
  }
 
- a=module(argc,argv,moduleName,categoryNameList);
+ a=module(argc,argv,moduleName,categoryNameList,categoryActionNumberList);
 
 
  return Py_BuildValue("i",a);

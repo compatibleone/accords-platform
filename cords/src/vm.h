@@ -7,6 +7,7 @@ struct	cords_vm
 	char *	image;
 	char *	provider;
 	char *	application;
+	char *	url;
 	char *	price;
 	int	state;
 };

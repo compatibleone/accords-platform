@@ -192,4 +192,4 @@ public int rest_occi_on_config(FILE * fh,struct on_config * sptr,char * prefix, 
 
 }
 
-#endif	/* _onconfig_c_ */
+#endif	/* _onconfig_conconfig_c_ */

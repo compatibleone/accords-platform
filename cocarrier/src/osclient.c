@@ -29,43 +29,6 @@ char *                  occi_unquoted_value( char * sptr );
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
-private	struct os_config Os = {
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	0 
-
-	};
-
-struct	keystone_config
-{
-	char *	requestauth;
-	char *	acceptauth;
-	char *	tenantname;
-	char *	tenantid;
-	char *	host;
-} KeyStone = 
-{
-	"application/xml",
-	"application/xml",
-	(char *) 0,
-	(char *) 0,
-	(char *) 0
-};
-
-
 /*	------------------------------------------------	*/
 /*		o s _ v a l i d _ s t r i n g			*/
 /*	------------------------------------------------	*/
@@ -179,16 +142,6 @@ public	struct	os_response *
 }
 
 /*	------------------------------------------------------------	*/
-/*	      o s _ c l i e n t _ d e l e t e _ r e q u e s t		*/
-/*	------------------------------------------------------------	*/
-public	struct	os_response * 
-	os_client_delete_request(
-		char * target, char * tls, char * nptr, struct rest_header * hptr )
-{
-	return( os_check( rest_client_delete_request( target, tls, nptr, hptr ) ) );
-}
-
-/*	------------------------------------------------------------	*/
 /*		 o s _ c l i e n t _ h e a d _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response * 
@@ -196,6 +149,16 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	return( os_check( rest_client_head_request( target, tls, nptr, hptr ) ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	      o s _ c l i e n t _ d e l e t e _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response * 
+	os_client_delete_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	return( os_check( rest_client_delete_request( target, tls, nptr, hptr ) ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -246,39 +209,67 @@ public	char *	keystone_auth_message( char * user, char * password, char * tenant
 }
 
 /*	---------------------------------------------------------	*/
+/*		o s _ a d d _ m e t a _ h e a d e r			*/
+/*	---------------------------------------------------------	*/
+public	struct	rest_header * 	os_add_meta_header( 
+		struct rest_header * root,
+		char * name,
+		char * value 
+		)
+{
+	struct	rest_header * hptr;
+	struct	rest_header * foot;
+	if (!( foot = root ))
+		return( foot );
+	else
+	{ 	while ( foot->next )
+			foot = foot->next;
+		if (!( hptr = rest_create_header( name, value ) ))
+			return( root );
+		else
+		{
+			foot->next = hptr;
+			hptr->previous = foot;
+			return( root );
+		}
+	}
+}
+
+/*	---------------------------------------------------------	*/
 /*	 c h e c k _ k e y s t o n e _ a u t h o r i z a t i o n	*/
 /*	---------------------------------------------------------	*/
-public	int	check_keystone_authorization()
+public	int	check_keystone_authorization(struct os_subscription * sptr)
 {
 	struct	xml_element * document;
 	struct	xml_element * eptr;
+	struct	xml_element * gptr;
 	struct	xml_atribut * aptr;
 	struct	rest_response * rptr;
 	struct	rest_header * hptr;
 	char *	tptr;
 	char *	filename;
 	char	buffer[1024];
-	if (!( Os.authenticate ))
+	if (!( sptr->Os.authenticate ))
 	{
-		sprintf(buffer,"%s/tokens",Os.host);
-		if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, KeyStone.requestauth ) ))
+		sprintf(buffer,"%s/tokens",sptr->Os.host);
+		if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, sptr->KeyStone.requestauth ) ))
 			return( 0 );
-		else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, KeyStone.acceptauth ) ))
+		else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, sptr->KeyStone.acceptauth ) ))
 		{
 			liberate_rest_header( hptr );
 			return( 0 );
 		}
 		else	hptr->next->previous = hptr;
 		if (!( filename = keystone_auth_message( 
-			Os.user, 
-			Os.password,
-			KeyStone.tenantname ) ))
+			sptr->Os.user, 
+			sptr->Os.password,
+			sptr->KeyStone.tenantname ) ))
 		{
 			liberate_rest_header( hptr );
 			return( 0 );
 		}
 		else if (!( rptr = rest_client_post_request( 
-			buffer, Os.tls, Os.agent, filename, hptr ) ))
+			buffer, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 		{
 			liberate_rest_header( hptr );
 			return( 0 );
@@ -295,7 +286,7 @@ public	int	check_keystone_authorization()
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if ( strncasecmp( hptr->value, KeyStone.acceptauth, strlen(KeyStone.acceptauth) ) )
+		else if ( strncasecmp( hptr->value, sptr->KeyStone.acceptauth, strlen(sptr->KeyStone.acceptauth) ) )
 		{
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
@@ -328,13 +319,13 @@ public	int	check_keystone_authorization()
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if (!( Os.authenticate = allocate_string( aptr->value )))
+		else if (!( sptr->Os.authenticate = allocate_string( aptr->value )))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if (!( Os.authenticate = occi_unquoted_value( Os.authenticate ) ))
+		else if (!( sptr->Os.authenticate = occi_unquoted_value( sptr->Os.authenticate ) ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
@@ -358,13 +349,13 @@ public	int	check_keystone_authorization()
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if (!( KeyStone.tenantid = allocate_string( aptr->value )))
+		else if (!( sptr->KeyStone.tenantid = allocate_string( aptr->value )))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
 			return( 0 );
 		}
-		else if (!( KeyStone.tenantid = occi_unquoted_value( KeyStone.tenantid ) ))
+		else if (!( sptr->KeyStone.tenantid = occi_unquoted_value( sptr->KeyStone.tenantid ) ))
 		{
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
@@ -408,13 +399,13 @@ public	int	check_keystone_authorization()
 				else if (!( strcasecmp( tptr, "compute" ) ))
 				{
 					liberate( tptr );
-					if (!( eptr = document_element( eptr, "endpoint" ) ))
+					if (!( gptr = document_element( eptr, "endpoint" ) ))
 					{
 						document = document_drop( document );
 						rptr = liberate_rest_response( rptr );
 						return( 0 );
 					}
-					if (!( aptr = document_atribut( eptr, "publicURL" ) ))
+					if (!( aptr = document_atribut( gptr, "publicURL" ) ))
 					{
 						document = document_drop( document );
 						rptr = liberate_rest_response( rptr );
@@ -426,29 +417,93 @@ public	int	check_keystone_authorization()
 						rptr = liberate_rest_response( rptr );
 						return( 0 );
 					}
-					else if (!( Os.base = allocate_string( aptr->value ) ))
+					else if (!( sptr->Os.base = allocate_string( aptr->value ) ))
 					{
 						document = document_drop( document );
 						rptr = liberate_rest_response( rptr );
 						return( 0 );
 					}
-					else if (!( Os.base = occi_unquoted_value( Os.base ) ))
+					else if (!( sptr->Os.base = occi_unquoted_value( sptr->Os.base ) ))
 					{
 						document = document_drop( document );
 						rptr = liberate_rest_response( rptr );
 						return( 0 );
 					}
-					else	break;
 				}
-				else
+				else if (!( strcasecmp( tptr, "image" ) ))
 				{
-					eptr = eptr->next;
 					liberate( tptr );
+					if (!( gptr = document_element( eptr, "endpoint" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					if (!( aptr = document_atribut( gptr, "publicURL" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( aptr->value ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.glance = allocate_string( aptr->value ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.glance = occi_unquoted_value( sptr->KeyStone.glance ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
 				}
+				else if (!( strcasecmp( tptr, "volume" ) ))
+				{
+					liberate( tptr );
+					if (!( gptr = document_element( eptr, "endpoint" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					if (!( aptr = document_atribut( gptr, "publicURL" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( aptr->value ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.volume = allocate_string( aptr->value ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.volume = occi_unquoted_value( sptr->KeyStone.volume ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+				}
+				else	liberate( tptr );
+				eptr = eptr->next;
 			}
 			document = document_drop( document );
 			rptr = liberate_rest_response( rptr );
-			if (!( Os.base ))
+			if (!( sptr->Os.base ))
 				return( 0 );
 			else	return( 1 );
 		}
@@ -459,7 +514,7 @@ public	int	check_keystone_authorization()
 /*	------------------------------------------------------------	*/
 /*			o s _ a u t h e n t i c a t e ()		*/
 /*	------------------------------------------------------------	*/
-public	struct	rest_header   *	os_authenticate	( )
+public	struct	rest_header   *	os_authenticate	(struct os_subscription * sptr)
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	struct	os_response	*	rptr;
@@ -478,9 +533,9 @@ public	struct	rest_header   *	os_authenticate	( )
 	
 	if (!( status ))
 	{
-		if (!( check_keystone_authorization() ))
+		if (!( check_keystone_authorization(sptr) ))
 			return((struct rest_header * )0);
-		else if (!( Os.authenticate ))
+		else if (!( sptr->Os.authenticate ))
 			return((struct rest_header * )0);
 	}
 	else
@@ -488,17 +543,17 @@ public	struct	rest_header   *	os_authenticate	( )
 		/* ------------------------------ */
 		/* Old Diablo Type Authentication */
 		/* ------------------------------ */
-		if (!( Os.user ))
+		if (!( sptr->Os.user ))
 			return( hptr );
-		else if (!( Os.password ))
+		else if (!( sptr->Os.password ))
 			return( hptr );
-		else if (!( Os.version ))
+		else if (!( sptr->Os.version ))
 			return( hptr );
-		else if (!( Os.authenticate ))
+		else if (!( sptr->Os.authenticate ))
 		{
-			sprintf(buffer,"/%s",Os.version);
+			sprintf(buffer,"/%s",sptr->Os.version);
 
-			if (!( uptr = analyse_url( Os.host )))
+			if (!( uptr = analyse_url( sptr->Os.host )))
 				return( hptr );
 			else if (!( uptr = validate_url( uptr ) ))
 				return( hptr );
@@ -516,32 +571,32 @@ public	struct	rest_header   *	os_authenticate	( )
 
 
 
-			if (!( hptr = rest_create_header( "X-Auth-User", Os.user ) ))
+			if (!( hptr = rest_create_header( "X-Auth-User", sptr->Os.user ) ))
 			{
 				liberate( nptr );
 				return( hptr );
 			}
-			else if (!( hptr->next = rest_create_header( "X-Auth-Key", Os.password ) ))
+			else if (!( hptr->next = rest_create_header( "X-Auth-Key", sptr->Os.password ) ))
 			{
 				liberate( nptr );
 				return( liberate_rest_header( hptr ) );
 			}
 			else	hptr->next->previous = hptr;
 	
-			if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+			if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 			{
 				liberate( nptr );
 				return( liberate_rest_header( hptr ) );
 			}
 			else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Auth-Token") ))
 			{
-				if (!( Os.authenticate = allocate_string("abcde-1234-5678-fgh-ijklm") ))
+				if (!( sptr->Os.authenticate = allocate_string("abcde-1234-5678-fgh-ijklm") ))
 				{
 					liberate( nptr );
 					return( (struct rest_header *) 0 );
 				}
 			}
-			else if (!( Os.authenticate = allocate_string( hptr->value ) ))
+			else if (!( sptr->Os.authenticate = allocate_string( hptr->value ) ))
 			{
 				liberate( nptr );
 				return( (struct rest_header *) 0 );
@@ -550,7 +605,7 @@ public	struct	rest_header   *	os_authenticate	( )
 					rptr->response->first,"X-Server-Management-Url")) 
 					!= (struct rest_header *) 0)
 			{
-				if (!( Os.base = allocate_string( hptr->value ) ))
+				if (!( sptr->Os.base = allocate_string( hptr->value ) ))
 				{
 					liberate( nptr );
 					return( (struct rest_header *) 0 );
@@ -558,23 +613,23 @@ public	struct	rest_header   *	os_authenticate	( )
 			}
 			else if (!( hptr = rest_resolve_header(rptr->response->first,"X-Identity") ))
 			{
-				if (!( Os.base = allocate( strlen( Os.host ) + strlen( Os.version ) + 16 ) ))
+				if (!( sptr->Os.base = allocate( strlen( sptr->Os.host ) + strlen( sptr->Os.version ) + 16 ) ))
 				{
 					liberate( nptr );
 					return( (struct rest_header *) 0 );
 				}
-				else	sprintf( Os.base, "%s/%s", Os.host, Os.version );
+				else	sprintf( sptr->Os.base, "%s/%s", sptr->Os.host, sptr->Os.version );
 			}
-			else if (!( Os.base = allocate_string( hptr->value ) ))
+			else if (!( sptr->Os.base = allocate_string( hptr->value ) ))
 			{
 				liberate( nptr );
 				return( (struct rest_header *) 0 );
 			}
 		}
 	}
-	if (!( Os.authenticate ))
+	if (!( sptr->Os.authenticate ))
 		return((struct rest_header *) 0);
-	else if (!( hptr = rest_create_header( "X-Auth-Token", Os.authenticate ) ))
+	else if (!( hptr = rest_create_header( "X-Auth-Token", sptr->Os.authenticate ) ))
 		return( hptr );
 	else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, "text/xml" ) ))
 		return( liberate_rest_header( hptr ) );
@@ -584,7 +639,7 @@ public	struct	rest_header   *	os_authenticate	( )
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ s e r v e r s			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_servers	( )
+public	struct	os_response *	os_list_servers	(struct os_subscription * sptr )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -594,9 +649,9 @@ public	struct	os_response *	os_list_servers	( )
 
 	sprintf(buffer,"/servers");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -605,7 +660,7 @@ public	struct	os_response *	os_list_servers	( )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -617,7 +672,7 @@ public	struct	os_response *	os_list_servers	( )
 /*	------------------------------------------------------------	*/
 /*		o s _ l i s t _ s e r v e r _ d e t a i l s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_server_details	( )
+public	struct	os_response *	os_list_server_details	(struct os_subscription * sptr )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -627,9 +682,9 @@ public	struct	os_response *	os_list_server_details	( )
 
 	sprintf(buffer,"/servers/detail");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -638,7 +693,7 @@ public	struct	os_response *	os_list_server_details	( )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -650,16 +705,16 @@ public	struct	os_response *	os_list_server_details	( )
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-private struct	os_response *	os_list_operation( char * buffer )
+private struct	os_response *	os_list_operation(struct os_subscription * sptr, char * buffer )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -668,7 +723,7 @@ private struct	os_response *	os_list_operation( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -680,65 +735,65 @@ private struct	os_response *	os_list_operation( char * buffer )
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ f l o a t i n g _ i p s		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_floating_ips( )
+public	struct	os_response *	os_list_floating_ips(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/os-floating-ips" ) );
+	return( os_list_operation(sptr, "/os-floating-ips" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	   o s _ l i s t _ f l o a t i n g _ i p _ d e t a i l s	*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_floating_ip_details( )
+public	struct	os_response *	os_list_floating_ip_details(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/os-floating-ips/detail" ) );
+	return( os_list_operation(sptr, "/os-floating-ips/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		o s _ l i s t _ s e c u r i t y _ g r o u p		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_security_groups( )
+public	struct	os_response *	os_list_security_groups(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/os-security-groups" ) );
+	return( os_list_operation(sptr, "/os-security-groups" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	o s _ l i s t _ s e c u r i t y _ g r o u p _ d e t a i l s	*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_security_group_details( )
+public	struct	os_response *	os_list_security_group_details(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/os-security-groups/detail" ) );
+	return( os_list_operation(sptr, "/os-security-groups/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ f l a v o u r s			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_flavors( )
+public	struct	os_response *	os_list_flavors(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/flavors" ) );
+	return( os_list_operation(sptr, "/flavors" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		o s _ l i s t _ f l a v o u r _ d e t a i l s		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_flavor_details( )
+public	struct	os_response *	os_list_flavor_details(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/flavors/detail" ) );
+	return( os_list_operation(sptr, "/flavors/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ i m a g e s 			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_images( )
+public	struct	os_response *	os_list_images(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/images" ) );
+	return( os_list_operation(sptr, "/images" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		o s _ l i s t _ i m a g e _ d e t a i l s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_image_details( )
+public	struct	os_response *	os_list_image_details(struct os_subscription * sptr )
 {
-	return( os_list_operation( "/images/detail" ) );
+	return( os_list_operation(sptr, "/images/detail" ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -817,12 +872,12 @@ private	int	os_parse_metadata( char ** rptr, char ** kptr, char ** dptr )
 /*	-------------------------------------------------------------------	*/
 /*	    o s _ c r e a t e _ s e c u r i t y _ g r o u p _ r e q u e s t	*/
 /*	-------------------------------------------------------------------	*/
-public	char * os_create_security_group_request( char * nptr )
+public	char * os_create_security_group_request(struct os_subscription * sptr, char * nptr )
 {
 	char *	filename;
 	FILE *	h;
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -842,12 +897,12 @@ public	char * os_create_security_group_request( char * nptr )
 /*	-------------------------------------------------------------------	*/
 /*	    o s _ c r e a t e _ s e c u r i t y _ r u l e _ r e q u e s t	*/
 /*	-------------------------------------------------------------------	*/
-public	char * os_create_security_rule_request( char * group, char * protocol, char * from, char * to, char * cidr )
+public	char * os_create_security_rule_request(struct os_subscription * sptr, char * group, char * protocol, char * from, char * to, char * cidr )
 {
 	char *	filename;
 	FILE *	h;
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -872,12 +927,12 @@ public	char * os_create_security_rule_request( char * group, char * protocol, ch
 /*	------------------------------------------------------------	*/
 /*	     o s _ c r e a t e _  a d d r e s s _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * os_create_address_request( char * address )
+public	char * os_create_address_request(struct os_subscription * sptr, char * address )
 {
 	char *	filename;
 	FILE *	h;
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -886,7 +941,32 @@ public	char * os_create_address_request( char * address )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<addFloatingIp xmlns=%c%s%c>\n",0x0022,Os.namespace,0x0022);
+		fprintf(h,"<addFloatingIp xmlns=%c%s%c>\n",0x0022,sptr->Os.namespace,0x0022);
+		fprintf(h,"<address>%s</address>\n",address);
+		fprintf(h,"</addFloatingIp>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+			
+/*	------------------------------------------------------------	*/
+/*	     o s _ r e m o v e _  a d d r e s s _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * os_remove_address_request(struct os_subscription * sptr,char * address )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate(sptr) ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<removeFloatingIp xmlns=%c%s%c>\n",0x0022,sptr->Os.namespace,0x0022);
 		fprintf(h,"<address>%s</address>\n",address);
 		fprintf(h,"</addFloatingIp>\n");
 		fclose(h);
@@ -897,7 +977,7 @@ public	char * os_create_address_request( char * address )
 /*	------------------------------------------------------------	*/
 /*	   o s _ c r e a t e _  m e t a d a t a _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * 	os_create_metadata_request( char * personality )
+public	char * 	os_create_metadata_request(struct os_subscription * subptr, char * personality )
 {
 	char *	filename;
 	FILE *	h;
@@ -907,7 +987,7 @@ public	char * 	os_create_metadata_request( char * personality )
 	char *	sptr;
 	char *	tptr;
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(subptr) ))
 		return((char *) 0);
 	if (!( personality ))
 		return( personality );
@@ -921,7 +1001,7 @@ public	char * 	os_create_metadata_request( char * personality )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<metadata xmlns=%c%s%c>\n",0x0022,Os.namespace,0x0022);
+		fprintf(h,"<metadata xmlns=%c%s%c>\n",0x0022,subptr->Os.namespace,0x0022);
 		while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
 			fprintf(h,"<meta key='%s'>%s</meta>\n",kptr,dptr);
 		fprintf(h,"</metadata>\n");
@@ -936,14 +1016,14 @@ public	char * 	os_create_metadata_request( char * personality )
 /*	------------------------------------------------------------	*/
 /*	   	o s _ c r e a t e _  m e t a _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * os_create_meta_request( char * key, char * value )
+public	char * os_create_meta_request(struct os_subscription * sptr, char * key, char * value )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
 
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -952,7 +1032,7 @@ public	char * os_create_meta_request( char * key, char * value )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<meta xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
+		fprintf(h,"<meta xmlns=%c%s%c\n",0x0022,sptr->Os.namespace,0x0022);
 		fprintf(h," key=%c%s%c>%s</meta>\n",0x0022,key,0x0022,value);
 		fclose(h);
 		return( filename );
@@ -964,7 +1044,7 @@ public	char * os_create_meta_request( char * key, char * value )
 /*	------------------------------------------------------------	*/
 /*			o s _ g e t _ a d d r e s s			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_address( char * id )
+public	struct	os_response *	os_get_address(struct os_subscription * sptr, char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -972,9 +1052,9 @@ public	struct	os_response *	os_get_address( char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-floating-ips/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -983,7 +1063,7 @@ public	struct	os_response *	os_get_address( char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -995,7 +1075,7 @@ public	struct	os_response *	os_get_address( char * id )
 /*	------------------------------------------------------------	*/
 /*		o s _ g e t _ s e c u r i t y _ g r o u p		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_security_group( char * id )
+public	struct	os_response *	os_get_security_group(struct os_subscription * sptr, char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1003,9 +1083,9 @@ public	struct	os_response *	os_get_security_group( char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-security-groups/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1014,7 +1094,7 @@ public	struct	os_response *	os_get_security_group( char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1024,9 +1104,9 @@ public	struct	os_response *	os_get_security_group( char * id )
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ g e t _ m e t a d a t a			*/
+/*		o s _ g e t _ s e r v e r _ m e t a d a t a		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_metadata( char * id, char * name )
+public	struct	os_response *	os_get_server_metadata(struct os_subscription * sptr, char * id, char * name )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1034,9 +1114,9 @@ public	struct	os_response *	os_get_metadata( char * id, char * name )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s/metadata/%s",id,name);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1045,7 +1125,7 @@ public	struct	os_response *	os_get_metadata( char * id, char * name )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1055,9 +1135,40 @@ public	struct	os_response *	os_get_metadata( char * id, char * name )
 }
 
 /*	------------------------------------------------------------	*/
-/*		   o s _ u p d a t e _ m e t a d a t a			*/
+/*		o s _ g e t _ i m a g e _ m e t a d a t a		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_update_metadata( char * id, char * name, char * value )
+public	struct	os_response *	os_get_image_metadata(struct os_subscription * sptr, char * id, char * name )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/images/%s/metadata/%s",id,name);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	    o s _ u p d a t e _ s e r v e r _ m e t a d a t a		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_update_server_metadata(struct os_subscription * sptr, char * id, char * name, char * value )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1066,11 +1177,11 @@ public	struct	os_response *	os_update_metadata( char * id, char * name, char * v
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	char 			*	filename;
 	sprintf(buffer,"/servers/%s/metadata/%s",id,name);
-	if (!( filename = os_create_meta_request( name, value )))
+	if (!( filename = os_create_meta_request(sptr, name, value )))
 		return( rptr );
-	else if (!( hptr = os_authenticate() ))
+	else if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1079,7 +1190,7 @@ public	struct	os_response *	os_update_metadata( char * id, char * name, char * v
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_put_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1089,9 +1200,43 @@ public	struct	os_response *	os_update_metadata( char * id, char * name, char * v
 }
 
 /*	------------------------------------------------------------	*/
-/*		   o s _ d e l e t e _ m e t a d a t a			*/
+/*	    o s _ u p d a t e _ i m a g e _ m e t a d a t a		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_metadata( char * id, char * name )
+public	struct	os_response *	os_update_image_metadata(struct os_subscription * sptr, char * id, char * name, char * value )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char 			*	filename;
+	sprintf(buffer,"/images/%s/metadata/%s",id,name);
+	if (!( filename = os_create_meta_request(sptr, name, value )))
+		return( rptr );
+	else if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	    o s _ d e l e t e _ s e r v e r _ m e t a d a t a		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_server_metadata(struct os_subscription * sptr, char * id, char * name )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1099,9 +1244,9 @@ public	struct	os_response *	os_delete_metadata( char * id, char * name )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s/metadata/%s",id,name);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1110,7 +1255,7 @@ public	struct	os_response *	os_delete_metadata( char * id, char * name )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_delete_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1119,13 +1264,81 @@ public	struct	os_response *	os_delete_metadata( char * id, char * name )
 	else	return( rptr );
 }
 
-#include "eucahack.c"
+/*	------------------------------------------------------------	*/
+/*	    o s _ d e l e t e _ i m a g e _ m e t a d a t a		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_image_metadata(struct os_subscription * sptr, char * id, char * name )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/images/%s/metadata/%s",id,name);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+			/* -------------------------------------- */
+#include "eucahack.c"	/* this was necessary for the CO POC 1 V1 */
+			/* -------------------------------------- */
+
+/*	------------------------------------------------------------	*/
+/*		o s _ b u i l d _ i m a g e _ r e f e r e n c e		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_build_image_reference(struct os_subscription * sptr, char * nptr )
+{
+	char	buffer[4096];
+	if (!( nptr ))
+		return( nptr );
+	else if (!( strncmp( nptr, sptr->Os.base, strlen( sptr->Os.base ) ) ))
+		return( allocate_string( nptr ) );
+	else
+	{
+		sprintf(buffer,"%s/images/%s",sptr->Os.base,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	    o s _ b u i l d _ f l a v o r _ r e f e r e n c e		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_build_flavor_reference(struct os_subscription * sptr, char * nptr )
+{
+	char	buffer[4096];
+	if (!( nptr ))
+		return( nptr );
+	else if (!( strncmp( nptr, sptr->Os.base, strlen( sptr->Os.base ) ) ))
+		return( allocate_string( nptr ) );
+	else
+	{
+		sprintf(buffer,"%s/flavors/%s",sptr->Os.base,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
 
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 
 public	char * os_create_server_request(
+		struct os_subscription * subptr,
 		char * identity,	/* the identity of the server 	*/
 		char * image,		/* the server image identifier  */
 		char * flavor,		/* the server machine flavour	*/
@@ -1148,7 +1361,7 @@ public	char * os_create_server_request(
 	struct	rest_header * hptr;
 	if ( hack )
 		return( euca_data_hack( image, flavor, personality ) );
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(subptr) ))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -1160,30 +1373,33 @@ public	char * os_create_server_request(
 		/* ---------------------------------------- */
 		/* generate server creation request element */
 		/* ---------------------------------------- */
-		fprintf(h,"<server xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
-		if (!( strcmp( Os.version, "v1.0" ) ))
+		fprintf(h,"<server xmlns=%c%s%c\n",0x0022,subptr->Os.namespace,0x0022);
+		if (!( strcmp( subptr->Os.version, "v1.0" ) ))
 		{
 			fprintf(h,"\timageId=%c%s%c\n",0x0022,image,0x0022);
 			fprintf(h,"\tflavorId=%c%s%c\n",0x0022,flavor,0x0022);
 		}
-		else if (!( strcmp( Os.version, "v1.1" ) ))
+		else if (!( strcmp( subptr->Os.version, "v1.1" ) ))
 		{
-			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,Os.base,image,0x0022);
-			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,Os.base,flavor,0x0022);
+			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
+			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
 		if ( os_valid_string( address ) )
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
-		if ( os_valid_string( group ) )
-		{
-			fprintf(h,"\tsecurity_group=%c%s%c\n",0x0022,group,0x0022);
-		}			
 		if ( os_valid_string( zone ) )
 		{
 			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
 		}			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
+
+		if ( os_valid_string( group ) )
+		{
+			fprintf(h,"\t<security_groups>\n");
+			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);
+			fprintf(h,"\t</security_groups>\n");
+		}			
 
 		/* ----------------------------- */
 		/* generate meta data statements */
@@ -1239,13 +1455,13 @@ public	char * os_create_server_request(
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a te _ f l a v o r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * os_create_flavor_request(char * identity, char * ram, char * cpus, char * disk )
+public	char * os_create_flavor_request(struct os_subscription * sptr, char * identity, char * ram, char * cpus, char * disk )
 {
 	char *	filename;
 	FILE *	h;
 
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -1267,13 +1483,13 @@ public	char * os_create_flavor_request(char * identity, char * ram, char * cpus,
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a te _  i m a g e _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * os_create_image_request(char * identity, char * server )
+public	char * os_create_image_request(struct os_subscription * sptr,char * identity, char * server )
 {
 	char *	filename;
 	FILE *	h;
 
 	struct	rest_header * hptr;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return((char *) 0);
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
@@ -1282,15 +1498,15 @@ public	char * os_create_image_request(char * identity, char * server )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		if (!( strcmp( Os.version, "v1.0" ) ))
+		if (!( strcmp( sptr->Os.version, "v1.0" ) ))
 		{
-			fprintf(h,"<image xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
+			fprintf(h,"<image xmlns=%c%s%c\n",0x0022,sptr->Os.namespace,0x0022);
 			fprintf(h,"\tname=%c%s%c\n",0x0022,identity,0x0022);
 			fprintf(h,"\tserverId=%c%s%c />\n",0x0022,server,0x0022);
 		}
-		else if (!( strcmp( Os.version, "v1.1" ) ))
+		else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
 		{
-			fprintf(h,"<createImage xmlns=%c%s%c\n",0x0022,Os.namespace,0x0022);
+			fprintf(h,"<createImage xmlns=%c%s%c\n",0x0022,sptr->Os.namespace,0x0022);
 			fprintf(h,"\tname=%c%s%c\n>",0x0022,identity,0x0022);
 			fprintf(h,"\t<metadata>\n");
 			fprintf(h,"\t\t<meta key=%cactionAgent%c>OS Client</meta>\n",0x0022,0x0022);
@@ -1305,24 +1521,20 @@ public	char * os_create_image_request(char * identity, char * server )
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ c r e a t e _  i m a g e   		*/
+/*			o s _ g l a n c e _ a c c e s s   		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_image( char * filename, char * id )
+public	struct	os_response *	os_glance_access(struct os_subscription * sptr, char * id, int ispublic )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( strcmp( Os.version, "v1.0" ) ))
-		sprintf(buffer,"/images");
-	else if (!( strcmp( Os.version, "v1.1" ) ))
-		sprintf(buffer,"/servers/%s/action",id);
-	else	return( rptr );
 
-	if (!( hptr = os_authenticate() ))
+	sprintf(buffer,"/images/%s",id);
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->KeyStone.glance )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1331,7 +1543,60 @@ public	struct	os_response *	os_create_image( char * filename, char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	/* ----------------------- */
+	/* test for a public image */
+	/* ----------------------- */
+	if ( ispublic )
+	{
+		if (!( hptr = os_add_meta_header( hptr, "X-Image-Meta-Is-Public", "True" ) ))
+			return( rptr );
+	}
+	else if (!( hptr = os_add_meta_header( hptr, "X-Image-Meta-Is-Public", "False" ) ))
+		return( rptr );
+	
+	if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent, (char *) 0, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _  i m a g e   		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_image(struct os_subscription * sptr, char * filename, char * id, int ispublic )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	if (!( strcmp( sptr->Os.version, "v1.0" ) ))
+		sprintf(buffer,"/images");
+	else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
+		sprintf(buffer,"/servers/%s/action",id);
+	else	return( rptr );
+
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	/* ----------------------- */
+	/* test for a public image */
+	/* ----------------------- */
+	if (( ispublic )
+	&&  (!( hptr = os_add_meta_header( hptr, "x-image-meta-is-public", "true" ) )))
+		return( rptr );
+
+	if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1342,7 +1607,7 @@ public	struct	os_response *	os_create_image( char * filename, char * id )
 /*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _  a d d r e s s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_address()
+public	struct	os_response *	os_create_address(struct os_subscription * sptr)
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1351,9 +1616,9 @@ public	struct	os_response *	os_create_address()
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-floating-ips");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1362,7 +1627,7 @@ public	struct	os_response *	os_create_address()
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, (char *) 0, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, (char *) 0, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1373,7 +1638,7 @@ public	struct	os_response *	os_create_address()
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a t e _  s e c u r i t y _ g r o u p	*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_security_group( char * filename )
+public	struct	os_response *	os_create_security_group(struct os_subscription * sptr, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1382,9 +1647,9 @@ public	struct	os_response *	os_create_security_group( char * filename )
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-security-groups");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1393,7 +1658,7 @@ public	struct	os_response *	os_create_security_group( char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1404,7 +1669,7 @@ public	struct	os_response *	os_create_security_group( char * filename )
 /*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _ f l a v o r 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_flavor( char * filename )
+public	struct	os_response *	os_create_flavor(struct os_subscription * sptr, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1413,9 +1678,9 @@ public	struct	os_response *	os_create_flavor( char * filename )
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/flavors");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1424,7 +1689,7 @@ public	struct	os_response *	os_create_flavor( char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1435,7 +1700,7 @@ public	struct	os_response *	os_create_flavor( char * filename )
 /*	------------------------------------------------------------	*/
 /*		o s _ c r e a t e _  s e c u r i t y _ r u l e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_security_rule( char * filename )
+public	struct	os_response *	os_create_security_rule(struct os_subscription * sptr, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1444,9 +1709,9 @@ public	struct	os_response *	os_create_security_rule( char * filename )
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-security-group-rules");
 
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1455,7 +1720,7 @@ public	struct	os_response *	os_create_security_rule( char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1466,7 +1731,7 @@ public	struct	os_response *	os_create_security_rule( char * filename )
 /*	------------------------------------------------------------	*/
 /*			o s _ s e r v e r _ a d d r e s s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_server_address( char * filename, char * serverid )
+public	struct	os_response *	os_server_address(struct os_subscription * sptr, char * filename, char * serverid )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1474,9 +1739,9 @@ public	struct	os_response *	os_server_address( char * filename, char * serverid 
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s/action",serverid);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1485,7 +1750,7 @@ public	struct	os_response *	os_server_address( char * filename, char * serverid 
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1496,7 +1761,7 @@ public	struct	os_response *	os_server_address( char * filename, char * serverid 
 /*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _  s e r v e r 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_server( char * filename )
+public	struct	os_response *	os_create_server(struct os_subscription * sptr, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1506,9 +1771,9 @@ public	struct	os_response *	os_create_server( char * filename )
 	if ( hack )
 		return( os_check( euca_command_hack( filename ) ) );
 	sprintf(buffer,"/servers");
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1517,7 +1782,7 @@ public	struct	os_response *	os_create_server( char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1526,9 +1791,9 @@ public	struct	os_response *	os_create_server( char * filename )
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ c r e a t e _  m e t a d a t a		*/
+/*		o s _ c r e a t e _ s e r v e r _ m e t a d a t a	*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_metadata( char * id, char * filename )
+public	struct	os_response *	os_create_server_metadata(struct os_subscription * sptr, char * id, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1536,9 +1801,9 @@ public	struct	os_response *	os_create_metadata( char * id, char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s/metadata",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1547,7 +1812,7 @@ public	struct	os_response *	os_create_metadata( char * id, char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, Os.tls, Os.agent, filename, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -1557,19 +1822,19 @@ public	struct	os_response *	os_create_metadata( char * id, char * filename )
 
 	
 /*	------------------------------------------------------------	*/
-/*			o s _ l i s t  _ m e t a d a t a		*/
+/*		o s _ c r e a t e _ i m a ge _ m e t a d a t a		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_list_metadata	(  char * id )
+public	struct	os_response *	os_create_image_metadata(struct os_subscription * sptr, char * id, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/servers/%s/metadata",id);
-	if (!( hptr = os_authenticate() ))
+	sprintf(buffer,"/images/%s/metadata",id);
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1578,7 +1843,37 @@ public	struct	os_response *	os_list_metadata	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ l i s t  _ s e r v e r _ m e t a d a t a		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_server_metadata	(struct os_subscription * sptr,  char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/servers/%s/metadata",id);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1587,21 +1882,20 @@ public	struct	os_response *	os_list_metadata	(  char * id )
 	else	return( rptr );
 }
 
-
 /*	------------------------------------------------------------	*/
-/*			o s _ g e t _ s e r v e r 			*/
+/*		o s _ l i s t  _ i m a g e _ m e t a d a t a		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_server	(  char * id )
+public	struct	os_response *	os_list_image_metadata	(struct os_subscription * sptr,  char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/servers/%s",id);
-	if (!( hptr = os_authenticate() ))
+	sprintf(buffer,"/images/%s/metadata",id);
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1610,7 +1904,38 @@ public	struct	os_response *	os_get_server	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ g e t _ s e r v e r 			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_server	( struct os_subscription * sptr, char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/servers/%s",id);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1623,7 +1948,7 @@ public	struct	os_response *	os_get_server	(  char * id )
 /*	------------------------------------------------------------	*/
 /*			o s _ g e t _ f l av o u r			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_flavor(  char * id )
+public	struct	os_response *	os_get_flavor(struct os_subscription * sptr,  char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1631,9 +1956,9 @@ public	struct	os_response *	os_get_flavor(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/flavors/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1642,7 +1967,7 @@ public	struct	os_response *	os_get_flavor(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1655,7 +1980,7 @@ public	struct	os_response *	os_get_flavor(  char * id )
 /*	------------------------------------------------------------	*/
 /*			o s _ g e t _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_get_image 	(  char * id )
+public	struct	os_response *	os_get_image 	(struct os_subscription * sptr,  char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1663,9 +1988,9 @@ public	struct	os_response *	os_get_image 	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1674,7 +1999,69 @@ public	struct	os_response *	os_get_image 	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_get_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ g e t _ g l an c e 			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_glance	(struct os_subscription * sptr,  char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/images/%s",id);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.glance )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ h e a d _ g l an c e 			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_head_glance	(struct os_subscription * sptr,  char * id )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/images/%s",id);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.glance )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_head_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1687,7 +2074,7 @@ public	struct	os_response *	os_get_image 	(  char * id )
 /*	------------------------------------------------------------	*/
 /*			o s _ u p d a t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_update_server(  char * id, char * filename )
+public	struct	os_response *	os_update_server(struct os_subscription * sptr,  char * id, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1695,9 +2082,9 @@ public	struct	os_response *	os_update_server(  char * id, char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1706,7 +2093,7 @@ public	struct	os_response *	os_update_server(  char * id, char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_put_request( nptr, Os.tls, Os.agent,filename, hptr ) ))
+	else if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent,filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1719,7 +2106,7 @@ public	struct	os_response *	os_update_server(  char * id, char * filename )
 /*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_server(  char * id )
+public	struct	os_response *	os_delete_server(struct os_subscription * sptr,  char * id )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -1727,9 +2114,9 @@ public	struct	os_response *	os_delete_server(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/servers/%s",id);
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1738,7 +2125,7 @@ public	struct	os_response *	os_delete_server(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_delete_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1750,15 +2137,15 @@ public	struct	os_response *	os_delete_server(  char * id )
 /*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-private	struct	os_response *	os_delete_operation(  char * buffer )
+private	struct	os_response *	os_delete_operation(struct os_subscription * sptr,  char * buffer )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = os_authenticate() ))
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Os.base )))
+	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1767,7 +2154,7 @@ private	struct	os_response *	os_delete_operation(  char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_delete_request( nptr, Os.tls, Os.agent, hptr ) ))
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1779,110 +2166,142 @@ private	struct	os_response *	os_delete_operation(  char * buffer )
 /*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_image	(  char * id )
+public	struct	os_response *	os_delete_image	(struct os_subscription * sptr,  char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/images/%s",id);
-	return( os_delete_operation( buffer ) );
+	return( os_delete_operation(sptr, buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ f l a v o r			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_flavor(  char * id )
+public	struct	os_response *	os_delete_flavor( struct os_subscription * sptr, char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/flavors/%s",id);
-	return( os_delete_operation( buffer ) );
+	return( os_delete_operation(sptr, buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ a d d r e s s		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_address(  char * id )
+public	struct	os_response *	os_delete_address(struct os_subscription * sptr,  char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/os-floating-ips/%s",id);
-	return( os_delete_operation( buffer ) );
+	return( os_delete_operation(sptr, buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	 	o s _ d e l e t e _ s e c u r i t y _ g r o u p		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_security_group(  char * id )
+public	struct	os_response *	os_delete_security_group(struct os_subscription * sptr,  char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/os-security-groups/%s",id);
-	return( os_delete_operation( buffer ) );
+	return( os_delete_operation(sptr, buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	 	o s _ d e l e t e _ s e c u r i t y _ r u l e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_delete_security_rule(  char * id )
+public	struct	os_response *	os_delete_security_rule( struct os_subscription * sptr, char * id )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/os-security-group-rules/%s",id);
-	return( os_delete_operation( buffer ) );
+	return( os_delete_operation(sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ l i b e r a t e _ s u b s c r i p t i o n		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_subscription * os_liberate_subscription(struct os_subscription * sptr)
+{
+	if ( sptr )
+	{
+		liberate( sptr );
+	}
+	return((struct os_subscription *) 0);
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ a l l o c a t e _ s u b s c r i p t i o n		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_subscription * os_allocate_subscription()
+{
+	struct	os_subscription * sptr;
+	if (!( sptr = (struct os_subscription *) allocate( sizeof( struct os_subscription ) ) ))
+		return( sptr );
+	else
+	{
+	 	memset( sptr, 0, sizeof( struct os_subscription ));
+		if (!( sptr->KeyStone.requestauth = allocate_string( "application/xml" ) ))
+			return( os_liberate_subscription( sptr ) );
+		else if (!( sptr->KeyStone.acceptauth = allocate_string( "application/xml" ) ))
+			return( os_liberate_subscription( sptr ) );
+		else 	return( sptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
 /*		o s _ i n i t i a l i s e _ c l i e n t 		*/
 /*	------------------------------------------------------------	*/
-public	int	os_initialise_client( 
+public	struct os_subscription * os_initialise_client( 
 		char * user, char * password, char * tenant, 
 		char * host, char * agent, char * version, char * tls )
 {
+	struct os_subscription * sptr=(struct os_subscription *) 0;
 	char	*	eptr;
 	struct	url * 	url;
 
-	if ((eptr = getenv("EUCAHACK")) != (char *) 0)
+	if (!( sptr = os_allocate_subscription()))
+		return( sptr );
+	else if ((eptr = getenv("EUCAHACK")) != (char *) 0)
 		hack = atoi(eptr);
 	else	hack = 0;
 
 	if (!( url = analyse_url( host )))
-		return( 30 );
-	else if (!( KeyStone.host = serialise_url_host_no_port( url ) ))
-		return( 27 );
+		return(os_liberate_subscription( sptr ));
+	else if (!( sptr->KeyStone.host = serialise_url_host_no_port( url ) ))
+		return(os_liberate_subscription( sptr ));
 	else	liberate_url( url );
 
-	if (!( Os.user = allocate_string( user )))
-		return( 27 );
-	if (!( Os.password = allocate_string( password )))
-		return( 27 );
-	if (!( Os.host = allocate_string( host )))
-		return( 27 );
-	else if (!( Os.agent = allocate_string( agent )))
-		return( 27 );
-	else if (!( Os.version = allocate_string( version )))
-		return( 27 );
-	else if (!( KeyStone.tenantname = allocate_string( tenant )))
-		return( 27 );
+	if (!( sptr->Os.user = allocate_string( user )))
+		return(os_liberate_subscription( sptr ) );
+	if (!( sptr->Os.password = allocate_string( password )))
+		return(os_liberate_subscription( sptr ));
+	if (!( sptr->Os.host = allocate_string( host )))
+		return(os_liberate_subscription( sptr ));
+	else if (!( sptr->Os.agent = allocate_string( agent )))
+		return(os_liberate_subscription( sptr ));
+	else if (!( sptr->Os.version = allocate_string( version )))
+		return(os_liberate_subscription( sptr ));
+	else if (!( sptr->KeyStone.tenantname = allocate_string( tenant )))
+		return(os_liberate_subscription( sptr ));
 
 	/* namespace selection */
-	if (!( strcmp( Os.version, "v1.0" ) ))
+	if (!( strcmp( sptr->Os.version, "v1.0" ) ))
 	{
-		if (!( Os.namespace = allocate_string(  _OS_NS_COMPUTE_V10 ) ))
-			return( 27 );
+		if (!( sptr->Os.namespace = allocate_string(  _OS_NS_COMPUTE_V10 ) ))
+			return(os_liberate_subscription( sptr ));
 	}
-	else if (!( strcmp( Os.version, "v1.1" ) ))
+	else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
 	{
-	     if (!( Os.namespace = allocate_string(  _OS_NS_COMPUTE_V11 ) ))
-		return( 27 );
+	     if (!( sptr->Os.namespace = allocate_string(  _OS_NS_COMPUTE_V11 ) ))
+		return(os_liberate_subscription( sptr ));
 	}
-	else	return( 55 );
+	else	return(os_liberate_subscription( sptr ));
 
-	Os.authenticate= (char *) 0;
+	sptr->Os.authenticate= (char *) 0;
 	if (!( tls ))
-		Os.tls = (char *) 0;
-	else if ((Os.tls = allocate_string(tls)) != (char *) 0)
-		if ( (!( strlen( Os.tls ) )) || ( *(Os.tls) == '0' ) )
-			Os.tls = liberate( Os.tls );
+		sptr->Os.tls = (char *) 0;
+	else if ((sptr->Os.tls = allocate_string(tls)) != (char *) 0)
+		if ( (!( strlen( sptr->Os.tls ) )) || ( *(sptr->Os.tls) == '0' ) )
+			sptr->Os.tls = liberate( sptr->Os.tls );
 
-	return( 0 );
+	return( sptr );
 }
-
-
 
 #endif	/* _os_client_c */
 	/* ------------ */

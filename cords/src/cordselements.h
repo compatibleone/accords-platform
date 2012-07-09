@@ -62,14 +62,6 @@ public struct enquiry * allocate_enquiry();
 public struct enquiry * liberate_enquiry(struct enquiry * sptr);
 public struct agency * allocate_agency();
 public struct agency * liberate_agency(struct agency * sptr);
-public struct openstack * allocate_openstack();
-public struct openstack * liberate_openstack(struct openstack * sptr);
-public struct on_config * allocate_on_config();
-public struct on_config * liberate_on_config(struct on_config * sptr);
-public struct os_config * allocate_os_config();
-public struct os_config * liberate_os_config(struct os_config * sptr);
-public struct opennebula * allocate_opennebula();
-public struct opennebula * liberate_opennebula(struct opennebula * sptr);
 
 #endif	/* _cords_elements_h */
 	/* ----------------- */
