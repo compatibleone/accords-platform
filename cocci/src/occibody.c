@@ -308,7 +308,7 @@ private	char *	occi_html_body(
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
-
+	int	linkto=0;
 	id[0] = 0;
 
 	if (!( prefix = rest_http_prefix() ))
@@ -391,7 +391,20 @@ private	char *	occi_html_body(
 					else if ( *(vptr++) == '.' )
 						name = vptr;
 				}
-				fprintf(h,"<tr><th>%s</th>",name);
+				/* ---------------------------------------------------------- */
+				/* detect an HTTP or HTTPS prefixed string and build url link */
+				/* ---------------------------------------------------------- */
+				if (!( vptr ))
+					linkto=0;
+				else if ((!( strncmp( vptr, "http://", strlen( "http://" ) ) ))
+				     ||  (!( strncmp( vptr, "http://", strlen( "http://" ) ) )))
+					linkto=1;
+				else	linkto=0;
+
+				if (!( linkto ))
+					fprintf(h,"<tr><th>%s</th>",name);
+				else	fprintf(h,"<tr><th><a href='%s'>%s</a></th>",vptr,name);
+
 				fprintf(h,"<td><input type=text name='%s' value='%s'>\n",name,vptr);
 				/* ---------------------------------------------------------- */
 				/* detect the ID element value and store for eventual actions */
@@ -399,18 +412,6 @@ private	char *	occi_html_body(
 				if ( name )
 					if (!( strcmp(name,"id") ))
 						strcpy(id,vptr);
-				/* ---------------------------------------------------------- */
-				/* detect an HTTP or HTTPS prefixed string and build url link */
-				/* ---------------------------------------------------------- */
-				if ( vptr )
-				{
-					if ((!( strncmp( vptr, "http://", strlen( "http://" ) ) ))
-					||  (!( strncmp( vptr, "http://", strlen( "http://" ) ) )))
-					{
-						fprintf(h,"<a href='%s'>",vptr);
-						fprintf(h,"...</a>\n");
-					}
-				}
 				fprintf(h,"</td></tr>\n");
 				hptr = occi_consume_header( hptr );
 			}
@@ -441,9 +442,8 @@ private	char *	occi_html_body(
 				fprintf(h,"<tr><th>Actions</th><td>\n");
 				while ( aptr )
 				{
-					fprintf(h,"<div class='action'>");
-					fprintf(h,"<a href='/%s/%s?action=%s'>",cptr->id,id,aptr->name);
-					fprintf(h,"%s</a></div><br>",aptr->name);
+					fprintf(h,"<form action='/%s/%s?action=%s' method='POST' enctype='application/x-www-form-urlencoded'>",cptr->id,id,aptr->name);
+					fprintf(h,"<input type=submit value='%s' name='%s'></form>",aptr->name,aptr->name);
 					aptr = aptr->next;
 				}
 				fprintf(h,"</td></tr>\n");
