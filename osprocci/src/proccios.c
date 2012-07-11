@@ -28,8 +28,6 @@
 #include "cb.h"
 #include "stdnode.h"
 
-private	int	rate_recovery=120;
-
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
 	char * category, char * nptr );
@@ -1215,49 +1213,35 @@ private	struct	rest_response * start_openstack(
 		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	}
-	while (1)
+	else if (!( osptr = os_create_server( subptr, filename )))
 	{
-		if (!( osptr = os_create_server( subptr, filename )))
-		{
-			release_floating_address( subptr,pptr );
-			subptr = os_liberate_subscription( subptr );
-			personality = liberate( personality );
-			filename = liberate( filename );
-			reset_openstack_server( pptr );
-		 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
-		}
-		else if (!( osptr->response ))
-		{
-			release_floating_address( subptr,pptr );
-			subptr = os_liberate_subscription( subptr );
-			personality = liberate( personality );
-			filename = liberate( filename );
-			osptr = liberate_os_response( osptr );
-			reset_openstack_server( pptr );
-		 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
-		}
-		else if ( osptr->response->status <  400 )
-			break;	
-		else if ( osptr->response->status == 413 )
-		{
-			/* -------------------------- */
-			/* rate limiting is in effect */
-			/* -------------------------- */
-			osptr = liberate_os_response( osptr );
-			sleep(rate_recovery);
-			continue;
-		}
-		else if ( osptr->response->status >= 400 )
-		{
-			release_floating_address( subptr,pptr );
-			subptr = os_liberate_subscription( subptr );
-			personality = liberate( personality );
-			filename = liberate( filename );
-			aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
-			osptr = liberate_os_response( osptr );
-			reset_openstack_server( pptr );
-			return( aptr );
-		}
+		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
+		reset_openstack_server( pptr );
+	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
+	}
+	else if (!( osptr->response ))
+	{
+		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
+		osptr = liberate_os_response( osptr );
+		reset_openstack_server( pptr );
+	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
+	}
+	else if ( osptr->response->status >= 400 )
+	{
+		release_floating_address( subptr,pptr );
+		subptr = os_liberate_subscription( subptr );
+		personality = liberate( personality );
+		filename = liberate( filename );
+		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
+		osptr = liberate_os_response( osptr );
+		reset_openstack_server( pptr );
+		return( aptr );
 	}
 
 	liberate( filename );

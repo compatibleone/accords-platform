@@ -26,6 +26,7 @@
 #define	_CORDS_NONE "none"
 char *                  occi_unquoted_value( char * sptr );
 
+private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
@@ -131,6 +132,28 @@ private	struct	os_response * os_check( struct rest_response * aptr )
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*		o s _ c l i e n t _ r a t e _ l i m i t e d		*/
+/*	---------------------------------------------------------	*/
+private	int	os_client_rate_limited( struct rest_response * rptr )
+{
+	if (!( rptr ))
+		return( 0 );
+	else if ( rptr->status < 400 )
+		return( 0 );
+	else if ( rptr->status != 413 )
+		return( 0 );
+	else
+	{
+		/* -------------------------- */
+		/* rate limiting is in effect */
+		/* -------------------------- */
+		rptr = liberate_rest_response( rptr );
+		sleep(rate_recovery);
+		return(1);
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*		 o s _ c l i e n t _ g e t _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
@@ -138,7 +161,11 @@ public	struct	os_response *
 	os_client_get_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_get_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	while ((rptr = rest_client_get_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -148,7 +175,11 @@ public	struct	os_response *
 	os_client_head_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_head_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	while (( rptr = rest_client_head_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -158,7 +189,11 @@ public	struct	os_response *
 	os_client_delete_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_delete_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	while (( rptr = rest_client_delete_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -168,7 +203,11 @@ public	struct	os_response *
 	os_client_post_request(
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
-	return( os_check( rest_client_post_request( target, tls, nptr, filename, hptr ) ) );
+	struct	rest_response * rptr;
+	while (( rptr = rest_client_post_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -178,8 +217,15 @@ public	struct	os_response *
 	os_client_put_request(
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
-	return( os_check( rest_client_put_request( target, tls, nptr, filename, hptr ) ) );
+	struct	rest_response * rptr;
+
+	while (( rptr = rest_client_put_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+
+	return( os_check( rptr ) );
 }
+
 
 /*	-------------------------------------------	*/
 /*	 k e y s t o n e _ a u t h _ m e s s a g e 	*/
