@@ -111,6 +111,7 @@ public	char *	default_operator();
 #define	_OCCI_APP_JSON		"application/json"
 #define	_OCCI_TEXT_JSON		"text/json"
 #define	_OCCI_MIME_JSON		"text/json"
+#define	_OCCI_TEXT_FORM		"application/x-www-form-urlencoded"
 
 #define	_OCCI_OCCI_XML		"application/xml+occi"
 #define	_OCCI_APP_XML		"application/xml"

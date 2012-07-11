@@ -4,11 +4,11 @@ table 	{
 	}
 
 th 	{
-	background-color: #EEEEFF;
-	color: #000044;
+	background-color: #EEEEEE;
+	color: #444444;
 	padding: 2mm;
 	border-style: solid;
-	border-color: #000033;
+	border-color: #333333;
 	border-width: 1px;
 	}
 
@@ -19,20 +19,20 @@ th 	{
 	}
 .button	{
 	border-width: 1px;
-	background-color: #DDDDFF;
+	background-color: #DDDDDD;
 	border-style: outset;
 	width: 30mm;
 	}
 .action	{
 	border-width: 1px;
-	background-color: #DDDDFF;
+	background-color: #DDDDDD;
 	border-style: outset;
 	width: 8cm;
 	}
 
 td 	{
 	padding: 2mm;
-	background-color: #F6F6FF;
+	background-color: #F6F6F6;
 	border-style: none;
 	width: 70%;
 	}
@@ -50,7 +50,7 @@ td 	{
 	font-size: 12pt;
 	padding: 5mm;
 	border-style: dotted;
-	border-color: #000088;
+	border-color: #888888;
 	}
 
 

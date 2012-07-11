@@ -198,6 +198,15 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback = (void *) 0;
 
+	if (!( optr = occi_cords_connection_builder( Slam.domain, "connection" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback = (void *) 0;
+	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
+
 	rest_initialise_log(Slam.monitor);
 
 	if (!( Slam.identity ))

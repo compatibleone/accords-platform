@@ -13,6 +13,7 @@ struct	cords_service
 	char *	price;
 	char *	session;
 	int	when;
+	int	instructions;
 	int	contracts;
 	int	state;
 };

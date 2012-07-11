@@ -71,6 +71,7 @@ public struct cords_service * reset_cords_service(struct cords_service * sptr)
 		sptr->price = (char*) 0;
 		sptr->session = (char*) 0;
 		sptr->when =  0;
+		sptr->instructions =  0;
 		sptr->contracts =  0;
 		sptr->state =  0;
 	}
@@ -135,6 +136,10 @@ public int xmlin_cords_service(struct cords_service * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"instructions") ))
+		{
+			if ( wptr->value ) { sptr->instructions = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"contracts") ))
 		{
 			if ( wptr->value ) { sptr->contracts = atoi(wptr->value); }
@@ -166,6 +171,7 @@ public int rest_occi_cords_service(FILE * fh,struct cords_service * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contracts='%u'\r\n",prefix,nptr,sptr->contracts);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

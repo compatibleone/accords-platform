@@ -1088,10 +1088,13 @@ private	int	cords_broker_configuration(
 		struct occi_response * zptr,
 		char * agent, char * tls )
 {
+	struct	xml_atribut * xptr;
 	struct	occi_element *	eptr;
 	struct	occi_response * aptr;
 	char	*	id;
 	int		status;
+	int		instructions=0;
+	char		buffer[64];
 	if (!( zptr )) return(0);
 	for (	eptr=cords_first_link( zptr );
 		eptr != (struct occi_element *) 0;
@@ -1109,11 +1112,22 @@ private	int	cords_broker_configuration(
 		{
 			cords_configuration_action( host, document, aptr, agent, tls );
 			aptr = occi_remove_response( aptr );
+			instructions++;
 			id = liberate( id );
 			continue;
 		}
 	}
-	return( 0 );
+	sprintf(buffer,"%u",instructions);
+	if (( xptr = document_atribut( document, "instructions" ) ) != (struct xml_atribut *) 0)
+	{
+		if ( xptr->value ) xptr->value = liberate( xptr->value );
+		if (!( xptr->value = allocate_string( buffer ) ))
+			return( 927 );
+		else	return( 0 );
+	}
+	else if (!( xptr = document_add_atribut( document, "instructions", buffer ) ))
+		return( 927 );
+	else	return( 0 );
 }
 
 /*	-------------------------------------------------------		*/
@@ -3079,6 +3093,7 @@ public	char *	cords_service_broker(
 	char * 	tls, 
 	struct xml_element ** root )
 {
+	char *	resultid=(char *) 0;
 	int	status;
 	char *	id;
 	struct	cords_placement_criteria CpC;
@@ -3110,7 +3125,7 @@ public	char *	cords_service_broker(
 	/* ----------------------------------------------- */
 	/* handle the account from the sla or the manifest */
 	/* ----------------------------------------------- */
-	if (!( id = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
+	if (!( resultid = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
 		return( id );
 
 	/* ----------------------------------- */
@@ -3191,7 +3206,11 @@ public	char *	cords_service_broker(
 	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
 
-	return( service );
+	else
+	{
+		cords_terminate_provisioning( 0, &CbC );
+		return( resultid );
+	}
 }
 
 /*	-------------------------------------------------------		*/

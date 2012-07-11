@@ -94,6 +94,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->type = (char*) 0;
 		sptr->service = (char*) 0;
 		sptr->firewall = (char*) 0;
+		sptr->instructions =  0;
 		sptr->commons =  0;
 		sptr->when =  0;
 		sptr->state =  0;
@@ -187,6 +188,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"instructions") ))
+		{
+			if ( wptr->value ) { sptr->instructions = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"commons") ))
 		{
 			if ( wptr->value ) { sptr->commons = atoi(wptr->value); }
@@ -229,6 +234,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.commons='%u'\r\n",prefix,nptr,sptr->commons);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);

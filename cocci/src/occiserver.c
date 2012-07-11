@@ -63,6 +63,23 @@ private	struct rest_response * occi_failure(struct rest_client * cptr,  int stat
 }
 
 /*	---------------------------------------------------------	*/
+/*			o c c i _ r e d i r e c t			*/
+/*	---------------------------------------------------------	*/
+/*	this local function redirects to the resource specified		*/
+/*	in the fourth parameter.						*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_redirect(struct rest_client * cptr,  int status, char * message, char * target )
+{
+	struct	rest_response * aptr;
+	struct	rest_header * hptr;
+	if (!( aptr = rest_allocate_response(cptr)))
+		return( aptr );
+	else if (!( hptr = rest_response_header( aptr, "Location", target ) ))
+		return( rest_html_response( aptr, 500, message ) );
+	else	return( rest_html_response( aptr, status, message ) );
+}
+
+/*	---------------------------------------------------------	*/
 /*			o c c i _ s u c c e s s				*/
 /*	---------------------------------------------------------	*/
 public	int	occi_success( struct rest_response * aptr )
@@ -70,10 +87,10 @@ public	int	occi_success( struct rest_response * aptr )
 	char			* nptr;
 	struct	rest_header 	* hptr;
 
-	if (!( hptr = rest_response_header( aptr, "Content-Type", "text/occi" ) ))
+	if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
 		return( 0 );
 
-	else if (!( hptr = rest_response_header( aptr, "Content-Length", "4" ) ))
+	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "4" ) ))
 		return( 0 );
 
 	else if (!( nptr = allocate_string( "OK\r\n" ) ))
@@ -393,6 +410,20 @@ private	struct rest_response * occi_get_capacities(
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else	return( rest_response_status( aptr, 200, "OK" ) );
 	}
+	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
+	{
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" )))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else if (!( mptr = occi_html_capacities( optr, hptr ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else
+		{
+			rest_response_body( aptr, mptr, _FILE_BODY );
+			return( rest_response_status( aptr, 200, "OK" ) );
+		}
+	}
 	else
 	{
 		for (	;
@@ -510,6 +541,93 @@ private	struct	rest_request *	occi_php_request_body(
 	struct rest_request * rptr)
 {
 	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ f o r m _ r e q u e s t _ t o k e n 		*/
+/*	---------------------------------------------------------	*/
+private	char *	occi_form_request_token( FILE * h, int t )
+{
+	char 	buffer[8192];
+	int	i=0;
+	int	c;
+	while ((c = fgetc( h )) > 0 )
+	{
+		if ( c == t )
+			break;
+		else if ( i < 8190 )
+			buffer[i++] = c;
+		else	break;
+	}
+	if (!( i ))
+		return((char *) 0);
+	else
+	{
+		buffer[i++] = 0;
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ f o r m _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_form_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	FILE * h;
+	char *	domain=(char *) 0;
+	char *	category=(char *) 0;
+	char *	name=(char *) 0;
+	char *	value=(char *) 0;
+
+	struct rest_header * hptr=(struct rest_header *) 0;
+
+	char 	buffer[4048];
+
+	if (!( rptr->body ))
+		return( rptr );
+	else if (!( h = fopen( rptr->body,"r" ) ))
+		return( rptr );
+	else
+	{
+		while ((name = occi_form_request_token( h,'=' )) != (char *) 0)
+		{
+			if (!(value = occi_form_request_token( h, '&' ) ))
+			{
+				liberate( name );
+				continue;
+			}
+			else if (!( strcmp( name, "domain" ) ))
+			{
+				liberate( name );
+				domain=value;
+				continue;
+			}
+			else if (!( strcmp( name, "category" ) ))
+			{
+				liberate( name );
+				category=value;
+				continue;
+			}
+			else
+			{
+				sprintf(buffer,"%s.%s.%s=%s",
+					(domain ? domain : "occi" ),
+					(category ? category : "category" ),
+					name,
+					(value ? value : "" ));
+				if (!( hptr = rest_request_header( rptr, _OCCI_ATTRIBUTE, buffer ) ))
+					break;
+				else	liberate( value );
+			}
+		}
+		fclose(h);
+		if ( domain ) liberate( domain );
+		if ( category ) liberate( category );
+		return( rptr );
+	}
+
 }
 
 /*	---------------------------------------------------------	*/
@@ -719,6 +837,8 @@ private	struct	rest_request *	occi_request_body(
 		return( occi_json_request_body( optr, rptr ) );
 	else if (!( strcasecmp( hptr->value, _OCCI_OLD_JSON ) ))
 		return( occi_old_json_request_body( optr, rptr ) );
+	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_FORM ) ))
+		return( occi_form_request_body( optr, rptr ) );
 	else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
@@ -922,6 +1042,8 @@ private	struct rest_response * occi_get(
 		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_get_capacities( optr, cptr, rptr ) );
+	else if (!( strcmp( rptr->object, "/" ) ))
+		return( occi_redirect(cptr,  301, "Redirected to Capacities", "/-/" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_get( optr, cptr, rptr ) );

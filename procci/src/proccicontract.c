@@ -92,7 +92,7 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 /*	of the same collection through the provider	*/
 /*	contract id.					*/
 /*	-------------------------------------------	*/
-private	int	contract_instructions( char * contract, char * provision )
+private	int	contract_instructions( struct cords_contract * pptr, char * contract, char * provision )
 {
 
 	char	*	ihost;
@@ -148,7 +148,8 @@ private	int	contract_instructions( char * contract, char * provision )
 	/* ---------------------------------------------------- */
 	/* for each of the instructions of the current contract */
 	/* ---------------------------------------------------- */
-	for (	eptr = yptr->first;
+	for (	pptr->instructions=0,
+		eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
 	{
@@ -183,6 +184,7 @@ private	int	contract_instructions( char * contract, char * provision )
 				zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() );
 				zzptr = occi_remove_response ( zzptr );
 				zptr = occi_remove_response ( zptr );
+				pptr->instructions++;
 			}
 		}
 
@@ -276,7 +278,7 @@ private	struct	rest_response * start_contract(
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
-				contract_instructions( fullid, pptr->provider );
+				contract_instructions( pptr, fullid, pptr->provider );
 				cords_invoke_action( pptr->provider, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() );
 				retrieve_provider_information( pptr );

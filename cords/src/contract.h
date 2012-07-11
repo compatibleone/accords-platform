@@ -20,6 +20,7 @@ struct	cords_contract
 	char *	type;
 	char *	service;
 	char *	firewall;
+	int	instructions;
 	int	commons;
 	int	when;
 	int	state;

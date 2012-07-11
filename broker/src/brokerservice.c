@@ -184,10 +184,9 @@ private	int	update_instruction_values(
 /*	--------------------------------------------	*/
 /*	Optimised Configuration Instruction Proccess	*/
 /*	--------------------------------------------	*/
-private	int	service_action( char * id, char * action )
+private	int	service_action( struct cords_service * pptr, char * id, char * action )
 {
 	int	items=0;
-	int	contracts=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_link_node  * nptr;
@@ -213,7 +212,8 @@ private	int	service_action( char * id, char * action )
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
-	for (	nptr=occi_first_link_node();
+	for (	pptr->contracts=0,
+		nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
 		nptr = nptr->next )
 	{
@@ -239,7 +239,7 @@ private	int	service_action( char * id, char * action )
 		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
-		if ( contracts++ ) fprintf(h,",\n" );
+		if ( pptr->contracts++ ) fprintf(h,",\n" );
 
 		if ( generate_service_report )
 		{
@@ -316,10 +316,9 @@ private	int	service_action( char * id, char * action )
 /*	--------------------------------------------	*/
 /*	Optimised Configuration Instruction Proccess	*/
 /*	--------------------------------------------	*/
-private	int	reverse_service_action( char * id, char * action )
+private	int	reverse_service_action( struct cords_service * pptr, char * id, char * action )
 {
 	int	items=0;
-	int	contracts=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_link_node  * nptr;
@@ -345,7 +344,8 @@ private	int	reverse_service_action( char * id, char * action )
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
-	for (	nptr=occi_last_link_node();
+	for (	pptr->contracts=0,
+		nptr=occi_last_link_node();
 		nptr != (struct occi_link_node *) 0;
 		nptr = nptr->previous )
 	{
@@ -371,7 +371,7 @@ private	int	reverse_service_action( char * id, char * action )
 		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
-		if ( contracts++ ) fprintf(h,",\n" );
+		if ( pptr->contracts++ ) fprintf(h,",\n" );
 
 		if ( generate_service_report )
 		{
@@ -448,7 +448,7 @@ private	struct	rest_response * start_service(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
-			service_action( pptr->id, _CORDS_START );
+			service_action( pptr, pptr->id, _CORDS_START );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
@@ -478,7 +478,7 @@ private	struct	rest_response * suspend_service(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			service_action( pptr->id, _CORDS_SUSPEND );
+			service_action( pptr, pptr->id, _CORDS_SUSPEND );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
 			autosave_cords_service_nodes();
@@ -508,7 +508,7 @@ private	struct	rest_response * restart_service(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			service_action( pptr->id, _CORDS_RESTART );
+			service_action( pptr, pptr->id, _CORDS_RESTART );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
@@ -537,7 +537,7 @@ private	struct	rest_response * save_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			service_action( pptr->id, _CORDS_SAVE );
+			service_action( pptr, pptr->id, _CORDS_SAVE );
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 		}
@@ -565,7 +565,7 @@ private	struct	rest_response * snapshot_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			service_action( pptr->id, _CORDS_SNAPSHOT );
+			service_action( pptr, pptr->id, _CORDS_SNAPSHOT );
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 		}
@@ -593,7 +593,7 @@ private	struct	rest_response * stop_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
-			reverse_service_action( pptr->id, _CORDS_STOP );
+			reverse_service_action( pptr, pptr->id, _CORDS_STOP );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
 			autosave_cords_service_nodes();
@@ -684,7 +684,16 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 			default_tls(), 
 			(struct xml_element **) 0 ) ))
 		return( 999 );
-	else	return( 0 );
+	else
+	{
+		/* ------------------------------------- */
+		/* store the resolve account information */
+		/* ------------------------------------- */
+		if ( pptr->account ) pptr->account = liberate( pptr->account );
+		if (!( pptr->account = allocate_string( result ) ))
+			return( 999 );
+		else	return( 0 );
+	}
 }
 
 /*	-------------------------------------------	*/

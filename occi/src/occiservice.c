@@ -152,6 +152,8 @@ private void autoload_cords_service_nodes() {
 				pptr->session = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "instructions" )) != (struct xml_atribut *) 0)
+				pptr->instructions = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "contracts" )) != (struct xml_atribut *) 0)
 				pptr->contracts = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -207,6 +209,9 @@ public  void autosave_cords_service_nodes() {
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
+		fprintf(h," instructions=%c",0x0022);
+		fprintf(h,"%u",pptr->instructions);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," contracts=%c",0x0022);
 		fprintf(h,"%u",pptr->contracts);
 		fprintf(h,"%c",0x0022);
@@ -250,6 +255,8 @@ private void set_cords_service_field(
 			pptr->session = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
+		if (!( strcmp( nptr, "instructions" ) ))
+			pptr->instructions = atoi(vptr);
 		if (!( strcmp( nptr, "contracts" ) ))
 			pptr->contracts = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -335,6 +342,7 @@ private int pass_cords_service_filter(
 			return(0);
 		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
+	if (( fptr->instructions ) && ( pptr->instructions != fptr->instructions )) return(0);
 	if (( fptr->contracts ) && ( pptr->contracts != fptr->contracts )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -374,6 +382,9 @@ private struct rest_response * cords_service_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.instructions=%u",optr->domain,optr->id,pptr->instructions);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.contracts=%u",optr->domain,optr->id,pptr->contracts);
@@ -802,6 +813,8 @@ public struct occi_category * occi_cords_service_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "instructions",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "contracts",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -919,6 +932,17 @@ public struct rest_header *  cords_service_occi_headers(struct cords_service * s
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_service.when='%u'\r\n",sptr->when);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_service.instructions='%u'\r\n",sptr->instructions);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
