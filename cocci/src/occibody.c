@@ -448,7 +448,7 @@ private	char *	occi_html_body(
 				if (!( vptr ))
 					linkto=0;
 				else if ((!( strncmp( vptr, "http://", strlen( "http://" ) ) ))
-				     ||  (!( strncmp( vptr, "http://", strlen( "http://" ) ) )))
+				     ||  (!( strncmp( vptr, "https://", strlen( "https://" ) ) )))
 					linkto=1;
 				else	linkto=0;
 
@@ -500,7 +500,7 @@ private	char *	occi_html_body(
 				fprintf(h,"<tr><th>Methods</th><td>\n");
 				fprintf(h,"<div align=center><table><tr>\n");
 				fprintf(h,"<td><input class=button type=submit value='POST' name='POST'></form>");
-				fprintf(h,"<td><form action='/%s/%s' method='GET' enctype='application/x-www-form-urlencoded'>",cptr->id,id,aptr->name);
+				fprintf(h,"<td><form action='/%s/%s' method='GET' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
 				fprintf(h,"<input class=button type=submit value='GET' name='GET'></form>");
 				fprintf(h,"</th></tr></table></div></th></tr>\n");
 			}

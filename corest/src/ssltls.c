@@ -73,9 +73,12 @@ private	void	tls_show_errors( char * message)
 {
 	char SSL_ErrorBuf[1024];
 	int	sslerr;
-	while ((sslerr = ERR_get_error())) 
-		if ( ERR_error_string( sslerr, SSL_ErrorBuf ) ) 
-			printf("SSL ERR(%s) : %lu : %s \n",message,sslerr,SSL_ErrorBuf );
+	if ( check_debug() )
+	{
+		while ((sslerr = ERR_get_error())) 
+			if ( ERR_error_string( sslerr, SSL_ErrorBuf ) ) 
+				printf("SSL ERR(%s) : %lu : %s \n",message,sslerr,SSL_ErrorBuf );
+	}
 	return;
 }
 
@@ -275,9 +278,14 @@ public	int	sslsocketreader(
 	if ((status = SSL_read( handle, buffer, length )) >= 0)
 		*(buffer+status) = 0;
 	else if ( status == -1 )
-		printf("socket reader failure at %lu : %s : %u \r\n",
-			time((long) 0),"sslread",
-			SSL_get_error( handle,status ) );
+	{
+		if ( check_debug() )
+		{
+			printf("socket reader failure at %lu : %s : %u \r\n",
+				time((long) 0),"sslread",
+				SSL_get_error( handle,status ) );
+		}
+	}
 	close_socket_catcher(0,"ssl read",SSL_get_error(handle,status));
 	return( status );
 }
@@ -613,13 +621,15 @@ ENGINE *setup_engine(const char *engine)
 	    ENGINE_load_builtin_engines();
 	    if ((e = ENGINE_by_id(engine)) == NULL)
 	      {
-		printf("engine: %s\n", engine);
+		if ( check_debug() )
+			printf("engine: %s\n", engine);
 		tls_show_errors( "invalid engine");
 		return NULL;
 	      }
 	    if(!ENGINE_set_default(e, ENGINE_METHOD_ALL))
 	      {
-		printf("engine: %s\n", ENGINE_get_id(e));
+		if ( check_debug() )
+			printf("engine: %s\n", ENGINE_get_id(e));
 		tls_show_errors( "can't use that engine");
 		ENGINE_free(e);
 		return NULL;
@@ -642,7 +652,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 {
 	char 	buffer[1024];
 	int	oof=0;
-	void	*	fptr=(void *) 0;
+	void *	fptr=(void *) 0;
 	ENGINE *e=NULL;
 	EVP_PKEY *pkey=NULL;
 
@@ -695,14 +705,14 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 
 	if ( mode & _SSL_COMPATIBLE )
 	{
-		if (!( fptr = SSLv23_method() )) 
+		if (!( fptr = (void *) SSLv23_method() )) 
 		{
 			tls_show_errors( "SSLv23_method" );
 			close_connection( cptr );
 			return( 0 );
 		}
 	}
-	else if (!( fptr = TLSv1_method() )) 
+	else if (!( fptr = (void *) TLSv1_method() )) 
 	{
 		tls_show_errors( "TLSv1_method" );
 		close_connection( cptr );
