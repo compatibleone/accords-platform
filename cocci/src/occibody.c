@@ -296,14 +296,13 @@ private	void	occi_html_footer( FILE * h )
 /*	------------------------------------------------------------	*/
 public	char *	occi_html_capacities( 
 		struct occi_category * cptr,
-		struct rest_header  * hptr )
+		struct rest_response * aptr )
 {
 	FILE *	h;
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
 	char *	nptr;
-	struct	rest_header * rootheader=hptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	rest_header * contenttype=(struct rest_header *) 0;
 
@@ -316,17 +315,6 @@ public	char *	occi_html_capacities(
 	}
 	else
 	{
-		while ( hptr )
-		{
-			if ( hptr->name )
-			{
-				if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
-					contenttype = hptr;
-				else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
-					contentlength = hptr;
-				hptr = hptr->next;
-			}
-		}
 		occi_html_header(h,"Accords OCCI Capacities","");
 		fprintf(h,"<table><tr><th><h2>ACCORDS OCCI Capacities</h2></th></tr>\n");
 		occi_html_publisher(h);
@@ -344,19 +332,9 @@ public	char *	occi_html_capacities(
 		fprintf(h,"</table>\n");
 		occi_html_footer(h);
 		fclose(h);
-		if ((!( contenttype )) || (!( contentlength )))
-		{
-			while ( rootheader->next )
-				rootheader = rootheader->next;
-			if (!( rootheader = rest_postfix_header( rootheader, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
-				return( filename );
-			else	contenttype = rootheader;
-
-			if (!( rootheader = rest_postfix_header( rootheader, _HTTP_CONTENT_LENGTH, "0" ) ))
-				return( filename );
-			else	contentlength = rootheader;
-		}
-		return( occi_content_length(contentlength, filename ));
+		if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
+			return( filename );
+		else	return( occi_content_length(contentlength, filename ));
 	}
 }
 

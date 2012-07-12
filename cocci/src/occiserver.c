@@ -412,11 +412,9 @@ private	struct rest_response * occi_get_capacities(
 	}
 	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
 	{
-		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
-		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" )))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
-		else if (!( mptr = occi_html_capacities( optr, aptr->first ) ))
+		else if (!( mptr = occi_html_capacities( optr, aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else
 		{
