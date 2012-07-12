@@ -133,12 +133,12 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 /*	---------------------------------------------	*/
 public	void	tls_configuration_use(struct tls_configuration * cptr )
 {
-	security_lock("configuration");
+	security_lock(0,"configuration");
 	https_use_encryption( cptr->key );
 	https_use_certificate( cptr->certificate );
 	https_use_password( cptr->passphrase );
 	https_use_CA_list( cptr->authority );
-	security_unlock("configuration");
+	security_unlock(0,"configuration");
 	return;
 }
 
