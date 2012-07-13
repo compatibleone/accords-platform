@@ -1,0 +1,40 @@
+module=$1
+auth=$2
+export calist=$makesecurity/Certificates.crt
+export pass=Accords
+export bits=2048
+export days=365
+export sslconfig=./openssl.cnf
+export secdir=$makesecurity
+
+if [ -z "$nethsm" ]; then 
+	export options=13
+else
+	export options=525
+fi
+
+echo "<tls key='$secdir/"${module}"PrivateKey.pem'" > $secdir/${module}Tls.xml
+echo "     certificate='$secdir/"${module}"Certificate.pem'" >> $secdir/${module}Tls.xml
+echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
+echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
+echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
+chmod 0640 $secdir/${module}Tls.xml
+
+echo "Creating certificate for module $1"
+if test ! -e $sslconfig; then
+	echo "Can not find openSSL config file: $sslconfig"
+	exit 1
+fi
+if [ -z "$nethsm" ]; then
+	openssl req -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem 2> /dev/null
+else
+	openssl req -engine pkcs11 -keyform e -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem
+fi
+chmod 0400 ${secdir}/${module}PrivateKey.pem
+chmod 0444 ${secdir}/${module}Certificate.pem
+

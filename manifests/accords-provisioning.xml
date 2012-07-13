@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<manifest name="accords:platform" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+<manifest name="accords:provisioning" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
 <node name="accords:osprocci" scope=normal access=public type="accords:osprocci"/>
 <node name="accords:onprocci" scope=normal access=public type="accords:onprocci"/>
 <node name="accords:paprocci" scope=normal access=public type="accords:paprocci"/>

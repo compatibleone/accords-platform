@@ -1,3 +1,4 @@
+bash build-package-cosacs
 bash build-package publisher
 bash build-package coss cords_user.xml
 bash build-package comons

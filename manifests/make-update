@@ -1,3 +1,4 @@
+bash build-update-cosacs
 bash build-update publisher
 bash build-update coss cords_user.xml
 bash build-update comons

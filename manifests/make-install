@@ -1,3 +1,4 @@
+bash build-install cosacs $1
 bash build-install publisher $1
 bash build-install azprocci $1
 bash build-install broker $1

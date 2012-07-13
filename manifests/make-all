@@ -2,11 +2,21 @@ echo "--------------------------------------------------------------"
 echo "   production of the compatible one demonstrator packages     "
 echo "    this should really only be run on a debian platform       "
 echo "   and must provide the NAME of the provisioning ACCOUNT      "
+echo "   and an eventual security parameter for security mode       "
 echo "--------------------------------------------------------------"
 echo "validate to proceed only if you really know what you are doing"
 read var
+export makeuser=$1
+export makesecurity=$2
 echo "cleaning packages"
-bash make-clean 
+bash make-clean
+if [ -z "$makesecurity" ]; then
+	echo "security not required"
+	cp build-config-unsafe build-config
+else
+	bash make-security
+	cp build-config-secure build-config
+fi
 echo "building accords platform manifests"
 bash make-manifest
 echo "building accords platform service level agreements"
@@ -15,12 +25,15 @@ echo "building installation scripts"
 bash make-install 
 echo "building run scripts"
 bash make-run
-echo "building packages"
+echo "building packages" 
 bash make-package 
 echo "building update"
 bash make-update 
-echo "transfering to www.compatibleone.fr"
-scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform
-bash make-clean
+if [ -z "$makeuser" ]; then
+	echo "not transfering files"
+else
+	echo "transfering to www.compatibleone.fr"
+	scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform
+fi
 echo "demonstrator production is up to date on www.compatibleone.fr"
 
