@@ -1,4 +1,4 @@
-bash build-run cosacs
+bash build-run-cosacs cosacs
 bash build-run publisher
 bash build-run azprocci
 bash build-run broker
