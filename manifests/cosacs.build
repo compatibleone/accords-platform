@@ -1,0 +1,32 @@
+# -----------------------
+# install the git package
+# -----------------------
+	clear
+	git clone ssh://git@gitorious.ow2.org/ow2-compatibleone/accords-platform.git
+
+# --------------------------
+# build the accords platform
+# --------------------------
+	export CFLAGS="-g -ggdb -O0"
+	cd accords-platform
+	./autogen.sh
+	./configure
+	make clean
+	make 
+	make install
+	ldconfig
+
+# ------------------------
+# build accords packages
+# ------------------------
+	cd manifests
+	bash make-all jamie
+	rm -r /home/cosacs -f
+	mkdir /home/cosacs
+	cp run-cosacs /home/cosacs
+	ls -tl /home/cosacs
+
+echo "now add the sleep 15 to the /home/run-cosacs to ensure the tempo"
+
+
+
