@@ -320,7 +320,6 @@ public	int	check_keystone_authorization(struct os_subscription * sptr)
 			liberate_rest_header( hptr );
 			return( 0 );
 		}
-		else	hptr = liberate_rest_header( hptr );
 
 		if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
 		{

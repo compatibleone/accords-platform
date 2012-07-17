@@ -318,8 +318,10 @@ private	int	connect_openstack_image(
 		/* the final identification information to complete the  */
 		/* openstack provisioning request.			 */
 		/* ----------------------------------------------------- */
-		yptr = rptr;
+		/* dont liberate the rptr we received, it will be used	 */
+		/* ----------------------------------------------------- */
 		zptr = (struct os_response *) 0;
+		yptr = rptr;
 		while (1)
 		{
 			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
@@ -332,8 +334,7 @@ private	int	connect_openstack_image(
 			else 
 			{
 				sleep(1);
-				if ( zptr )
-					zptr = liberate_os_response( zptr );
+				if ( zptr ) zptr = liberate_os_response( zptr );
 				if (!( zptr = os_get_image( subptr, pptr->image )))
 				{
 					reset_openstack_server( pptr );
@@ -342,6 +343,7 @@ private	int	connect_openstack_image(
 				else	yptr = zptr;
 			}
 		}
+		if ( zptr ) zptr = liberate_os_response( zptr );
 		return( 0 );
 	}
 }
@@ -531,8 +533,10 @@ private	int	connect_openstack_server(
 		/* the final identification information to complete the  */
 		/* openstack provisioning request.			 */
 		/* ----------------------------------------------------- */
-		yptr = rptr;
+		/* dont liberate the rptr we received, it will be used	 */
+		/* ----------------------------------------------------- */
 		zptr = (struct os_response *) 0;
+		yptr = rptr;
 		while (1)
 		{
 			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
@@ -550,11 +554,10 @@ private	int	connect_openstack_server(
 				}
 				else	yptr = zptr;
 			}
-			if (!( strcmp( vptr, "BUILD" )))
+			else if (!( strcmp( vptr, "BUILD" )))
 			{
 				sleep(1);
-				if ( zptr )
-					zptr = liberate_os_response( zptr );
+				if ( zptr ) zptr = liberate_os_response( zptr );
 				if (!( zptr = os_get_server( subptr, pptr->number )))
 				{
 					reset_openstack_server( pptr );
@@ -605,6 +608,8 @@ private	int	connect_openstack_server(
 		/* now overload using a floating IP or an access IP */
 		/* if one or the other is available.		    */
 		/* ------------------------------------------------ */
+		if ( yptr ) yptr = liberate_os_response( yptr );
+
 		if ( os_valid_address( pptr->floating ) )
 		{
 			if ( pptr->publicaddr ) 
@@ -1059,15 +1064,9 @@ private	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 				if (!( filename = os_create_security_group_request( subptr,pptr->firewall )))
 					return(0);
 				else if (!( osptr = os_create_security_group( subptr,filename ) ))
-				{
-					liberate( filename );
 					return(0);
-				}
 				else if (!( rulegroup = json_atribut( osptr->jsonroot, "id") ))
-				{
 					osptr = liberate_os_response( osptr );
-					liberate( filename );
-				}
 				else
 				{
 					/* ---------------------------------- */
@@ -1075,7 +1074,6 @@ private	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 					/* ---------------------------------- */
 					pptr->group = allocate_string( rulegroup );
 					osptr = liberate_os_response( osptr );
-					liberate( filename );
 				}
 			}			
 
@@ -1102,15 +1100,8 @@ private	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 					subptr,pptr->group, ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
 				return(0);
 			else if (!( osptr = os_create_security_rule( subptr,filename ) ))
-			{
-				liberate( filename );
 				return(0);
-			}
-			else
-			{
-				osptr = liberate_os_response( osptr );
-				liberate( filename );
-			}
+			else	osptr = liberate_os_response( osptr );
 		}
 		release_standard_message( &port );
 		release_standard_message( &firewall );
@@ -1218,7 +1209,6 @@ private	struct	rest_response * start_openstack(
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );
 		personality = liberate( personality );
-		filename = liberate( filename );
 		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
 	}
@@ -1227,7 +1217,6 @@ private	struct	rest_response * start_openstack(
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );
 		personality = liberate( personality );
-		filename = liberate( filename );
 		osptr = liberate_os_response( osptr );
 		reset_openstack_server( pptr );
 	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
@@ -1237,14 +1226,12 @@ private	struct	rest_response * start_openstack(
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );
 		personality = liberate( personality );
-		filename = liberate( filename );
 		aptr = rest_html_response( aptr, osptr->response->status + 4000, "Bad Request : Create Server No Response" );
 		osptr = liberate_os_response( osptr );
 		reset_openstack_server( pptr );
 		return( aptr );
 	}
 
-	liberate( filename );
 	/* --------------------------------- */
 	/* retrieve crucial data from server */
 	/* --------------------------------- */
@@ -1333,11 +1320,7 @@ private	struct	rest_response * start_openstack(
 			reset_openstack_server( pptr );
 		 	return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
 		}
-		else
-		{
-			metaptr = liberate_os_response( metaptr );
-			liberate( metafilename );
-		}
+		else	metaptr = liberate_os_response( metaptr );
 	}
 	osptr = liberate_os_response( osptr );
 	if (!( status ))

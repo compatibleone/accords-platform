@@ -497,7 +497,9 @@ public	struct	occi_response *	occi_create_default_response(
 						break;
 				if ( *vptr == '=' )
 					*(vptr++) = 0;
-				if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+				eptr=occi_response_element(aptr,nptr,vptr);
+				nptr = liberate( nptr );
+				if (!( eptr ))
 					break;
 			}
 		}

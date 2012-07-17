@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="small-accords-platform" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
+	<node name="small-accords-platform" type="simple" access="public" scope="normal" provider="openstack" >
+		<infrastructure name="small-accords-platform">
+			<compute name="small-accords-platform" architecture="x86" cores="1" memory="1G" speed="1G"/>
+			<storage name="small-accords-platform" size="10G"/>
+			<network name="small-accords-platform" label="ethernet" vlan="100M">
+				<port name="publisher" protocol="tcp" range="0.0.0.0/0" from="8086" to="8086"/>
+				<port name="coss" protocol="tcp" range="0.0.0.0/0" from="8087" to="8087"/>
+				<port name="comons" protocol="tcp" range="0.0.0.0/0" from="8088" to="8088"/>
+				<port name="coes" protocol="tcp" range="0.0.0.0/0" from="8089" to="8089"/>
+				<port name="conets" protocol="tcp" range="0.0.0.0/0" from="8090" to="8090"/>
+				<port name="coobas" protocol="tcp" range="0.0.0.0/0" from="8091" to="8091"/>
+				<port name="parser" protocol="tcp" range="0.0.0.0/0" from="8092" to="8092"/>
+				<port name="broker" protocol="tcp" range="0.0.0.0/0" from="8093" to="8093"/>
+				<port name="procci" protocol="tcp" range="0.0.0.0/0" from="8094" to="8094"/>
+				<port name="osprocci" protocol="tcp" range="0.0.0.0/0" from="8095" to="8095"/>
+				<port name="paprocci" protocol="tcp" range="0.0.0.0/0" from="8096" to="8096"/>
+				<port name="testosocci" protocol="tcp" range="0.0.0.0/0" from="8097" to="8097"/>
+				<port name="osocciprocci" protocol="tcp" range="0.0.0.0/0" from="8098" to="8098"/>
+				<port name="onprocci" protocol="tcp" range="0.0.0.0/0" from="8099" to="8099"/>
+				<port name="azprocci" protocol="tcp" range="0.0.0.0/0" from="8100" to="8100"/>
+				<port name="dcprocci" protocol="tcp" range="0.0.0.0/0" from="8101" to="8101"/>
+				<port name="fileserver" protocol="tcp" range="0.0.0.0/0" from="8102" to="8102"/>
+				<port name="ezvm" protocol="tcp" range="0.0.0.0/0" from="8103" to="8103"/>
+				<port name="coips" protocol="tcp" range="0.0.0.0/0" from="8104" to="8104"/>
+				<port name="coees" protocol="tcp" range="0.0.0.0/0" from="8105" to="8105"/>
+				<port name="cosched" protocol="tcp" range="0.0.0.0/0" from="8106" to="8106"/>
+				<port name="slam" protocol="tcp" range="0.0.0.0/0" from="8107" to="8107"/>
+				<port name="cosacs" protocol="tcp" range="0.0.0.0/0" from="8286" to="8286"/>
+				<port name="ssh" protocol="tcp" from="22" to="22"/>
+			</network>
+		</infrastructure>
+		<image name="small-accords-platform">
+			<system name="accords-platform"/>
+		</image>
+	</node>
+	<configuration name="small-accords-platform"/>
+	<interface name="small-accords-platform"/>
+	<account name="test"/>
+	<security name="small-accords-platform"/>
+</manifest>
+
+
+
+
+
+
+
+
+
+
+
+
