@@ -91,7 +91,7 @@ private	int	ll_test_cords_parser_operation( char * filename )
 		dname = dirname(dirc);
 		bname = basename(basec);
 		sprintf(nameplan,"%s/plan_%s",dname, bname);
-		direc = liberate( dirc );
+		dirc = liberate( dirc );
 		basec = liberate( basec );
 		if (!( Cp.result = allocate_string( nameplan ) ))
 			return( failure(4,"allocation","result filename"));
