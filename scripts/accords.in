@@ -37,7 +37,8 @@ tls=security
 nethsm=
 # tls=
 # -------------------------------------
-export secdir=$tls
+resthost=$1
+secdir=$tls
 zone="europe"
 trace=1
 threads=1
