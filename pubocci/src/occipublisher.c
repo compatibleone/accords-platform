@@ -483,7 +483,8 @@ public	int	publish_occi_category(
 		int item,
 		char * user,	char * password,
 		char * url,	char * agent, 
-		struct occi_category * category
+		struct occi_category * category,
+		char * contract
 		)
 {
 	struct	rest_interface * iptr;
@@ -544,7 +545,9 @@ public	int	publish_occi_category(
 	}
 	else if ((!( eptr = occi_request_element( rptr, "occi.publication.who",username		)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.pass",password 	)))
-	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",Publisher.room	)))
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",
+			( category->access & _OCCI_CONTRACT ? 
+			( contract ? contract : Publisher.room ) : Publisher.room)	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category->id 	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.operator",default_operator() )))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.zone",default_zone() )))
@@ -629,6 +632,7 @@ private	int 	occi_auto_publish(
 		struct rest_client * cptr, 
 		struct rest_request * rptr )
 {
+	char 	*	contract=(char *) 0;
 	struct	occi_category * optr;
 	struct	rest_interface * iptr;
 	struct	auto_publication * pptr;
@@ -639,7 +643,7 @@ private	int 	occi_auto_publish(
 	  return(118);
 	else 	return( publish_occi_category( 
 				pptr->item, pptr->user, pptr->password, 
-				pptr->url, pptr->agent, optr ));
+				pptr->url, pptr->agent, optr, contract ));
 }
 
 /*	---------------------------------------------------------	*/
@@ -715,7 +719,7 @@ public	int	occi_auto_publication(
 public	int	publish_occi_categories( 
 		char * user,	char * password,
 		char * url,	char * agent, 
-		struct occi_category * category )
+		struct occi_category * category, char * contract )
 {
 	char *	vptr;
 	int	items=0;
@@ -757,7 +761,7 @@ public	int	publish_occi_categories(
 
 		if ( optr->access & _OCCI_PRIVATE )
 			continue;
-		else if ((status = publish_occi_category( ++items, user, password, url, agent, optr )) != 0)
+		else if ((status = publish_occi_category( ++items, user, password, url, agent, optr, contract )) != 0)
 			break;
 		else if (!( optr->access & _OCCI_AUTO_PUBLISH ))
 			continue;
@@ -807,6 +811,7 @@ public	int	publishing_occi_server(
 {
 	int	status;
 	int	result;
+	char *	contract=(char *) 0;
 	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
 
 	/* --------------------------------------------- */
@@ -842,7 +847,7 @@ public	int	publishing_occi_server(
 	/* ----------------------------------------- */
 	if (( Publisher.host ) && ( Publisher.publication ))
 		if (( url ) && ( category ))
-			if ((status = publish_occi_categories( user, password, url, agent, category )) != 0)
+			if ((status = publish_occi_categories( user, password, url, agent, category, contract )) != 0)
 				return( status );
 
 	/* ---------------------------------------------------------- */

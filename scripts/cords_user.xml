@@ -1,44 +1,52 @@
 <cords_users>
 <cords_user
- id="3d960eb3-cone-4bdd-a7a7-20e9coms85f7" name="service-conets" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-cone-4bdd-a7a7-20e9coms85f7" name="service-conets" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-como-4bdd-a7a7-20e9coms85f7" name="service-comons" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-como-4bdd-a7a7-20e9coms85f7" name="service-comons" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-coss-4bdd-a6a7-20e9fe0b85f7" name="service-coss" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-coss-4bdd-a6a7-20e9fe0b85f7" name="service-coss" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-coes-4bdd-a6a7-20e9fe0b85f7" name="service-coes" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-coes-4bdd-a6a7-20e9fe0b85f7" name="service-coes" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-ezvm-4bdd-a6a7-20e9fe0b85f7" name="service-ezvm" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-slam-4bdd-a6a7-20e9fe0b85f7" name="service-slam" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-cosa-4bdd-a6a7-20e9fe0b85f7" name="service-cosacs" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-ezvm-4bdd-a6a7-20e9fe0b85f7" name="service-ezvm" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-shed-4bdd-a6a7-20e9fe0b85f7" name="service-cosched" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-cosa-4bdd-a6a7-20e9fe0b85f7" name="service-cosacs" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="3d960eb3-coip-4bdd-a6a7-20e9fe0b85f7" name="service-coips" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-shed-4bdd-a6a7-20e9fe0b85f7" name="service-cosched" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="fa77ed3c-coob-407c-9cd2-40cee4749af2" name="service-coobas" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="3d960eb3-coip-4bdd-a6a7-20e9fe0b85f7" name="service-coips" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="eba7ff7b-cofs-4bd6-bb06-c7e0a942e3bf" name="service-fileserver" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="fa77ed3c-coob-407c-9cd2-40cee4749af2" name="service-coobas" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="84962213-copa-41ea-b5c9-0954ba44e426" name="service-parser" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="eba7ff7b-cofs-4bd6-bb06-c7e0a942e3bf" name="service-fileserver" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="9ec3de8f-cobr-4ffa-bbd4-bb4b610ed15d" name="service-broker" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="84962213-copa-41ea-b5c9-0954ba44e426" name="service-parser" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b41a1345-copr-4fcc-b504-9db81d51b03f" name="service-procci" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="9ec3de8f-cobr-4ffa-bbd4-bb4b610ed15d" name="service-broker" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="e8b46183-ospr-4b30-a7d0-6a6711d43462" name="service-osprocci" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="b41a1345-copr-4fcc-b504-9db81d51b03f" name="service-procci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="e91cdde9-onpr-490c-941b-e74c1891c71b" name="service-onprocci" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="e8b46183-ospr-4b30-a7d0-6a6711d43462" name="service-osprocci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-azpr-400c-b6a7-c3f8a17f0ee6" name="service-azprocci" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="e91cdde9-onpr-490c-941b-e74c1891c71b" name="service-onprocci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-pars-400c-b6a7-c3f8a17f0ee6" name="test-parser" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="b949011b-azpr-400c-b6a7-c3f8a17f0ee6" name="service-azprocci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-brok-400c-b6a7-c3f8a17f0ee6" name="test-broker" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="b949011b-pars-400c-b6a7-c3f8a17f0ee6" name="test-parser" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-comp-400c-b6a7-c3f8a17f0ee6" name="service-compo" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="b949011b-brok-400c-b6a7-c3f8a17f0ee6" name="test-broker" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-ec2-400c-b6a7-c3f8a17f0ee6" name="service-ec2procci" password="co-system" role="" email="" account="" authorization="" when="0" state="0" />
+ id="b949011b-comp-400c-b6a7-c3f8a17f0ee6" name="service-compo" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
- id="b949011b-cp-400c-b6a7-c3f8a17f0ee6" name="admin" password="admin" role="administrator" email="" account="" authorization="" when="0" state="0" />
+ id="b949011b-ec2-400c-b6a7-c3f8a17f0ee6" name="service-ec2procci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
+ id="b949011b-cp-400c-b6a7-c3f8a17f0ee6" name="cloudport" password="admin" role="administrator" email="admin@cloudport.fr" account="cloudport" authorization="" when="0" state="0" />
+<cords_user
+ id="b949011b-cp-400c-b6a7-c3f8a17f0ee6" name="admin" password="admin" role="administrator" email="admin@compatibleone.fr" account="compatibleone" authorization="" when="0" state="0" />
+<cords_user
+ id="8b278541-4fa9-4177-8ecd-2b1b38dd6d9a" name="jamie" password="cuimhne" role="administrator" email="jamie@compatibleone.fr" account="jamie" authorization="administrator" when="0" state="0" />
+<cords_user
+ id="4903596a-4668-4abe-8d08-2dccdd2ff6e3" name="fabio" password="cuimhne" role="administrator" email="fabio@compatibleone.fr" account="fabio" authorization="" when="0" state="0" />
 </cords_users>

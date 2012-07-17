@@ -81,6 +81,7 @@ public	char *	default_operator();
 #define	_OCCI_NO_AUTHORIZE	64	/* inhibit category authorize failure	*/
 #define	_OCCI_CONSUMER	 	128	/* publish monitoring consumer		*/
 #define	_OCCI_PROVIDER	 	256	/* publish resources provider 		*/
+#define	_OCCI_CONTRACT	 	512	/* publish resources under contract	*/
 
 #define	_OCCI_IDLE		0	/* the resource is idle			*/
 #define	_OCCI_ACTIVE		1	/* the resource is active		*/

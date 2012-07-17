@@ -27,14 +27,13 @@ fi
 # then specify the security directory.
 # -------------------------------------
 # nethsm=1
-tls=security
+# tls=security
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-# tls=
+tls=
 # -------------------------------------
-secdir=$tls
 zone="europe"
 trace=1
 threads=1

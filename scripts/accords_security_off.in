@@ -30,14 +30,13 @@ fi
 # then specify the security directory.
 # -------------------------------------
 # nethsm=1
-tls=security
+# tls=security
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-# tls=
+tls=
 # -------------------------------------
-export secdir=$tls
 zone="europe"
 trace=1
 threads=1
@@ -419,6 +418,11 @@ _make_security_files() {
 }
 
 _accords_config() {
+    if test `id -u` -eq 0; then
+	export secdir=security
+    else
+	export secdir=security
+    fi
 
     if [ -z "$tls" ]; then
 	echo "Accords Security Not Required"

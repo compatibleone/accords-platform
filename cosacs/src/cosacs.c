@@ -449,6 +449,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= _OCCI_CONTRACT;
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------------------------------- */
@@ -460,6 +461,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= _OCCI_CONTRACT;
 	optr->callback  = &cords_script_interface;
 
 	/* ----------------------------------------------------------- */
@@ -471,6 +473,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= _OCCI_CONTRACT;
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------- */
@@ -488,7 +491,18 @@ private	int	cosacs_operation( char * nptr )
 	/* ------------------------------------------ */
 	rest_initialise_log(Cosacs.monitor);
 
-	return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first,(char *) 0 ) );
+	if (!( Cosacs.identity ))
+		return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first, (char *) 0 ) );
+	else
+	{
+		initialise_occi_publisher( Cosacs.publisher, (char*) 0, (char *) 0, (char *) 0);
+
+		return( publishing_occi_server(
+			Cosacs.user, Cosacs.password,
+			Cosacs.identity,  nptr, 
+			Cosacs.restport, Cosacs.tls, 
+			Cosacs.threads, first ) );
+	}
 
 }
 
