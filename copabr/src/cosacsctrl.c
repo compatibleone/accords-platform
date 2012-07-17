@@ -48,9 +48,23 @@ private	void	cosacs_synchronise()
 /*	-------------------------------------------------	*/
 /*		c o s a c s _ h t t p _ p r e f i x		*/
 /*	-------------------------------------------------	*/
+private	int	_secure_cosacs=-1;
+
+private	int	read_secure_cosacs()
+{
+	char *	eptr=(char *) 0;
+	if ( _secure_cosacs != -1 )
+		return( _secure_cosacs );
+	else if (!( eptr = getenv("SECURECOSACS") ))
+		return((_secure_cosacs=0));
+	else 	return((_secure_cosacs=atoi(eptr)));
+}
+
 private	char * 	cosacs_http_prefix()
 {
-	return( "http" );
+	if ( read_secure_cosacs() )
+		return( "https" );
+	else	return( "http"  );
 }
 
 /*	-------------------------------------------------	*/
@@ -58,7 +72,9 @@ private	char * 	cosacs_http_prefix()
 /*	-------------------------------------------------	*/
 private	char * 	cosacs_tls()
 {
-	return( (char *) 0 );
+	if ( read_secure_cosacs() )
+		return( default_tls() );
+	else	return( (char *) 0 );
 }
 
 

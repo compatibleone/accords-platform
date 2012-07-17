@@ -70,6 +70,7 @@ public	int 	failure( int v, char * mptr, char * aptr )
 /*	-----------------------------------------------------	*/
 private	int	ll_test_cords_parser_operation( char * filename )
 {
+	char *dirc, *basec, *bname, *dname;
 	struct	xml_element * dptr;
 	char	nameplan[512];
 	if (!( Cp.host ))
@@ -82,17 +83,18 @@ private	int	ll_test_cords_parser_operation( char * filename )
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
-	    char *dirc, *basec, *bname, *dname;
-	    dirc = strdup(filename);
-	    basec = strdup(filename);
-	    dname = dirname(dirc);
-	    bname = basename(basec);
-	    sprintf(nameplan,"%s/plan_%s",dname, bname);
-	    free(dirc);
-	    free(basec);
+		if (!( dirc = allocate_string( filename ) ))
+			return( failure(5,"allocation",filename));
+		else if (!( basec = allocate_string( filename ) ))
+			return( failure(6,"allocation",filename));
 
-	    if (!( Cp.result = allocate_string( nameplan ) ))
-		return( failure(4,"allocation","result filename"));
+		dname = dirname(dirc);
+		bname = basename(basec);
+		sprintf(nameplan,"%s/plan_%s",dname, bname);
+		direc = liberate( dirc );
+		basec = liberate( basec );
+		if (!( Cp.result = allocate_string( nameplan ) ))
+			return( failure(4,"allocation","result filename"));
 	}
 	dptr = cords_serialise_document( dptr, Cp.result );
 	return( 0 );
