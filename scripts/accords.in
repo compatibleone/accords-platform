@@ -37,7 +37,7 @@ tls=security
 nethsm=
 # tls=
 # -------------------------------------
-resthost=$1
+resthost=127.0.0.1
 secdir=$tls
 zone="europe"
 trace=1
