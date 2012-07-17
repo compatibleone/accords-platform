@@ -34,6 +34,8 @@
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
 private	int	SSL_READY=0;
+private	int	ssl_contexts=0;
+private	int	total_contexts=0;
 
 #define	Portable_srandom	srandom
 #define	SSL_debug 		check_debug()
@@ -447,13 +449,14 @@ public	int	connection_shutdown( CONNECTIONPTR cptr )
 /*	the correct closure of a secure socket connection.	*/
 /*	------------------------------------------------	*/
 
-void		close_ssl_connection( 
+void	close_ssl_connection( 
 	CONNECTIONPTR	cptr,
 	int		mode)
 {
 	/* Check for an SSL object */
 	/* ----------------------- */
 	security_lock( cptr->socket, "close" );
+	printf("close_ssl_connection( %lx, %u )\n",cptr,mode);
 	if ( cptr->newobject ) 
 	{
 		ssl_tcp_shutdown(cptr->newobject);
@@ -468,6 +471,7 @@ void		close_ssl_connection(
 
 		if ( cptr->context ) 
 		{
+			/* if ( ssl_contexts ) { printf("old SSL CTX : %lx (%u/%u)\n",cptr,--ssl_contexts,total_contexts); } */
 			SSL_CTX_free( cptr->context );
 			cptr->context = (void *) 0;
 		}
@@ -725,6 +729,7 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
+	/* printf("new SSL CTX : %lx (%u/%u)\n",cptr,++ssl_contexts,++total_contexts); */
 
 	SSL_CTX_set_mode (cptr->context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 	SSL_CTX_set_mode (cptr->context, SSL_MODE_AUTO_RETRY);

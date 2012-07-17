@@ -794,7 +794,15 @@ public	struct	rest_response * rest_client_get_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -840,7 +848,15 @@ public	struct	rest_response * rest_client_try_get_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -880,7 +896,15 @@ public	struct	rest_response * rest_client_delete_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 }
 
@@ -919,7 +943,15 @@ public	struct	rest_response * rest_client_head_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 }
 
@@ -960,7 +992,15 @@ public	struct	rest_response * rest_client_post_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -1002,7 +1042,15 @@ public	struct	rest_response * rest_client_put_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }

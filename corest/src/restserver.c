@@ -622,6 +622,18 @@ public	struct	rest_response * rest_allocate_response(struct rest_client * cptr)
 }
 
 /*	------------------------------------------------	*/
+/*	   r e s t _ l i b e r a t e _ r e s p o n s e		*/
+/*	------------------------------------------------	*/
+public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr)
+{
+	if ( aptr )
+	{
+		liberate_rest_response( aptr );
+		return((struct rest_response *) 0);
+	}
+}		
+
+/*	------------------------------------------------	*/
 /*		r e s t _ h t m l _ f a i l u r e		*/
 /*	------------------------------------------------	*/
 private	char * rest_html_failure( int status, char * message )
@@ -1452,7 +1464,7 @@ private	int	rest_process_message(
 		rest_log_debug("rest: liberate request");
 		liberate_rest_request( rptr );
 		rest_log_debug("rest: liberate response");
-		liberate_rest_response( aptr );
+		rest_liberate_response( aptr );
 		rest_drop_client( cptr );
 		rest_log_debug("rest: process message done");
 		return(0);
@@ -1915,6 +1927,9 @@ public	struct	rest_client * rest_drop_client( struct rest_client * cptr )
 	char 			buffer[1024];
 	struct	rest_server * 	sptr;
 
+	if (!( cptr ))
+		return( cptr );
+
 	if ((sptr = cptr->parent))
 		lock_rest_server( sptr );
 
@@ -1923,7 +1938,7 @@ public	struct	rest_client * rest_drop_client( struct rest_client * cptr )
 	{
 		sprintf(buffer,"connection close (socket=%u)",cptr->net.socket);
 		rest_log_debug( buffer );
-		connection_close( &cptr->net,0);
+		connection_close( &cptr->net,1);
 	}
 	cptr = drop_rest_client( cptr );
 	if ( sptr )

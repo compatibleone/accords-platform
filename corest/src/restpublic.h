@@ -111,6 +111,8 @@ public	char *
 public	void	
 	rest_add_http_prefix(char * buffer, int buflen, char * host );
 
+public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
+
 #endif	/* _restpublic_h */
 	/* ------------- */
 
