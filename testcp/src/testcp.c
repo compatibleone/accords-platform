@@ -20,6 +20,8 @@
 #ifndef	_test_cords_parser_c
 #define	_test_cords_parser_c
 
+#include <libgen.h>
+
 #include "standard.h"
 #include "cp.h"
 #include "occilogin.h"
@@ -80,9 +82,17 @@ private	int	ll_test_cords_parser_operation( char * filename )
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
-		sprintf(nameplan,"plan_%s",filename);
-		if (!( Cp.result = allocate_string( nameplan ) ))
-			return( failure(4,"allocation","result filename"));
+	    char *dirc, *basec, *bname, *dname;
+	    dirc = strdup(filename);
+	    basec = strdup(filename);
+	    dname = dirname(dirc);
+	    bname = basename(basec);
+	    sprintf(nameplan,"%s/plan_%s",dname, bname);
+	    free(dirc);
+	    free(basec);
+
+	    if (!( Cp.result = allocate_string( nameplan ) ))
+		return( failure(4,"allocation","result filename"));
 	}
 	dptr = cords_serialise_document( dptr, Cp.result );
 	return( 0 );
