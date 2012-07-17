@@ -456,7 +456,9 @@ void	close_ssl_connection(
 	/* Check for an SSL object */
 	/* ----------------------- */
 	security_lock( cptr->socket, "close" );
-	printf("close_ssl_connection( %lx, %u )\n",cptr,mode);
+
+	/* printf("close_ssl_connection( %lx, %u )\n",cptr,mode); */
+
 	if ( cptr->newobject ) 
 	{
 		ssl_tcp_shutdown(cptr->newobject);
