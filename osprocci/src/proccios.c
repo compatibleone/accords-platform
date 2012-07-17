@@ -848,12 +848,11 @@ private	int	associate_server_address(
 		return( 1002 );
 	else if (!( nomfic = os_create_address_request( subptr, pptr->floating ) ))
 		return( 1003 );
-	else if (!( osptr = os_server_address( subptr,nomfic, pptr->number ) ))
+	else if (!( osptr = os_server_address( subptr, nomfic, pptr->number ) ))
 		return( 1004 );
 	else
 	{
 		osptr = liberate_os_response( osptr );
-		nomfic = liberate( nomfic );
 		while (iterate)
 		{
 			if (!( osptr = os_get_address( subptr,pptr->floatingid ) ))
@@ -908,7 +907,6 @@ private	int	disassociate_server_address( struct os_subscription * subptr, struct
 	else
 	{
 		osptr = liberate_os_response( osptr );
-		nomfic = liberate( nomfic );
 		if (!( osptr = os_get_address( subptr,pptr->floatingid ) ))
 			return( 1005 );
 		else
