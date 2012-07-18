@@ -1264,6 +1264,11 @@ private	struct	rest_response * start_openstack(
 		/* ------------------------------------- */
 		if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
 		{
+			/* ------------------------------------- */
+			/* release the COSACS client information */
+			/* ------------------------------------- */
+			occi_release_client( pptr->hostname );
+
 			/* -------------------------------- */
 			/* disassociate address from server */
 			/* -------------------------------- */

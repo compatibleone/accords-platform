@@ -1295,6 +1295,23 @@ public	struct	occi_client *	occi_resolve_client( char * host )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ r e l e a s e _  c l i e n t		*/
+/*	------------------------------------------------------------	*/
+/*	this function is required when an OCCI component such as a	*/
+/*	COSACS server is private and will no longer need to be used	*/
+/*	the client must be released in order to avoid problems due	*/
+/*	to incorrect use of the OCCI Client structure. 			*/
+/*	Many thanks to Thanks Jean Michel Leonard for finding this	*/
+/*	------------------------------------------------------------	*/
+public	int	occi_release_client( char * host )
+{
+	struct	occi_client *	cptr;
+	if (( cptr = occi_resolve_client( host )) != (struct occi_client *) 0)
+		occi_delete_client( cptr );
+	return(0);
+}
+
+/*	------------------------------------------------------------	*/
 /*			o c c i _ c r e a t e _ c l i e n t		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_create_client( char * host, char * agent, char * tls )
