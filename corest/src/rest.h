@@ -53,6 +53,10 @@
 #define	_HTTP_CONTENT_TYPE	"Content-Type"
 #define	_HTTP_CONTENT_LENGTH	"Content-Length"
 #define	_HTTP_LOCATION		"Location"
+#define	_HTTP_AUTHORIZATION	"Authorization"
+#define	_HTTP_WWW_AUTHENTICATE	"WWW-Authenticate"
+#define	_HTTP_PROXY_AUTHENTICATE "PROXY-Authenticate"
+#define	_HTTP_BASIC		"Basic realm=*"
 
 struct	rest_server;
 struct	rest_client;

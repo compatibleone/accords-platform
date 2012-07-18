@@ -41,10 +41,21 @@
 #include "occiclient.h"
 #include "occiresolver.h"
 #include "occibody.h"
+#include "occilogin.h"
 #include "json.h"
+
+struct	accords_authorization
+{
+	struct	accords_authorization * previous;
+	struct	accords_authorization * next;
+	char *	user;
+	char *	pass;
+	char *	authorization;
+};
 
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
+private	struct	accords_authorization * AccordsAuthorization=(struct accords_authorization *) 0;
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
 
@@ -57,9 +68,22 @@ private	char *	occi_authorization=(char *) 0;
 private	struct rest_response * occi_failure(struct rest_client * cptr,  int status, char * message )
 {
 	struct	rest_response * aptr;
+	struct	rest_header * hptr;
 	if (!( aptr = rest_allocate_response(cptr)))
 		return( aptr );
-	else	return( rest_html_response( aptr, status, message ) );
+	else 
+	{
+		switch ( status )
+		{
+		case	401	:
+			hptr = rest_response_header( aptr, _HTTP_WWW_AUTHENTICATE, _HTTP_BASIC );
+			break;
+		case	407	:
+			hptr = rest_response_header( aptr, _HTTP_PROXY_AUTHENTICATE, _HTTP_BASIC );
+			break;
+		}
+		return( rest_html_response( aptr, status, message ) );
+	}
 }
 
 /*	---------------------------------------------------------	*/
@@ -74,7 +98,7 @@ private	struct rest_response * occi_redirect(struct rest_client * cptr,  int sta
 	struct	rest_header * hptr;
 	if (!( aptr = rest_allocate_response(cptr)))
 		return( aptr );
-	else if (!( hptr = rest_response_header( aptr, "Location", target ) ))
+	else if (!( hptr = rest_response_header( aptr, _HTTP_LOCATION, target ) ))
 		return( rest_html_response( aptr, 500, message ) );
 	else	return( rest_html_response( aptr, status, message ) );
 }
@@ -994,6 +1018,119 @@ private	struct	rest_response *	occi_invoke_transaction(
 }
 
 /*	----------------------------------------------------------------	*/
+/*		o c c i _ a u t h o r i z a t i o n _ f a i l u r e		*/
+/*	----------------------------------------------------------------	*/
+private	struct rest_response * occi_authorization_failure( 
+		struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_ACCEPT ) ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( hptr->value ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( accept_string_includes( hptr->value, _OCCI_TEXT_HTML ) ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else	return( occi_failure(cptr,  401, "Authorization required" ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ l o c a t e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_locate_authorization( char * username, char * password )
+{
+	struct	accords_authorization * aptr;
+	for (	aptr=AccordsAuthorization;
+		aptr != (struct accords_authorization *) 0;
+		aptr = aptr->next )
+	{
+		if ( strcmp( aptr->user, username ) != 0)
+			continue;
+		else if ( strcmp( aptr->pass, password ) != 0)
+			continue;
+		else	break;
+	}
+	return( aptr );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ r e m o v e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_remove_authorization( struct accords_authorization * aptr )
+{
+	if ( aptr )
+	{
+		if ( aptr->user )
+			aptr->user = liberate( aptr->user );
+		if ( aptr->pass )
+			aptr->pass = liberate( aptr->pass );
+		if ( aptr->authorization )
+			aptr->authorization = liberate( aptr->authorization );
+		aptr = liberate( aptr );
+	}
+	return((struct accords_authorization *) 0);
+}
+
+/*	----------------------------------------------------------------	*/
+/*		a c c o r d s _ d r o p _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_drop_authorization( struct accords_authorization * aptr )
+{
+	if (!( aptr->previous ))
+	{
+		if ((AccordsAuthorization = aptr->next) != (struct accords_authorization *) 0)
+			AccordsAuthorization->previous = (struct accords_authorization *) 0;
+	}
+	else if (( aptr->previous->next = aptr->next ) != (struct accords_authorization *) 0)
+		aptr->next->previous = aptr->previous;
+
+	return( accords_remove_authorization( aptr ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ c r e a t e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_create_authorization( char * username, char * password, char * authorization )
+{
+	struct	accords_authorization * aptr;
+	if (!( aptr = (struct accords_authorization *) allocate( sizeof( struct accords_authorization ) ) ))
+		return( aptr );
+	else	memset( aptr, 0, sizeof( struct accords_authorization ) );
+	if (!( aptr->user = allocate_string( username ) ))
+		return( accords_remove_authorization( aptr ) );
+	else if (!( aptr->pass = allocate_string( password ) ))
+		return( accords_remove_authorization( aptr ) );
+	else if (!( aptr->authorization = allocate_string( authorization ) ))
+		return( accords_remove_authorization( aptr ) );
+	else
+	{
+		if ((aptr->next = AccordsAuthorization) != (struct accords_authorization *) 0)
+			aptr->next->previous = aptr;
+		return ((AccordsAuthorization = aptr));
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ r e s o l v e _ a u t h o r i z a t i o n		*/
+/*	----------------------------------------------------------------	*/
+private	int	accords_resolve_authorization( char * sptr, char * agent, char * tls )
+{
+	struct	accords_authorization * aptr;
+	char 	username[1024];
+	char 	password[1024];
+	char *	authorization;
+	if (!( rest_decode_credentials( sptr, username, password ) ))
+		return( 0 );
+	else if ((aptr = accords_locate_authorization( username, password )) != (struct accords_authorization *) 0)
+		return( 1 );
+	else if (!( authorization = login_occi_user( username, password, agent, tls )))
+		return( 0 );
+	else if (!(aptr = accords_create_authorization( username, password, authorization ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	----------------------------------------------------------------	*/
 /*	o c c i _ c h e c k _ r e q u e s t _ a u t h o r i z a t i o n		*/
 /*	----------------------------------------------------------------	*/
 /*	Here we check the request authorization header value in respect		*/
@@ -1012,11 +1149,24 @@ private	int	occi_check_request_authorization(
 		struct occi_category * optr )
 {
 	struct	rest_header * hptr;
-	if (!( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )))
+
+	/* ----------------------------------------------- */
+	/* test first for OCCI Authorization token present */
+	/* ----------------------------------------------- */
+	if (( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )) != (struct rest_header *) 0)
+	{
+		if (!( hptr->value ))
+			return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
+		else 	return( occi_resolve_authorization( hptr->value ) );
+	}
+	/* ------------------------------------- */
+	/* test for an HTTP AUTHORIZATION header */
+	/* ------------------------------------- */
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_AUTHORIZATION ) ))
 		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
 	else if (!( hptr->value ))
 		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
-	else 	return( occi_resolve_authorization( hptr->value ) );
+	else 	return( accords_resolve_authorization( hptr->value, _CORDS_CONTRACT_AGENT, default_tls()  ) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -1036,8 +1186,8 @@ private	struct rest_response * occi_get(
 	occi_show_request( rptr );
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
-	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_get_capacities( optr, cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/" ) ))
@@ -1081,7 +1231,7 @@ private	struct rest_response * occi_post(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Creation" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -1135,7 +1285,7 @@ private	struct rest_response * occi_put(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if ((hptr = rest_resolve_header( rptr->first, "Link" )))
 		return( occi_failure(cptr,  400, "Bad Request : MUST not PUT Link" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
@@ -1173,7 +1323,7 @@ private	struct rest_response * occi_delete(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Removal" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -1210,7 +1360,7 @@ private	struct rest_response * occi_head(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_head( optr, cptr, rptr ) );
@@ -1243,11 +1393,11 @@ public	int	occi_process_atributs(
 	char 	*	vptr;
 	struct	rest_header * hptr;
 
-	for ( 	hptr = rest_resolve_header( rptr->first, "X-OCCI-Attribute");
+	for ( 	hptr = rest_resolve_header( rptr->first, _OCCI_ATTRIBUTE );
 		hptr != (struct rest_header *) 0;
 		hptr = hptr->next )
 	{
-		if ( strcasecmp(hptr->name,"X-OCCI-Attribute") != 0)
+		if ( strcasecmp(hptr->name, _OCCI_ATTRIBUTE) != 0)
 			continue;
 		else if (!( hptr->value ))
 			continue;
