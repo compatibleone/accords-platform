@@ -66,7 +66,9 @@ if [ -z "$makeuser" ]; then
 	echo "not transfering files"
 else
 	echo "transfering to www.compatibleone.fr"
-	scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform/$makesystem
+	tar -czvf accords-manifests.tgz accords-*.xml accords-*.sh sla-accords-*.xml
+	scp -P 22100 accords-*.xml accords-*.sh sla*.xml accords-manifests.tgz update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform/$makesystem
+	rm accords-manifests.tgz
 fi
 echo "-------------------------------------------- "
 echo "demonstrator production is ready for "$makesystem
