@@ -270,6 +270,146 @@ private	struct	on_response * on_shutdown_object(
 }
 
 /* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ p u b l i c _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_public_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "storage" ) ))
+	{
+		if (!( filename = on_public_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_public_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		if (!( filename = on_public_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_public_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*		o n _ c l i e n t _ p e r s i s t e n t _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_persistent_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "storage" ) ))
+	{
+		if (!( filename = on_persistent_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_persistent_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		if (!( filename = on_persistent_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_persistent_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*		o n _ c l i e n t _ v o l a t i l e _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_volatile_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "storage" ) ))
+	{
+		if (!( filename = on_volatile_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_volatile_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		if (!( filename = on_volatile_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_volatile_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ p u b l i c _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_rename_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		char * p4 )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "storage" ) ))
+	{
+		if (!( filename = on_rename_image_request( p3, p4 )))
+			return((struct on_response *) 0);
+		else 	return( on_rename_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		if (!( filename = on_rename_image_request( p3, p4 )))
+			return((struct on_response *) 0);
+		else 	return( on_rename_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
+/*			o n _ c l i e n t _ p r i v a t e _ o b j e c t			*/
+/* ------------------------------------------------------------------------------------ */
+private	struct	on_response * on_private_object( 
+		char * keyword, 
+		char * tls, 
+		char * agent,
+		char * p3,
+		struct rest_header * hptr )
+{
+	char *	filename;
+	if (!( keyword ))
+		return((struct on_response *) 0);
+	else if (!( strcasecmp( keyword, "storage" ) ))
+	{
+		if (!( filename = on_private_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_private_image( p3, filename ) );
+	}
+	else if (!( strcasecmp( keyword, "image" ) ))
+	{
+		if (!( filename = on_private_image_request( p3 )))
+			return((struct on_response *) 0);
+		else 	return( on_private_image( p3, filename ) );
+	}
+	else	return((struct on_response *) 0);
+}
+
+/* ------------------------------------------------------------------------------------ */
 /*			o n _ c l i e n t _ s t a r t _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_start_object( 
@@ -436,6 +576,16 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return( on_result( on_stop_object( p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"SHUTDOWN" ) ))
 		return( on_result( on_shutdown_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"PUBLIC" ) ))
+		return( on_result( on_public_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"PRIVATE" ) ))
+		return( on_result( on_private_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"PERSISTENT" ) ))
+		return( on_result( on_persistent_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"VOLATILE" ) ))
+		return( on_result( on_volatile_object( p2, default_tls(), agent, p3, hptr ) ) );
+	else if (!( strcasecmp(p1,"RENAME" ) ))
+		return( on_result( on_rename_object( p2, default_tls(), agent, p3, p4 ) ) );
 	else if (!( strcasecmp(p1,"START" ) ))
 		return( on_result( on_start_object( p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( p4 ))
@@ -528,8 +678,8 @@ private	int	on_command(int argc, char * argv[] )
 /* ------------------------------------------------------------------------------------ */
 private	int	on_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.04");
-	printf("\n   Beta Version 28/03/2012");
+	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.05");
+	printf("\n   Beta Version 20/07/2012");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue" );
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -538,16 +688,21 @@ private	int	on_banner()
 	printf("\n");
 	printf("\n   REST Methods");
 	printf("\n");
-	printf("\n   [ GET    [ compute | storage | network | server ] {id} ");
-	printf("\n   [ DELETE [ compute | storage | network | server ] {id} ");
-	printf("\n   [ POST     compute {name} {small|medium|large} {image} {network} {driver} ");
-	printf("\n   [ SAVE     compute {id} {number} {name} {driver} ");
-	printf("\n   [ STOP     compute {id} ");
-	printf("\n   [ START    compute {id} ");
-	printf("\n   [ SHUTDOWN compute {id} ");
-	printf("\n   [ POST     storage {name} {description} {type} {size} ");
-	printf("\n   [ POST     network {name} {address} {class} ");
-	printf("\n   [ PUT    [ compute | storage | network | server ] {id} {filename} ");
+	printf("\n   [ GET      [ compute | storage | network | server ] {id} ");
+	printf("\n   [ DELETE   [ compute | storage | network | server ] {id} ");
+	printf("\n   [ POST       compute {name} {small|medium|large} {image} {network} {driver} ");
+	printf("\n   [ SAVE       compute {id} {number} {name} {driver} ");
+	printf("\n   [ STOP       compute {id} ");
+	printf("\n   [ START      compute {id} ");
+	printf("\n   [ SHUTDOWN   compute {id} ");
+	printf("\n   [ POST       storage {name} {description} {type} {size} ");
+	printf("\n   [ PUBLIC     storage {id} ");
+	printf("\n   [ PRIVATE    storage {id} ");
+	printf("\n   [ PERSISTENT storage {id} ");
+	printf("\n   [ VOLATILE   storage {id} ");
+	printf("\n   [ RENAME     storage {id} {newname} ");
+	printf("\n   [ POST       network {name} {address} {class} ");
+	printf("\n   [ PUT      [ compute | storage | network | server ] {id} {filename} ");
 	printf("\n\n");
 	return( 0 );
 }

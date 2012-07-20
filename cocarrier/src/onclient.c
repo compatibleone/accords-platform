@@ -492,6 +492,130 @@ public	char * on_create_image_request(
 }
 
 /*	----------------------------------------------------------------	*/
+/*	 	o n _ p u b l i c _ i m a g e _ r e q u e s t			*/
+/*	----------------------------------------------------------------	*/
+public	char * on_public_image_request( char * image )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<STORAGE><ID>%s</ID><PUBLIC>YES</PUBLIC></STORAGE>\n",image);
+		fclose(h);
+		return( filename );
+	}
+}
+/*	----------------------------------------------------------------	*/
+/*	 	o n _ p r i v a t e _ i m a g e _ r e q u e s t			*/
+/*	----------------------------------------------------------------	*/
+public	char * on_private_image_request( char * image )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<STORAGE><ID>%s</ID><PUBLIC>NO</PUBLIC></STORAGE>\n",image);
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	    	o n _ r e n a m e _ i m a g e _ r e q u e s t			*/
+/*	----------------------------------------------------------------	*/
+public	char * on_rename_image_request( char * image, char * newname )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<STORAGE><ID>%s</ID><NAME>%s</NAME></STORAGE>\n",image,newname);
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	    o n _ p e r s i s t e n t _ i m a g e _ r e q u e s t		*/
+/*	----------------------------------------------------------------	*/
+public	char * on_persistent_image_request( char * image )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<STORAGE><ID>%s</ID><PERSISTENT>YES</PERSISTENT></STORAGE>\n",image);
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	    	o n _ v o l a t i l e _ i m a g e _ r e q u e s t		*/
+/*	----------------------------------------------------------------	*/
+public	char * on_volatile_image_request( char * image )
+{
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+
+	if (!( hptr = on_authenticate() ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<STORAGE><ID>%s</ID><PERSISTENT>NO</PERSISTENT></STORAGE>\n",image);
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	----------------------------------------------------------------	*/
 /*			o n _ c r e a t e _ i m a g e 				*/
 /*	----------------------------------------------------------------	*/
 public	struct	on_response *	on_create_image( char * id, char * filename ) 
@@ -1005,6 +1129,56 @@ public	struct	on_response *	on_delete_server( char * id )
 public	struct	on_response *	on_delete_image ( char * id ) 
 {
 	return( on_delete_storage( id ));
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ p u b l i c _ i m a g e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_public_image ( char * id, char * filename ) 
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/storage/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ p r i v a t e _ i m a g e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_private_image ( char * id, char * filename ) 
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/storage/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ r e n a m e _ i m a g e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_rename_image ( char * id, char * filename ) 
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/storage/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*		o n _ p e r s i s t e n t _ i m a g e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_persistent_image ( char * id, char * filename ) 
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/storage/%s",id);
+	return( on_put_request( buffer, filename ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*		o n _ v o l a t i l e _ i m a g e				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_volatile_image ( char * id, char * filename ) 
+{
+	char 	buffer[2048];
+	sprintf(buffer,"/storage/%s",id);
+	return( on_put_request( buffer, filename ) );
 }
 
 /*	------------------------------------------------------------	*/

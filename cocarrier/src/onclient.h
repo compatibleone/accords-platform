@@ -115,6 +115,16 @@ public	char * 	on_start_compute_request( char * identity );
 public	struct	on_response *	on_start_compute( char * id, char * filename );
 public	char * 	on_shutdown_compute_request( char * identity );
 public	struct	on_response *	on_shutdown_compute( char * id, char * filename );
+public	char * on_public_image_request( char * image );
+public	struct	on_response *	on_public_image ( char * id, char * filename );
+public	char * on_private_image_request( char * image );
+public	struct	on_response *	on_private_image ( char * id, char * filename );
+public	char * on_rename_image_request( char * image, char * newname );
+public	char * on_persistent_image_request( char * image );
+public	char * on_volatile_image_request( char * image );
+public	struct	on_response *	on_rename_image ( char * id, char * filename );
+public	struct	on_response *	on_persistent_image ( char * id, char * filename );
+public	struct	on_response *	on_volatile_image ( char * id, char * filename );
 
 #endif	/* _on_client_h */
 	/* ------------ */
