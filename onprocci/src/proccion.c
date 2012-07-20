@@ -357,7 +357,6 @@ private	struct	rest_response * start_opennebula(
 	}
 	else
 	{
-		liberate( filename );
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
@@ -433,26 +432,22 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 	struct	on_response * rptr;
 	char *	vptr;
 	if (!( filename = on_shutdown_compute_request( pptr->number ) ))
-		return(0);
+		return(118);
 	else if (!( rptr = on_shutdown_compute( pptr->number, filename ) ))
-	{
-		filename = liberate( filename );
-		return(0);
-	}
+		return(119);
 	else
 	{
-		filename = liberate( filename );
 		rptr = liberate_on_response( rptr );
 		while (1)
 		{
 			if (!( rptr = on_get_server( pptr->number )))
 			{
-				return(0);
+				return(120);
 			}
 			else if (!( vptr = xml_element_value( rptr->xmlroot, "STATE" )))
 			{
 				rptr = liberate_on_response( rptr );
-				return(0);
+				return(121);
 			}
 			else if (!( strcmp( vptr, "DONE" )))
 			{
@@ -544,8 +539,8 @@ private	struct	rest_response * save_opennebula(
 	}
 	else if (!( onptr = on_connect_image( pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if (!( on_shutdown_image( pptr ) ))
-	 	return( rest_html_response( aptr, 1406, "shutdown failure" ) );
+	else if ((status = on_shutdown_image( pptr )) != 0)
+	 	return( rest_html_response( aptr, 1400 + status, "save shutdown failure" ) );
 	else
 	{
 		/* ----------------------------- */
@@ -610,8 +605,8 @@ private	struct	rest_response * snapshot_opennebula(
 	}
 	else if (!( onptr = on_connect_image( pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if (!( on_shutdown_image( pptr ) ))
-	 	return( rest_html_response( aptr, 1406, "shutdown failure" ) );
+	else if ((status = on_shutdown_image( pptr )) != 0)
+	 	return( rest_html_response( aptr, 1400+status, "snapshot shutdown failure" ) );
 	{
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);

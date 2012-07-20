@@ -2006,8 +2006,14 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 				else	break;
 			}
 			else if ( status == -1 ) 
-				break;
-
+			{
+				if ( errno != EINTR )
+				{
+					rest_log_debug("rest server select interrupt errno != EINTR");
+					break;
+				}
+				else	continue;
+			}
 			else if ( sptr->active )
 			{
 				rest_log_debug( "server: accept message" );

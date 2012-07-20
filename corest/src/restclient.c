@@ -288,7 +288,7 @@ private	struct	rest_client * rest_allocate_client()
 }
 
 /*	------------------------------------------------	*/
-/*	    r e s t _ l i b e r a t e _ s e r v e r		*/
+/*	    r e s t _ l i b e r a t e _ c l i e n t 		*/
 /*	------------------------------------------------	*/
 private	struct	rest_client * rest_liberate_client( struct rest_client * cptr )
 {
@@ -353,8 +353,10 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 {
 	struct rest_client *  cptr;
 	char	buffer[1024]; 
+
 	if (!( port ))
 		return((struct rest_client*) 0); 
+
 	else if (!( cptr = rest_allocate_client() ))
 	{
 		if ( check_debug() )

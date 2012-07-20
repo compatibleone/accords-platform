@@ -229,6 +229,8 @@ private	char *	opennebula_image_id( char * href )
 {
 	struct	url * uptr;
 	char *	result;
+	char *	work;
+	char *	number;
 	if (!( href ))
 		return( href );
 	else if (!( uptr = analyse_url( href ) ))
@@ -247,7 +249,16 @@ private	char *	opennebula_image_id( char * href )
 	{
 		uptr = liberate_url( uptr );
 		href = liberate( href );
-		return( result );
+		for (	number=work=result;
+			*work != 0;
+			work++)
+		{
+			if ( *work == '/' )
+				number = (work+1);
+		}
+		work = allocate_string( number );
+		liberate( result );
+		return( work );
 	}
 }
 
@@ -258,6 +269,8 @@ private	char *	opennebula_network_id( char * href )
 {
 	struct	url * uptr;
 	char *	result;
+	char *	work;
+	char *	number;
 	if (!( href ))
 		return( href );
 	else if (!( uptr = analyse_url( href ) ))
@@ -276,7 +289,16 @@ private	char *	opennebula_network_id( char * href )
 	{
 		uptr = liberate_url( uptr );
 		href = liberate( href );
-		return( result );
+		for (	number=work=result;
+			*work != 0;
+			work++)
+		{
+			if ( *work == '/' )
+				number = (work+1);
+		}
+		work = allocate_string( number );
+		liberate( result );
+		return( work );
 	}
 }
 
@@ -489,13 +511,14 @@ public	int	create_opennebula_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
-	else if (!( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
-		_CORDS_NODE, _CORDS_FIREWALL ) ))
-		return( terminate_opennebula_contract( 1171, &contract ) );
-	else if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
-		return( terminate_opennebula_contract( 1172, &contract ) );
+	else if (( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_FIREWALL )) != (char *) 0)
+	{
+		if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
+			return( terminate_opennebula_contract( 1172, &contract ) );
+	}
 
-	else if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
+	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_opennebula_contract( 1571, &contract ) );
 	else if (!( contract.infrastructure.message = occi_simple_get( contract.infrastructure.id, agent, tls ) ))
