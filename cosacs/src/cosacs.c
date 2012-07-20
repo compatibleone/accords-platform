@@ -84,8 +84,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.05");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.06");
+	printf("\n   Beta Version : 20/07/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -441,6 +441,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = (void *) 0;
 
 	if (!( optr = occi_cords_file_builder( Cosacs.domain, "file" ) ))
@@ -449,7 +450,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->access |= _OCCI_CONTRACT;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------------------------------- */
@@ -461,7 +462,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->access |= _OCCI_CONTRACT;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = &cords_script_interface;
 
 	/* ----------------------------------------------------------- */
@@ -473,7 +474,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->access |= _OCCI_CONTRACT;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------- */
@@ -491,7 +492,8 @@ private	int	cosacs_operation( char * nptr )
 	/* ------------------------------------------ */
 	rest_initialise_log(Cosacs.monitor);
 
-	if (!( Cosacs.identity ))
+	if ((!( Cosacs.identity ))
+	||  (!( strlen( Cosacs.identity ))) )
 		return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first, (char *) 0 ) );
 	else
 	{
