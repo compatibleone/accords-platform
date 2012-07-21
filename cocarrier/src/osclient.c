@@ -317,7 +317,6 @@ public	int	check_keystone_authorization(struct os_subscription * sptr)
 		else if (!( rptr = rest_client_post_request( 
 			buffer, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 		{
-			liberate_rest_header( hptr );
 			return( 0 );
 		}
 
