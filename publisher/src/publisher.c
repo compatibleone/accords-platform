@@ -867,6 +867,8 @@ private	int	publisher_operation( char * nptr )
 	else if (!( optr = occi_add_action( optr,"stop","",stop_agency)))
 		return( 27 );
 
+	Publisher.monitor &= ~2;
+
 	rest_initialise_log(Publisher.monitor);
 
 	/* ------------------------------------- */

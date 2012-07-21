@@ -176,6 +176,8 @@ private	int	coss_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= ( _OCCI_NO_PRICING | _OCCI_NO_AUTHORIZE );
 
+	Coss.monitor &= ~ 2;
+
 	rest_initialise_log(Coss.monitor);
 
 	if (!( Coss.identity ))

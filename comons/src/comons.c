@@ -472,6 +472,8 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
+	Comons.monitor &= ~2;
+
 	rest_initialise_log(Comons.monitor);
 
 	if (!( Comons.identity ))
