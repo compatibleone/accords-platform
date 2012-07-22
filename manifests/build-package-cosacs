@@ -7,7 +7,6 @@ cp /usr/local/lib/libpubocci.so.0 .
 cp /usr/local/lib/libcocarrier.so.0 .
 cp /usr/local/lib/libcopabr.so.0 .
 cp /usr/local/bin/cosacs .
-cp /usr/local/bin/cosacs .
 if [ -z "$makesecurity" ]; then
 	tar -czf update-cosacs.tgz build-config-cosacs style.css cosacs *.so.* run-cosacs
 else
