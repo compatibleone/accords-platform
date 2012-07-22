@@ -1,10 +1,4 @@
-cp /usr/local/lib/libcocci.so.0 .
-cp /usr/local/lib/libocci.so.0 .
-cp /usr/local/lib/libcords.so.0 .
-cp /usr/local/lib/libcorest.so.0 .
-cp /usr/local/lib/libcoxml.so.0 .
-cp /usr/local/lib/libpubocci.so.0 .
-cp /usr/local/lib/libcopabr.so.0 .
+cp /usr/local/lib/libco*.so.0 .
 cp /usr/local/bin/cosacs .
 if [ -z "$makesecurity" ]; then
 	tar -czf update-cosacs.tgz build-config-cosacs style.css cosacs *.so.* run-cosacs
