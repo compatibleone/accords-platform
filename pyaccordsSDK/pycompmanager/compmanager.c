@@ -1,32 +1,27 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* module to generate a new gategory for Accords platform                       */
-/* Hamid MEDJAHED for (C) 2011 Prologue              		                */
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------------*/
+/* ACCORDS Platform                                                       	 */
+/* module to generate a new gategory for Accords platform                        */
+/*-------------------------------------------------------------------------------*/
+/* copyright 2012 ,Hamid MEDJAHE    (hmedjahed@prologue.fr)    Prologue          */
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
 
 #include "compmanager.h"
 
 
-/*******************************************************************************************************/
-/*Function to commit accords platform                                                                  */
-/*******************************************************************************************************/
+/*--------------------------------------------------------------------------------*/
+/*               Function to commit accords platform                              */
+/*--------------------------------------------------------------------------------*/
 int commitPlatform()
 {
 
@@ -47,9 +42,9 @@ int commitPlatform()
  return 1;
 }
 
-/*******************************************************************************************************/
-/* Function to remove a component                                                                      */
-/*******************************************************************************************************/
+/*----------------------------------------------------------------------------------*/
+/*               Function to remove a component                                     */
+/*----------------------------------------------------------------------------------*/
 int deleteModule(char moduleName[])
 {
  char pathff[TAILLE];
@@ -63,12 +58,13 @@ int deleteModule(char moduleName[])
  }
  return 1;
 }
-/*******************************************************************************************************/
-/* Function to delete a category from accords platform                                                 */
-/* pathf: char * path of the directory project                                                         */
-/* categoryName: char * the name of the category                                                       */
-/* return 1 if succeeded                                                                               */
-/*******************************************************************************************************/
+
+/*-----------------------------------------------------------------------------------*/
+/* Function to delete a category from accords platform                               */
+/* pathf: char * path of the directory project                                       */
+/* categoryName: char * the name of the category                                     */
+/* return 1 if succeeded                                                             */
+/*-----------------------------------------------------------------------------------*/
 int deleteCategory(char categoryName[],int indice,int flag)
 {
  char cordsh[TAILLE];
@@ -212,7 +208,7 @@ int deleteCategory(char categoryName[],int indice,int flag)
   deleteInFile(pathactstruct,pathactstructname); 
  }
 
- if(flag==0)
+ if(!flag)
  {
   deleteInFile(cordsh,cordshname);
   deleteInFile(occibuilder,occibuildername);
@@ -232,13 +228,13 @@ int deleteCategory(char categoryName[],int indice,int flag)
 }
 
 
-/*****************************************************************************************************************/
-/* Fucntion to generate a category in accords paltform                                                           */
-/* categoryName: (char*) the name of the category                                                                */
-/* categoryAttributes: (char*) the list of the attribute as a string delimited by a comma (,)                    */
-/* pathf: (char*) a path name for the directory project                                                          */
-/* return 1 if succeeded                                                                                         */
-/*****************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------*/
+/* Fucntion to generate a category in accords paltform                                                   */
+/* categoryName: (char*) the name of the category                                                        */
+/* categoryAttributes: (char*) the list of the attribute as a string delimited by a comma (,)            */
+/* pathf: (char*) a path name for the directory project                                                  */
+/* return 1 if succeeded                                                                                 */
+/*-------------------------------------------------------------------------------------------------------*/
 int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag)
 {
  FILE *f;
@@ -257,7 +253,8 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
  sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);
  if(categoryActions[0]!='\0') indice=1;
-//create category.h file
+
+ //create category.h file
  if((f=fopen(pathff,"w"))==NULL)
  {
   printf("Error create category file H: No such file or directory: %s\n",pathff);
@@ -317,15 +314,18 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
   
     generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,pathf);
     generateCategoryActionPyfile(categoryName,categoryAtrB,categoryAct,pathf);
-    generateCategoryActionStruct(categoryName,categoryAct,pathf);
+    generateCategoryActionStruct(categoryName,categoryAct,0,pathf);
+    generateCategoryActionStruct(categoryName,categoryAct,1,pathf);
+    generateCategoryActionStruct(categoryName,categoryAct,2,pathf);
    }
    return dim;
  }
 }
-/**************************************************************************************************/
-/* function to generate category Action struct file                                               */
-/**************************************************************************************************/
-int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf[])
+
+/*---------------------------------------------------------------------------------------------*/
+/* function to generate category Action struct file                                            */
+/*---------------------------------------------------------------------------------------------*/
+int generateCategoryActionStruct(char *categoryName,listc categoryAct,int n,char pathf[])
 {
   FILE *fIn;
   FILE *fOut;
@@ -334,8 +334,11 @@ int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf
   int i=0;
   char line[1024];
   char strcats[2];
+  
+  if(n==0) sprintf(name,"%s/%s",pathf,PY_ACT_STRUCT);
+  else if(n==1) sprintf(name,"%s/%s",pathf,PY_ACT_NAME_STRUCT);
+  else if(n==2) sprintf(name,"%s/%s",pathf,PY_ACT_NUMBER_STRUCT);
 
-  sprintf(name,"%s/%s",pathf,PY_ACT_STRUCT);
   if((fIn=fopen(name,"r"))==NULL)
   {
    printf("Error in generate category Action struct file: No such file or directory\n");
@@ -359,20 +362,20 @@ int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf
     else
     {
      str_sub(line,0,1,strcats);
-     if((strcmp(strcats,"};"))==0) break;
+     if(!(strcmp(strcats,"};"))) break;
      else fprintf(fOut,"%s",line);
-
     }
   }
   
-  if(a==0)
+  if(!a)
   {
      elem *pelem=categoryAct.first;
      while(pelem)
      {
-      fprintf(fOut,"\t{\"%s_action%d\", %s_action%d },\n",categoryName,i,categoryName,i); 
+      if(n==0)fprintf(fOut,"\t{\"%s_%s\", %s_%s },\n",categoryName,pelem->value,pelem->value,categoryName); 
+      else if(n==1) fprintf(fOut,"\t{\"%s_getname\", %s_getname },\n",categoryName,categoryName);
+      else if(n==2) fprintf(fOut,"\t{\"%s_getnumber\", %s_getnumber },\n",categoryName,categoryName);
       pelem = pelem->next;
-      i++;
      }
   }
   
@@ -383,14 +386,15 @@ int generateCategoryActionStruct(char *categoryName,listc categoryAct,char pathf
   rename("text.tmp",name);
   return 1;
 }
-/**************************************************************************************************/
+
+/*------------------------------------------------------------------------------------------------*/
 /* Function to generate category Actions C file                                                   */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categoryAct,char pathf[])
 {
  FILE * f;
- int count=0;
  char name[1024];
+ int i=0;
 
  sprintf(name,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSS,categoryName);
  if((f=fopen(name,"w"))==NULL)
@@ -400,18 +404,34 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
  }
  else
  {
-    fprintf(f,"/********************************************************************************************************/\n");
-    fprintf(f,"/* Hamid MEDAJHED (c) Prologue                                                            */\n");
-    fprintf(f,"/********************************************************************************************************/\n");
+    fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/* ACCORDS Platform                                                              */\n"); 
+    fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
+    fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+    fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
+    fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
+    fprintf(f,"/*                                                                               */\n");
+    fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
+    fprintf(f,"/*                                                                               */\n");
+    fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
+    fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+    fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
+    fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
+    fprintf(f,"/* limitations under the License.                                                */\n");
+    fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
     fprintf(f,"#include \"../../occi/src/occi.h\"\n");
     fprintf(f,"#include \"ctools.h\"\n");
-    fprintf(f,"#include <Python.h>\n\n");
+    fprintf(f,"#include <Python.h>\n");
+    fprintf(f,"#include \"pytools.h\"\n\n");
   
     elem *pelem = categoryAct.first;
     while (pelem)
     {  
-       fprintf(f,"//            category %s action  \n",pelem->value);
-       fprintf(f,"struct rest_response * %s_action%d(\n",categoryName,count);
+       fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+       fprintf(f,"/*           %s %s action                                              */\n",categoryName,pelem->value);
+       fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+       fprintf(f,"struct rest_response * %s_%s(\n",categoryName,pelem->value);
        fprintf(f,"\tstruct occi_category * optr,\n"); 
        fprintf(f,"\tstruct rest_client * cptr,\n"); 
        fprintf(f,"\tstruct rest_request * rptr,\n"); 
@@ -428,7 +448,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\tchar * token;\n");
        fprintf(f,"\tFILE * exp_file;\n");
        fprintf(f,"\tlistcc restResponse;\n");
-       fprintf(f,"\tPyObject *main_module, *global_dict, *cbFunc, *result;\n\n");
+       fprintf(f,"\tPyObject    *pName, *pModule, *pDict, *pFunc,*result;\n\n");
 
        fprintf(f,"\tif (!( pptr = vptr ))\n");
        fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Invalid Action\" ) );\n");
@@ -452,20 +472,27 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
         pelemm=pelemm->next;
        }
        fprintf(f,"\t\t//           python interface\n");
-       fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc/%sAct.py\",PYPATH);\n",categoryName);
-       fprintf(f,"\t\texp_file = fopen(srcdir, \"r\");\n");
-       fprintf(f,"\t\tif(!exp_file) printf(\"error in %sAction.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
-       fprintf(f,"\t\tPy_Initialize();\n");
-       fprintf(f,"\t\tPyRun_SimpleFile(exp_file, srcdir);\n");
-       fprintf(f,"\t\tmain_module = PyImport_AddModule(\"__main__\");\n");
-       fprintf(f,"\t\tglobal_dict = PyModule_GetDict(main_module);\n");
-       fprintf(f,"\t\tcbFunc = PyDict_GetItemString(global_dict,\"%s\");\n",pelem->value);
-       fprintf(f,"\t\tif(!cbFunc) printf(\"error in %sAction.c :no python function\\n\");\n",categoryName);
-       fprintf(f,"\t\tresult=PyObject_CallFunction(cbFunc,\"s\",sendstr);\n");
-       fprintf(f,"\t\tresponse=PyString_AsString( result );\n"); 
+       fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
+       frintf(f,"\t\tif(!Py_IsInitialized)\n");
+       fprintf(f,"\t\t{\n");
+       fprintf(f,"\t\t\tPy_Initialize();\n");
+       fprintf(f,"\t\t}\n");
+       fprintf(f,"\t\tpython_path(srcdir);\n"); 
+       fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
+       fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
+       fprintf(f,"\t\telse pModule = PyImport_Import(pName);\n");
+       fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %s module\\n\");\n",categoryName);
+       fprintf(f,"\t\telse pDict = PyModule_GetDict(pModule);\n");
+       fprintf(f,"\t\tif(pDict == NULL) printf(\"error: failed to load dict name in %s module\\n\");\n",categoryName);
+       fprintf(f,"\t\telse pFunc = PyDict_GetItemString(pDict,\"%s\");\n",pelem->value);
+       fprintf(f,"\t\tif(pFunc == NULL) printf(\"error: failed to load %s function in %s module\\n\");\n",pelem->value,categoryName);
+       fprintf(f,"\t\telse result=PyObject_CallFunction(pFunc,\"s\",sendstr);\n");
+       fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
+       fprintf(f,"\t\tPy_DECREF(pModule);\n");
+       fprintf(f,"\t\tPy_DECREF(pName);\n");
        fprintf(f,"\t\tPy_Finalize();\n\n");
+       
        fprintf(f,"\t\tresetListe(&restResponse);\n");
-
        fprintf(f,"\t\ttoken= strtok(response,\",\");\n");
        fprintf(f,"\t\tfor(; token != NULL ;)\n");
        fprintf(f,"\t\t{\n");
@@ -483,18 +510,43 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\t\t}\n");
        fprintf(f,"\t\treturn( rest_html_response( aptr, status, message ) );\n");
        fprintf(f,"\t}\n");
-       fprintf(f,"}\n");
-       count++;
+       fprintf(f,"}\n\n");
        pelem=pelem->next;
     }
+    
+    fprintf(f,"char *%s_getname(int a)\n",categoryName);
+    fprintf(f,"{\n");
+    fprintf(f,"\tchar action[256];\n");
+    fprintf(f,"\tswitch(a)\n");
+    fprintf(f,"\t{\n");
+    elem *pelemn = categoryAct.first;
+    while(pelemn)
+    {
+     fprintf(f,"\t\tcase %d:\n",i);
+     fprintf(f,"\t\t\tstrcpy(action,pelemn->value);\n");
+     fprintf(f,"\t\t\tbreak;\n");
+     pelemn=pelemn->next;
+     i++;
+    }
+    fprintf(f,"\t\tdefault:\n");
+    fprintf(f,"\t\t\tstrcpy(action,%s);\n",categoryName);
+    fprintf(f,"\t\t\tbreak;\n");
+    fprintf(f,"\t}\n");
+    fprintf(f,"\treturn action;\n");
+    fprintf(f,"}\n\n");
+    
+    fprintf(f,"int %s_getnumber()\n",categoryName);
+    fprintf(f,"{\n");
+    fprintf(f,"\treturn %d;\n",i);
+    fprintf(f,"}\n");
     fclose(f);
   }
  return 1;
 }
 
-/*******************************************************************************************************************/
-/* function to generate python category Actions source file                                                        */
-/*******************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------*/
+/* function to generate python category Actions source file                                              */
+/*-------------------------------------------------------------------------------------------------------*/
 int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc categoryAct,char pathf[])
 {
  FILE * f;
@@ -525,9 +577,22 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
   }
   else
   {
+   fprintf(f,"###############################################################################\n");
+   fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+   fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+   fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+   fprintf(f,"# limitations under the License.                                              #\n");
+   fprintf(f,"###############################################################################\n");
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
-   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import pypacksrc\n");
    fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords\"\n");
@@ -563,7 +628,7 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
      fprintf(f,"\tl=categStr.split(\",\")\n");
      fprintf(f,"\tcategoryAtr = C%s%s\n",categoryName,listAtr);
      fprintf(f,"\trestCateg = %s_%s(categoryAtr)\n",categoryName,pelemact->value);
-     fprintf(f,"\trestResp = [str(restCateg.status),str(restCateg.message)]\n");//%s\n",listResult);
+     fprintf(f,"\trestResp = [str(restCateg.status),str(restCateg.message)]\n");
      fprintf(f,"\trestResponse = \",\".join(restResp)\n");
      fprintf(f,"\treturn restResponse\n\n");
      pelemact=pelemact->next;
@@ -578,9 +643,23 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
   }
   else
   {
+   fprintf(f,"###############################################################################\n");
+   fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+   fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+   fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+   fprintf(f,"# limitations under the License.                                              #\n");
+   fprintf(f,"###############################################################################\n");
+
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
-   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
    fprintf(f,"# Implementation of category actions\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import %s\n",LIB_PYCOMPDEV); 
@@ -610,7 +689,7 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
      fprintf(f,"def %s_%s(%s):\n",categoryName,pelemaction->value,categoryName);
      fprintf(f,"\tresponse=respAction(\"200\",\"ok\")\n");
      fprintf(f,"\t\"\"\"Implement here your function\"\"\"\n\n");
-     fprintf(f,"\treturn response\n\n");//categoryName);
+     fprintf(f,"\treturn response\n\n");
      pelemaction=pelemaction->next;
    }
    fclose(f);
@@ -620,9 +699,9 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
 
 }
 
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 /* Function to generate category interface membership file                                        */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pathf[])
 {
  FILE * f;
@@ -639,13 +718,28 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
  }
  else
  {
-  fprintf(f,"/********************************************************************************************************/\n");
-  fprintf(f,"/* Hamid MEDAJHED & Elyes ZEKRI (c) Prologue                                                            */\n");
-  fprintf(f,"/********************************************************************************************************/\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* ACCORDS Platform                                                              */\n");
+  fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+  fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
+  fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
+  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+  fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
+  fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
+  fprintf(f,"/* limitations under the License.                                                */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+
   fprintf(f,"#include \"../../occi/src/occi.h\"\n");
   fprintf(f,"#include \"ctools.h\"\n");
   fprintf(f,"#include \"listcateg.h\"\n");
-  fprintf(f,"#include <Python.h>\n\n");
+  fprintf(f,"#include <Python.h>\n");
+  fprintf(f,"#include \"pytools.h\"\n\n");
   for(j=0;j<4;j++)
   {
       fprintf(f,"private int %s_%s(struct occi_category * optr, void * vptr)\n",categoryName,funcName[j]);
@@ -659,8 +753,8 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       fprintf(f,"\tchar * token;\n");
       fprintf(f,"\tFILE * exp_file;\n");
       fprintf(f,"\tlistcc categoryAtr;\n");
-      fprintf(f,"\tPyObject*    main_module, * global_dict, * cbFunc, *result;\n\n");
-     
+      fprintf(f,"\tPyObject    *pName, *pModule, *pDict, *pFunc,*result;\n\n");
+
       fprintf(f,"\tif (!( nptr = vptr ))\n");
       fprintf(f,"\t\treturn(0);\n");
       fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
@@ -687,22 +781,29 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       }
       i++;
       free(pelem);
-      fprintf(f,"\t//           python interface\n");
-      fprintf(f,"\tsprintf(srcdir,\"%%s/pyaccords/pysrc/%s.py\",PYPATH);\n",categoryName);
-      fprintf(f,"\texp_file = fopen(srcdir, \"r\");\n");
-      fprintf(f,"\tif(!exp_file) printf(\"error in %sInterface.c %s.py :No such file or directory\\n\");\n",categoryName,categoryName); 
-      fprintf(f,"\tPy_Initialize();\n");
-      fprintf(f,"\tPyRun_SimpleFile(exp_file, srcdir);\n");
-      fprintf(f,"\tmain_module = PyImport_AddModule(\"__main__\");\n");
-      fprintf(f,"\tglobal_dict = PyModule_GetDict(main_module);\n");
-      fprintf(f,"\tcbFunc = PyDict_GetItemString(global_dict,\"%s\");\n",funcName[j]);
-      fprintf(f,"\tif(!cbFunc) printf(\"error in %sInterface.c :no python function\\n\");\n",categoryName);
-      fprintf(f,"\tresult=PyObject_CallFunction(cbFunc,\"s\",sendstr);\n");
-      fprintf(f,"\tresponse=PyString_AsString( result );\n"); 
-      fprintf(f,"\tPy_Finalize();\n\n");
-      fprintf(f,"\tresetListe(&categoryAtr);\n");
-
       
+      fprintf(f,"\t\t//           python interface\n");
+      fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
+      frintf(f,"\t\tif(!Py_IsInitialized)\n");
+      fprintf(f,"\t\t{\n");
+      fprintf(f,"\t\t\tPy_Initialize();\n");
+      fprintf(f,"\t\t}\n");
+      fprintf(f,"\t\tpython_path(srcdir);\n"); 
+      fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
+      fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
+      fprintf(f,"\t\telse pModule = PyImport_Import(pName);\n");
+      fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %s module\\n\");\n",categoryName);
+      fprintf(f,"\t\telse pDict = PyModule_GetDict(pModule);\n");
+      fprintf(f,"\t\tif(pDict == NULL) printf(\"error: failed to load dict name in %s module\\n\");\n",categoryName);
+      fprintf(f,"\t\telse pFunc = PyDict_GetItemString(pDict,\"%s\");\n",funcName[j]);
+      fprintf(f,"\t\tif(pFunc == NULL) printf(\"error: failed to load %s function in %s module\\n\");\n",funcName,categoryName);
+      fprintf(f,"\t\telse result=PyObject_CallFunction(pFunc,\"s\",sendstr);\n");
+      fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
+      fprintf(f,"\t\tPy_DECREF(pModule);\n");
+      fprintf(f,"\t\tPy_DECREF(pName);\n");
+      fprintf(f,"\t\tPy_Finalize();\n\n");
+
+      fprintf(f,"\tresetListe(&categoryAtr);\n");  
       fprintf(f,"\ttoken= strtok(response,\",\");\n");
       fprintf(f,"\tfor(; token != NULL ;)\n");
       fprintf(f,"\t{\n");
@@ -732,11 +833,11 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
  }
    return 1;
 }
-/**************************************************************************************************/
-/* Function to generate category Interfcas file                                                   */
+/*------------------------------------------------------------------------------------------------*/
+/* Function to generate category Interfces file                                                   */
 /* pathf: (char*) path to the project directory name                                              */
 /* return 1 if succeeded                                                                          */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int generateCategoryInterfceStructFile(char pathf[])
 {
  FILE * f;
@@ -764,10 +865,23 @@ int generateCategoryInterfceStructFile(char pathf[])
    return 0;
   }
  
-  resetList(&categoryList);  
-  fprintf(h,"/********************************************************************************************************/\n");
-  fprintf(h,"/* Hamid MEDAJHED & Elyes ZEKRI (c) Prologue                                                            */\n");
-  fprintf(h,"/********************************************************************************************************/\n");
+  resetList(&categoryList); 
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* ACCORDS Platform                                                              */\n");
+  fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+  fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
+  fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
+  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+  fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
+  fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
+  fprintf(f,"/* limitations under the License.                                                */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n"); 
   fprintf(h,"#ifndef _CATEGINTERF_H_\n");
   fprintf(h,"#define _CATEGINTERF_H_\n");
   fprintf(h,"#include \"categcrud.h\"\n");
@@ -812,9 +926,9 @@ int generateCategoryInterfceStructFile(char pathf[])
   return 1;
 }
 
-/*******************************************************************************************************************/
-/* function to generate python source file                                                                         */
-/*******************************************************************************************************************/
+/*---------------------------------------------------------------------------------------------------------------*/
+/* function to generate python source file                                                                       */
+/*---------------------------------------------------------------------------------------------------------------*/
 int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf[])
 {
  FILE * f;
@@ -840,9 +954,22 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
  }
  else
  {
+  fprintf(f,"###############################################################################\n");
+  fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
+  fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+  fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+  fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+  fprintf(f,"#                                                                             #\n");
+  fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+  fprintf(f,"#                                                                             #\n");
+  fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+  fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+  fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+  fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+  fprintf(f,"# limitations under the License.                                              #\n");
+  fprintf(f,"###############################################################################\n");
   fprintf(f,"#!/usr/bin/env python\n");
   fprintf(f,"# -*- coding: latin-1 -*-\n");
-  fprintf(f,"# Hamid MEDJAHED (c) Prologue\n\n");
   fprintf(f,"class C%s:\n",categoryName);
   fprintf(f,"\t\"\"\"Class to define the %s category structure\"\"\"\n",categoryName);
 
@@ -877,15 +1004,27 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   }
   else
   {
+   fprintf(f,"###############################################################################\n");
+   fprintf(f,"# copyright 2012, Hamid MEDJAHED    (hmedjahed@prologue.fr) Prologue          #\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+   fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+   fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+   fprintf(f,"# limitations under the License.                                              #\n");
+   fprintf(f,"###############################################################################\n");
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
-   fprintf(f,"# Hamid MEDJAHED (c) Prologue\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import pypacksrc\n");
    fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords\"\n");
    fprintf(f,"sys.path.append(srcdirectory)\n");
    fprintf(f,"from %sInterface import *\n\n",categoryName);
-
 
    for(j=1;j<i;j++)
    {
@@ -899,7 +1038,6 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
    pelemmm=pelemmm->next;
    while(pelemmm)
    {
-     
      sprintf(listr,"str(resCateg.%s)",pelemmm->value);
      strConcat(listResult,listr,',');
      pelemmm=pelemmm->next;
@@ -927,9 +1065,23 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   }
   else
   {
+   fprintf(f,"###############################################################################\n");
+   fprintf(f,"# copyright 2012, Hamid MEDJAHED & Elyes ZEKRI (hmedjahed@prologue.fr)        #\n");
+   fprintf(f,"# Prologue                                                                    #\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+   fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+   fprintf(f,"#                                                                             #\n");
+   fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+   fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+   fprintf(f,"# limitations under the License.                                              #\n");
+   fprintf(f,"###############################################################################\n");
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
-   fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n");
    fprintf(f,"# Implementation of category CRUD functions\n");
    fprintf(f,"import sys\n");
    fprintf(f,"import %s\n",LIB_PYCOMPDEV);
@@ -964,14 +1116,14 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
 
 
 
-/*******************************************************************************************************************/
+/*-----------------------------------------------------------------------------------------------------------------*/
 /* Function to generate the occicategory.c file                                                                    */
 /* categoryName:(char*) the name of the category                                                                   */
 /* categoryAttributes: list of attributes                                                                          */
 /* pathf:(char*) path name file                                                                                    */
 /* dim: (int) number of attributes                                                                                 */
 /* return 1 if succeeded                                                                                           */
-/*******************************************************************************************************************/
+/*-----------------------------------------------------------------------------------------------------------------*/
 int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,char pathf[])
 {
  char pathfc[1024];
@@ -1616,28 +1768,16 @@ int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,c
     fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n       */\n");
     fprintf(f,"/*	--------------------------------------------------------------------------------------*/\n");
    
-   fprintf(f,"private void	redirect_occi_cords_%s_mt( struct rest_interface * iptr )\n",categoryName);
-   fprintf(f,"{\n");
-   fprintf(f,"\tiptr->get = occi_cords_%s_get;\n",categoryName);
-   fprintf(f,"\tiptr->post = occi_cords_%s_post;\n",categoryName);
-   fprintf(f,"\tiptr->put = occi_cords_%s_put;\n",categoryName);
-   fprintf(f,"\tiptr->delete = occi_cords_%s_delete;\n",categoryName);
-   fprintf(f,"\tiptr->head = occi_cords_%s_head;\n",categoryName);
-   fprintf(f,"\treturn;\n");
-   fprintf(f,"}\n\n");
-   /*
-    fprintf(f,"private struct rest_interface occi_cords_%s_mt = {\n",categoryName);
-    fprintf(f,"\t(void*) 0,\n");
-    fprintf(f,"\t(void*) 0,\n");
-    fprintf(f,"\t(void*) 0,\n");
-    fprintf(f,"\tocci_cords_%s_get,\n",categoryName);
-    fprintf(f,"\tocci_cords_%s_post,\n",categoryName);
-    fprintf(f,"\tocci_cords_%s_put,\n",categoryName);
-    fprintf(f,"\tocci_cords_%s_delete,\n",categoryName);
-    fprintf(f,"\tocci_cords_%s_head,\n",categoryName);
-    fprintf(f,"\t(void*) 0\n");
-    fprintf(f,"};\n\n");
-    */
+    fprintf(f,"private void	redirect_occi_cords_%s_mt( struct rest_interface * iptr )\n",categoryName);
+    fprintf(f,"{\n");
+    fprintf(f,"\tiptr->get = occi_cords_%s_get;\n",categoryName);
+    fprintf(f,"\tiptr->post = occi_cords_%s_post;\n",categoryName);
+    fprintf(f,"\tiptr->put = occi_cords_%s_put;\n",categoryName);
+    fprintf(f,"\tiptr->delete = occi_cords_%s_delete;\n",categoryName);
+    fprintf(f,"\tiptr->head = occi_cords_%s_head;\n",categoryName);
+    fprintf(f,"\treturn;\n");
+    fprintf(f,"}\n\n");
+    
     fprintf(f,"/*	------------------------------------------	*/\n");
     fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
     fprintf(f,"/*	------------------------------------------	*/\n");
@@ -1719,13 +1859,13 @@ int createCategoryOcciFile(char *categoryName,listc categoryAttributes,int dim,c
  return 1;   
 }
 
-/***************************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------------------------*/
 /* Function to generate category.c file                                                                                    */
 /* categoryName:(char*) the name of the category                                                                           */
 /* categoryAttributes: list of attributes                                                                                  */
 /* dim:(int) number of attributes                                                                                          */
 /* pathf:(char*) file name                                                                                                 */
-/***************************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------------------------*/
 int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim,char pathf[])
 {
  char pathfc[1024];
@@ -1765,9 +1905,9 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
     fprintf(f,"#include \"%s.h\"\n\n",categoryName);
     
     //liberate category function
-    fprintf(f,"/*****************************************************************************************/\n");
-    fprintf(f,"//                               Liberate_cords_%s\n",categoryName);
-    fprintf(f,"/*****************************************************************************************/\n");
+    fprintf(f,"/*----------------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/*                               Liberate_cords_%s\n       */",categoryName);
+    fprintf(f,"/*----------------------------------------------------------------------------------------*/\n");
     fprintf(f,"public struct cords_%s * liberate_cords_%s(struct cords_%s * sptr)\n",categoryName,categoryName,categoryName);
     fprintf(f,"{\n");
     fprintf(f,"\tif( sptr )\n");
@@ -1783,9 +1923,9 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
     fprintf(f,"}\n\n");
     
     //reset category function
-    fprintf(f,"/*****************************************************************************************/\n");
-    fprintf(f,"//                            Reset_cords_%s\n",categoryName);
-    fprintf(f,"/*****************************************************************************************/\n");
+    fprintf(f,"/*-----------------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/*                            Reset_cords_%s   */\n",categoryName);
+    fprintf(f,"/*-----------------------------------------------------------------------------------------*/\n");
     fprintf(f,"public struct cords_%s * reset_cords_%s(struct cords_%s * sptr)\n",categoryName,categoryName,categoryName);
     fprintf(f,"{\n");
     fprintf(f,"\tif( sptr )\n");
@@ -1799,9 +1939,9 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
     fprintf(f,"}\n\n");
    
     //allocate category function
-    fprintf(f,"/*****************************************************************************************/\n");
-    fprintf(f,"//                            Allocate_cords_%s\n",categoryName);
-    fprintf(f,"/*****************************************************************************************/\n");
+    fprintf(f,"/*-----------------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/*                            Allocate_cords_%s     */\n",categoryName);
+    fprintf(f,"/*-----------------------------------------------------------------------------------------*/\n");
     fprintf(f,"public struct cords_%s * allocate_cords_%s()\n",categoryName,categoryName);
     fprintf(f,"{\n");
     fprintf(f,"\tstruct cords_%s * sptr;\n",categoryName);
@@ -1811,9 +1951,9 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
     fprintf(f,"}\n\n");
     
     //xmlin cords category
-    fprintf(f,"/*****************************************************************************************/\n");
-    fprintf(f,"//                             Xmlin_cords_%s\n",categoryName);
-    fprintf(f,"/*****************************************************************************************/\n");
+    fprintf(f,"/*------------------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/*                             Xmlin_cords_%s      */\n",categoryName);
+    fprintf(f,"/*------------------------------------------------------------------------------------------*/\n");
     fprintf(f,"public int xmlin_cords_%s(struct cords_%s * sptr,struct xml_element * eptr)\n",categoryName,categoryName);
     fprintf(f,"{\n");
     fprintf(f,"\tstruct xml_element * wptr;\n");
@@ -1838,9 +1978,9 @@ int createCategoryCordsCfile(char *categoryName,listc categoryAttributes,int dim
     fprintf(f,"}\n\n");
 
     //reset occi_cords_ category
-    fprintf(f,"/*****************************************************************************************/\n");
-    fprintf(f,"//                         Rest_occi_cords_%s\n",categoryName);
-    fprintf(f,"/*****************************************************************************************/\n");
+    fprintf(f,"/*---------------------------------------------------------------------------------------*/\n");
+    fprintf(f,"/*                         Rest_occi_cords_%s  */\n",categoryName);  
+    fprintf(f,"/*---------------------------------------------------------------------------------------*/\n");
     fprintf(f,"public int rest_occi_cords_%s(FILE * fh,struct cords_%s * sptr,char * prefix, char * nptr)\n",categoryName,categoryName);
     fprintf(f,"{\n");
     fprintf(f,"\tstruct xml_element * wptr;\n");
@@ -1871,35 +2011,36 @@ int  enTete(char pathf[])
  }
  else
  {
-  fprintf(f,"/* ------------------------------------------------------------------------------------ */\n");
-  fprintf(f,"/*                               CompatibleOne Cloudware                                */\n");
-  fprintf(f,"/* ------------------------------------------------------------------------------------ */\n");
-  fprintf(f,"/*                                                                                      */\n");
-  fprintf(f,"/* Ce fichier fait partie de ce(tte) oeuvre de Iain James Marshall et est mise a        */\n");
-  fprintf(f,"/* disposition selon les termes de la licence Creative Commons Paternit<82> :           */\n");
-  fprintf(f,"/*                                                                                      */\n");
-  fprintf(f,"/*                              Pas d'Utilisation Commerciale                           */\n");
-  fprintf(f,"/*                              Pas de Modification                                     */\n");
-  fprintf(f,"/*                              3.0 non transcrit.                                      */\n");
-  fprintf(f,"/*                                                                                      */\n");
-  fprintf(f,"/* ------------------------------------------------------------------------------------ */\n");
-  fprintf(f,"/*                      Copyright (c) 2011 Iain James Marshall for Prologue             */\n");
-  fprintf(f,"/*                                 All rights reserved                                  */\n");
-  fprintf(f,"/* ------------------------------------------------------------------------------------ */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* ACCORDS PLATFORM                                                              */\n");
+  fprintf(f,"/* copyright 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>         */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+  fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
+  fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
+  fprintf(f,"/*                                                                               */\n");
+  fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
+  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+  fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
+  fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
+  fprintf(f,"/* limitations under the License.                                                */\n");
+  fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
   fclose(f);
  }
  return 1;
 }
 
 
-/*****************************************************************************************************************/
+/*---------------------------------------------------------------------------------------------------------------*/
 /* Function to gerate a python module for accords platform                                                       */
 /* moduleName:(char*) the name of the module                                                                     */
 /* categoryNameList: (char*) the list of categories handled by this module                                       */ 
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
-/*****************************************************************************************************************/
-int generateModuleFile(char * moduleName, char * categoryNameList,char *categoryActionNumberList)
+/*---------------------------------------------------------------------------------------------------------------*/
+int generateModuleFile(char * moduleName, char * categoryNameList)
 {
    char pathfd[TAILLE];
    char pathff[TAILLE];
@@ -1923,14 +2064,27 @@ int generateModuleFile(char * moduleName, char * categoryNameList,char *category
      }
      else
      {
+      fprintf(f,"###############################################################################\n");
+      fprintf(f,"# copyright 2012, Hamid MEDJAHE & Elyes ZEKRi (hmedjahed@prologue.fr) Prologue#\n");
+      fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+      fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
+      fprintf(f,"# You may obtain a copy of the License at                                     #\n");
+      fprintf(f,"#                                                                             #\n");
+      fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
+      fprintf(f,"#                                                                             #\n");
+      fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
+      fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+      fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
+      fprintf(f,"# See the License for the specific language governing permissions and         #\n");
+      fprintf(f,"# limitations under the License.                                              #\n");
+      fprintf(f,"###############################################################################\n");
       fprintf(f,"#!/usr/bin/env python\n");
       fprintf(f,"# -*- coding: latin-1 -*-\n");
-      fprintf(f,"# Hamid MEDJAHED & Elyes Zekri (c) Prologue\n\n");
       fprintf(f,"import sys\n");
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule( argc , sys.argv , \"%s\" ,\"%s\",\"%s\")\n",LIB_PYCOMPDEV,moduleName, categoryNameList,categoryActionNumberList);
+      fprintf(f,"\treturn %s.launchModule( argc , sys.argv , \"%s\" ,\"%s\")\n",LIB_PYCOMPDEV,moduleName, categoryNameList);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);

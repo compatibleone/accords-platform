@@ -42,7 +42,7 @@ Generate an ACCORDS component/OCCI Server
 -----------------------------------------
 (where '2' indicates the category action number)
             
->>>pycompmanager.generateComponent(“myComponent”, “myCategory”, "2")
+>>>pycompmanager.generateComponent(“myComponent”, “myCategory”)
       
             
   

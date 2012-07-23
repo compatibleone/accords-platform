@@ -1,25 +1,19 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* module to launch a new Accords component                                     */
-/* Hamid MEDJAHED & Elyes ZEKRI for (C) 2011 Prologue              		*/
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------------*/
+/* Accords Platform                                                              */
+/* copyright 2012 ,Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */
+/*-------------------------------------------------------------------------------*/
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
 #ifndef	_COMPONENT_c
 #define	_COMPONENT_c
  
@@ -34,9 +28,10 @@
 #include "list.h"
 #include "../../pyaccords/pysrc/crudinterf.h"
 #include "../../pyaccords/pysrc/categaction.h"
+#include "../../pyaccords/pysrc/categactionname.h"
+#include "../../pyaccords/pysrc/categactionnumber.h"
 #include "listoccibuilder.h"
 
-char cords_action[12][1024]={"start","stop","restart","snapshot","save","suspend","softboot","hardboot","resize","confirm","revert"}; 
 struct accords_configuration moduleConfig;
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName)
@@ -111,7 +106,7 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
-/**************************************************************************************************/
+/*-----------------------------------------------------------------------------------*/
 #include "occibuilder.h"
 
 private	int banner()
@@ -126,9 +121,9 @@ private	int banner()
 
 }
 
-/*	------------------------------------------------------------------	*/
-/*			module_ i n i t i a l i s e			*/
-/*	------------------------------------------------------------------	*/
+/*------------------------------------------------------------------------------------*/
+/*			module_ i n i t i a l i s e			              */
+/*------------------------------------------------------------------------------------*/
 private	struct rest_server * module_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
@@ -141,10 +136,15 @@ private	struct rest_server * module_initialise(  void * v,struct rest_server * s
 	}
 }
 
-/*	------------------------------------------------------------------	*/
-/*			module _ a u t h o r i s e 			*/
-/*	------------------------------------------------------------------	*/
-private	int	module_authorise(  void * v,struct rest_client * cptr, char * username, char * password, struct accords_configuration *componentModule)
+/*------------------------------------------------------------------------------------*/
+/*			module _ a u t h o r i s e 			              */
+/*------------------------------------------------------------------------------------*/
+private	int module_authorise(
+             void * v,
+             struct rest_client * cptr, 
+             char * username, 
+             char * password, 
+             struct accords_configuration *componentModule)
 {
 	if ( strcmp( username, componentModule->user ) )
 		return(0);
@@ -157,16 +157,16 @@ private	int	module_authorise(  void * v,struct rest_client * cptr, char * userna
 	else	return(1);
 }
 
-/*	------------------------------------------------------------------	*/
-/*			module _ e x t e n s i o n 			*/
-/*	------------------------------------------------------------------	*/
+/*--------------------------------------------------------------------------------------------*/
+/*			module _ e x t e n s i o n 			                      */
+/*--------------------------------------------------------------------------------------------*/
 private	struct rest_extension * module_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
-/******************************************************************************************************************/
-/*      Function to call occi category action for the category specified in name variable                        */
-/******************************************************************************************************************/
+/*---------------------------------------------------------------------------------------------*/
+/*      Function to call occi category action for the category specified in name variable      */
+/*---------------------------------------------------------------------------------------------*/
 struct rest_response * callocciCategoryAction(const char *name)
 {
   int i;
@@ -181,9 +181,41 @@ struct rest_response * callocciCategoryAction(const char *name)
   return (struct occi_category *) 0;
 }
 
-/******************************************************************************************************************/
-/*      Function to call occi category builder for the category specified in name variable                        */
-/******************************************************************************************************************/
+/*---------------------------------------------------------------------------------------------*/
+/*      Function to get category action number for the category specified in name variable     */
+/*---------------------------------------------------------------------------------------------*/
+int callocciCategoryActionNumber(const char *name)
+{
+  int i;
+   for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   {
+     if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
+     {
+       return occiCategoryActionNumber_map[i].func();
+     }
+  }
+
+  return 0;
+}
+/*---------------------------------------------------------------------------------------------*/
+/*      Function get  category action name for the category specified in name variable         */
+/*---------------------------------------------------------------------------------------------*/
+char * callocciCategoryActionName(const char *name, int a)
+{
+  int i;
+   for (i = 0; i < (sizeof(occiCategoryActionName_map) / sizeof(occiCategoryActionName_map[0])); i++) 
+   {
+     if (!strcmp(occiCategoryActionName_map[i].name, name) && occiCategoryActionName_map[i].func) 
+     {
+       return occiCategoryActionName_map[i].func(a);
+     }
+  }
+
+  return (char *) 0;
+}
+/*--------------------------------------------------------------------------------------------*/
+/*      Function to call occi category builder for the category specified in name variable    */
+/*--------------------------------------------------------------------------------------------*/
 struct occi_category * callocciCategoryBuilder(const char *name, char *a,char *b)
 {
   int i;
@@ -198,9 +230,9 @@ struct occi_category * callocciCategoryBuilder(const char *name, char *a,char *b
   return (struct occi_category *) 0;
 }
 
-/******************************************************************************************************************/
-/* Function to call occi category interface for the category indicated in name variable                           */
-/******************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------*/
+/* Function to call occi category interface for the category indicated in name variable      */
+/*-------------------------------------------------------------------------------------------*/
 struct occi_interface * callocciCategoryInterface(const char *name)
 {
   int i;
@@ -215,11 +247,14 @@ struct occi_interface * callocciCategoryInterface(const char *name)
 }
 
 
-/******************************************************************************************************************/
-/*			module _ o p e r a t i o n				                                  */
-/******************************************************************************************************************/
-private	int	module_operation( char * nptr, struct accords_configuration *componentModule, char *moduleName, 
-listc categoryName,listc categoryAct,int dim)
+/*---------------------------------------------------------------------------------------------*/
+/*			module _ o p e r a t i o n				               */
+/*---------------------------------------------------------------------------------------------*/
+private	int	module_operation( 
+                 char * nptr, 
+                 struct accords_configuration *componentModule, 
+                 char *moduleName, 
+                 listc categoryName)
 {
         char xlinkModule[1024];
 	struct	occi_category * first=(struct occi_category *) 0;
@@ -228,16 +263,18 @@ listc categoryName,listc categoryAct,int dim)
         
         int i;
         struct occi_interface categoryInterface;
-        int indice;
-        
+        int numOfact; 
         char categoryAction[1024];
+        char *actionName;
 
         elem *pelem = categoryName.first;    
+        sprintf(xlinkModule,"links_%s.xml",moduleName);
+        xlinkModule[strlen(xlinkModule)]=0;
+	set_autosave_cords_xlink_name(xlinkModule);
+        
         while(pelem)
         {       
-          sprintf(xlinkModule,"links_%s.xml",moduleName);
-          xlinkModule[strlen(xlinkModule)]=0;
-	  set_autosave_cords_xlink_name(xlinkModule);
+          
       
 	  if (!( optr = callocciCategoryBuilder( pelem->value,componentModule->domain,pelem->value) ))
 		   return( 27 );
@@ -247,21 +284,19 @@ listc categoryName,listc categoryAct,int dim)
 	  last = optr;
 	  optr->callback = callocciCategoryInterface(pelem->value);
           
-          elem *pelemact=categoryAct.first;
-          indice=atoi(pelemact->value);
-         
-          for(i=0;i<indice;i++)
+          numOfact = callocciCategoryActionNumber(pelem->value);
+          for(i=0;i<numOfact;i++)
           {
-               sprintf(categoryAction,"%s_action%d",pelem->value,i);
-               if (!( optr = occi_add_action( optr,cords_action[i],"",callocciCategoryAction(categoryAction))))
+               actionName = allocate_string(callocciCategoryActionName(pelem->value,i));
+               sprintf(categoryAction,"%s_%s",pelem->value,actionName);
+               if (!( optr = occi_add_action( optr,actionName,"",callocciCategoryAction(categoryAction))))
 		   return( optr );
           }  
            
-           pelemact=pelemact->next;
            pelem=pelem->next;  
-         }
-       
-	rest_initialise_log( componentModule->monitor );
+        } 
+	
+        rest_initialise_log( componentModule->monitor );
        
 	if (!( componentModule->identity ))
         {
@@ -282,16 +317,14 @@ listc categoryName,listc categoryAct,int dim)
 /*	------------------------------------------------------------------	*/
 /*				Module 				        	*/
 /*	------------------------------------------------------------------	*/
-private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,char * categoryActionNumberList)
+private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-        char * token;
+        char *  token;
        
         listc  categoryLst;
-        listc  categoryAct;  
-        int dim=0;
         if ( argc == 1 )
         {
 		return( banner() );
@@ -303,24 +336,13 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
            token= strtok(categoryList," ");
            for(; token != NULL ;)
            {
-              dim++;
               addBack(&categoryLst,token);
               token=strtok(NULL, " ");
-           }
-           
-           resetList(&categoryAct);
-           token= strtok(categoryActionNumberList," ");
-           for(; token != NULL ;)
-           {
-              dim++;
-              addBack(&categoryAct,token);
-              token=strtok(NULL, " ");
-           }
+           } 
 
            //loud configuration module
            fillInAccordsConfiguration( &moduleConfig,moduleName);
            load_accords_configuration( &moduleConfig, moduleName );
-	 
 
            while ( argi < argc )
 	   {
@@ -345,7 +367,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
 			status = 30;
 			break;
 		}
-		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst,categoryAct,dim) ))
+		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst) ))
 			continue;
 		else	break;
 	  }
@@ -353,7 +375,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
         }
 }
 
-	/* --------- */
-#endif	/* _COMPONENT_C */
-	/* --------- */
+	/* ------------- */
+#endif	/* _COMPONENT_C  */
+	/* ------------- */
 

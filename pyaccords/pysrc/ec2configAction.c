@@ -1,12 +1,25 @@
-/********************************************************************************************************/
-/* Hamid MEDAJHED (c) Prologue                                                            */
-/********************************************************************************************************/
+/*-------------------------------------------------------------------------------*/
+/* ACCORDS Platform                                                              */
+/* copyright 2012 ,Hamid MEDJAHE & Elyes ZEKRI  (hmedjahed@prologue.fr) Prologue */
+/*-------------------------------------------------------------------------------*/
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
 #include "../../occi/src/occi.h"
 #include "ctools.h"
 #include <Python.h>
 
 //            category current action  
-struct rest_response * ec2config_action0(
+struct rest_response * current_ec2config(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -163,3 +176,25 @@ struct rest_response * ec2config_action0(
 		return( rest_html_response( aptr, status, message ) );
 	}
 }
+
+char * ec2config_getname(int a)
+{
+  char action[256];
+  
+  switch (a)
+  {
+      case 0:
+          strcpy(action,"current");
+          break;
+      default:
+          strcpy(action,"ec2config");
+          break;
+  }
+  return action;
+}
+
+int ec2config_getnumber()
+{
+ return 1;
+}
+

@@ -1,6 +1,20 @@
-/********************************************************************************************************/
-/* Hamid MEDAJHED (c) Prologue                                                            */
-/********************************************************************************************************/
+/*-------------------------------------------------------------------------------*/
+/* ACCORDS Platform                                                              */
+/* copyright 2012 ,Hamid MEDJAHE   (hmedjahed@prologue.fr) Prologue              */
+/*-------------------------------------------------------------------------------*/
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
+
 #include "../../occi/src/occi.h"
 #include "ctools.h"
 #include "ec2procci_tools.c"
@@ -14,7 +28,7 @@ extern char accesskey[256];
 extern char secretkey[256];
 extern char zone[256];
 
-struct rest_response * amazonEc2_action0(
+struct rest_response * start_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -289,7 +303,7 @@ struct rest_response * amazonEc2_action0(
 	}
 }
 //            category save action  
-struct rest_response * amazonEc2_action1(
+struct rest_response * save_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -564,7 +578,7 @@ struct rest_response * amazonEc2_action1(
 	}
 }
 //            category snapshot action  
-struct rest_response * amazonEc2_action2(
+struct rest_response * snapshot_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -839,7 +853,7 @@ struct rest_response * amazonEc2_action2(
 	}
 }
 //            category stop action  
-struct rest_response * amazonEc2_action3(
+struct rest_response * stop_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -1114,7 +1128,7 @@ struct rest_response * amazonEc2_action3(
 	}
 }
 //            category suspend action  
-struct rest_response * amazonEc2_action4(
+struct rest_response * suspend_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -1389,7 +1403,7 @@ struct rest_response * amazonEc2_action4(
 	}
 }
 //            category restart action  
-struct rest_response * amazonEc2_action5(
+struct rest_response * restart_amazonEc2(
 	struct occi_category * optr,
 	struct rest_client * cptr,
 	struct rest_request * rptr,
@@ -1663,3 +1677,40 @@ struct rest_response * amazonEc2_action5(
 		return( rest_html_response( aptr, status, message ) );
 	}
 }
+
+char * amazonEc2_getname(int a)
+{
+  char action[256];
+  switch (a)
+  {
+      case 0:
+          strcpy(action,"start");
+          break;
+      case 1:
+          strcpy(action,"stop");
+          break;
+      case 2:
+          strcpy(action, "restart");
+          break;
+      case 3:
+          strcpy(action,"snapshot");
+          break;
+      case 4:
+          strcpy(action,"save");
+          break;
+      case 5:
+          strcpy(action,"suspend");
+          break;
+      default:
+          strcpy(action,"amazonEc2");
+          break;
+   }
+   return action;
+}
+
+int amazonEc2_getnumber()
+{
+ return 6;
+}
+
+

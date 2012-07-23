@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------------*/
-/* Accords Platform                                                              */
-/* copyright 2012 ,Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */
+/* ACCORDS Platform                                                              */
+/* copyright 2012 ,Hamid MEDJAHED  (hmedjahed@prologue.fr)    Prologue           */
 /*-------------------------------------------------------------------------------*/
 /* Licensed under the Apache License, Version 2.0 (the "License");               */
 /* you may not use this file except in compliance with the License.              */
@@ -14,28 +14,19 @@
 /* See the License for the specific language governing permissions and           */
 /* limitations under the License.                                                */
 /*-------------------------------------------------------------------------------*/
-#ifndef _LIST_H_
-#define _LIST_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> 
+#include <Python.h>
+#include "pytools.h"
 
-typedef struct el
+int python_path(char *path) 
 {
- char value[1024];
- struct el *prev,*next;
-}elem;
+    char pathpy[1024];    
+    sprintf(pathpy,"sys.path.append(\"%s\")\n",path);
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString(pathpy);
+    return 0;
+}
 
-typedef struct
-{
-  elem *first;
-  elem *last;
-}listc;
 
-void resetList(listc *l);
-void addBack(listc *l, char *val);
-void addFront(listc *l, char *val);
-void liberateList(listc *l);
 
-#endif
+

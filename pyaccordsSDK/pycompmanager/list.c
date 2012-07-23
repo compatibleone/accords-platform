@@ -1,3 +1,20 @@
+/* ----------------------------------------------------------------------------- */
+/* ACCORDS Platform                                                      	 */
+/* Copyright 2011  Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue               */
+/* ----------------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
+
 #include "list.h"
 
 /******************************************************************************/
@@ -31,33 +48,6 @@ void addFront(listc *l, char *val)
    l->first = nouv;
 }
 
-/******************************************************************************/
-/*char *retBack(listc *l)
-{
-   char val[1024];
-   elem *tmp = l->last;
-   if(!tmp) return NULL;
-   strcpy(val,tmp->value);
-   l->last = tmp->prev;
-   if(l->last) l->last->next = NULL;
-   else l->first = NULL;
-   free(tmp);
-   return val;
-}*/
-/******************************************************************************/
-/*char *retFront(listc *l)
-{
-   char val[1024];
-   elem *tmp = l->first;
-   if(!tmp) return NULL;
-   strcpy(val,tmp->value);
-   l->first = tmp->next;
-   if(l->first)l->first->prev = NULL;
-   else l->last = NULL;
-   free(tmp);
-   return val;
-}*/
-/*******************************************************************************/
 void liberateList(listc *l)
 {
    elem *tmp;

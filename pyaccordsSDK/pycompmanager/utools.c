@@ -1,34 +1,31 @@
-/* ---------------------------------------------------------------------------- */
-/* tools to generate a new gategory for Accords platform                        */
-/* Hamid MEDJAHED for (C) 2011 Prologue              		                */
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------- */
+/* ACCORDS Platform                                                        	 */
+/* module to interface Accords platform  for Python                              */
+/* Copyright 2012  Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue               */
+/* ----------------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
+
 
 #include "utools.h"
 
 
-/******************************************************************************************************************/
-/* Function to inserte category include files in cords.h occibuilder.h and cordsbase.c                            */
-/* pathf: char * the project directory name                                                                       */
-/* categoryName: char * the name of the category                                                                  */
-/* return 1 if successfully inserted                                                                              */
-/******************************************************************************************************************/
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to inserte category include files in cords.h occibuilder.h and cordsbase.c                       */
+/* pathf: char * the project directory name                                                                  */
+/* categoryName: char * the name of the category                                                             */
+/* return 1 if successfully inserted                                                                         */
+/*-----------------------------------------------------------------------------------------------------------*/
 int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 {
  char cordsh[TAILLE];
@@ -74,8 +71,8 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  
 
 
- if(flag==0)insertInFile(cordsh,cordshname,categoryName,0,flag);
- if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1,flag);
+ if(!flag)insertInFile(cordsh,cordshname,categoryName,0,flag);
+ if(!flag)insertInFile(occibuilder,occibuildername,categoryName,1,flag);
  insertInFile(occibuilderb,occibuildername,categoryName,1,flag);
 
  insertInFile(cordsbase,cordsbasename,categoryName,0,flag);
@@ -85,19 +82,19 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 
  insertInFile(pyListcateg,pyListcategname,categoryName,0,flag);
 
- if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0,flag);
+ if (indice) insertInFile(pylistaction,pylistactionname,categoryName,0,flag);
 
 
  return 1;
 }
 
-/********************************************************************************************************************/
-/* Function to insert a line in a file                                                                              */
-/* pathf: char *  the path file name                                                                                */
-/* categoryName: char * the name of the category                                                                    */
-/* indoice: int  to select a processing                                                                             */
-/* retutn 1 if successfully done                                                                                    */
-/********************************************************************************************************************/
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to insert a line in a file                                                                       */
+/* pathf: char *  the path file name                                                                         */
+/* categoryName: char * the name of the category                                                             */
+/* indoice: int  to select a processing                                                                      */
+/* retutn 1 if successfully done                                                                             */
+/*-----------------------------------------------------------------------------------------------------------*/
 int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag)
 {
   int a=0;
@@ -108,7 +105,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
   listc categoryN;
   
 
-  if(indice==1)
+  if(indice)
   {
     resetList(&categoryN);
   }
@@ -144,7 +141,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    }
    else
    {
-      if(indice==1)
+      if(indice)
        {
          if(line[0]=='c' && line[1]=='o') break;
          else
@@ -167,17 +164,17 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    }
    
   }  
-  if(a==0)
+  if(!a)
   {
    fprintf(fOut,"%s\n",categoryName);
-   if(indice==1) addBack(&categoryN,getCategoryName(categoryName,"_",3));
+   if(indice) addBack(&categoryN,getCategoryName(categoryName,"_",3));
   }
-  if(indice==1)
+  if(indice)
   {
    fprintf(fOut,"const static struct {\n");
    fprintf(fOut,"\tconst char *name;\n");
    fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
-   if (flag==0) fprintf(fOut,"} occiCategoryBuilder_map2[]={\n");
+   if (!flag) fprintf(fOut,"} occiCategoryBuilder_map2[]={\n");
    else  fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
 
 
@@ -201,12 +198,12 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
 }
 
 
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 /* Function to delete a line in a file                                                            */
 /* pathf: char* file name                                                                         */
 /* categoryName: char * name of the category                                                      */
 /* return 1 if succeeded                                                                          */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int deleteInFile(char pathf[],char categoryName[])
 {
   FILE *fIn;
@@ -227,7 +224,6 @@ int deleteInFile(char pathf[],char categoryName[])
  
   while(fgets(line,sizeof line, fIn))
   {
-   //line[strlen(line)]=0;
    if(searchWord(categoryName,line)!=1)
    {
     fprintf(fOut,"%s",line);
@@ -241,13 +237,13 @@ int deleteInFile(char pathf[],char categoryName[])
 
 
 
-/*****************************************************************************************************************/
-/* Function to parse a string to get the category name                                                           */
-/* strCat: (char*) string to be parsed                                                                           */
-/* tok: (char*) delimeter for parssing                                                                           */
-/* p:(int) position of the name                                                                                  */
-/* return a string the categoryName                                                                              */
-/*****************************************************************************************************************/
+/*--------------------------------------------------------------------------------------------------*/
+/* Function to parse a string to get the category name                                              */
+/* strCat: (char*) string to be parsed                                                              */
+/* tok: (char*) delimeter for parssing                                                              */
+/* p:(int) position of the name                                                                     */
+/* return a string the categoryName                                                                 */
+/*--------------------------------------------------------------------------------------------------*/
 char *getCategoryName(char strCt[],char * tok,int p)
 {
  char *token=NULL;
@@ -265,14 +261,12 @@ char *getCategoryName(char strCt[],char * tok,int p)
 
 }
 
-
-
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 /* Function to search a word in a string                                                          */
 /* mot: char * word name                                                                          */
 /* line: char * the string                                                                        */
 /* return 1 if the word exist otherwise 0                                                         */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int searchWord(char *mot,char *line)
 {
     char car = 0;
@@ -287,7 +281,7 @@ int searchWord(char *mot,char *line)
               i++;
 	      if(mot[i] == 0 || line[j]=='\n') 
 	      {
-		 return 1; // on a trouvé, le mot on retourne 1
+		 return 1; // if found , return 1 
 	      }		
         }
         else
@@ -297,14 +291,14 @@ int searchWord(char *mot,char *line)
       j++;
      }
 
-    return 0;	// si on a rien trouvé, on retourne 0
+    return 0;	// if not found , return 0
 }
 
-/******************************************************************************************************************/
-/* Function to get the number of line in a file                                                                   */
-/* pathf: (char*) path name of the file                                                                           */
-/* return int the nubmer of line                                                                                  */
-/******************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------*/
+/* Function to get the number of line in a file                                                          */
+/* pathf: (char*) path name of the file                                                                  */
+/* return int the nubmer of line                                                                         */
+/*-------------------------------------------------------------------------------------------------------*/
 int getLineNumber(char pathf[])  
 { 
    FILE* fp = fopen (pathf, "r" );
@@ -328,13 +322,13 @@ int getLineNumber(char pathf[])
 
 
 
-/******************************************************************************************************************************/
-/* Function to extract a substring from a string                                                                              */
-/* s: (char*) string sourcs                                                                                                   */
-/* start: (int) the extracted string start                                                                                    */
-/* end: (int) the extracted string end                                                                                        */
-/* new_s: (char*) the extracted string                                                                                        */
-/******************************************************************************************************************************/
+/*------------------------------------------------------------------------------------------------------------------*/
+/* Function to extract a substring from a string                                                                    */
+/* s: (char*) string sourcs                                                                                         */
+/* start: (int) the extracted string start                                                                          */
+/* end: (int) the extracted string end                                                                              */
+/* new_s: (char*) the extracted string                                                                              */
+/*------------------------------------------------------------------------------------------------------------------*/
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
 {
  if (s && (start < end))
@@ -350,9 +344,10 @@ void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
  }
  new_s[end-start+1]=0;
 }
-/*******************************************************************************************************************************/
-/* Function to concatenate two string str1, str2 with  a dilimeter d                                                           */
-/*******************************************************************************************************************************/
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* Function to concatenate two string str1, str2 with  a dilimeter d                                                  */
+/*--------------------------------------------------------------------------------------------------------------------*/
 void strConcat(char str1[],char str2[], char d)
 {
     int i=0,j=0;
