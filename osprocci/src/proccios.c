@@ -1536,11 +1536,20 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 	int	status;
 	struct	os_response * osptr;
 	struct	os_subscription * subptr=(struct os_subscription *) 0;
+	char		reference[512];
 
 	if (!( subptr = use_openstack_configuration( pptr->profile )))
 		return((struct os_response *) 0);
 	else
 	{
+		/* ------------------------------------------- */
+		/* perform pre-release actions for destruction */
+		/* ------------------------------------------- */
+		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_RELEASE,
+			reference, OsProcci.publisher );
+
 		/* ------------------------------------------ */
 		/* disconnect the floating IP from the server */
 		/* ------------------------------------------ */
@@ -1549,6 +1558,7 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 			occi_flush_client( pptr->floating, _COSACS_PORT );
 			release_floating_address( subptr,pptr );
 		}
+
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */

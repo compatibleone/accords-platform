@@ -50,6 +50,7 @@ public struct occi_category * occi_cords_authorization_builder(char *a,char * b)
 public struct occi_category * occi_cords_provider_builder(char *a,char * b);
 public struct occi_category * occi_cords_compute_builder(char *a,char * b);
 public struct occi_category * occi_cords_configuration_builder(char *a,char * b);
+public struct occi_category * occi_cords_release_builder(char *a,char * b);
 public struct occi_category * occi_cords_constraint_builder(char *a,char * b);
 public struct occi_category * occi_cords_image_builder(char *a,char * b);
 public struct occi_category * occi_cords_infrastructure_builder(char *a,char * b);

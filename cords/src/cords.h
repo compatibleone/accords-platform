@@ -33,6 +33,7 @@
 #include "node.h"
 #include "action.h"
 #include "configuration.h"
+#include "release.h"
 #include "instruction.h"
 #include "value.h"
 #include "parameter.h"

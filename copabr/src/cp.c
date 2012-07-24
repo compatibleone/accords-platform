@@ -1249,6 +1249,9 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 	if ((status = cords_instance_identifier( dptr, _CORDS_CONFIGURATION )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_CONFIGURATION));
 
+	else if ((status = cords_instance_identifier( dptr, _CORDS_RELEASE )) != 0)
+		return(cords_append_error(dptr,status,_CORDS_RELEASE));
+
 	else if ((status = cords_instance_identifier( dptr, _CORDS_INTERFACE )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_INTERFACE));
 
@@ -1587,6 +1590,22 @@ private	int	cords_terminate_configuration( struct xml_element * dptr, char * age
 }
 
 /*	-----------------------------------------------------	*/
+/*	    c o r d s _ t e r m i n a t e _ r e l e a s e 	*/
+ /*	-----------------------------------------------------	*/
+private	int	cords_terminate_release( struct xml_element * dptr, char * agent,char * tls )
+{
+	int	status;
+	struct	xml_atribut * aptr;
+	if ((status = cords_append_links(dptr,_CORDS_ACTION,agent,tls)) != 0)
+		return(cords_append_error(dptr,status,"ACTION linkage failure"));
+	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
+		return(cords_append_error(dptr,701,"unresolved element ID"));
+	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+		return(cords_append_error(dptr,704,"updating RELEASE category"));
+	else	return(0);
+}
+
+/*	-----------------------------------------------------	*/
 /*	  c o r d s _ t e r m i n a t e _ i n t e r f a c e 	*/
  /*	-----------------------------------------------------	*/
 private	int	cords_terminate_interface( struct xml_element * dptr, char * agent,char * tls )
@@ -1791,6 +1810,8 @@ private	int	cords_terminate_xml( struct xml_element * dptr, char * agent,char * 
 		return( cords_terminate_image( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_CONFIGURATION ) ))
 		return( cords_terminate_configuration( dptr, agent,tls ) );
+	else if (!( strcmp( dptr->name, _CORDS_RELEASE ) ))
+		return( cords_terminate_release( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_INTERFACE ) ))
 		return( cords_terminate_interface( dptr, agent,tls ) );
 	else if (!( strcmp( dptr->name, _CORDS_ACCOUNT ) ))

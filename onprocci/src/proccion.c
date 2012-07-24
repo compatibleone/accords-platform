@@ -625,9 +625,19 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 {
 	int	status;
 	struct	on_response * onptr;
+	char		reference[512];
 	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return((struct on_response *) 0);
-	else 	return( on_delete_server( pptr->number ) );
+	else
+	{
+		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		cosacs_metadata_instructions( 
+			pptr->hostname, 
+			_CORDS_RELEASE,
+			reference, 
+			OnProcci.publisher );
+		return( on_delete_server( pptr->number ) );
+	}
 }
 
 /*	-------------------------------------------	*/

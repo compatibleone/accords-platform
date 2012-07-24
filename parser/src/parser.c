@@ -82,8 +82,8 @@ private	void	parser_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Parser : Version 1.0a.0.06");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Request Parser : Version 1.0a.0.07");
+	printf("\n   Beta Version : 24/07/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -154,6 +154,14 @@ private	int	parser_operation( char * nptr )
 		optr->access   |= _OCCI_AUTO_PUBLISH;
 
 	if (!( optr = occi_cords_configuration_builder( Parser.domain, "configuration" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_release_builder( Parser.domain, "release" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

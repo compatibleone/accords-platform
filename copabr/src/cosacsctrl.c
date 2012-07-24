@@ -518,6 +518,7 @@ public	int	cosacs_metadata_instructions(
 				zptr = occi_remove_response ( zptr );
 			else if ((!( strcasecmp( fptr->value, "system" ) ))
 			     ||  (!( strcasecmp( fptr->value, "fork"   ) ))
+			     ||  (!( strcasecmp( fptr->value, "kill"   ) ))
 			     ||  (!( strcasecmp( fptr->value, "process") ))
 			     ||  (!( strcasecmp( fptr->value, "command") )))
 			{

@@ -17,17 +17,17 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _configuration_c_
-#define _configuration_c_
+#ifndef _release_c_
+#define _release_c_
 
 #include "element.h"
 
-#include "configuration.h"
+#include "release.h"
 
-/*	--------------------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------------	*/
-public struct cords_configuration * liberate_cords_configuration(struct cords_configuration * sptr)
+/*	--------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ r e l e a s e 	*/
+/*	--------------------------------------------	*/
+public struct cords_release * liberate_cords_release(struct cords_release * sptr)
 {
 	if ( sptr )
 	{
@@ -37,14 +37,14 @@ public struct cords_configuration * liberate_cords_configuration(struct cords_co
 			 sptr->name = liberate(sptr->name);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_configuration *) 0);
+	return((struct cords_release *) 0);
 
 }
 
-/*	--------------------------------------------------	*/
-/*	r e s e t _ c o r d s _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------	*/
-public struct cords_configuration * reset_cords_configuration(struct cords_configuration * sptr)
+/*	--------------------------------------	*/
+/*	r e s e t _ c o r d s _ r e l e a s e 	*/
+/*	--------------------------------------	*/
+public struct cords_release * reset_cords_release(struct cords_release * sptr)
 {
 	if ( sptr )
 	{
@@ -57,21 +57,21 @@ public struct cords_configuration * reset_cords_configuration(struct cords_confi
 
 }
 
-/*	--------------------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------------	*/
-public struct cords_configuration * allocate_cords_configuration()
+/*	--------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ r e l e a s e 	*/
+/*	--------------------------------------------	*/
+public struct cords_release * allocate_cords_release()
 {
-	struct cords_configuration * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_configuration ) ) ))
+	struct cords_release * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_release ) ) ))
 		return( sptr );
-	else	return( reset_cords_configuration(sptr) );
+	else	return( reset_cords_release(sptr) );
 }
 
-/*	--------------------------------------------------	*/
-/*	x m l i n _ c o r d s _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------	*/
-public int xmlin_cords_configuration(struct cords_configuration * sptr,struct xml_element * eptr)
+/*	--------------------------------------	*/
+/*	x m l i n _ c o r d s _ r e l e a s e 	*/
+/*	--------------------------------------	*/
+public int xmlin_cords_release(struct cords_release * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -99,10 +99,10 @@ public int xmlin_cords_configuration(struct cords_configuration * sptr,struct xm
 
 }
 
-/*	----------------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ c o n f i g u r a t i o n 	*/
-/*	----------------------------------------------------------	*/
-public int rest_occi_cords_configuration(FILE * fh,struct cords_configuration * sptr,char * prefix, char * nptr)
+/*	----------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ r e l e a s e 	*/
+/*	----------------------------------------------	*/
+public int rest_occi_cords_release(FILE * fh,struct cords_release * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -116,4 +116,4 @@ public int rest_occi_cords_configuration(FILE * fh,struct cords_configuration * 
 
 }
 
-#endif	/* _configuration_c_ */
+#endif	/* _release_c_ */

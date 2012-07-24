@@ -84,8 +84,8 @@ private	void	cosacs_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.06");
-	printf("\n   Beta Version : 20/07/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.07");
+	printf("\n   Beta Version : 24/07/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -277,14 +277,25 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 				execmode = 0;
 			else if (!( strcmp( "system", sptr->nature ) ))
 				execmode = 0;
+			else if (!( strcmp( "kill", sptr->nature ) ))
+				execmode = 2;
 			else if (!( strcmp( "fork", sptr->nature ) ))
 				execmode = 1;
 			else if (!( strcmp( "process", sptr->nature ) ))
 				execmode = 1;
 			else	execmode = 0;
-			if ( execmode )
+			switch( execmode )
+			{
+			case	1	:
 				fprintf(h,"%s&\n",sptr->syntax);
-			else	fprintf(h,"%s\n",sptr->syntax);
+				break;
+			case	0	:	
+				fprintf(h,"%s\n",sptr->syntax);
+				break;
+			case	2	:
+				fprintf(h,"killall -15 %s\n",sptr->syntax);
+				break;
+			}
 			sptr->state = 1;
 			scripts++;
 		}

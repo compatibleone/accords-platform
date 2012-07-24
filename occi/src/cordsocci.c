@@ -36,6 +36,7 @@
 #include "occiprovider.c"
 #include "occiapplication.c"
 #include "occiconfiguration.c"
+#include "occirelease.c"
 #include "occiinstruction.c"
 #include "occivalue.c"
 #include "occiconstraint.c"

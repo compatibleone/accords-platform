@@ -8,9 +8,8 @@ struct	cords_manifest
 	char *				name;
 	char *				plan;
 	char *				nodes;
-	struct	cords_node	 	* firstapp;
-	struct	cords_node	 	* lastapp;
 	char *				configuration;
+	char *				release;
 	char *				interface;
 	char *				account;
 	char *				security;

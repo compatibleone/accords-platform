@@ -5,6 +5,7 @@
 			<xsd:element name="security" type="cordsSecurity" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="account" type="cordsAccount" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="release" type="cordsRelease" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="interface" type="cordsInterface" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="node" type="cordsNode" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="error" type="cordsError" minOccurs="0" maxOccurs="unbounded"/>
@@ -16,6 +17,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="xmlns" type="xsd:string"/>
 		<xsd:attribute name="configuration" type="xsd:string"/>
+		<xsd:attribute name="release" type="xsd:string"/>
 		<xsd:attribute name="interface" type="xsd:string"/>
 		<xsd:attribute name="security" type="xsd:string"/>
 		<xsd:attribute name="account" type="xsd:string"/>
@@ -63,6 +65,16 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsConfiguration">
+		<xsd:sequence>
+			<xsd:element name="action" type="cordsAction" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="actions" type="xsd:integer"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsRelease">
 		<xsd:sequence>
 			<xsd:element name="action" type="cordsAction" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>

@@ -104,6 +104,10 @@ private	char * 	cords_terminate_provisioning(
 		pptr->interID = liberate( pptr->interID );
 	if ( pptr->interface )
 		pptr->interface = occi_remove_response( pptr->interface );
+	if ( pptr->releaseID )
+		pptr->releaseID = liberate( pptr->releaseID );
+	if ( pptr->release )
+		pptr->release = occi_remove_response( pptr->release );
 	if ( pptr->secID )
 		pptr->secID = liberate( pptr->secID );
 	if ( pptr->security )
@@ -304,6 +308,12 @@ private	char * cords_resolve_contract_id( struct xml_element * document, char * 
 	struct	xml_element * eptr=(struct xml_element *) 0;
 	struct	xml_atribut * bptr;
 	int	l;
+
+	/* -------------------------- */
+	/* ensure valid core app name */
+	/* -------------------------- */
+	if (!( coreappname ))
+		return( coreappname );
 
 	/* --------------------------------------------------- */ 
 	/* resolve the contract id of the target of the action */
@@ -808,6 +818,7 @@ private	int	cords_action_instruction(
 
 	else if (!( strcasecmp( mname, "none" ) ))
 		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
+
 	else if (!( strcasecmp( mname, "set" ) ))
 		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
 
@@ -815,6 +826,9 @@ private	int	cords_action_instruction(
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( strcasecmp( mname, "fork" ) ))
+		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
+
+	else if (!( strcasecmp( mname, "kill" ) ))
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( strcasecmp( mname, "invoke" ) ))
@@ -968,7 +982,7 @@ private	int	cords_configuration_action(
 	{
 		if (!( strcmp( type, "cordscript" )))
 			if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
-				cords_action_instruction( host, document, aptr,"configuration", agent, tls );
+				cords_action_instruction( host, document, aptr,_CORDS_CONFIGURATION, agent, tls );
 
 		type = liberate( type );
 	}
@@ -997,12 +1011,45 @@ private	int	cords_interface_action(
 		return( 78 );
 	if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
+
 	if (!( name = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_NAME ) ))
 		name = allocate_string("method");
 
 	if (!( strcmp( type, "cordscript" )))
 		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
 			cords_action_instruction( host, document, aptr,name, agent, tls );
+
+	type = liberate( type );
+	name = liberate( name );
+	statement = liberate( statement );	 
+
+	return(0);
+}
+
+/*	-------------------------------------------------------		*/
+/*	  	c o r d s _ r e l e a s _ a c t i o n			*/
+/*	-------------------------------------------------------		*/
+private	int	cords_release_action( 
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent,
+		char * tls )
+{
+	char *	type=(char *) 0;
+	char *	name=(char *) 0;
+	char *	statement=(char *) 0;
+	struct	cordscript_action * aptr=(struct cordscript_action*) 0;
+
+	if (!( statement = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
+		return( 78 );
+
+	if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
+		type = allocate_string("cordscript");
+
+	if (!( strcmp( type, "cordscript" )))
+		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+			cords_action_instruction( host, document, aptr,_CORDS_RELEASE, agent, tls );
 
 	type = liberate( type );
 	name = liberate( name );
@@ -1132,6 +1179,47 @@ private	int	cords_broker_configuration(
 	else if (!( xptr = document_add_atribut( document, "instructions", buffer ) ))
 		return( 927 );
 	else	return( 0 );
+}
+
+/*	-------------------------------------------------------		*/
+/*		c o r d s _ b r o k e r _ r e l e a s e 		*/
+/*	-------------------------------------------------------		*/
+/*	the counterpart to configuration is release and will be		*/
+/*	invoked through the COSACS interface just prior to the		*/
+/*	release of provisioning.					*/
+/*	-------------------------------------------------------		*/
+private	int	cords_broker_release(
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent, char * tls )
+{
+	struct	occi_element *	eptr;
+	struct	occi_response * aptr;
+	char	*	id;
+	int		status;
+	if (!( zptr )) return(0);
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+		{
+			return( 908 );
+		}
+		else
+		{
+			cords_release_action( host, document, aptr, agent, tls );
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+			continue;
+		}
+	}
+	return( 0 );
 }
 
 /*	-------------------------------------------------------		*/
@@ -3273,6 +3361,17 @@ public	char *	cords_manifest_broker(
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
 
+	/* ----------------------------- */
+	/* retrieve the release instance */
+	/* ----------------------------- */
+	if ((( CbC.releaseID = occi_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_RELEASE)) != (char *) 0)
+	&& (( CbC.releaseID = cords_valid_identifier( CbC.releaseID )) != (char *) 0))
+	{
+		if (!( CbC.release = cords_retrieve_instance( host, CbC.releaseID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
+
 	/* ------------------------------- */
 	/* retrieve the interface instance */
 	/* ------------------------------- */
@@ -3343,6 +3442,13 @@ public	char *	cords_manifest_broker(
 	/* perform configuration instruction processing */
 	/* -------------------------------------------- */
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
+		return( cords_terminate_provisioning( status, &CbC ) );
+	
+	/* -------------------------------------- */
+	/* perform release instruction processing */
+	/* -------------------------------------- */
+	if (( CbC.release )
+	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
 	/* -------------------------------------------- */

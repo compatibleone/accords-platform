@@ -55,6 +55,8 @@ struct	cords_provisioning
 	struct	occi_response 	* security;
 	char			* confID;
 	struct	occi_response 	* configuration;
+	char			* releaseID;
+	struct	occi_response 	* release;
 	char			* interID;
 	struct	occi_response 	* interface;
 	char			* instID;

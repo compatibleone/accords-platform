@@ -102,6 +102,7 @@
 #define	_CORDS_PORT		"port"
 
 #define	_CORDS_CONFIGURATION	"configuration"
+#define	_CORDS_RELEASE		"release"
 #define	_CORDS_INTERFACE	"interface"
 #define	_CORDS_ACTION		"action"
 #define	_CORDS_PARAMETER	"parameter"

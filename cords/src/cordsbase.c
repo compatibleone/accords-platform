@@ -61,6 +61,7 @@
 #include "action.c"
 #include "user.c"
 #include "configuration.c"
+#include "release.c"
 #include "application.c"
 #include "parameter.c"
 #include "instruction.c"

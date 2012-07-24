@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _manifest_c_
@@ -41,12 +39,10 @@ public struct cords_manifest * liberate_cords_manifest(struct cords_manifest * s
 			 sptr->plan = liberate(sptr->plan);
 		if ( sptr->nodes )
 			 sptr->nodes = liberate(sptr->nodes);
-		if ( sptr->firstapp )
-			 sptr->firstapp = liberate_cords_node(sptr->firstapp);
-		if ( sptr->lastapp )
-			 sptr->lastapp = liberate_cords_node(sptr->lastapp);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
+		if ( sptr->release )
+			 sptr->release = liberate(sptr->release);
 		if ( sptr->interface )
 			 sptr->interface = liberate(sptr->interface);
 		if ( sptr->account )
@@ -74,9 +70,8 @@ public struct cords_manifest * reset_cords_manifest(struct cords_manifest * sptr
 		sptr->name = (char*) 0;
 		sptr->plan = (char*) 0;
 		sptr->nodes = (char*) 0;
-		sptr->firstapp = (struct cords_node*) 0;
-		sptr->lastapp = (struct cords_node*) 0;
 		sptr->configuration = (char*) 0;
+		sptr->release = (char*) 0;
 		sptr->interface = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->security = (char*) 0;
@@ -129,6 +124,10 @@ public int xmlin_cords_manifest(struct cords_manifest * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"release") ))
+		{
+			if ( wptr->value ) { sptr->release = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"interface") ))
 		{
 			if ( wptr->value ) { sptr->interface = allocate_string(wptr->value); }
@@ -172,6 +171,7 @@ public int rest_occi_cords_manifest(FILE * fh,struct cords_manifest * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.plan='%s'\r\n",prefix,nptr,(sptr->plan?sptr->plan:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nodes='%s'\r\n",prefix,nptr,(sptr->nodes?sptr->nodes:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.release='%s'\r\n",prefix,nptr,(sptr->release?sptr->release:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.interface='%s'\r\n",prefix,nptr,(sptr->interface?sptr->interface:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
