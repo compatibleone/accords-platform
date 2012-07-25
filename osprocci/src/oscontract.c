@@ -483,7 +483,9 @@ public	int	delete_openstack_contract(
 {
 	struct	os_response * osptr;
 	struct	os_subscription * subptr;
-	if (!(subptr = use_openstack_configuration( pptr->profile )))
+	if ( pptr->state == _OCCI_IDLE )
+		return(0);
+	else if (!(subptr = use_openstack_configuration( pptr->profile )))
 		return(0);
 	else if ((osptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
 		osptr = liberate_os_response( osptr );

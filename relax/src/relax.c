@@ -449,19 +449,19 @@ private	int	relax_operation( char * nptr )
 {
 	char *	eptr;
 
-	if (!( eptr = getenv( "elastic-floor" ) ))
+	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
 
-	if (!( eptr = getenv( "elastic-ceiling" ) ))
+	if (!( eptr = getenv( "elastic_ceiling" ) ))
 		Elastic.ceiling = 1;
 	else	Elastic.ceiling = atoi(eptr);
 
-	if (!( eptr = getenv( "elastic-strategy" ) ))
+	if (!( eptr = getenv( "elastic_strategy" ) ))
 		Elastic.floor = 0;
 	else	Elastic.floor = atoi(eptr);
 
-	if (!( eptr = getenv( "elastic-contract" ) ))
+	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( 118 );
 	else if (!( add_elastic_contract( eptr, 0 ) ))
 		return( 27 );
