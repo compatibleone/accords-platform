@@ -58,6 +58,8 @@
 #define	_HTTP_PROXY_AUTHENTICATE "PROXY-Authenticate"
 #define	_HTTP_BASIC		"Basic realm=*"
 
+#define	_HTTP_MOVED		301
+
 struct	rest_server;
 struct	rest_client;
 struct	rest_extension;
