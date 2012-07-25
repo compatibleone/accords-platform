@@ -14,6 +14,7 @@ echo "<action expression=\"$1.fork('bash run-$1');\"/>" >> accords-$1.xml
 echo "</configuration>" >> accords-$1.xml 
 echo "<release name=\"${makesystem}:$1\">" >> accords-$1.xml 
 echo "<action expression=\"$1.kill('$1');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('sleep 5');\"/>" >> accords-$1.xml 
 echo "</release>" >> accords-$1.xml 
 echo "<security name=\"accords:security\"/>" >> accords-$1.xml 
 echo "<account name=\"accords:account\"/>" >> accords-$1.xml 
