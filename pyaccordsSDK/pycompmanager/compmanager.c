@@ -473,7 +473,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        }
        fprintf(f,"\t\t//           python interface\n");
        fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
-       frintf(f,"\t\tif(!Py_IsInitialized)\n");
+       fprintf(f,"\t\tif(!Py_IsInitialized)\n");
        fprintf(f,"\t\t{\n");
        fprintf(f,"\t\t\tPy_Initialize();\n");
        fprintf(f,"\t\t}\n");
@@ -784,7 +784,7 @@ int generateCategoryInterfaceCfile(char *categoryName,listc categoryAtr,char pat
       
       fprintf(f,"\t\t//           python interface\n");
       fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
-      frintf(f,"\t\tif(!Py_IsInitialized)\n");
+      fprintf(f,"\t\tif(!Py_IsInitialized)\n");
       fprintf(f,"\t\t{\n");
       fprintf(f,"\t\t\tPy_Initialize();\n");
       fprintf(f,"\t\t}\n");
