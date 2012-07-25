@@ -10,6 +10,7 @@ bash build-package cosched
 bash build-package slam
 bash build-package ezvm
 bash build-package coips
+bash build-package relax
 bash build-package broker
 bash build-package parser
 bash build-package procci
