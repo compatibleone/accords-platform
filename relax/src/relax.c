@@ -28,6 +28,7 @@
 #include "document.h"
 #include "relax.h"
 #include "cordslang.h"
+#include "cb.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
@@ -177,10 +178,6 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			eptr->service = liberate( eptr->service );
 		if ( eptr->contract )
 			eptr->contract = liberate( eptr->contract );
-		if ( eptr->node )
-			eptr->node = liberate( eptr->node );
-		if ( eptr->provider )
-			eptr->provider = liberate( eptr->provider );
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -240,16 +237,6 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	else if (!( eptr->hostname = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	/* ---------------------------- */
-	/* retrieve the node identifier */
-	/* ---------------------------- */
-	else if (!( result = occi_extract_atribut( 
-					zptr, Relax.domain, 
-					_CORDS_CONTRACT, _CORDS_NODE )))
-		return( liberate_elastic_contract( eptr ) );
-	else if (!( eptr->node = allocate_string( result ) ))
-		return( liberate_elastic_contract( eptr ) );
-
 	/* ----------------------------- */
 	/* store the contract identifier */
 	/* ----------------------------- */
@@ -268,11 +255,134 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	return(eptr);
 }
 
-/*	--------------------------------------------	*/
+/*	---------------------------------------------------	*/
+/*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
+/*	---------------------------------------------------	*/
+private	char *	negotiate_elastic_contract(char * node,char * name, char * user, struct cords_placement_criteria * selector)
+{
+	char *	contract=(char *) 0;
+	struct	xml_element * document=(struct xml_element *) 0;
+	struct	xml_atribut * aptr;
+	if ( check_debug() ) rest_log_message("relax:negotiate_elastic_contract");
+	if (!( document = cords_instance_node(
+		selector, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
+		return( (char *) 0 );
+	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
+	{
+		document = document_drop( document );
+		return((char * ) 0);
+	}
+	else if (!( contract = allocate_string( aptr->value ) ))
+	{
+		document = document_drop( document );
+		return((char * ) 0);
+	}
+	else
+	{
+		document = document_drop( document );
+		if ( check_debug() ) rest_log_message("relax:negotiate_elastic_contract:done");
+		return(contract);
+	}
+}
+
+/*	---------------------------------------------	*/
 /*	  n e w _ e l a s t i c _ c o n t r a c t	*/
-/*	--------------------------------------------	*/
+/*	---------------------------------------------	*/
+/*	creates a new elastic contract by duplicating	*/
+/*	an existing contract and provision instance.	*/
+/*	---------------------------------------------	*/
 private	struct elastic_contract * new_elastic_contract( struct elastic_contract * eptr, char * contract )
 {
+	struct	occi_response * zptr=(struct occi_response *) 0;
+	struct	occi_response * yptr=(struct occi_response *) 0;
+	struct	occi_response * xptr=(struct occi_response *) 0;
+	char *	result=(char *) 0;
+	char *	profile=(char *) 0;
+	char *	provision=(char *) 0;
+	char *	account=(char *) 0;
+	char *	node=(char *) 0;
+	char *	name=(char *) 0;
+	struct	cords_placement_criteria selector;
+	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+
+	/* ------------------------------ */
+	/* retrieve the CONTRACT instance */
+	/* ------------------------------ */
+	if (!( contract ))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------- */
+	/* retrieve the PROFILE name */
+	/* ------------------------- */
+	else if (!( result = occi_extract_atribut( 
+					zptr, Relax.domain, 
+					_CORDS_CONTRACT, _CORDS_PROFILE )))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( profile = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ---------------------------- */
+	/* retrieve the NODE identifier */
+	/* ---------------------------- */
+	else if (!( result = occi_extract_atribut( 
+					zptr, Relax.domain, 
+					_CORDS_CONTRACT, _CORDS_NODE )))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( node = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* -------------------------------- */
+	/* extract the PROVISION identifier */
+	/* -------------------------------- */
+	else if (!( result = occi_extract_atribut( 
+					zptr, Relax.domain, 
+					_CORDS_CONTRACT, _CORDS_PROVISION )))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( provision = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------------- */
+	/* retrieve the PROVISION instance */
+	/* ------------------------------- */
+	else if (!( yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------------ */
+	/* extract the ACCOUNT identifier */
+	/* ------------------------------ */
+	else if (!( result = occi_extract_atribut( 
+					yptr, Relax.domain, 
+					profile, _CORDS_ACCOUNT )))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( account = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------- */
+	/* extract the CONTRACT name */
+	/* ------------------------- */
+	else if (!( result = occi_extract_atribut( 
+					yptr, Relax.domain, 
+					profile, _CORDS_NAME )))
+		return( liberate_elastic_contract( eptr ) );
+
+	else if (!( name = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+
+	else if (!( contract = negotiate_elastic_contract( 
+			node, name, account, &selector ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------------- */
+	/* start the new CONTRACT instance */
+	/* ------------------------------- */
+	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
+
+	/* ---------------------------- */
+	/* add the new ELASTIC CONTRACT */
+	/* ---------------------------- */
 	return( use_elastic_contract( eptr, contract ) );	
 }
 

@@ -25,11 +25,9 @@ struct	elastic_contract
 	struct	elastic_contract * previous;
 	struct	elastic_contract * next;
 
-	char *	contract;
-	char *	node;
-	char *	hostname;
-	char *	service;
-	char *	provider;
+	char *		contract;
+	char *		hostname;
+	char *		service;
 
 	int		port;
 	int		lastused;
