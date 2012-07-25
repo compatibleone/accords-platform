@@ -873,7 +873,9 @@ private	int	cords_action_instruction(
 				continue;
 			else if (!( pvalue = cords_contract_property_value( source, rvalue->value, agent, tls ) ))
 			{
-				if (!( strcmp( symbol, "contract" ) ))
+				if (!( rvalue->value )
+					ivalue = allocate_string("");
+				else if (!( strcmp( rvalue->value, "contract" ) ))
 					ivalue = allocate_string( aptr );
 				else	ivalue = allocate_string("");
 			}
