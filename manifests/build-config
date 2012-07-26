@@ -14,7 +14,11 @@ if test -z "$thishost"; then
 else
 	resthost=${thishost}
 fi
-restport=8086
+if test -z "$thisport"; then
+	restport=8086
+else
+	restport=${thisport}
+fi
 if test -z "$pubhost"; then
 	publisher=""
 	identity=""

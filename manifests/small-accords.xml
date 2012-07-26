@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF8"?>
 <manifest name="small-accords-platform" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd">
-	<node name="small-accords-platform" type="simple" access="public" scope="normal" provider="openstack" >
+	<node name="ap" type="simple" access="public" scope="normal" provider="openstack" >
 		<infrastructure name="small-accords-platform">
 			<compute name="small-accords-platform" architecture="x86" cores="1" memory="1G" speed="1G"/>
 			<storage name="small-accords-platform" size="10G"/>
@@ -16,7 +16,6 @@
 				<port name="procci" protocol="tcp" range="0.0.0.0/0" from="8094" to="8094"/>
 				<port name="osprocci" protocol="tcp" range="0.0.0.0/0" from="8095" to="8095"/>
 				<port name="paprocci" protocol="tcp" range="0.0.0.0/0" from="8096" to="8096"/>
-				<port name="testosocci" protocol="tcp" range="0.0.0.0/0" from="8097" to="8097"/>
 				<port name="osocciprocci" protocol="tcp" range="0.0.0.0/0" from="8098" to="8098"/>
 				<port name="onprocci" protocol="tcp" range="0.0.0.0/0" from="8099" to="8099"/>
 				<port name="azprocci" protocol="tcp" range="0.0.0.0/0" from="8100" to="8100"/>
@@ -27,15 +26,64 @@
 				<port name="coees" protocol="tcp" range="0.0.0.0/0" from="8105" to="8105"/>
 				<port name="cosched" protocol="tcp" range="0.0.0.0/0" from="8106" to="8106"/>
 				<port name="slam" protocol="tcp" range="0.0.0.0/0" from="8107" to="8107"/>
+				<port name="paasprocci" protocol="tcp" range="0.0.0.0/0" from="8108" to="8108"/>
 				<port name="cosacs" protocol="tcp" range="0.0.0.0/0" from="8286" to="8286"/>
 				<port name="ssh" protocol="tcp" from="22" to="22"/>
 			</network>
 		</infrastructure>
 		<image name="small-accords-platform">
-			<system name="accords-platform"/>
+			<system name="debian_with_cosacs"/>
 		</image>
 	</node>
-	<configuration name="small-accords-platform"/>
+	<configuration name="small-accords-platform">
+		<action expression="ap.system('export accords_publisher_publisher_hostname=$cosacs');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-publisher; bash run-publisher 8086');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coss; bash run-coss 8087');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-comons; bash run-comons 8088');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coes; bash run-coes 8089');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-conets; bash run-conets 8090');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coobas; bash run-coobas 8091');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-parser; bash run-parser 8092');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-broker; bash run-broker 8093');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-procci; bash run-procci 8094');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-osprocci; bash run-osprocci 8095');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-paprocci; bash run-paprocci 8096');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-osocciprocci; bash run-osocciprocci 8098');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-onprocci; bash run-onprocci 8099');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-azprocci; bash run-azprocci 8100');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-dcprocci; bash run-dcprocci 8101');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-fileserver; bash run-fileserver 8102');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-ezvm; bash run-ezvm 8103');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coips; bash run-coips 8104');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coees; bash run-coees 8105');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-cosched; bash run-cosched 8106');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-slam; bash run-slam 8107');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-paasprocci; bash run-paasprocci 8108');"/>
+	</configuration>
+	<release name="small-accords-platform">
+		<action expression="ap.kill('paasprocci');"/>
+		<action expression="ap.kill('slam');"/>
+		<action expression="ap.kill('cosched');"/>
+		<action expression="ap.kill('coees');"/>
+		<action expression="ap.kill('coips');"/>
+		<action expression="ap.kill('ezvm');"/>
+		<action expression="ap.kill('fileserver');"/>
+		<action expression="ap.kill('dcprocci');"/>
+		<action expression="ap.kill('azprocci');"/>
+		<action expression="ap.kill('onprocci');"/>
+		<action expression="ap.kill('osocciprocci')"/>;
+		<action expression="ap.kill('paprocci');"/>
+		<action expression="ap.kill('osprocci');"/>
+		<action expression="ap.kill('procci');"/>
+		<action expression="ap.kill('broker');"/>
+		<action expression="ap.kill('parser');"/>
+		<action expression="ap.kill('coobas');"/>
+		<action expression="ap.kill('conets');"/>
+		<action expression="ap.kill('coes');"/>
+		<action expression="ap.kill('comons');"/>
+		<action expression="ap.kill('coss');"/>
+		<action expression="ap.kill('publisher');"/>
+	</release>
 	<interface name="small-accords-platform"/>
 	<account name="test"/>
 	<security name="small-accords-platform"/>
