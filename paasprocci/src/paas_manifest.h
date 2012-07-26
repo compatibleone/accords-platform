@@ -9,7 +9,7 @@ struct paas_manifest
 	int status;
 };
 
-#endif	/*_paas_manifest_h */
+#endif	
 
 
 

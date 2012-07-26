@@ -1,10 +1,10 @@
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _paas_config_option_c_
-#define _paas_config_option_c_
+#ifndef _paas_configuration_option_c_
+#define _paas_configuration_option_c_
 
 #include "element.h"
 
-#include "paas_config_option.h"
+#include "paas_configuration_option.h"
 
 /*	--------------------------------------------------------------------	*/
 /*	l i b e r a t e _ p a a s _ c o n f i g u r a t i o n _ o p t i o n 	*/
@@ -164,4 +164,4 @@ public int rest_occi_paas_configuration_option(FILE * fh,struct paas_configurati
 
 }
 
-#endif	/* _paas_config_option_cpaas_config_option_c_ */
+#endif	/* _paas_configuration_option_cpaas_configuration_option_c_ */

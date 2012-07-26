@@ -1,10 +1,10 @@
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _paas_config_template_c_
-#define _paas_config_template_c_
+#ifndef _paas_configuration_template_c_
+#define _paas_configuration_template_c_
 
 #include "element.h"
 
-#include "paas_config_template.h"
+#include "paas_configuration_template.h"
 
 /*	------------------------------------------------------------------------	*/
 /*	l i b e r a t e _ p a a s _ c o n f i g u r a t i o n _ t e m p l a t e 	*/
@@ -124,4 +124,4 @@ public int rest_occi_paas_configuration_template(FILE * fh,struct paas_configura
 
 }
 
-#endif	/* _paas_config_template_cpaas_config_template_c_ */
+#endif	/* _paas_configuration_template_cpaas_configuration_template_c_ */

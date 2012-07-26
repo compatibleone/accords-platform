@@ -60,6 +60,7 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "paas_environment.c"
 #include "paas_link.c"
 #include "paas_manifest.c"
+#include "paas_relation.c"
 #include "paas_node.c"
 #include "paas_version.c"
 #include "paas_version_instance.c"
@@ -70,6 +71,7 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "occipaas_environment.c"
 #include "occipaas_link.c"
 #include "occipaas_manifest.c"
+#include "occipaas_relation.c"
 #include "occipaas_node.c"
 #include "occipaas_version.c"
 #include "occipaas_version_instance.c"
@@ -206,6 +208,13 @@ private	int	paasprocci_operation( char * nptr )
 	last = optr;
 
 	if (!( optr = occi_paas_version_builder( PaasProcci.domain, "paas_version" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_paas_relation_builder( PaasProcci.domain, "paas_relation" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

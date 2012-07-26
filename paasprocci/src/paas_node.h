@@ -11,6 +11,5 @@ struct paas_node
 	int status;
 };
 
-#endif	/* _paas_node_h */
-	/* ------------ */
+#endif	
 

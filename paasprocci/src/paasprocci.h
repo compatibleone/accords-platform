@@ -9,6 +9,7 @@
 #include "paas_environment.h"
 #include "paas_link.h"
 #include "paas_manifest.h"
+#include "paas_relation.h"
 #include "paas_node.h"
 #include "paas_version.h"
 #include "paas_version_instance.h"

@@ -13,7 +13,7 @@ struct paas_environment{
 	int status;
 	};
 
-#endif	/* _paas_environment_h */
+#endif	
 
 
 

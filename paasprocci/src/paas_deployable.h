@@ -6,9 +6,11 @@ struct paas_deployable
 	char* id;
 	char* name;
 	char* content_type;
+	char* location;
+	char* multitenancy_level;
 	int status;
 };
 
-#endif	/* _paas_deployable_h */
+#endif	
 
 

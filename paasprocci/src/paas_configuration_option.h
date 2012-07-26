@@ -17,5 +17,5 @@ struct paas_configuration_option
 	int status;
 };
 
-#endif	/* _paas_configuration_option_h */
+#endif	
 
