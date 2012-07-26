@@ -55,7 +55,7 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "paasprocci.h"
 #include "paas_application.c"
 #include "paas_configuration_option.c"
-#include "paas_configuragtion_template.c"
+#include "paas_configuration_template.c"
 #include "paas_deployable.c"
 #include "paas_environment.c"
 #include "paas_link.c"
