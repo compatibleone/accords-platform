@@ -3,8 +3,8 @@
 #define	_paasprocci_h
 
 #include "paas_application.h"
-#include "paas_config_option.h"
-#include "paas_config_template.h"
+#include "paas_configuration_option.h"
+#include "paas_configuration_template.h"
 #include "paas_deployable.h"
 #include "paas_environment.h"
 #include "paas_link.h"
