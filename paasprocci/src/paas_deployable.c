@@ -19,6 +19,10 @@ public struct paas_deployable * liberate_paas_deployable(struct paas_deployable 
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->content_type )
 			 sptr->content_type = liberate(sptr->content_type);
+		if ( sptr->location )
+			 sptr->location = liberate(sptr->location);
+		if ( sptr->multitenancy_level )
+			 sptr->multitenancy_level = liberate(sptr->multitenancy_level);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_deployable *) 0);
@@ -35,6 +39,8 @@ public struct paas_deployable * reset_paas_deployable(struct paas_deployable * s
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->content_type = (char*) 0;
+		sptr->location = (char*) 0;
+		sptr->multitenancy_level = (char*) 0;
 		sptr->status =  0;
 	}
 	return(sptr);
@@ -74,6 +80,14 @@ public int xmlin_paas_deployable(struct paas_deployable * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->content_type = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"location") ))
+		{
+			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"multitenancy_level") ))
+		{
+			if ( wptr->value ) { sptr->multitenancy_level = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"status") ))
 		{
 			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
@@ -95,6 +109,8 @@ public int rest_occi_paas_deployable(FILE * fh,struct paas_deployable * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.content_type='%s'\r\n",prefix,nptr,(sptr->content_type?sptr->content_type:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.multitenancy_level='%s'\r\n",prefix,nptr,(sptr->multitenancy_level?sptr->multitenancy_level:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 

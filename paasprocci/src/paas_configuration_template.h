@@ -12,6 +12,5 @@ struct paas_configuration_template
 	int status;
 };
 
-#endif	/* _paas_configuration_template_h */
-	/* ------------------------------ */
+#endif	
 

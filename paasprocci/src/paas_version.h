@@ -10,6 +10,6 @@ struct paas_version
 	int status;
 };
 
-#endif	/* _paas_version_h */
+#endif	
 
 

@@ -12,5 +12,5 @@ struct paas_version_instance
 	int status;
 };
 
-#endif	/* _paas_version_instance_h */
+#endif	
 

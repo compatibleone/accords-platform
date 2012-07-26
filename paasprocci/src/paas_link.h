@@ -10,5 +10,5 @@ struct	paas_link
 	int	status;
 };
 
-#endif	/* _paas_link_h */
+#endif	
 
