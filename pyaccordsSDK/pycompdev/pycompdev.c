@@ -25,6 +25,8 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
 {                    
  char * categoryNameList;
  char * categoryActionNumberList;
+ int paccess;
+ int caccess;
  char **argv;
  int argc;
  char *moduleName;
@@ -34,7 +36,7 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
  PyObject * strObj;  /* one string in the list */
  int numLines;
  
- if (! PyArg_ParseTuple( args,"iO!ss", &argc,&PyList_Type, &listObj,&moduleName, &categoryNameList)) return NULL;
+ if (! PyArg_ParseTuple( args,"iO!ssii", &argc,&PyList_Type, &listObj,&moduleName, &categoryNameList, &paccess, &caccess)) return NULL;
  numLines = PyList_Size(listObj);
 
  if (numLines < 0)   return NULL;
@@ -50,7 +52,7 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
 
  }
 
- a=module(argc,argv,moduleName,categoryNameList);
+ a=module(argc,argv,moduleName,categoryNameList,paccess,caccess);
 
  return Py_BuildValue("i",a);
 }

@@ -29,9 +29,16 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
 
  if (! PyArg_ParseTuple( args,"sssi",&categoryName, &categoryAttributes,&categoryActions,&flag)) return NULL;
  dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag);
- if(dim <= 0) return NULL;
- printf(" %s OCCI category is created\n",categoryName); 
- return Py_BuildValue("i", dim);
+ if(dim <= 0) 
+ {
+   printf("Failure to create %s OCCI category\n",categoryName);
+   return Py_BuildValue("i", dim);
+ }
+ else
+ {
+  printf(" %s OCCI category is created\n",categoryName); 
+  return Py_BuildValue("i", dim);
+ }
 
 }
 
@@ -44,8 +51,16 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   int flag;
   if (! PyArg_ParseTuple( args,"sii",&categoryName,&indice,&flag)) return NULL;
   a=deleteCategory(categoryName,indice,flag);
-  printf("%s OCCI category is removed\n",categoryName);
-  return Py_BuildValue("i",a);
+  if(a)
+  {
+   printf("%s OCCI category is removed\n",categoryName);
+   return Py_BuildValue("i",a);
+  }
+  else
+  {
+    printf("Failure to remove %s category\n",categoryName);
+    return Py_BuildValue("i",a);
+  }
 
 }
 
@@ -55,10 +70,20 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  char * moduleName;
  char * categoryNameList;
  char * categoryActionNumberList; 
- if (! PyArg_ParseTuple( args,"ss",&moduleName,&categoryNameList)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList);
- printf(" %s component is created\n",moduleName);
- return Py_BuildValue("i", a);
+ int paccess;
+ int caccess;
+ if (! PyArg_ParseTuple( args,"ssii",&moduleName,&categoryNameList,&paccess,&caccess)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList,paccess,caccess);
+ if(!a)
+ {
+   printf(" %s component is created\n",moduleName);
+   return Py_BuildValue("i", a);
+ }
+ else
+ {
+  printf(" Failure to create %s component\n",moduleName);
+  return Py_BuildValue("i", a);
+ }
 
 }
 
@@ -71,8 +96,16 @@ static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
  if (! PyArg_ParseTuple( args,"s",&moduleName)) return NULL;
  
  a=deleteModule(moduleName);
- printf(" %s component is removed\n",moduleName);
- return Py_BuildValue("i", a);
+ if(a)
+ {
+  printf(" %s component is removed\n",moduleName);
+  return Py_BuildValue("i", a);
+ }
+ else
+ {
+  printf(" Failure to remove %s component\n",moduleName);
+  Py_BuildValue("i", a);
+ }
 
 }
 

@@ -27,7 +27,7 @@
 #include "list.h"
 #include "../../pyaccords/pysrc/pypath.h"
 
-#define TAILLE 1024
+#define DIM 1024
 #define CORDS_SRC "cords/src"
 #define INCLUDE_CORDS_H "cords/src/cords.h"
 #define INCLUDE_OCCI_BUILDER "occi/src/occibuilder.h"
@@ -49,14 +49,14 @@
 
 int insertCategory(char pathf[], char categoryName[],int indice,int flag);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
-int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag);
+char *sub_str(const char *s, unsigned int start, unsigned int end);
+int insertInFile(char pathf[],char categoryName[],char categoryNames[]);
 int enTete(char pathf[]);
 char *getCategoryName(char strCt[],char *tok,int p);
 int getLineNumber(char pathf[]);
-int searchWord(char *mot,char *line);
+int searchWord(char mot[], char line[]);
 int deleteInFile(char pathf[],char categoryName[]);
 void strConcat(char str1[],char str2[], char d);
-
-
- 
+int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[]);
+int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]);
 #endif

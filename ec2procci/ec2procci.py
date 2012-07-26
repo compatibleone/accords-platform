@@ -7,6 +7,6 @@ import pycompdev
 
 def main():
 	argc=len(sys.argv)
-	return pycompdev.launchModule( argc , sys.argv , "ec2procci" ,"amazonEc2 ec2config")
+	return pycompdev.launchModule( argc , sys.argv , "ec2procci" ,"amazonEc2 ec2config",1,0)
 if __name__=="__main__":
 	main()
