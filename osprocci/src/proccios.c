@@ -1267,7 +1267,7 @@ private	struct	rest_response * start_openstack(
 			/* ------------------------------------- */
 			/* release the COSACS client information */
 			/* ------------------------------------- */
-			occi_release_client( pptr->hostname );
+			cosacs_release_interface( pptr->hostname );
 
 			/* -------------------------------- */
 			/* disassociate address from server */

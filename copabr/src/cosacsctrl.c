@@ -78,6 +78,20 @@ private	char * 	cosacs_tls()
 }
 
 
+/*	-----------------------------------------------		*/
+/*	r e l e a s e _ c o s a c s _ i n t e r f a c e		*/
+/*	-----------------------------------------------		*/
+/*	releases the OCCI client interface for private		*/
+/*	provisioned VM's because the IP can be reused.		*/
+/*	-----------------------------------------------		*/
+public	void	cosacs_release_interface( char * host )
+{
+	char	buffer[2048];
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_METADATA);
+	occi_release_client( buffer );
+	return;
+}
+
 /*	-------------------------------------------------	*/
 /*	c o s a c s _ o c c i _ c r e a t e _ c l i e n t	*/
 /*	-------------------------------------------------	*/

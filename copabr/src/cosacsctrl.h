@@ -23,6 +23,7 @@
 #define	_COSACS_TIMEOUT	15
 #define	_COSACS_RETRY   60
 
+public	void	cosacs_release_interface( char * host );
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value );
 public	int	cosacs_create_script( char * cosacs, char * action, char * parameters, char * type );
 public	int	cosacs_create_file( char * cosacs, char * remotename, char * localname, char * type );
