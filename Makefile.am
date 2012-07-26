@@ -51,6 +51,9 @@ endif
 if ENABLE_SLAM
 SUBDIRS += slam
 endif
+if ENABLE_PAASPROCCI
+SUBDIRS += paasprocci
+endif
 if ENABLE_RELAX
 SUBDIRS += relax
 endif

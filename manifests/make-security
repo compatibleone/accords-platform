@@ -26,6 +26,7 @@ else
 	bash build-security parser
 	bash build-security procci
 	bash build-security slam
+	bash build-security paasprocci
 fi
 
 

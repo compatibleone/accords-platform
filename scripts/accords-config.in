@@ -208,6 +208,8 @@ _co-status() {
 co-stop() {
     killall example
     sleep 1
+    killall paasprocci
+    sleep 1
     killall slam
     sleep 1
     killall onprocci
@@ -323,6 +325,10 @@ _run-testosocci() {
 
 _run-slam() {
     /usr/local/bin/slam --config $target CO-SLAM/1.0
+}
+
+_run-paasprocci() {
+    /usr/local/bin/paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
 _run-example() {

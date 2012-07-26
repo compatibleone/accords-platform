@@ -171,6 +171,10 @@ _co_start() {
     @bindir@/run-slam &
     sleep 1
 
+    echo "Starting accords paas procci services"
+    @bindir@/run-paasprocci &
+    sleep 1
+
     echo "Starting accords procci example"
     @bindir@/run-example &
     sleep 1
@@ -261,6 +265,7 @@ _co_stop() {
     _stop_service cosacs
     _stop_service example
     _stop_service slam
+    _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -356,6 +361,10 @@ _run_slam() {
     @bindir@/slam --config $target CO-SLAM/1.0
 }
 
+_run_paasprocci() {
+    @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
+}
+
 _run_example() {
     @bindir@/example --config $target CO-EXAMPLE/1.0
 }
@@ -407,6 +416,7 @@ _make_security_files() {
 	_mksecs azprocci 1
 	_mksecs dcprocci 1
 	_mksecs slam 1
+	_mksecs paasprocci 1
 	_mksecs example 1
 	_mksecs command
     
@@ -477,6 +487,7 @@ _accords_config() {
 		_mkcert azprocci
 		_mkcert dcprocci
 		_mkcert slam
+		_mkcert paasprocci
 		_mkcert example
 		_mkcert cosacs
 	
@@ -522,6 +533,7 @@ _accords_config() {
     _mkcfg coees 
     _mkcfg cosched
     _mkcfg slam
+    _mkcfg paasprocci
     _mkcfg example
     _mkcosacs cosacs
 
@@ -773,6 +785,9 @@ case `basename $0` in
 	;;
     run-slam)
 	_run_slam $*
+	;;
+    run-paasprocci)
+	_run_paasprocci $*
 	;;
     run-example)
 	_run_example $*
