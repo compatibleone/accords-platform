@@ -254,7 +254,9 @@ private	int	module_operation(
                  char * nptr, 
                  struct accords_configuration *componentModule, 
                  char *moduleName, 
-                 listc categoryName)
+                 listc categoryName,
+                 int paccess,
+                 int caccess)
 {
         char xlinkModule[1024];
 	struct	occi_category * first=(struct occi_category *) 0;
@@ -283,7 +285,8 @@ private	int	module_operation(
 	  else	optr->previous->next = optr;
 	  last = optr;
 	  optr->callback = callocciCategoryInterface(pelem->value);
-          
+          if(paccess) optr->access |= _OCCI_PROVIDER;
+          if(caccess) optr->access |= _OCCI_CONSUMER;
           numOfact = callocciCategoryActionNumber(pelem->value);
           for(i=0;i<numOfact;i++)
           {
@@ -317,7 +320,7 @@ private	int	module_operation(
 /*	------------------------------------------------------------------	*/
 /*				Module 				        	*/
 /*	------------------------------------------------------------------	*/
-private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
+private	int	module(int argc, char * argv[],char *moduleName,char * categoryList, int paccess, int caccess)
 {
 	int	status=0;
 	int	argi=0;
@@ -367,7 +370,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
 			status = 30;
 			break;
 		}
-		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst) ))
+		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst, paccess, caccess) ))
 			continue;
 		else	break;
 	  }
