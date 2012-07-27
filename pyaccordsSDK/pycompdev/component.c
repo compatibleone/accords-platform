@@ -255,8 +255,7 @@ private	int	module_operation(
                  struct accords_configuration *componentModule, 
                  char *moduleName, 
                  listc categoryName,
-                 int paccess,
-                 int caccess)
+                 listc flaglist)
 {
         char xlinkModule[1024];
 	struct	occi_category * first=(struct occi_category *) 0;
@@ -268,8 +267,11 @@ private	int	module_operation(
         int numOfact; 
         char categoryAction[1024];
         char *actionName;
+        int provider_access;
+
 
         elem *pelem = categoryName.first;    
+        elem *pelem2 = flaglist.first;    
         sprintf(xlinkModule,"links_%s.xml",moduleName);
         xlinkModule[strlen(xlinkModule)]=0;
 	set_autosave_cords_xlink_name(xlinkModule);
@@ -285,8 +287,8 @@ private	int	module_operation(
 	  else	optr->previous->next = optr;
 	  last = optr;
 	  optr->callback = callocciCategoryInterface(pelem->value);
-          if(paccess) optr->access |= _OCCI_PROVIDER;
-          if(caccess) optr->access |= _OCCI_CONSUMER;
+          provider_access=atoi(pelem2->value);
+          if(provider_access) optr->access |= _OCCI_PROVIDER;
           numOfact = callocciCategoryActionNumber(pelem->value);
           for(i=0;i<numOfact;i++)
           {
@@ -297,6 +299,7 @@ private	int	module_operation(
           }  
            
            pelem=pelem->next;  
+           pelem2=pelem2->next;
         } 
 	
         rest_initialise_log( componentModule->monitor );
@@ -320,14 +323,14 @@ private	int	module_operation(
 /*	------------------------------------------------------------------	*/
 /*				Module 				        	*/
 /*	------------------------------------------------------------------	*/
-private	int	module(int argc, char * argv[],char *moduleName,char * categoryList, int paccess, int caccess)
+private	int	module(int argc, char * argv[],char *moduleName,char * categoryList, char * flaglist)
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
         char *  token;
-       
         listc  categoryLst;
+        listc  l_flaglist;
         if ( argc == 1 )
         {
 		return( banner() );
@@ -343,6 +346,13 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
               token=strtok(NULL, " ");
            } 
 
+           resetList(&l_flaglist);
+           token= strtok(flaglist," ");
+           for(; token != NULL ;)
+           {
+              addBack(&l_flaglist,token);
+              token=strtok(NULL, " ");
+           } 
            //loud configuration module
            fillInAccordsConfiguration( &moduleConfig,moduleName);
            load_accords_configuration( &moduleConfig, moduleName );
@@ -370,7 +380,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
 			status = 30;
 			break;
 		}
-		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst, paccess, caccess) ))
+		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst, l_flaglist) ))
 			continue;
 		else	break;
 	  }

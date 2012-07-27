@@ -381,7 +381,7 @@ int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, ch
   
   if((fIn=fopen(pathf,"r"))==NULL)
   {
-   printf("Error in generate category Action struct file: No such file or directory\n",pathf);
+   printf("Error in generate category Action struct file: No such file or directory\n");
    return 0;
   }
   if((fOut=fopen(pathtmp,"w")) == NULL)
@@ -414,24 +414,24 @@ int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, ch
   
   if(!a)
   {
-     elem *pelem=categoryAct.first;
-     while(pelem)
-     {
-        switch(n)
-        {
+    elem *pelem=categoryAct.first;
+    switch(n)
+    {
          case 0:
-              fprintf(fOut,"\t{\"%s_%s\", %s_%s },\n",categoryName,pelem->value,pelem->value,categoryName); 
-              break;
+               while(pelem)
+	      {
+		 fprintf(fOut,"\t{\"%s_%s\", %s_%s },\n",categoryName,pelem->value,pelem->value,categoryName); 
+		 pelem = pelem->next;
+	      }
+	      break;
          case 1:
-              fprintf(fOut,"\t{\"%s_getname\", %s_getname },\n",categoryName,categoryName);
+              fprintf(fOut,"\t{\"%s\", %s_getname },\n",categoryName,categoryName);
               break;
          case 2:
-              fprintf(fOut,"\t{\"%s_getnumber\", %s_getnumber },\n",categoryName,categoryName);
+              fprintf(fOut,"\t{\"%s\", %s_getnumber },\n",categoryName,categoryName);
               break;
-        }
-      pelem = pelem->next;
-     }
-  }
+    }
+ }
   
   fprintf(fOut,"};\n");
   fprintf(fOut,"#endif\n");
@@ -653,7 +653,7 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
    fprintf(f,"srcdirectory=pypacksrc.srcpydir+\"/pyaccords\"\n");
    fprintf(f,"sys.path.append(srcdirectory)\n");
    fprintf(f,"from %sAction import *\n",categoryName);
-   fprintf(f,"from actionClass import *\n\n",categoryName);
+   fprintf(f,"from actionClass import *\n\n");
 
 
    for(j=1;j<i;j++)
@@ -2398,7 +2398,7 @@ int  enTete(char pathf[])
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
 /*---------------------------------------------------------------------------------------------------------------*/
-int generateModuleFile(char * moduleName, char * categoryNameList, int paccess, int caccess)
+int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglist)
 {
    char pathfd[DIM];
    char pathff[DIM];
@@ -2442,7 +2442,7 @@ int generateModuleFile(char * moduleName, char * categoryNameList, int paccess, 
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\", %d, %d)\n",LIB_PYCOMPDEV,moduleName,categoryNameList,paccess,caccess);
+      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\", \"%s\")\n",LIB_PYCOMPDEV,moduleName,categoryNameList,flaglist);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);
