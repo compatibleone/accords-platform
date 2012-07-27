@@ -506,6 +506,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\tFILE * exp_file;\n");
        fprintf(f,"\tlistcc restResponse;\n");
        fprintf(f,"\tPyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;\n\n");
+       fprintf(f,"\tPyThreadState* pythr=NULL;\n");
 
        fprintf(f,"\tif (!( pptr = vptr ))\n");
        fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Invalid Action\" ) );\n");
@@ -530,10 +531,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        }
        fprintf(f,"\t\t//           python interface\n");
        fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
-       fprintf(f,"\t\tif(!Py_IsInitialized())\n");
-       fprintf(f,"\t\t{\n");
-       fprintf(f,"\t\t\tPy_Initialize();\n");
-       fprintf(f,"\t\t}\n");
+       fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
        fprintf(f,"\t\tpython_path(srcdir);\n"); 
        fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
        fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
@@ -547,7 +545,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
        fprintf(f,"\t\tPy_DECREF(pModule);\n");
        fprintf(f,"\t\tPy_DECREF(pName);\n");
-       fprintf(f,"\t\tPy_Finalize();\n\n");
+       fprintf(f,"\t\tPy_EndInterpreter(pythr);\n\n");
        
        fprintf(f,"\t\tresetListe(&restResponse);\n");
        fprintf(f,"\t\ttoken= strtok(response,\",\");\n");
@@ -812,7 +810,8 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       fprintf(f,"\tFILE * exp_file;\n");
       fprintf(f,"\tlistcc categoryAtr;\n");
       fprintf(f,"\tPyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;\n\n");
-
+      fprintf(f,"\tPyThreadState* pythr=NULL;\n");
+      
       fprintf(f,"\tif (!( nptr = vptr ))\n");
       fprintf(f,"\t\treturn(0);\n");
       fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
@@ -842,10 +841,7 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       
       fprintf(f,"\t\t//           python interface\n");
       fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
-      fprintf(f,"\t\tif(!Py_IsInitialized())\n");
-      fprintf(f,"\t\t{\n");
-      fprintf(f,"\t\t\tPy_Initialize();\n");
-      fprintf(f,"\t\t}\n");
+      fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
       fprintf(f,"\t\tpython_path(srcdir);\n"); 
       fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
       fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
@@ -859,7 +855,7 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
       fprintf(f,"\t\tPy_DECREF(pModule);\n");
       fprintf(f,"\t\tPy_DECREF(pName);\n");
-      fprintf(f,"\t\tPy_Finalize();\n\n");
+      fprintf(f,"\t\tPy_EndInterpreter(pythr);\n\n");
 
       fprintf(f,"\tresetListe(&categoryAtr);\n");  
       fprintf(f,"\ttoken= strtok(response,\",\");\n");
