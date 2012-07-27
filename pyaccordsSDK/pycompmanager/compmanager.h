@@ -8,7 +8,7 @@ int generateAccordsCategory(char *name,char *categoryAttributes, char *categoryA
 int createCategoryCordsCfile(char *categoryName, listc categoryAttributes, int dim, int flag, char pathf[]);
 int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim, int flag, char pathf[]);
 int enTete(char pathf[]);
-int generateModuleFile(char * moduleName, char * categoryNameList);
+int generateModuleFile(char * moduleName, char * categoryNameList, int paccess , int caccess);
 int generateCategoryInterfceStructFile(char pathf[]);
 int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int flag, char pathf[]);
 int generateCategoryPySourcefile(char *categoryName, listc categoryAtr, char pathf[]);

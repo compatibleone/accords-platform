@@ -69,7 +69,6 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  int a;          
  char * moduleName;
  char * categoryNameList;
- char * categoryActionNumberList; 
  int paccess;
  int caccess;
  if (! PyArg_ParseTuple( args,"ssii",&moduleName,&categoryNameList,&paccess,&caccess)) return NULL;
@@ -104,9 +103,9 @@ static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
  else
  {
   printf(" Failure to remove %s component\n",moduleName);
-  Py_BuildValue("i", a);
+  return Py_BuildValue("i", a);
  }
-
+ 
 }
 
 static PyObject *pycompmanager_commit(PyObject *self, PyObject *args)
