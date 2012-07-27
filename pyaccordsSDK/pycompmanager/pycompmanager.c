@@ -73,7 +73,7 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  int caccess;
  if (! PyArg_ParseTuple( args,"ssii",&moduleName,&categoryNameList,&paccess,&caccess)) return NULL;
  a=generateModuleFile(moduleName,categoryNameList,paccess,caccess);
- if(!a)
+ if(a)
  {
    printf(" %s component is created\n",moduleName);
    return Py_BuildValue("i", a);
