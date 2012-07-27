@@ -18,7 +18,7 @@
 
 
 #include "utools.h"
-
+#include "allocate.h"
 
 /*-----------------------------------------------------------------------------------------------------------*/
 /* Function to inserte category include files in cords.h occibuilder.h and cordsbase.c                       */
@@ -178,6 +178,7 @@ int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]
   char line[DIM];
   char pathtmp[DIM];
   listc categoryN;
+  char * ctemp;
   
   sprintf(pathtmp,"%s/pyaccords/pysrc/occibuilder.tmp",PYPATH);
 
@@ -225,7 +226,9 @@ int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]
   if(!a)
   {
      fprintf(fOut,"%s\n",categoryName);
-     addBack(&categoryN,getCategoryName(categoryName,"_",3));
+     ctemp = allocate_string(getCategoryName(categoryName,"_",3);
+     if (ctemp)
+      addBack(&categoryN,ctemp);
   }
   
   fprintf(fOut,"const static struct {\n");
@@ -264,6 +267,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
   char strcats[10];
   char pathtmp[DIM];
   listc categoryN;
+  char * ctemp;
   
   sprintf(pathtmp,"%s/pyaccords/pysrc/listoccibuilder.tmp",PYPATH);
 
@@ -311,7 +315,9 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
   if(!a)
   {
      fprintf(fOut,"%s\n",categoryName);
-     addBack(&categoryN,getCategoryName(categoryName,"_",3));
+      ctemp = allocate_string(getCategoryName(categoryName,"_",3);
+     if (ctemp)
+      addBack(&categoryN,ctemp);
   }
 
   fprintf(fOut,"const static struct {\n");
