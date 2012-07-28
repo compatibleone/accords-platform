@@ -8,6 +8,10 @@ struct	cords_probe
 	char *	name;
 	char *	metric;
 	char *	connection;
+	char *	expression;
+	int	samples;
+	int	period;
+	int	pid;
 	int	packets;
 	int	state;
 };

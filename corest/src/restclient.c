@@ -170,6 +170,21 @@ private	void	show_url( struct url * uptr )
 }	
 
 /*	-------------------------------------------------	*/
+/*		r e p l a c e _ u r l _ o b j e c t		*/
+/*	-------------------------------------------------	*/
+public	char 	  * replace_url_object( struct url * uptr, char * xptr )
+{
+	if (!( uptr ))
+		return( (char *) 0);
+	else
+	{
+		if ( uptr->object )
+			uptr->object = liberate( uptr->object );
+		return((uptr->object = allocate_string( xptr )));
+	}
+}
+
+/*	-------------------------------------------------	*/
 /*		     s e r i a l i s e  _ u r l			*/
 /*	-------------------------------------------------	*/
 public char 	  * serialise_url( struct url * uptr, char * xptr )
@@ -216,7 +231,7 @@ public char 	  * serialise_url_host_port( struct url * uptr )
 /*		     a p p e n d  _ u r l			*/
 /*	-------------------------------------------------	*/
 /*	appends the second parameter to the first one and	*/
-/*	liberates the firs tone then resturns allocation	*/
+/*	liberates the first one then returns allocation		*/
 /*	of new string						*/
 /*	-------------------------------------------------	*/
 public char 	  * append_url( char * sptr, char * xptr )

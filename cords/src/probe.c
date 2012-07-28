@@ -39,6 +39,8 @@ public struct cords_probe * liberate_cords_probe(struct cords_probe * sptr)
 			 sptr->metric = liberate(sptr->metric);
 		if ( sptr->connection )
 			 sptr->connection = liberate(sptr->connection);
+		if ( sptr->expression )
+			 sptr->expression = liberate(sptr->expression);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_probe *) 0);
@@ -56,6 +58,10 @@ public struct cords_probe * reset_cords_probe(struct cords_probe * sptr)
 		sptr->name = (char*) 0;
 		sptr->metric = (char*) 0;
 		sptr->connection = (char*) 0;
+		sptr->expression = (char*) 0;
+		sptr->samples =  0;
+		sptr->period =  0;
+		sptr->pid =  0;
 		sptr->packets =  0;
 		sptr->state =  0;
 	}
@@ -100,6 +106,22 @@ public int xmlin_cords_probe(struct cords_probe * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->connection = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"expression") ))
+		{
+			if ( wptr->value ) { sptr->expression = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"samples") ))
+		{
+			if ( wptr->value ) { sptr->samples = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"period") ))
+		{
+			if ( wptr->value ) { sptr->period = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"pid") ))
+		{
+			if ( wptr->value ) { sptr->pid = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"packets") ))
 		{
 			if ( wptr->value ) { sptr->packets = atoi(wptr->value); }
@@ -126,6 +148,10 @@ public int rest_occi_cords_probe(FILE * fh,struct cords_probe * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expression='%s'\r\n",prefix,nptr,(sptr->expression?sptr->expression:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.samples='%u'\r\n",prefix,nptr,sptr->samples);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.period='%u'\r\n",prefix,nptr,sptr->period);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.pid='%u'\r\n",prefix,nptr,sptr->pid);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.packets='%u'\r\n",prefix,nptr,sptr->packets);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

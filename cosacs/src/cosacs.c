@@ -28,6 +28,7 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
 
 #define	_COSACS_START "cosacs:start"
 
@@ -85,7 +86,7 @@ private	void	cosacs_load()
 private	int	banner()
 {
 	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.07");
-	printf("\n   Beta Version : 24/07/2012");
+	printf("\n   Beta Version : 27/07/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -133,9 +134,124 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 	return( xptr );
 }
 
+private	void	cosacs_post_samples( struct cords_probe * pptr, int samples )
+{
+	struct	url *	uptr;
+	struct	occi_element * dptr;
+	struct	occi_client * kptr;
+	char *	host;
+	char *	ihost;
+	char	now[64];
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_request  * qptr;
+
+	sprintf(now,"%u",time((long*) 0));
+
+	if (!( pptr->connection ))
+		return;
+	else if (!( uptr = analyse_url( pptr->connection ) ))
+		return;
+	else if (!( replace_url_object( uptr, _CORDS_PACKET ) ))
+		return;
+	else if (!( host = serialise_url( uptr, (char *) 0 ) ))
+		return;
+	else	uptr = liberate_url( uptr );
+
+	if (!( kptr = occi_create_client( host, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return;
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.packet.probe"  	, pptr->id 	  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.connection"   	, pptr->connection) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.metric"  	, pptr->metric    ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.start"		, now 		  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.finish"		, now 		  ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	sprintf(now,"%u",samples);
+	if (!(dptr=occi_request_element(qptr,"occi.packet.samples"  	, now )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	sprintf(now,"%u",++pptr->packets);
+	if (!(dptr=occi_request_element(qptr,"occi.packet.sequence"  	, now )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!( zptr =  cords_create_link( pptr->id,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+}
+
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the cosacs instance category		*/
 /*	------------------------------------------------------------------	*/
+private	void	cosacs_probe_worker( struct cords_probe * pptr )
+{
+	int	sample=0;
+	char 	filename[1024];
+	char 	buffer[2048];
+	sprintf(filename,"rest/%s.probe",pptr->id);
+	unlink( filename );
+	while (1)
+	{
+		if (( pptr->expression ) || ( strlen(pptr->expression) ))
+		{
+			sprintf(buffer,"%s >> %s",
+				pptr->expression, filename);
+			system( buffer );
+			if ( ++sample >= pptr->samples )
+			{
+				/* -------------------- */
+				/* TO DO : POST /packet */
+				/* -------------------- */
+				cosacs_post_samples(pptr, sample);
+				sample=0;
+				unlink( filename );
+			}
+		}
+		if ( pptr->period )
+		{
+			sleep(pptr->period);
+		}
+	}
+}
 
 /*	-------------------------------------------	*/
 /* 		s t a r t _ p r o b e			*/
@@ -147,6 +263,7 @@ private	struct rest_response * start_probe(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	pid;
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
@@ -154,8 +271,19 @@ private	struct rest_response * start_probe(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		pptr->state = 1;
-		return( rest_html_response( aptr, 200, "OK" ) );
+		switch ((pid = fork()))
+		{
+		case	-1	:
+			return( rest_html_response( aptr, 500, "Probe Process Start Failure" ) );
+		case	0	:
+			cosacs_probe_worker( pptr );
+			exit(0);
+		default		:
+			pptr->pid = pid;
+			pptr->state = 1;
+			autosave_cords_probe_nodes();
+			return( rest_html_response( aptr, 200, "OK" ) );
+		}
 	}		
 }
 
@@ -176,7 +304,14 @@ private	struct rest_response * stop_probe(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
+		if ( pptr->pid )
+		{
+			/* remove the worker */
+			kill( pptr->pid, 9 );
+			pptr->pid = 0;
+		}
 		pptr->state = 0;
+		autosave_cords_probe_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }

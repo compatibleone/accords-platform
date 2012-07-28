@@ -140,6 +140,14 @@ private void autoload_cords_probe_nodes() {
 				pptr->metric = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "connection" )) != (struct xml_atribut *) 0)
 				pptr->connection = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "expression" )) != (struct xml_atribut *) 0)
+				pptr->expression = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "samples" )) != (struct xml_atribut *) 0)
+				pptr->samples = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "period" )) != (struct xml_atribut *) 0)
+				pptr->period = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "pid" )) != (struct xml_atribut *) 0)
+				pptr->pid = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "packets" )) != (struct xml_atribut *) 0)
 				pptr->packets = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -180,6 +188,18 @@ public  void autosave_cords_probe_nodes() {
 		fprintf(h," connection=%c",0x0022);
 		fprintf(h,"%s",(pptr->connection?pptr->connection:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," expression=%c",0x0022);
+		fprintf(h,"%s",(pptr->expression?pptr->expression:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," samples=%c",0x0022);
+		fprintf(h,"%u",pptr->samples);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," period=%c",0x0022);
+		fprintf(h,"%u",pptr->period);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," pid=%c",0x0022);
+		fprintf(h,"%u",pptr->pid);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," packets=%c",0x0022);
 		fprintf(h,"%u",pptr->packets);
 		fprintf(h,"%c",0x0022);
@@ -213,6 +233,14 @@ private void set_cords_probe_field(
 			pptr->metric = allocate_string(vptr);
 		if (!( strcmp( nptr, "connection" ) ))
 			pptr->connection = allocate_string(vptr);
+		if (!( strcmp( nptr, "expression" ) ))
+			pptr->expression = allocate_string(vptr);
+		if (!( strcmp( nptr, "samples" ) ))
+			pptr->samples = atoi(vptr);
+		if (!( strcmp( nptr, "period" ) ))
+			pptr->period = atoi(vptr);
+		if (!( strcmp( nptr, "pid" ) ))
+			pptr->pid = atoi(vptr);
 		if (!( strcmp( nptr, "packets" ) ))
 			pptr->packets = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -269,6 +297,16 @@ private int pass_cords_probe_filter(
 		else if ( strcmp(pptr->connection,fptr->connection) != 0)
 			return(0);
 		}
+	if (( fptr->expression )
+	&&  (strlen( fptr->expression ) != 0)) {
+		if (!( pptr->expression ))
+			return(0);
+		else if ( strcmp(pptr->expression,fptr->expression) != 0)
+			return(0);
+		}
+	if (( fptr->samples ) && ( pptr->samples != fptr->samples )) return(0);
+	if (( fptr->period ) && ( pptr->period != fptr->period )) return(0);
+	if (( fptr->pid ) && ( pptr->pid != fptr->pid )) return(0);
 	if (( fptr->packets ) && ( pptr->packets != fptr->packets )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -293,6 +331,18 @@ private struct rest_response * cords_probe_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.connection=%s",optr->domain,optr->id,pptr->connection);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.expression=%s",optr->domain,optr->id,pptr->expression);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.samples=%u",optr->domain,optr->id,pptr->samples);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.period=%u",optr->domain,optr->id,pptr->period);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.pid=%u",optr->domain,optr->id,pptr->pid);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.packets=%u",optr->domain,optr->id,pptr->packets);
@@ -711,6 +761,14 @@ public struct occi_category * occi_cords_probe_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "connection",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "expression",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "samples",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "period",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "pid",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "packets",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -773,6 +831,50 @@ public struct rest_header *  cords_probe_occi_headers(struct cords_probe * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_probe.connection='%s'\r\n",(sptr->connection?sptr->connection:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_probe.expression='%s'\r\n",(sptr->expression?sptr->expression:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_probe.samples='%u'\r\n",sptr->samples);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_probe.period='%u'\r\n",sptr->period);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_probe.pid='%u'\r\n",sptr->pid);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
