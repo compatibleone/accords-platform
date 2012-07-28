@@ -16,6 +16,7 @@ struct	cords_contract
 	char *	price;
 	char *	access;
 	char *	common;
+	char *	session;
 	char *	scope;
 	char *	type;
 	char *	service;

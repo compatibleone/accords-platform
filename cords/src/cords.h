@@ -28,6 +28,7 @@
 #include "storage.h"
 #include "infrastructure.h"
 #include "package.h"
+#include "packet.h"
 #include "system.h"
 #include "image.h"
 #include "node.h"

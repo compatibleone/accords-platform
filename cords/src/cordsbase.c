@@ -50,6 +50,7 @@
 #include "consumer.c"
 #include "connection.c"
 #include "stream.c"
+#include "packet.c"
 #include "probe.c"
 #include "metric.c"
 #include "alert.c"

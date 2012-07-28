@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _connection_c_
@@ -138,14 +136,16 @@ private void autoload_cords_connection_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "date" )) != (struct xml_atribut *) 0)
-				pptr->date = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
-				pptr->service = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "start" )) != (struct xml_atribut *) 0)
+				pptr->start = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "finish" )) != (struct xml_atribut *) 0)
+				pptr->finish = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "session" )) != (struct xml_atribut *) 0)
 				pptr->session = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "stream" )) != (struct xml_atribut *) 0)
-				pptr->stream = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "probes" )) != (struct xml_atribut *) 0)
+				pptr->probes = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -178,17 +178,20 @@ public  void autosave_cords_connection_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," date=%c",0x0022);
-		fprintf(h,"%s",(pptr->date?pptr->date:""));
+		fprintf(h," start=%c",0x0022);
+		fprintf(h,"%s",(pptr->start?pptr->start:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," service=%c",0x0022);
-		fprintf(h,"%s",(pptr->service?pptr->service:""));
+		fprintf(h," finish=%c",0x0022);
+		fprintf(h,"%s",(pptr->finish?pptr->finish:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," session=%c",0x0022);
 		fprintf(h,"%s",(pptr->session?pptr->session:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," stream=%c",0x0022);
-		fprintf(h,"%s",(pptr->stream?pptr->stream:""));
+		fprintf(h," probes=%c",0x0022);
+		fprintf(h,"%u",pptr->probes);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -216,14 +219,16 @@ private void set_cords_connection_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "date" ) ))
-			pptr->date = allocate_string(vptr);
-		if (!( strcmp( nptr, "service" ) ))
-			pptr->service = allocate_string(vptr);
+		if (!( strcmp( nptr, "start" ) ))
+			pptr->start = allocate_string(vptr);
+		if (!( strcmp( nptr, "finish" ) ))
+			pptr->finish = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "session" ) ))
 			pptr->session = allocate_string(vptr);
-		if (!( strcmp( nptr, "stream" ) ))
-			pptr->stream = allocate_string(vptr);
+		if (!( strcmp( nptr, "probes" ) ))
+			pptr->probes = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -264,18 +269,25 @@ private int pass_cords_connection_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->date )
-	&&  (strlen( fptr->date ) != 0)) {
-		if (!( pptr->date ))
+	if (( fptr->start )
+	&&  (strlen( fptr->start ) != 0)) {
+		if (!( pptr->start ))
 			return(0);
-		else if ( strcmp(pptr->date,fptr->date) != 0)
+		else if ( strcmp(pptr->start,fptr->start) != 0)
 			return(0);
 		}
-	if (( fptr->service )
-	&&  (strlen( fptr->service ) != 0)) {
-		if (!( pptr->service ))
+	if (( fptr->finish )
+	&&  (strlen( fptr->finish ) != 0)) {
+		if (!( pptr->finish ))
 			return(0);
-		else if ( strcmp(pptr->service,fptr->service) != 0)
+		else if ( strcmp(pptr->finish,fptr->finish) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
 	if (( fptr->session )
@@ -285,13 +297,7 @@ private int pass_cords_connection_filter(
 		else if ( strcmp(pptr->session,fptr->session) != 0)
 			return(0);
 		}
-	if (( fptr->stream )
-	&&  (strlen( fptr->stream ) != 0)) {
-		if (!( pptr->stream ))
-			return(0);
-		else if ( strcmp(pptr->stream,fptr->stream) != 0)
-			return(0);
-		}
+	if (( fptr->probes ) && ( pptr->probes != fptr->probes )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -311,16 +317,19 @@ private struct rest_response * cords_connection_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.date=%s",optr->domain,optr->id,pptr->date);
+	sprintf(cptr->buffer,"%s.%s.start=%s",optr->domain,optr->id,pptr->start);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.service=%s",optr->domain,optr->id,pptr->service);
+	sprintf(cptr->buffer,"%s.%s.finish=%s",optr->domain,optr->id,pptr->finish);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.session=%s",optr->domain,optr->id,pptr->session);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.stream=%s",optr->domain,optr->id,pptr->stream);
+	sprintf(cptr->buffer,"%s.%s.probes=%u",optr->domain,optr->id,pptr->probes);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -732,13 +741,15 @@ public struct occi_category * occi_cords_connection_builder(char * a,char * b) {
 		redirect_occi_cords_connection_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "date",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "start",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "finish",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "session",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "stream",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "probes",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -788,7 +799,7 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_connection.date='%s'\r\n",(sptr->date?sptr->date:""));
+	sprintf(buffer,"occi.cords_connection.start='%s'\r\n",(sptr->start?sptr->start:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -799,7 +810,18 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_connection.service='%s'\r\n",(sptr->service?sptr->service:""));
+	sprintf(buffer,"occi.cords_connection.finish='%s'\r\n",(sptr->finish?sptr->finish:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_connection.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -821,7 +843,7 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_connection.stream='%s'\r\n",(sptr->stream?sptr->stream:""));
+	sprintf(buffer,"occi.cords_connection.probes='%u'\r\n",sptr->probes);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

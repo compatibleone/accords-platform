@@ -17,8 +17,8 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_relax_c	
-#define	_relax_c
+#ifndef	_cool_c	
+#define	_cool_c
 
 #include "standard.h"
 #include "broker.h"
@@ -26,14 +26,14 @@
 #include "occi.h"
 #include "occiclient.h"
 #include "document.h"
-#include "relax.h"
+#include "cool.h"
 #include "cordslang.h"
 #include "cb.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
-struct	accords_configuration Relax = {
+struct	accords_configuration Cool = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -46,17 +46,17 @@ struct	accords_configuration Relax = {
 	"xmpp",  8000,
 	"domain",
 	"europe",
-	"relax.xml",
+	"cool.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(Relax.debug);		}
-public	int	check_verbose()		{	return(Relax.verbose);		}
-public	char *	default_publisher()	{	return(Relax.publisher);	}
-public	char *	default_operator()	{	return(Relax.operator);		}
-public	char *	default_tls()		{	return(Relax.tls);		}
-public	char *	default_zone()		{	return(Relax.zone);		}
+public	int	check_debug()		{	return(Cool.debug);		}
+public	int	check_verbose()		{	return(Cool.verbose);		}
+public	char *	default_publisher()	{	return(Cool.publisher);	}
+public	char *	default_operator()	{	return(Cool.operator);		}
+public	char *	default_tls()		{	return(Cool.tls);		}
+public	char *	default_zone()		{	return(Cool.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -73,24 +73,24 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------------------------	*/  
-/*	r e l a x _ c o n f i g u r a t i o n				*/
+/*	c o o l _ c o n f i g u r a t i o n				*/
 /*	---------------------------------------------------------------	*/  
-/*	this function loads relax configuration				*/
+/*	this function loads cool configuration				*/
 /*	from the xml configuration file.				*/
 /*	---------------------------------------------------------------	*/  
-private	void	relax_configuration()
+private	void	cool_configuration()
 {
-	load_accords_configuration( &Relax, "relax" );
+	load_accords_configuration( &Cool, "cool" );
 	return;
 }
 
 /*	---------------------------------------------------------------	*/  
-/*	r e l a x _ b a n n e r						*/
+/*	c o o l _ b a n n e r						*/
 /*	---------------------------------------------------------------	*/  
 /*	this function will be called to display module identification 	*/
 /*	when launched from the command line without any parameters.	*/
 /*	---------------------------------------------------------------	*/  
-private	int	relax_banner()
+private	int	cool_banner()
 {
 	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.01");
 	printf("\n   Beta Version : 25/07/2012 ");
@@ -102,9 +102,9 @@ private	int	relax_banner()
 }
 
 /*	--------------------------------------- 	*/
-/*	r e l a x _ i n i t i a l i s e			*/
+/*	c o o l _ i n i t i a l i s e			*/
 /*	--------------------------------------- 	*/
-private	struct rest_server * relax_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * cool_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -117,13 +117,13 @@ private	struct rest_server * relax_initialise(  void * v,struct rest_server * sp
 }
 
 /*	-------------------------------------------	*/
-/*	r e l a x _ a u t h o r i s e 			*/
+/*	c o o l _ a u t h o r i s e 			*/
 /*	------------------------------------------- 	*/
-private	int	relax_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	cool_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, Relax.user ) )
+	if ( strcmp( username, Cool.user ) )
 		return(0);
-	else if ( strcmp( password, Relax.password ) )
+	else if ( strcmp( password, Cool.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -133,9 +133,9 @@ private	int	relax_authorise(  void * v,struct rest_client * cptr, char * usernam
 }
 
 /*	------------------------------------------- 	*/
-/*	r e l a x _ e x t e n s i o n 			*/
+/*	c o o l _ e x t e n s i o n 			*/
 /*	-------------------------------------------	*/
-private	struct rest_extension * relax_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * cool_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
@@ -195,7 +195,7 @@ private	struct elastic_contract * allocate_elastic_contract()
 
 	if (!( eptr->service = allocate_string( (default_tls()? "https" : "http" ) )))
 		return( liberate_elastic_contract( eptr ) );
-	else	eptr->port = Relax.restport;
+	else	eptr->port = Cool.restport;
 	return( eptr );
 }
 
@@ -231,7 +231,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* the contract hostname value */
 	/* --------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Relax.domain, 
+					zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( eptr->hostname = allocate_string( result ) ))
@@ -263,7 +263,7 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
-	if ( check_debug() ) rest_log_message("relax:negotiate_elastic_contract");
+	if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract");
 	if (!( document = cords_instance_node(
 		selector, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
 		return( (char *) 0 );
@@ -280,7 +280,7 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
 	else
 	{
 		document = document_drop( document );
-		if ( check_debug() ) rest_log_message("relax:negotiate_elastic_contract:done");
+		if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract:done");
 		return(contract);
 	}
 }
@@ -317,7 +317,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* retrieve the PROFILE name */
 	/* ------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Relax.domain, 
+					zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_PROFILE )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( profile = allocate_string( result ) ))
@@ -327,7 +327,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* retrieve the NODE identifier */
 	/* ---------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Relax.domain, 
+					zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_NODE )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( node = allocate_string( result ) ))
@@ -337,7 +337,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* extract the PROVISION identifier */
 	/* -------------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Relax.domain, 
+					zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_PROVISION )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( provision = allocate_string( result ) ))
@@ -353,7 +353,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* extract the ACCOUNT identifier */
 	/* ------------------------------ */
 	else if (!( result = occi_extract_atribut( 
-					yptr, Relax.domain, 
+					yptr, Cool.domain, 
 					profile, _CORDS_ACCOUNT )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( account = allocate_string( result ) ))
@@ -363,7 +363,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* extract the CONTRACT name */
 	/* ------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					yptr, Relax.domain, 
+					yptr, Cool.domain, 
 					profile, _CORDS_NAME )))
 		return( liberate_elastic_contract( eptr ) );
 
@@ -532,9 +532,9 @@ private	int	load_balancer( char * nptr )
 		(void *) 0
 	};
 
-	if ( Relax.tls )
-		if (!( strlen(Relax.tls) ))
-			Relax.tls = (char *) 0;
+	if ( Cool.tls )
+		if (!( strlen(Cool.tls) ))
+			Cool.tls = (char *) 0;
 
 	Osi.authorise = (void *) 0;
 
@@ -546,16 +546,16 @@ private	int	load_balancer( char * nptr )
 	/* --------------------------------- */
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
-	return( rest_server(  nptr, Relax.restport, Relax.tls, 0, &Osi ) );
+	return( rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi ) );
 }
 
 
 /*	--------------------------------------------	*/
-/*	r e l a x _ o p e r a t i o n 			*/
+/*	c o o l _ o p e r a t i o n 			*/
 /*	--------------------------------------------	*/
 /*	environment and category preparation		*/
 /*	--------------------------------------------	*/
-private	int	relax_operation( char * nptr )
+private	int	cool_operation( char * nptr )
 {
 	char *	eptr;
 
@@ -576,22 +576,22 @@ private	int	relax_operation( char * nptr )
 	else if (!( add_elastic_contract( eptr, 0 ) ))
 		return( 27 );
 
-	rest_initialise_log( Relax.monitor );
+	rest_initialise_log( Cool.monitor );
 
 	return( load_balancer( nptr ) );
 }
 
 /*	------------------------------------------- 	*/
-/*	r e l a x _ o p t i o n s			*/
+/*	c o o l _ o p t i o n s			*/
 /*	------------------------------------------- 	*/
 /*	Command line option analysis			*/
 /*	------------------------------------------- 	*/
-private	int	relax_options(int argc, char * argv[] )
+private	int	cool_options(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	relax_configuration();
+	cool_configuration();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -602,10 +602,10 @@ private	int	relax_options(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				Relax.verbose=1;
+				Cool.verbose=1;
 				continue;
 			case	'd'	:
-				Relax.debug = 0xFFFF;
+				Cool.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -615,7 +615,7 @@ private	int	relax_options(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = relax_operation(aptr) ))
+		else if (!( status = cool_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -630,12 +630,12 @@ private	int	relax_options(int argc, char * argv[] )
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
-		return( relax_banner() );
-	else	return( relax_options( argc, argv ) );
+		return( cool_banner() );
+	else	return( cool_options( argc, argv ) );
 }
 
 	/* ---------- */
-#endif 	/* _relax_c */
+#endif 	/* _cool_c */
 	/* ---------- */
 
 

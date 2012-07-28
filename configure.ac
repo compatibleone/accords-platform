@@ -312,14 +312,14 @@ AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
 AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
 AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
 
-AC_ARG_ENABLE([relax],
-      [AS_HELP_STRING([--disable-relax],
-		      [Disable relax @<:@default=enable@:>@])],
+AC_ARG_ENABLE([cool],
+      [AS_HELP_STRING([--disable-cool],
+		      [Disable cool @<:@default=enable@:>@])],
       [],
-      [enable_relax=yes])
-AM_CONDITIONAL([ENABLE_RELAX], [test "$enable_relax" = "yes"])
-AC_SUBST([CFLAGS_RELAX], [-I\${abs_top_srcdir}/relax/src])
-AC_SUBST([PATH_RELAX], [${abs_top_srcdir}/relax/src])
+      [enable_cool=yes])
+AM_CONDITIONAL([ENABLE_COOL], [test "$enable_cool" = "yes"])
+AC_SUBST([CFLAGS_COOL], [-I\${abs_top_srcdir}/cool/src])
+AC_SUBST([PATH_COOL], [${abs_top_srcdir}/cool/src])
 
 AC_ARG_ENABLE([example],
       [AS_HELP_STRING([--disable-example],
@@ -470,7 +470,7 @@ AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
-AC_CONFIG_FILES([relax/Makefile relax/src/Makefile])
+AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
@@ -526,7 +526,7 @@ echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - paasprocci               : $enable_paasprocci"
-echo "    - relax                    : $enable_relax"
+echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - testosocci               : $enable_testosocci"
 echo "    - onprocci                 : $enable_onprocci"

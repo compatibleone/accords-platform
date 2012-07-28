@@ -17,8 +17,8 @@
 /*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
 /*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
 /* --------------------------------------------------------------------*/
-#ifndef	_relax_h	
-#define	_relax_h
+#ifndef	_cool_h	
+#define	_cool_h
 
 struct	elastic_contract
 {
@@ -52,7 +52,7 @@ struct	elastic_control
 	struct	elastic_contract * current;
 };
 
-	/* -------- */
-#endif	/* _relax_h */
-	/* -------- */
+	/* ------- */
+#endif	/* _cool_h */
+	/* ------- */
 

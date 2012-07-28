@@ -49,6 +49,7 @@
 #include "occiport.c"
 #include "occifirewall.c"
 #include "occipackage.c"
+#include "occipacket.c"
 #include "occiparameter.c"
 #include "occiplan.c"
 #include "occiprofile.c"

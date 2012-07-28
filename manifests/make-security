@@ -18,7 +18,7 @@ else
 	bash build-security dcprocci
 	bash build-security ezvm
 	bash build-security coips
-	bash build-security relax
+	bash build-security cool
 	bash build-security onprocci
 	bash build-security osocciprocci
 	bash build-security osprocci

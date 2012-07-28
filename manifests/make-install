@@ -12,7 +12,7 @@ bash build-install coss $1
 bash build-install dcprocci $1
 bash build-install ezvm $1
 bash build-install coips $1
-bash build-install relax $1
+bash build-install cool $1
 bash build-install onprocci $1
 bash build-install osocciprocci $1
 bash build-install osprocci $1

@@ -20,6 +20,7 @@ public struct occi_category * occi_cords_connection_builder(char *a,char * b);
 public struct occi_category * occi_cords_stream_builder(char *a,char * b);
 public struct occi_category * occi_cords_probe_builder(char *a,char * b);
 public struct occi_category * occi_cords_metric_builder(char *a,char * b);
+public struct occi_category * occi_cords_packet_builder(char *a,char * b);
 public struct occi_category * occi_cords_alert_builder(char *a,char * b);
 public struct occi_category * occi_cords_quota_builder(char *a,char * b);
 public struct occi_category * occi_cords_port_builder(char *a,char * b);

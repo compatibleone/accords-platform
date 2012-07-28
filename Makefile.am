@@ -54,8 +54,8 @@ endif
 if ENABLE_PAASPROCCI
 SUBDIRS += paasprocci
 endif
-if ENABLE_RELAX
-SUBDIRS += relax
+if ENABLE_COOL
+SUBDIRS += cool
 endif
 if ENABLE_EXAMPLE
 SUBDIRS += example

@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _connection_c_
@@ -37,14 +35,14 @@ public struct cords_connection * liberate_cords_connection(struct cords_connecti
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->date )
-			 sptr->date = liberate(sptr->date);
-		if ( sptr->service )
-			 sptr->service = liberate(sptr->service);
+		if ( sptr->start )
+			 sptr->start = liberate(sptr->start);
+		if ( sptr->finish )
+			 sptr->finish = liberate(sptr->finish);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		if ( sptr->session )
 			 sptr->session = liberate(sptr->session);
-		if ( sptr->stream )
-			 sptr->stream = liberate(sptr->stream);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_connection *) 0);
@@ -60,10 +58,11 @@ public struct cords_connection * reset_cords_connection(struct cords_connection 
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->date = (char*) 0;
-		sptr->service = (char*) 0;
+		sptr->start = (char*) 0;
+		sptr->finish = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->session = (char*) 0;
-		sptr->stream = (char*) 0;
+		sptr->probes =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -99,21 +98,25 @@ public int xmlin_cords_connection(struct cords_connection * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"date") ))
+		else if (!( strcmp(wptr->name,"start") ))
 		{
-			if ( wptr->value ) { sptr->date = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->start = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"service") ))
+		else if (!( strcmp(wptr->name,"finish") ))
 		{
-			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->finish = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"session") ))
 		{
 			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"stream") ))
+		else if (!( strcmp(wptr->name,"probes") ))
 		{
-			if ( wptr->value ) { sptr->stream = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->probes = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -135,10 +138,11 @@ public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,c
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.start='%s'\r\n",prefix,nptr,(sptr->start?sptr->start:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.finish='%s'\r\n",prefix,nptr,(sptr->finish?sptr->finish:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.stream='%s'\r\n",prefix,nptr,(sptr->stream?sptr->stream:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

@@ -5,7 +5,7 @@
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-platform.xml
 bash build-manifest-publisher publisher PUB_Compatible
 echo "<manifest name=\"accords:platform\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-platform.xml
-bash build-manifest relax 8087
+bash build-manifest cool 8087
 bash build-manifest coss 8087
 echo "<node name=\"accords:coss\" scope=normal access=public type=\"accords:coss\"/>" >> accords-platform.xml
 bash build-manifest comons 8087

@@ -6,7 +6,7 @@ rm *.bak -f
 rm *.so.* -f
 rm azprocci broker coes coips comons conets coobas coees slam publisher dcprocci -f
 rm procci parser paprocci osprocci osocciprocci onprocci ezvm cosacs cosched coss -f
-rm relax paasprocci -f
+rm cool paasprocci -f
 rm accords-*.xml -f
 rm sla-accords-*.xml -f
 

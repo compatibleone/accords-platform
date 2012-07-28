@@ -20,5 +20,5 @@ bash build-run parser
 bash build-run procci
 bash build-run slam
 bash build-run paasprocci
-bash build-run relax
+bash build-run cool
 

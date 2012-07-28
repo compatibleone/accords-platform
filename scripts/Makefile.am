@@ -23,7 +23,7 @@ EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.i
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
-localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COES):$(PATH_COMONS):$(PATH_CONETS):$(PATH_COOBAS):$(PATH_COSS):$(PATH_EZVM):$(PATH_FILESERVER):$(PATH_ONPROCCI):$(PATH_OSPROCCI):$(PATH_PARSER):$(PATH_PROCCI):$(PATH_COSCHED):$(PATH_PUBLISHER):$(builddir)
+localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COOL):$(PATH_COES):$(PATH_COMONS):$(PATH_CONETS):$(PATH_COOBAS):$(PATH_COSS):$(PATH_EZVM):$(PATH_FILESERVER):$(PATH_ONPROCCI):$(PATH_OSPROCCI):$(PATH_PARSER):$(PATH_PROCCI):$(PATH_COSCHED):$(PATH_PUBLISHER):$(builddir)
 localedit = sed \
         -e 's|@sitepath[@]|$(localpath)|g' \
 	-e 's|@bindir[@]|$(bindir)|g' \
