@@ -139,6 +139,7 @@ private	struct rest_extension * coobas_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /* 	 actions and methods required for the coobas instance categories	*/
 /*	------------------------------------------------------------------	*/
+#include "comonsconnection.c"
 
 /*	------------------------------------------------------------------	*/
 /*		s t a r t _ i n v o i c e _ d o c u m e n t			*/
@@ -546,14 +547,12 @@ private	int	coobas_operation( char * nptr )
 	optr->callback  = &invoice_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_cords_connection_builder( CooBas.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( CooBas.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 	rest_initialise_log(CooBas.monitor );
 

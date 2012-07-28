@@ -138,6 +138,7 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the slam instance category		*/
 /*	------------------------------------------------------------------	*/
+#include "comonsconnection.c"
 
 /*	------------------------------------------------------------------	*/
 /*			s l a m _ o p e r a t i o n				*/
@@ -198,14 +199,12 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback = (void *) 0;
 
-	if (!( optr = occi_cords_connection_builder( Slam.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Slam.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 	rest_initialise_log(Slam.monitor);
 

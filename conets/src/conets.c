@@ -148,6 +148,7 @@ private	struct rest_extension * conets_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 #include "conetsdomain.c"
 #include "conetsip.c"
+#include "comonsconnection.c"
 
 /*	-------------------------------------------	*/
 /*	      a d d _ f i r e w a l l _ p o r t		*/
@@ -302,14 +303,12 @@ private	int	conets_operation( char * nptr )
 	if (!( optr = occi_add_action( optr,_CORDS_BUILD,"",build_firewall)))
 		return( 28 );
 
-	if (!( optr = occi_cords_connection_builder( Conets.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Conets.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 	if (!( optr = occi_cords_iprange_builder( Conets.domain, "iprange" ) ))
 		return( 27 );

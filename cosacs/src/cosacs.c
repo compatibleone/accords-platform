@@ -150,7 +150,13 @@ private	struct rest_response * start_probe(
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		pptr->state = 1;
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}		
 }
 
 /*	-------------------------------------------	*/
@@ -166,7 +172,13 @@ private	struct rest_response * stop_probe(
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		pptr->state = 0;
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}		
 }
 
 /*	-------------------------------------------	*/

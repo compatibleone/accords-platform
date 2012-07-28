@@ -288,6 +288,16 @@ private	struct	rest_response * start_contract(
 				cords_invoke_action( pptr->service, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() );
 			}
+
+			/* ------------------------ */
+			/* start monitoring session */
+			/* ------------------------ */
+			if ( pptr->session )
+			{
+				cords_invoke_action( pptr->session, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
+			
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			pptr->commons= 1;
@@ -419,6 +429,14 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			/* ------------------------ */
+			/* stop monitoring session */
+			/* ------------------------ */
+			if ( pptr->session )
+			{
+				cords_invoke_action( pptr->session, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() );
+			}
 			if ( pptr->commons )
 				pptr->commons--;
 			if ( pptr->commons )

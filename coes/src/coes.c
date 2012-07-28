@@ -134,6 +134,8 @@ private	struct rest_extension * coes_extension( void * v,struct rest_server * sp
 	return( xptr );
 }
 
+#include "comonsconnection.c"
+
 /*	-----------------------------------------------------------	*/
 /*			s e l e c t _ p l a c e m e n t			*/
 /*	-----------------------------------------------------------	*/
@@ -456,14 +458,12 @@ private	int	coes_operation( char * nptr )
 	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
 		return( 28 );
 
-	if (!( optr = occi_cords_connection_builder( Coes.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Coes.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= (_OCCI_PRIVATE | _OCCI_CONSUMER);
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );
