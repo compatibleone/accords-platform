@@ -142,17 +142,18 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples )
 	char *	host;
 	char *	ihost;
 	char	now[64];
+	char	buffer[1024];
 	struct	occi_response * yptr;
 	struct	occi_response * zptr;
 	struct	occi_request  * qptr;
 
 	sprintf(now,"%u",time((long*) 0));
-
+	sprintf(buffer,"/%s/",_CORDS_PACKET);
 	if (!( pptr->connection ))
 		return;
 	else if (!( uptr = analyse_url( pptr->connection ) ))
 		return;
-	else if (!( replace_url_object( uptr, _CORDS_PACKET ) ))
+	else if (!( replace_url_object( uptr, buffer ) ))
 		return;
 	else if (!( host = serialise_url( uptr, (char *) 0 ) ))
 		return;
