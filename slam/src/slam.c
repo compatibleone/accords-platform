@@ -206,7 +206,7 @@ private	int	slam_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = comons_packet_builder( Slam.domain ) ))
+	if (!( optr = comons_packet_builder( Slam.domain, "packet_slam.xml" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

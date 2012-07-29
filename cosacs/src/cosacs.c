@@ -231,20 +231,15 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 	unlink( filename );
 	while (1)
 	{
-		if (( pptr->expression ) || ( strlen(pptr->expression) ))
+		if ( rest_valid_string( pptr->expression) )
+			sprintf(buffer,"%s > %s",pptr->expression, filename);
+		else	sprintf(buffer,"date > filename");
+		system( buffer );
+		if ( ++sample >= pptr->samples )
 		{
-			sprintf(buffer,"%s >> %s",
-				pptr->expression, filename);
-			system( buffer );
-			if ( ++sample >= pptr->samples )
-			{
-				/* -------------------- */
-				/* TO DO : POST /packet */
-				/* -------------------- */
-				cosacs_post_samples(pptr, sample);
-				sample=0;
-				unlink( filename );
-			}
+			cosacs_post_samples(pptr, sample);
+			sample=0;
+			unlink( filename );
 		}
 		if ( pptr->period )
 		{

@@ -554,7 +554,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = comons_packet_builder( CooBas.domain ) ))
+	if (!( optr = comons_packet_builder( CooBas.domain, "packet_coobas.xml" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

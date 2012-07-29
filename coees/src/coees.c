@@ -162,7 +162,7 @@ private	int	coees_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = comons_packet_builder( Coees.domain ) ))
+	if (!( optr = comons_packet_builder( Coees.domain, "packet_coees.xml" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

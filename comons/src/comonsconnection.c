@@ -144,7 +144,7 @@ public	struct occi_category * comons_connection_builder( char * domain )
 /*	------------------------------------------------------------------	*/
 /*			 o m o n s _ p a c k e t _ b u i l d e r		*/
 /*	------------------------------------------------------------------	*/
-public	struct occi_category * comons_packet_builder( char * domain )
+public	struct occi_category * comons_packet_builder( char * domain, char * filename )
 {
 	struct	occi_category * optr;
 
@@ -152,6 +152,7 @@ public	struct occi_category * comons_packet_builder( char * domain )
 		return( optr );
 	else
 	{
+		set_autosave_cords_packet_name( filename );
 		optr->callback = (void *) 0;
 		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
 

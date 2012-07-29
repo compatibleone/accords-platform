@@ -310,7 +310,7 @@ private	int	conets_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = comons_packet_builder( Conets.domain ) ))
+	if (!( optr = comons_packet_builder( Conets.domain, "packet_conets.xml" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
