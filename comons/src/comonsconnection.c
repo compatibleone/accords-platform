@@ -141,6 +141,24 @@ public	struct occi_category * comons_connection_builder( char * domain )
 	}
 }
 
+/*	------------------------------------------------------------------	*/
+/*			 o m o n s _ p a c k e t _ b u i l d e r		*/
+/*	------------------------------------------------------------------	*/
+public	struct occi_category * comons_packet_builder( char * domain )
+{
+	struct	occi_category * optr;
+
+	if (!( optr = occi_cords_packet_builder( domain, "packet" ) ))
+		return( optr );
+	else
+	{
+		optr->callback = (void *) 0;
+		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+
+		return( optr );
+	}
+}
+
 	/* -------------------- */
 #endif	/* _commonsconnection_c */
 	/* -------------------- */

@@ -206,14 +206,12 @@ private	int	comons_operation( char * nptr )
 	/* ------------------------------------- */
 	/* monitoring packet category management */
 	/* ------------------------------------- */
-	if (!( optr = occi_cords_packet_builder( Comons.domain, "packet" ) ))
+	if (!( optr = comons_packet_builder( Comons.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
 
 	/* ------------------------------------- */
 	/* monitoring metric category management */

@@ -310,6 +310,13 @@ private	int	conets_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = comons_packet_builder( Conets.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_cords_iprange_builder( Conets.domain, "iprange" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

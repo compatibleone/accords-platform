@@ -162,6 +162,13 @@ private	int	coees_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = comons_packet_builder( Coees.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	rest_initialise_log( Coees.monitor );
 
 	if (!( Coees.identity ))

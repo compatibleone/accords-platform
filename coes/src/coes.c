@@ -465,6 +465,13 @@ private	int	coes_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = comons_packet_builder( Coes.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

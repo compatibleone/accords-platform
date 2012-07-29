@@ -206,6 +206,13 @@ private	int	slam_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = comons_packet_builder( Slam.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	rest_initialise_log(Slam.monitor);
 
 	if (!( Slam.identity ))
