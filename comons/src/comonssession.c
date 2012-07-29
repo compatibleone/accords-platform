@@ -126,12 +126,12 @@ public	struct occi_category * comons_session_builder( char * domain )
 {
 	struct	occi_category * optr;
 
-	if (!( optr = occi_cords_connection_builder( domain, "session" ) ))
+	if (!( optr = occi_cords_session_builder( domain, "session" ) ))
 		return( optr );
 	else
 	{
 		optr->callback = (void *) 0;
-		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+		optr->access |= _OCCI_NO_PRICING;
 
 		if (!( optr = occi_add_action( optr,"start","",start_session)))
 			return( optr );

@@ -23,6 +23,10 @@
 #include "paclient.h"
 #include "cordslang.h"
 
+#include "proactive.h"
+#include "proactive.c"
+#include "occiproactive.c"
+
 /*! 
  * Return the occi_kind_node content such that its name matches the given string parameter. 
  * The content is always a pa_config*.  
@@ -84,64 +88,6 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 	}
 	return(0);
 }
-
-/*	--------------------------------------------------------	*/
-/* 	     c o n n e c t _ p r o a c t i v e _ i m a g e  		*/
-/*	--------------------------------------------------------	*/
-//private	int	connect_proactive_image( struct pa_response * rptr,struct proactive * pptr )
-//{
-//	struct	pa_response * zptr;
-//	struct	pa_response * yptr;
-//	char *	vptr;
-//	if (!( pptr ))
-//		return( 118 );
-//	else if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
-//	{
-//		reset_structure_proactive_server( pptr );
-//		return( 27 );
-//	}
-//	else
-//	{
-//		if ( pptr->image )
-//			pptr->image = liberate( pptr->image );
-//		if (!( pptr->image = allocate_string( vptr ) ))
-//		{
-//			reset_structure_proactive_server( pptr );
-//			return( 27 );
-//		}
-//		autosave_proactive_nodes();
-//		/* ----------------------------------------------------- */
-//		/* we must now await ACTIVE status to be able to collect */
-//		/* the final identification information to complete the  */
-//		/* proactive provisioning request.			 */
-//		/* ----------------------------------------------------- */
-//		yptr = rptr;
-//		zptr = (struct pa_response *) 0;
-//		while (1)
-//		{
-//			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
-//			{
-//				reset_structure_proactive_server( pptr );
-//				return( 27 );
-//			}
-//			else if (!( strcmp( vptr, "SAVING" )))
-//			{
-//				sleep(1);
-//				if ( zptr )
-//					zptr = liberate_pa_response( zptr );
-//				if (!( zptr = pa_get_image( pptr->image )))
-//				{
-//					reset_structure_proactive_server( pptr );
-//					return( 555 );
-//				}
-//				else	yptr = zptr;
-//			}
-//			else if (!( strcmp( vptr, "ACTIVE" )))
-//				break;
-//		}
-//		return( 0 );
-//	}
-//}
 
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ s e r v e r		*/
@@ -357,7 +303,7 @@ private	struct	rest_response * start_proactive(
             /* ---------------------------- */
             cosacs_metadata_instructions( 
                     pptr->hostname, _CORDS_CONFIGURATION,
-                    reference, WpaProcci.publisher );
+                    reference, WpaProcci.publisher, pptr->account );
 
             /* ------------------------------------- */
             /* release the public IP if not required */
@@ -706,6 +652,7 @@ private	struct	occi_interface	proactive_interface = {
 public	struct	occi_category * build_proactive( char * domain )
 {
 	struct	occi_category * optr;
+
 	if (!( optr = occi_proactive_builder( domain,"proactive" ) ))
 		return( optr );
 	else

@@ -1256,7 +1256,7 @@ private	struct	rest_response * start_openstack(
 		{
 			cosacs_metadata_instructions( 
 				pptr->hostname, _CORDS_CONFIGURATION,
-				reference, OsProcci.publisher );
+				reference, OsProcci.publisher, pptr->account );
 		}
 
 		/* ------------------------------------- */
@@ -1548,7 +1548,7 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 		cosacs_metadata_instructions( 
 			pptr->hostname, _CORDS_RELEASE,
-			reference, OsProcci.publisher );
+			reference, OsProcci.publisher, pptr->account );
 
 		/* ------------------------------------------ */
 		/* disconnect the floating IP from the server */

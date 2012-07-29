@@ -225,22 +225,6 @@ public	char * on_create_storage_request(
 	}
 }
 
-/*	------------------------------------------------	*/
-/*		o n _ v a l i d _ s t r i n g			*/
-/*	------------------------------------------------	*/
-private	int	on_valid_string( char * vptr )
-{
-	if (!( vptr ))
-		return( 0 );
-	else if (!( strlen( vptr ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NULL ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NONE ) ))
-		return( 0 );
-	else	return( 1 );
-}
-
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ c o m p u t e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
@@ -274,11 +258,11 @@ public	char * on_create_compute_request(
 		/* generate server creation request element */
 		/* ---------------------------------------- */
 		fprintf(h,"<COMPUTE>\n");
-		if ( on_valid_string( identity ) )
+		if ( rest_valid_string( identity ) )
 		{
 			fprintf(h,"<NAME>%s</NAME>\n",identity);
 		}
-		if ( on_valid_string( flavour ) )
+		if ( rest_valid_string( flavour ) )
 		{
 			fprintf(h,"<INSTANCE_TYPE>%s</INSTANCE_TYPE>\n",flavour);
 		}
@@ -289,12 +273,12 @@ public	char * on_create_compute_request(
 		/* specify the base operating system disk image */
 		/* -------------------------------------------- */
 		fprintf(h,"<DISK>\n");
-		if ( on_valid_string( image ) )
+		if ( rest_valid_string( image ) )
 		{
 			fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
 		}
 		fprintf(h,"<TYPE>OS</TYPE>\n");
-		if ( on_valid_string( driver ) )
+		if ( rest_valid_string( driver ) )
 		{
 			fprintf(h,"<DRIVER>%s</DRIVER>\n",driver);
 		}
@@ -303,7 +287,7 @@ public	char * on_create_compute_request(
 		/* ------------------------------ */
 		/* 64 bit architecture is crucial */
 		/* ------------------------------ */
-		if ( on_valid_string( architecture ) )
+		if ( rest_valid_string( architecture ) )
 		{
 			fprintf(h,"<OS><ARCH>%s</ARCH></OS>\n",architecture);
 		}
@@ -311,7 +295,7 @@ public	char * on_create_compute_request(
 		/* -------------------------------------- */
 		/* a second public address may be present */
 		/* -------------------------------------- */
-		if ( on_valid_string( network ) )
+		if ( rest_valid_string( network ) )
 		{
 			fprintf(h,"<NIC>\n");
 			fprintf(h,"<NETWORK href='%s'/>\n",network);
@@ -321,7 +305,7 @@ public	char * on_create_compute_request(
 		/* -------------------------------------- */
 		/* a local address must always be present */
 		/* -------------------------------------- */
-		if (!( on_valid_string( local ) ))
+		if (!( rest_valid_string( local ) ))
 		{
 			/* ------------- */
 			/* default local */
@@ -480,7 +464,7 @@ public	char * on_create_image_request(
 		fprintf(h,"<DISK id='0'>");
 		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,oldnumber);
 		fprintf(h,"<SAVE_AS name='%s'/>\n",newname);
-		if ( on_valid_string( driver ) )
+		if ( rest_valid_string( driver ) )
 		{
 			fprintf(h,"<DRIVER>%s</DRIVER>\n",driver);
 		}

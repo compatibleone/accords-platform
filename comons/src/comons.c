@@ -140,7 +140,7 @@ private	struct rest_extension * comons_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 
 #include "comonssession.c"
-#include "comonsconnection.c"
+#include "comonsevent.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o m o n s _ o p e r a t i o n				*/
@@ -153,7 +153,9 @@ private	int	comons_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_comons.xml");
 
-
+	/* -------------------------------------- */
+	/* monitoring monitor category management */
+	/* -------------------------------------- */
 	if (!( optr = occi_cords_monitor_builder( Comons.domain, "monitor" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -163,23 +165,15 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_cords_event_builder( Comons.domain, "event" ) ))
+	/* ------------------------------------ */
+	/* monitoring event category management */
+	/* ------------------------------------ */
+	if (!( optr = comons_event_builder( Comons.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
-	optr->access |= _OCCI_NO_PRICING;
-
-	/* -------------------------------------- */
-	/* monitoring session category management */
-	/* -------------------------------------- */
-	if (!( optr = comons_session_builder( Comons.domain ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
 
 	/* --------------------------------------- */
 	/* monitoring consumer category management */
@@ -193,20 +187,10 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
-	/* ----------------------------------------- */
-	/* monitoring connection category management */
-	/* ----------------------------------------- */
-	if (!( optr = comons_connection_builder( Comons.domain ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-	/* ------------------------------------- */
-	/* monitoring packet category management */
-	/* ------------------------------------- */
-	if (!( optr = comons_packet_builder( Comons.domain ) ))
+	/* -------------------------------------- */
+	/* monitoring session category management */
+	/* -------------------------------------- */
+	if (!( optr = comons_session_builder( Comons.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

@@ -131,7 +131,7 @@ public	struct occi_category * comons_connection_builder( char * domain )
 	else
 	{
 		optr->callback = (void *) 0;
-		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE );
+		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 		if (!( optr = occi_add_action( optr,"start","",start_connection)))
 			return( optr );

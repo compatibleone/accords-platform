@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _proactive_c_
@@ -59,6 +57,8 @@ public struct proactive * liberate_proactive(struct proactive * sptr)
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		sptr = liberate( sptr );
 	}
 	return((struct proactive *) 0);
@@ -85,6 +85,7 @@ public struct proactive * reset_proactive(struct proactive * sptr)
 		sptr->privateaddr = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
 	}
@@ -165,6 +166,10 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -200,10 +205,11 @@ public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);
 
 }
 
-#endif	/* _proactive_cproactive_c_ */
+#endif	/* _proactive_c_ */

@@ -22,29 +22,11 @@
 
 #include "osclient.h"
 
-#define	_CORDS_NULL "(null)"
-#define	_CORDS_NONE "none"
 char *                  occi_unquoted_value( char * sptr );
 
 private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
-
-/*	------------------------------------------------	*/
-/*		o s _ v a l i d _ s t r i n g			*/
-/*	------------------------------------------------	*/
-private	int	os_valid_string( char * vptr )
-{
-	if (!( vptr ))
-		return( 0 );
-	else if (!( strlen( vptr ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NULL ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NONE ) ))
-		return( 0 );
-	else	return( 1 );
-}
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o s _ r e s p o n s e			*/
@@ -1428,17 +1410,17 @@ public	char * os_create_server_request(
 			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
-		if ( os_valid_string( address ) )
+		if ( rest_valid_string( address ) )
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
-		if ( os_valid_string( zone ) )
+		if ( rest_valid_string( zone ) )
 		{
 			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
 		}			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
 
-		if ( os_valid_string( group ) )
+		if ( rest_valid_string( group ) )
 		{
 			fprintf(h,"\t<security_groups>\n");
 			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);

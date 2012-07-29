@@ -372,7 +372,8 @@ private	struct	rest_response * start_opennebula(
 					pptr->hostname, 
 					_CORDS_CONFIGURATION,
 					reference, 
-					OnProcci.publisher );
+					OnProcci.publisher,
+					pptr->account );
 			}
 		}
 		osptr = liberate_on_response( osptr );
@@ -635,7 +636,8 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 			pptr->hostname, 
 			_CORDS_RELEASE,
 			reference, 
-			OnProcci.publisher );
+			OnProcci.publisher,
+			pptr->account );
 		return( on_delete_server( pptr->number ) );
 	}
 }

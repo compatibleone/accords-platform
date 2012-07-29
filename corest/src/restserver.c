@@ -72,6 +72,22 @@ public	int	rest_thread_control(int new_value)
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ v a l i d _ s t r i n g		*/
+/*	------------------------------------------------	*/
+public	int	rest_valid_string( char * vptr )
+{
+	if (!( vptr ))
+		return( 0 );
+	else if (!( strlen( vptr ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, "(null)" ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, "(none)" ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	------------------------------------------------	*/
 /*		r e s t _ h t t p _ p r e f i x 		*/
 /*	------------------------------------------------	*/
 public	char *	rest_http_prefix()
@@ -79,11 +95,7 @@ public	char *	rest_http_prefix()
 	char *	prefix;
 	if (!( prefix = default_tls() ))
 		prefix = "http";
-	else if (!( strlen( prefix ) ))
-		prefix = "http";
-	else if (!( strcmp( prefix, "(none)" )))
-		prefix = "http";
-	else if (!( strcmp( prefix, "(null)" )))
+	else if (!( rest_valid_string( prefix ) ))
 		prefix = "http";
 	else	prefix = "https";
 	return( prefix );

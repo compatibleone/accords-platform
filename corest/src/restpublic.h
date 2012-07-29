@@ -113,6 +113,8 @@ public	void
 
 public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
 
+public	int	rest_valid_string( char * vptr );
+
 #endif	/* _restpublic_h */
 	/* ------------- */
 

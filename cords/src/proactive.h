@@ -20,6 +20,7 @@ struct	proactive
 
 	char *	hostname;
 	char *	workload;
+	char *	account;
 
 	int	when;
 

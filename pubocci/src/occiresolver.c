@@ -747,8 +747,6 @@ public	char *	occi_resolve_consumer( char * consumer, char * agent, char * tls )
 	struct	occi_element  	* fptr;
 	char 			* result=(char *) 0;
 
-	printf("Resolve Consumer : %s\n",consumer);
-
 	if (!( aptr = cords_retrieve_named_instance_list( _CORDS_CONSUMER, "occi.consumer.name", consumer, agent, tls ) ))
 		return( (char *) 0 );
 
@@ -796,6 +794,72 @@ public	char *	occi_resolve_consumer( char * consumer, char * agent, char * tls )
 					break;
 				else	break;
 			}
+			zptr = occi_remove_response( zptr );
+			rptr = occi_remove_request( rptr );
+			cptr = occi_remove_client( cptr );
+			host = liberate( host );
+			if ( result ) break;
+		}
+
+	}
+	aptr = occi_remove_response( aptr );
+	return( result );
+}
+
+/*	-------------------------------------------------------------		*/
+/*	 o c c i _ r e s o l v e _ c o n s u m e r _ i d e n t i t y		*/
+/*	-------------------------------------------------------------		*/
+public	char *	occi_resolve_consumer_identity( char * consumer, char * agent, char * tls )
+{
+	struct	occi_response 	* aptr;
+	struct	occi_element  	* eptr;
+	char 			* host=(char *) 0;
+	struct	occi_client	* cptr;
+	struct	occi_request	* rptr;
+	struct	occi_response 	* zptr;
+	struct	occi_element  	* fptr;
+	char 			* result=(char *) 0;
+
+	if (!( aptr = cords_retrieve_named_instance_list( _CORDS_CONSUMER, "occi.consumer.name", consumer, agent, tls ) ))
+		return( (char *) 0 );
+
+	for (	eptr = aptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		/* ------------------------------------- */
+		/* ensure valid element list information */
+		/* ------------------------------------- */
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+
+		/* ------------------------------------- */
+		/* build the price category instance ID  */
+		/* ------------------------------------- */
+		else if (!( host = cords_build_host( aptr, eptr->value) ))
+			continue;
+
+		/* ------------------------------------- */
+		/* attempt to locate the category price  */
+		/* ------------------------------------- */
+		else if (!( cptr = occi_create_client( host, agent, tls ) ))
+			continue;
+		else if (!( rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+			continue;
+		else if (!( zptr = occi_client_get( cptr, rptr ) ))
+			continue;
+		else if (!( fptr = occi_locate_element( zptr->first, "occi.consumer.name" ) ))
+			continue;
+		else if ( strcmp( fptr->value , consumer ) )
+			continue;
+		else if (!( fptr = occi_locate_element( zptr->first, "occi.consumer.identity" ) ))
+			continue;
+		else if (!( result = allocate_string( fptr->value ) ))
+			continue;
+		else 
+		{
 			zptr = occi_remove_response( zptr );
 			rptr = occi_remove_request( rptr );
 			cptr = occi_remove_client( cptr );
