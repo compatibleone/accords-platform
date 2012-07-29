@@ -501,7 +501,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\tchar status[1024];\n");
        fprintf(f,"\tchar message[1024];\n");
        fprintf(f,"\tchar srcdir[1024];\n");
-       fprintf(f,"\tchar * response;\n");
+       fprintf(f,"\tchar * response = NULL;\n");
        fprintf(f,"\tchar * token;\n");
        fprintf(f,"\tFILE * exp_file;\n");
        fprintf(f,"\tlistcc restResponse;\n");
@@ -533,10 +533,10 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pysrc\",PYPATH);\n");
        fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
        fprintf(f,"\t\tpython_path(srcdir);\n"); 
-       fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
-       fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
+       fprintf(f,"\t\tpName = PyString_FromString(\"%sAct\");\n",categoryName); 
+       fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %sAct no such file name\\n\");\n",categoryName);
        fprintf(f,"\t\telse pModule = PyImport_Import(pName);\n");
-       fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %s module\\n\");\n",categoryName);
+       fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %sAct module\\n\");\n",categoryName);
        fprintf(f,"\t\telse pDict = PyModule_GetDict(pModule);\n");
        fprintf(f,"\t\tif(pDict == NULL) printf(\"error: failed to load dict name in %s module\\n\");\n",categoryName);
        fprintf(f,"\t\telse pFunc = PyDict_GetItemString(pDict,\"%s\");\n",pelem->value);
@@ -805,7 +805,7 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       fprintf(f,"\tchar sendstr[1024];\n");
       fprintf(f,"\tchar strtmp[1024];\n");
       fprintf(f,"\tchar srcdir[1024];\n");
-      fprintf(f,"\tchar * response;\n");
+      fprintf(f,"\tchar * response = NULL;\n");
       fprintf(f,"\tchar * token;\n");
       fprintf(f,"\tFILE * exp_file;\n");
       fprintf(f,"\tlistcc categoryAtr;\n");
