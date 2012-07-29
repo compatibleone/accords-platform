@@ -226,7 +226,7 @@ int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]
   if(!a)
   {
      fprintf(fOut,"%s\n",categoryName);
-     ctemp = allocate_string(getCategoryName(categoryName,"_",3);
+     ctemp = allocate_string(getCategoryName(categoryName,"_",3));
      if (ctemp)
       addBack(&categoryN,ctemp);
   }
@@ -315,7 +315,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
   if(!a)
   {
      fprintf(fOut,"%s\n",categoryName);
-      ctemp = allocate_string(getCategoryName(categoryName,"_",3);
+      ctemp = allocate_string(getCategoryName(categoryName,"_",3));
      if (ctemp)
       addBack(&categoryN,ctemp);
   }
