@@ -134,13 +134,37 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 	return( xptr );
 }
 
-private	void	cosacs_post_samples( struct cords_probe * pptr, int samples )
+/*	------------------------------------------------------------------	*/
+/*			c o s a c s _ f i l e _ e n c o d e			*/
+/*	------------------------------------------------------------------	*/
+private	char *	cosacs_file_encode( char * filename )
+{
+	FILE * h;
+	int	bytes;
+	char	buffer[8193];
+	if (!( h = fopen( filename, "r" )))
+		return((char *) 0);
+	else if (!( bytes = fread(buffer,1,8192,h) ))
+	{
+		fclose(h);
+		return((char *) 0);
+	}
+	else	
+	{
+		fclose(h);
+		buffer[bytes] = 0;
+		return( rest_encode_html( buffer ) );
+	}
+}
+
+private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char * filename )
 {
 	struct	url *	uptr;
 	struct	occi_element * dptr;
 	struct	occi_client * kptr;
 	char *	host;
 	char *	ihost;
+	char *	vptr;
 	char	now[64];
 	char	buffer[1024];
 	struct	occi_response * yptr;
@@ -190,7 +214,21 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples )
 		kptr = occi_remove_client( kptr );
 		return;
 	}
-	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	else if (!( vptr = cosacs_file_encode( filename )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!(dptr=occi_request_element(qptr,"occi.packet.value"  	, vptr )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else	vptr = liberate( vptr );
+
+	if (!( yptr = occi_client_post( kptr, qptr ) ))
 	{
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
@@ -233,12 +271,12 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 	while (1)
 	{
 		if ( rest_valid_string( pptr->expression) )
-			sprintf(buffer,"%s > %s",pptr->expression, filename);
-		else	sprintf(buffer,"date > %s",filename);
+			sprintf(buffer,"%s >> %s",pptr->expression, filename);
+		else	sprintf(buffer,"date >> %s",filename);
 		system( buffer );
 		if ( ++sample >= pptr->samples )
 		{
-			cosacs_post_samples(pptr, sample);
+			cosacs_post_samples(pptr, sample,filename);
 			sample=0;
 			unlink( filename );
 		}

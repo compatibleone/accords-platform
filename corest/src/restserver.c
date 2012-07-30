@@ -749,6 +749,92 @@ public	struct rest_response * rest_authentication_challenge(struct rest_client *
 }		
 
 /*	---------------------------------------------------------	*/
+/*		r e s t _ e n c o d e _ h t m l 			*/
+/*	---------------------------------------------------------	*/
+public	char *	rest_encode_html( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( wptr = allocate( strlen( sptr ) * 3 ) ))
+		return( wptr );
+	else	rptr = wptr;
+
+	while( *sptr )
+	{
+		if (!( c = ( *(sptr++) & 0x00FF ) ))
+			break;
+		else if (( c >= '0' ) && ( c <= '9' ))
+			*(wptr++) = c;
+		else if (( c >= 'a' ) && ( c <= 'z' ))
+			*(wptr++) = c;
+		else if (( c >= 'A' ) && ( c <= 'Z' ))
+			*(wptr++) = c;
+		else if ( c == ' ' )
+			*(wptr++) = '+';
+		else if (( c == '.' ) || ( c == '_' ) || ( c == '-' ))
+			*(wptr++) = c;
+		else 
+		{
+			sprintf(wptr, "%c%02.2X",'%',c);
+			wptr += strlen(wptr);
+		}
+	}
+	*(wptr++) = 0;
+	wptr = allocate_string( rptr );
+	liberate( rptr );
+	return( wptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ d e c o d e _ h t m l 			*/
+/*	---------------------------------------------------------	*/
+public	char *	rest_decode_html( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	int	x;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( wptr = allocate_string( sptr ) ))
+		return( wptr );
+	else	rptr = wptr;
+
+	while( *sptr )
+	{
+		if (!( c = ( *(sptr++) & 0x00FF ) ))
+			break;
+		else if ( c != '%' )
+			*(wptr++) = c;
+		else
+		{
+			c = *(sptr++);
+			if ((c >= '0') && (x <= '9'))
+				x = ((c - '0') * 16);
+			else if ((c >= 'a') && (x <= 'f'))
+				x = (((c - 'a') + 10) * 16);
+			else if ((c >= 'A') && (x <= 'F'))
+				x = (((c - 'A') + 10) * 16);
+			c = *(sptr++);
+			if ((c >= '0') && (x <= '9'))
+				x += (c - '0');
+			else if ((c >= 'a') && (x <= 'f'))
+				x += ((c - 'a') + 10);
+			else if ((c >= 'A') && (x <= 'F'))
+				x += ((c - 'A') + 10);
+			*(wptr++) = x;
+		}
+	}
+	*(wptr++) = 0;
+	wptr = allocate_string( rptr );
+	liberate( rptr );
+	return( wptr );
+}
+
+/*	---------------------------------------------------------	*/
 /*		r e s t _ e n c o d e _ c r e d e n t i a l s		*/
 /*	---------------------------------------------------------	*/
 public	char *	rest_encode_credentials( char * username, char * password )

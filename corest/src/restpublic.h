@@ -114,6 +114,8 @@ public	void
 public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
 
 public	int	rest_valid_string( char * vptr );
+public	char *	rest_encode_html( char * sptr );
+public	char *	rest_decode_html( char * sptr );
 
 #endif	/* _restpublic_h */
 	/* ------------- */
