@@ -220,7 +220,7 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		kptr = occi_remove_client( kptr );
 		return;
 	}
-	else if (!(dptr=occi_request_element(qptr,"occi.packet.value"  	, vptr )))
+	else if (!(dptr=occi_request_element(qptr,"occi.packet.data"  	, vptr )))
 	{
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
