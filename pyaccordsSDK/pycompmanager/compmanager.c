@@ -571,7 +571,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
     
     fprintf(f,"char *%s_getname(int a)\n",categoryName);
     fprintf(f,"{\n");
-    fprintf(f,"\tchar action[256];\n");
+    fprintf(f,"\tstatic char action[256];\n");
     fprintf(f,"\tswitch(a)\n");
     fprintf(f,"\t{\n");
     elem *pelemn = categoryAct.first;
