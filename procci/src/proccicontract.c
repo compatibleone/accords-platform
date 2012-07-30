@@ -551,9 +551,13 @@ private	struct	rest_response * snapshot_contract(
 /*	-----------------------------------------------------------	*/
 private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
 {
+	struct	occi_response 	* zptr;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	char 			* wptr;
+	char			buffer[2048];
+
+	buffer[0] = 0;
 
 	/* ------------------------------------------------------- */
 	/* delete the contract if simple or complex but not common */
@@ -590,9 +594,30 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 		else
 		{
 			liberate( wptr );
-			occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() );
+			if (!( buffer[0] ))
+				strcpy(buffer, lptr->source );
+			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
+				continue;
+			else	zptr = occi_remove_response( zptr );
 		}
 	}
+
+	/* -------------------------------------------- */
+	/* delete a monitoring session if one is active */
+	/* -------------------------------------------- */
+	if ( pptr->session )
+	{
+		if (( zptr = occi_simple_delete( pptr->session, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+		pptr->session = liberate( pptr->session );
+	}
+
+	/* -------------------------------------- */
+	/* delete eventual links from this object */
+	/* -------------------------------------- */
+	if ( strlen(buffer) )
+		if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
 	return(0);
 }

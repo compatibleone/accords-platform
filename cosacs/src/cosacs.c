@@ -157,7 +157,7 @@ private	char *	cosacs_file_encode( char * filename )
 	}
 }
 
-private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char * filename )
+private	void	cosacs_post_samples( char * self, struct cords_probe * pptr, int samples, char * filename )
 {
 	struct	url *	uptr;
 	struct	occi_element * dptr;
@@ -228,6 +228,8 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 	}
 	else	vptr = liberate( vptr );
 
+	sprintf(buffer,"%s/%s/%s",self,_CORDS_PROBE,pptr->id);
+
 	if (!( yptr = occi_client_post( kptr, qptr ) ))
 	{
 		qptr = occi_remove_request( qptr );
@@ -241,7 +243,7 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		kptr = occi_remove_client( kptr );
 		return;
 	}
-	else if (!( zptr =  cords_create_link( pptr->id,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( zptr =  cords_create_link( buffer,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -261,7 +263,7 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the cosacs instance category		*/
 /*	------------------------------------------------------------------	*/
-private	void	cosacs_probe_worker( struct cords_probe * pptr )
+private	void	cosacs_probe_worker( struct cords_probe * pptr, char * host )
 {
 	int	sample=0;
 	char 	filename[1024];
@@ -276,7 +278,7 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 		system( buffer );
 		if ( ++sample >= pptr->samples )
 		{
-			cosacs_post_samples(pptr, sample,filename);
+			cosacs_post_samples(host, pptr, sample,filename);
 			sample=0;
 			unlink( filename );
 		}
@@ -363,7 +365,7 @@ private	struct rest_response * start_probe(
 		case	-1	:
 			return( rest_html_response( aptr, 500, "Probe Process Start Failure" ) );
 		case	0	:
-			cosacs_probe_worker( pptr );
+			cosacs_probe_worker( pptr, rptr->host );
 			exit(0);
 		default		:
 			pptr->pid = pid;

@@ -607,13 +607,15 @@ private	struct	rest_response * stop_service(
 /*	-----------------------------------------------------------	*/
 private	int	delete_service_contract( struct occi_category * optr, struct cords_service * pptr )
 {
+	struct	occi_response 	* zptr;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
-	char 	buffer[1024];
+	char 			  buffer[2048];
 	char 			* wptr;
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
+	buffer[0] = 0;
 	for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
 		nptr = nptr->next )
@@ -634,9 +636,19 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 		else
 		{
 			liberate( wptr );
-			occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() );
+			if (!( buffer[0] ))
+				strcpy( buffer, lptr->source );
+			if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
 		}
 	}
+
+	/* ----------------------------- */
+	/* delete links from this object */
+	/* ----------------------------- */
+	if ( strlen( buffer ) )
+		if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
 
 	/* ------------------------------- */
 	/* remove service description file */

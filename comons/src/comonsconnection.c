@@ -123,8 +123,9 @@ private	struct rest_response * stop_connection(
 		}
 		pptr->state = 0;
 		autosave_cords_connection_nodes();
-		if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
-			zptr = occi_remove_response( zptr );
+		if ( strlen(buffer) )
+			if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }

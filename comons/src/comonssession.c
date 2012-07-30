@@ -119,6 +119,113 @@ private	struct rest_response * stop_session(
 	}		
 }
 
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	create_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return( 0 ); 
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	update_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n t r a c t	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_monitoring_session(struct occi_category * optr,struct cords_session * pptr)
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	char 	buffer[2048];
+	char *	wptr;
+	buffer[0] = 0;
+	for (	pptr->connections=0,
+		nptr=occi_last_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->previous )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else 
+		{
+			liberate( wptr );
+			if (!( buffer[0] ))
+				strcpy(buffer,lptr->source);
+			if ((zptr = occi_simple_delete( lptr->target, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+		}
+	}
+	if ( strlen(buffer) )
+		if ((zptr = cords_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	return(0);
+}
+
+private	int	delete_session(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_session * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(delete_monitoring_session(optr, pptr));
+}
+
+private	struct	occi_interface	session_interface = 
+{
+	create_session,
+	retrieve_session,
+	update_session,
+	delete_session
+};
+
+
 /*	------------------------------------------------------------------	*/
 /*			c o m o n s _ s e s s i o n _ b u i l d e r		*/
 /*	------------------------------------------------------------------	*/
@@ -130,7 +237,7 @@ public	struct occi_category * comons_session_builder( char * domain )
 		return( optr );
 	else
 	{
-		optr->callback = (void *) 0;
+		optr->callback = &session_interface;
 		optr->access |= _OCCI_NO_PRICING;
 
 		if (!( optr = occi_add_action( optr,"start","",start_session)))
