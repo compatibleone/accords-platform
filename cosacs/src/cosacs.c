@@ -234,7 +234,7 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 	{
 		if ( rest_valid_string( pptr->expression) )
 			sprintf(buffer,"%s > %s",pptr->expression, filename);
-		else	sprintf(buffer,"date > filename");
+		else	sprintf(buffer,"date > %s",filename);
 		system( buffer );
 		if ( ++sample >= pptr->samples )
 		{
@@ -246,6 +246,57 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 		{
 			sleep(pptr->period);
 		}
+	}
+}
+
+/*	----------------------------------------------------------	*/
+/*		c o s a c s _ v a l i d a t e _ p r o b e		*/
+/*	----------------------------------------------------------	*/
+private	int cosacs_validate_probe( struct cords_probe * pptr )
+{
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+
+	if (!( pptr ))
+		return( 0 );
+	else if (!( pptr->metric ))
+		return( 0 );
+	else if (!( zptr = occi_simple_get( pptr->metric, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( 0 );
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.expression" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->expression = allocate_string( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.period" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->period = atoi( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.samples" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->samples = atoi( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( 1 );
 	}
 }
 
@@ -265,6 +316,8 @@ private	struct rest_response * start_probe(
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if ( pptr->state )
 		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( cosacs_validate_probe( pptr ) ))
+		return( rest_html_response( aptr, 802, "Probe Validation Failure" ) );
 	else
 	{
 		switch ((pid = fork()))

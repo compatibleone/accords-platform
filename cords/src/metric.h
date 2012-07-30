@@ -7,6 +7,9 @@ struct	cords_metric
 	char *	id;
 	char *	name;
 	char *	units;
+	char *	period;
+	char *	samples;
+	char *	expression;
 	int	state;
 };
 

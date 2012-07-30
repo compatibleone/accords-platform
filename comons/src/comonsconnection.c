@@ -77,12 +77,14 @@ private	struct rest_response * stop_connection(
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	char *	wptr;
+	char	buffer[2048];
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if (!( pptr->state ))
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
+		buffer[0] = 0;
 		for (	pptr->probes=0,
 			nptr=occi_last_link_node();
 			nptr != (struct occi_link_node *) 0;
@@ -103,18 +105,26 @@ private	struct rest_response * stop_connection(
 			}
 			else
 			{	
+				strcpy(buffer,lptr->source);
 				liberate( wptr );
 				if (!(zptr = cords_invoke_action( lptr->target, "stop", _CORDS_SERVICE_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 801, "Probe Stop Failure" ) );
 				else
 				{
 					zptr = occi_remove_response( zptr );
-					pptr->probes++;
+					if (( occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+					{
+						zptr = occi_remove_response( zptr );
+						if ( pptr->probes )
+							pptr->probes--;
+					}
 				}
 			}
 		}
 		pptr->state = 0;
 		autosave_cords_connection_nodes();
+		if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }

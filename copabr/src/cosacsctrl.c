@@ -35,6 +35,7 @@
 /*	------------------------------------	*/
 #define	_COSACS_HOST "127.0.0.1"
 #define	_COSACS_ITERATIONS 10
+#define	_COSACS_PERIOD "2"
 
 /*	-------------------------------------------------	*/
 /*		c o s a c s _ s y n c h r o n i s e		*/
@@ -188,7 +189,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 			cptr = occi_remove_client( cptr );
 		}
 
-		if (!( zptr = cords_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		if (( zptr = cords_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
 		return(0);
@@ -680,9 +681,12 @@ private	int	cosacs_monitoring_instruction(
 {
 	struct	occi_element * fptr;
 	struct	occi_element * gptr;
+
 	char *	session=(char *) 0;
 	char *	connection=(char *) 0;
 	char *	contract=(char *) 0;
+	char *	metric=(char *) 0;
+
 	/* ---------------------------------------- */
 	/* retrieve the generic contract identifier */
 	/* ---------------------------------------- */
@@ -717,10 +721,16 @@ private	int	cosacs_monitoring_instruction(
 	else if (!(gptr = occi_locate_element( instruction->first, "occi.instruction.property" )))
 		return( 118 );
 
+	/* ----------------------------- */
+	/* resolve the metric identifier */
+	/* ----------------------------- */
+	else if (!( metric = occi_resolve_metric( gptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( 118 );
+
 	/* ------------------------------------------------- */
 	/* create a new probe for this connection and metric */
 	/* ------------------------------------------------- */
-	else	return( cosacs_create_probe( cosacs, fptr->value, gptr->value, connection, gptr->value, "1" ) );
+	else	return( cosacs_create_probe( cosacs, fptr->value, gptr->value, connection, metric, _COSACS_PERIOD ) );
 
 }
 

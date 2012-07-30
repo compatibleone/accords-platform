@@ -39,6 +39,12 @@ public struct cords_metric * liberate_cords_metric(struct cords_metric * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->units )
 			 sptr->units = liberate(sptr->units);
+		if ( sptr->period )
+			 sptr->period = liberate(sptr->period);
+		if ( sptr->samples )
+			 sptr->samples = liberate(sptr->samples);
+		if ( sptr->expression )
+			 sptr->expression = liberate(sptr->expression);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_metric *) 0);
@@ -55,6 +61,9 @@ public struct cords_metric * reset_cords_metric(struct cords_metric * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->units = (char*) 0;
+		sptr->period = (char*) 0;
+		sptr->samples = (char*) 0;
+		sptr->expression = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -94,6 +103,18 @@ public int xmlin_cords_metric(struct cords_metric * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->units = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"period") ))
+		{
+			if ( wptr->value ) { sptr->period = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"samples") ))
+		{
+			if ( wptr->value ) { sptr->samples = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"expression") ))
+		{
+			if ( wptr->value ) { sptr->expression = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -115,6 +136,9 @@ public int rest_occi_cords_metric(FILE * fh,struct cords_metric * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.units='%s'\r\n",prefix,nptr,(sptr->units?sptr->units:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.period='%s'\r\n",prefix,nptr,(sptr->period?sptr->period:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.samples='%s'\r\n",prefix,nptr,(sptr->samples?sptr->samples:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expression='%s'\r\n",prefix,nptr,(sptr->expression?sptr->expression:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
