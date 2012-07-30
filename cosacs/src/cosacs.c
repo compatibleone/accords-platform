@@ -157,7 +157,10 @@ private	char *	cosacs_file_encode( char * filename )
 	}
 }
 
-private	void	cosacs_post_samples( char * self, struct cords_probe * pptr, int samples, char * filename )
+/*	---------------------------------------------------	*/
+/*		c o s a c s _ p o s t _ s a m p l e s		*/
+/*	---------------------------------------------------	*/
+private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char * filename )
 {
 	struct	url *	uptr;
 	struct	occi_element * dptr;
@@ -228,7 +231,9 @@ private	void	cosacs_post_samples( char * self, struct cords_probe * pptr, int sa
 	}
 	else	vptr = liberate( vptr );
 
-	sprintf(buffer,"%s/%s/%s",self,_CORDS_PROBE,pptr->id);
+	if (!( rest_valid_string( Cosacs.identity ) ))
+		return;
+	else	sprintf(buffer,"%s/%s/%s",Cosacs.identity,_CORDS_PROBE,pptr->id);
 
 	if (!( yptr = occi_client_post( kptr, qptr ) ))
 	{
@@ -263,7 +268,11 @@ private	void	cosacs_post_samples( char * self, struct cords_probe * pptr, int sa
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the cosacs instance category		*/
 /*	------------------------------------------------------------------	*/
-private	void	cosacs_probe_worker( struct cords_probe * pptr, char * host )
+
+/*	------------------------------------------------------------------	*/
+/*			c o s a c s _ p r o b e _ w o r k e r			*/
+/*	------------------------------------------------------------------	*/
+private	void	cosacs_probe_worker( struct cords_probe * pptr )
 {
 	int	sample=0;
 	char 	filename[1024];
@@ -278,7 +287,7 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr, char * host )
 		system( buffer );
 		if ( ++sample >= pptr->samples )
 		{
-			cosacs_post_samples(host, pptr, sample,filename);
+			cosacs_post_samples( pptr, sample,filename);
 			sample=0;
 			unlink( filename );
 		}
@@ -365,7 +374,7 @@ private	struct rest_response * start_probe(
 		case	-1	:
 			return( rest_html_response( aptr, 500, "Probe Process Start Failure" ) );
 		case	0	:
-			cosacs_probe_worker( pptr, rptr->host );
+			cosacs_probe_worker( pptr );
 			exit(0);
 		default		:
 			pptr->pid = pid;
@@ -667,6 +676,85 @@ private	struct	occi_interface	cords_script_interface = {
 	delete_cords_script
 	};
 
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	create_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	char	buffer[1024];
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( rest_valid_string( pptr->name ) ))
+		return( 0 );
+	else if (!( rest_valid_string( pptr->value ) ))
+		return( 0 );
+	else if ( strcmp( pptr->name,"cosacs" ) != 0 )
+		return(0);
+	else if ( rest_valid_string( Cosacs.identity ) )
+		return( 0 );
+	else
+	{
+		sprintf(buffer,"http://%s:%u",pptr->value,Cosacs.restport);
+		if (!( Cosacs.identity = allocate_string( buffer ) ))
+			return(0); 
+		else	return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	update_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n t r a c t	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	cords_metadata_interface = 
+{
+	create_metadata,
+	retrieve_metadata,
+	update_metadata,
+	delete_metadata
+};
+
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ o p e r a t i o n				*/
@@ -689,7 +777,7 @@ private	int	cosacs_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
-	optr->callback  = (void *) 0;
+	optr->callback  = &cords_metadata_interface;
 
 	if (!( optr = occi_cords_file_builder( Cosacs.domain, "file" ) ))
 		return( 27 );
