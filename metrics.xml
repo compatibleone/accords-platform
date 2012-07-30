@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="metrics" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<metric name="activity" period="10" samples="1" expression="top -b -n1 | grep users"/>
+<metric name="cpu" period="2" samples="1" expression="top -b -n1 | grep Cpu"/>
+<metric name="memory" period="5" samples="1" expression="top -b -n1 | grep Mem | grep total "/>
+<metric name="tasks" period="10" samples="1" expression="top -b -n1 | grep Tasks"/>
+<metric name="swap" period="10" samples="1" expression="top -b -n1 | grep Swap"/>
+
+</import>
+
+
+

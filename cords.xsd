@@ -24,6 +24,7 @@
 		<xsd:element name="network" type="cordsPort" minOccurs="0"  maxOccurs="unbounded"/>
 		<xsd:element name="port" type="cordsStorage" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element name="user" type="cordsUser" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element name="metric" type="cordsMetric" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="xmlns" type="xsd:string"/>
