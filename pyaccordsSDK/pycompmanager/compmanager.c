@@ -498,7 +498,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
        fprintf(f,"\tchar sendstr[1024]=\" \";\n");
        fprintf(f,"\tchar strtmp[1024]=\" \";\n");
-       fprintf(f,"\tchar status[1024];\n");
+       fprintf(f,"\tint status;\n");
        fprintf(f,"\tchar message[1024];\n");
        fprintf(f,"\tchar srcdir[1024];\n");
        fprintf(f,"\tchar * response = NULL;\n");
@@ -556,7 +556,7 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\t\t}\n");
        fprintf(f,"\t\telemm *pelem = restResponse.first;\n");
        fprintf(f,"\t\tif(pelem){\n");
-       fprintf(f,"\t\t\tstrcpy(status , pelem->value);\n");
+       fprintf(f,"\t\t\tstatus = atoi(pelem->value);\n");
        fprintf(f,"\t\t\tpelem = pelem->next;\n");
        fprintf(f,"\t\t}\n");
        fprintf(f,"\t\tif(pelem){\n");
