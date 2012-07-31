@@ -279,7 +279,8 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="units" type="xsd:string"/>
-		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="period" type="xsd:string"/>
+		<xsd:attribute name="samples" type="xsd:string"/>
 		<xsd:attribute name="expression" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
