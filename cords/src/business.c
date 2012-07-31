@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _business_c_
@@ -39,6 +37,12 @@ public struct cords_business * liberate_cords_business(struct cords_business * s
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
+		if ( sptr->expression )
+			 sptr->expression = liberate(sptr->expression);
+		if ( sptr->condition )
+			 sptr->condition = liberate(sptr->condition);
+		if ( sptr->value )
+			 sptr->value = liberate(sptr->value);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_business *) 0);
@@ -55,6 +59,9 @@ public struct cords_business * reset_cords_business(struct cords_business * sptr
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
+		sptr->expression = (char*) 0;
+		sptr->condition = (char*) 0;
+		sptr->value = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -94,6 +101,18 @@ public int xmlin_cords_business(struct cords_business * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"expression") ))
+		{
+			if ( wptr->value ) { sptr->expression = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"condition") ))
+		{
+			if ( wptr->value ) { sptr->condition = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"value") ))
+		{
+			if ( wptr->value ) { sptr->value = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -115,6 +134,9 @@ public int rest_occi_cords_business(FILE * fh,struct cords_business * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expression='%s'\r\n",prefix,nptr,(sptr->expression?sptr->expression:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.condition='%s'\r\n",prefix,nptr,(sptr->condition?sptr->condition:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

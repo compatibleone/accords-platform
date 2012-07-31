@@ -88,6 +88,9 @@
 	<xsd:complexType name="cordsBusiness">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="expression" type="xsd:string"/>
+		<xsd:attribute name="condition" type="xsd:string"/>
+		<xsd:attribute name="value" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>

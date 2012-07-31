@@ -1,4 +1,5 @@
 echo "rm -f update-$1.tgz" > run-$1
+echo "sleep 5" >> run-$1
 echo "wget http://www.compatibleone.fr/accords-platform/${makesystem}/update-$1.tgz" >> run-$1
 echo "tar -xzvf update-$1.tgz" >> run-$1
 echo "export pubhost=\$accords_publisher_publisher_hostname" >> run-$1
