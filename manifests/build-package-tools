@@ -1,0 +1,9 @@
+cp /usr/local/bin/testcp .
+cp /usr/local/bin/testcb .
+cp /usr/local/bin/testresolver .
+cp /usr/local/bin/command .
+tar -czf package-tools.tgz testcp testcb testresolver command co-parser co-broker co-resolver co-command
+
+
+
+

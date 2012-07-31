@@ -21,4 +21,6 @@ bash build-package azprocci
 bash build-package dcprocci
 bash build-package osocciprocci
 bash build-package paprocci
+bash build-package-tools
+
 
