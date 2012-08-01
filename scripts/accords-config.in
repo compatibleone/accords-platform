@@ -27,12 +27,12 @@ fi
 # then specify the security directory.
 # -------------------------------------
 # nethsm=1
-# tls=security
+tls=security
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-tls=
+# tls=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls

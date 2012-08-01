@@ -34,7 +34,7 @@ echo "    <security" >> $target
 echo "         user='service-"${module}"'" >> $target
 echo "         password='"$password"'" >> $target
 echo "         monitor='"$monitor"'" >> $target
-echo "         tls='"${tls}"/"${module}"Tls.xml'/>" >> $target
+echo "         tls=''/>" >> $target
 echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
 echo "</"${module}">" >> $target
 echo "</accords>" >> $target
