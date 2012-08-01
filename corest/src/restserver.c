@@ -1866,11 +1866,13 @@ private	int	rest_accept_connection( struct rest_server * sptr )
 			sprintf(buffer,"rest server(%u): tls socket(%u) handshake(%u) failure(%u)",
 				getpid(),cptr->net.socket,sptr->tlsconf->option, handshakes);
 			rest_log_debug( buffer );
-			failure(550, buffer );
 			rest_drop_client( cptr );
 		}
-		sprintf(buffer,"server: accept (tls) (socket=%u)",cptr->net.socket);
-		rest_log_debug(buffer);
+		else
+		{
+			sprintf(buffer,"server: accept (tls) (socket=%u)",cptr->net.socket);
+			rest_log_debug(buffer);
+		}
 		return( 0 );
 	}
 }
