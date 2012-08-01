@@ -734,8 +734,6 @@ private	int	intercept_publisher( char * vptr )
 {
 	if ( rest_valid_string( Cosacs.publisher ) )
 		return(0);
-	else if (!( rest_valid_string( Cosacs.identity ) ))
-		return( 0 );
 	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
 		return(0); 
 	else	return(0);
