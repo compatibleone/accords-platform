@@ -695,7 +695,11 @@ private	int	cosacs_use_publisher()
 	rest_log_message("cosacs_use_publisher");
 	if (!( rest_valid_string( Cosacs.publisher ) ))
 		return( 0 );
-	else	initialise_occi_publisher( Cosacs.publisher, (char*) 0, (char *) 0, (char *) 0);
+	else
+	{
+		initialise_occi_resolver ( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+		initialise_occi_publisher( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+	}
 
 	if (!( rest_valid_string((tls = default_tls()) )))
 		return( 0 );

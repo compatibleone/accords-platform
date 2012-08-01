@@ -802,6 +802,23 @@ public	int	occi_secure_AAA( char * user, char * password, char * agent, char * t
 {
 	struct	rest_header * hptr;
 	rest_log_message("occi_secure_AAA");
+	if ( user )
+	{
+		rest_log_message("AAA user");
+		rest_log_message(user);
+	}
+	if ( password )
+	{
+		rest_log_message("AAA password");
+		rest_log_message(password);
+	}
+	if ( tls )
+	{
+		rest_log_message("AAA tls");
+		rest_log_message(tls);
+	}
+
+
 	if ( Publisher.authorization )
 	{
 		rest_log_message("already authorized");
