@@ -801,45 +801,13 @@ public	int	unpublish_occi_categories(
 public	int	occi_secure_AAA( char * user, char * password, char * agent, char * tls )
 {
 	struct	rest_header * hptr;
-	rest_log_message("occi_secure_AAA");
-	if ( user )
-	{
-		rest_log_message("AAA user");
-		rest_log_message(user);
-	}
-	if ( password )
-	{
-		rest_log_message("AAA password");
-		rest_log_message(password);
-	}
-	if ( tls )
-	{
-		rest_log_message("AAA tls");
-		rest_log_message(tls);
-	}
-
-
 	if ( Publisher.authorization )
-	{
-		rest_log_message("already authorized");
 		return( 0 );
-	}
 	else if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
-	{
-		rest_log_message("AAA login failure");
 		return( 403 );
-	}
 	else if (!( hptr = occi_client_authentication( Publisher.authorization )))
-	{
-		rest_log_message("AAA occi authentication failure");
 		return( 503 );
-	}
-	else
-	{
-		rest_log_message("AAA OK");
-		rest_log_message( Publisher.authorization );
-		return( 0 );
-	}
+	else	return( 0 );
 }
 
 /*	---------------------------------------------------------	*/

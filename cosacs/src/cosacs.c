@@ -692,7 +692,6 @@ private	struct	occi_interface	cords_script_interface = {
 private	int	cosacs_use_publisher()
 {
 	char *	tls;
-	rest_log_message("cosacs_use_publisher");
 	if (!( rest_valid_string( Cosacs.publisher ) ))
 		return( 0 );
 	else
@@ -717,8 +716,6 @@ private	int	intercept_identity( char * vptr )
 {
 	char	buffer[1024];
 
-	rest_log_message( "COSACS intercept identity" );
-	rest_log_message( vptr );
 	if (!( strcmp( vptr, _COSACS_LOCAL ) ))
 		return( 0 );
 	else if ( rest_valid_string( Cosacs.identity ) )
@@ -726,7 +723,6 @@ private	int	intercept_identity( char * vptr )
 	else
 	{
 		sprintf(buffer,"http://%s:%u",vptr,Cosacs.restport);
-		rest_log_message( buffer );
 		if (!( Cosacs.identity = allocate_string( buffer ) ))
 			return(0); 
 		else	return(0);
@@ -738,8 +734,6 @@ private	int	intercept_identity( char * vptr )
 /*	-------------------------------------------------	*/
 private	int	intercept_publisher( char * vptr )
 {
-	rest_log_message( "COSACS intercept publisher" );
-	rest_log_message( vptr );
 	if ( rest_valid_string( Cosacs.publisher ) )
 		return(0);
 	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
@@ -782,9 +776,6 @@ private	int	intercept_metadata( char * nptr, char * vptr )
 	/* --------------------------------- */
 	if (!( nptr )) 		return(0);
 	else if (!( vptr ))	return(0);
-
-	rest_log_message( "COSACS intercept METADATA" );
-	rest_log_message( nptr );
 
 	/* ----------------------------------- */
 	/* detect the cosacs identity variable */
