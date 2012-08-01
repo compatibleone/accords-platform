@@ -56,6 +56,7 @@
 #include "script.h"
 
 #include "monitor.h"
+#include "control.h"
 #include "event.h"
 #include "report.h"
 

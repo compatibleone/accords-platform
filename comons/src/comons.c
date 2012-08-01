@@ -165,6 +165,18 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
+	/* -------------------------------------- */
+	/* monitoring control category management */
+	/* -------------------------------------- */
+	if (!( optr = occi_cords_control_builder( Comons.domain, "control" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
 	/* ------------------------------------ */
 	/* monitoring event category management */
 	/* ------------------------------------ */

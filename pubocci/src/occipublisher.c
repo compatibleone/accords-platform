@@ -796,6 +796,32 @@ public	int	unpublish_occi_categories(
 }
 
 /*	---------------------------------------------------------	*/
+/*		   o c c i _ s e c u r e _ A A A 			*/
+/*	---------------------------------------------------------	*/
+public	int	occi_secure_AAA( char * user, char * password, char * agent, char * tls )
+{
+	struct	rest_header * hptr;
+	if ( Publisher.authorization )
+		return( 0 );
+	else if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
+		return( 403 );
+	else if (!( hptr = occi_client_authentication( Publisher.authorization )))
+		return( 503 );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		   o c c i _ r el e a s e _ A A A 			*/
+/*	---------------------------------------------------------	*/
+public	int	occi_release_AAA( char * user, char * password, char * agent, char * tls )
+{
+	if ( Publisher.authorization )
+		Publisher.authorization = logout_occi_user( 
+			user, password, agent, Publisher.authorization, tls );
+	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
 /*		p u b l i s h i n g _ o c c i _ s e r v e r		*/
 /*	---------------------------------------------------------	*/
 /*	this encapsulation function provides the compatible one 	*/
@@ -835,9 +861,8 @@ public	int	publishing_occi_server(
 		{
 			if ((user) && (password))
 			{
-				if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
-					return( 403 );
-				else 	(void) occi_client_authentication( Publisher.authorization );
+				if ((status = occi_secure_AAA( user, password, agent, tls )) != 0)
+					return( status );
 			}
 		}
 	}
@@ -886,6 +911,7 @@ public	int	publishing_occi_server(
 	/* -------------------------------------------- */
 	if (( tls ) && ( tlsconf ))
 	{
+		occi_release_AAA( user, password, agent, tls );
 		if ( Publisher.authorization )
 			Publisher.authorization = logout_occi_user( 
 				user, password, agent, Publisher.authorization, tls );

@@ -35,16 +35,24 @@ public struct cords_report * liberate_cords_report(struct cords_report * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
+		if ( sptr->monitor )
+			 sptr->monitor = liberate(sptr->monitor);
 		if ( sptr->service )
 			 sptr->service = liberate(sptr->service);
-		if ( sptr->title )
-			 sptr->title = liberate(sptr->title);
-		if ( sptr->description )
-			 sptr->description = liberate(sptr->description);
+		if ( sptr->control )
+			 sptr->control = liberate(sptr->control);
+		if ( sptr->contract )
+			 sptr->contract = liberate(sptr->contract);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->date )
 			 sptr->date = liberate(sptr->date);
+		if ( sptr->target )
+			 sptr->target = liberate(sptr->target);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_report *) 0);
@@ -59,11 +67,15 @@ public struct cords_report * reset_cords_report(struct cords_report * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
+		sptr->monitor = (char*) 0;
 		sptr->service = (char*) 0;
-		sptr->title = (char*) 0;
-		sptr->description = (char*) 0;
+		sptr->control = (char*) 0;
+		sptr->contract = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->date = (char*) 0;
+		sptr->target = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -95,17 +107,29 @@ public int xmlin_cords_report(struct cords_report * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"monitor") ))
+		{
+			if ( wptr->value ) { sptr->monitor = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"service") ))
 		{
 			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"title") ))
+		else if (!( strcmp(wptr->name,"control") ))
 		{
-			if ( wptr->value ) { sptr->title = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->control = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"description") ))
+		else if (!( strcmp(wptr->name,"contract") ))
 		{
-			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->contract = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"type") ))
 		{
@@ -114,6 +138,10 @@ public int xmlin_cords_report(struct cords_report * sptr,struct xml_element * ep
 		else if (!( strcmp(wptr->name,"date") ))
 		{
 			if ( wptr->value ) { sptr->date = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"target") ))
+		{
+			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -134,11 +162,15 @@ public int rest_occi_cords_report(FILE * fh,struct cords_report * sptr,char * pr
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.monitor='%s'\r\n",prefix,nptr,(sptr->monitor?sptr->monitor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.title='%s'\r\n",prefix,nptr,(sptr->title?sptr->title:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.control='%s'\r\n",prefix,nptr,(sptr->control?sptr->control:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.contract='%s'\r\n",prefix,nptr,(sptr->contract?sptr->contract:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

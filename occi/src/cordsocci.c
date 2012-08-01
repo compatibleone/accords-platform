@@ -74,6 +74,7 @@
 #include "occievent.c"
 #include "occialert.c"
 #include "occimonitor.c"
+#include "occicontrol.c"
 
 #include "occiinterface.c"
 #include "occisession.c"

@@ -4,11 +4,15 @@
 struct	cords_report
 {
 	char *	id;
+	char *	name;
+	char *	monitor;
 	char *	service;
-	char *	title;
-	char *	description;
+	char *	control;
+	char *	contract;
+	char *	account;
 	char *	type;
 	char *	date;
+	char *	target;
 	int	state;
 };
 
