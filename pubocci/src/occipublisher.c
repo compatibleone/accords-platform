@@ -801,13 +801,28 @@ public	int	unpublish_occi_categories(
 public	int	occi_secure_AAA( char * user, char * password, char * agent, char * tls )
 {
 	struct	rest_header * hptr;
+	rest_log_message("occi_secure_AAA");
 	if ( Publisher.authorization )
+	{
+		rest_log_message("already authorized");
 		return( 0 );
+	}
 	else if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
+	{
+		rest_log_message("AAA login failure");
 		return( 403 );
+	}
 	else if (!( hptr = occi_client_authentication( Publisher.authorization )))
+	{
+		rest_log_message("AAA occi authentication failure");
 		return( 503 );
-	else	return( 0 );
+	}
+	else
+	{
+		rest_log_message("AAA OK");
+		rest_log_message( Publisher.authorization );
+		return( 0 );
+	}
 }
 
 /*	---------------------------------------------------------	*/
@@ -851,19 +866,16 @@ public	int	publishing_occi_server(
 	/* -------------------------------------------- */
 	/* handle transport layer security, if required */
 	/* -------------------------------------------- */
-	if ( tls )
+	if (!( rest_valid_string( tls ) ))
+		tls = (char *) 0;
+	else if (!( tlsconf = tls_configuration_load( tls ) ))
+		return( 40 );
+	else if ( tlsconf->authenticate )
 	{
-		if (!( strlen(tls) ))
-			tls = (char *) 0;
-		else if (!( tlsconf = tls_configuration_load( tls ) ))
-			return( 40 );
-		else if ( tlsconf->authenticate )
+		if ((user) && (password))
 		{
-			if ((user) && (password))
-			{
-				if ((status = occi_secure_AAA( user, password, agent, tls )) != 0)
-					return( status );
-			}
+			if ((status = occi_secure_AAA( user, password, agent, tls )) != 0)
+				return( status );
 		}
 	}
 
