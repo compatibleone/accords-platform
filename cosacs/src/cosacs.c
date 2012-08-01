@@ -716,14 +716,12 @@ private	int	intercept_identity( char * vptr )
 		return( 0 );
 	else if ( rest_valid_string( Cosacs.identity ) )
 		return(0);
-	else if (!( rest_valid_string( Cosacs.publisher ) ))
-		return(0);
 	else
 	{
 		sprintf(buffer,"http://%s:%u",vptr,Cosacs.restport);
 		if (!( Cosacs.identity = allocate_string( buffer ) ))
 			return(0); 
-		else	return( cosacs_use_publisher() );
+		else	return(0);
 	}
 }
 
@@ -736,7 +734,7 @@ private	int	intercept_publisher( char * vptr )
 		return(0);
 	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
 		return(0); 
-	else	return(0);
+	else	return( cosacs_use_publisher() );
 }
 
 /*	-------------------------------------------------	*/
