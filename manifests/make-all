@@ -38,6 +38,7 @@ if [ -z "$makesecurity" ]; then
 	cp build-config-cosacs-unsafe build-config-cosacs
 else
 	bash make-security
+	cp build-config-secure build-config
 	cp build-config-cosacs-secure build-config-cosacs
 fi
 echo "-------------------------------------------- "
