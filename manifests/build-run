@@ -3,7 +3,7 @@ echo "wget http://www.compatibleone.fr/accords-platform/${makesystem}/update-$1.
 echo "tar -xzvf update-$1.tgz" >> run-$1
 echo "export pubhost=\$accords_publisher_publisher_hostname" >> run-$1
 echo "export thisport=\$1" >> run-$1
-echo "bash build-config $1 europe \$cosacs \$pubhost $makesecurity " >> run-$1
+echo "bash build-config $1 europe \$cosacs \$pubhost " >> run-$1
 echo "install -d /home/cosacs/service" >> run-$1
 echo "install -d /home/cosacs/rest" >> run-$1
 echo "cp $1 /usr/local/bin" >> run-$1
