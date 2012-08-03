@@ -21,4 +21,5 @@ bash build-run procci
 bash build-run slam
 bash build-run paasprocci
 bash build-run cool
+bash build-run-tools
 

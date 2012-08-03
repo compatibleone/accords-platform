@@ -7,6 +7,10 @@
 <metric name="memory" period="60" samples="1" expression="top -b -n1 | grep Mem | grep total "/>
 <metric name="tasks" period="60" samples="1" expression="top -b -n1 | grep Tasks"/>
 <metric name="swap" period="60" samples="1" expression="top -b -n1 | grep Swap"/>
+<metric name="net:rx" period="60" samples="1" expression="ifconfig eth0 | grep RX"/>
+<metric name="net:tx" period="60" samples="1" expression="ifconfig eth0 | grep TX"/>
+<metric name="net:err" period="60" samples="1" expression="ifconfig eth0 | grep collisions"/>
+<metric name="net:status" period="60" samples="1" expression="ifconfig eth0 | grep Metric"/>
 
 </import>
 

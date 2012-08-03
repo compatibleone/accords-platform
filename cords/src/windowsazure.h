@@ -22,6 +22,13 @@ struct	windowsazure
 	char *	hostname;
 	char *	workload;
 
+	char *	node;
+	char *	architecture;
+	char *	driver;
+	char *	price;
+	char *	original;
+	char *	publicnetwork;
+
 	int	when;
 
 	int	state;

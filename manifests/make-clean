@@ -9,6 +9,10 @@ rm procci parser paprocci osprocci osocciprocci onprocci ezvm cosacs cosched cos
 rm cool paasprocci -f
 rm accords-*.xml -f
 rm sla-accords-*.xml -f
+rm co-parser co-broker co-resolver co-command -f
+rm testcp testcb testresolver command -f
+rm -r security -f 
+
 
 
 

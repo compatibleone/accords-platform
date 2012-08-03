@@ -27,6 +27,7 @@ private	char *	tls=(char *) 0;
 private	char *	publisher=(char *) 0;
 private	char * 	operator="accords";
 private	char *	zone="europe";
+private	char *	hostingservice="compatibleone";
 public	char *	default_operator()	{	return(operator);	}
 public	char *	default_zone()		{	return(zone);		}
 public	int	check_debug()		{	return(debug);		}
@@ -81,7 +82,7 @@ private	int	az_result( struct az_response * rptr )
 	else	return( failure(99,"no","result") );
 }
 
-private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7 )
+private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8, char * p9 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "CO-AZCLIENT/1.0";
@@ -99,8 +100,14 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "OS" ) ))
+			az_result( az_list_os_image() );
 		else if (!( strcasecmp( p2, "HOSTS" ) ))
-			az_result( az_list_servers() );
+			az_result( az_list_hosted_services() );
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+			az_result( az_list_network() );
+		else if (!( strcasecmp( p2, "VM" ) ))
+			az_result( az_list_vm( p3 ) );
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 			az_result( az_list_deployments(p3) );
 		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
@@ -124,11 +131,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = az_create_server_request( p3, p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_hosted_service_request( p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","request" ) );
 			else
 			{ 	
-				az_result( az_create_server( nomfic ) );
+				az_result( az_create_hosted_service( nomfic ) );
 				return( 0 );
 			}
 		}
@@ -139,6 +146,17 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			else
 			{ 	
 				az_result( az_create_deployment( nomfic, p7, p7 ) );
+				return( 0 );
+			}
+		}
+		else if  (!( strcasecmp( p2, "VM" ) ))
+		{
+
+			if (!( nomfic = az_create_vm_request( p4, p3, p5, p6, p7, p8, atoi(p9) ) ))
+				return( failure(27,"cannot create","vm deployment request" ) );
+			else
+			{ 	
+				az_result( az_create_vm( nomfic ) );
 				return( 0 );
 			}
 		}
@@ -174,7 +192,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
 			az_result( az_get_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
-			az_result( az_get_server( p3 ) );
+			az_result( az_get_hosted_service( p3 ) );
+		else if (!( strcasecmp( p2, "VM" ) ))
+			az_result( az_get_vm( p3, p4 ) );
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+			az_result( az_get_network_config() );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			az_result( az_get_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
@@ -192,8 +214,23 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = az_create_server_request( p2, p3, p4, personality, resource ) ))
-				az_result( az_update_server( p4, nomfic ) );
+			if (!( nomfic = az_create_hosted_service_request( p3, p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot create","affinity group request" ) );
+			else
+			{
+				az_result( az_update_hosted_service( p4, nomfic ) );
+				return(0);
+			}
+		}
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+		{
+			if (!( nomfic = az_create_network_config_request( p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot update","network config" ) );
+			else
+			{
+				az_result( az_update_network_config(  nomfic ) );
+				return(0);
+			}
 		}
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
@@ -205,13 +242,25 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
 			az_result( az_delete_deployment( p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
-			az_result( az_delete_server( p3 ) );
+			az_result( az_delete_hosted_service( p3 ) );
+		else if (!( strcasecmp( p2, "VM" ) ))
+			az_result( az_delete_vm( p3, p4 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			az_result( az_delete_affinity_group( p3 ) );
 		else if (!( strcasecmp( p2, "STORAGE" ) ))
 			az_result( az_delete_storage_service( p3 ) );
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+		{
+			if (!( nomfic = az_delete_network_config_request( p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot delete","network config" ) );
+			else
+			{
+				az_result( az_delete_network_config( nomfic ) );
+				return(0);
+			}
+		}
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -229,7 +278,7 @@ private	int	az_command(int argc, char * argv[] )
 	char *	thost="https://127.0.0.1:8080/";
 	char *  other="https://windows.azure.com/";
 	char *	agent="CO-AZCLIENT/1.0";
-	char *	version="2011-10-01";
+	char *	version="2012-03-01";
 	char * 	subscription="f346740d-e45e-42e9-80b8-4865f3a855d1";
 	char *	namespace="http://schemas.microsoft.com/windowsazure";
 	while ( argi < argc )
@@ -241,13 +290,18 @@ private	int	az_command(int argc, char * argv[] )
 			if ((status = az_initialise_client( user, pass, host, agent, version, tls,
 					namespace, subscription )) != 0)
 				return( failure( status, "initialising", "client" ) );
-			return( az_operation( aptr, 
+			else if (( status = az_initialise_service( hostingservice )) != 0)
+				return( failure( status, "initialising", "service" ) );
+			
+			else return( az_operation( aptr, 
 				( argi < argc ? argv[argi] : (char *) 0 ),
 				( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
 				( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),
 				( (argi+3) < argc ? argv[argi+3] : (char *) 0 ),
 				( (argi+4) < argc ? argv[argi+4] : (char *) 0 ),
-				( (argi+5) < argc ? argv[argi+5] : (char *) 0 ) ) );
+				( (argi+5) < argc ? argv[argi+5] : (char *) 0 ),
+				( (argi+6) < argc ? argv[argi+6] : (char *) 0 ),
+				( (argi+7) < argc ? argv[argi+7] : (char *) 0 ) ) );
 
 		}
 		else if (  *(++aptr) == '-' )
@@ -262,6 +316,8 @@ private	int	az_command(int argc, char * argv[] )
 				version = argv[argi++];
 			else if (!( strcasecmp( aptr,"host" ) ))
 				host = argv[argi++];
+			else if (!( strcasecmp( aptr,"service" ) ))
+				hostingservice = argv[argi++];
 			else if (!( strcasecmp( aptr,"agent" ) ))
 				agent = argv[argi++];
 			else if (!( strcasecmp( aptr,"tls" ) ))
@@ -291,33 +347,55 @@ private	int	az_command(int argc, char * argv[] )
 
 private	int	az_banner()
 {
-	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0a.0.03");
-	printf("\n   Beta Version 03/07/2012");
+	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0a.0.04");
+	printf("\n   Beta Version 03/08/2012");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   General Options ");
 	printf("\n");
 	printf("\n   --verbose, --debug   ");
-	printf("\n   --tls      <name>    ");
-	printf("\n   --host     <address> ");
-	printf("\n   --user     <username> ");
-	printf("\n   --password <password> ");
-	printf("\n   --agent    <name>     ");
-	printf("\n   --version  <value>    ");
+	printf("\n   --tls            <name>    ");
+	printf("\n   --host           <address> ");
+	printf("\n   --user           <username> ");
+	printf("\n   --password       <password> ");
+	printf("\n   --agent          <name>     ");
+	printf("\n   --hostingservice <name>     ");
+	printf("\n   --version        <value>    ");
 	printf("\n");
-	printf("\n   CRUD Operations ");
+	printf("\n   AZURE Operations ");
 	printf("\n");
-	printf("\n   LIST   [ HOSTS   | STORAGE  | OPERATIONS  | LOCATIONS ");
-	printf("\n            GROUPS  | PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   Hosted Service Operations: HOST");
+	printf("\n          LIST   HOSTS");
+	printf("\n          CREATE HOST <name> <description> <location> <group> ");
+	printf("\n          GET HOST <name> ");
+	printf("\n          UPDATE HOST <name> ");
+	printf("\n          DELETE HOST <name> \n");
+	printf("\n   Network Configuration Operations: NETWORK");
+	printf("\n          GET    NETWORK ");
+	printf("\n          UPDATE NETWORK <name> <group> <address> <label>");
+	printf("\n          LIST   NETWORK ");
+	printf("\n          DELETE NETWORK \n");
+	printf("\n   Deployment and Role Operations: VM");
+	printf("\n          LIST   VM <deployment>");
+	printf("\n          CREATE VM <deployment> <role> <image> <flavor> <network> <zone> <access> ");
+	printf("\n          GET    VM <deployment> <role>");
+	printf("\n          DELETE VM <deployment> <role>\n");
+	printf("\n   Affinity Group Operations: GROUP");
+	printf("\n          CREATE GROUP   <name> <description> <location>  ");
+	printf("\n          LIST   GROUP ");
+	printf("\n          DELETE GROUP <id> ");
+	printf("\n          GET    GROUP <id> \n");
+	printf("\n   Other Operations:");
+	printf("\n   LIST   [ STORAGE  | OPERATIONS  | LOCATIONS ");
+	printf("\n            PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   LIST   OS ");
 	printf("\n   LIST   [ DEPLOYMENT ] <host> " );
-	printf("\n   CREATE [ GROUP   <name> <description> <location>         ] ");
-	printf("\n   CREATE [ HOST    <name> <description> <location> <group> ] ");
 	printf("\n   CREATE [ STORAGE <name> <description> <location> <group> ] ");
 	printf("\n   CREATE [ DEPLOYMENT <name> <image> <configuration> <host> <slot> ] ");
-	printf("\n   GET    [ SUBSCRIPTION | HOST | GROUP | CERTIFICATE | STORAGE ] <id> ");
+	printf("\n   GET    [ SUBSCRIPTION | CERTIFICATE | STORAGE ] <id> ");
 	printf("\n   GET    [ DEPLOYMENT ] <host> <slot> " );
-	printf("\n   UPDATE HOST <id> ");
-	printf("\n   DELETE [ HOST | GROUP | STORAGE | CERTIFICATE | LOCATION ] <id> ");
+	printf("\n   GET    NETWORK ");
+	printf("\n   DELETE [ STORAGE | CERTIFICATE | LOCATION ] <id> ");
 	printf("\n   DELETE [ DEPLOYMENT ] <host> <slot> " );
 	printf("\n\n");
 	return( 0 );

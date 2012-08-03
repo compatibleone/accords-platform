@@ -19,17 +19,17 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _monitor_c_
-#define _monitor_c_
+#ifndef _control_c_
+#define _control_c_
 
 #include "element.h"
 
-#include "monitor.h"
+#include "control.h"
 
 /*	--------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ m o n i t o r 	*/
+/*	l i b e r a t e _ c o r d s _ c o n t r o l 	*/
 /*	--------------------------------------------	*/
-public struct cords_monitor * liberate_cords_monitor(struct cords_monitor * sptr)
+public struct cords_control * liberate_cords_control(struct cords_control * sptr)
 {
 	if ( sptr )
 	{
@@ -37,34 +37,28 @@ public struct cords_monitor * liberate_cords_monitor(struct cords_monitor * sptr
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->agreement )
-			 sptr->agreement = liberate(sptr->agreement);
-		if ( sptr->account )
-			 sptr->account = liberate(sptr->account);
-		if ( sptr->service )
-			 sptr->service = liberate(sptr->service);
-		if ( sptr->report )
-			 sptr->report = liberate(sptr->report);
+		if ( sptr->monitor )
+			 sptr->monitor = liberate(sptr->monitor);
+		if ( sptr->guarantee )
+			 sptr->guarantee = liberate(sptr->guarantee);
 		sptr = liberate( sptr );
 	}
-	return((struct cords_monitor *) 0);
+	return((struct cords_control *) 0);
 
 }
 
 /*	--------------------------------------	*/
-/*	r e s e t _ c o r d s _ m o n i t o r 	*/
+/*	r e s e t _ c o r d s _ c o n t r o l 	*/
 /*	--------------------------------------	*/
-public struct cords_monitor * reset_cords_monitor(struct cords_monitor * sptr)
+public struct cords_control * reset_cords_control(struct cords_control * sptr)
 {
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->agreement = (char*) 0;
-		sptr->account = (char*) 0;
-		sptr->service = (char*) 0;
-		sptr->report = (char*) 0;
-		sptr->controls =  0;
+		sptr->monitor = (char*) 0;
+		sptr->guarantee = (char*) 0;
+		sptr->probes =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -72,20 +66,20 @@ public struct cords_monitor * reset_cords_monitor(struct cords_monitor * sptr)
 }
 
 /*	--------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ m o n i t o r 	*/
+/*	a l l o c a t e _ c o r d s _ c o n t r o l 	*/
 /*	--------------------------------------------	*/
-public struct cords_monitor * allocate_cords_monitor()
+public struct cords_control * allocate_cords_control()
 {
-	struct cords_monitor * sptr;
-	if (!( sptr = allocate( sizeof( struct cords_monitor ) ) ))
+	struct cords_control * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_control ) ) ))
 		return( sptr );
-	else	return( reset_cords_monitor(sptr) );
+	else	return( reset_cords_control(sptr) );
 }
 
 /*	--------------------------------------	*/
-/*	x m l i n _ c o r d s _ m o n i t o r 	*/
+/*	x m l i n _ c o r d s _ c o n t r o l 	*/
 /*	--------------------------------------	*/
-public int xmlin_cords_monitor(struct cords_monitor * sptr,struct xml_element * eptr)
+public int xmlin_cords_control(struct cords_control * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -100,25 +94,17 @@ public int xmlin_cords_monitor(struct cords_monitor * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"agreement") ))
+		else if (!( strcmp(wptr->name,"monitor") ))
 		{
-			if ( wptr->value ) { sptr->agreement = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->monitor = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"account") ))
+		else if (!( strcmp(wptr->name,"guarantee") ))
 		{
-			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->guarantee = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"service") ))
+		else if (!( strcmp(wptr->name,"probes") ))
 		{
-			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"report") ))
-		{
-			if ( wptr->value ) { sptr->report = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"controls") ))
-		{
-			if ( wptr->value ) { sptr->controls = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->probes = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -130,9 +116,9 @@ public int xmlin_cords_monitor(struct cords_monitor * sptr,struct xml_element * 
 }
 
 /*	----------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ m o n i t o r 	*/
+/*	r e s t _ o c c i _ c o r d s _ c o n t r o l 	*/
 /*	----------------------------------------------	*/
-public int rest_occi_cords_monitor(FILE * fh,struct cords_monitor * sptr,char * prefix, char * nptr)
+public int rest_occi_cords_control(FILE * fh,struct cords_control * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -140,14 +126,12 @@ public int rest_occi_cords_monitor(FILE * fh,struct cords_monitor * sptr,char * 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.report='%s'\r\n",prefix,nptr,(sptr->report?sptr->report:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.controls='%u'\r\n",prefix,nptr,sptr->controls);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.monitor='%s'\r\n",prefix,nptr,(sptr->monitor?sptr->monitor:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.guarantee='%s'\r\n",prefix,nptr,(sptr->guarantee?sptr->guarantee:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _monitor_c_ */
+#endif	/* _control_c_ */

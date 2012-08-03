@@ -57,7 +57,7 @@ private	int	read_secure_cosacs()
 	if ( _secure_cosacs != -1 )
 		return( _secure_cosacs );
 	else if (!( eptr = getenv("SECURECOSACS") ))
-		return((_secure_cosacs=0));
+		return((_secure_cosacs=1));
 	else 	return((_secure_cosacs=atoi(eptr)));
 }
 

@@ -41,7 +41,7 @@ public struct occi_response * create_new_domain(char * domain, char * agent, cha
 	if ( check_verbose() )
 		printf("   OCCI Conets ( %s, %s )\n","domain",agent);
 
-        initialise_occi_resolver( tls , (char *) 0, (char *) 0, (char *) 0 );
+        initialise_occi_resolver( _DEFAULT_PUBLISHER , (char *) 0, (char *) 0, (char *) 0 );
         
 	if (!( aptr = occi_resolver( "domain" , agent ) ))
 	{ 

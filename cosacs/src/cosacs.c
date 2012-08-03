@@ -30,9 +30,11 @@
 #include "occibuilder.h"
 #include "cordslang.h"
 
-#define	_COSACS_START "cosacs:start"
+#define	_COSACS_START 		"cosacs:start"
+#define	_COSACS_SHITDOWN	"cosacs:shutdown"
+#define	_COSACS_LOCAL		"127.0.0.1"
 
-struct	accords_configuration Cosacs = {
+private	struct	accords_configuration Cosacs = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -50,6 +52,8 @@ struct	accords_configuration Cosacs = {
 	(struct occi_category *) 0
 	};
 
+private	char * CosacsContract=(char *) 0;
+
 public	int	check_debug()		{	return(Cosacs.debug);		}
 public	int	check_verbose()		{	return(Cosacs.verbose);		}
 public	char *	default_publisher()	{	return(Cosacs.publisher);	}
@@ -57,6 +61,9 @@ public	char *	default_operator()	{	return(Cosacs.operator);	}
 public	char *	default_tls()		{	return(Cosacs.tls);		}
 public	char *	default_zone()		{	return(Cosacs.zone);		}
 
+/*	---------------------------------------------	*/  
+/*			f a i l u r e			*/
+/*	---------------------------------------------	*/  
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -83,16 +90,18 @@ private	void	cosacs_load()
 	return;
 }
 
-private	int	banner()
+/*	---------------------------------------------	*/  
+/*		c o s a c s _ b a n n e r		*/
+/*	---------------------------------------------	*/  
+private	int	cosacs_banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.07");
-	printf("\n   Beta Version : 27/07/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.08");
+	printf("\n   Beta Version : 01/08/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
 	return(0);
-
 }
 
 /*	------------------------------------------------------------------	*/
@@ -264,10 +273,6 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		return;
 	}
 }
-
-/*	------------------------------------------------------------------	*/
-/* 	  actions and methods required for the cosacs instance category		*/
-/*	------------------------------------------------------------------	*/
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ p r o b e _ w o r k e r			*/
@@ -676,6 +681,129 @@ private	struct	occi_interface	cords_script_interface = {
 	delete_cords_script
 	};
 
+/*	-------------------------------------------------	*/
+/*	     c o s a c s _ u s e _ p u b l i s h e r		*/
+/*	-------------------------------------------------	*/
+/*	this is necessary when security enforcement is to	*/
+/*	be performed by all cooperating modules requiring	*/
+/*	the standard authentication, authorization action	*/
+/*	to be performed.					*/
+/*	-------------------------------------------------	*/
+private	int	cosacs_use_publisher()
+{
+	char *	tls;
+	if (!( rest_valid_string( Cosacs.publisher ) ))
+		return( 0 );
+	else
+	{
+		initialise_occi_resolver ( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+		initialise_occi_publisher( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+	}
+
+	if (!( rest_valid_string((tls = default_tls()) )))
+		return( 0 );
+	else if (!( rest_valid_string( Cosacs.user ) ))
+		return( 0 );
+	else if (!( rest_valid_string( Cosacs.password ) ))
+		return( 0 );
+	else	return( occi_secure_AAA( Cosacs.user, Cosacs.password, _CORDS_CONTRACT_AGENT, tls ) );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ i d e n t i t y		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_identity( char * vptr )
+{
+	char	buffer[1024];
+
+	if (!( strcmp( vptr, _COSACS_LOCAL ) ))
+		return( 0 );
+	else if ( rest_valid_string( Cosacs.identity ) )
+		return(0);
+	else
+	{
+		sprintf(buffer,"http://%s:%u",vptr,Cosacs.restport);
+		if (!( Cosacs.identity = allocate_string( buffer ) ))
+			return(0); 
+		else	return(0);
+	}
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ p u b l i s h e r		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_publisher( char * vptr )
+{
+	if ( rest_valid_string( Cosacs.publisher ) )
+		return(0);
+	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
+		return(0); 
+	else	return( cosacs_use_publisher() );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ c o n t r a c t		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_contract( char * vptr )
+{
+	if ( rest_valid_string( CosacsContract ) )
+		return(0);
+	else if (!( CosacsContract = allocate_string( vptr ) ))
+		return(0); 
+	else	return(0);
+}
+
+/*	-------------------------------------------------	*/
+/*	  i n t e r c e p t _ a u t h o r i z a t i o n		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_authorization( char * vptr )
+{
+	return( occi_resolve_authorization( vptr ) );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ m e t a d a t a		*/
+/*	-------------------------------------------------	*/
+/*	interception of cosacs specific metadata is to be	*/
+/*	performed for the recovery of operational values	*/
+/*	that are know only to the contract negotiator		*/
+/*	that spawned the hosting virtual machine.		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_metadata( char * nptr, char * vptr )
+{
+	/* --------------------------------- */
+	/* no name nor value then do nothing */
+	/* --------------------------------- */
+	if (!( nptr )) 		return(0);
+	else if (!( vptr ))	return(0);
+
+	/* ----------------------------------- */
+	/* detect the cosacs identity variable */
+	/* ----------------------------------- */
+	if (!( strcmp( nptr,"cosacs" ) ))
+		return( intercept_identity( vptr ) );
+
+	/* ------------------------------------ */
+	/* detect the cosacs publisher identity */
+	/* ------------------------------------ */
+	else if (!( strcmp( nptr,"publisher" ) ))
+		return( intercept_publisher( vptr ) );
+
+	/* ------------------------------------------ */
+	/* detect the cosacs host contract identifier */
+	/* ------------------------------------------ */
+	else if (!( strcmp( nptr,"contract" ) ))
+		return( intercept_contract( vptr ) );
+
+	/* -------------------------------------------- */
+	/* detect the callers authorization declaration */
+	/* -------------------------------------------- */
+	else if (!( strcmp( nptr,"authorization" ) ))
+		return( intercept_authorization( vptr ) );
+
+	else	return(0);
+}
+
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
@@ -683,7 +811,6 @@ private	int	create_metadata(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;
-	char	buffer[1024];
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -692,18 +819,9 @@ private	int	create_metadata(struct occi_category * optr, void * vptr)
 		return( 0 );
 	else if (!( rest_valid_string( pptr->value ) ))
 		return( 0 );
-	else if ( strcmp( pptr->name,"cosacs" ) != 0 )
-		return(0);
-	else if ( rest_valid_string( Cosacs.identity ) )
-		return( 0 );
-	else
-	{
-		sprintf(buffer,"http://%s:%u",pptr->value,Cosacs.restport);
-		if (!( Cosacs.identity = allocate_string( buffer ) ))
-			return(0); 
-		else	return(0);
-	}
+	else	return( intercept_metadata( pptr->name, pptr->value ) );
 }
+
 
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ c o n t r a c t  		*/
@@ -754,7 +872,6 @@ private	struct	occi_interface	cords_metadata_interface =
 	update_metadata,
 	delete_metadata
 };
-
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ o p e r a t i o n				*/
@@ -827,8 +944,7 @@ private	int	cosacs_operation( char * nptr )
 	/* ------------------------------------------ */
 	rest_initialise_log(Cosacs.monitor);
 
-	if ((!( Cosacs.identity ))
-	||  (!( strlen( Cosacs.identity ))) )
+	if (!( rest_valid_string( Cosacs.identity ) ))
 		return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first, (char *) 0 ) );
 	else
 	{
@@ -844,9 +960,9 @@ private	int	cosacs_operation( char * nptr )
 }
 
 /*	------------------------------------------------------------------	*/
-/*				c o s a c s 					*/
+/*			c o s a c s _ c o m m a n d				*/
 /*	------------------------------------------------------------------	*/
-private	int	cosacs(int argc, char * argv[] )
+private	int	cosacs_command(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
@@ -888,8 +1004,8 @@ private	int	cosacs(int argc, char * argv[] )
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
-		return( banner() );
-	else	return( cosacs( argc, argv ) );
+		return( cosacs_banner() );
+	else	return( cosacs_command( argc, argv ) );
 }
 
 

@@ -35,9 +35,11 @@ bash make-clean
 if [ -z "$makesecurity" ]; then
 	echo "security not required"
 	cp build-config-unsafe build-config
+	cp build-config-cosacs-unsafe build-config-cosacs
 else
 	bash make-security
 	cp build-config-secure build-config
+	cp build-config-cosacs-secure build-config-cosacs
 fi
 echo "-------------------------------------------- "
 echo "building accords platform manifests"

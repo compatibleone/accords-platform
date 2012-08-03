@@ -136,16 +136,24 @@ private void autoload_cords_report_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "monitor" )) != (struct xml_atribut *) 0)
+				pptr->monitor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
 				pptr->service = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "title" )) != (struct xml_atribut *) 0)
-				pptr->title = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
-				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "control" )) != (struct xml_atribut *) 0)
+				pptr->control = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "contract" )) != (struct xml_atribut *) 0)
+				pptr->contract = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
 				pptr->type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "date" )) != (struct xml_atribut *) 0)
 				pptr->date = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
+				pptr->target = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -175,20 +183,32 @@ public  void autosave_cords_report_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," monitor=%c",0x0022);
+		fprintf(h,"%s",(pptr->monitor?pptr->monitor:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," service=%c",0x0022);
 		fprintf(h,"%s",(pptr->service?pptr->service:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," title=%c",0x0022);
-		fprintf(h,"%s",(pptr->title?pptr->title:""));
+		fprintf(h," control=%c",0x0022);
+		fprintf(h,"%s",(pptr->control?pptr->control:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," description=%c",0x0022);
-		fprintf(h,"%s",(pptr->description?pptr->description:""));
+		fprintf(h," contract=%c",0x0022);
+		fprintf(h,"%s",(pptr->contract?pptr->contract:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," type=%c",0x0022);
 		fprintf(h,"%s",(pptr->type?pptr->type:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," date=%c",0x0022);
 		fprintf(h,"%s",(pptr->date?pptr->date:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," target=%c",0x0022);
+		fprintf(h,"%s",(pptr->target?pptr->target:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -214,16 +234,24 @@ private void set_cords_report_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "monitor" ) ))
+			pptr->monitor = allocate_string(vptr);
 		if (!( strcmp( nptr, "service" ) ))
 			pptr->service = allocate_string(vptr);
-		if (!( strcmp( nptr, "title" ) ))
-			pptr->title = allocate_string(vptr);
-		if (!( strcmp( nptr, "description" ) ))
-			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "control" ) ))
+			pptr->control = allocate_string(vptr);
+		if (!( strcmp( nptr, "contract" ) ))
+			pptr->contract = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
 			pptr->type = allocate_string(vptr);
 		if (!( strcmp( nptr, "date" ) ))
 			pptr->date = allocate_string(vptr);
+		if (!( strcmp( nptr, "target" ) ))
+			pptr->target = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -257,6 +285,20 @@ private int pass_cords_report_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
+	if (( fptr->monitor )
+	&&  (strlen( fptr->monitor ) != 0)) {
+		if (!( pptr->monitor ))
+			return(0);
+		else if ( strcmp(pptr->monitor,fptr->monitor) != 0)
+			return(0);
+		}
 	if (( fptr->service )
 	&&  (strlen( fptr->service ) != 0)) {
 		if (!( pptr->service ))
@@ -264,18 +306,25 @@ private int pass_cords_report_filter(
 		else if ( strcmp(pptr->service,fptr->service) != 0)
 			return(0);
 		}
-	if (( fptr->title )
-	&&  (strlen( fptr->title ) != 0)) {
-		if (!( pptr->title ))
+	if (( fptr->control )
+	&&  (strlen( fptr->control ) != 0)) {
+		if (!( pptr->control ))
 			return(0);
-		else if ( strcmp(pptr->title,fptr->title) != 0)
+		else if ( strcmp(pptr->control,fptr->control) != 0)
 			return(0);
 		}
-	if (( fptr->description )
-	&&  (strlen( fptr->description ) != 0)) {
-		if (!( pptr->description ))
+	if (( fptr->contract )
+	&&  (strlen( fptr->contract ) != 0)) {
+		if (!( pptr->contract ))
 			return(0);
-		else if ( strcmp(pptr->description,fptr->description) != 0)
+		else if ( strcmp(pptr->contract,fptr->contract) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
 	if (( fptr->type )
@@ -290,6 +339,13 @@ private int pass_cords_report_filter(
 		if (!( pptr->date ))
 			return(0);
 		else if ( strcmp(pptr->date,fptr->date) != 0)
+			return(0);
+		}
+	if (( fptr->target )
+	&&  (strlen( fptr->target ) != 0)) {
+		if (!( pptr->target ))
+			return(0);
+		else if ( strcmp(pptr->target,fptr->target) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -308,19 +364,31 @@ private struct rest_response * cords_report_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.monitor=%s",optr->domain,optr->id,pptr->monitor);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.service=%s",optr->domain,optr->id,pptr->service);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.title=%s",optr->domain,optr->id,pptr->title);
+	sprintf(cptr->buffer,"%s.%s.control=%s",optr->domain,optr->id,pptr->control);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.contract=%s",optr->domain,optr->id,pptr->contract);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.date=%s",optr->domain,optr->id,pptr->date);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.target=%s",optr->domain,optr->id,pptr->target);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -730,15 +798,23 @@ public struct occi_category * occi_cords_report_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_cords_report_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "monitor",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "title",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "control",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "contract",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "date",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -777,6 +853,28 @@ public struct rest_header *  cords_report_occi_headers(struct cords_report * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_report.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_report.monitor='%s'\r\n",(sptr->monitor?sptr->monitor:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_report.service='%s'\r\n",(sptr->service?sptr->service:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -788,7 +886,7 @@ public struct rest_header *  cords_report_occi_headers(struct cords_report * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_report.title='%s'\r\n",(sptr->title?sptr->title:""));
+	sprintf(buffer,"occi.cords_report.control='%s'\r\n",(sptr->control?sptr->control:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -799,7 +897,18 @@ public struct rest_header *  cords_report_occi_headers(struct cords_report * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_report.description='%s'\r\n",(sptr->description?sptr->description:""));
+	sprintf(buffer,"occi.cords_report.contract='%s'\r\n",(sptr->contract?sptr->contract:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_report.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -822,6 +931,17 @@ public struct rest_header *  cords_report_occi_headers(struct cords_report * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_report.date='%s'\r\n",(sptr->date?sptr->date:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_report.target='%s'\r\n",(sptr->target?sptr->target:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

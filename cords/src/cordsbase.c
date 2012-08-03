@@ -83,6 +83,7 @@
 #include "publication.c"
 
 #include "monitor.c"
+#include "control.c"
 #include "event.c"
 #include "report.c"
 #include "optimise.c"

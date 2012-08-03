@@ -4,9 +4,12 @@
 struct	cords_monitor
 {
 	char *	id;
+	char *	name;
+	char *	agreement;
+	char *	account;
 	char *	service;
-	char *	type;
 	char *	report;
+	int	controls;
 	int	state;
 };
 
