@@ -2,7 +2,7 @@ bash build-update-cosacs
 bash build-update publisher
 bash build-update coss cords_user.xml
 bash build-update comons
-bash build-update coobas
+bash build-update coobas cords_price.xml
 bash build-update coes
 bash build-update coees
 bash build-update conets

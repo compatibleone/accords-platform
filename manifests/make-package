@@ -2,7 +2,7 @@ bash build-package-cosacs
 bash build-package publisher
 bash build-package coss cords_user.xml
 bash build-package comons
-bash build-package coobas
+bash build-package coobas cords_price.xml
 bash build-package coes
 bash build-package coees
 bash build-package conets
