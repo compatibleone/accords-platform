@@ -286,7 +286,7 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ w i n d o w s a z u r e _ i m a g e   		*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr )
+private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, struct windowsazure * pptr )
 {
 	struct	az_image_infos	request;
 	struct	az_image_infos	image;
@@ -331,7 +331,7 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr )
 			continue;
 		else if ( strcmp( dptr->name, "OSImage" ) != 0 )
 			continue;
-		else if (!( bptr = document_element( dptr, "Label" ) ))
+		else if (!( bptr = document_element( dptr, "Name" ) ))
 		{
 			image.id = liberate( image.id );
 			continue;
@@ -347,16 +347,19 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr )
 		}
 		else
 		{
-			liberate( iname );
+			pptr->image = iname;
 			liberate( vptr );
 		}
 
-		if (!( bptr = document_element( dptr, "Name" ) ))
+		if (!( bptr = document_element( dptr, "MediaLink" ) ))
 			return((char *) 0);
 		else if (!( vptr = occi_unquoted_value(bptr->value)))
 			return((char *) 0);
-		else 	return( vptr );
-	
+		else 	
+		{
+			pptr->media = vptr;
+			return( pptr->image );
+		}
 	}
 
 	liberate( iname );
@@ -376,10 +379,10 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr )
 		else if ( strcmp( dptr->name, "OSImage" ) != 0 )
 			continue;
 		memset( &image, 0, sizeof( struct az_image_infos ));
-		if (!( bptr = document_element( dptr, "Label" ) ))
+		if (!( bptr = document_element( dptr, "Name" ) ))
 			continue;
 		else	image.name = occi_unquoted_value(bptr->value);
-		if (!( bptr = document_element( dptr, "Name" ) ))
+		if (!( bptr = document_element( dptr, "MediaLink" ) ))
 		{
 			image.name = liberate( image.name );
 			continue;
@@ -399,11 +402,9 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr )
 			continue;
 		}
 	}
-	if ( best.name )
-		best.name = liberate( best.name );
-	if (!( best.id ))
-		return( best.id );
-	else 	return( best.id );
+	pptr->image = best.name;
+	pptr->media = best.id;
+	return( pptr->image );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -499,9 +500,9 @@ public	int	create_windowsazure_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = az_list_os_images() ))
+	else if (!( contract.images = az_list_os_disks() ))
 		return( terminate_windowsazure_contract( 1585, &contract ) );
-	else if (!( pptr->image = resolve_windowsazure_image( &contract ) ))
+	else if (!( pptr->image = resolve_windowsazure_image( &contract, pptr ) ))
 		return( terminate_windowsazure_contract( 1586, &contract ) );
 	else if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_windowsazure_contract( 1587, &contract ) );

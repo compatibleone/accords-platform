@@ -264,7 +264,8 @@ public	char * az_create_vm_request(
 	/* 	struct os_subscription * subptr,	*/
 	char * name,		
 	char * label,		
-	char * image,		
+	char * image,	
+	char * media,	
 	char * flavor,		
 	char * network,		
 	char * zone,		

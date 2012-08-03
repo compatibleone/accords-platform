@@ -10,6 +10,7 @@ struct	windowsazure
 	char *	flavor;
 	char *	image;
 	char *	profile;
+	char *	media;
 
 	char *	number;
 	char *	access;

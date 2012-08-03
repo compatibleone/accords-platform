@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiwindowsazure_c_
@@ -142,6 +144,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "media" )) != (struct xml_atribut *) 0)
+				pptr->media = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
@@ -216,6 +220,9 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," media=%c",0x0022);
+		fprintf(h,"%s",(pptr->media?pptr->media:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
@@ -300,6 +307,8 @@ private void set_windowsazure_field(
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
+		if (!( strcmp( nptr, "media" ) ))
+			pptr->media = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
@@ -393,6 +402,13 @@ private int pass_windowsazure_filter(
 		if (!( pptr->profile ))
 			return(0);
 		else if ( strcmp(pptr->profile,fptr->profile) != 0)
+			return(0);
+		}
+	if (( fptr->media )
+	&&  (strlen( fptr->media ) != 0)) {
+		if (!( pptr->media ))
+			return(0);
+		else if ( strcmp(pptr->media,fptr->media) != 0)
 			return(0);
 		}
 	if (( fptr->number )
@@ -534,6 +550,9 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.media=%s",optr->domain,optr->id,pptr->media);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
@@ -1002,6 +1021,8 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "media",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
@@ -1107,6 +1128,17 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.profile='%s'\r\n",(sptr->profile?sptr->profile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.media='%s'\r\n",(sptr->media?sptr->media:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1311,4 +1343,4 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 
 }
 
-#endif	/* _windowsazure_c_ */
+#endif	/* _occiwindowsazure_c_ */

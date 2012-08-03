@@ -2660,6 +2660,7 @@ public	char * az_create_vm_request(
 	char * name,		/* the identity of the server 	*/
 	char * label,		/* the contract ID of the server*/
 	char * image,		/* the server image identifier  */
+	char * media,		/* the media link to the image  */
 	char * flavor,		/* the server machine flavour	*/
 	char * network,		/* the network groul		*/
 	char * zone,		/* an eventual locality zone	*/
@@ -2790,19 +2791,24 @@ public	char * az_create_vm_request(
 			/* --------------------------- */
 			if ( option & _AZURE_HARDDISK )
 			{
-				fprintf(h,"<DataVirtualHardDisk/>\n");
+				fprintf(h,"\t\t<DataVirtualHardDisk/>\n");
 			}
-			fprintf(h,"<OSVirtualHardDisk>\n");
-			fprintf(h,"<HostCaching>%s</HostCaching>\n",
+			fprintf(h,"\t\t<OSVirtualHardDisk>\n");
+			fprintf(h,"\t\t<HostCaching>%s</HostCaching>\n",
 				( option & _AZURE_READONLY ? "ReadOnly" : "ReadWrite" ));
 
 			/* <DiskLabel>os-disk-label</DiskLabel> */
 			/* <DiskName>new-or-existing-disk-name</DiskName> */
-			/* <MediaLink>url-of-the-blob-containing-the-os-disk</MediaLink> */
 
-			fprintf(h,"<SourceImageName>%s</SourceImageName>\n",image);
-			fprintf(h,"</OSVirtualHardDisk>\n");
-			fprintf(h,"<RoleSize>%s</RoleSize>\n",flavor);
+			if ( rest_valid_string( media ) )
+				fprintf(h,"\t\t<MediaLink>%s</MediaLink>\n",media);
+			if ( rest_valid_string( image ) )
+				fprintf(h,"\t\t<SourceImageName>%s</SourceImageName>\n",image);
+
+			fprintf(h,"\t\t</OSVirtualHardDisk>\n");
+
+			if ( rest_valid_string( flavor ) )
+				fprintf(h,"\t\t<RoleSize>%s</RoleSize>\n",flavor);
 
 		fprintf(h,"\t</Role>\n");
 		fprintf(h,"\t</RoleList>\n");

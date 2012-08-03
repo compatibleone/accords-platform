@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _windowsazure_c_
@@ -41,6 +43,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
+		if ( sptr->media )
+			 sptr->media = liberate(sptr->media);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
 		if ( sptr->access )
@@ -91,6 +95,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
+		sptr->media = (char*) 0;
 		sptr->number = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->rootpass = (char*) 0;
@@ -154,6 +159,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		else if (!( strcmp(wptr->name,"profile") ))
 		{
 			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"media") ))
+		{
+			if ( wptr->value ) { sptr->media = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"number") ))
 		{
@@ -246,6 +255,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.media='%s'\r\n",prefix,nptr,(sptr->media?sptr->media:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
@@ -268,4 +278,4 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 
 }
 
-#endif	/* _windowsazure_c_ */
+#endif	/* _windowsazure_cwindowsazure_c_ */

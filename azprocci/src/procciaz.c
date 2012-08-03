@@ -205,7 +205,7 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
 	else if (!( filename = az_create_vm_request(
 		pptr->name, pptr->id,
-		pptr->image, pptr->flavor,
+		pptr->image, pptr->media, pptr->flavor,
 		pptr->publicnetwork,
 		(char *) 0, 0 )))
 		return( rest_html_response( aptr, 500, "Error Creating WINDOWS AZURE VM Request" ) );
