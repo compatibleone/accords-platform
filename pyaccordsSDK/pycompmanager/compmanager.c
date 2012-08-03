@@ -542,6 +542,14 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        fprintf(f,"\t\telse pFunc = PyDict_GetItemString(pDict,\"%s\");\n",pelem->value);
        fprintf(f,"\t\tif(pFunc == NULL) printf(\"error: failed to load %s function in %s module\\n\");\n",pelem->value,categoryName);
        fprintf(f,"\t\telse result=PyObject_CallFunction(pFunc,\"s\",sendstr);\n");
+       
+       //Error handling
+       fprintf(f,"\t\tif (PyErr_Occurred());\n");
+       fprintf(f,"\t\t{\n");
+       fprintf(f,"\t\t\tPyErr_Print();\n");
+       fprintf(f,"\t\t\treturn (aptr,1388,\"Python syntax error in file %sAction.c\");\n",categoryName);
+       fprintf(f,"\t\t}\n");
+       
        fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
        fprintf(f,"\t\tPy_DECREF(pModule);\n");
        fprintf(f,"\t\tPy_DECREF(pName);\n");
@@ -852,6 +860,15 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       fprintf(f,"\t\telse pFunc = PyDict_GetItemString(pDict,\"%s\");\n",funcName[j]);
       fprintf(f,"\t\tif(pFunc == NULL) printf(\"error: failed to load %s function in %s module\\n\");\n",funcName[j],categoryName);
       fprintf(f,"\t\telse result=PyObject_CallFunction(pFunc,\"s\",sendstr);\n");
+      
+      //Error handling
+      fprintf(f,"\t\tif (PyErr_Occurred());\n");
+      fprintf(f,"\t\t{\n");
+      fprintf(f,"\t\t\tPyErr_Print();\n");
+      fprintf(f,"\t\t\treturn 0;\n");
+      fprintf(f,"\t\t}\n");
+
+      
       fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
       fprintf(f,"\t\tPy_DECREF(pModule);\n");
       fprintf(f,"\t\tPy_DECREF(pName);\n");
