@@ -150,13 +150,14 @@ private	int	connect_windowsazure_image( struct az_response * rptr,struct windows
 }
 
 /*	--------------------------------------------------------	*/
-/* 	     c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
+/* 	 c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
 private	int	connect_windowsazure_server( struct az_response * rptr,struct windowsazure * pptr )
 {
 	struct	az_response * zptr;
 	struct	az_response * yptr;
 	char *	vptr;
+	char	buffer[2048];
 	if (!( pptr ))
 		return( 118 );
 	else
@@ -165,15 +166,21 @@ private	int	connect_windowsazure_server( struct az_response * rptr,struct window
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		pptr->when = time((long *) 0);
-		pptr->state = _OCCI_RUNNING;
-		autosave_windowsazure_nodes();
+		sprintf(buffer,"%s.compatibleone.fr",pptr->id);
+		if (!( pptr->hostname = allocate_string( buffer) ))
+			return( 27 );
+		else
+		{
+			pptr->when = time((long *) 0);
+			pptr->state = _OCCI_RUNNING;
+			autosave_windowsazure_nodes();
+		}
 		return(0);
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	      s t a r t  _ w i n d o w s a z u r e	  	*/
+/* 	   s t a r t  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * start_windowsazure(
 		struct occi_category * optr, 
@@ -182,19 +189,61 @@ private	struct	rest_response * start_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
+	struct	xml_element * eptr;
+	struct	az_response * azptr;
 	struct	windowsazure * pptr;
-	int		status;
-	char	*	filename;
-	char 	*	personality="";
-	char 	*	resource=_CORDS_LAUNCH_CFG;
+	int	status;
+	char	* filename;
+	char	reference[512];
+	char	buffer[2048];
+
 	if (!( pptr = vptr ))
-	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	 	return( rest_html_response( aptr, 404, "WINDOWS AZURE Invalid Action" ) );
 	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
+	else if (!( filename = az_create_vm_request(
+		pptr->name, pptr->id,
+		pptr->image, pptr->flavor,
+		pptr->publicnetwork,
+		(char *) 0, 0 )))
+		return( rest_html_response( aptr, 500, "Error Creating WINDOWS AZURE VM Request" ) );
+	else if (!( azptr = az_create_vm( filename ) ))
+		return( rest_html_response( aptr, 501, "Error Creating WINDOWS AZURE VM" ) );
+	else if (!( azptr->response ))
+	{
+		azptr = liberate_az_response( azptr );
+		return( rest_html_response( aptr, 501, "No Response Creating WINDOWS AZURE VM" ) );
+	}
+	else if ((status = azptr->response->status) > 299 )
+	{
+		if (!( azptr->xmlroot ))
+			strcpy(buffer,"Failure Creating WINDOWS AZURE VM");
+		else if (!( eptr = document_element( azptr->xmlroot, "Message" ) ))
+			strcpy(buffer,"Failure Creating WINDOWS AZURE VM");
+		else	strcpy(buffer,eptr->value);
+		azptr = liberate_az_response( azptr );
+		return( rest_html_response( aptr, status, buffer ) );
+	}
+	else if ((status = connect_windowsazure_server( azptr, pptr )) != 0)
+	{
+		azptr = liberate_az_response( azptr );
+		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
+	}
+	else
+	{
+		pptr->when = time((long *) 0);
+		pptr->state = _OCCI_RUNNING;
+		autosave_windowsazure_nodes();
+		azptr = liberate_az_response( azptr );
+		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+		if (!( rest_valid_string( pptr->price ) ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=start", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -207,27 +256,27 @@ private	struct	rest_response * save_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
-	int		status;
+	struct	az_response * azptr;
+	int	status;
 	struct	windowsazure * pptr;
-	char	*	filename;
+	char	* filename;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = az_create_image_request( pptr->name, pptr->number ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = az_create_image( filename ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+/*	else if (!( filename = az_create_image_request( pptr->name, pptr->number ) ))	*/
+/*	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		*/
+/*	else if (!( azptr = az_create_image( filename ) ))				*/
+/*	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		*/
 	else
 	{
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_windowsazure_image( osptr, pptr );
-		osptr = liberate_az_response( osptr );
+		status = connect_windowsazure_image( azptr, pptr );
+		azptr = liberate_az_response( azptr );
 		if (!( status ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
@@ -235,7 +284,7 @@ private	struct	rest_response * save_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      s t o p  _ w i n d o w s a z u r e	  	*/
+/* 	     s t o p  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * stop_windowsazure(
 		struct occi_category * optr, 
@@ -244,24 +293,30 @@ private	struct	rest_response * stop_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
-	int		status;
+	char	reference[512];
+	struct	az_response * azptr;
+	int	status;
 	struct	windowsazure * pptr;
 	if (!( pptr = vptr ))
-	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	 	return( rest_html_response( aptr, 404, "Invalid WINDOWS AZUREAction" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
+		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
+	else if (!( azptr = az_delete_vm( pptr->id, pptr->name )))
+	 	return( rest_html_response( aptr, 504, "Error Deleting WINDOWS AZURE VM" ) );
 	else
 	{
-		if ( pptr->state != _OCCI_IDLE )
-		{
-			reset_windowsazure_server( pptr );
-			pptr->when = time((long *) 0);
-			osptr = liberate_az_response( osptr );
-		}
-		return( rest_html_response( aptr, 200, "OK" ) );
+		reset_windowsazure_server( pptr );
+		pptr->when = time((long *) 0);
+		autosave_windowsazure_nodes();
+		azptr = liberate_az_response( azptr );
+		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+		if (!( rest_valid_string( pptr->price ) ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=stop", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 

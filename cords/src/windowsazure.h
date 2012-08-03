@@ -29,6 +29,8 @@ struct	windowsazure
 	char *	original;
 	char *	publicnetwork;
 
+	char *	account;
+
 	int	when;
 
 	int	state;

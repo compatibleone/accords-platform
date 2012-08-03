@@ -223,86 +223,6 @@ private	char *	resolve_windowsazure_flavor( struct cords_az_contract * cptr )
 
 }
 
-/*	---------------------------------------------------	*/
-/*		w i n d o w s a z u r e _ i m a g e _ i d		*/
-/*	---------------------------------------------------	*/
-private	char *	windowsazure_image_id( char * href )
-{
-	struct	url * uptr;
-	char *	result;
-	char *	work;
-	char *	number;
-	if (!( href ))
-		return( href );
-	else if (!( uptr = analyse_url( href ) ))
-		return( liberate( href ) );
-	else if (!( uptr->object ))
-	{
-		uptr = liberate_url( uptr );
-		return( liberate( href ) );
-	}
-	else if (!( result = allocate_string( uptr->object ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( liberate( href ) );
-	}
-	else
-	{
-		uptr = liberate_url( uptr );
-		href = liberate( href );
-		for (	number=work=result;
-			*work != 0;
-			work++)
-		{
-			if ( *work == '/' )
-				number = (work+1);
-		}
-		work = allocate_string( number );
-		liberate( result );
-		return( work );
-	}
-}
-
-/*	---------------------------------------------------	*/
-/*		w i n d o w s a z u r e _ n e t w o r k _ i d	*/
-/*	---------------------------------------------------	*/
-private	char *	windowsazure_network_id( char * href )
-{
-	struct	url * uptr;
-	char *	result;
-	char *	work;
-	char *	number;
-	if (!( href ))
-		return( href );
-	else if (!( uptr = analyse_url( href ) ))
-		return( liberate( href ) );
-	else if (!( uptr->object ))
-	{
-		uptr = liberate_url( uptr );
-		return( liberate( href ) );
-	}
-	else if (!( result = allocate_string( uptr->object ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( liberate( href ) );
-	}
-	else
-	{
-		uptr = liberate_url( uptr );
-		href = liberate( href );
-		for (	number=work=result;
-			*work != 0;
-			work++)
-		{
-			if ( *work == '/' )
-				number = (work+1);
-		}
-		work = allocate_string( number );
-		liberate( result );
-		return( work );
-	}
-}
-
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ w i n d o w s a z u r e _ n e t w o r k 		*/
 /*	-----------------------------------------------------------------	*/
@@ -314,6 +234,7 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
+	struct	xml_element * bptr;
 	struct	xml_atribut * aptr;
 	char 		    * vptr;
 	char	* seekname;
@@ -343,33 +264,22 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 			continue;
 
 		memset( &infos, 0, sizeof( struct az_network_infos ));
-		if (!( aptr = document_atribut( dptr, "href" ) ))
+		if (!( bptr = document_element( dptr, "Name" ) ))
 			continue;
-		else 	infos.href = occi_unquoted_value( aptr->value );
-
-		if (!( aptr = document_atribut( dptr, "name" ) ))
-			continue;
-		else 	infos.name = occi_unquoted_value( aptr->value );
+		else 	infos.name = occi_unquoted_value( bptr->value );
 
 		if (!( strncasecmp( infos.name, request.name, strlen( request.name ) ) ))
 		{
-			best.href = infos.href;
 			best.name = infos.name;
 			break;
 		}
 		else
 		{
-			liberate( infos.href );
 			liberate( infos.name );
 		}
 	}
 	liberate( request.name );
-	if ( best.name )
-		best.name = liberate( best.name );
-	if (!( best.href ))
-		return( best.href );
-	else 	return( windowsazure_network_id( best.href ) );
-	return((char *) 0);
+	return ( best.name );
 }
 
 
@@ -589,7 +499,7 @@ public	int	create_windowsazure_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = az_list_os_image() ))
+	else if (!( contract.images = az_list_os_images() ))
 		return( terminate_windowsazure_contract( 1585, &contract ) );
 	else if (!( pptr->image = resolve_windowsazure_image( &contract ) ))
 		return( terminate_windowsazure_contract( 1586, &contract ) );

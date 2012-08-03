@@ -172,6 +172,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->original = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
 				pptr->publicnetwork = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -260,6 +262,9 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," publicnetwork=%c",0x0022);
 		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -325,6 +330,8 @@ private void set_windowsazure_field(
 			pptr->original = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicnetwork" ) ))
 			pptr->publicnetwork = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -493,6 +500,13 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
 			return(0);
 		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -565,6 +579,9 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -1015,6 +1032,8 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -1263,6 +1282,17 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.windowsazure.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.windowsazure.when='%u'\r\n",sptr->when);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1281,4 +1311,4 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 
 }
 
-#endif	/* _occiwindowsazure_c_ */
+#endif	/* _windowsazure_c_ */

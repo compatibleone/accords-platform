@@ -135,6 +135,51 @@ int isQue=0;
 int isCstrg=0;
 
 /*	------------------------------------------------------------	*/
+/*		a z _ r a n d o m _ p a s s w o r d 			*/
+/*	------------------------------------------------------------	*/
+public	char *	az_random_password( char * pattern, int length )
+{
+	char 	buffer[72];
+	int	i;
+	int	seed;
+	int	xseed;
+	int	x;
+	int	v;
+	if ( length > 72 ) 
+		length=70;
+	else if ( length < 7 )
+		length=10;
+	seed = time((long) 0);
+	xseed = seed ^ 0xFFFFFFFF;
+	i = 0;
+	while ( *pattern )
+	{
+		x += ( buffer[i] ^ *(pattern++));
+	}		
+	for (	i=0;
+		i < length;
+		i++)
+	{
+		if (!( i ))
+			v = (((seed % 26) & 0x00FF) + 'A');
+		else
+		{
+			v = ((seed % 36) & 0x00FF);
+			if ( v > 9 )
+				v = ((v - 10) + 'a');
+			else	v += '0';
+		}
+		buffer[i] = v;
+		seed /= v;
+		seed *= x;
+		seed ^= xseed;
+	}
+	buffer[length] = 0;
+	printf("random password : %s \n",buffer);
+	return(allocate_string(buffer));
+}
+
+/*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ a z _ r e s p o n s e		          	    */
 /*	------------------------------------------------------------	*/
 public	struct az_response * liberate_az_response( struct az_response * rptr )	
@@ -2625,6 +2670,7 @@ public	char * az_create_vm_request(
 	char *	newlabel=(char *) 0;
 	char 	buffer[1024];
 	char *	filename=(char *) 0;
+	char *	password=(char *) 0;
 	/* ------------------------------------- */
 	/* validate or allocate the unique label */
 	/* ------------------------------------- */
@@ -2694,12 +2740,18 @@ public	char * az_create_vm_request(
 				/* ------------------------------------ */
 				/* LINUX SPECIFIC Configuration Section */
 				/* ------------------------------------ */
-				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration<ConfigurationSet>\n");
+				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration</ConfigurationSetType>\n");
 				if (!( rest_valid_string(hostname) ))
 					fprintf(h,"\t\t<HostName>%s-%s</HostName>\n",name,label);
 				else	fprintf(h,"\t\t<HostName>%s</HostName>\n",hostname);
 				fprintf(h,"\t\t<UserName>%s</UserName>\n",name);
-				fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",name);
+				if (!( password = az_random_password( name, 21 )))
+					fprintf(h,"\t\t<UserPassword>%s%s</UserPassword>\n",name,name);
+				else
+				{
+					fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",password);
+					password = liberate( password );
+				}
 				fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
 					(option & _AZURE_LINUX_SSH ? "true" : "false") );
 
@@ -2714,7 +2766,7 @@ public	char * az_create_vm_request(
 				/* -------------------------------------- */
 				/* WINDOWS SPECIFIC Configuration Section */
 				/* -------------------------------------- */
-				fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration<ConfigurationSet>\n");
+				fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration</ConfigurationSetType>\n");
 				fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",name);
 				fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",name);
 				fprintf(h,"\t\t<ResetPasswordOnFirstLogon>%s</ResetPasswordOnFirstLogon>\n",
@@ -2840,7 +2892,6 @@ public	char *	az_delete_network_config_request()
 			fprintf(h,"\txmlns=%chttp://schemas.microsoft.com/ServiceHosting/2011/07/NetworkConfiguration%c\n",0x0022,0x0022);
 			fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 	    	fprintf(h,"<VirtualNetworkConfiguration>\n");
-		fprintf(h,"<Dns/>\n");
 		fprintf(h,"<VirtualNetworkSites/>\n");
 	    	fprintf(h,"</VirtualNetworkConfiguration>\n");
 		fprintf(h,"</NetworkConfiguration>\n");
@@ -2857,33 +2908,16 @@ public	char *	az_create_network_config_request(char * name, char * group, char *
 	FILE * h;
 	char *	filename;
 	char 	buffer[2048];
-	char *	newlabel=(char *) 0;
-	/* ------------------------------------- */
-	/* validate or allocate the unique label */
-	/* ------------------------------------- */
-	if (!( label ))
-	{
-		if (!( label = rest_allocate_uuid() ))
-			return( label );
-		else	newlabel = label;
-	}
-
-	/* --------------------------------- */
-	/* and then base 64 encode the label */
-	/* --------------------------------- */
-	(void) EncodeBase64( buffer, label, strlen(label));
 
 	/* ---------------------------------- */
 	/* build the VM creation request file */
 	/* ---------------------------------- */
 	if (!( filename = rest_temporary_filename("xml")))
 	{
-		if ( newlabel ) liberate( newlabel );
 		return( filename );
 	}
 	else if (!( h = fopen( filename,"wa" ) ))
 	{
-		if ( newlabel ) liberate( newlabel );
 		return( liberate( filename ) );
 	}
 	else
@@ -2896,11 +2930,9 @@ public	char *	az_create_network_config_request(char * name, char * group, char *
 			fprintf(h,"\txmlns=%chttp://schemas.microsoft.com/ServiceHosting/2011/07/NetworkConfiguration%c\n",0x0022,0x0022);
 			fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 	    	fprintf(h,"<VirtualNetworkConfiguration>\n");
-		fprintf(h,"<Dns/>\n");
 		fprintf(h,"<VirtualNetworkSites>\n");
 
-			fprintf(h,"\t<VirtualNetworkSite name='%s' AffinityGroup='%s'>\n",name,group);
-		        fprintf(h,"\t<Label>%s</Label>\n",buffer);
+			fprintf(h,"\t<VirtualNetworkSite name=%c%s%c AffinityGroup=%c%s%c>\n",0x0022,name,0x0022,0x0022,group,0x0022);
 			fprintf(h,"\t<AddressSpace><AddressPrefix>%s</AddressPrefix></AddressSpace>\n",address);
 			fprintf(h,"\t</VirtualNetworkSite>\n");
 
@@ -2908,7 +2940,6 @@ public	char *	az_create_network_config_request(char * name, char * group, char *
 	    	fprintf(h,"</VirtualNetworkConfiguration>\n");
 		fprintf(h,"</NetworkConfiguration>\n");
 		fclose(h);
-		if ( newlabel ) liberate( newlabel );
 		return( filename );
 	}
 }
@@ -2994,9 +3025,37 @@ public	char * az_create_hosted_service_request(
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ i m a g e s               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_list_os_image()
+public	struct	az_response * az_list_os_images()
 {
-	return( azure_retrieve_operation("/services/images") ); 
+	return( azure_list_operation("/services/images") ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ o s _ i m a g e s               */
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_get_os_image(char * name)
+{
+	char	url[2048];
+	sprintf(url,"/services/images/%s",name);
+	return( azure_retrieve_operation(url) ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ c o n t a i n e r s             */
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_list_containers(char * storage)
+{
+	char	url[2048];
+	sprintf(url,"http://%s.blob.core.windows.net/?comp=list",storage);
+	return( azure_retrieve_operation(url) ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ o s _ d i s k s			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_list_os_disks()
+{
+	return( azure_retrieve_operation("/services/disks") ); 
 }
 
 /*	------------------------------------------------------------	*/
@@ -3177,6 +3236,7 @@ public	struct	az_response *	az_delete_image	(  char * id )
 /*	------------------------------------------------------------	*/
 /*		a z _ i n i t i a l i s e _ s e r v i c e		*/
 /*	------------------------------------------------------------	*/
+private	int	check_hosted_service=0;
 public	int	az_initialise_service( char * servicename )
 {
 	struct	az_response * azptr;
@@ -3184,6 +3244,8 @@ public	int	az_initialise_service( char * servicename )
 	if ( Waz.hostingservice ) Waz.hostingservice = liberate( Waz.hostingservice );
 	if (!( Waz.hostingservice = allocate_string( servicename ) ))
 		return( 27 );
+	else if (!( check_hosted_service ))
+		return( 0 );
 	else if (!( azptr = az_get_hosted_service( Waz.hostingservice ) ))
 		return( 512 );
 	else if (!( azptr->response ))

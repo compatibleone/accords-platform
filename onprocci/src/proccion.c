@@ -25,20 +25,6 @@
 #include "occiresolver.h"
 #include "cosacsctrl.h"
 
-/*	------------------------------------------	*/
-/*		o n _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	on_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
 /* ---------------------------------------------------------------------------- */
 /*			x m l _ a t r i b u t _ v a l u e			*/
 /* ---------------------------------------------------------------------------- */
@@ -301,15 +287,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		/* ------------------------------------------------- */
 		pptr->when = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
-		if ( check_debug() )
-		{
-			rest_log_message("*** ON PROCCI Instance is UP and RUNNING ***");
-		}
 		autosave_opennebula_nodes();
-		if ( check_debug() )
-		{
-			rest_log_message("*** ON PROCCI connect_opennebula_server( exit ) ***");
-		}
 		return(0);
 	}
 }
@@ -378,15 +356,14 @@ private	struct	rest_response * start_opennebula(
 		}
 		osptr = liberate_on_response( osptr );
 		if (!( status ))
-		if (!( status ))
 		{
-			if (!( on_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
+		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Nebula" ) );
 	}
 
 }
@@ -562,7 +539,7 @@ private	struct	rest_response * save_opennebula(
 		}
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if (!( on_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -611,7 +588,7 @@ private	struct	rest_response * snapshot_opennebula(
 	{
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if (!( on_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -671,9 +648,9 @@ private	struct	rest_response * stop_opennebula(
 			pptr->when = time((long *) 0);
 			onptr = liberate_on_response( onptr );
 			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-			if (!( on_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=stop", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}

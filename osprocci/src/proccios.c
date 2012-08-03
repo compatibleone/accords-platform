@@ -32,34 +32,6 @@ public	char *	occi_extract_atribut(
 	struct occi_response * zptr, char * domain,
 	char * category, char * nptr );
 
-/*	------------------------------------------	*/
-/*		o s _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	os_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
-/*	------------------------------------------	*/
-/*		o s _ v a l i d _ a d d r e s s		*/
-/*	------------------------------------------	*/
-private	int	os_valid_address( char * address )
-{
-	if (!( address ))
-		return(0);
-	else if (!( strlen( address )))
-		return( 0 );
-	else if (!( strcmp( address, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
 /* ---------------------------------------------------------------------------- */
 /* 		r e s o l v e _ o s _ c o n f i g u r a t i o n			*/
 /* ---------------------------------------------------------------------------- */
@@ -610,7 +582,7 @@ private	int	connect_openstack_server(
 		/* ------------------------------------------------ */
 		if ( yptr ) yptr = liberate_os_response( yptr );
 
-		if ( os_valid_address( pptr->floating ) )
+		if ( rest_valid_string( pptr->floating ) )
 		{
 			if ( pptr->publicaddr ) 
 				pptr->publicaddr = liberate( pptr->publicaddr );
@@ -620,7 +592,7 @@ private	int	connect_openstack_server(
 				return( 27 );
 			}
 		}
-		else if ( os_valid_address( pptr->accessip ) )
+		else if ( rest_valid_string( pptr->accessip ) )
 		{
 			if ( pptr->publicaddr ) 
 				pptr->publicaddr = liberate( pptr->publicaddr );
@@ -844,7 +816,7 @@ private	int	associate_server_address(
 	struct	os_response * osptr;
 	if (!( pptr ))
 		return( 1001 );
-	else if (!( os_valid_address( pptr->floating ) ))
+	else if (!( rest_valid_string( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_create_address_request( subptr, pptr->floating ) ))
 		return( 1003 );
@@ -898,7 +870,7 @@ private	int	disassociate_server_address( struct os_subscription * subptr, struct
 	struct	os_response * osptr;
 	if (!( pptr ))
 		return( 1001 );
-	else if (!( os_valid_address( pptr->floating ) ))
+	else if (!( rest_valid_string( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_remove_address_request( subptr,pptr->floating ) ))
 		return( 1003 );
@@ -1328,7 +1300,7 @@ private	struct	rest_response * start_openstack(
 	osptr = liberate_os_response( osptr );
 	if (!( status ))
 	{
-		if ( os_valid_price( pptr->price ) )
+		if ( rest_valid_string( pptr->price ) )
 			occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference );
 
 		subptr = os_liberate_subscription( subptr );
@@ -1429,7 +1401,7 @@ private	struct	rest_response * snapshot_openstack(
 		if (!( status ))
 		{
 			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
-			if (!( os_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
@@ -1518,7 +1490,7 @@ private	struct	rest_response * save_openstack(
 
 			}
 			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
-			if (!( os_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
@@ -1618,7 +1590,7 @@ private	struct	rest_response * stop_openstack(
 		reset_openstack_server( pptr );
 		pptr->when = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		if (!( os_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );

@@ -210,7 +210,9 @@ public	struct	az_response *	az_list_images  ();
 public	struct	az_response *	az_create_image( char * filename );
 public	struct	az_response *	az_get_image    ( char * id );
 public	struct	az_response *	az_delete_image ( char * id );
-public	struct	az_response * 	az_list_os_image();
+public	struct	az_response * 	az_list_os_images();
+public	struct	az_response * 	az_get_os_image(char * name);
+public	struct	az_response * 	az_list_os_disks();
 	
 public	char * az_create_image_request(
     char * identity, char * server );
@@ -256,6 +258,7 @@ public	struct	az_response *	az_retrieve_storage_service( char * filename );
 public	struct	az_response *	az_update_storage_service( char * filename );
 public	struct	az_response *	az_delete_storage_service( char * filename );
 public	struct	az_response *	az_list_storage_services();
+public	struct	az_response *  	az_list_containers( char * account );
 
 public	char * az_create_vm_request(
 	/* 	struct os_subscription * subptr,	*/

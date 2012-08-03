@@ -59,10 +59,14 @@ private	int	az_result( struct az_response * rptr )
 			switch ( rptr->nature )
 			{
 			case	_TEXT_JSON	:
-				json_show( rptr->jsonroot );
+				if ( rptr->jsonroot )
+					json_show( rptr->jsonroot );
+				break;
+			case	_TEXT_XML	:
+				if ( rptr->xmlroot )
+					document_show_element( rptr->xmlroot, 0 );
 				break;
 			default			:
-			case	_TEXT_XML	:
 				if (( rptr->response->status != 204 )
 				&&  ( rptr->response->body ))
 				{
@@ -101,11 +105,15 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "OS" ) ))
-			az_result( az_list_os_image() );
+			az_result( az_list_os_images() );
+		else if (!( strcasecmp( p2, "DISKS" ) ))
+			az_result( az_list_os_disks() );
 		else if (!( strcasecmp( p2, "HOSTS" ) ))
 			az_result( az_list_hosted_services() );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
 			az_result( az_list_network() );
+		else if (!( strcasecmp( p2, "CONTAINERS" ) ))
+			az_result( az_list_containers( p3 ) );
 		else if (!( strcasecmp( p2, "VM" ) ))
 			az_result( az_list_vm( p3 ) );
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
@@ -181,6 +189,17 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+		{
+			if (!( nomfic = az_create_network_config_request( p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot create","network config" ) );
+			else
+			{
+				az_result( az_update_network_config(  nomfic ) );
+				return(0);
+			}
+		}
+		else	return( failure(33, p1, p2 ) );
 
 	}
 	else if (!( strcasecmp(p1,"GET" ) ))
@@ -201,6 +220,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			az_result( az_get_flavor( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_get_image( p3 ) );
+		else if (!( strcasecmp( p2, "OS" ) ))
+			az_result( az_get_os_image( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			az_result( az_retrieve_affinity_group( p3 ) );
 		else if (!( strcasecmp( p2, "STORAGE") ))
@@ -219,16 +240,6 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			else
 			{
 				az_result( az_update_hosted_service( p4, nomfic ) );
-				return(0);
-			}
-		}
-		else if (!( strcasecmp( p2, "NETWORK" ) ))
-		{
-			if (!( nomfic = az_create_network_config_request( p3, p4, p5, p6 ) ))
-				return( failure(27,"cannot update","network config" ) );
-			else
-			{
-				az_result( az_update_network_config(  nomfic ) );
 				return(0);
 			}
 		}
@@ -352,7 +363,6 @@ private	int	az_banner()
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   General Options ");
-	printf("\n");
 	printf("\n   --verbose, --debug   ");
 	printf("\n   --tls            <name>    ");
 	printf("\n   --host           <address> ");
@@ -361,42 +371,44 @@ private	int	az_banner()
 	printf("\n   --agent          <name>     ");
 	printf("\n   --hostingservice <name>     ");
 	printf("\n   --version        <value>    ");
-	printf("\n");
 	printf("\n   AZURE Operations ");
-	printf("\n");
 	printf("\n   Hosted Service Operations: HOST");
-	printf("\n          LIST   HOSTS");
 	printf("\n          CREATE HOST <name> <description> <location> <group> ");
+	printf("\n          LIST   HOSTS");
 	printf("\n          GET HOST <name> ");
 	printf("\n          UPDATE HOST <name> ");
-	printf("\n          DELETE HOST <name> \n");
+	printf("\n          DELETE HOST <name> ");
 	printf("\n   Network Configuration Operations: NETWORK");
-	printf("\n          GET    NETWORK ");
-	printf("\n          UPDATE NETWORK <name> <group> <address> <label>");
+	printf("\n          CREATE NETWORK <name> <group> <address> <label>");
 	printf("\n          LIST   NETWORK ");
-	printf("\n          DELETE NETWORK \n");
+	printf("\n          GET    NETWORK ");
+	printf("\n          DELETE NETWORK ");
 	printf("\n   Deployment and Role Operations: VM");
-	printf("\n          LIST   VM <deployment>");
 	printf("\n          CREATE VM <deployment> <role> <image> <flavor> <network> <zone> <access> ");
+	printf("\n          LIST   VM <deployment>");
 	printf("\n          GET    VM <deployment> <role>");
-	printf("\n          DELETE VM <deployment> <role>\n");
+	printf("\n          DELETE VM <deployment> <role>");
 	printf("\n   Affinity Group Operations: GROUP");
 	printf("\n          CREATE GROUP   <name> <description> <location>  ");
 	printf("\n          LIST   GROUP ");
+	printf("\n          GET    GROUP <id> ");
 	printf("\n          DELETE GROUP <id> ");
-	printf("\n          GET    GROUP <id> \n");
-	printf("\n   Other Operations:");
-	printf("\n   LIST   [ STORAGE  | OPERATIONS  | LOCATIONS ");
-	printf("\n            PROFILES | DEFINITIONS | CERTIFICATES ] ");
-	printf("\n   LIST   OS ");
-	printf("\n   LIST   [ DEPLOYMENT ] <host> " );
-	printf("\n   CREATE [ STORAGE <name> <description> <location> <group> ] ");
-	printf("\n   CREATE [ DEPLOYMENT <name> <image> <configuration> <host> <slot> ] ");
-	printf("\n   GET    [ SUBSCRIPTION | CERTIFICATE | STORAGE ] <id> ");
-	printf("\n   GET    [ DEPLOYMENT ] <host> <slot> " );
-	printf("\n   GET    NETWORK ");
-	printf("\n   DELETE [ STORAGE | CERTIFICATE | LOCATION ] <id> ");
-	printf("\n   DELETE [ DEPLOYMENT ] <host> <slot> " );
+	printf("\n   Storage Operations: STORAGE, OS and DISK");
+	printf("\n          CREATE [ STORAGE <name> <description> <location> <group> ] ");
+	printf("\n          LIST   STORAGE ");
+	printf("\n          GET    STORAGE <id> ");
+	printf("\n          DELETE STORAGE <id> ");
+	printf("\n          LIST   OS ");
+	printf("\n          LIST   DISKS ");
+	printf("\n          LIST   CONTAINERS ");
+	printf("\n   Service Deployment Operations: DEPLOYMENT ");
+	printf("\n          CREATE DEPLOYMENT <name> <image> <configuration> <host> <slot> ");
+	printf("\n          LIST   DEPLOYMENT <host> " );
+	printf("\n          GET    DEPLOYMENT <host> <slot> " );
+	printf("\n          DELETE DEPLOYMENT <host> <slot> " );
+	printf("\n   LIST   [ OPERATIONS | LOCATIONS | PROFILES | DEFINITIONS | CERTIFICATES ] ");
+	printf("\n   GET    [ SUBSCRIPTION | CERTIFICATE ] <id> ");
+	printf("\n   DELETE [ CERTIFICATE  | LOCATION    ] <id> ");
 	printf("\n\n");
 	return( 0 );
 }
