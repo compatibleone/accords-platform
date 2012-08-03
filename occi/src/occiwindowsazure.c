@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiwindowsazure_c_
@@ -162,6 +160,18 @@ private void autoload_windowsazure_nodes() {
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
 				pptr->workload = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "architecture" )) != (struct xml_atribut *) 0)
+				pptr->architecture = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "driver" )) != (struct xml_atribut *) 0)
+				pptr->driver = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "original" )) != (struct xml_atribut *) 0)
+				pptr->original = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
+				pptr->publicnetwork = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -232,6 +242,24 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," workload=%c",0x0022);
 		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," architecture=%c",0x0022);
+		fprintf(h,"%s",(pptr->architecture?pptr->architecture:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," driver=%c",0x0022);
+		fprintf(h,"%s",(pptr->driver?pptr->driver:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," original=%c",0x0022);
+		fprintf(h,"%s",(pptr->original?pptr->original:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," publicnetwork=%c",0x0022);
+		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -285,6 +313,18 @@ private void set_windowsazure_field(
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
 			pptr->workload = allocate_string(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
+		if (!( strcmp( nptr, "architecture" ) ))
+			pptr->architecture = allocate_string(vptr);
+		if (!( strcmp( nptr, "driver" ) ))
+			pptr->driver = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "original" ) ))
+			pptr->original = allocate_string(vptr);
+		if (!( strcmp( nptr, "publicnetwork" ) ))
+			pptr->publicnetwork = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -411,6 +451,48 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->workload,fptr->workload) != 0)
 			return(0);
 		}
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
+			return(0);
+		else if ( strcmp(pptr->node,fptr->node) != 0)
+			return(0);
+		}
+	if (( fptr->architecture )
+	&&  (strlen( fptr->architecture ) != 0)) {
+		if (!( pptr->architecture ))
+			return(0);
+		else if ( strcmp(pptr->architecture,fptr->architecture) != 0)
+			return(0);
+		}
+	if (( fptr->driver )
+	&&  (strlen( fptr->driver ) != 0)) {
+		if (!( pptr->driver ))
+			return(0);
+		else if ( strcmp(pptr->driver,fptr->driver) != 0)
+			return(0);
+		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
+	if (( fptr->original )
+	&&  (strlen( fptr->original ) != 0)) {
+		if (!( pptr->original ))
+			return(0);
+		else if ( strcmp(pptr->original,fptr->original) != 0)
+			return(0);
+		}
+	if (( fptr->publicnetwork )
+	&&  (strlen( fptr->publicnetwork ) != 0)) {
+		if (!( pptr->publicnetwork ))
+			return(0);
+		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -465,6 +547,24 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.architecture=%s",optr->domain,optr->id,pptr->architecture);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.driver=%s",optr->domain,optr->id,pptr->driver);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -903,6 +1003,18 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "architecture",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "driver",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "original",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -1075,6 +1187,72 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.node='%s'\r\n",(sptr->node?sptr->node:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.architecture='%s'\r\n",(sptr->architecture?sptr->architecture:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.driver='%s'\r\n",(sptr->driver?sptr->driver:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.price='%s'\r\n",(sptr->price?sptr->price:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.original='%s'\r\n",(sptr->original?sptr->original:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.publicnetwork='%s'\r\n",(sptr->publicnetwork?sptr->publicnetwork:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

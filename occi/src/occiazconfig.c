@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiazconfig_c_
@@ -160,6 +158,8 @@ private void autoload_az_config_nodes() {
 				pptr->subscription = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "certificate" )) != (struct xml_atribut *) 0)
 				pptr->certificate = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "hostingservice" )) != (struct xml_atribut *) 0)
+				pptr->hostingservice = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
 				pptr->tls = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "current" )) != (struct xml_atribut *) 0)
@@ -227,6 +227,9 @@ public  void autosave_az_config_nodes() {
 		fprintf(h," certificate=%c",0x0022);
 		fprintf(h,"%s",(pptr->certificate?pptr->certificate:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," hostingservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->hostingservice?pptr->hostingservice:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," tls=%c",0x0022);
 		fprintf(h,"%s",(pptr->tls?pptr->tls:""));
 		fprintf(h,"%c",0x0022);
@@ -278,6 +281,8 @@ private void set_az_config_field(
 			pptr->subscription = allocate_string(vptr);
 		if (!( strcmp( nptr, "certificate" ) ))
 			pptr->certificate = allocate_string(vptr);
+		if (!( strcmp( nptr, "hostingservice" ) ))
+			pptr->hostingservice = allocate_string(vptr);
 		if (!( strcmp( nptr, "tls" ) ))
 			pptr->tls = allocate_string(vptr);
 		if (!( strcmp( nptr, "current" ) ))
@@ -397,6 +402,13 @@ private int pass_az_config_filter(
 		else if ( strcmp(pptr->certificate,fptr->certificate) != 0)
 			return(0);
 		}
+	if (( fptr->hostingservice )
+	&&  (strlen( fptr->hostingservice ) != 0)) {
+		if (!( pptr->hostingservice ))
+			return(0);
+		else if ( strcmp(pptr->hostingservice,fptr->hostingservice) != 0)
+			return(0);
+		}
 	if (( fptr->tls )
 	&&  (strlen( fptr->tls ) != 0)) {
 		if (!( pptr->tls ))
@@ -454,6 +466,9 @@ private struct rest_response * az_config_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.certificate=%s",optr->domain,optr->id,pptr->certificate);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.hostingservice=%s",optr->domain,optr->id,pptr->hostingservice);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.tls=%s",optr->domain,optr->id,pptr->tls);
@@ -890,6 +905,8 @@ public struct occi_category * occi_az_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "certificate",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "hostingservice",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "tls",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
@@ -1061,6 +1078,17 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.az_config.hostingservice='%s'\r\n",(sptr->hostingservice?sptr->hostingservice:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.az_config.tls='%s'\r\n",(sptr->tls?sptr->tls:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1079,4 +1107,4 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 
 }
 
-#endif	/* _occiazconfig_c_ */
+#endif	/* _azconfig_c_ */

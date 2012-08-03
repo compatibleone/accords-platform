@@ -1,6 +1,7 @@
 /* ------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */  
+/*  (C) 2011 by Iain James MARSHALL (Prologue) <ijm667@hotmail.com>    */  
+/*      2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr> 	       */
 /* --------------------------------------------------------------------*/
 /*  This is free software; you can redistribute it and/or modify it    */
 /*  under the terms of the GNU Lesser General Public License as        */
@@ -45,9 +46,9 @@ private	struct az_config Waz = {
 
 	"2012-03-01",
 	_AZ_NS_COMPUTE,
-
 	_AZ_BASE,
 	subscriptionid,
+	(char *) 0,
 	(char *) 0,
 	(char *) 0,
 
@@ -133,7 +134,6 @@ int isTablec=0;
 int isQue=0;
 int isCstrg=0;
 
-
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ a z _ r e s p o n s e		          	    */
 /*	------------------------------------------------------------	*/
@@ -215,14 +215,18 @@ private	struct	az_response * az_check( struct rest_response * aptr )
 			rptr->xmlroot = document_parse_file( aptr->body );
 			return( rptr );
 		}
-		else	return( rptr );
-		
+		else if (!( rptr->xmlroot = document_parse_file( aptr->body ) ))
+			return( rptr );
+		else
+		{
+			rptr->nature = _TEXT_XML;
+			return( rptr );
+		}
 	}
 }
 
 /*	------------------------------------------------------------	*/
 /*		 a z _ c l i e n t _ r e q u e s t		        */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>    */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * az_client_request(char * target, char * tls, char * nptr,  char * filename,struct rest_header * hptr, char *method)
 {
@@ -295,7 +299,7 @@ public	struct	az_response * az_client_put_request(char * target, char * tls, cha
 /*	------------------------------------------------------------	*/
 /*			a z _ a u t h e n t i c a t e ()	        */
 /*	------------------------------------------------------------	*/
-public	struct	rest_header   *	az_authenticate	( )
+public	struct	rest_header   *	az_authenticate	( char * content_type )
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	if (!( Waz.user ))
@@ -306,9 +310,65 @@ public	struct	rest_header   *	az_authenticate	( )
 		return( hptr );
 	else if (!( hptr = rest_create_header( "x-ms-version", Waz.version ) ))
 		return( hptr );
-	else if (!( hptr->next = rest_create_header( _HTTP_CONTENT_TYPE, "text/xml" ) ))
+	else if (!( hptr->next = rest_create_header( _HTTP_CONTENT_TYPE, content_type ) ))
 		return( hptr );
 	else	return((hptr->next->previous = hptr));
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z u r e  _ u p d a t e _ o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	azure_update_operation( char * action, char * filename )
+{
+	struct	az_response	*	rptr=(struct az_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	if (!( hptr = az_authenticate("text/xml") ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Waz.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, action ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = az_client_put_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		n e t w o r k _ u p d a t e _ o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	network_update_operation( char * action, char * filename )
+{
+	struct	az_response	*	rptr=(struct az_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	if (!( hptr = az_authenticate("text/plain") ))
+		return( rptr );
+	else if (!( uptr = analyse_url( Waz.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, action ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = az_client_put_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
 }
 
 /*	------------------------------------------------------------	*/
@@ -320,7 +380,7 @@ public	struct	az_response *	azure_create_operation( char * action, char * filena
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -349,7 +409,7 @@ private	struct	az_response * azure_list_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -379,7 +439,7 @@ private	struct	az_response * azure_retrieve_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -409,7 +469,7 @@ private	struct	az_response * azure_delete_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -432,45 +492,41 @@ private	struct	az_response * azure_delete_operation( char * buffer )
 
 /*	------------------------------------------------------------	*/
 /* 	a z u r e  _ l i s t _ c o n t a i n e r		        */
-/*   (c) 2012 Hamid MEDJAHED   (Prologue) <hmedjahed@prologue.fr>       */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_container( char * myStorageAccount,char *mykeyStorage)
 {
-char uri[256]="?comp=list";
+	char uri[1024]="?comp=list";
 	char *contentBody=NULL;
 	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e _ c o n t a i n e r		*/
-/*   (c) 2012 Hamid MEDJAHED   (Prologue) <hmedjahed@prologue.fr>       */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_container( char * myStorageAccount,char *mykeyStorage,char* containerName)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"%s?restype=container",containerName);
 	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
 }
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e _ c o n t a i n e r		*/
-/*   (c) 2012 Hamid MEDJAHED     (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_container( char * myStorageAccount,char *mykeyStorage,char* containerName)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"%s?restype=container",containerName);
 	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
-/* a z u r e  _ l i s t _ b l o b s		                        */
-/*  (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>     */
+/*		 a z u r e  _ l i s t _ b l o b s	                */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_blob( char * myStorageAccount,char *mykeyStorage,char*containerName)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s?restype=container&comp=list",containerName);
@@ -480,26 +536,28 @@ public	struct	az_response * azure_list_blob( char * myStorageAccount,char *mykey
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _c r e a t e _ b l o b 		        */
-/*   (c) 2012 Hamid MEDJAHE  (Prologue) <hmedjahed@prologue.fr>         */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_blob( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName, char *content)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isBlobc=1;
 	isBlob=1;
-	contentBody=allocate_string(content);
-	sprintf(uri,"%s/%s",containerName,blobName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
+	if (!( contentBody=allocate_string(content) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"%s/%s",containerName,blobName);
+		return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
+	}
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e _d e l e t e _ b l o b_           		*/
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_blob( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s/%s",containerName,blobName);
@@ -507,11 +565,10 @@ public	struct	az_response * azure_delete_blob( char * myStorageAccount,char *myk
 }
 /*	------------------------------------------------------------	*/
 /*		a z u r e _g e t _ b l o b_c o n t e n t 	        */
-/*   (c) 2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr>         */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_get_blob_content( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s/%s",containerName,blobName);
@@ -520,7 +577,6 @@ public	struct	az_response * azure_get_blob_content( char * myStorageAccount,char
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  b l o b_ c o n t e n t   		*/
-/*   (c) 2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr>         */
 /*	------------------------------------------------------------	*/
 public	char * az_create_blob_content(char *contentBody)
 {
@@ -528,7 +584,7 @@ public	char * az_create_blob_content(char *contentBody)
 	FILE *	h;
 	if (!( filename = rest_temporary_filename("txt")))
 		return filename;
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
@@ -540,11 +596,10 @@ public	char * az_create_blob_content(char *contentBody)
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t _ t a b l e		        */
-/*   (c) 2012 Hamid MEDJAHED     (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_table( char * myStorageAccount,char *mykeyStorage)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isTable=1;
 	sprintf(uri,"Tables");
@@ -553,22 +608,21 @@ public	struct	az_response * azure_list_table( char * myStorageAccount,char *myke
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e _ t a b l e		        */
-/*   (c) 2012 Hamid MEDJAHED     (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_table( char * myStorageAccount,char *mykeyStorage,char *tablename)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isTable=1;
 	isTablec=1;
 	sprintf(uri,"Tables");
-	contentBody=allocate_string(tablename);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"POST",contentBody));
+	if (!( contentBody=allocate_string(tablename) ))
+		return((struct az_response *) 0);
+	else	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"POST",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  t a b l e _ b o d y	                */
-/*  (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	char * az_create_table_request_body( char *tablename)
 {
@@ -578,7 +632,7 @@ public	char * az_create_table_request_body( char *tablename)
 	now=allocate_string(timestampo());
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
@@ -587,15 +641,15 @@ public	char * az_create_table_request_body( char *tablename)
 		fprintf(h,"\t<title />\n");
 		fprintf(h,"\t<updated>%s</updated>\n",now);
 		fprintf(h,"\t<author>\n");
-        fprintf(h,"\t\t<name/>\n"); 
-        fprintf(h,"\t</author>\n"); 
-        fprintf(h,"\t<id/>\n"); 
-        fprintf(h,"\t<content type=\"application/xml\">\n");
-        fprintf(h,"\t\t<m:properties>\n");
-        fprintf(h,"\t\t\t<d:TableName>%s</d:TableName>\n",tablename);
-        fprintf(h,"\t\t</m:properties>\n");
-        fprintf(h,"\t</content>\n"); 
-        fprintf(h,"</entry>\n");
+        	fprintf(h,"\t\t<name/>\n"); 
+        	fprintf(h,"\t</author>\n"); 
+        	fprintf(h,"\t<id/>\n"); 
+        	fprintf(h,"\t<content type=\"application/xml\">\n");
+        	fprintf(h,"\t\t<m:properties>\n");
+        	fprintf(h,"\t\t\t<d:TableName>%s</d:TableName>\n",tablename);
+        	fprintf(h,"\t\t</m:properties>\n");
+        	fprintf(h,"\t</content>\n"); 
+        	fprintf(h,"</entry>\n");
 		fclose(h);
 		return( filename );
 	}
@@ -603,11 +657,10 @@ public	char * az_create_table_request_body( char *tablename)
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e _ t a b l e		        */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_table( char * myStorageAccount,char *mykeyStorage,char *tablename)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isTable=1;
 	sprintf(uri,"Tables('%s')",tablename);
@@ -617,11 +670,10 @@ public	struct	az_response * azure_delete_table( char * myStorageAccount,char *my
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ q u e u e_ t a b l e		        */
-/*   (c) 2012 Hamid MEDJAHED   (Prologue) <hmedjahed@prologue.fr>       */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_queue( char * myStorageAccount,char *mykeyStorage)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"?comp=list");
@@ -630,11 +682,10 @@ public	struct	az_response * azure_list_queue( char * myStorageAccount,char *myke
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ t a b l e		        */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_queue( char * myStorageAccount,char *mykeyStorage,char *name)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"%s",name);
@@ -643,11 +694,10 @@ public	struct	az_response * azure_create_queue( char * myStorageAccount,char *my
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ t a b l e		        */
-/*   (c) 2012 Hamid MEDJAHED     (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_queue( char * myStorageAccount,char *mykeyStorage,char *name)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"%s",name);
@@ -656,11 +706,10 @@ public	struct	az_response * azure_delete_queue( char * myStorageAccount,char *my
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ s t o r a g e_ a c c o u t        */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_storage_account()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/storageservices");
 	return (azure_service_management_request(uri,"GET",contentBody));
@@ -668,24 +717,26 @@ public	struct	az_response * azure_list_storage_account()
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ s t o r a g e_ a c c o u n t  */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_storage_account(char *strgname,char *location, char *affigroupe)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char label[]="v1.0.0";
 	char description[]="storageaccountdescription";
 	char *filename;
 	isCstrg=1;
-	filename=az_create_storage_account_request_body(strgname,label,description,location,affigroupe);
-	sprintf(uri,"/services/storageservices");
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_create_storage_account_request_body(strgname,label,description,location,affigroupe) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/storageservices");
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /*	-------------------------------------------------------------------------	*/
 /*		a z _ c r e a te _  s t o r a g e _ a c c o u n t _ b o d y	        */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                    */
 /*	-------------------------------------------------------------------------	*/
 public	char * az_create_storage_account_request_body( char * name,char * label,char * description,char * location,char * group )
 {
@@ -696,7 +747,7 @@ public	char * az_create_storage_account_request_body( char * name,char * label,c
 	n = EncodeBase64( buffer, label,strlen(label));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
@@ -716,12 +767,11 @@ public	char * az_create_storage_account_request_body( char * name,char * label,c
 }
 
 /*	------------------------------------------------------------	*/
-/* a z u r e  _ d e l e t e_ s t o r a g e_ a c c o u n t		*/
-/*  (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>     */
+/*	 a z u r e  _ d e l e t e_ s t o r a g e_ a c c o u n t		*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_storage_account(char *strgname)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	
 	sprintf(uri,"/services/storageservices/%s",strgname);
@@ -730,11 +780,10 @@ public	struct	az_response * azure_delete_storage_account(char *strgname)
 
 /*	----------------------------------------------------------------	*/
 /*		a z u r e  _ g e t_ s t o r a g e_ a c c o u n t _ k e y s      */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	----------------------------------------------------------------	*/
 public	struct	az_response * azure_get_storage_account_keys(char *strgname)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	
 	sprintf(uri,"/services/storageservices/%s/keys",strgname);
@@ -744,22 +793,24 @@ public	struct	az_response * azure_get_storage_account_keys(char *strgname)
 /*	-----------------------------------------------------------------------------	*/
 /*		a z u r e  _ r e g e r a t e_ s t o r a g e_ a c c o u n t _ k e y s    */
 /*      keytype = Primary|Secondary                                                     */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                    */
 /*	-----------------------------------------------------------------------------	*/
 public	struct	az_response * azure_regenerate_storage_account_key(char *strgname,char *keytype)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_regenerate_storage_account_key_request_body(keytype);
-	sprintf(uri,"/services/storageservices/%s/keys?action=regenerate",strgname);
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_regenerate_storage_account_key_request_body(keytype) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/storageservices/%s/keys?action=regenerate",strgname);
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /*	-----------------------------------------------------------------------------------  */
 /*		a z _ r e g e n e r a t e _  s t o r a g e _ a c c o u n t _ k e y_b o d y   */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                         */
 /*	-----------------------------------------------------------------------------------  */
 public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 {
@@ -767,7 +818,7 @@ public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 	FILE *	h;
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
@@ -778,90 +829,6 @@ public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 		fclose(h);
 		return( filename );
 	}
-}
-
-/*	------------------------------------------------------------	*/
-/*		a z u r e  _ l i s t_ h o s t e d_ s e r v i c e s      */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
-/*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_hosted_service()
-{
-	char uri[256];
-	char *contentBody=NULL;
-	sprintf(uri,"/services/hostedservices");
-	return (azure_service_management_request(uri,"GET",contentBody));
-}
-
-/*	------------------------------------------------------------	*/
-/*		a z u r e  _ c r e a t e_ h o s t e d_ s e r v i c e    */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
-/*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_hosted_service(char *srvname, char *label, char *description, char *location, char *affigroupe)
-{
-	char uri[256];
-	char *contentBody=NULL;
-	char *filename;
-	isCstrg=1;
-	filename=az_create_hosted_service_request_body(srvname,label,description,location,affigroupe);
-	sprintf(uri,"/services/hostedservices");
-	return (azure_service_management_request(uri,"POST",filename));
-}
-
-/*	------------------------------------------------------------------------------------	*/
-/*		a z _ c r e a te _  h o s t e d _ s e r v i c e_ r e q u e s t_ b o d y		*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                            */
-/*	------------------------------------------------------------------------------------	*/
-public	char * az_create_hosted_service_request_body(char * name,char * label,char * description,char * location,char * group )
-{
-	char *	filename;
-	FILE *	h;
-	char 	buffer[1024];
-	int	n;
-	n = EncodeBase64( buffer, label,strlen(label));
-	if (!( filename = rest_temporary_filename("xml")))
-		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
-		return (char *)( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
-		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
-		fprintf(h,"\t<Label>%s</Label>\n",buffer);
-		fprintf(h,"\t<Description>%s</Description>\n",description);
-		if ( group )
-			fprintf(h,"\t<AffinityGroup>%s</AffinityGroup>\n",group);
-		else if ( location )
-			fprintf(h,"\t<Location>%s</Location>\n",location);
-		fprintf(h,"</CreateHostedService>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	-------------------------------------------------------------------------	*/
-/*		a z u r e  _ g e t_ h o s t e d_ s e r v i c e_ p r o p e r t i e s     */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                    */
-/*	-------------------------------------------------------------------------	*/
-public	struct	az_response * azure_get_hosted_service_properties(char *srvname)
-{
-	char uri[256];
-	char *contentBody=NULL;
-	sprintf(uri,"/services/hostedservices/%s",srvname);
-	return (azure_service_management_request(uri,"GET",contentBody));
-}
-
-/*	------------------------------------------------------------	*/
-/*		a z u r e  _ d e l e t e_ h o s t e d_ s e r v i c e    */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
-/*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_hosted_service(char *strgname)
-{
-	char uri[256];
-	char *contentBody=NULL;
-	
-	sprintf(uri,"/services/hostedservices/%s",strgname);
-	return (azure_service_management_request(uri,"DELETE",contentBody));
 }
 
 /*	------------------------------------------------------------*/
@@ -878,7 +845,6 @@ public	struct	az_response * azure_delete_hosted_service(char *strgname)
 /* label: A label for this deployment that is Base64-encoded        */
 /* startdeploy: true or false.Indicates whether to start the        */
 /*              deployment immediately after it is created          */
-/*   (c) 2012 Hamid MEDJAHED    (Prologue) <hmedjahed@prologue.fr>  */
 /*	------------------------------------------------------------*/
 public	struct	az_response * azure_create_deployment(
 	char *servicename, 
@@ -889,18 +855,21 @@ public	struct	az_response * azure_create_deployment(
 	char *label, 
 	char *startdeploy)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_create_deployment_request_body(deployname,pkgUrl,label,configfile,startdeploy);
-	sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_create_deployment_request_body(deployname,pkgUrl,label,configfile,startdeploy) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  d e p l o y m e n t _ r e q u e s t _ b o d y	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	------------------------------------------------------------------	*/
 public char* az_create_deployment_request_body(char *deployname,char*pkgUrl,char *label,char *configfile, char *startdeploy)
 {
@@ -913,30 +882,29 @@ public char* az_create_deployment_request_body(char *deployname,char*pkgUrl,char
 	n = EncodeBase64( bufferc, configfile,strlen(configfile));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
-      fprintf(h,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-      fprintf(h,"<CreateDeployment xmlns=\"http://schemas.microsoft.com/windowsazure\">\n");
-      fprintf(h,"\t<Name>%s</Name>\n",deployname);
-      fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",pkgUrl);
-      fprintf(h,"\t<Label>%s</Label>\n",buffer);
-      fprintf(h,"\t<Configuration>%s</Configuration>\n",bufferc);
-      fprintf(h,"\t<StartDeployment>%s</StartDeployment>\n",startdeploy);
-      fprintf(h,"</CreateDeployment>\n");
-	  fclose(h);
-	  return( filename );
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+		fprintf(h,"<CreateDeployment xmlns=\"http://schemas.microsoft.com/windowsazure\">\n");
+		fprintf(h,"\t<Name>%s</Name>\n",deployname);
+		fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",pkgUrl);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		fprintf(h,"\t<Configuration>%s</Configuration>\n",bufferc);
+		fprintf(h,"\t<StartDeployment>%s</StartDeployment>\n",startdeploy);
+		fprintf(h,"</CreateDeployment>\n");
+		fclose(h);
+	  	return( filename );
 	}
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ d e p y m e n t               */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_deployement(char *servicename, char *deploymentslot)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
 	return (azure_service_management_request(uri,"DELETE",contentBody));
@@ -944,11 +912,10 @@ public	struct	az_response * azure_delete_deployement(char *servicename, char *de
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ a f f i n i t y g r o u p s       */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>    */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_affinitygroups()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/affinitygroups");
 	return (azure_service_management_request(uri,"GET",contentBody));
@@ -956,17 +923,20 @@ public	struct	az_response * azure_list_affinitygroups()
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ a f f i n i t y g r o u p s	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>    */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_create_affinitygroups(char * name,char * label,char * description,char * location)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_create_affinity_group_request_body(name,label,description,location );
-	sprintf(uri,"/affinitygroups");
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_create_affinity_group_request_body(name,label,description,location ) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/affinitygroups");
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /*	------------------------------------------------------------------	*/
@@ -985,7 +955,7 @@ public	char * az_create_affinity_group_request(
 	n = EncodeBase64( buffer, label,strlen(label));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"wa" ) ))
+	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
 	else
 	{
@@ -1004,7 +974,6 @@ public	char * az_create_affinity_group_request(
 
 /*	--------------------------------------------------------------------------- */
 /*	a z _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t_ b o d y   */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                */
 /*	--------------------------------------------------------------------------- */
 public	char * az_create_affinity_group_request_body(
 	char * name,
@@ -1019,7 +988,7 @@ public	char * az_create_affinity_group_request_body(
 	n = EncodeBase64( buffer, label,strlen(label));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
@@ -1037,11 +1006,10 @@ public	char * az_create_affinity_group_request_body(
 }
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ a f f i n i t y g r o u p     */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_affinitygroup(char *name)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/affinitygroups/%s",name);
 	return (azure_service_management_request(uri,"DELETE",contentBody));
@@ -1049,11 +1017,10 @@ public	struct	az_response * azure_delete_affinitygroup(char *name)
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ l o c a t i o n s                 */
-/* (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>      */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_locations()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/locations");
 	return (azure_service_management_request(uri,"GET",contentBody));
@@ -1061,11 +1028,10 @@ public	struct	az_response * azure_list_locations()
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ o s_ i m a g e s                  */
-/*  (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>     */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * azure_list_os_image()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/images");
 	return (azure_service_management_request(uri,"GET",contentBody));
@@ -1082,7 +1048,6 @@ public	struct	az_response * azure_list_os_image()
 /*               Example: http://example.blob.core.windows.net/disks/mydisk.vhd     */
 /* os: The operating system type of the OS image.                                   */
 /*       Possible values are:Linux / Windows                                        */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                */
 /*	----------------------------------------------------------------------------*/
 public	struct	az_response * azure_add_os_image(
 	char * name,
@@ -1090,18 +1055,21 @@ public	struct	az_response * azure_add_os_image(
 	char *medialink,
 	char * os)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_create_os_image_request_body(name,label,medialink,os );
-	sprintf(uri,"/services/images");
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_create_os_image_request_body(name,label,medialink,os ) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/images");
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  o s _ i m a g e _ r e q u e s t_ b o d y   	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	------------------------------------------------------------------	*/
 public char *az_create_os_image_request_body(char * name,char * label,char *medialink,char * os)
 {
@@ -1110,16 +1078,16 @@ public char *az_create_os_image_request_body(char * name,char * label,char *medi
 
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
 		fprintf(h,"<OSImage xmlns=\"http://schemas.microsoft.com/windowsazure\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
-        fprintf(h,"\t<Label>%s</Label>\n",label);
-        fprintf(h,"\t<MediaLink>%s</MediaLink>\n",medialink);
-        fprintf(h,"\t<Name>%s</Name>\n",name);
-        fprintf(h,"\t<OS>%s</OS>\n",os);
-        fprintf(h,"</OSImage>\n");
+		fprintf(h,"\t<Label>%s</Label>\n",label);
+        	fprintf(h,"\t<MediaLink>%s</MediaLink>\n",medialink);
+        	fprintf(h,"\t<Name>%s</Name>\n",name);
+        	fprintf(h,"\t<OS>%s</OS>\n",os);
+        	fprintf(h,"</OSImage>\n");
 		fclose(h);
 		return (filename);
 	}
@@ -1130,22 +1098,24 @@ public char *az_create_os_image_request_body(char * name,char * label,char *medi
 /*	----------------------------------------------------------------------	*/
 /*  name:the image to delete                                                    */
 /*  label: Specifies the friendly name of the image to delete                   */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	----------------------------------------------------------------------	*/
 public	struct	az_response * azure_delete_os_image(char *name, char *label)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
-	filename=az_delete_os_image_request_body(label);
-	isCstrg=1;
-	sprintf(uri,"/services/images/%s",name);
-	return (azure_service_management_request(uri,"DELETE",filename));
+	if (!( filename=az_delete_os_image_request_body(label) ))
+		return((struct az_response *) 0);
+	else
+	{
+		isCstrg=1;
+		sprintf(uri,"/services/images/%s",name);
+		return (azure_service_management_request(uri,"DELETE",filename));
+	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ d e le t e _  o s _ i m a g e _ r e q u e s t_ b o d y     	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	------------------------------------------------------------------	*/
 public char *az_delete_os_image_request_body(char * label)
 {
@@ -1154,15 +1124,15 @@ public char *az_delete_os_image_request_body(char * label)
 	char 	buffer[1024];
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
-	if (!( h = fopen( filename,"w" ) ))
+	else if (!( h = fopen( filename,"w" ) ))
 		return (char *)( liberate( filename ) );
 	else
 	{
-     fprintf(h,"<OSImage xmlns=\"http://schemas.microsoft.com/windowsazure\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
-     fprintf(h,"\t<Label>%s</Label>\n",label);
-     fprintf(h,"</OSImage>\n");
-	 fclose(h);
-	 return (filename);
+		fprintf(h,"<OSImage xmlns=\"http://schemas.microsoft.com/windowsazure\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
+		fprintf(h,"\t<Label>%s</Label>\n",label);
+		fprintf(h,"</OSImage>\n");
+		fclose(h);
+		return (filename);
 	}
 }
 
@@ -1177,7 +1147,6 @@ public char *az_delete_os_image_request_body(char * label)
 /*               Example: http://example.blob.core.windows.net/disks/mydisk.vhd         */
 /* os: The operating system type of the OS image.                                       */
 /*       Possible values are:Linux / Windows                                            */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                    */
 /*	-------------------------------------------------------------------------------	*/
 public	struct	az_response * azure_update_os_image(
 	char * name,
@@ -1185,41 +1154,46 @@ public	struct	az_response * azure_update_os_image(
 	char *medialink,
 	char * os)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_create_os_image_request_body(name,label,medialink,os );
-	sprintf(uri,"/services/images/%s",name);
-	return (azure_service_management_request(uri,"PUT",filename));
+	if (!( filename=az_create_os_image_request_body(name,label,medialink,os )))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/images/%s",name);
+		return (azure_service_management_request(uri,"PUT",filename));
+	}
 }
 
 /* -------------------------------------------------------------------------------*/
 /*   a z u r e  _ c r e a t e_ V i r t u a l M a c h i n e _ D e p l o y m e n t  */
 /* -------------------------------------------------------------------------------*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>              */
-/* -------------------------------------------------------------------------------*/
 public	struct	az_response * azure_create_vm_deployment(
 	char * sname,
 	char * dname,
 	char * label,
-	char *vnetworkname,
-	char *vmname,
-	char *provisioningconfig)
+	char * vnetworkname,
+	char * vmname,
+	char * provisioningconfig)
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
 	isTable=1;
-	filename=az_create_vm_request_body(dname,label,vnetworkname,vmname,provisioningconfig);
-	sprintf(uri,"/services/hostedservices/%s/deployments/",sname);
-	return (azure_service_management_request(uri,"POST",filename));
+	if (!( filename=az_create_vm_request_body(dname,label,vnetworkname,vmname,provisioningconfig) ))
+		return((struct az_response *) 0);
+	else
+	{
+		sprintf(uri,"/services/hostedservices/%s/deployments/",sname);
+		return (azure_service_management_request(uri,"POST",filename));
+	}
 }
 
 /* ------------------------------------------------------------------	*/
 /*  a z _ c r e a t e _  v m _ r e q u e s t_ b o d y   	        */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>    */
 /* ------------------------------------------------------------------	*/
 public char *az_create_vm_request_body(char *name,char *label,char *vnetworkname,char *vmname, char *provisioningconfig)
 {
@@ -1349,7 +1323,7 @@ public char *az_create_vm_request_body(char *name,char *label,char *vnetworkname
                 fprintf(h,"\t\t\t\t\t<UserPassword>%s</UserPassword>\n",Waz_vm.lpassword);
 
 	        //Optional. Specifies whether or not SSH password authentication is disabled
-                fprintf(h,"\t\t\t\t\t<DisableSshPasswordAuthentication>true</DisableSshPasswordAuthentication>\n");   
+                fprintf(h,"\t\t\t\t\t<DisableSshPasswordAuthentication>false</DisableSshPasswordAuthentication>\n");   
 
 	        //Optional. Specifies the SSH public keys and key pairs to populate in the image during provisioning
 	        if(Waz_vm.ssh)
@@ -1552,11 +1526,9 @@ public char *az_create_vm_request_body(char *name,char *label,char *vnetworkname
 /*	----------------------------------------------------------------------------	*/
 /*		a z u r e  _ s e t_ n e t w o r k _ c o n f i g u r a t i o n           */
 /*	----------------------------------------------------------------------------	*/
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                    */
-/*	-------------------------------------------------------------------------------	*/
 public	struct	az_response * azure_set_network_configuration()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
@@ -1567,7 +1539,6 @@ public	struct	az_response * azure_set_network_configuration()
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  v m _ r e q u e s t_ b o d y   	                */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            */
 /*	------------------------------------------------------------------	*/
 public char *az_ceate_network_configuration_request_body()
 {
@@ -1718,11 +1689,9 @@ public char *az_ceate_network_configuration_request_body()
 /*	----------------------------------------------------------------------------	*/
 /*		a z u r e  _ g e t_ n e t w o r k _ c o n f i g u r a t i o n           */
 /*	----------------------------------------------------------------------------	*/
-/*   	(c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                 */
-/*	-------------------------------------------------------------------------------	*/
 public	struct	az_response * azure_get_network_configuration()
 {
-	char uri[256];
+	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/networking/media");
 	return (azure_service_management_request(uri,"GET",contentBody));
@@ -1730,7 +1699,6 @@ public	struct	az_response * azure_get_network_configuration()
 
 /*	-------------------------------------------------------------------------	*/
 /*		a z u r e  _ s e r v i c e _ m a n a g e m e n t _ r e q u e s t        */
-/*  	 (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>            	*/
 /*	--------------------------------------------------------------------------	*/
 public	struct	az_response *azure_service_management_request(char *uri,char *method,char *contentBody)
 {
@@ -1777,7 +1745,6 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 }
 /*------------------------------------------------------------	*/
 /*		a z u r e  _ s t o r a g e _ r e q u e s t      */
-/* (c) 2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr>   */
 /*------------------------------------------------------------	*/
 public	struct	az_response * azure_storage_request(
 		char * myStorageAccount,
@@ -1903,7 +1870,6 @@ public	struct	az_response * azure_storage_request(
 
 /************************************************************************************************/
 /* Generate Autorization header                                                                 */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                            */
 /************************************************************************************************/
 public char* AuthorizationHeader(char *method, 
                                  char* now, 
@@ -1973,7 +1939,6 @@ public char* AuthorizationHeader(char *method,
 
 /************************************************************************************************/
 /* Generate Canonicalized header                                                                */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                            */
 /************************************************************************************************/
 char* getCanonicalizedHeaders(struct rest_header *hptr)
 {
@@ -2035,7 +2000,6 @@ char* getCanonicalizedHeaders(struct rest_header *hptr)
 
 /************************************************************************************************/
 /* Generate Canonicalized Resource                                                              */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                            */
 /************************************************************************************************/
 char *	getCanonicalizedResource(char *uri,char *myAccountStorage)
 {
@@ -2173,7 +2137,6 @@ char *	getCanonicalizedResource(char *uri,char *myAccountStorage)
 
 /**************************************************************************************************/
 /* function to sort a table of strings                                                            */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                              */
 /**************************************************************************************************/
 void tri_iteratif(char *tableau[], int taille)
 {
@@ -2192,7 +2155,6 @@ void tri_iteratif(char *tableau[], int taille)
 
 /**************************************************************************************************/
 /* Function to locate the index of a caratere in a string                                         */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                              */
 /**************************************************************************************************/
 int indexOfchar(char str[],char c)
 {
@@ -2206,7 +2168,6 @@ int indexOfchar(char str[],char c)
 /* mot: char * word name                                                                          */
 /* line: char * the string                                                                        */
 /* return 1 if the word exist otherwise 0                                                         */
-/*   (c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>                              */
 /**************************************************************************************************/
 int searchWord(char *mot,char *line)
 {
@@ -2255,9 +2216,9 @@ void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
  }
  new_s[end-start+1]=0;
 }
+
 /***************************************************************/
 /*Generate UTC time                                            */
-/*(c) 2012 Hamid MEDJAHED (Prologue) <hmedjahed@prologue.fr>   */
 /***************************************************************/
 char *timestamp()
 {    
@@ -2277,12 +2238,11 @@ char *timestamp()
 	sscanf(tmp,"%s %s %s %s %s",jr,ms,jj,hr,yr);
 	sprintf(tmp,"%s, %s %s %s %s GMT",jr,jj,ms,yr,hr);
 	tmpstp=allocate_string(tmp);
-    return tmpstp;
+    	return tmpstp;
 }
 
 /********************************************************************/
 /* Function for calculating ISO 8601 Date formats                   */
-/*(c) 2012 Hamid MEDJAHED      (Prologue) <hmedjahed@prologue.fr>   */
 /********************************************************************/
 char *timestampo()
 {
@@ -2305,7 +2265,6 @@ char *timestampo()
    tmps=allocate_string(tmp);
    return tmps;
 #endif
-
 }
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ a f f i n i t y _ g r o u p 		*/
@@ -2456,9 +2415,9 @@ public	struct	az_response *	az_list_WATM_profiles()
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_list_WATM_definitions(char * profile )
 {
-	char 	buffer[2048];
-	sprintf(buffer,"/services/WATM/profiles/%s/definitions",profile );
-	return( azure_list_operation( buffer ) );
+	char 	url[2048];
+	sprintf(url,"/services/WATM/profiles/%s/definitions",profile );
+	return( azure_list_operation( url ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -2466,31 +2425,39 @@ public	struct	az_response *	az_list_WATM_definitions(char * profile )
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_create_hosted_service( char * filename )
 {
-	return((struct az_response *) 0);
+	char 	uri[2048];
+	sprintf(uri,"/services/hostedservices");
+	return (azure_create_operation(uri,filename));
 }
 
 /*	------------------------------------------------------------	*/
-/*	   a z _ r e t r i e v e _ h o s t e d _ s e r v i c e 		*/
+/*	   	a z _ g e t _ h o s t e d _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_retrieve_hosted_service( char * filename )
+public	struct	az_response *	az_get_hosted_service( char * hostname )
 {
-	return((struct az_response *) 0);
+	char 	uri[2048];
+	sprintf(uri,"/services/hostedservices/%s",hostname);
+	return (azure_retrieve_operation(uri));
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ u p d a t e _ h o s t e d _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_update_hosted_service( char * filename )
+public	struct	az_response *	az_update_hosted_service( char * hostname, char * filename )
 {
-	return((struct az_response *) 0);
+	char 	uri[2048];
+	sprintf(uri,"/services/hostedservices/%s",hostname);
+	return (azure_update_operation(uri,filename));
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ d e l e t e _ h o s t e d _ s e r v i c e 	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_hosted_service( char * filename )
+public	struct	az_response *	az_delete_hosted_service( char * hostname )
 {
-	return((struct az_response *) 0);
+	char 	uri[2048];
+	sprintf(uri,"/services/hostedservices/%s",hostname);
+	return (azure_delete_operation(uri));
 }
 
 /*	------------------------------------------------------------	*/
@@ -2514,7 +2481,9 @@ public	struct	az_response *	az_create_certificate( char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_retrieve_certificate( char * filename )
 {
-	return((struct az_response *) 0);
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostingservice, filename ); 
+	return( azure_retrieve_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -2522,16 +2491,18 @@ public	struct	az_response *	az_retrieve_certificate( char * filename )
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_delete_certificate( char * filename )
 {
-	return((struct az_response *) 0);
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostingservice,filename ); 
+	return( azure_delete_operation( buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ c e r t i f i c a t e s		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_certificates(char * server)
+public	struct	az_response *	az_list_certificates()
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates" , server ); 
+	sprintf(buffer,"/services/hostedservices/%s/certificates" , Waz.hostingservice ); 
 	return( azure_list_operation( buffer ) );
 }
 
@@ -2543,7 +2514,6 @@ public	struct	az_response *	az_list_locations()
 	return( azure_list_operation( "/locations" ) );
 }
 
-
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ s e r v e r s			*/
 /*	------------------------------------------------------------	*/
@@ -2551,7 +2521,6 @@ public	struct	az_response *	az_list_servers	( )
 {
 	return( azure_list_operation( "/services/hostedservices" ) );
 }
-
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ f l a v o u r s			*/
@@ -2561,7 +2530,6 @@ public	struct	az_response *	az_list_flavors( )
 	return( azure_list_operation( "/flavors" )) ;
 }
 
-
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ i m a g e s 			*/
 /*	------------------------------------------------------------	*/
@@ -2569,10 +2537,6 @@ public	struct	az_response *	az_list_images( )
 {
 	return( azure_list_operation( "/images" ) );
 }
-
-
-
-
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  i m a g e _ r e q u e s t		*/
@@ -2608,7 +2572,7 @@ public	struct	az_response *	az_create_image( char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images");
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2630,7 +2594,369 @@ public	struct	az_response *	az_create_image( char * filename )
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * az_create_server_request(
+/*									*/
+/*	The creation of a VM Role is Quite a Complex Message		*/
+/*									*/
+/*	There are quite a lot of optional parameters that will need	*/
+/*	some kind of value but for the moment the parameters passed	*/
+/*	have been minimalised as follows:				*/
+/*									*/
+/*		name   : name of the required machine			*/
+/*		label  : unique identity ( should be contract )		*/
+/*		image  : the azure storage name of the image		*/
+/*		flavor : small etc					*/
+/*		network: the virtual network identity			*/
+/*		zone   : the availablility set 				*/
+/*		option : options to control the deployment message	*/
+/*									*/
+/*	------------------------------------------------------------	*/
+public	char * az_create_vm_request(
+	/* 	struct os_subscription * subptr,	*/
+	char * name,		/* the identity of the server 	*/
+	char * label,		/* the contract ID of the server*/
+	char * image,		/* the server image identifier  */
+	char * flavor,		/* the server machine flavour	*/
+	char * network,		/* the network groul		*/
+	char * zone,		/* an eventual locality zone	*/
+	int    option )		/* option flags for staging 	*/
+{
+	char *	hostname=(char *) 0;
+	FILE *	h=(FILE *) 0;
+	char *	newlabel=(char *) 0;
+	char 	buffer[1024];
+	char *	filename=(char *) 0;
+	/* ------------------------------------- */
+	/* validate or allocate the unique label */
+	/* ------------------------------------- */
+	if (!( label ))
+	{
+		if (!( label = rest_allocate_uuid() ))
+			return( label );
+		else	newlabel = label;
+	}
+
+	/* --------------------------------- */
+	/* and then base 64 encode the label */
+	/* --------------------------------- */
+	(void) EncodeBase64( buffer, label,strlen(label));
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+	{
+		if ( newlabel ) liberate( newlabel );
+		return( filename );
+	}
+	else if (!( h = fopen( filename,"wa" ) ))
+	{
+		if ( newlabel ) liberate( newlabel );
+		return( liberate( filename ) );
+	}
+	else
+	{
+	/* ----------------------------------- */
+	/* generate the content of the request */
+	/* ----------------------------------- */
+	/* first the deployment control header */
+	/* ----------------------------------- */
+	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+	fprintf(h,"<Deployment xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+
+		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+		/* --------------------------- */
+		/* the identity must be unique */
+		/* --------------------------- */
+		fprintf(h,"\t<Name>%s</Name>\n",label);
+		if ( option & _AZURE_IS_PRODUCTION )
+			fprintf(h,"\t<DeploymentSlot>Production</DeploymentSlot>\n");
+		else	fprintf(h,"\t<DeploymentSlot>Staging</DeploymentSlot>\n");
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);      
+
+		/* --------------------------------- */
+		/* and now the description of the VM */
+		/* --------------------------------- */
+		fprintf(h,"\t<RoleList>\n");
+		fprintf(h,"\t<Role>\n");
+
+			/* --------------------------------------- */
+			/* VM configuration is described by a Role */
+			/* --------------------------------------- */
+			fprintf(h,"\t\t<RoleName>%s</RoleName>\n",name);
+			fprintf(h,"\t\t<RoleType>PersistentVMRole</RoleType>\n");
+			fprintf(h,"\t\t<ConfigurationSets>\n");
+			fprintf(h,"\t\t<ConfigurationSet>\n");
+			/* ------------------------------------- */
+			/* determine the VM type windows | linux */
+			/* ------------------------------------- */
+			if (!( option & _AZURE_IS_WINDOWS ))
+			{
+				/* ------------------------------------ */
+				/* LINUX SPECIFIC Configuration Section */
+				/* ------------------------------------ */
+				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration<ConfigurationSet>\n");
+				if (!( rest_valid_string(hostname) ))
+					fprintf(h,"\t\t<HostName>%s-%s</HostName>\n",name,label);
+				else	fprintf(h,"\t\t<HostName>%s</HostName>\n",hostname);
+				fprintf(h,"\t\t<UserName>%s</UserName>\n",name);
+				fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",name);
+				fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
+					(option & _AZURE_LINUX_SSH ? "true" : "false") );
+
+				/* ----------------------------------- */
+				/* TODO: handle eventual SSH Key Pairs */
+				/* ----------------------------------- */
+				if ( option & _AZURE_LINUX_SSH )
+				{	fprintf(h,"\t\t<SSH/>");	}
+			}
+			else
+			{
+				/* -------------------------------------- */
+				/* WINDOWS SPECIFIC Configuration Section */
+				/* -------------------------------------- */
+				fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration<ConfigurationSet>\n");
+				fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",name);
+				fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",name);
+				fprintf(h,"\t\t<ResetPasswordOnFirstLogon>%s</ResetPasswordOnFirstLogon>\n",
+					(option & _AZURE_WINDOW_RESET ? "true" : "false") );
+				fprintf(h,"\t\t<EnableAutomaticUpdates>%s</EnableAutomaticUpdates>\n",
+					(option & _AZURE_WINDOWS_UPDATE ? "true" : "false") );
+				/* ------------------------------------------------ */
+				/* TODO: the stored certificates need to be handled */
+				/* ------------------------------------------------ */
+				fprintf(h,"\t\t<StoredCertificateSettings/>");
+			}
+
+			fprintf(h,"\t\t</ConfigurationSet>\n");
+			fprintf(h,"\t\t</ConfigurationSets>\n");
+			if ( rest_valid_string( zone ) )
+			{
+				fprintf(h,"\t\t<AvailabilitySetName>%s</AvailabilitySetName>\n",zone);
+			}
+			/* --------------------------- */
+        		/* TODO Handle Extension disks */
+			/* --------------------------- */
+			if ( option & _AZURE_HARDDISK )
+			{
+				fprintf(h,"<DataVirtualHardDisk/>\n");
+			}
+			fprintf(h,"<OSVirtualHardDisk>\n");
+			fprintf(h,"<HostCaching>%s</HostCaching>\n",
+				( option & _AZURE_READONLY ? "ReadOnly" : "ReadWrite" ));
+
+			/* <DiskLabel>os-disk-label</DiskLabel> */
+			/* <DiskName>new-or-existing-disk-name</DiskName> */
+			/* <MediaLink>url-of-the-blob-containing-the-os-disk</MediaLink> */
+
+			fprintf(h,"<SourceImageName>%s</SourceImageName>\n",image);
+			fprintf(h,"</OSVirtualHardDisk>\n");
+			fprintf(h,"<RoleSize>%s</RoleSize>\n",flavor);
+
+		fprintf(h,"\t</Role>\n");
+		fprintf(h,"\t</RoleList>\n");
+			
+		/* ------------------------------- */
+		/* the virtual network information */
+		/* ------------------------------- */
+		fprintf(h,"\t<VirtualNetworkName>%s</VirtualNetworkName>\n",network);
+
+		/* --------------------------------------------- */
+		/* TODO : Option DNS Description will go in here */
+		/* --------------------------------------------- */
+
+	fprintf(h,"</Deployment>\n");
+	fclose(h);
+	if ( newlabel ) liberate( newlabel );
+	return( filename );
+	}
+}
+
+/*	----------------------------------------	*/
+/*		a z _ c r e a t e _ vm 			*/
+/*	----------------------------------------	*/
+public	struct	az_response *	az_create_vm( char * filename )
+{
+	char	url[2048];
+	sprintf(url,"/services/hostedservices/%s/deployments",Waz.hostingservice);
+	return( azure_create_operation( url, filename ) );
+}
+
+/*	----------------------------------------	*/
+/*		a z _ d e l e t e _ vm 			*/
+/*	----------------------------------------	*/
+public	struct	az_response *	az_delete_vm( char * depname, char * rolename )
+{
+	char	url[2048];
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostingservice,depname,rolename);
+	return( azure_delete_operation( url ) );
+}
+
+/*	----------------------------------------	*/
+/*		a z _ g e t _ vm 			*/
+/*	----------------------------------------	*/
+public	struct	az_response *	az_get_vm( char * depname, char * rolename )
+{
+	char	url[2048];
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostingservice,depname,rolename);
+	return( azure_retrieve_operation( url ) );
+}
+
+/*	----------------------------------------	*/
+/*		a z _ l i s t _ vm 			*/
+/*	----------------------------------------	*/
+public	struct	az_response *	az_list_vm( char * depname )
+{
+	char	url[2048];
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles",Waz.hostingservice,depname);
+	return( azure_list_operation( url ) );
+}
+
+/*	-------------------------------------------------	*/
+/*	a z _ n e t w o r k _ c o n f i g _ r e q u e s t	*/
+/*	-------------------------------------------------	*/
+public	char *	az_delete_network_config_request()
+{
+	FILE * h;
+	char *	filename;
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+	{
+		return( filename );
+	}
+	else if (!( h = fopen( filename,"wa" ) ))
+	{
+		return( liberate( filename ) );
+	}
+	else
+	{
+		/* ----------------------------------- */
+		/* generate the content of the request */
+		/* ----------------------------------- */
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<NetworkConfiguration \n");
+			fprintf(h,"\txmlns=%chttp://schemas.microsoft.com/ServiceHosting/2011/07/NetworkConfiguration%c\n",0x0022,0x0022);
+			fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+	    	fprintf(h,"<VirtualNetworkConfiguration>\n");
+		fprintf(h,"<Dns/>\n");
+		fprintf(h,"<VirtualNetworkSites/>\n");
+	    	fprintf(h,"</VirtualNetworkConfiguration>\n");
+		fprintf(h,"</NetworkConfiguration>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	-------------------------------------------------	*/
+/*	a z _ n e t w o r k _ c o n f i g _ r e q u e s t 	*/
+/*	-------------------------------------------------	*/
+public	char *	az_create_network_config_request(char * name, char * group, char * address, char * label )
+{
+	FILE * h;
+	char *	filename;
+	char 	buffer[2048];
+	char *	newlabel=(char *) 0;
+	/* ------------------------------------- */
+	/* validate or allocate the unique label */
+	/* ------------------------------------- */
+	if (!( label ))
+	{
+		if (!( label = rest_allocate_uuid() ))
+			return( label );
+		else	newlabel = label;
+	}
+
+	/* --------------------------------- */
+	/* and then base 64 encode the label */
+	/* --------------------------------- */
+	(void) EncodeBase64( buffer, label, strlen(label));
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+	{
+		if ( newlabel ) liberate( newlabel );
+		return( filename );
+	}
+	else if (!( h = fopen( filename,"wa" ) ))
+	{
+		if ( newlabel ) liberate( newlabel );
+		return( liberate( filename ) );
+	}
+	else
+	{
+		/* ----------------------------------- */
+		/* generate the content of the request */
+		/* ----------------------------------- */
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<NetworkConfiguration \n");
+			fprintf(h,"\txmlns=%chttp://schemas.microsoft.com/ServiceHosting/2011/07/NetworkConfiguration%c\n",0x0022,0x0022);
+			fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+	    	fprintf(h,"<VirtualNetworkConfiguration>\n");
+		fprintf(h,"<Dns/>\n");
+		fprintf(h,"<VirtualNetworkSites>\n");
+
+			fprintf(h,"\t<VirtualNetworkSite name='%s' AffinityGroup='%s'>\n",name,group);
+		        fprintf(h,"\t<Label>%s</Label>\n",buffer);
+			fprintf(h,"\t<AddressSpace><AddressPrefix>%s</AddressPrefix></AddressSpace>\n",address);
+			fprintf(h,"\t</VirtualNetworkSite>\n");
+
+		fprintf(h,"</VirtualNetworkSites>\n");
+	    	fprintf(h,"</VirtualNetworkConfiguration>\n");
+		fprintf(h,"</NetworkConfiguration>\n");
+		fclose(h);
+		if ( newlabel ) liberate( newlabel );
+		return( filename );
+	}
+}
+
+/*	-----------------------------------------	*/
+/*	a z _ g e t _ n e t w o r k _ c o n f i g	*/
+/*	-----------------------------------------	*/
+public	struct	az_response * az_get_network_config()
+{
+	char	url[2048];
+	sprintf(url,"/services/networking/media");
+	return( azure_retrieve_operation( url ) );
+}
+
+/*	-----------------------------------------------	*/
+/*	a z _ u p d a t e _ n e t w o r k _ c o n f i g	*/
+/*	-----------------------------------------------	*/
+public	struct	az_response * az_update_network_config(char * filename)
+{
+	char	url[2048];
+	sprintf(url,"/services/networking/media");
+	return( network_update_operation( url, filename ) );
+}
+
+/*	-----------------------------------------------	*/
+/*	a z _ d e l e t e _ n e t w o r k _ c o n f i g	*/
+/*	-----------------------------------------------	*/
+public	struct	az_response * az_delete_network_config(char * filename)
+{
+	char	url[2048];
+	sprintf(url,"/services/networking/media");
+	return( network_update_operation( url, filename ) );
+}
+
+/*	----------------------------------------	*/
+/*	     a z _ l i s t _ n e t w o r k 		*/
+/*	----------------------------------------	*/
+public	struct	az_response * az_list_network()
+{
+	char	url[2048];
+	sprintf(url,"/services/networking/virtualnetwork");
+	return( azure_list_operation( url ) );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	 a z _ c r e a t e _ h o s t e d _ s e r v i c e _ r e q u e s t 	*/ 
+/*	-----------------------------------------------------------------	*/
+public	char * az_create_hosted_service_request(
 	char * name,
 	char * label,
 	char * description,
@@ -2641,7 +2967,9 @@ public	char * az_create_server_request(
 	FILE *	h;
 	char 	buffer[1024];
 	int	n;
-	n = EncodeBase64( buffer, label,strlen(label));
+	if (!( label ))
+		return( label );
+	else	n = EncodeBase64( buffer, label,strlen(label));
 	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	if (!( h = fopen( filename,"wa" ) ))
@@ -2664,13 +2992,13 @@ public	char * az_create_server_request(
 }
 
 /*	------------------------------------------------------------	*/
-/*			a z _ c r e a t e _  s e r v e r 		*/
+/*			a z _ l i s t _ o s _ i m a g e s               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_server( char * filename )
+public	struct	az_response * az_list_os_image()
 {
-	return( azure_create_operation( "/services/hostedservices", filename ) );
+	return( azure_retrieve_operation("/services/images") ); 
 }
-	
+
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ s u b s c r i p t i o n	        */
 /*	------------------------------------------------------------	*/
@@ -2753,38 +3081,6 @@ public	char * az_create_deployment_request(
 }
 
 /*	------------------------------------------------------------	*/
-/*			a z _ g e t _ s e r v e r 			*/
-/*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_server	(  char * id )
-{
-	struct	az_response	*	rptr=(struct az_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	if (!( hptr = az_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
-
-/*	------------------------------------------------------------	*/
 /*			a z _ g e t _ f l av o u r			*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_get_flavor(  char * id )
@@ -2795,7 +3091,7 @@ public	struct	az_response *	az_get_flavor(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/flavors/%s",id);
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2826,7 +3122,7 @@ public	struct	az_response *	az_get_image 	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2848,46 +3144,6 @@ public	struct	az_response *	az_get_image 	(  char * id )
 
 
 /*	------------------------------------------------------------	*/
-/*			a z _ u p d a t e _ s e r v e r 		*/
-/*	------------------------------------------------------------	*/
-public	struct	az_response *	az_update_server(  char * id, char * filename )
-{
-	struct	az_response	*	rptr=(struct az_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	if (!( hptr = az_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = az_client_put_request( nptr, Waz.tls, Waz.agent,filename, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );	}
-	else	return( rptr );
-}
-
-/*	------------------------------------------------------------	*/
-/*			a z _ d e l e t e _ s e r v e r 	        */
-/*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_server(  char * id )
-{
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	return( azure_delete_operation( buffer ) );
-}
-
-/*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_delete_image	(  char * id )
@@ -2898,7 +3154,7 @@ public	struct	az_response *	az_delete_image	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate() ))
+	if (!( hptr = az_authenticate("text/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2916,6 +3172,29 @@ public	struct	az_response *	az_delete_image	(  char * id )
 		return( rptr );
 	}
 	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z _ i n i t i a l i s e _ s e r v i c e		*/
+/*	------------------------------------------------------------	*/
+public	int	az_initialise_service( char * servicename )
+{
+	struct	az_response * azptr;
+	int	status;
+	if ( Waz.hostingservice ) Waz.hostingservice = liberate( Waz.hostingservice );
+	if (!( Waz.hostingservice = allocate_string( servicename ) ))
+		return( 27 );
+	else if (!( azptr = az_get_hosted_service( Waz.hostingservice ) ))
+		return( 512 );
+	else if (!( azptr->response ))
+		return( 513 );
+	{
+		status = azptr->response->status;
+		azptr = liberate_az_response( azptr );
+		if ( status < 300 )
+			return( 0 );
+		else	return( status );
+	}
 }
 
 /*	------------------------------------------------------------	*/

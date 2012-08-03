@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _windowsazure_c_
@@ -61,6 +59,18 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
+		if ( sptr->architecture )
+			 sptr->architecture = liberate(sptr->architecture);
+		if ( sptr->driver )
+			 sptr->driver = liberate(sptr->driver);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->original )
+			 sptr->original = liberate(sptr->original);
+		if ( sptr->publicnetwork )
+			 sptr->publicnetwork = liberate(sptr->publicnetwork);
 		sptr = liberate( sptr );
 	}
 	return((struct windowsazure *) 0);
@@ -88,6 +98,12 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->firewall = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->node = (char*) 0;
+		sptr->architecture = (char*) 0;
+		sptr->driver = (char*) 0;
+		sptr->price = (char*) 0;
+		sptr->original = (char*) 0;
+		sptr->publicnetwork = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -172,6 +188,30 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"node") ))
+		{
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"architecture") ))
+		{
+			if ( wptr->value ) { sptr->architecture = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"driver") ))
+		{
+			if ( wptr->value ) { sptr->driver = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"price") ))
+		{
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"original") ))
+		{
+			if ( wptr->value ) { sptr->original = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"publicnetwork") ))
+		{
+			if ( wptr->value ) { sptr->publicnetwork = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -208,10 +248,16 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.architecture='%s'\r\n",prefix,nptr,(sptr->architecture?sptr->architecture:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.driver='%s'\r\n",prefix,nptr,(sptr->driver?sptr->driver:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _windowsazure_cwindowsazure_c_ */
+#endif	/* _windowsazure_c_ */
