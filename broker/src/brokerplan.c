@@ -33,6 +33,7 @@ private	struct	rest_response * instance_plan(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	occi_response * zptr;
 	char *	service=(char *) 0;
 	struct	cords_plan * pptr;
 
@@ -56,7 +57,7 @@ private	struct	rest_response * instance_plan(
 	/* -------------------------------------------------------- */
 	/* invoke the start action for the new service of this plan */
 	/* -------------------------------------------------------- */
-	else if (!( cords_invoke_action( service, _CORDS_START, _CORDS_BROKER_AGENT, default_tls() ) ))
+	else if (!( zptr = cords_invoke_action( service, _CORDS_START, _CORDS_BROKER_AGENT, default_tls() ) ))
 	{
 		service = liberate( service );
 	 	return( rest_html_response( aptr, 517, "START FAILURE" ) );
@@ -66,6 +67,7 @@ private	struct	rest_response * instance_plan(
 		/* ------------------------------------------------ */
 		/* TODO: need to link the service to the plan still */
 		/* ------------------------------------------------ */
+		zptr = occi_remove_response( zptr );
 		service = liberate( service );
 		pptr->services++;
 		return( rest_html_response( aptr, 200, "OK" ) );

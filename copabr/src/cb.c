@@ -1550,10 +1550,12 @@ private	char *	cords_coes_operation(
 				/* --------------------------- */
 				if (!( yptr = cords_invoke_action( buffer, _CORDS_CHOOSE, agent, tls ) ))
 					continue;
+				else	yptr = occi_remove_response( yptr );
+
 				/* --------------------- */
 				/* retrieve the solution */
 				/* --------------------- */
-				else if (!( yptr = occi_simple_get( buffer, agent, tls ) ))
+				if (!( yptr = occi_simple_get( buffer, agent, tls ) ))
 					continue;
 				/* ------------------------- */
 				/* detect solution available */
@@ -2882,11 +2884,16 @@ private	int	cords_instance_plan(
 {
 	struct	xml_atribut *	aptr;
 	struct	occi_response * zptr;
+
 	if (!( zptr =  cords_create_link( plan, instance, agent, tls ) ))
 		return(914);
-	else if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent, tls ) ))
+	else	zptr = occi_remove_response( zptr );
+
+	if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent, tls ) ))
 		return(915);
-	else if (!( aptr = document_add_atribut( document, "instance", instance )))
+	else	zptr = occi_remove_response( zptr );
+
+	if (!( aptr = document_add_atribut( document, "instance", instance )))
 		return(916);
 	else	return(0);
 }

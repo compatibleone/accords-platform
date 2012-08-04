@@ -375,10 +375,14 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 			node, name, account, &selector ) ))
 		return( liberate_elastic_contract( eptr ) );
 
+	if ( zptr )
+		zptr = occi_remove_response( zptr );
+
 	/* ------------------------------- */
 	/* start the new CONTRACT instance */
 	/* ------------------------------- */
-	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 
 	/* ---------------------------- */
 	/* add the new ELASTIC CONTRACT */

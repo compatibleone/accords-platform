@@ -297,8 +297,10 @@ private	char *	negotiate_application_contract(char * node,struct cords_placement
 /* ------------------------- */
 private char * 	provision_application_contract(char *contract)
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract");
-	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract:done");
 	coips_synchronise();
 	return(contract);
@@ -352,8 +354,10 @@ private	char * 	install_application_package( char * cosacs , char * package )
 /* ------------------------- */
 private void	save_application_image( char * contract )
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:save_image");
-	cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:save_image:done");
 	coips_synchronise();
 	return;
@@ -364,8 +368,10 @@ private void	save_application_image( char * contract )
 /* ------------------------- */
 private	void 	stop_application_provisioning(  char * contract )
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:stop_server");
-	cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:stop_server:done");
 	coips_synchronise();
 	return;
