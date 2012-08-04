@@ -183,6 +183,9 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 	struct	occi_response * zptr;
 	struct	occi_request  * qptr;
 
+	/* ------------------------------------- */
+	/* prepare the date stamp and packet URL */
+	/* ------------------------------------- */
 	sprintf(now,"%u",time((long*) 0));
 	sprintf(buffer,"/%s/",_CORDS_PACKET);
 	if (!( pptr->connection ))
@@ -195,23 +198,42 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		return;
 	else	uptr = liberate_url( uptr );
 
-	if (!( kptr = occi_create_client( host, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	/* ------------------------------------- */
+	/* prepare the local cosacs identity URL */
+	/* ------------------------------------- */
+	if (!( rest_valid_string( Cosacs.identity ) ))
+	{
+		host = liberate( host );
 		return;
+	}
+	else	sprintf(buffer,"%s/%s/%s",Cosacs.identity,_CORDS_PROBE,pptr->id);
+
+	/* ------------------------------------- */
+	/* send the data packet  to the consumer */
+	/* ------------------------------------- */
+	if (!( kptr = occi_create_client( host, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		host = liberate( host );
+		return;
+	}
 	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
 	{
+		host = liberate( host );
 		kptr = occi_remove_client( kptr );
 		return;
 	}
-	else if ((!(dptr=occi_request_element(qptr,"occi.packet.probe"  	, pptr->id 	  ) ))
+	else if ((!(dptr=occi_request_element(qptr,"occi.packet.probe"  	, buffer 	  ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.connection"   	, pptr->connection) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.metric"  	, pptr->metric    ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.start"		, now 		  ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.finish"		, now 		  ) )))
 	{
+		host = liberate( host );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
 		return;
 	}
+	host = liberate( host );
 	sprintf(now,"%u",samples);
 	if (!(dptr=occi_request_element(qptr,"occi.packet.samples"  	, now )))
 	{
@@ -234,15 +256,12 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 	}
 	else if (!(dptr=occi_request_element(qptr,"occi.packet.data"  	, vptr )))
 	{
+		vptr = liberate( vptr );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
 		return;
 	}
 	else	vptr = liberate( vptr );
-
-	if (!( rest_valid_string( Cosacs.identity ) ))
-		return;
-	else	sprintf(buffer,"%s/%s/%s",Cosacs.identity,_CORDS_PROBE,pptr->id);
 
 	if (!( yptr = occi_client_post( kptr, qptr ) ))
 	{
@@ -250,6 +269,10 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		kptr = occi_remove_client( kptr );
 		return;
 	}
+
+	/* -------------------------------------- */
+	/* recover response packet identifier URL */
+	/* -------------------------------------- */
 	else if (!( ihost = occi_extract_location( yptr ) ))
 	{
 		yptr = occi_remove_response( yptr );
@@ -257,6 +280,10 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 		kptr = occi_remove_client( kptr );
 		return;
 	}
+
+	/* ------------------------------------ */
+	/* send a new link to the COSACS master */
+	/* ------------------------------------ */
 	else if (!( zptr =  cords_create_link( buffer,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		yptr = occi_remove_response( yptr );
