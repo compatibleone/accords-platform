@@ -9,18 +9,27 @@ private	pthread_mutex_t socket_control = PTHREAD_MUTEX_INITIALIZER;
 
 private	_socket_type=AF_INET;
 
+/*	------------------------------------------	*/
+/*		s o c k e t _ i p v 6			*/
+/*	------------------------------------------	*/
 public	void	set_socket_ipv6()
 {
 	_socket_type=AF_INET6;
 	return;
 }
 	
+/*	------------------------------------------	*/
+/*		s o c k e t _ i p v 4			*/
+/*	------------------------------------------	*/
 public	void	set_socket_ipv4()
 {
 	_socket_type=AF_INET;
 	return;
 }
 	
+/*	------------------------------------------	*/
+/*		g e t _ s o c k e t _ t y p e 		*/
+/*	------------------------------------------	*/
 public	int	get_socket_type()
 {
 	return( _socket_type );
@@ -91,6 +100,9 @@ public	int	socket_getch(struct connection *  h)
 	else	return((result & 0x00FF));
 }
 
+/*	------------------------------------------	*/
+/*		s o c k e t _ l o c k			*/
+/*	------------------------------------------	*/
 void	socket_lock(int h, char * f)
 {
 	char	buffer[1024];
@@ -100,6 +112,9 @@ void	socket_lock(int h, char * f)
 	return;
 }
 
+/*	------------------------------------------	*/
+/*		s o c k e t _ u n l o c k		*/
+/*	------------------------------------------	*/
 void	socket_unlock(int h, char * f)
 {
 	char	buffer[1024];
@@ -194,6 +209,7 @@ private	int	socket_alarm=0;
 private	void	socket_try_catcher( int s ) { socket_alarm=1; }
 public	int	socket_try_connect( int h, char * u,int port, int timeout )
 {
+	int	lerrno;
 	int	status=0;
 	void *	vptr;
 	unsigned  char tempxfer[4];
@@ -201,10 +217,10 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 	struct  hostent *hp=(struct hostent *) 0;
 	struct sockaddr_in address;
 	struct sockaddr_in server;
-
+	char 	buffer[1024];
 	if ( check_debug() & _DEBUG_SOCKET ) 
 	{
-		printf( "socket_connect(%u,%s,%u)\n",h,u,port);
+		printf( "socket_try_connect(%u,%s,%u)\n",h,u,port);
 	}
 	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -218,23 +234,95 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 		return( 0 );
 	else 	
 	{
+		sprintf(buffer,"attempting to connect to cosacs: %s",u);
+		rest_log_message( buffer );
 		server.sin_family = get_socket_type();
 		memcpy(tempxfer, hp->h_addr_list[0],4);
 		memcpy(&server.sin_addr.s_addr,tempxfer,4);
 		server.sin_port = htons(port);
+		/* ---------------------------- */
+		/* set the socket polling alarm */
+		/* ---------------------------- */
 		socket_alarm=0;
 		vptr = signal(SIGALRM,socket_try_catcher);
 		alarm( timeout );
-		status = connect( h, 
-			(struct sockaddr *) & server,
-			sizeof( struct sockaddr ) );
+		status = connect( h, (struct sockaddr *) & server, sizeof( struct sockaddr ) );
+		lerrno = errno;
 		alarm(0);
 		vptr = signal(SIGALRM,vptr);
-		if ( socket_alarm )
+		/* ----------------------------- */
+		/* detect failure conditions now */
+		/* ----------------------------- */
+		if (status < 0) 
+		{
+			sprintf(buffer,"failure(%u) to connect to cosacs: %s",lerrno,u);
+			rest_log_message( buffer );
+			switch ( lerrno )
+			{
+			/* ----------------------------------------- */
+			/* these indicate that a retry might succeed */
+			/* ----------------------------------------- */
+			case	EINTR:	
+				if ( socket_alarm )
+				{
+					sprintf(buffer,"socket alarm timeout connecting to cosacs: %s",u);
+					rest_log_message( buffer );
+				}
+				else	rest_log_message("error:trycosacs: interrupted system call");
+				return(0);
+			case	EISCONN:	
+				rest_log_message("error:trycosacs: socket already connected");
+				return(0);
+			case	ECONNREFUSED:	
+				rest_log_message("error:trycosacs: connection refused by server");
+				return(0);
+			case	EADDRINUSE:
+				rest_log_message("error:trycosacs: the address is already being used");
+				return(0);
+			case	ETIMEDOUT:	
+				rest_log_message("error:trycosacs: connection attempt timed out");
+				return(0);
+			case	ENETUNREACH:
+				rest_log_message("error:trycosacs: network unreachable");
+				return(0);
+			case	EINPROGRESS:
+				rest_log_message("error:trycosacs: connection in progress");
+				return(0);
+			case	EALREADY:
+				rest_log_message("error:trycosacs: already trying");
+				return(0);
+			case	EAGAIN:
+				rest_log_message("error:trycosacs: try again no local port available");
+				return(0);
+			/* --------------------------------------------- */
+			/* these indicate that a retry would not succeed */
+			/* --------------------------------------------- */
+			case	EAFNOSUPPORT:
+				rest_log_message("error:trycosacs: target address family unsupported");
+				return(-1);
+			case	EACCES:
+				rest_log_message("error:trycosacs: not allowed");
+				return(-1);
+			case	EPERM:
+				rest_log_message("error:trycosacs: not permitted");
+				return(-1);
+			default	:
+				rest_log_message("error:trycosacs: unxepected error code");
+				return(-1);
+			}
+		}
+		else if ( socket_alarm )
+		{
+			sprintf(buffer,"socket alarm timeout connecting to cosacs: %s",u);
+			rest_log_message( buffer );
 			return(0);
-		else if ( status < 0 )
-			return(0);
-		else	return(1);
+		}
+		else
+		{
+			sprintf(buffer,"connection established to cosacs: %s",u);
+			rest_log_message( buffer );
+			return(1);
+		}
 	}
 }
 

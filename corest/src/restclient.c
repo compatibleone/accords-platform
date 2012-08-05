@@ -368,6 +368,7 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 {
 	struct rest_client *  cptr;
 	char	buffer[1024]; 
+	int	status;
 
 	if (!( port ))
 		return((struct rest_client*) 0); 
@@ -386,10 +387,33 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 	}
 	while ( retry-- )
 	{
-		if (!( socket_try_connect( cptr->net.socket, host, port, timeout  ) ))
+		if (( status = socket_try_connect( cptr->net.socket, host, port, ( timeout > 1 ? timeout / 2 : 1 ) )) == 1)
+		{
+			/* ------- */
+			/* success */
+			/* ------- */
+			break;
+		}
+		else if ( status == 0 )
+		{
+			/* ------- */
+			/* failure */
+			/* ------- */
+			sleep(( timeout > 1 ? timeout / 2 : 1 ));
 			continue;
-		else	break;
+		}
+		else
+		{
+			/* --------------------- */
+			/* unrecoverable failure */
+			/* --------------------- */
+			return( rest_liberate_client( cptr ) );
+		}
 	}
+
+	/* -------------------------------------- */
+	/* if the number of retries has timed out */
+	/* -------------------------------------- */
 	if (!( retry ))
 		return( rest_liberate_client( cptr ) );
 
