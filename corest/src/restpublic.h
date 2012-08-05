@@ -51,6 +51,9 @@ public	struct rest_response *
 public	struct	rest_header * 
 	rest_response_header( struct rest_response * aptr, char * nptr, char * vptr );
 
+public	struct	rest_header * 
+	rest_duplicate_headers( struct rest_header * hptr );
+
 public	struct	rest_client *
 	rest_drop_client( struct rest_client * cptr);
 

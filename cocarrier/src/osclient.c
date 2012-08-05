@@ -120,19 +120,18 @@ private	struct	os_response * os_check( struct rest_response * aptr )
 private	int	os_client_rate_limited( struct rest_response * rptr )
 {
 	if (!( rptr ))
-		return( 0 );
+		return(0);
 	else if ( rptr->status < 400 )
-		return( 0 );
+		return(0);
 	else if ( rptr->status != 413 )
-		return( 0 );
-	else
+		return(0);
 	{
 		/* -------------------------- */
 		/* rate limiting is in effect */
 		/* -------------------------- */
 		rptr = liberate_rest_response( rptr );
 		sleep(rate_recovery);
-		return(1);
+		return( 1 );
 	}
 }
 
@@ -144,9 +143,26 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
 	while ((rptr = rest_client_get_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
 		if (!( os_client_rate_limited( rptr ) ))
 			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
 	return( os_check( rptr ) );
 }
 
@@ -158,9 +174,26 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
 	while (( rptr = rest_client_head_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
 		if (!( os_client_rate_limited( rptr ) ))
 			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
 	return( os_check( rptr ) );
 }
 
@@ -172,9 +205,27 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
 	while (( rptr = rest_client_delete_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
 		if (!( os_client_rate_limited( rptr ) ))
 			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
 	return( os_check( rptr ) );
 }
 
@@ -186,9 +237,39 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+	char		      * body=(char *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	if (( filename )
+	&&  (!( body = allocate_string( filename ) )))
+	{
+		copy = liberate_rest_headers( copy );
+		return((struct os_response *) 0);
+	}
+
 	while (( rptr = rest_client_post_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+	{
 		if (!( os_client_rate_limited( rptr ) ))
 			break;
+		if ( copy  )
+			if (!( hptr = rest_duplicate_headers( copy ) ))
+				return((struct os_response *) 0);
+		if ( body )
+			if (!( filename = allocate_string( body ) ))
+				return((struct os_response *) 0);
+
+	}			
+
+	if (( filename ) &&  ( body ))
+		body = liberate( body );
+
+	if (( hptr ) &&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
 	return( os_check( rptr ) );
 }
 
@@ -200,10 +281,37 @@ public	struct	os_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+	char		      * body=(char *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	if (( filename )
+	&&  (!( body = allocate_string( filename ) )))
+	{
+		copy = liberate_rest_headers( copy );
+		return((struct os_response *) 0);
+	}
 
 	while (( rptr = rest_client_put_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+	{
 		if (!( os_client_rate_limited( rptr ) ))
 			break;
+		if ( copy  )
+			if (!( hptr = rest_duplicate_headers( copy ) ))
+				return((struct os_response *) 0);
+		if ( body )
+			if (!( filename = allocate_string( body ) ))
+				return((struct os_response *) 0);
+	}			
+
+	if (( filename ) && ( body ))
+		body = liberate( body );
+
+	if (( hptr ) &&  ( copy ))
+		copy = liberate_rest_headers( copy );
 
 	return( os_check( rptr ) );
 }

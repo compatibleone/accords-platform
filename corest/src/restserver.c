@@ -531,6 +531,30 @@ public struct rest_header * rest_postfix_header( struct rest_header * foot, char
 }
 
 /*	------------------------------------------------	*/
+/*	  r e s t _ d u p l i c a t e _ h e a d e r s 		*/
+/*	------------------------------------------------	*/
+public	struct	rest_header * rest_duplicate_headers( struct rest_header * hptr )
+{
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	rest_header * wptr=(struct rest_header *) 0;
+	for (	;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( wptr = rest_create_header( hptr->name, hptr->value ) ))
+			break;
+		else if (!( wptr->previous = foot ))
+			root = wptr;
+		else	wptr->previous->next = wptr;
+		foot = wptr;
+	}
+	return( root );
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ h e a d e r 		*/
 /*	------------------------------------------------	*/
 public	struct	rest_header * rest_response_header(struct rest_response * aptr, char * nptr, char * vptr )
