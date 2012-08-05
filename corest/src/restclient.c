@@ -346,6 +346,7 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 	else if (!( tls ))
 		return( cptr );
+
 	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
 	{
 		if ( check_debug() )
@@ -363,6 +364,15 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 
 /*	------------------------------------------------	*/
 /*	    r e s t _ t r y _ o p e n _ c l i e n t		*/
+/*	------------------------------------------------	*/
+/*	attempts to open a client connection using coscs	*/
+/*	and needs to do very careful connect polling to		*/
+/*	avoid crashing the:					*/
+/*	A) callers TCP stack					*/
+/*	B) the targets router					*/
+/*	C) the targets network address translation		*/
+/*	D) the target machines TCP stack			*/
+/*	E) anyone else who might be in the way			*/
 /*	------------------------------------------------	*/
 private	struct rest_client * 	rest_try_open_client( char * host, int port, char * tls, int timeout, int retry )
 {
@@ -416,21 +426,20 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 	/* -------------------------------------- */
 	if (!( retry ))
 		return( rest_liberate_client( cptr ) );
-
-	if (!( tls ))
-		return( cptr );
-	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
-	{
-		if ( check_debug() )
-			failure(27,"rest","tls configuration");
-		return( rest_liberate_client( cptr ) );
-	}
 	else
 	{
-		tls_configuration_use( cptr->tlsconf );
-		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
-			return( rest_liberate_client( cptr ) );
-		else	return( cptr );
+		/* ------------------------------------ */
+		/* drop this connection it may be dirty */
+		/* ------------------------------------ */
+		cptr = rest_liberate_client( cptr );
+		/* ------------------------ */
+		/* allow the dust to settle */
+		/* ------------------------ */
+		sleep(2);
+		/* ----------------------- */
+		/* and try a standard open */
+		/* ----------------------- */
+		return( rest_open_client( host, port, tls ) );
 	}
 }
 

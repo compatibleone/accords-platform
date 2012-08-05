@@ -268,52 +268,60 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 					sprintf(buffer,"socket alarm timeout connecting to cosacs: %s",u);
 					rest_log_message( buffer );
 				}
-				else	rest_log_message("error:trycosacs: interrupted system call");
+				else	rest_log_message("error:try:cosacs: interrupted system call");
 				return(0);
 			case	EISCONN:	
-				rest_log_message("error:trycosacs: socket already connected");
+				rest_log_message("error:try:cosacs: socket already connected");
 				return(0);
 			case	ECONNREFUSED:	
-				rest_log_message("error:trycosacs: connection refused by server");
+				rest_log_message("error:try:cosacs: connection refused by server");
 				return(0);
 			case	EADDRINUSE:
-				rest_log_message("error:trycosacs: the address is already being used");
+				rest_log_message("error:try:cosacs: the address is already being used");
 				return(0);
 			case	ETIMEDOUT:	
-				rest_log_message("error:trycosacs: connection attempt timed out");
+				rest_log_message("error:try:cosacs: connection attempt timed out");
 				return(0);
+#ifdef			EHOSTUNREACH
 			case	ENETUNREACH:
-				rest_log_message("error:trycosacs: network unreachable");
+				rest_log_message("error:try:cosacs: host machine unreachable");
 				return(0);
+#endif
+#ifdef			ENETUNREACH
+			case	ENETUNREACH:
+				rest_log_message("error:try:cosacs: network unreachable");
+				return(0);
+#endif
 			case	EINPROGRESS:
-				rest_log_message("error:trycosacs: connection in progress");
+				rest_log_message("error:try:cosacs: connection in progress");
 				return(0);
 			case	EALREADY:
-				rest_log_message("error:trycosacs: already trying");
+				rest_log_message("error:try:cosacs: already trying");
 				return(0);
 			case	EAGAIN:
-				rest_log_message("error:trycosacs: try again no local port available");
+				rest_log_message("error:try:cosacs: try again no local port available");
 				return(0);
 			/* --------------------------------------------- */
 			/* these indicate that a retry would not succeed */
 			/* --------------------------------------------- */
 			case	EAFNOSUPPORT:
-				rest_log_message("error:trycosacs: target address family unsupported");
+				rest_log_message("error:try:cosacs: target address family unsupported");
 				return(-1);
 			case	EACCES:
-				rest_log_message("error:trycosacs: not allowed");
+				rest_log_message("error:try:cosacs: not allowed");
 				return(-1);
 			case	EPERM:
-				rest_log_message("error:trycosacs: not permitted");
+				rest_log_message("error:try:cosacs: not permitted");
 				return(-1);
+
 			default	:
-				rest_log_message("error:trycosacs: unxepected error code");
+				rest_log_message("error:try:cosacs: unxepected error code");
 				return(-1);
 			}
 		}
 		else if ( socket_alarm )
 		{
-			sprintf(buffer,"socket alarm timeout connecting to cosacs: %s",u);
+			sprintf(buffer,"socket alarm timeout connecting to cosacs %s",u);
 			rest_log_message( buffer );
 			return(0);
 		}
