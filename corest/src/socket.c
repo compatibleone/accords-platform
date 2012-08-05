@@ -283,7 +283,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 				rest_log_message("error:try:cosacs: connection attempt timed out");
 				return(0);
 #ifdef			EHOSTUNREACH
-			case	ENETUNREACH:
+			case	EHOSTUNREACH:
 				rest_log_message("error:try:cosacs: host machine unreachable");
 				return(0);
 #endif
