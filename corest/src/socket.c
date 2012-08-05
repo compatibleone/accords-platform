@@ -319,12 +319,6 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 				return(-1);
 			}
 		}
-		else if ( socket_alarm )
-		{
-			sprintf(buffer,"socket alarm timeout connecting to cosacs %s",u);
-			rest_log_message( buffer );
-			return(0);
-		}
 		else
 		{
 			sprintf(buffer,"connection established to cosacs: %s",u);
