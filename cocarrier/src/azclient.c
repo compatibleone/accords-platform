@@ -2657,8 +2657,8 @@ public	struct	az_response *	az_create_image( char * filename )
 /*	some kind of value but for the moment the parameters passed	*/
 /*	have been minimalised as follows:				*/
 /*									*/
-/*		name   : name of the required machine			*/
-/*		label  : unique identity ( should be contract )		*/
+/*		deployment : the deployment group			*/
+/*		role   : the machine name or role			*/
 /*		image  : the azure storage name of the image		*/
 /*		flavor : small etc					*/
 /*		network: the virtual network identity			*/
@@ -2668,8 +2668,8 @@ public	struct	az_response *	az_create_image( char * filename )
 /*	------------------------------------------------------------	*/
 public	char * az_create_vm_request(
 	/* 	struct os_subscription * subptr,	*/
-	char * name,		/* the identity of the server 	*/
-	char * label,		/* the contract ID of the server*/
+	char * deployment,	/* the identity of the server 	*/
+	char * role,		/* the contract ID of the server*/
 	char * image,		/* the server image identifier  */
 	char * media,		/* the media link to the image  */
 	char * flavor,		/* the server machine flavour	*/
@@ -2679,36 +2679,36 @@ public	char * az_create_vm_request(
 {
 	char *	hostname=(char *) 0;
 	FILE *	h=(FILE *) 0;
-	char *	newlabel=(char *) 0;
+	char *	newdeployment=(char *) 0;
 	char 	buffer[1024];
 	char *	filename=(char *) 0;
 	char *	password=(char *) 0;
 	/* ------------------------------------- */
 	/* validate or allocate the unique label */
 	/* ------------------------------------- */
-	if (!( label ))
+	if (!( deployment ))
 	{
-		if (!( label = rest_allocate_uuid() ))
-			return( label );
-		else	newlabel = label;
+		if (!( deployment = rest_allocate_uuid() ))
+			return( deployment );
+		else	newdeployment = deployment;
 	}
 
 	/* --------------------------------- */
-	/* and then base 64 encode the label */
+	/* and then base 64 encode the deployment */
 	/* --------------------------------- */
-	(void) EncodeBase64( buffer, label,strlen(label));
+	(void) EncodeBase64( buffer, deployment,strlen(deployment));
 
 	/* ---------------------------------- */
 	/* build the VM creation request file */
 	/* ---------------------------------- */
 	if (!( filename = rest_temporary_filename("xml")))
 	{
-		if ( newlabel ) liberate( newlabel );
+		if ( newdeployment ) liberate( newdeployment );
 		return( filename );
 	}
 	else if (!( h = fopen( filename,"wa" ) ))
 	{
-		if ( newlabel ) liberate( newlabel );
+		if ( newdeployment ) liberate( newdeployment );
 		return( liberate( filename ) );
 	}
 	else
@@ -2725,7 +2725,7 @@ public	char * az_create_vm_request(
 		/* --------------------------- */
 		/* the identity must be unique */
 		/* --------------------------- */
-		fprintf(h,"\t<Name>%s</Name>\n",label);
+		fprintf(h,"\t<Name>%s</Name>\n",deployment);
 		if ( option & _AZURE_IS_PRODUCTION )
 			fprintf(h,"\t<DeploymentSlot>Production</DeploymentSlot>\n");
 		else	fprintf(h,"\t<DeploymentSlot>Staging</DeploymentSlot>\n");
@@ -2740,7 +2740,7 @@ public	char * az_create_vm_request(
 			/* --------------------------------------- */
 			/* VM configuration is described by a Role */
 			/* --------------------------------------- */
-			fprintf(h,"\t\t<RoleName>%s</RoleName>\n",name);
+			fprintf(h,"\t\t<RoleName>%s</RoleName>\n",role);
 			fprintf(h,"\t\t<RoleType>PersistentVMRole</RoleType>\n");
 			fprintf(h,"\t\t<ConfigurationSets>\n");
 			fprintf(h,"\t\t<ConfigurationSet>\n");
@@ -2753,7 +2753,7 @@ public	char * az_create_vm_request(
 				/* LINUX SPECIFIC Configuration Section */
 				/* ------------------------------------ */
 				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration</ConfigurationSetType>\n");
-				fprintf(h,"\t\t<HostName>%s</HostName>\n",name);
+				fprintf(h,"\t\t<HostName>%s</HostName>\n",role);
 				fprintf(h,"\t\t<UserName>%s</UserName>\n",Waz.user);
 				fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",Waz.password);
 				fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
@@ -2771,8 +2771,8 @@ public	char * az_create_vm_request(
 				/* WINDOWS SPECIFIC Configuration Section */
 				/* -------------------------------------- */
 				fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration</ConfigurationSetType>\n");
-				fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",name);
-				fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",name);
+				fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",role);
+				fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",Waz.password);
 				fprintf(h,"\t\t<ResetPasswordOnFirstLogon>%s</ResetPasswordOnFirstLogon>\n",
 					(option & _AZURE_WINDOW_RESET ? "true" : "false") );
 				fprintf(h,"\t\t<EnableAutomaticUpdates>%s</EnableAutomaticUpdates>\n",
@@ -2827,7 +2827,7 @@ public	char * az_create_vm_request(
 
 	fprintf(h,"</Deployment>\n");
 	fclose(h);
-	if ( newlabel ) liberate( newlabel );
+	if ( newdeployment ) liberate( newdeployment );
 	return( filename );
 	}
 }
@@ -3129,10 +3129,10 @@ public	struct	az_response *	az_delete_deployment_slots( char * server, char * sl
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ d e p l o y m e n t         */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_deployment( char * server, char * slot )
+public	struct	az_response *	az_delete_deployment( char * server, char *deployment )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , server, slot ); 
+	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , server, deployment );
 	return( azure_delete_operation( buffer ) );
 }
 

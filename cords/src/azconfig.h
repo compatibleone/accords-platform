@@ -17,10 +17,11 @@ struct	az_config
 	char	*	base;
 	char	*	subscription;
 	char	*	certificate;
+	char 	*	tls;
 	char 	*	hostingservice;
 	char 	*	storageaccount;
 	char 	*	location;
-	char 	*	tls;
+	int		deployment;
 	int		current;
 };
 

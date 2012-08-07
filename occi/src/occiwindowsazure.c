@@ -1463,4 +1463,4 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 
 }
 
-#endif	/* _windowsazure_c_ */
+#endif	/* _occiwindowsazure_c_ */

@@ -444,6 +444,18 @@ public	int	create_windowsazure_contract(
 
 	else	memset( &contract, 0, sizeof( struct cords_az_contract ));
 
+	/* --------------------------------------------------------------- */
+	/* the subscription account management uuid is unique for accounts */
+	/* and would prove a useful deployment identifier to regroup   VMS */
+	/* deployed for that account. this requires that start and stop be */
+	/* in the same conditions.					   */
+	/* --------------------------------------------------------------- */
+	if ( pptr->deployment ) pptr->deployment = liberate( pptr->deployment );
+
+	if ( cfptr->deployment )
+		if (!( pptr->deployment = allocate_string( cfptr->id ) ))
+			return( 27 );
+
 	/* ----------------------------------------------------------- */
 	/* Before we get here if we are in SLA Mode we must resolve an */
 	/* eventual geolocalisation criteria for use in determining if */

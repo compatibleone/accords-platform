@@ -31,7 +31,6 @@ struct	windowsazure
 	char *	publicnetwork;
 
 	char *	account;
-
 	char *	hostingservice;
 	char *	storageaccount;
 	char *	deployment;

@@ -212,7 +212,7 @@ private	struct	rest_response * start_windowsazure(
 		/* the name has been chosen for now but needs something more */
 		/* suitable for allowing multiple instances of the named node*/
 		/* --------------------------------------------------------- */
-		pptr->name, pptr->id,
+		( rest_valid_string( pptr->deployment ) ? pptr->deployment : pptr->id ), pptr->name,
 		pptr->image, pptr->media, pptr->flavor,
 		pptr->publicnetwork,
 		(char *) 0, 0 )))
@@ -315,7 +315,9 @@ private	struct	rest_response * stop_windowsazure(
 	/* the deployment name needs to be the same as the one used  */
 	/* during the creation operation above.                      */
 	/* --------------------------------------------------------- */
-	else if (!( azptr = az_delete_vm( pptr->hostingservice, pptr->name )))
+	else if (!( azptr = az_delete_deployment( 
+			pptr->hostingservice, 
+			( rest_valid_string(pptr->deployment) ? pptr->deployment : pptr->id)  )))
 	 	return( rest_html_response( aptr, 504, "Error Deleting WINDOWS AZURE VM" ) );
 	else
 	{
