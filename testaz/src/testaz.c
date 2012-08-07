@@ -147,6 +147,16 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else if  (!( strcasecmp( p2, "OS" ) ))
+		{
+			if (!( nomfic = az_create_os_request( p3, p4, p5, p6 ) ))
+				return( failure(27,"cannot create","OS request" ) );
+			else
+			{ 	
+				az_result( az_create_os_image( nomfic ) );
+				return( 0 );
+			}
+		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 		{
 			if (!( nomfic = az_create_deployment_request( p3, p3, p4, p5 ) ))
@@ -256,6 +266,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			az_result( az_delete_hosted_service( p3 ) );
 		else if (!( strcasecmp( p2, "VM" ) ))
 			az_result( az_delete_vm( p3, p4 ) );
+		else if (!( strcasecmp( p2, "OS" ) ))
+			az_result( az_delete_os_image( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
@@ -400,6 +412,9 @@ private	int	az_banner()
 	printf("\n          GET    STORAGE <id> ");
 	printf("\n          DELETE STORAGE <id> ");
 	printf("\n          LIST   OS ");
+	printf("\n          CREATE OS <name> <label> <media> [Linux|Windows]");
+	printf("\n          GET    OS <name> ");
+	printf("\n          DELETE OS <name> ");
 	printf("\n          LIST   DISKS ");
 	printf("\n          LIST   CONTAINERS ");
 	printf("\n   Service Deployment Operations: DEPLOYMENT ");

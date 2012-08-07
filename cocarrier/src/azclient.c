@@ -3032,6 +3032,44 @@ public	char * az_create_hosted_service_request(
 }
 
 /*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ o s _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char * az_create_os_request(char * name, char * label, char * media, char * os)
+{
+	char *	filename;
+	FILE *	h;
+	char 	buffer[1024];
+	int	n;
+	if (!( label ))
+		return( label );
+	else	n = EncodeBase64( buffer, label,strlen(label));
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<OSImage xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<Label>%s</Label>\n",buffer);
+		fprintf(h,"\t<MediaLink>%s</MediaLink>\n",media);
+		fprintf(h,"\t<Name>%s</Name>\n",name);
+		fprintf(h,"\t<OS>%s</OS>\n",os);
+		fprintf(h,"</OSImage>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ c r e a t e _ o s _ i m a g e 		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_create_os_image(char * filename )
+{
+	return( azure_create_operation("/services/images",filename) ); 
+}
+
+/*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ i m a g e s               */
 /*	------------------------------------------------------------	*/
 public	struct	az_response * az_list_os_images()
@@ -3047,6 +3085,16 @@ public	struct	az_response * az_get_os_image(char * name)
 	char	url[2048];
 	sprintf(url,"/services/images/%s",name);
 	return( azure_retrieve_operation(url) ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*		    a z _ d e l e t e _ o s _ i m a g e s		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_delete_os_image(char * name)
+{
+	char	url[2048];
+	sprintf(url,"/services/images/%s",name);
+	return( azure_delete_operation(url) ); 
 }
 
 /*	------------------------------------------------------------	*/

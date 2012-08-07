@@ -213,6 +213,9 @@ public	struct	az_response *	az_delete_image ( char * id );
 public	struct	az_response * 	az_list_os_images();
 public	struct	az_response * 	az_get_os_image(char * name);
 public	struct	az_response * 	az_list_os_disks();
+public	struct	az_response * az_delete_os_image(char * name);
+public	struct	az_response * az_create_os_image(char * filename );
+public	char * 	az_create_os_request(char * name, char * label, char * media, char * os);
 	
 public	char * az_create_image_request(
     char * identity, char * server );
