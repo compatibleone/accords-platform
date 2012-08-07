@@ -86,7 +86,7 @@ private	int	az_result( struct az_response * rptr )
 	else	return( failure(99,"no","result") );
 }
 
-private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8, char * p9 )
+private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8, char * p9, char * p10 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "CO-AZCLIENT/1.0";
@@ -160,7 +160,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_create_vm_request( p4, p3, p5, p5, p6, p7, p8, atoi(p9) ) ))
+			if (!( nomfic = az_create_vm_request( p4, p3, p5, p6, p7, p8, p9, atoi(p10) ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
@@ -312,7 +312,8 @@ private	int	az_command(int argc, char * argv[] )
 				( (argi+4) < argc ? argv[argi+4] : (char *) 0 ),
 				( (argi+5) < argc ? argv[argi+5] : (char *) 0 ),
 				( (argi+6) < argc ? argv[argi+6] : (char *) 0 ),
-				( (argi+7) < argc ? argv[argi+7] : (char *) 0 ) ) );
+				( (argi+7) < argc ? argv[argi+7] : (char *) 0 ),
+				( (argi+8) < argc ? argv[argi+8] : (char *) 0 ) ) );
 
 		}
 		else if (  *(++aptr) == '-' )
@@ -384,7 +385,7 @@ private	int	az_banner()
 	printf("\n          GET    NETWORK ");
 	printf("\n          DELETE NETWORK ");
 	printf("\n   Deployment and Role Operations: VM");
-	printf("\n          CREATE VM <deployment> <role> <image> <flavor> <network> <zone> <access> ");
+	printf("\n          CREATE VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
 	printf("\n          LIST   VM <deployment>");
 	printf("\n          GET    VM <deployment> <role>");
 	printf("\n          DELETE VM <deployment> <role>");

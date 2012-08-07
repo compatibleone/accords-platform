@@ -204,6 +204,14 @@ private	struct	rest_response * start_windowsazure(
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
 	else if (!( filename = az_create_vm_request(
+		/* --------------------------------------------------------- */
+		/* hmmmmm the name needs to be unique because it will be the */
+		/* resulting host name of the deployed machine so it needs   */
+		/* to be the unique ID but that would be a little ugly ..... */
+		/* --------------------------------------------------------- */
+		/* the name has been chosen for now but needs something more */
+		/* suitable for allowing multiple instances of the named node*/
+		/* --------------------------------------------------------- */
 		pptr->name, pptr->id,
 		pptr->image, pptr->media, pptr->flavor,
 		pptr->publicnetwork,
@@ -303,7 +311,11 @@ private	struct	rest_response * stop_windowsazure(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
-	else if (!( azptr = az_delete_vm( pptr->id, pptr->name )))
+	/* --------------------------------------------------------- */
+	/* the deployment name needs to be the same as the one used  */
+	/* during the creation operation above.                      */
+	/* --------------------------------------------------------- */
+	else if (!( azptr = az_delete_vm( pptr->hostingservice, pptr->name )))
 	 	return( rest_html_response( aptr, 504, "Error Deleting WINDOWS AZURE VM" ) );
 	else
 	{

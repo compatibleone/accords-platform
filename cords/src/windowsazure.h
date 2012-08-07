@@ -32,6 +32,11 @@ struct	windowsazure
 
 	char *	account;
 
+	char *	hostingservice;
+	char *	storageaccount;
+	char *	deployment;
+	char *	location;
+
 	int	when;
 
 	int	state;

@@ -77,6 +77,14 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->publicnetwork = liberate(sptr->publicnetwork);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
+		if ( sptr->hostingservice )
+			 sptr->hostingservice = liberate(sptr->hostingservice);
+		if ( sptr->storageaccount )
+			 sptr->storageaccount = liberate(sptr->storageaccount);
+		if ( sptr->deployment )
+			 sptr->deployment = liberate(sptr->deployment);
+		if ( sptr->location )
+			 sptr->location = liberate(sptr->location);
 		sptr = liberate( sptr );
 	}
 	return((struct windowsazure *) 0);
@@ -112,6 +120,10 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->original = (char*) 0;
 		sptr->publicnetwork = (char*) 0;
 		sptr->account = (char*) 0;
+		sptr->hostingservice = (char*) 0;
+		sptr->storageaccount = (char*) 0;
+		sptr->deployment = (char*) 0;
+		sptr->location = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -228,6 +240,22 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"hostingservice") ))
+		{
+			if ( wptr->value ) { sptr->hostingservice = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"storageaccount") ))
+		{
+			if ( wptr->value ) { sptr->storageaccount = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"deployment") ))
+		{
+			if ( wptr->value ) { sptr->deployment = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"location") ))
+		{
+			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -272,10 +300,14 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostingservice='%s'\r\n",prefix,nptr,(sptr->hostingservice?sptr->hostingservice:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.storageaccount='%s'\r\n",prefix,nptr,(sptr->storageaccount?sptr->storageaccount:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.deployment='%s'\r\n",prefix,nptr,(sptr->deployment?sptr->deployment:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _windowsazure_cwindowsazure_c_ */
+#endif	/* _windowsazure_c_ */

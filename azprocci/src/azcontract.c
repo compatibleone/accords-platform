@@ -282,6 +282,24 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 	return ( best.name );
 }
 
+/*	-----------------------------------------------------------------	*/
+/*		    b u i l d _ a z u r e _ m e d i a l i n k 			*/
+/*	-----------------------------------------------------------------	*/
+private	int	build_azure_medialink( struct windowsazure * pptr )
+{
+	char 	buffer[2048];
+	if (!( rest_valid_string( pptr->storageaccount ) ))
+		return( 0 );
+	else
+	{
+		sprintf(buffer,"https://%s.blob.core.windows.net/vhds/%s.vhd",
+			pptr->storageaccount,
+			pptr->id );
+		if (!( pptr->media = allocate_string( buffer ) ))
+			return( 0 );
+		else	return( 1 );
+	}
+}
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ w i n d o w s a z u r e _ i m a g e   		*/
@@ -345,21 +363,14 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			liberate( vptr );
 			continue;
 		}
-		else
-		{
-			pptr->image = iname;
-			liberate( vptr );
-		}
 
-		if (!( bptr = document_element( dptr, "Name" ) ))
+		else if (!( bptr = document_element( dptr, "Name" ) ))
 			return((char *) 0);
 		else if (!( vptr = occi_unquoted_value(bptr->value)))
 			return((char *) 0);
-		else 	
-		{
-			pptr->media = vptr;
-			return( pptr->image );
-		}
+		else if (!( build_azure_medialink( pptr ) ))
+			return((char *) 0);
+		else	return(( pptr->image = vptr ));
 	}
 
 	liberate( iname );
@@ -382,6 +393,7 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 		if (!( bptr = document_element( dptr, "Label" ) ))
 			continue;
 		else	image.name = occi_unquoted_value(bptr->value);
+
 		if (!( bptr = document_element( dptr, "Name" ) ))
 		{
 			image.name = liberate( image.name );
@@ -402,9 +414,9 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			continue;
 		}
 	}
-	pptr->image = best.name;
-	pptr->media = best.id;
-	return( pptr->image );
+	if (!( build_azure_medialink( pptr ) ))
+		return((char *) 0);
+	else	return(( pptr->image = best.id ));
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -416,14 +428,103 @@ public	int	create_windowsazure_contract(
 		char * agent,
 		char * tls )
 {
+	struct	az_config * cfptr;
+	struct	az_response * azptr;
 	struct	cords_az_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	char *	filename;
 	int	status;
 
 	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( status );
+
+	else if (!( cfptr = resolve_az_configuration( pptr->profile )))
+	 	return( 404 );
+
 	else	memset( &contract, 0, sizeof( struct cords_az_contract ));
+
+	/* ----------------------------------------------------------- */
+	/* Before we get here if we are in SLA Mode we must resolve an */
+	/* eventual geolocalisation criteria for use in determining if */
+	/* an appropriate hosting service is actually available and it */
+	/* may even need to be created with a localisation prefix ???? */
+	/* ----------------------------------------------------------- */
+	/* this is the none SLA section of code only 		       */
+	/* collect and validate and perhaps create ??? hosting service */
+	/* ----------------------------------------------------------- */
+	if ( pptr->hostingservice ) pptr->hostingservice = liberate( pptr->hostingservice );
+
+	if (!( pptr->hostingservice = allocate_string( cfptr->hostingservice ) ))
+		return( 27 );
+	else if (!( azptr = az_get_hosted_service(pptr->hostingservice) ))
+	{
+		if (!( filename = az_create_hosted_service_request(
+				pptr->hostingservice,
+				pptr->hostingservice,
+				pptr->hostingservice,
+			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ),
+				(char *) 0 ) ))
+			return( 118 );
+		else if (!( azptr = az_create_hosted_service( filename ) ))
+			return( 118 );
+		else 	azptr = liberate_az_response( azptr );
+	}	
+	else if ((!( azptr->response )) || ( azptr->response->status > 399 ))
+	{
+		azptr = liberate_az_response( azptr );
+		if (!( filename = az_create_hosted_service_request(
+				pptr->hostingservice,
+				pptr->hostingservice,
+				pptr->hostingservice,
+			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
+				(char *) 0 ) ))
+			return( 118 );
+		else if (!( azptr = az_create_hosted_service( filename ) ))
+			return( 118 );
+		else 	azptr = liberate_az_response( azptr );
+	}	
+	else 	azptr = liberate_az_response( azptr );
+
+	/* ----------------------------------------------------------- */
+	/* The same remark concerning SLA and GeoLocalisation applies  */
+	/* ----------------------------------------------------------- */
+	/* collect and validate and perhaps create ??? storage account */
+	/* ----------------------------------------------------------- */
+	if ( pptr->storageaccount ) pptr->storageaccount = liberate( pptr->storageaccount );
+
+	if (!( pptr->storageaccount = allocate_string( cfptr->storageaccount ) ))
+		return( 27 );
+
+	else if (!( azptr = az_retrieve_storage_service(pptr->storageaccount) ))
+	{
+		if (!( filename = az_create_storage_service_request(
+				pptr->storageaccount,
+				pptr->storageaccount,
+				pptr->storageaccount,
+			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
+				(char *) 0 ) ))
+			return( 118 );
+		else if (!( azptr = az_create_storage_service( filename ) ))
+			return( 118 );
+		else 	azptr = liberate_az_response( azptr );
+	}	
+	else if ((!( azptr->response )) || ( azptr->response->status > 399 ))
+	{
+		azptr = liberate_az_response( azptr );
+		if (!( filename = az_create_storage_service_request(
+				pptr->storageaccount,
+				pptr->storageaccount,
+				pptr->storageaccount,
+			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
+				(char *) 0 ) ))
+			return( 118 );
+		else if (!( azptr = az_create_storage_service( filename ) ))
+			return( 118 );
+		else 	azptr = liberate_az_response( azptr );
+	}	
+	else 	azptr = liberate_az_response( azptr );
+
 
 	/* ---------------------------- */
 	/* recover the node description */

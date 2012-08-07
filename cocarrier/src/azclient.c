@@ -947,11 +947,22 @@ public char* az_create_deployment_request_body(char *deployname,char*pkgUrl,char
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ d e p y m e n t               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_deployement(char *servicename, char *deploymentslot)
+public	struct	az_response * azure_delete_deployement_slots(char *servicename, char *deploymentslot)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
+	return (azure_service_management_request(uri,"DELETE",contentBody));
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z u r e  _ d e l e t e_ d e p y m e n t               */
+/*	------------------------------------------------------------	*/
+public	struct	az_response * azure_delete_deployement(char *servicename, char *deploymentslot)
+{
+	char uri[1024];
+	char *contentBody=NULL;
+	sprintf(uri,"/services/hostedservices/%s/deployments/%s",servicename,deploymentslot);
 	return (azure_service_management_request(uri,"DELETE",contentBody));
 }
 
@@ -2742,17 +2753,9 @@ public	char * az_create_vm_request(
 				/* LINUX SPECIFIC Configuration Section */
 				/* ------------------------------------ */
 				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration</ConfigurationSetType>\n");
-				if (!( rest_valid_string(hostname) ))
-					fprintf(h,"\t\t<HostName>%s-%s</HostName>\n",name,label);
-				else	fprintf(h,"\t\t<HostName>%s</HostName>\n",hostname);
-				fprintf(h,"\t\t<UserName>%s</UserName>\n",name);
-				if (!( password = az_random_password( name, 21 )))
-					fprintf(h,"\t\t<UserPassword>%s%s</UserPassword>\n",name,name);
-				else
-				{
-					fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",password);
-					password = liberate( password );
-				}
+				fprintf(h,"\t\t<HostName>%s</HostName>\n",name);
+				fprintf(h,"\t\t<UserName>%s</UserName>\n",Waz.user);
+				fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",Waz.password);
 				fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
 					(option & _AZURE_LINUX_SSH ? "true" : "false") );
 
@@ -3076,10 +3079,20 @@ public	struct	az_response *	az_get_subscription()
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ d e p l o y m e n t             */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_deployments(char * server)
+public	struct	az_response *	az_list_deployment_slots(char * server)
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deploymentslots" , server ); 
+	return( azure_list_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ l i s t _ d e p l o y m e n t             */
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_list_deployments(char * server)
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deployments" , server ); 
 	return( azure_list_operation( buffer ) );
 }
 
@@ -3106,10 +3119,20 @@ public	struct	az_response *	az_get_deployment( char * server, char * slot )
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ d e p l o y m e n t         */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_deployment( char * server, char * slot )
+public	struct	az_response *	az_delete_deployment_slots( char * server, char * slot )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
+	return( azure_delete_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ d e l e t e _ d e p l o y m e n t         */
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_delete_deployment( char * server, char * slot )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , server, slot ); 
 	return( azure_delete_operation( buffer ) );
 }
 
