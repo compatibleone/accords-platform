@@ -183,6 +183,7 @@ public	struct	az_response *	az_list_certificates();
 /* locations */
 /* --------- */
 public	struct	az_response *	az_list_locations();
+public	struct	az_response *	az_retrieve_location(char * nptr);
 
 /* ------- */
 /* servers */
@@ -224,6 +225,7 @@ public	char * az_create_image_request(
 /* operations */
 /* ---------- */
 public	struct	az_response *	az_list_operations();
+public	struct	az_response *	az_get_operation_status(char * opid);
 
 /* ----------- */
 /* deployments */

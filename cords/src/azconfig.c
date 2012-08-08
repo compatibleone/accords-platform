@@ -61,12 +61,14 @@ public struct az_config * liberate_az_config(struct az_config * sptr)
 			 sptr->certificate = liberate(sptr->certificate);
 		if ( sptr->tls )
 			 sptr->tls = liberate(sptr->tls);
-		if ( sptr->hostingservice )
-			 sptr->hostingservice = liberate(sptr->hostingservice);
+		if ( sptr->hostedservice )
+			 sptr->hostedservice = liberate(sptr->hostedservice);
 		if ( sptr->storageaccount )
 			 sptr->storageaccount = liberate(sptr->storageaccount);
 		if ( sptr->location )
 			 sptr->location = liberate(sptr->location);
+		if ( sptr->group )
+			 sptr->group = liberate(sptr->group);
 		sptr = liberate( sptr );
 	}
 	return((struct az_config *) 0);
@@ -94,10 +96,10 @@ public struct az_config * reset_az_config(struct az_config * sptr)
 		sptr->subscription = (char*) 0;
 		sptr->certificate = (char*) 0;
 		sptr->tls = (char*) 0;
-		sptr->hostingservice = (char*) 0;
+		sptr->hostedservice = (char*) 0;
 		sptr->storageaccount = (char*) 0;
 		sptr->location = (char*) 0;
-		sptr->deployment =  0;
+		sptr->group = (char*) 0;
 		sptr->current =  0;
 	}
 	return(sptr);
@@ -181,9 +183,9 @@ public int xmlin_az_config(struct az_config * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->tls = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"hostingservice") ))
+		else if (!( strcmp(wptr->name,"hostedservice") ))
 		{
-			if ( wptr->value ) { sptr->hostingservice = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->hostedservice = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"storageaccount") ))
 		{
@@ -193,9 +195,9 @@ public int xmlin_az_config(struct az_config * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"deployment") ))
+		else if (!( strcmp(wptr->name,"group") ))
 		{
-			if ( wptr->value ) { sptr->deployment = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->group = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"current") ))
 		{
@@ -229,10 +231,10 @@ public int rest_occi_az_config(FILE * fh,struct az_config * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.subscription='%s'\r\n",prefix,nptr,(sptr->subscription?sptr->subscription:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.certificate='%s'\r\n",prefix,nptr,(sptr->certificate?sptr->certificate:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.tls='%s'\r\n",prefix,nptr,(sptr->tls?sptr->tls:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostingservice='%s'\r\n",prefix,nptr,(sptr->hostingservice?sptr->hostingservice:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostedservice='%s'\r\n",prefix,nptr,(sptr->hostedservice?sptr->hostedservice:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.storageaccount='%s'\r\n",prefix,nptr,(sptr->storageaccount?sptr->storageaccount:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.deployment='%u'\r\n",prefix,nptr,sptr->deployment);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.current='%u'\r\n",prefix,nptr,sptr->current);
 	return(0);
 

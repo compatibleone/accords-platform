@@ -7,10 +7,7 @@ struct	windowsazure
 	char *	id;
 
 	char *	name;
-	char *	flavor;
-	char *	image;
 	char *	profile;
-	char *	media;
 
 	char *	number;
 	char *	access;
@@ -28,13 +25,17 @@ struct	windowsazure
 	char *	driver;
 	char *	price;
 	char *	original;
-	char *	publicnetwork;
-
 	char *	account;
-	char *	hostingservice;
-	char *	storageaccount;
-	char *	deployment;
+
 	char *	location;
+	char *	group;
+	char *	hostedservice;
+	char *	storageaccount;
+
+	char *	image;
+	char *	media;
+	char *	flavor;
+	char *	publicnetwork;
 
 	int	when;
 

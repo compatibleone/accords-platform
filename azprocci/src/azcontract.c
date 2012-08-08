@@ -109,6 +109,50 @@ private	int	terminate_windowsazure_contract( int status, struct cords_az_contrac
 	return( status );
 }
 
+/*	---------------------------------	*/
+/*	a z _ n o r m a l i s e _ n a m e 	*/
+/*	---------------------------------	*/
+private	char *	az_normalise_name( char * wptr )
+{
+	int	c;
+	int	i;
+	int	j;
+	int	upper;
+	char *	sptr;
+	if (!( sptr = wptr ))
+		return( sptr );
+	else if (!( sptr = allocate_string( wptr )))
+		return( sptr );
+	else
+	{
+		wptr = wptr;
+		for ( upper=1,j=0,i=0; *(wptr+i) != 0; i++)
+		{
+			if ((c = *(wptr+i)) == ' ' )
+			{
+				upper=1;
+				continue;
+			}
+			else if (!( upper ))
+			{
+				if (( c >= 'A') && ( c <= 'Z'))
+					*(wptr+j) = ((c - 'A') + 'a');
+				else	*(wptr+j) = c;
+				j++;
+			}
+			else 
+			{
+				upper = 0;
+				if (( c >= 'a') && ( c <= 'z'))
+					*(wptr+j) = ((c - 'a') + 'A');
+				else	*(wptr+j) = c;
+				j++;
+			}
+		}
+		return( sptr );
+	}
+}
+
 /*	---------------------------------------------------	*/
 /*		o s _ n o r m a l i s e _ v a l u e 		*/
 /*	---------------------------------------------------	*/
@@ -420,6 +464,147 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 }
 
 /*	-----------------------------------------------------------------	*/
+/*	    r e s o l v e _ w i n d o w s a z u r e _ l o c a t i o n		*/
+/*	-----------------------------------------------------------------	*/
+/*	- retrieve location definition from account and use in contract		*/
+/*	- retrieve affinity definition from account and use in contract		*/
+/*	- if    affinity defined then check affinity existance			*/
+/*	- else  check location existance					*/
+/*	-----------------------------------------------------------------	*/
+private	int 	resolve_windowsazure_location( 
+		struct cords_az_contract * cptr, 
+		struct windowsazure * pptr, 
+		struct	az_config * cfptr )
+{
+	struct	az_response * zptr;
+	int	status;
+
+	/***************************************************/
+	/* This is not yet SLA GEO Localisation Compliant  */
+	/***************************************************/
+	/*			TODO			   */
+	/* ----------------------------------------------- */
+
+
+	/* ----------------------------------------------- */
+	/* handle the configured prefered geo-localisation */
+	/* ----------------------------------------------- */
+	if ( pptr->location ) pptr->location = liberate( pptr->location );
+
+	if ( cfptr->location )
+		if (!( pptr->location = allocate_string( cfptr->location ) ))
+			return( 27 );
+
+	/* ----------------------------------------------- */
+	/* handle the configured prefered "affinity group" */
+	/* ----------------------------------------------- */
+	if ( pptr->group ) pptr->group = liberate( pptr->group );
+
+	if ( cfptr->group )
+		if (!( pptr->group = az_normalise_name( cfptr->group ) ))
+			return( 27 );
+
+	/* ----------------------------------------------- */
+	/* check usage and existance of the affinity group */
+	/* ----------------------------------------------- */
+	if ( pptr->group )
+	{
+		if (!( zptr = az_retrieve_affinity_group( pptr->group ) ))
+			return( 801 );
+		else if ((status = check_windowsazure_operation( zptr )) != 200)
+			return( status );
+		else	return( 0 );
+	}
+
+	/* ------------------------------------------------ */
+	/* check usage and existance of the geolocalisation */
+	/* ------------------------------------------------ */
+	else
+	{
+		if (!( zptr = az_retrieve_location( pptr->location ) ))
+			return( 801 );
+		else if ((status = check_windowsazure_operation( zptr )) != 200)
+			return( status );
+		else	return( 0 );
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	    r e s o l v e _ w i n d o w s a z u r e _ s t o r a g e		*/
+/*	-----------------------------------------------------------------	*/
+private	int 	resolve_windowsazure_storage( 
+		struct cords_az_contract * cptr, 
+		struct windowsazure * pptr, 
+		struct	az_config * cfptr )
+{
+	char	buffer[2048];
+	struct	az_response * zptr;
+	int	i;
+	int	j;
+	int	upper=0;
+	int	status;
+	char *	filename;
+
+	/* ---------------------------------------------------- */
+	/* recover the root of the subscription storage account */
+	/* ---------------------------------------------------- */
+	if ( pptr->storageaccount ) pptr->storageaccount = liberate( pptr->storageaccount );
+
+	if (!( cfptr->storageaccount ))
+		return( 818 );
+	else	strcpy(buffer,cfptr->storageaccount);
+
+	/* ------------------------------- */
+	/* create the storage account name */
+	/* ------------------------------- */
+	if ( pptr->group )	
+		strcpy(buffer,pptr->group);
+	else if ( pptr->location )
+		strcpy(buffer,pptr->location);
+	else	return( 818 );
+
+	/* ----------------------------------------------- */
+	/* ensure the geo localised storage account exists */
+	/* ----------------------------------------------- */
+	if (!( pptr->storageaccount = az_normalise_name( buffer )))
+		return( 817 );
+	else if (!( zptr = az_retrieve_storage_service( buffer )))
+		return( 500 );
+	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+		return( 0 );
+
+	/* ------------------------------ */
+	/* create the new storage account */
+	/* ------------------------------ */
+	if (!( filename = az_create_storage_service_request( 
+				pptr->storageaccount,
+				pptr->storageaccount,
+				pptr->storageaccount,
+				pptr->location,
+				pptr->group )))
+		return( 820 );
+
+	/* ------------------------------------------ */
+	/* ensure creation of the appropriate Account */
+	/* ------------------------------------------ */
+	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+		return( 0 );
+	else	return( status );
+
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	    r e s o l v e _ w i n d o w s a z u r e _ s e r v i c e 		*/
+/*	-----------------------------------------------------------------	*/
+private	int 	resolve_windowsazure_service( 
+		struct cords_az_contract * cptr, 
+		struct windowsazure * pptr, 
+		struct	az_config * cfptr )
+{
+	return(0);
+}
+
+/*	-----------------------------------------------------------------	*/
 /*		c r e a t e _ w i n d o w s a z u r e _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
 public	int	create_windowsazure_contract(
@@ -435,7 +620,11 @@ public	int	create_windowsazure_contract(
 	struct	os_response * images =(struct os_response *) 0;
 	char *	filename;
 	int	status;
+	char	buffer[1024];
 
+	/* ----------------------------------------- */
+	/* resolve the user or operator subscription */
+	/* ----------------------------------------- */
 	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( status );
 
@@ -444,17 +633,24 @@ public	int	create_windowsazure_contract(
 
 	else	memset( &contract, 0, sizeof( struct cords_az_contract ));
 
-	/* --------------------------------------------------------------- */
-	/* the subscription account management uuid is unique for accounts */
-	/* and would prove a useful deployment identifier to regroup   VMS */
-	/* deployed for that account. this requires that start and stop be */
-	/* in the same conditions.					   */
-	/* --------------------------------------------------------------- */
-	if ( pptr->deployment ) pptr->deployment = liberate( pptr->deployment );
+	/* ------------------------------------------ */
+	/* Resolve the required Geographical Location */
+	/* ------------------------------------------ */
+	if (( status = resolve_windowsazure_location( &contract, pptr, cfptr )) != 0)
+		return( status );
 
-	if ( cfptr->deployment )
-		if (!( pptr->deployment = allocate_string( cfptr->id ) ))
-			return( 27 );
+	/* ------------------------------------------ */
+	/* Resolve the required GeoLo Storage Account */
+	/* ------------------------------------------ */
+	else if ((status = resolve_windowsazure_storage( &contract, pptr, cfptr )) != 0)
+		return( status );
+
+	/* ------------------------------------------ */
+	/* Resolve the required Hosted Service Entity */
+	/* ------------------------------------------ */
+	else if ((status = resolve_windowsazure_service( &contract, pptr, cfptr )) != 0)
+		return( status );
+
 
 	/* ----------------------------------------------------------- */
 	/* Before we get here if we are in SLA Mode we must resolve an */
@@ -465,16 +661,16 @@ public	int	create_windowsazure_contract(
 	/* this is the none SLA section of code only 		       */
 	/* collect and validate and perhaps create ??? hosting service */
 	/* ----------------------------------------------------------- */
-	if ( pptr->hostingservice ) pptr->hostingservice = liberate( pptr->hostingservice );
+	if ( pptr->hostedservice ) pptr->hostedservice = liberate( pptr->hostedservice );
 
-	if (!( pptr->hostingservice = allocate_string( cfptr->hostingservice ) ))
+	if (!( pptr->hostedservice = allocate_string( cfptr->hostedservice ) ))
 		return( 27 );
-	else if (!( azptr = az_get_hosted_service(pptr->hostingservice) ))
+	else if (!( azptr = az_get_hosted_service(pptr->hostedservice) ))
 	{
 		if (!( filename = az_create_hosted_service_request(
-				pptr->hostingservice,
-				pptr->hostingservice,
-				pptr->hostingservice,
+				pptr->hostedservice,
+				pptr->hostedservice,
+				pptr->hostedservice,
 			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ),
 				(char *) 0 ) ))
 			return( 118 );
@@ -486,9 +682,9 @@ public	int	create_windowsazure_contract(
 	{
 		azptr = liberate_az_response( azptr );
 		if (!( filename = az_create_hosted_service_request(
-				pptr->hostingservice,
-				pptr->hostingservice,
-				pptr->hostingservice,
+				pptr->hostedservice,
+				pptr->hostedservice,
+				pptr->hostedservice,
 			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
 				(char *) 0 ) ))
 			return( 118 );

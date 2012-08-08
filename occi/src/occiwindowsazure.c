@@ -138,14 +138,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
-				pptr->flavor = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
-				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "media" )) != (struct xml_atribut *) 0)
-				pptr->media = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
@@ -174,18 +168,24 @@ private void autoload_windowsazure_nodes() {
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "original" )) != (struct xml_atribut *) 0)
 				pptr->original = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
-				pptr->publicnetwork = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "hostingservice" )) != (struct xml_atribut *) 0)
-				pptr->hostingservice = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
-				pptr->storageaccount = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "deployment" )) != (struct xml_atribut *) 0)
-				pptr->deployment = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
 				pptr->location = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "hostedservice" )) != (struct xml_atribut *) 0)
+				pptr->hostedservice = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
+				pptr->storageaccount = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
+				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "media" )) != (struct xml_atribut *) 0)
+				pptr->media = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
+				pptr->flavor = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
+				pptr->publicnetwork = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -220,17 +220,8 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," flavor=%c",0x0022);
-		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," image=%c",0x0022);
-		fprintf(h,"%s",(pptr->image?pptr->image:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," media=%c",0x0022);
-		fprintf(h,"%s",(pptr->media?pptr->media:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
@@ -274,23 +265,32 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," original=%c",0x0022);
 		fprintf(h,"%s",(pptr->original?pptr->original:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," publicnetwork=%c",0x0022);
-		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," hostingservice=%c",0x0022);
-		fprintf(h,"%s",(pptr->hostingservice?pptr->hostingservice:""));
+		fprintf(h," location=%c",0x0022);
+		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," hostedservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->hostedservice?pptr->hostedservice:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," storageaccount=%c",0x0022);
 		fprintf(h,"%s",(pptr->storageaccount?pptr->storageaccount:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," deployment=%c",0x0022);
-		fprintf(h,"%s",(pptr->deployment?pptr->deployment:""));
+		fprintf(h," image=%c",0x0022);
+		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," location=%c",0x0022);
-		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h," media=%c",0x0022);
+		fprintf(h,"%s",(pptr->media?pptr->media:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," flavor=%c",0x0022);
+		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," publicnetwork=%c",0x0022);
+		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
@@ -321,14 +321,8 @@ private void set_windowsazure_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "flavor" ) ))
-			pptr->flavor = allocate_string(vptr);
-		if (!( strcmp( nptr, "image" ) ))
-			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
-		if (!( strcmp( nptr, "media" ) ))
-			pptr->media = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
@@ -357,18 +351,24 @@ private void set_windowsazure_field(
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "original" ) ))
 			pptr->original = allocate_string(vptr);
-		if (!( strcmp( nptr, "publicnetwork" ) ))
-			pptr->publicnetwork = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
-		if (!( strcmp( nptr, "hostingservice" ) ))
-			pptr->hostingservice = allocate_string(vptr);
-		if (!( strcmp( nptr, "storageaccount" ) ))
-			pptr->storageaccount = allocate_string(vptr);
-		if (!( strcmp( nptr, "deployment" ) ))
-			pptr->deployment = allocate_string(vptr);
 		if (!( strcmp( nptr, "location" ) ))
 			pptr->location = allocate_string(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
+		if (!( strcmp( nptr, "hostedservice" ) ))
+			pptr->hostedservice = allocate_string(vptr);
+		if (!( strcmp( nptr, "storageaccount" ) ))
+			pptr->storageaccount = allocate_string(vptr);
+		if (!( strcmp( nptr, "image" ) ))
+			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "media" ) ))
+			pptr->media = allocate_string(vptr);
+		if (!( strcmp( nptr, "flavor" ) ))
+			pptr->flavor = allocate_string(vptr);
+		if (!( strcmp( nptr, "publicnetwork" ) ))
+			pptr->publicnetwork = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -411,32 +411,11 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->flavor )
-	&&  (strlen( fptr->flavor ) != 0)) {
-		if (!( pptr->flavor ))
-			return(0);
-		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
-			return(0);
-		}
-	if (( fptr->image )
-	&&  (strlen( fptr->image ) != 0)) {
-		if (!( pptr->image ))
-			return(0);
-		else if ( strcmp(pptr->image,fptr->image) != 0)
-			return(0);
-		}
 	if (( fptr->profile )
 	&&  (strlen( fptr->profile ) != 0)) {
 		if (!( pptr->profile ))
 			return(0);
 		else if ( strcmp(pptr->profile,fptr->profile) != 0)
-			return(0);
-		}
-	if (( fptr->media )
-	&&  (strlen( fptr->media ) != 0)) {
-		if (!( pptr->media ))
-			return(0);
-		else if ( strcmp(pptr->media,fptr->media) != 0)
 			return(0);
 		}
 	if (( fptr->number )
@@ -537,13 +516,6 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->original,fptr->original) != 0)
 			return(0);
 		}
-	if (( fptr->publicnetwork )
-	&&  (strlen( fptr->publicnetwork ) != 0)) {
-		if (!( pptr->publicnetwork ))
-			return(0);
-		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
-			return(0);
-		}
 	if (( fptr->account )
 	&&  (strlen( fptr->account ) != 0)) {
 		if (!( pptr->account ))
@@ -551,11 +523,25 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
-	if (( fptr->hostingservice )
-	&&  (strlen( fptr->hostingservice ) != 0)) {
-		if (!( pptr->hostingservice ))
+	if (( fptr->location )
+	&&  (strlen( fptr->location ) != 0)) {
+		if (!( pptr->location ))
 			return(0);
-		else if ( strcmp(pptr->hostingservice,fptr->hostingservice) != 0)
+		else if ( strcmp(pptr->location,fptr->location) != 0)
+			return(0);
+		}
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
+	if (( fptr->hostedservice )
+	&&  (strlen( fptr->hostedservice ) != 0)) {
+		if (!( pptr->hostedservice ))
+			return(0);
+		else if ( strcmp(pptr->hostedservice,fptr->hostedservice) != 0)
 			return(0);
 		}
 	if (( fptr->storageaccount )
@@ -565,18 +551,32 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->storageaccount,fptr->storageaccount) != 0)
 			return(0);
 		}
-	if (( fptr->deployment )
-	&&  (strlen( fptr->deployment ) != 0)) {
-		if (!( pptr->deployment ))
+	if (( fptr->image )
+	&&  (strlen( fptr->image ) != 0)) {
+		if (!( pptr->image ))
 			return(0);
-		else if ( strcmp(pptr->deployment,fptr->deployment) != 0)
+		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
-	if (( fptr->location )
-	&&  (strlen( fptr->location ) != 0)) {
-		if (!( pptr->location ))
+	if (( fptr->media )
+	&&  (strlen( fptr->media ) != 0)) {
+		if (!( pptr->media ))
 			return(0);
-		else if ( strcmp(pptr->location,fptr->location) != 0)
+		else if ( strcmp(pptr->media,fptr->media) != 0)
+			return(0);
+		}
+	if (( fptr->flavor )
+	&&  (strlen( fptr->flavor ) != 0)) {
+		if (!( pptr->flavor ))
+			return(0);
+		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
+			return(0);
+		}
+	if (( fptr->publicnetwork )
+	&&  (strlen( fptr->publicnetwork ) != 0)) {
+		if (!( pptr->publicnetwork ))
+			return(0);
+		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
 			return(0);
 		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
@@ -599,16 +599,7 @@ private struct rest_response * windowsazure_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.media=%s",optr->domain,optr->id,pptr->media);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
@@ -653,22 +644,31 @@ private struct rest_response * windowsazure_occi_response(
 	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostingservice=%s",optr->domain,optr->id,pptr->hostingservice);
+	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.hostedservice=%s",optr->domain,optr->id,pptr->hostedservice);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.storageaccount=%s",optr->domain,optr->id,pptr->storageaccount);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.deployment=%s",optr->domain,optr->id,pptr->deployment);
+	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
+	sprintf(cptr->buffer,"%s.%s.media=%s",optr->domain,optr->id,pptr->media);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -1083,13 +1083,7 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 		redirect_occi_windowsazure_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "media",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
@@ -1119,17 +1113,23 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "original",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "hostingservice",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "hostedservice",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "storageaccount",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "deployment",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "media",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
@@ -1181,40 +1181,7 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.windowsazure.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.windowsazure.image='%s'\r\n",(sptr->image?sptr->image:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.windowsazure.profile='%s'\r\n",(sptr->profile?sptr->profile:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.windowsazure.media='%s'\r\n",(sptr->media?sptr->media:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1379,17 +1346,6 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.windowsazure.publicnetwork='%s'\r\n",(sptr->publicnetwork?sptr->publicnetwork:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.windowsazure.account='%s'\r\n",(sptr->account?sptr->account:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1401,7 +1357,29 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.windowsazure.hostingservice='%s'\r\n",(sptr->hostingservice?sptr->hostingservice:""));
+	sprintf(buffer,"occi.windowsazure.location='%s'\r\n",(sptr->location?sptr->location:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.group='%s'\r\n",(sptr->group?sptr->group:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.hostedservice='%s'\r\n",(sptr->hostedservice?sptr->hostedservice:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1423,7 +1401,7 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.windowsazure.deployment='%s'\r\n",(sptr->deployment?sptr->deployment:""));
+	sprintf(buffer,"occi.windowsazure.image='%s'\r\n",(sptr->image?sptr->image:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1434,7 +1412,29 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.windowsazure.location='%s'\r\n",(sptr->location?sptr->location:""));
+	sprintf(buffer,"occi.windowsazure.media='%s'\r\n",(sptr->media?sptr->media:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.publicnetwork='%s'\r\n",(sptr->publicnetwork?sptr->publicnetwork:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

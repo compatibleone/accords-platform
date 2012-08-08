@@ -37,14 +37,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->flavor )
-			 sptr->flavor = liberate(sptr->flavor);
-		if ( sptr->image )
-			 sptr->image = liberate(sptr->image);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
-		if ( sptr->media )
-			 sptr->media = liberate(sptr->media);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
 		if ( sptr->access )
@@ -73,18 +67,24 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->original )
 			 sptr->original = liberate(sptr->original);
-		if ( sptr->publicnetwork )
-			 sptr->publicnetwork = liberate(sptr->publicnetwork);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
-		if ( sptr->hostingservice )
-			 sptr->hostingservice = liberate(sptr->hostingservice);
-		if ( sptr->storageaccount )
-			 sptr->storageaccount = liberate(sptr->storageaccount);
-		if ( sptr->deployment )
-			 sptr->deployment = liberate(sptr->deployment);
 		if ( sptr->location )
 			 sptr->location = liberate(sptr->location);
+		if ( sptr->group )
+			 sptr->group = liberate(sptr->group);
+		if ( sptr->hostedservice )
+			 sptr->hostedservice = liberate(sptr->hostedservice);
+		if ( sptr->storageaccount )
+			 sptr->storageaccount = liberate(sptr->storageaccount);
+		if ( sptr->image )
+			 sptr->image = liberate(sptr->image);
+		if ( sptr->media )
+			 sptr->media = liberate(sptr->media);
+		if ( sptr->flavor )
+			 sptr->flavor = liberate(sptr->flavor);
+		if ( sptr->publicnetwork )
+			 sptr->publicnetwork = liberate(sptr->publicnetwork);
 		sptr = liberate( sptr );
 	}
 	return((struct windowsazure *) 0);
@@ -100,10 +100,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->flavor = (char*) 0;
-		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
-		sptr->media = (char*) 0;
 		sptr->number = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->rootpass = (char*) 0;
@@ -118,12 +115,15 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->driver = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->original = (char*) 0;
-		sptr->publicnetwork = (char*) 0;
 		sptr->account = (char*) 0;
-		sptr->hostingservice = (char*) 0;
-		sptr->storageaccount = (char*) 0;
-		sptr->deployment = (char*) 0;
 		sptr->location = (char*) 0;
+		sptr->group = (char*) 0;
+		sptr->hostedservice = (char*) 0;
+		sptr->storageaccount = (char*) 0;
+		sptr->image = (char*) 0;
+		sptr->media = (char*) 0;
+		sptr->flavor = (char*) 0;
+		sptr->publicnetwork = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -160,21 +160,9 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"flavor") ))
-		{
-			if ( wptr->value ) { sptr->flavor = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"image") ))
-		{
-			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"profile") ))
 		{
 			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"media") ))
-		{
-			if ( wptr->value ) { sptr->media = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"number") ))
 		{
@@ -232,29 +220,41 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->original = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"publicnetwork") ))
-		{
-			if ( wptr->value ) { sptr->publicnetwork = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"account") ))
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"hostingservice") ))
+		else if (!( strcmp(wptr->name,"location") ))
 		{
-			if ( wptr->value ) { sptr->hostingservice = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"group") ))
+		{
+			if ( wptr->value ) { sptr->group = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"hostedservice") ))
+		{
+			if ( wptr->value ) { sptr->hostedservice = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"storageaccount") ))
 		{
 			if ( wptr->value ) { sptr->storageaccount = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"deployment") ))
+		else if (!( strcmp(wptr->name,"image") ))
 		{
-			if ( wptr->value ) { sptr->deployment = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"location") ))
+		else if (!( strcmp(wptr->name,"media") ))
 		{
-			if ( wptr->value ) { sptr->location = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->media = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"flavor") ))
+		{
+			if ( wptr->value ) { sptr->flavor = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"publicnetwork") ))
+		{
+			if ( wptr->value ) { sptr->publicnetwork = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
@@ -280,10 +280,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.media='%s'\r\n",prefix,nptr,(sptr->media?sptr->media:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
@@ -298,12 +295,15 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.driver='%s'\r\n",prefix,nptr,(sptr->driver?sptr->driver:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.original='%s'\r\n",prefix,nptr,(sptr->original?sptr->original:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostingservice='%s'\r\n",prefix,nptr,(sptr->hostingservice?sptr->hostingservice:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.storageaccount='%s'\r\n",prefix,nptr,(sptr->storageaccount?sptr->storageaccount:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.deployment='%s'\r\n",prefix,nptr,(sptr->deployment?sptr->deployment:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.location='%s'\r\n",prefix,nptr,(sptr->location?sptr->location:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostedservice='%s'\r\n",prefix,nptr,(sptr->hostedservice?sptr->hostedservice:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.storageaccount='%s'\r\n",prefix,nptr,(sptr->storageaccount?sptr->storageaccount:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.media='%s'\r\n",prefix,nptr,(sptr->media?sptr->media:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

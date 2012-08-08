@@ -162,14 +162,14 @@ private void autoload_az_config_nodes() {
 				pptr->certificate = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
 				pptr->tls = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "hostingservice" )) != (struct xml_atribut *) 0)
-				pptr->hostingservice = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "hostedservice" )) != (struct xml_atribut *) 0)
+				pptr->hostedservice = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
 				pptr->storageaccount = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
 				pptr->location = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "deployment" )) != (struct xml_atribut *) 0)
-				pptr->deployment = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "current" )) != (struct xml_atribut *) 0)
 				pptr->current = document_atribut_value(aptr);
 			}
@@ -238,8 +238,8 @@ public  void autosave_az_config_nodes() {
 		fprintf(h," tls=%c",0x0022);
 		fprintf(h,"%s",(pptr->tls?pptr->tls:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," hostingservice=%c",0x0022);
-		fprintf(h,"%s",(pptr->hostingservice?pptr->hostingservice:""));
+		fprintf(h," hostedservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->hostedservice?pptr->hostedservice:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," storageaccount=%c",0x0022);
 		fprintf(h,"%s",(pptr->storageaccount?pptr->storageaccount:""));
@@ -247,8 +247,8 @@ public  void autosave_az_config_nodes() {
 		fprintf(h," location=%c",0x0022);
 		fprintf(h,"%s",(pptr->location?pptr->location:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," deployment=%c",0x0022);
-		fprintf(h,"%u",pptr->deployment);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," current=%c",0x0022);
 		fprintf(h,"%u",pptr->current);
@@ -300,14 +300,14 @@ private void set_az_config_field(
 			pptr->certificate = allocate_string(vptr);
 		if (!( strcmp( nptr, "tls" ) ))
 			pptr->tls = allocate_string(vptr);
-		if (!( strcmp( nptr, "hostingservice" ) ))
-			pptr->hostingservice = allocate_string(vptr);
+		if (!( strcmp( nptr, "hostedservice" ) ))
+			pptr->hostedservice = allocate_string(vptr);
 		if (!( strcmp( nptr, "storageaccount" ) ))
 			pptr->storageaccount = allocate_string(vptr);
 		if (!( strcmp( nptr, "location" ) ))
 			pptr->location = allocate_string(vptr);
-		if (!( strcmp( nptr, "deployment" ) ))
-			pptr->deployment = atoi(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
 		if (!( strcmp( nptr, "current" ) ))
 			pptr->current = atoi(vptr);
 		}
@@ -432,11 +432,11 @@ private int pass_az_config_filter(
 		else if ( strcmp(pptr->tls,fptr->tls) != 0)
 			return(0);
 		}
-	if (( fptr->hostingservice )
-	&&  (strlen( fptr->hostingservice ) != 0)) {
-		if (!( pptr->hostingservice ))
+	if (( fptr->hostedservice )
+	&&  (strlen( fptr->hostedservice ) != 0)) {
+		if (!( pptr->hostedservice ))
 			return(0);
-		else if ( strcmp(pptr->hostingservice,fptr->hostingservice) != 0)
+		else if ( strcmp(pptr->hostedservice,fptr->hostedservice) != 0)
 			return(0);
 		}
 	if (( fptr->storageaccount )
@@ -453,7 +453,13 @@ private int pass_az_config_filter(
 		else if ( strcmp(pptr->location,fptr->location) != 0)
 			return(0);
 		}
-	if (( fptr->deployment ) && ( pptr->deployment != fptr->deployment )) return(0);
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
 	if (( fptr->current ) && ( pptr->current != fptr->current )) return(0);
 	return(1);
 }
@@ -509,7 +515,7 @@ private struct rest_response * az_config_occi_response(
 	sprintf(cptr->buffer,"%s.%s.tls=%s",optr->domain,optr->id,pptr->tls);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostingservice=%s",optr->domain,optr->id,pptr->hostingservice);
+	sprintf(cptr->buffer,"%s.%s.hostedservice=%s",optr->domain,optr->id,pptr->hostedservice);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.storageaccount=%s",optr->domain,optr->id,pptr->storageaccount);
@@ -518,7 +524,7 @@ private struct rest_response * az_config_occi_response(
 	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.deployment=%u",optr->domain,optr->id,pptr->deployment);
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.current=%u",optr->domain,optr->id,pptr->current);
@@ -954,13 +960,13 @@ public struct occi_category * occi_az_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "tls",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "hostingservice",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "hostedservice",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "storageaccount",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "deployment",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
@@ -1142,7 +1148,7 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.az_config.hostingservice='%s'\r\n",(sptr->hostingservice?sptr->hostingservice:""));
+	sprintf(buffer,"occi.az_config.hostedservice='%s'\r\n",(sptr->hostedservice?sptr->hostedservice:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1175,7 +1181,7 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.az_config.deployment='%u'\r\n",sptr->deployment);
+	sprintf(buffer,"occi.az_config.group='%s'\r\n",(sptr->group?sptr->group:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

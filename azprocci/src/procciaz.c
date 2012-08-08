@@ -23,6 +23,8 @@
 #include "azclient.h"
 #include "cordslang.h"
 
+#define	_AZURE_STATUS_POLL	5
+
 /* ---------------------------------------------------------------------------------- */
 /* if ((status = az_initialise_client( user, pass, host, agent, version, tls )) != 0) */
 /* ---------------------------------------------------------------------------------- */
@@ -63,7 +65,7 @@ private	int	use_windowsazure_configuration( char * sptr )
 			pptr->namespace, pptr->subscription )) != 0)
 		return(status);
 
-	else if ((status = az_initialise_service( pptr->hostingservice )) != 0)
+	else if ((status = az_initialise_service( pptr->hostedservice )) != 0)
 		return( status );
 	else	return( 0 );
 }
@@ -149,33 +151,143 @@ private	int	connect_windowsazure_image( struct az_response * rptr,struct windows
 	}
 }
 
+/*	-------------------------------------------------------		*/
+/*	c h e c k _ w i n d o w s a z u r e _ o p e r a t i o n		*/
+/*	-------------------------------------------------------		*/
+private	int	check_windowsazure_operation( struct az_response * zptr )
+{
+	struct	rest_header * hptr;
+	struct	xml_element * eptr;
+	char	buffer[2048];
+	int	status;
+
+	if ((!( zptr ))
+	||  (!( zptr->response )))
+		return(599);
+
+	switch((status = zptr->response->status))
+	{
+	case	200	:	/* OK 		*/
+		zptr = liberate_az_response( zptr );
+		return(200);
+
+	case	201	:	/* Created 	*/
+	case	202	:	/* Accepted 	*/
+		/* locate a request id header 	*/
+		if (!( hptr = rest_resolve_header( zptr->response->first, "x-ms-request-id" ) ))
+		{
+			zptr = liberate_az_response( zptr );
+			return(200);
+		}
+		else if (!( hptr->value ))
+		{
+			zptr = liberate_az_response( zptr );
+			return(200);
+		}
+		else
+		{
+			strcpy( buffer, hptr->value );
+			break;
+		}
+	default		:
+		zptr = liberate_az_response( zptr );
+		return( status );
+	}
+
+	while(1)
+	{
+		zptr = liberate_az_response( zptr );
+		if (!( zptr = az_get_operation_status( buffer )))
+			return( 518 );
+		else if (!( zptr->response ))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 501 );
+		}
+		else if ((zptr->response->status) != 200 )
+		{
+			zptr = liberate_az_response( zptr );
+			return( status );
+		}
+		else if (!( zptr->xmlroot ))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 502 );
+		}
+		else if ((!( eptr = document_element( zptr->xmlroot, "Status" ) ))
+		     ||  (!( eptr->value )))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 503 );
+		}
+		else if ((!( strcasecmp( eptr->value, "SUCCEEDED" )))
+		     ||  (!( strcasecmp( eptr->value, "SUCCESS"   ))))
+			break;
+		else if ((!( strcasecmp( eptr->value, "FAILED"    )))
+		     ||  (!( strcasecmp( eptr->value, "FAILURE"   ))))
+			break;
+		else if (!( strcasecmp( eptr->value, "INPROGRESS" )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			continue;
+		}
+		else	continue;
+	}
+	/* ---------------------------------------------------------- */
+	/* recover and return the status code of the original request */
+	/* ---------------------------------------------------------- */
+	if ((!( eptr = document_element( zptr->xmlroot, "HttpStatusCode" ) ))
+	||  (!( eptr->value ))
+	||  (!( status = atoi( eptr->value ) )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 504 );
+	}
+	else
+	{
+		zptr = liberate_az_response( zptr );
+		return( status );
+	}
+	
+}
+
+
 /*	--------------------------------------------------------	*/
 /* 	 c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
-private	int	connect_windowsazure_server( struct az_response * rptr,struct windowsazure * pptr )
+private	int	connect_windowsazure_server( struct az_response * zptr,struct windowsazure * pptr )
 {
-	struct	az_response * zptr;
-	struct	az_response * yptr;
-	char *	vptr;
+	int	status;
 	char	buffer[2048];
-	if (!( pptr ))
-		return( 118 );
+
+	if ((!( pptr ))
+	||  (!( zptr ))
+	||  (!( zptr->response )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 500 );
+	}
+	else if ((status = check_windowsazure_operation( zptr )) != 200 )
+		return( status );
+		
 	else
 	{
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		sprintf(buffer,"%s.compatibleone.fr",pptr->id);
+
+		sprintf(buffer,"%s.cloudapp.net",pptr->hostedservice);
+
 		if (!( pptr->hostname = allocate_string( buffer) ))
-			return( 27 );
-		else
+			return( 505 );
+		else	
 		{
 			pptr->when = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
 			autosave_windowsazure_nodes();
+			return(0);
 		}
-		return(0);
 	}
 }
 
@@ -204,15 +316,7 @@ private	struct	rest_response * start_windowsazure(
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
 	else if (!( filename = az_create_vm_request(
-		/* --------------------------------------------------------- */
-		/* hmmmmm the name needs to be unique because it will be the */
-		/* resulting host name of the deployed machine so it needs   */
-		/* to be the unique ID but that would be a little ugly ..... */
-		/* --------------------------------------------------------- */
-		/* the name has been chosen for now but needs something more */
-		/* suitable for allowing multiple instances of the named node*/
-		/* --------------------------------------------------------- */
-		( rest_valid_string( pptr->deployment ) ? pptr->deployment : pptr->id ), pptr->name,
+		pptr->id,  pptr->name,
 		pptr->image, pptr->media, pptr->flavor,
 		pptr->publicnetwork,
 		(char *) 0, 0 )))
@@ -235,16 +339,9 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, status, buffer ) );
 	}
 	else if ((status = connect_windowsazure_server( azptr, pptr )) != 0)
-	{
-		azptr = liberate_az_response( azptr );
 		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
-	}
 	else
 	{
-		pptr->when = time((long *) 0);
-		pptr->state = _OCCI_RUNNING;
-		autosave_windowsazure_nodes();
-		azptr = liberate_az_response( azptr );
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -311,20 +408,19 @@ private	struct	rest_response * stop_windowsazure(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
-	/* --------------------------------------------------------- */
-	/* the deployment name needs to be the same as the one used  */
-	/* during the creation operation above.                      */
-	/* --------------------------------------------------------- */
 	else if (!( azptr = az_delete_deployment( 
-			pptr->hostingservice, 
-			( rest_valid_string(pptr->deployment) ? pptr->deployment : pptr->id)  )))
+			pptr->hostedservice, 
+			pptr->id  )))
 	 	return( rest_html_response( aptr, 504, "Error Deleting WINDOWS AZURE VM" ) );
+
+	else if ((status = check_windowsazure_operation( azptr )) != 200 )
+	 	return( rest_html_response( aptr, status, "Error Deleting WINDOWS AZURE VM" ) );
+		
 	else
 	{
 		reset_windowsazure_server( pptr );
 		pptr->when = time((long *) 0);
 		autosave_windowsazure_nodes();
-		azptr = liberate_az_response( azptr );
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -335,7 +431,7 @@ private	struct	rest_response * stop_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e s t a r t  _ w i n d o w s a z u r e	  	*/
+/* 	 r e s t a r t  _ w i n d o w s a z u r e	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * restart_windowsazure(
 		struct occi_category * optr, 
@@ -362,7 +458,7 @@ private	struct	rest_response * restart_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	     s u s p e n d  _ w i n d o w s a z u r e	  	*/
+/* 	  s u s p e n d  _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * suspend_windowsazure(
 		struct occi_category * optr, 
@@ -420,7 +516,7 @@ private	struct	rest_response * hardboot_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	     r e b u i l d_ w i n d o w s a z u r e  		*/
+/* 	   r e b u i l d_ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * rebuild_windowsazure(
 		struct occi_category * optr, 
@@ -436,7 +532,7 @@ private	struct	rest_response * rebuild_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e s i z e _ w i n d o w s a z u r e  		*/
+/* 	    r e s i z e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * resize_windowsazure(
 		struct occi_category * optr, 
@@ -452,7 +548,7 @@ private	struct	rest_response * resize_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	    c o n f i r m _ w i n d o w s a z u r e  		*/
+/* 	  c o n f i r m _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * confirm_windowsazure(
 		struct occi_category * optr, 
@@ -468,7 +564,7 @@ private	struct	rest_response * confirm_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e v e r t _ w i n d o w s a z u r e  		*/
+/* 	  r e v e r t _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * revert_windowsazure(
 		struct occi_category * optr, 
@@ -486,7 +582,7 @@ private	struct	rest_response * revert_windowsazure(
 #include "azcontract.c"
 
 /*	-------------------------------------------	*/
-/* 	      c r e a t e _ w i n d o w s a z u r e  		*/
+/* 	  c r e a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	create_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -500,7 +596,7 @@ private	int	create_windowsazure(struct occi_category * optr, void * vptr)
 }
 
 /*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ w i n d o w s a z u r e  	*/
+/* 	 r e t r i e v e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -514,7 +610,7 @@ private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
 }
 
 /*	-------------------------------------------	*/
-/* 	      u p d a t e _ w i n d o w s a z u r e 	 	*/
+/* 	   u p d a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	update_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -524,11 +620,10 @@ private	int	update_windowsazure(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
-}
+	else	return(0);}
 
 /*	-------------------------------------------	*/
-/* 	      d e l e t e _ w i n d o w s a z u r e  		*/
+/* 	   d e l e t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	delete_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -549,7 +644,7 @@ private	struct	occi_interface	windowsazure_interface = {
 	};
 
 /*	-------------------------------------------	*/
-/* 	       b u i l d _ w i n d o w s a z u r e  		*/
+/* 	    b u i l d _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 /*	this function is to be called to build the	*/
 /*	complete windowsazure occi category to offer	*/
@@ -593,9 +688,9 @@ public	struct	occi_category * build_windowsazure( char * domain )
 	}
 }
 
-/*	-------------------------------------------	*/
+/*	------------------------------------------------	*/
 /*	 s e t _ d e f a u l t _ w i n d o w s a z u r e	*/
-/*	-------------------------------------------	*/
+/*	------------------------------------------------	*/
 private	int	set_default_windowsazure(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;

@@ -344,21 +344,44 @@ public	struct	az_response * az_client_put_request(char * target, char * tls, cha
 /*	------------------------------------------------------------	*/
 /*			a z _ a u t h e n t i c a t e ()	        */
 /*	------------------------------------------------------------	*/
-public	struct	rest_header   *	az_authenticate	( char * content_type )
+public	struct	rest_header   *	az_authenticate	( char * content_type, char * accepts )
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	struct	rest_header 	*	root=(struct rest_header * ) 0;
+	struct	rest_header 	*	foot=(struct rest_header * ) 0;
 	if (!( Waz.user ))
 		return( hptr );
 	else if (!( Waz.password ))
 		return( hptr );
 	else if (!( Waz.version ))
 		return( hptr );
-	else if (!( hptr = rest_create_header( "x-ms-version", Waz.version ) ))
-		return( hptr );
-	else if (!( hptr->next = rest_create_header( _HTTP_CONTENT_TYPE, content_type ) ))
-		return( hptr );
-	else	return((hptr->next->previous = hptr));
+	else if (!( foot = root = rest_create_header( "x-ms-version", Waz.version ) ))
+		return( root );
+	if ( content_type )
+	{
+		if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, content_type ) ))
+			return( root );
+		else 
+		{
+			hptr->previous = root;
+			foot->next     = hptr;
+			foot = hptr;
+		}
+	}
+	if ( accepts )
+	{
+		if (!( hptr = rest_create_header( _HTTP_ACCEPT, accepts ) ))
+			return( root );
+		else 
+		{
+			hptr->previous = root;
+			foot->next     = hptr;
+			foot = hptr;
+		}
+	}
+	return( root );
 }
+
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ u p d a t e _ o p e r a t i o n		*/
@@ -369,7 +392,7 @@ public	struct	az_response *	azure_update_operation( char * action, char * filena
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -397,7 +420,7 @@ public	struct	az_response *	network_update_operation( char * action, char * file
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/plain") ))
+	if (!( hptr = az_authenticate("text/plain","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -425,7 +448,7 @@ public	struct	az_response *	azure_create_operation( char * action, char * filena
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -454,7 +477,7 @@ private	struct	az_response * azure_list_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -484,7 +507,7 @@ private	struct	az_response * azure_retrieve_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -514,7 +537,7 @@ private	struct	az_response * azure_delete_operation( char * buffer )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2459,6 +2482,17 @@ public	struct	az_response *	az_list_operations(char * start,char * end)
 }
 
 /*	------------------------------------------------------------	*/
+/*		a z _ g e t _ o p e r a t i o n _ s t a t u s		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_get_operation_status(char * opid)
+{
+	char buffer[2048];
+	sprintf(buffer,"/operations/%s",opid);
+	return( azure_retrieve_operation( buffer ) );
+}
+
+
+/*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ W A T M _ p r o f i l e s		*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response *	az_list_WATM_profiles()
@@ -2538,7 +2572,7 @@ public	struct	az_response *	az_create_certificate( char * filename )
 public	struct	az_response *	az_retrieve_certificate( char * filename )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostingservice, filename ); 
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostedservice, filename ); 
 	return( azure_retrieve_operation( buffer ) );
 }
 
@@ -2548,7 +2582,7 @@ public	struct	az_response *	az_retrieve_certificate( char * filename )
 public	struct	az_response *	az_delete_certificate( char * filename )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostingservice,filename ); 
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostedservice,filename ); 
 	return( azure_delete_operation( buffer ) );
 }
 
@@ -2558,7 +2592,7 @@ public	struct	az_response *	az_delete_certificate( char * filename )
 public	struct	az_response *	az_list_certificates()
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates" , Waz.hostingservice ); 
+	sprintf(buffer,"/services/hostedservices/%s/certificates" , Waz.hostedservice ); 
 	return( azure_list_operation( buffer ) );
 }
 
@@ -2568,6 +2602,16 @@ public	struct	az_response *	az_list_certificates()
 public	struct	az_response *	az_list_locations()
 {
 	return( azure_list_operation( "/locations" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		a z _ r e t r i e v e _ l o c a t i o n s 		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_retrieve_location(char * nptr)
+{
+	char	buffer[2048];
+	sprintf(buffer,"/locations/%s",nptr);
+	return( azure_list_operation( nptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -2628,7 +2672,7 @@ public	struct	az_response *	az_create_image( char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images");
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -2838,7 +2882,7 @@ public	char * az_create_vm_request(
 public	struct	az_response *	az_create_vm( char * filename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments",Waz.hostingservice);
+	sprintf(url,"/services/hostedservices/%s/deployments",Waz.hostedservice);
 	return( azure_create_operation( url, filename ) );
 }
 
@@ -2848,7 +2892,7 @@ public	struct	az_response *	az_create_vm( char * filename )
 public	struct	az_response *	az_delete_vm( char * depname, char * rolename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostingservice,depname,rolename);
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostedservice,depname,rolename);
 	return( azure_delete_operation( url ) );
 }
 
@@ -2858,7 +2902,7 @@ public	struct	az_response *	az_delete_vm( char * depname, char * rolename )
 public	struct	az_response *	az_get_vm( char * depname, char * rolename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostingservice,depname,rolename);
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostedservice,depname,rolename);
 	return( azure_retrieve_operation( url ) );
 }
 
@@ -2868,7 +2912,7 @@ public	struct	az_response *	az_get_vm( char * depname, char * rolename )
 public	struct	az_response *	az_list_vm( char * depname )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles",Waz.hostingservice,depname);
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles",Waz.hostedservice,depname);
 	return( azure_list_operation( url ) );
 }
 
@@ -3227,7 +3271,7 @@ public	struct	az_response *	az_get_flavor(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/flavors/%s",id);
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -3258,7 +3302,7 @@ public	struct	az_response *	az_get_image 	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -3290,7 +3334,7 @@ public	struct	az_response *	az_delete_image	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate("text/xml") ))
+	if (!( hptr = az_authenticate("text/xml","application/xml") ))
 		return( rptr );
 	else if (!( uptr = analyse_url( Waz.base )))
 		return( rptr );
@@ -3313,28 +3357,16 @@ public	struct	az_response *	az_delete_image	(  char * id )
 /*	------------------------------------------------------------	*/
 /*		a z _ i n i t i a l i s e _ s e r v i c e		*/
 /*	------------------------------------------------------------	*/
-private	int	check_hosted_service=0;
 public	int	az_initialise_service( char * servicename )
 {
 	struct	az_response * azptr;
 	int	status;
-	if ( Waz.hostingservice ) Waz.hostingservice = liberate( Waz.hostingservice );
-	if (!( Waz.hostingservice = allocate_string( servicename ) ))
+	if ( Waz.hostedservice ) Waz.hostedservice = liberate( Waz.hostedservice );
+	if (!( Waz.hostedservice = allocate_string( servicename ) ))
 		return( 27 );
-	else if (!( check_hosted_service ))
-		return( 0 );
-	else if (!( azptr = az_get_hosted_service( Waz.hostingservice ) ))
-		return( 512 );
-	else if (!( azptr->response ))
-		return( 513 );
-	{
-		status = azptr->response->status;
-		azptr = liberate_az_response( azptr );
-		if ( status < 300 )
-			return( 0 );
-		else	return( status );
-	}
+	else	return( 0  );
 }
+
 
 /*	------------------------------------------------------------	*/
 /*		a z _ i n i t i a l i s e _ c l i e n t 	        */
