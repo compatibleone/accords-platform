@@ -2426,6 +2426,51 @@ public	char * az_create_storage_service_request(
 	}
 }
 
+/*	------------------------------------------------------------------	*/
+/*			a z _ s t a r t _ e n d p o i n t s			*/
+/*	------------------------------------------------------------------	*/
+public	FILE * az_start_endpoints( char * filename )
+{
+	FILE * h;
+	if (!( h = fopen( filename, "w")))
+		return( h );
+	else
+	{
+		fprintf(h,"<InputEndpoints>\n");
+		return( h );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			a z _ c r e a t e _ e n d p o i n t s			*/
+/*	------------------------------------------------------------------	*/
+public	void	az_create_endpoint( FILE * h, char * name, int localport, int port, char * protocol ) 
+{
+	if ( h )
+	{
+		fprintf(h,"<InputEndpoint>\n");
+		fprintf(h,"<LoadBalancedEndpointSetName></LoadBalancedEndpointSetName>\n");
+		fprintf(h,"<LocalPort>%u</LocalPort>\n",localport);
+		fprintf(h,"<Name>%s</Name>\n",name);
+		fprintf(h,"<Port>%u</Port>\n",port);
+		fprintf(h,"<Protocol>%s</Protocol>\n",protocol);  
+		fprintf(h,"</InputEndpoint>\n");
+	}
+	return;
+}
+
+/*	------------------------------------------------------------------	*/
+/*			a z _ c l o s e _ e n d p o i n t s			*/
+/*	------------------------------------------------------------------	*/
+public	void	az_close_endpoints( FILE * h )
+{
+	if ( h )
+	{
+		fprintf(h,"</InputEndpoints>\n");
+		fclose(h);
+	}
+	return;
+}
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ s t o r a g e _ s e r v i c e 	        */
@@ -2719,10 +2764,13 @@ public	char * az_create_vm_request(
 	char * flavor,		/* the server machine flavour	*/
 	char * network,		/* the network groul		*/
 	char * zone,		/* an eventual locality zone	*/
-	int    option )		/* option flags for staging 	*/
+	int    option,		/* option flags for staging 	*/
+	char * endpoints )	/* filename with endpoints info	*/
 {
 	char *	hostname=(char *) 0;
 	FILE *	h=(FILE *) 0;
+	FILE *	hh=(FILE *) 0;
+	int	c;
 	char *	newdeployment=(char *) 0;
 	char 	buffer[1024];
 	char *	filename=(char *) 0;
@@ -2828,6 +2876,18 @@ public	char * az_create_vm_request(
 			}
 
 			fprintf(h,"\t\t</ConfigurationSet>\n");
+			if ( rest_valid_string( endpoints ) )
+			{
+				if ((hh = fopen( endpoints, "r" )) != (FILE *) 0)
+				{
+					fprintf(h,"\t\t<ConfigurationSet>\n");
+			                fprintf(h,"\t\t<ConfigurationSetType>NetworkConfiguration</ConfigurationSetType>\n");
+					while ((c = fgetc(hh)) > 0)
+					{ 	fputc(c,h);	}
+					fprintf(h,"\t\t</ConfigurationSet>\n");
+					fclose(hh);
+				}
+			}
 			fprintf(h,"\t\t</ConfigurationSets>\n");
 			if ( rest_valid_string( zone ) )
 			{

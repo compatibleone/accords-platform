@@ -22,6 +22,8 @@
 
 #include "azclient.h"
 #include "cordslang.h"
+#include "cosacsctrl.h"
+#include "stdnode.h"
 
 #define	_AZURE_STATUS_POLL	5
 
@@ -292,6 +294,76 @@ private	int	connect_windowsazure_server( struct az_response * zptr,struct window
 	}
 }
 
+/*	----------------------------------------------------------------	*/
+/*	     b u i l d _ w i n d o w s a z u r e _ f i r e w a l l		*/
+/*	----------------------------------------------------------------	*/
+private	char *	build_windowsazure_firewall(/* struct os_subscription * subptr,*/ struct windowsazure * pptr )
+{
+	int	status;
+	char *	sptr;
+	char *	filename;
+	FILE *	h;
+	char *	rulename;
+	char *	rulefrom;
+	char *	ruleproto;
+	char *	ruleto;
+	struct	occi_element * eptr;
+	struct	standard_message firewall;
+	struct	standard_message port;
+
+	memset( &firewall, 0, sizeof(struct standard_message));
+	memset( &port, 0, sizeof(struct standard_message));
+
+	/* ---------------------------------------------------- */
+	/* prepare the file containing the firewall description */
+	/* ---------------------------------------------------- */
+	if (!( filename = rest_temporary_filename( ".xml" )))
+		return( filename );
+	else if (!( h = az_start_endpoints( filename )))
+		return( liberate( filename ) );
+	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+		return( liberate( filename ) );
+	{
+		/* -------------------------- */
+		/* create the security group  */
+		/* -------------------------- */
+		for (	eptr = first_standard_message_link( firewall.message );
+			eptr != (struct occi_element *) 0;
+			eptr = next_standard_message_link( eptr ) )
+		{
+			/* ------------------------ */
+			/* retrieve the port record */
+			/* ------------------------ */
+			if (!( sptr = standard_message_link_value( eptr->value )))
+				continue;
+			else if ((status = get_standard_message( &port, sptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+				continue;
+
+			/* ---------------------------------- */
+			/* retrieve the port rule information */
+			/* ---------------------------------- */
+			if ((!( rulename = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_NAME ) ))
+			||  (!( ruleproto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_PROTOCOL ) ))
+			||  (!( rulefrom = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_FROM ) ))
+			||  (!( ruleto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_TO   ) )) )
+			{
+				release_standard_message( &port );
+				release_standard_message( &firewall );
+				filename = liberate(filename);
+				break;
+			}
+			else	az_create_endpoint( h, rulename, atoi(rulefrom), atoi(rulefrom), ruleproto );
+		}
+		az_close_endpoints( h );
+		return( filename );
+	}
+
+}
+
 /*	-------------------------------------------	*/
 /* 	   s t a r t  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
@@ -317,12 +389,14 @@ private	struct	rest_response * start_windowsazure(
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
-		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Hosted Service Failure" ) );
+	else if (!(filename = build_windowsazure_firewall( /* subptr,*/ pptr )))
+		return( rest_html_response( aptr, 888, "WINDOWS AZURE Firewall Failure" ) );
 	else if (!( filename = az_create_vm_request(
 		pptr->id,  pptr->name,
 		pptr->image, pptr->media, pptr->flavor,
 		pptr->publicnetwork,
-		(char *) 0, 0 )))
+		(char *) 0, 0, filename )))
 		return( rest_html_response( aptr, 500, "Error Creating WINDOWS AZURE VM Request" ) );
 	else if (!( azptr = az_create_vm( filename ) ))
 		return( rest_html_response( aptr, 501, "Error Creating WINDOWS AZURE VM" ) );
@@ -346,6 +420,20 @@ private	struct	rest_response * start_windowsazure(
 	else
 	{
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+
+		/* ---------------------------- */
+		/* launch the COSACS operations */
+		/* ---------------------------- */
+		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_CONFIGURATION,
+				reference, WazProcci.publisher, pptr->account );
+		}
+
+		/* --------------------------- */
+		/* now handle the transactions */
+		/* --------------------------- */
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=start", pptr->account, reference ) )
@@ -398,14 +486,30 @@ private	struct	rest_response * save_windowsazure(
 /*	-----------------------------------------------------------------	*/
 private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 {
+	char 	reference[2024];
 	int	status;
 	struct	az_response * azptr;
 
+	/* ------------------------ */
+	/* prepare the subscription */
+	/* ------------------------ */
 	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return(118);
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return(27);
-	else if (!( azptr = az_delete_deployment( 
+	else	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+
+	/* ------------------------------------------- */
+	/* perform pre-release actions for destruction */
+	/* ------------------------------------------- */
+	cosacs_metadata_instructions( 
+		pptr->hostname, _CORDS_RELEASE,
+		reference, WazProcci.publisher, pptr->account );
+
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( azptr = az_delete_deployment( 
 			pptr->hostedservice, 
 			pptr->id  )))
 		return(40);

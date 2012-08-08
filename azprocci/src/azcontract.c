@@ -750,15 +750,20 @@ public	int	create_windowsazure_contract(
 		return( terminate_windowsazure_contract( 1570, &contract ) );
 
 	/* -------------------------------------- */
-	/* recover the infrastructure description */
+	/* recover the firewall ports description */
 	/* -------------------------------------- */
 	else if (( contract.firewall.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_FIREWALL )) != (char *) 0)
 	{
 		if (!( contract.firewall.message = occi_simple_get( contract.firewall.id, agent, tls ) ))
 			return( terminate_windowsazure_contract( 1172, &contract ) );
+		else if (!( pptr->firewall = allocate_string( contract.firewall.id ) ))
+			return( terminate_windowsazure_contract( 1172, &contract ) );
 	}
 
+	/* -------------------------------------- */
+	/* recover the infrastructure description */
+	/* -------------------------------------- */
 	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_windowsazure_contract( 1571, &contract ) );

@@ -170,7 +170,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_create_vm_request( p4, p3, p5, p6, p7, p8, p9, atoi(p10) ) ))
+			if (!( nomfic = az_create_vm_request( p4, p3, p5, p6, p7, p8, p9, atoi(p10), (char *) 0 ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	

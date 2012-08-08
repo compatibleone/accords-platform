@@ -274,7 +274,8 @@ public	char * az_create_vm_request(
 	char * flavor,		
 	char * network,		
 	char * zone,		
-	int    access );
+	int    access,
+	char * endpoints );
 
 public	char * az_create_network_config_request( char * name, char * group, char * address, char * label );
 public	char * az_delete_network_config_request();
@@ -354,6 +355,9 @@ public	char * az_create_affinity_group_request_body(char * name,char * label,cha
 public	struct	az_response * azure_delete_affinitygroup(char *name);
 
 public	struct	az_response * azure_list_locations();
+public	FILE *  az_start_endpoints( char * filename );
+public	void	az_create_endpoint( FILE * h, char * name, int localport, int port, char * protocol );
+public	void	az_close_endpoints( FILE * h );
 
 /* --------------------------*/
 /* azure vm images services  */
