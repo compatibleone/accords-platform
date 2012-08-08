@@ -8,14 +8,13 @@
 #
 lib_LTLIBRARIES = libcocarrier.la
 EXTRA_DIST = dataelement.c dataelement.h \
-	eucahack.c osconfig.c paclient.h paclient.c
+	eucahack.c osconfig.c 
 
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     list.c list.h \
     hmac_sha2.c hmac_sha2.h \
     sha2.c sha2.h \
     osclient.c osclient.h \
-    paclient.c paclient.h \
     onclient.c onclient.h \
     dcclient.c dcclient.h \
     json.c json.h 

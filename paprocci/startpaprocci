@@ -1,0 +1,6 @@
+#!/bin/bash
+CURRDIR=`dirname $0`
+echo Executing... 
+echo $CURRDIR/src/paprocci --config $CURRDIR/../scripts/accords.xml CO-PAPROCCI/1.0
+$CURRDIR/src/paprocci --config $CURRDIR/../scripts/accords.xml CO-PAPROCCI/1.0
+

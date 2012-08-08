@@ -49,7 +49,7 @@ private	struct pa_config Wpa = {
 
 	};
 
-
+private struct jvm_struct * jvmp = NULL;
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ p a _ r e s p o n s e			*/
@@ -268,6 +268,22 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 
 
 /*! Function that calls the Java procci layer. */
+public void pa_jvm_create_node()
+{ 
+
+    char* result = NULL;                   // output of the execution of the command 
+
+    fprintf(stderr, "JVM Creating node...");
+    if (jvmp==NULL){
+	    // start the JVM
+	jvmp = startjvm();
+	connect_proactive(jvmp);
+	    
+    }
+
+}
+
+/*! Function that calls the Java procci layer. */
 public char * pa_java_procci_call(char * specific_parameters)
 { 
     #define RESULT_SIZE 1024*8
@@ -377,86 +393,6 @@ private	struct	pa_response * proactive_delete_operation( char * buffer )
 	}
 	else	return( rptr );
 }
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ c r e a t e _ a f f i n i t y _ g r o u p 		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_create_affinity_group( char * filename )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	   p a _ r e t r i e v e _ a f f i n i t y _ g r o u p 		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_retrieve_affinity_group( char * id )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ u p d a t e _ a f f i n i t y _ g r o u p 		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_update_affinity_group( char * filename )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ d e l e t e _ a f f i n i t y _ g r o u p s		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_delete_affinity_group( char * id )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*		p a _ l i s t _ a f f i n i t y _ g r o u p s		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_list_affinity_groups()
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ c r e a t e _ s t o r a g e _ s e r v i c e 		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_create_storage_service( char * filename )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	   p a _ r e t r i e v e _ s t o r a g e _ s e r v i c e 	*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_retrieve_storage_service( char * id )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ u p d a t e _ s t o r a g e _ s e r v i c e 		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_update_storage_service( char * filename )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*	     p a _ d e l e t e _ s t o r a g e _ s e r v i c e		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_delete_storage_service( char * id )
-//{
-//	return((struct pa_response *) 0);
-//}
-
-/*	------------------------------------------------------------	*/
-/*		p a _ l i s t _ s t o r a g e _ s e r v i c e s		*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_list_storage_services()
-//{
-//	return((struct pa_response *) 0);
-//}
 
 /*	------------------------------------------------------------	*/
 /*		p a _ l i s t _ o p e r a t i o n s			*/
@@ -616,37 +552,24 @@ public	struct	pa_response *	pa_list_servers	( )
 
 
 /*	------------------------------------------------------------	*/
-/*			p a _ l i s t _ f l a v o u r s			*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_list_flavors( )
-//{
-//	return( proactive_list_operation( "/flavors" )) ;
-//}
-
-
-/*	------------------------------------------------------------	*/
-/*			p a _ l i s t _ i m a g e s 			*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_list_images( )
-//{
-//	return( proactive_list_operation( "/images" ) );
-//}
-
-
-
-/*	------------------------------------------------------------	*/
 /*			p a _ c r e a t e _ s e r v e r                         */
 /*	------------------------------------------------------------	*/
 /*! 
  * Lock a ProActive node using as parameters the constraints given.  */
-public	struct	pa_response *	pa_create_server()
+public	struct	pa_response * pa_create_server(struct proactive * constr)
 {
     char * filename = NULL;
     char * raw_list = NULL;
     char command[1024];
 
+    printf("Simulating creation of a node...\n");
+    pa_jvm_create_node();
+    printf("Returning a NULL node...\n");
+
+    return NULL;
+
     struct pa_response* result = (struct pa_response*) NULL;
-    sprintf(command,"--get-cosacs "); // Parameters for java layer. 
+    sprintf(command,"--get-cosacs --select-by-os %s", constr->image); // Parameters for java layer. 
 
     if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
         return NULL;
@@ -751,70 +674,6 @@ public	struct	pa_response *	pa_get_server	(  char * id )
 
 
 /*	------------------------------------------------------------	*/
-/*			p a _ g e t _ f l av o u r			*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_get_flavor(  char * id )
-//{
-//	struct	pa_response	*	rptr=(struct pa_response *) 0;
-//	struct	url		*	uptr;
-//	char	buffer[1024];
-//	char 			*	nptr;
-//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-//	sprintf(buffer,"/flavors/%s",id);
-//	if (!( hptr = pa_authenticate() ))
-//		return( rptr );
-//	else if (!( uptr = analyse_url( Wpa.base )))
-//		return( rptr );
-//	else if (!( uptr = validate_url( uptr ) ))
-//		return( rptr );
-//	else if (!( nptr = serialise_url( uptr,buffer ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		return( rptr );
-//	}
-//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		liberate( nptr );
-//		return( rptr );
-//	}
-//	else	return( rptr );
-//}
-//
-
-/*	------------------------------------------------------------	*/
-/*			p a _ g e t _ i m a g e 			*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_get_image 	(  char * id )
-//{
-//	struct	pa_response	*	rptr=(struct pa_response *) 0;
-//	struct	url		*	uptr;
-//	char	buffer[1024];
-//	char 			*	nptr;
-//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-//	sprintf(buffer,"/images/%s",id);
-//	if (!( hptr = pa_authenticate() ))
-//		return( rptr );
-//	else if (!( uptr = analyse_url( Wpa.base )))
-//		return( rptr );
-//	else if (!( uptr = validate_url( uptr ) ))
-//		return( rptr );
-//	else if (!( nptr = serialise_url( uptr, buffer ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		return( rptr );
-//	}
-//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		liberate( nptr );
-//		return( rptr );
-//	}
-//	else	return( rptr );
-//}
-//
-
-/*	------------------------------------------------------------	*/
 /*			p a _ u p d a t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_update_server(  char * id, char * filename )
@@ -881,43 +740,9 @@ public	struct	pa_response *	pa_delete_server(  char * id )
         }
     }
 	return(result);
-	//char	buffer[1024];
-	//sprintf(buffer,"/services/hostedservices/%s",id);
-	//return( proactive_delete_operation( buffer ) );
 }
 
 
-/*	------------------------------------------------------------	*/
-/*			p a _ d e l e t e _ i m a g e 			*/
-/*	------------------------------------------------------------	*/
-//public	struct	pa_response *	pa_delete_image	(  char * id )
-//{
-//	struct	pa_response	*	rptr=(struct pa_response *) 0;
-//	struct	url		*	uptr;
-//	char	buffer[1024];
-//	char 			*	nptr;
-//	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-//	sprintf(buffer,"/images/%s",id);
-//	if (!( hptr = pa_authenticate() ))
-//		return( rptr );
-//	else if (!( uptr = analyse_url( Wpa.base )))
-//		return( rptr );
-//	else if (!( uptr = validate_url( uptr ) ))
-//		return( rptr );
-//	else if (!( nptr = serialise_url( uptr,buffer ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		return( rptr );
-//	}
-//	else if (!( rptr = pa_client_get_request( nptr, Wpa.tls, Wpa.agent, hptr ) ))
-//	{
-//		uptr = liberate_url( uptr );
-//		liberate( nptr );
-//		return( rptr );
-//	}
-//	else	return( rptr );
-//}
-//
 /*	------------------------------------------------------------	*/
 /*		p a _ i n i t i a l i s e _ c l i e n t 		*/
 /*	------------------------------------------------------------	*/
@@ -952,8 +777,8 @@ public	int	pa_initialise_client(
 }
 
 
-
+	/* ------------ */
 #endif	/* _pa_client_c */
-		/* ------------ */
+	/* ------------ */
 
 

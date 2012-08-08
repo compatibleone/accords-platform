@@ -123,9 +123,6 @@ endif
 if ENABLE_TESTAZ
 SUBDIRS += testaz
 endif
-if ENABLE_TESTPA
-SUBDIRS += testpa
-endif
 if ENABLE_FILESERVER
 SUBDIRS += fileserver
 endif

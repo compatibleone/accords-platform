@@ -340,14 +340,16 @@ AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci/src])
 AC_SUBST([PATH_AZPROCCI], [${abs_top_srcdir}/azprocci/src])
 
 AC_ARG_ENABLE([paprocci],
-      [AS_HELP_STRING([--disable-paprocci],
-		      [Disable paprocci @<:@default=enable@:>@])],
-      [],
-      [enable_paprocci=yes])
+      [AS_HELP_STRING([--enable-paprocci],
+		      [Enable paprocci and get as argument the Sun JDK path (preferred jdk1.6.0_25) @<:@default=disable@:>@])],
+      [enable_paprocci=yes;paprocci_jdk=$enableval],
+      [])
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
-AC_SUBST([CFLAGS_PAPROCCI], [-I\${abs_top_srcdir}/paprocci/src])
+AC_SUBST([CFLAGS_PAPROCCI], [-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux])
+AC_SUBST([LDFLAGS_PAPROCCI], [-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverif])
 AC_SUBST([PATH_PAPROCCI], [${abs_top_srcdir}/paprocci/src])
 
+paprocci_LDFLAGS =  
 
 AC_ARG_ENABLE([command],
       [AS_HELP_STRING([--disable-command],
@@ -399,14 +401,6 @@ AC_ARG_ENABLE([testaz],
       [],
       [enable_testaz=yes])
 AM_CONDITIONAL([ENABLE_TESTAZ], [test "$enable_testaz" = "yes"])
-
-AC_ARG_ENABLE([testpa],
-      [AS_HELP_STRING([--disable-testpa],
-		      [Disable testpa @<:@default=enable@:>@])],
-      [],
-      [enable_testpa=yes])
-AM_CONDITIONAL([ENABLE_TESTPA], [test "$enable_testpa" = "yes"])
-
 
 AC_ARG_ENABLE([fileserver],
       [AS_HELP_STRING([--disable-fileserver],
@@ -464,7 +458,6 @@ AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
 AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
 AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
 AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
-AC_CONFIG_FILES([testpa/Makefile testpa/src/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
 
@@ -517,7 +510,6 @@ echo "    - teston                   : $enable_teston"
 echo "    - testcp                   : $enable_testcp"
 echo "    - testcb                   : $enable_testcb"
 echo "    - testaz                   : $enable_testaz"
-echo "    - testpa                   : $enable_testpa"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
 echo ""

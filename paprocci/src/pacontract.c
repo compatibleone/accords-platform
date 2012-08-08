@@ -238,16 +238,16 @@ private	char *	resolve_contract_flavor( struct cords_pa_contract * cptr )
 /*	-----------------------------------------------------------------	*/
 private	char *	resolve_contract_image( struct cords_pa_contract * cptr )
 {
-	struct	pa_image_infos	request;
-	struct	pa_image_infos	image;
-	struct	pa_image_infos	best;
+	//struct	pa_image_infos	request;
+	//struct	pa_image_infos	image;
+	//struct	pa_image_infos	best;
 	char *			vptr;
-	char *			iname=(char*) 0;
-	struct	data_element * eptr=(struct data_element *) 0;
-	struct	data_element * dptr=(struct data_element *) 0;
+	//char *			iname=(char*) 0;
+	//struct	data_element * eptr=(struct data_element *) 0;
+	//struct	data_element * dptr=(struct data_element *) 0;
 
-	if (!( eptr = json_element( cptr->images->jsonroot, "images" )))
-		return((char *) 0);
+	//if (!( eptr = json_element( cptr->images->jsonroot, "images" )))
+	//	return((char *) 0);
 
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
@@ -255,72 +255,74 @@ private	char *	resolve_contract_image( struct cords_pa_contract * cptr )
 	if (!( vptr = occi_extract_atribut( cptr->system.message, "occi", 
 		_CORDS_SYSTEM, _CORDS_NAME ) ))
 		return((char *) 0);
-	else	request.name = vptr;
+	else	
+        return vptr;
 
-	if (!( vptr = occi_extract_atribut( cptr->image.message, "occi", 
-		_CORDS_IMAGE, _CORDS_NAME ) ))
-		return((char *) 0);
-	else	request.other = vptr;
+	//if (!( vptr = occi_extract_atribut( cptr->image.message, "occi", 
+	//	_CORDS_IMAGE, _CORDS_NAME ) ))
+	//	return((char *) 0);
+	//else	request.other = vptr;
 
-	memset( &best, 0, sizeof( struct pa_image_infos ));
+	//memset( &best, 0, sizeof( struct pa_image_infos ));
 
 	/* ------------------------------------------ */
 	/* scan list for a perfect IPS produced match */
 	/* ------------------------------------------ */
 
-	if (!( iname = occi_category_id( cptr->image.id )))
-		return((char *) 0);
+	//if (!( iname = occi_category_id( cptr->image.id )))
+	//	return((char *) 0);
 
-	for ( 	dptr=eptr->first;
-		dptr != (struct data_element *) 0;
-		dptr = dptr->next )
-	{
-		if (!( vptr = json_atribut( dptr, "name" ) ))
-			continue;
-		else if ( strcmp( vptr, iname ) != 0 )
-			continue;
-		else if (!( vptr = json_atribut( dptr, "id" ) ))
-		{
-			liberate( iname );
-			return((char *) 0);
-		}
-		else
-		{
-			liberate( iname );
-			return( allocate_string( vptr ) );
-		}
-	}
-	liberate( iname );
+	//for ( 	dptr=eptr->first;
+	//	dptr != (struct data_element *) 0;
+	//	dptr = dptr->next )
+	//{
+	//	if (!( vptr = json_atribut( dptr, "name" ) ))
+	//		continue;
+	//	else if ( strcmp( vptr, iname ) != 0 )
+	//		continue;
+	//	else if (!( vptr = json_atribut( dptr, "id" ) ))
+	//	{
+	//		liberate( iname );
+	//		return((char *) 0);
+	//	}
+	//	else
+	//	{
+	//		liberate( iname );
+	//		return( allocate_string( vptr ) );
+	//	}
+	//}
+	//liberate( iname );
 
 	/* --------------------------------------------------- */
 	/* scan the image list for a system name partial match */
 	/* --------------------------------------------------- */
-	for ( 	dptr=eptr->first;
-		dptr != (struct data_element *) 0;
-		dptr = dptr->next )
-	{
+	//for ( 	dptr=eptr->first;
+	//	dptr != (struct data_element *) 0;
+	//	dptr = dptr->next )
+	//{
 		/* ----------------------------------------------- */
 		/* collect the information from the flavor element */
 		/* ----------------------------------------------- */
-		if (!( vptr = json_atribut( dptr, "id" ) ))
-			continue;
-		else	image.id = vptr;
-		if (!( vptr = json_atribut( dptr, "name" ) ))
-			continue;
-		else	image.name = vptr;
+	//	if (!( vptr = json_atribut( dptr, "id" ) ))
+	//		continue;
+	//	else	image.id = vptr;
+	//	if (!( vptr = json_atribut( dptr, "name" ) ))
+	//		continue;
+	//	else	image.name = vptr;
 
-		if ( (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
-		||   (!( strncasecmp( request.other, image.name, strlen( request.other ) ))))
-		{
-			best.id = image.id;
-			best.name = image.name;
-			break;
-		}		
-		else	continue;
-	}
-	if (!( best.id ))
-		return( best.id );
-	else 	return(allocate_string( best.id ));
+//		if ( (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
+//		||   (!( strncasecmp( request.other, image.name, strlen( request.other ) ))))
+//		{
+//			best.id = image.id;
+//			best.name = image.name;
+//			break;
+//		}		
+//		else	continue;
+//	}
+//	if (!( best.id ))
+//		return( best.id );
+//	else 	return(allocate_string( best.id ));
+    //return((char *) 0);
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -431,8 +433,8 @@ public	int	create_proactive_contract(
 	/* ------------------------------------------------------ */
 	//else if (!( contract.images = pa_list_image_details() ))
 	//	return( terminate_proactive_contract( 1186, &contract ) );
-	//else if (!( pptr->image = resolve_contract_image( &contract ) ))
-	//	return( terminate_proactive_contract( 1187, &contract ) );
+	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+		return( terminate_proactive_contract( 1187, &contract ) );
 	//else if (!( pptr->original = allocate_string( pptr->image ) ))
 	//	return( terminate_proactive_contract( 1188, &contract ) );
 	{

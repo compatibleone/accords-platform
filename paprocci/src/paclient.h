@@ -28,6 +28,7 @@
 #include "json.h"
 #include "document.h"
 #include "paconfig.h"
+#include "proactive.h"
 
 #define	_TEXT_NONE 	0
 #define	_TEXT_XML	1
@@ -109,7 +110,7 @@ public	struct	pa_response *	pa_list_locations();
 /* servers */
 /* ------- */
 public	struct	pa_response *	pa_list_servers	();
-public	struct	pa_response *	pa_create_server( ); // To be extended in the future. 
+public	struct	pa_response *	pa_create_server(struct proactive * constr); // To be extended in the future. 
 public	struct	pa_response *	pa_get_server	( char * id );
 public	struct	pa_response *	pa_update_server( char * id, char * filename );
 public	struct	pa_response *	pa_delete_server( char * id );
