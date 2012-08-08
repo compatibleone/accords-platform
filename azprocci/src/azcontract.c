@@ -112,7 +112,7 @@ private	int	terminate_windowsazure_contract( int status, struct cords_az_contrac
 /*	---------------------------------	*/
 /*	a z _ n o r m a l i s e _ n a m e 	*/
 /*	---------------------------------	*/
-private	char *	az_normalise_name( char * wptr )
+private	char *	az_normalise_name( char * wptr, int maxlength )
 {
 	int	c;
 	int	i;
@@ -123,34 +123,24 @@ private	char *	az_normalise_name( char * wptr )
 		return( sptr );
 	else if (!( sptr = allocate_string( wptr )))
 		return( sptr );
-	else
+	else	wptr = sptr;
+
+	for ( j=0,i=0; *(wptr+i) != 0; i++)
 	{
-		wptr = wptr;
-		for ( upper=1,j=0,i=0; *(wptr+i) != 0; i++)
+		if ((c = *(wptr+i)) == ' ' )
+			continue;
+		else
 		{
-			if ((c = *(wptr+i)) == ' ' )
-			{
-				upper=1;
-				continue;
-			}
-			else if (!( upper ))
-			{
-				if (( c >= 'A') && ( c <= 'Z'))
-					*(wptr+j) = ((c - 'A') + 'a');
-				else	*(wptr+j) = c;
-				j++;
-			}
-			else 
-			{
-				upper = 0;
-				if (( c >= 'a') && ( c <= 'z'))
-					*(wptr+j) = ((c - 'a') + 'A');
-				else	*(wptr+j) = c;
-				j++;
-			}
+			if (( c >= 'A') && ( c <= 'Z'))
+				*(wptr+j) = ((c - 'A') + 'a');
+			else	*(wptr+j) = c;
+			j++;
 		}
-		return( sptr );
 	}
+	*(wptr+j) = 0;
+	if ( strlen( sptr ) > maxlength )
+		*(sptr+ maxlength) = 0;
+	return( sptr );
 }
 
 /*	---------------------------------------------------	*/
@@ -329,19 +319,19 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 /*	-----------------------------------------------------------------	*/
 /*		    b u i l d _ a z u r e _ m e d i a l i n k 			*/
 /*	-----------------------------------------------------------------	*/
-private	int	build_azure_medialink( struct windowsazure * pptr )
+private	int	build_windowsazure_medialink( struct windowsazure * pptr )
 {
 	char 	buffer[2048];
 	if (!( rest_valid_string( pptr->storageaccount ) ))
-		return( 0 );
+		return( 118 );
 	else
 	{
 		sprintf(buffer,"https://%s.blob.core.windows.net/vhds/%s.vhd",
 			pptr->storageaccount,
 			pptr->id );
 		if (!( pptr->media = allocate_string( buffer ) ))
-			return( 0 );
-		else	return( 1 );
+			return( 27 );
+		else	return( 0 );
 	}
 }
 
@@ -412,8 +402,6 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			return((char *) 0);
 		else if (!( vptr = occi_unquoted_value(bptr->value)))
 			return((char *) 0);
-		else if (!( build_azure_medialink( pptr ) ))
-			return((char *) 0);
 		else	return(( pptr->image = vptr ));
 	}
 
@@ -458,9 +446,7 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			continue;
 		}
 	}
-	if (!( build_azure_medialink( pptr ) ))
-		return((char *) 0);
-	else	return(( pptr->image = best.id ));
+	return(( pptr->image = best.id ));
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -476,6 +462,8 @@ private	int 	resolve_windowsazure_location(
 		struct windowsazure * pptr, 
 		struct	az_config * cfptr )
 {
+	struct	xml_element * fptr;
+	struct	xml_element * eptr;
 	struct	az_response * zptr;
 	int	status;
 
@@ -491,23 +479,25 @@ private	int 	resolve_windowsazure_location(
 	/* ----------------------------------------------- */
 	if ( pptr->location ) pptr->location = liberate( pptr->location );
 
-	if ( cfptr->location )
-		if (!( pptr->location = allocate_string( cfptr->location ) ))
-			return( 27 );
+	if (!( rest_valid_string( cfptr->location ) ))
+		cfptr->location = (char *) 0;
+	else if (!( pptr->location = allocate_string( cfptr->location ) ))
+		return( 27 );
 
 	/* ----------------------------------------------- */
 	/* handle the configured prefered "affinity group" */
 	/* ----------------------------------------------- */
 	if ( pptr->group ) pptr->group = liberate( pptr->group );
 
-	if ( cfptr->group )
-		if (!( pptr->group = az_normalise_name( cfptr->group ) ))
-			return( 27 );
+	if (!( rest_valid_string( cfptr->group ) ))
+		cfptr->group = (char *) 0;
+	else if (!( pptr->group = az_normalise_name( cfptr->group, 63 ) ))
+		return( 27 );
 
 	/* ----------------------------------------------- */
 	/* check usage and existance of the affinity group */
 	/* ----------------------------------------------- */
-	if ( pptr->group )
+	if ( rest_valid_string( pptr->group ) )
 	{
 		if (!( zptr = az_retrieve_affinity_group( pptr->group ) ))
 			return( 801 );
@@ -519,14 +509,54 @@ private	int 	resolve_windowsazure_location(
 	/* ------------------------------------------------ */
 	/* check usage and existance of the geolocalisation */
 	/* ------------------------------------------------ */
-	else
+	else if (!( rest_valid_string( pptr->location )))
+		return( 56 );
 	{
-		if (!( zptr = az_retrieve_location( pptr->location ) ))
+		if (!( zptr = az_list_locations() ))
 			return( 801 );
-		else if ((status = check_windowsazure_operation( zptr )) != 200)
+		else if (!( zptr->response ))
+			return( 802 );
+		else if ((status = zptr->response->status) != 200)
+		{
+			zptr = liberate_az_response( zptr );
 			return( status );
-		else	return( 0 );
+		}
+		else if ((!( eptr = zptr->xmlroot ))
+		     ||  (!( eptr->name )))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 803 );
+		}
+		else if ( strcmp( eptr->name, "Locations" ) )
+		{
+			zptr = liberate_az_response( zptr );
+			return( 804 );
+		}
+		else
+		{
+			for (	eptr = eptr->first;
+				eptr != (struct xml_element *) 0;
+				eptr = eptr->next )
+			{
+				if (!( eptr->name ))
+					continue;
+				else if ( strcmp( eptr->name, "Location") != 0)
+					continue;
+				else if (!( fptr = document_element( eptr->first, "Name" ) ))
+					continue;
+				else if (!( fptr->value ))
+					continue;
+				else if (!( strcmp( fptr->value, pptr->location ) ))
+				{
+					zptr = liberate_az_response( zptr );
+					return( 0 );
+				}
+			}
+			zptr = liberate_az_response( zptr );
+			return( 804 );
+		}
 	}
+	
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -550,25 +580,27 @@ private	int 	resolve_windowsazure_storage(
 	/* ---------------------------------------------------- */
 	if ( pptr->storageaccount ) pptr->storageaccount = liberate( pptr->storageaccount );
 
-	if (!( cfptr->storageaccount ))
+	if (!( rest_valid_string( cfptr->storageaccount ) ))
 		return( 818 );
 	else	strcpy(buffer,cfptr->storageaccount);
 
 	/* ------------------------------- */
 	/* create the storage account name */
 	/* ------------------------------- */
-	if ( pptr->group )	
-		strcpy(buffer,pptr->group);
-	else if ( pptr->location )
-		strcpy(buffer,pptr->location);
+	strcat( buffer," ");
+
+	if ( rest_valid_string( pptr->group) )	
+		strcat(buffer,pptr->group);
+	else if (rest_valid_string(  pptr->location ))
+		strcat(buffer,pptr->location);
 	else	return( 818 );
 
 	/* ----------------------------------------------- */
 	/* ensure the geo localised storage account exists */
 	/* ----------------------------------------------- */
-	if (!( pptr->storageaccount = az_normalise_name( buffer )))
+	if (!( pptr->storageaccount = az_normalise_name( buffer, 24 )))
 		return( 817 );
-	else if (!( zptr = az_retrieve_storage_service( buffer )))
+	else if (!( zptr = az_retrieve_storage_service( pptr->storageaccount )))
 		return( 500 );
 	else if (( status = check_windowsazure_operation( zptr )) == 200 )
 		return( 0 );
@@ -583,6 +615,8 @@ private	int 	resolve_windowsazure_storage(
 				pptr->location,
 				pptr->group )))
 		return( 820 );
+	else if (!( zptr = az_create_storage_service( filename )))
+		return( 500 );
 
 	/* ------------------------------------------ */
 	/* ensure creation of the appropriate Account */
@@ -601,7 +635,57 @@ private	int 	resolve_windowsazure_service(
 		struct windowsazure * pptr, 
 		struct	az_config * cfptr )
 {
-	return(0);
+	char	buffer[2048];
+	struct	az_response * zptr;
+	int	i;
+	int	j;
+	int	upper=0;
+	int	status;
+	char *	filename;
+	/* --------------------------------------------------- */
+	/* recover the root of the subscription hosted service */
+	/* --------------------------------------------------- */
+	if ( pptr->hostedservice ) pptr->hostedservice = liberate( pptr->hostedservice );
+
+	if (!( rest_valid_string( cfptr->hostedservice )))
+		return( 818 );
+	else	strcpy(buffer,cfptr->hostedservice);
+
+	/* ------------------------ */
+	/* append the required name */
+	/* ------------------------ */
+	sprintf(buffer+strlen(buffer)," %s%u",pptr->name,++cfptr->services);
+
+	/* ---------------------------------------------- */
+	/* ensure the geo localised hosted service exists */
+	/* ---------------------------------------------- */
+	if (!( pptr->hostedservice = az_normalise_name( buffer, 24 )))
+		return( 817 );
+	else if (!( zptr = az_get_hosted_service( pptr->hostedservice )))
+		return( 500 );
+	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+		return( 0 );
+
+	/* ----------------------------- */
+	/* create the new hosted service */
+	/* ----------------------------- */
+	if (!( filename = az_create_hosted_service_request( 
+				pptr->hostedservice,
+				pptr->hostedservice,
+				pptr->hostedservice,
+				pptr->location,
+				pptr->group )))
+		return( 820 );
+
+	else if (!( zptr = az_create_hosted_service( filename )))
+		return( 500 );
+
+	/* ------------------------------------------ */
+	/* ensure creation of the appropriate Account */
+	/* ------------------------------------------ */
+	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+		return( 0 );
+	else	return( status );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -626,10 +710,10 @@ public	int	create_windowsazure_contract(
 	/* resolve the user or operator subscription */
 	/* ----------------------------------------- */
 	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( status );
+		return( terminate_windowsazure_contract( status, &contract ) );
 
 	else if (!( cfptr = resolve_az_configuration( pptr->profile )))
-	 	return( 404 );
+		return( terminate_windowsazure_contract( 404, &contract ) );
 
 	else	memset( &contract, 0, sizeof( struct cords_az_contract ));
 
@@ -637,102 +721,25 @@ public	int	create_windowsazure_contract(
 	/* Resolve the required Geographical Location */
 	/* ------------------------------------------ */
 	if (( status = resolve_windowsazure_location( &contract, pptr, cfptr )) != 0)
-		return( status );
+		return( terminate_windowsazure_contract( status, &contract ) );
 
 	/* ------------------------------------------ */
 	/* Resolve the required GeoLo Storage Account */
 	/* ------------------------------------------ */
 	else if ((status = resolve_windowsazure_storage( &contract, pptr, cfptr )) != 0)
-		return( status );
+		return( terminate_windowsazure_contract( status, &contract ) );
+
+	/* ------------------------------------------ */
+	/* Build the Media Link for the Image Storage */
+	/* ------------------------------------------ */
+	else if ((status = build_windowsazure_medialink( pptr )) != 0)
+		return( terminate_windowsazure_contract( status, &contract ) );
 
 	/* ------------------------------------------ */
 	/* Resolve the required Hosted Service Entity */
 	/* ------------------------------------------ */
 	else if ((status = resolve_windowsazure_service( &contract, pptr, cfptr )) != 0)
-		return( status );
-
-
-	/* ----------------------------------------------------------- */
-	/* Before we get here if we are in SLA Mode we must resolve an */
-	/* eventual geolocalisation criteria for use in determining if */
-	/* an appropriate hosting service is actually available and it */
-	/* may even need to be created with a localisation prefix ???? */
-	/* ----------------------------------------------------------- */
-	/* this is the none SLA section of code only 		       */
-	/* collect and validate and perhaps create ??? hosting service */
-	/* ----------------------------------------------------------- */
-	if ( pptr->hostedservice ) pptr->hostedservice = liberate( pptr->hostedservice );
-
-	if (!( pptr->hostedservice = allocate_string( cfptr->hostedservice ) ))
-		return( 27 );
-	else if (!( azptr = az_get_hosted_service(pptr->hostedservice) ))
-	{
-		if (!( filename = az_create_hosted_service_request(
-				pptr->hostedservice,
-				pptr->hostedservice,
-				pptr->hostedservice,
-			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ),
-				(char *) 0 ) ))
-			return( 118 );
-		else if (!( azptr = az_create_hosted_service( filename ) ))
-			return( 118 );
-		else 	azptr = liberate_az_response( azptr );
-	}	
-	else if ((!( azptr->response )) || ( azptr->response->status > 399 ))
-	{
-		azptr = liberate_az_response( azptr );
-		if (!( filename = az_create_hosted_service_request(
-				pptr->hostedservice,
-				pptr->hostedservice,
-				pptr->hostedservice,
-			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
-				(char *) 0 ) ))
-			return( 118 );
-		else if (!( azptr = az_create_hosted_service( filename ) ))
-			return( 118 );
-		else 	azptr = liberate_az_response( azptr );
-	}	
-	else 	azptr = liberate_az_response( azptr );
-
-	/* ----------------------------------------------------------- */
-	/* The same remark concerning SLA and GeoLocalisation applies  */
-	/* ----------------------------------------------------------- */
-	/* collect and validate and perhaps create ??? storage account */
-	/* ----------------------------------------------------------- */
-	if ( pptr->storageaccount ) pptr->storageaccount = liberate( pptr->storageaccount );
-
-	if (!( pptr->storageaccount = allocate_string( cfptr->storageaccount ) ))
-		return( 27 );
-
-	else if (!( azptr = az_retrieve_storage_service(pptr->storageaccount) ))
-	{
-		if (!( filename = az_create_storage_service_request(
-				pptr->storageaccount,
-				pptr->storageaccount,
-				pptr->storageaccount,
-			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
-				(char *) 0 ) ))
-			return( 118 );
-		else if (!( azptr = az_create_storage_service( filename ) ))
-			return( 118 );
-		else 	azptr = liberate_az_response( azptr );
-	}	
-	else if ((!( azptr->response )) || ( azptr->response->status > 399 ))
-	{
-		azptr = liberate_az_response( azptr );
-		if (!( filename = az_create_storage_service_request(
-				pptr->storageaccount,
-				pptr->storageaccount,
-				pptr->storageaccount,
-			( rest_valid_string( pptr->location ) ? pptr->location : cfptr->location ) ,
-				(char *) 0 ) ))
-			return( 118 );
-		else if (!( azptr = az_create_storage_service( filename ) ))
-			return( 118 );
-		else 	azptr = liberate_az_response( azptr );
-	}	
-	else 	azptr = liberate_az_response( azptr );
-
+		return( terminate_windowsazure_contract( status, &contract ) );
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -836,11 +843,6 @@ public	int	create_windowsazure_contract(
 
 }
 
-private	struct	az_response * stop_windowsazure_provisioning( struct windowsazure * pptr )
-{
-	return((struct az_response *) 0);
-}
-
 /*	-----------------------------------------------------------------	*/
 /*		d e l e t e _ w i n d o w s a z u r e _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
@@ -850,21 +852,28 @@ public	int	delete_windowsazure_contract(
 		char * agent,
 		char * tls )
 {
-	struct	az_response * osptr;
-	if ((osptr = stop_windowsazure_provisioning( pptr )) != (struct az_response *) 0)
-		osptr = liberate_az_response( osptr );
-	if (!( pptr->image ))
-		return( 0 );
-	else if (!( pptr->original ))
-		return( 0 );
-	else if (!( strcmp( pptr->original, pptr->image ) ))
-		return( 0 );
-	else
+	int	status;
+	struct	az_response * azptr;
+
+	status = stop_windowsazure_provisioning( pptr );
+
+	if ( pptr->hostedservice )
 	{
-		az_delete_image( pptr->image );
-		return(0);
+		if (( azptr = az_delete_hosted_service( pptr->hostedservice )) != (struct az_response *) 0)
+			check_windowsazure_operation( azptr );
+		pptr->hostedservice = liberate( pptr->hostedservice );
 	}
-	return(0);
+
+	if ( pptr->storageaccount ) 
+		pptr->storageaccount = liberate( pptr->storageaccount );
+	if ( pptr->group ) 
+		pptr->group = liberate( pptr->group );
+	if ( pptr->location ) 
+		pptr->location = liberate( pptr->location );
+	if ( pptr->media ) 
+		pptr->media = liberate( pptr->media );
+
+	return(status);
 }
 
 	/* ------------- */

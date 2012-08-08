@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiazconfig_c_
@@ -170,6 +168,8 @@ private void autoload_az_config_nodes() {
 				pptr->location = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
 				pptr->group = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "services" )) != (struct xml_atribut *) 0)
+				pptr->services = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "current" )) != (struct xml_atribut *) 0)
 				pptr->current = document_atribut_value(aptr);
 			}
@@ -250,6 +250,9 @@ public  void autosave_az_config_nodes() {
 		fprintf(h," group=%c",0x0022);
 		fprintf(h,"%s",(pptr->group?pptr->group:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," services=%c",0x0022);
+		fprintf(h,"%u",pptr->services);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," current=%c",0x0022);
 		fprintf(h,"%u",pptr->current);
 		fprintf(h,"%c",0x0022);
@@ -308,6 +311,8 @@ private void set_az_config_field(
 			pptr->location = allocate_string(vptr);
 		if (!( strcmp( nptr, "group" ) ))
 			pptr->group = allocate_string(vptr);
+		if (!( strcmp( nptr, "services" ) ))
+			pptr->services = atoi(vptr);
 		if (!( strcmp( nptr, "current" ) ))
 			pptr->current = atoi(vptr);
 		}
@@ -460,6 +465,7 @@ private int pass_az_config_filter(
 		else if ( strcmp(pptr->group,fptr->group) != 0)
 			return(0);
 		}
+	if (( fptr->services ) && ( pptr->services != fptr->services )) return(0);
 	if (( fptr->current ) && ( pptr->current != fptr->current )) return(0);
 	return(1);
 }
@@ -525,6 +531,9 @@ private struct rest_response * az_config_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.services=%u",optr->domain,optr->id,pptr->services);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.current=%u",optr->domain,optr->id,pptr->current);
@@ -968,6 +977,8 @@ public struct occi_category * occi_az_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "services",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
 		autoload_az_config_nodes();
@@ -1192,6 +1203,17 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.az_config.services='%u'\r\n",sptr->services);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.az_config.current='%u'\r\n",sptr->current);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1199,4 +1221,4 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 
 }
 
-#endif	/* _occiazconfig_c_ */
+#endif	/* _azconfig_c_ */

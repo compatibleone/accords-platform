@@ -64,7 +64,8 @@ private	int	use_windowsazure_configuration( char * sptr )
 			pptr->host, pptr->agent, pptr->version, pptr->tls,
 			pptr->namespace, pptr->subscription )) != 0)
 		return(status);
-
+	else if (!( pptr->hostedservice ))
+		return(0);
 	else if ((status = az_initialise_service( pptr->hostedservice )) != 0)
 		return( status );
 	else	return( 0 );
@@ -315,6 +316,8 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	else if (!( filename = az_create_vm_request(
 		pptr->id,  pptr->name,
 		pptr->image, pptr->media, pptr->flavor,
@@ -371,6 +374,8 @@ private	struct	rest_response * save_windowsazure(
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 /*	else if (!( filename = az_create_image_request( pptr->name, pptr->number ) ))	*/
 /*	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		*/
 /*	else if (!( azptr = az_create_image( filename ) ))				*/
@@ -386,6 +391,27 @@ private	struct	rest_response * save_windowsazure(
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	   s t o p _ w i n d o w s a z u r e _ p r o v i s i o n i n g		*/
+/*	-----------------------------------------------------------------	*/
+private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
+{
+	int	status;
+	struct	az_response * azptr;
+
+	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+		return(118);
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return(27);
+	else if (!( azptr = az_delete_deployment( 
+			pptr->hostedservice, 
+			pptr->id  )))
+		return(40);
+	else if ((status = check_windowsazure_operation( azptr )) != 200 )
+		return(56);
+	else	return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -406,18 +432,9 @@ private	struct	rest_response * stop_windowsazure(
 	 	return( rest_html_response( aptr, 404, "Invalid WINDOWS AZUREAction" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
-	else if (!( azptr = az_delete_deployment( 
-			pptr->hostedservice, 
-			pptr->id  )))
-	 	return( rest_html_response( aptr, 504, "Error Deleting WINDOWS AZURE VM" ) );
-
-	else if ((status = check_windowsazure_operation( azptr )) != 200 )
-	 	return( rest_html_response( aptr, status, "Error Deleting WINDOWS AZURE VM" ) );
-		
-	else
+	else 
 	{
+		stop_windowsazure_provisioning( pptr );
 		reset_windowsazure_server( pptr );
 		pptr->when = time((long *) 0);
 		autosave_windowsazure_nodes();
@@ -446,6 +463,8 @@ private	struct	rest_response * restart_windowsazure(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	else
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
@@ -473,6 +492,8 @@ private	struct	rest_response * suspend_windowsazure(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{

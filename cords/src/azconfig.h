@@ -24,6 +24,8 @@ struct	az_config
 	char 	*	location;
 	char 	*	group;
 
+	int		services;
+
 	int		current;
 };
 
