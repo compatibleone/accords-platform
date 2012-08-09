@@ -92,8 +92,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.01");
-	printf("\n   Beta Version : 25/07/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.02");
+	printf("\n   Beta Version : 09/08/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -728,6 +728,48 @@ private	int	load_balancer( char * nptr )
 	return( rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi ) );
 }
 
+/*	-------------------------------------------------	*/
+/*	     c o o l _ a u t h e n t i c a t i o n		*/
+/*	-------------------------------------------------	*/
+private	int	cool_authentication()
+{
+	char *	tls;
+
+	if (!( rest_valid_string( Cool.publisher ) ))
+		return( 30 );
+	else
+	{
+		initialise_occi_resolver ( Cool.publisher, (char *) 0, (char *) 0, (char *) 0 );
+		initialise_occi_publisher( Cool.publisher, (char *) 0, (char *) 0, (char *) 0 );
+	}
+
+	if (!( rest_valid_string((tls = default_tls()) )))
+		return( 0 );
+	else if (!( rest_valid_string( Cool.user ) ))
+		return( 0 );
+	else if (!( rest_valid_string( Cool.password ) ))
+		return( 0 );
+	else	return( occi_secure_AAA( Cool.user, Cool.password, _CORDS_CONTRACT_AGENT, tls ) );
+}
+
+/*	--------------------------------------------	*/
+/*		c o o l _ s h u t d o w n 		*/
+/*	--------------------------------------------	*/
+private	int	cool_shutdown( int status )
+{
+	char *	tls;
+	if (!( rest_valid_string((tls = default_tls()) )))
+		return( 0 );
+	else if (!( rest_valid_string( Cool.user ) ))
+		return( 0 );
+	else if (!( rest_valid_string( Cool.password ) ))
+		return( 0 );
+	else
+	{
+		(void) occi_release_AAA( Cool.user, Cool.password, _CORDS_CONTRACT_AGENT, tls );
+		return( status );
+	}
+}
 
 /*	--------------------------------------------	*/
 /*	c o o l _ o p e r a t i o n 			*/
@@ -736,6 +778,7 @@ private	int	load_balancer( char * nptr )
 /*	--------------------------------------------	*/
 private	int	cool_operation( char * nptr )
 {
+	int	status;
 	char *	eptr;
 
 	if (!( eptr = getenv( "elastic_floor" ) ))
@@ -750,14 +793,18 @@ private	int	cool_operation( char * nptr )
 		Elastic.floor = 0;
 	else	Elastic.floor = atoi(eptr);
 
-	if (!( eptr = getenv( "elastic_contract" ) ))
-		return( 118 );
+	if ((status = cool_authentication()) != 0)
+		return( cool_shutdown( status ) );
+
+	else if (!( eptr = getenv( "elastic_contract" ) ))
+		return( cool_shutdown( 118 ) );
+
 	else if (!( add_elastic_contract( eptr, 0 ) ))
-		return( 27 );
+		return( cool_shutdown( 27 ) );
 
 	rest_initialise_log( Cool.monitor );
 
-	return( load_balancer( nptr ) );
+	return( cool_shutdown( load_balancer( nptr ) ) );
 }
 
 /*	------------------------------------------- 	*/

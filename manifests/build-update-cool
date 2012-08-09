@@ -1,0 +1,8 @@
+if [ -z "$makesecurity" ]; then
+	tar -czf update-cool.tgz build-config-cool style.css cool $1 $2 $3 $4 $5 
+else
+	tar -czf update-cool.tgz build-config-cool style.css $makesecurity/cool* $makesecurity/Certificates.crt cool $1 $2 $3 $4 $5 
+fi
+
+
+

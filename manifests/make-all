@@ -36,10 +36,12 @@ if [ -z "$makesecurity" ]; then
 	echo "security not required"
 	cp build-config-unsafe build-config
 	cp build-config-cosacs-unsafe build-config-cosacs
+	cp build-config-cool-unsafe build-config-cool
 else
 	bash make-security
 	cp build-config-secure build-config
 	cp build-config-cosacs-secure build-config-cosacs
+	cp build-config-cool-secure build-config-cool
 fi
 echo "-------------------------------------------- "
 echo "building accords platform manifests"

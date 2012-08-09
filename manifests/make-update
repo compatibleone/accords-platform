@@ -11,7 +11,7 @@ bash build-update slam
 bash build-update paasprocci
 bash build-update ezvm
 bash build-update coips
-bash build-update cool
+bash build-update-cool
 bash build-update broker
 bash build-update parser
 bash build-update procci
