@@ -34,6 +34,15 @@ struct	elastic_contract
 	int		hitcount;
 	int		allocated;
 	int		usage;
+
+	/* -------------------------------- */
+	/* 3 temporary messages for control */
+	/* of contract negotitation process */
+	/* -------------------------------- */
+	struct	occi_response * xptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+
 };
 	
 struct	elastic_control 

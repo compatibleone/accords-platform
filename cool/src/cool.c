@@ -53,7 +53,7 @@ struct	accords_configuration Cool = {
 
 public	int	check_debug()		{	return(Cool.debug);		}
 public	int	check_verbose()		{	return(Cool.verbose);		}
-public	char *	default_publisher()	{	return(Cool.publisher);	}
+public	char *	default_publisher()	{	return(Cool.publisher);		}
 public	char *	default_operator()	{	return(Cool.operator);		}
 public	char *	default_tls()		{	return(Cool.tls);		}
 public	char *	default_zone()		{	return(Cool.zone);		}
@@ -178,6 +178,12 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			eptr->service = liberate( eptr->service );
 		if ( eptr->contract )
 			eptr->contract = liberate( eptr->contract );
+		if ( eptr->zptr )
+			eptr->zptr = occi_remove_response( eptr->zptr );
+		if ( eptr->yptr )
+			eptr->yptr = occi_remove_response( eptr->yptr );
+		if ( eptr->xptr )
+			eptr->xptr = occi_remove_response( eptr->xptr );
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -285,6 +291,163 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
 	}
 }
 
+/*	--------------------------------------------------	*/
+/*	  c o o l _ d u p l i c a t e _ c o n t r a c t		*/
+/*	--------------------------------------------------	*/
+private	struct	occi_element * cool_transform_instruction( 
+		struct occi_element * eptr, 
+		char * source, char * result, char * provision )
+{
+	struct	occi_element * root=(struct occi_element *) 0;
+	struct	occi_element * foot=(struct occi_element *) 0;
+	struct	occi_element * work=(struct occi_element *) 0;
+
+	for (	;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		/* -------------------------- */
+		/* filter out unwanted fields */
+		/* -------------------------- */
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if (!( strcmp( eptr->name, "occi.core.id" ) ))
+			continue;
+		else if (!( strcmp( eptr->name, "occi.core.status" ) ))
+			continue;
+		else if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
+		{
+			/* ---------------------------------------------------------------- */
+			/* create a new element and replace the reference to the provision  */
+			/* ---------------------------------------------------------------- */
+			if (!( work = occi_create_element( eptr->name, provision ) ))
+				continue;
+		}
+		else
+		{
+			/* ---------------------------------------------------------------- */
+			/* create a new element and replace a reference to the old contract */
+			/* ---------------------------------------------------------------- */
+			if (!( work = occi_create_element( 
+					eptr->name, 
+					( strcmp( eptr->value, source ) ? eptr->value : result ) ) ))
+				continue;
+		}
+		/* ------------------------------ */
+		/* append to the new element list */
+		/* ------------------------------ */
+		if (!( work->previous = foot ))
+			root = work;
+		else	work->previous->next = work;
+		foot = work;
+	}
+	return( root );
+}
+
+/*	--------------------------------------------------	*/
+/*	  c o o l _ d u p l i c a t e _ c o n t r a c t		*/
+/*	--------------------------------------------------	*/
+private	int	cool_duplicate_contract( char * source, char * result, char * provision )
+{
+
+	char	*	ihost;
+	char 	*	vptr;
+	struct	occi_response * zptr=(struct occi_response *) 0;
+	struct	occi_response * zzptr=(struct occi_response *) 0;
+	struct	occi_response * yptr=(struct occi_response *) 0;
+	struct	occi_element  * fptr=(struct occi_element  *) 0;
+	struct	occi_element  * eptr=(struct occi_element  *) 0;
+	struct	occi_client   * kptr=(struct occi_client   *) 0;
+	struct	occi_request  * qptr=(struct occi_request  *) 0;
+	char	instruction[4096];
+	char	buffer[4096];
+	char	tempname[4096];
+	int	length=0;
+
+	/* ---------------------------------------------------------------- */
+	/* select / retrieve instruction category service provider identity */
+	/* ---------------------------------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	 	return( 401 );
+
+	/* ---------------------------------------------------------------- */
+	/* retrieve the collection of instructions for the current contract */
+	/* ---------------------------------------------------------------- */
+	sprintf(instruction,"%s/%s/",ihost,_CORDS_INSTRUCTION);
+	liberate( ihost );
+	length = strlen(instruction);
+
+	if (!( kptr = occi_create_client( instruction, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( 401 );
+
+	else if (!(qptr = occi_create_request( 
+			kptr, 
+			kptr->target->object, 
+			_OCCI_NORMAL )))
+		return(401);
+	else if (!( fptr = occi_request_element( 
+			qptr,
+			"occi.instruction.target", source ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( 401 );
+	}
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( 401 );
+	}
+	else	qptr = occi_remove_request ( qptr );
+
+	/* ---------------------------------------------------- */
+	/* for each of the instructions of the current contract */
+	/* ---------------------------------------------------- */
+	for (	eptr = yptr->first;
+		eptr != (struct occi_element*) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if (!( vptr = allocate_string( eptr->value )))
+			continue;
+		else if (!( vptr = occi_category_id( vptr ) ))
+			continue;
+		else
+		{
+			strcat( buffer, vptr );
+			liberate( vptr );
+		}
+
+		/* ----------------------------------------- */
+		/* retrieve the current instruction instance */
+		/* ----------------------------------------- */
+		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		{
+			/* ------------------------------------------------------------ */
+			/* duplicate and transform the information of this instruction  */ 
+			/* the new contract and its associated provisioning contract	*/
+			/* ------------------------------------------------------------ */
+			if (( fptr = cool_transform_instruction( zptr->first , source, result, provision )) != (struct occi_element *) 0)
+				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+					zzptr = occi_remove_response ( zzptr );
+			zptr = occi_remove_response ( zptr );
+		}
+
+		/* ----------------------- */
+		/* quick reset of base url */
+		/* ----------------------- */
+		buffer[length] = 0;
+	}
+
+	yptr = occi_remove_response ( yptr );
+
+	return(0);
+}
+
 /*	---------------------------------------------	*/
 /*	  n e w _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
@@ -294,14 +457,15 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
 private	struct elastic_contract * new_elastic_contract( struct elastic_contract * eptr, char * contract )
 {
 	struct	occi_response * zptr=(struct occi_response *) 0;
-	struct	occi_response * yptr=(struct occi_response *) 0;
-	struct	occi_response * xptr=(struct occi_response *) 0;
 	char *	result=(char *) 0;
 	char *	profile=(char *) 0;
 	char *	provision=(char *) 0;
 	char *	account=(char *) 0;
 	char *	node=(char *) 0;
 	char *	name=(char *) 0;
+	char *	econtract=(char *) 0;
+	char *	eprovision=(char *) 0;
+	int	status;
 	struct	cords_placement_criteria selector;
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
@@ -310,14 +474,14 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------ */
 	if (!( contract ))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------- */
 	/* retrieve the PROFILE name */
 	/* ------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
+					eptr->zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_PROFILE )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( profile = allocate_string( result ) ))
@@ -327,7 +491,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* retrieve the NODE identifier */
 	/* ---------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
+					eptr->zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_NODE )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( node = allocate_string( result ) ))
@@ -337,7 +501,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* extract the PROVISION identifier */
 	/* -------------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
+					eptr->zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_PROVISION )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( provision = allocate_string( result ) ))
@@ -346,14 +510,14 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------- */
 	/* retrieve the PROVISION instance */
 	/* ------------------------------- */
-	else if (!( yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------------ */
 	/* extract the ACCOUNT identifier */
 	/* ------------------------------ */
 	else if (!( result = occi_extract_atribut( 
-					yptr, Cool.domain, 
+					eptr->yptr, Cool.domain, 
 					profile, _CORDS_ACCOUNT )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( account = allocate_string( result ) ))
@@ -363,31 +527,42 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* extract the CONTRACT name */
 	/* ------------------------- */
 	else if (!( result = occi_extract_atribut( 
-					yptr, Cool.domain, 
+					eptr->yptr, Cool.domain, 
 					profile, _CORDS_NAME )))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( name = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-
-	else if (!( contract = negotiate_elastic_contract( 
+	else if (!( econtract = negotiate_elastic_contract( 
 			node, name, account, &selector ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	if ( zptr )
-		zptr = occi_remove_response( zptr );
+	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
 
-	/* ------------------------------- */
-	/* start the new CONTRACT instance */
-	/* ------------------------------- */
-	if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
+	else if (( status = cool_duplicate_contract( econtract, contract, eprovision )) != 0)
+		return( liberate_elastic_contract( eptr ) );
+	else
+	{
+		/* --------------------------------- */
+		/* clean up the temporary points now */
+		/* --------------------------------- */
+		if ( eptr->zptr ) eptr->zptr = occi_remove_response( eptr->zptr );
+		if ( eptr->yptr ) eptr->yptr = occi_remove_response( eptr->yptr );
+		if ( eptr->xptr ) eptr->xptr = occi_remove_response( eptr->xptr );
 
-	/* ---------------------------- */
-	/* add the new ELASTIC CONTRACT */
-	/* ---------------------------- */
-	return( use_elastic_contract( eptr, contract ) );	
+		/* ------------------------------- */
+		/* start the new CONTRACT instance */
+		/* ------------------------------- */
+		if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+
+		/* ---------------------------- */
+		/* add the new ELASTIC CONTRACT */
+		/* ---------------------------- */
+		return( use_elastic_contract( eptr, contract ) );	
+	}
 }
 
 /*	--------------------------------------------	*/
