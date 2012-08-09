@@ -590,6 +590,8 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 private	struct elastic_contract * add_elastic_contract( char * contract, int allocate )
 {
 	struct	elastic_contract * eptr;
+	rest_log_message( "elastic contract" );
+	rest_log_message( contract );
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 		
@@ -644,6 +646,8 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 	else
 	{
 		sprintf(buffer,"%s://%s:%u",eptr->service,eptr->hostname,eptr->port);
+		rest_log_message("Cool Redirect");
+		rest_log_message(buffer);
 		if (!( hptr = rest_response_header( aptr, _HTTP_LOCATION, buffer )))
 		{
 			aptr = rest_liberate_response( aptr );
@@ -811,8 +815,8 @@ private	int	cool_operation( char * nptr )
 	else	Elastic.ceiling = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_strategy" ) ))
-		Elastic.floor = 0;
-	else	Elastic.floor = atoi(eptr);
+		Elastic.strategy = 0;
+	else	Elastic.strategy = atoi(eptr);
 
 	if ((status = cool_authentication()) != 0)
 		return( cool_shutdown( status ) );
