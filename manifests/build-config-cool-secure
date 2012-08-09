@@ -35,7 +35,7 @@ if test -z "$pubhost"; then
 	publisher=""
 	identity=""
 else
-	publisher=${prefix}${pubhost}:${pubport}
+	publisher=${prefix}${pubhost}
 	identity=${prefix}${resthost}:${restport}
 fi
 
