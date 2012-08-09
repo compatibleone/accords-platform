@@ -876,7 +876,7 @@ private	int	cords_action_instruction(
 				if (!( rvalue->value ))
 					ivalue = allocate_string("");
 				else if (!( strcmp( rvalue->value, "contract" ) ))
-					ivalue = allocate_string( aptr );
+					ivalue = allocate_string( bptr ) ;
 				else	ivalue = allocate_string("");
 			}
 			else	ivalue = pvalue;
