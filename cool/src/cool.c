@@ -223,34 +223,50 @@ private	struct elastic_contract * next_elastic_contract()
 /*	--------------------------------------------	*/
 /*	  u s e _ e l a s t i c _ c o n t r a c t	*/
 /*	--------------------------------------------	*/
+private	int	update_elastic_contract( struct elastic_contract * eptr )
+{
+	struct	occi_response * zptr;
+	char *	result;
+	/* --------------------------------- */
+	/* retrieve the contract information */
+	/* --------------------------------- */
+	if (!( eptr->contract ))
+		return( 0 );
+	else if (!( zptr = occi_simple_get( eptr->contract , _CORDS_COOL_AGENT, default_tls() ) ))
+		return( 0 );
+
+	/* --------------------------- */
+	/* the contract hostname value */
+	/* --------------------------- */
+	if (!( result = occi_extract_atribut( 
+					zptr, Cool.domain, 
+					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
+		return( 0 );
+	else if (!( eptr->hostname = allocate_string( result ) ))
+		return( 0 );
+	else 	return( rest_valid_string( eptr->hostname ) );
+}
+
+/*	--------------------------------------------	*/
+/*	  u s e _ e l a s t i c _ c o n t r a c t	*/
+/*	--------------------------------------------	*/
 private	struct elastic_contract * use_elastic_contract( struct elastic_contract * eptr, char * contract)
 {
 	struct	occi_response * zptr;
 	char *	result;
 
-	/* --------------------------------- */
-	/* retrieve the contract information */
-	/* --------------------------------- */
-	if (!( contract ))
-		return( liberate_elastic_contract( eptr ) );
-	else if (!( zptr = occi_simple_get( contract , _CORDS_COOL_AGENT, default_tls() ) ))
-		return( liberate_elastic_contract( eptr ) );
-
-	/* --------------------------- */
-	/* the contract hostname value */
-	/* --------------------------- */
-	else if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
-					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
-		return( liberate_elastic_contract( eptr ) );
-	else if (!( eptr->hostname = allocate_string( result ) ))
-		return( liberate_elastic_contract( eptr ) );
-
 	/* ----------------------------- */
 	/* store the contract identifier */
 	/* ----------------------------- */
+	if ( eptr->contract ) eptr->contract = liberate( eptr->contract );
+
 	if (!( eptr->contract = allocate_string( contract ) ))
 		return( liberate_elastic_contract( eptr ) );
+
+	/* ----------------------------------------- */
+	/* update the contract host name information */
+	/* ----------------------------------------- */
+	(void) update_elastic_contract( eptr );
 
 	/* ------------------------------- */
 	/* append to the list of contracts */
@@ -618,10 +634,12 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 
 	if (!( eptr = next_elastic_contract() )) 
 		return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
-	else if (!( eptr->hostname ))
-		return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
 
-	else if (!( aptr = rest_allocate_response(cptr)))
+	if (!( rest_valid_string( eptr->hostname ) ))
+		if (!( update_elastic_contract( eptr ) ))
+			return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
+
+	if (!( aptr = rest_allocate_response(cptr)))
 		return( lb_failure(cptr,  500, "Server Failure : Out of Memory" ) );
 	else
 	{
