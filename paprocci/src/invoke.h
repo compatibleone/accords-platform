@@ -14,6 +14,7 @@ struct list_jar {
 struct jvm_struct {
 	JNIEnv * env;
 	JavaVM * jvm;
+	jobject * procci;
 };
 
 typedef struct list_jar item_jar;

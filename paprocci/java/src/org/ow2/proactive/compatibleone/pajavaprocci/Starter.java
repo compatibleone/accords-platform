@@ -44,7 +44,6 @@ import org.ow2.proactive.compatibleone.misc.Misc;
  * Starter class for the ProActive Procci Java module. */
 public class Starter {
 
-	private static Starter 
 	public static void exit(){
 	}
 
@@ -63,6 +62,7 @@ public class Starter {
 	}
 	
 
+	/*
 	public static void start(String user, String pass){
 		ProcciParametersHandler prob = new ProcciParametersHandler();
 		try{
@@ -78,8 +78,9 @@ public class Starter {
 		System.out.println(stre);
 
 	}
+	*/
 
-	public static void start(String user, String pass){
+	public static ProActiveProcci start(String user, String pass){
 		ProcciParametersHandler prob = new ProcciParametersHandler(); 
 		try{
 			prob.initialize();
@@ -90,8 +91,9 @@ public class Starter {
 
 		ProActiveProcci procci = new ProActiveProcci(prob.getProperties()); 
 		procci.initialize(user, pass);  	
-		String stre = procci.listNodes();
-		System.out.println(stre);
+		//String stre = procci.listNodes();
+		//System.out.println(stre);
+		return procci;
 
 	}
 

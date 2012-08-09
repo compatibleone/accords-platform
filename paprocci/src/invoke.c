@@ -82,7 +82,51 @@ char* getjars(const char* targetdir){
 	return buffer;
 }
 
-void connect_proactive(struct jvm_struct * jvmp) {
+
+void start_server(struct jvm_struct * jvmp) {
+	jclass cls;
+	jmethodID methodid;
+	jstring jstr1;
+	jstring jstr2;
+	jclass stringClass;
+	jobjectArray args;
+	jobject procci;
+	jobject result;
+	JNIEnv *env;
+	JavaVM *jvm;
+	env = jvmp->env;
+	jvm = jvmp->jvm;
+	procci = jvmp->procci;
+
+	fprintf(stderr, "Executing start_server...\n");
+	
+	cls = (*env)->FindClass(env, "org/ow2/proactive/compatibleone/pajavaprocci/ProActiveProcci");
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the class ProActiveProcci...\n");
+		destroy(env, jvm);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	methodid = (*env)->GetMethodID(env, cls, "listNodes", "()Ljava/lang/String;");
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method listNodes.\n");
+		destroy(env, jvm);
+	}
+
+	result = (*env)->CallObjectMethod(env, procci, methodid);
+	const char *str= (*env)->GetStringUTFChars(env,result,0);
+	
+	printf("Result: %s\n", str);
+	//need to release this string when done with it in order to avoid memory leak
+	(*env)->ReleaseStringUTFChars(env, result, str);
+
+	/*
+	destroy(env, jvm);
+	*/
+}
+
+void connect_to_provider(struct jvm_struct * jvmp) {
 	jclass cls;
 	jmethodID methodid;
 	jstring jstr1;
@@ -94,6 +138,7 @@ void connect_proactive(struct jvm_struct * jvmp) {
 	env = jvmp->env;
 	jvm = jvmp->jvm;
 
+	fprintf(stderr, "Executing connect_to_provider...\n");
 	// Find the class to interact with. 
 	//cls = (*env)->FindClass(env, "Prog");
 	cls = (*env)->FindClass(env, "org/ow2/proactive/compatibleone/pajavaprocci/Starter");
@@ -106,9 +151,9 @@ void connect_proactive(struct jvm_struct * jvmp) {
 	//methodid = (*env)->GetStaticMethodID(env, cls, "setA", "(Ljava/lang/String;)V"); // Working.
 	//methodid = (*env)->GetStaticMethodID(env, cls, "getA", "()Ljava/lang/String;");
 
-	methodid = (*env)->GetStaticMethodID(env, cls, "start", "(Ljava/lang/String;Ljava/lang/String;)V");
+	methodid = (*env)->GetStaticMethodID(env, cls, "start", "(Ljava/lang/String;Ljava/lang/String;)Lorg/ow2/proactive/compatibleone/pajavaprocci/ProActiveProcci;");
 	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method.\n");
+		fprintf(stderr, "Could not find the method start.\n");
 		destroy(env, jvm);
 	}
 
@@ -122,20 +167,39 @@ void connect_proactive(struct jvm_struct * jvmp) {
 		destroy(env, jvm);
 	}
 
-	(*env)->CallStaticVoidMethod(env, cls, methodid, jstr1, jstr2);
+	jobject result; 
+	result = (*env)->CallStaticObjectMethod(env, cls, methodid, jstr1, jstr2);
 
-	fprintf(stderr, "Connected to ProActive...\n");
-	//jobject result; 
 	//result = (*env)->CallStaticObjectMethod(env, cls, methodid, NULL);
 
-	//if (result == NULL) {
-	//    fprintf(stderr, "Could not get a result.\n");
-	//}
+	if (result == NULL) {
+	    fprintf(stderr, "Could not get a result.\n");
+	}
+	jvmp->procci = result;
+	fprintf(stderr, "Connected to ProActive...\n");
 
-	//const char *str= (*env)->GetStringUTFChars(env,result,0);
-	//printf("Result: %s\n", str);
+	
+	fprintf(stderr, "NOW EXPERIMENT\n");
+	cls = (*env)->FindClass(env, "org/ow2/proactive/compatibleone/pajavaprocci/ProActiveProcci");
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the class ProActiveProcci...\n");
+		destroy(env, jvm);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	methodid = (*env)->GetMethodID(env, cls, "listNodes", "()Ljava/lang/String;");
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method listNodes.\n");
+		destroy(env, jvm);
+	}
+
+	result = (*env)->CallObjectMethod(env, result, methodid, jstr1, jstr2);
+	const char *str= (*env)->GetStringUTFChars(env,result,0);
+	
+	printf("Result: %s\n", str);
 	//need to release this string when done with it in order to avoid memory leak
-	//(*env)->ReleaseStringUTFChars(env, result, str);
+	(*env)->ReleaseStringUTFChars(env, result, str);
 
 	/*
 	destroy(env, jvm);
@@ -231,6 +295,7 @@ struct jvm_struct * startjvm() {
 	struct jvm_struct * ret = (struct jvm_struct *) malloc(sizeof(struct jvm_struct));
 	ret->jvm = jvm;
 	ret->env = env;
+	ret->procci = NULL;
 	return ret;
 }
 

@@ -271,15 +271,15 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 public void pa_jvm_create_node()
 { 
 
-    char* result = NULL;                   // output of the execution of the command 
+	char* result = NULL;                   // output of the execution of the command 
 
-    fprintf(stderr, "JVM Creating node...");
-    if (jvmp==NULL){
-	    // start the JVM
-	jvmp = startjvm();
-	connect_proactive(jvmp);
-	    
-    }
+	fprintf(stderr, "JVM Creating node...");
+	if (jvmp==NULL){
+		// start the JVM
+		jvmp = startjvm();
+		connect_to_provider(jvmp);
+	}
+	start_server(jvmp);
 
 }
 
