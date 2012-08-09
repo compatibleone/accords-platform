@@ -51,6 +51,9 @@ struct	accords_configuration Cool = {
 	(struct occi_category *) 0
 	};
 
+#define	_CORDS_COOL_AGENT	"COOL-AGENT/1.0a"
+
+
 public	int	check_debug()		{	return(Cool.debug);		}
 public	int	check_verbose()		{	return(Cool.verbose);		}
 public	char *	default_publisher()	{	return(Cool.publisher);		}
@@ -230,7 +233,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* --------------------------------- */
 	if (!( contract ))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( zptr = occi_simple_get( contract , _CORDS_COOL_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* --------------------------- */
@@ -271,7 +274,7 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract");
 	if (!( document = cords_instance_node(
-		selector, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
+		selector, name, node, _CORDS_COOL_AGENT, default_tls(), (char *) 0, user, user, user) ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -369,7 +372,7 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	/* ---------------------------------------------------------------- */
 	/* select / retrieve instruction category service provider identity */
 	/* ---------------------------------------------------------------- */
-	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_COOL_AGENT, default_tls() ) ))
 	 	return( 401 );
 
 	/* ---------------------------------------------------------------- */
@@ -379,7 +382,7 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	liberate( ihost );
 	length = strlen(instruction);
 
-	if (!( kptr = occi_create_client( instruction, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	if (!( kptr = occi_create_client( instruction, _CORDS_COOL_AGENT, default_tls() ) ))
 		return( 401 );
 
 	else if (!(qptr = occi_create_request( 
@@ -425,14 +428,14 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 		/* ----------------------------------------- */
 		/* retrieve the current instruction instance */
 		/* ----------------------------------------- */
-		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if (( zptr = occi_simple_get( buffer, _CORDS_COOL_AGENT, default_tls() )) != (struct occi_response *) 0)
 		{
 			/* ------------------------------------------------------------ */
 			/* duplicate and transform the information of this instruction  */ 
 			/* the new contract and its associated provisioning contract	*/
 			/* ------------------------------------------------------------ */
 			if (( fptr = cool_transform_instruction( zptr->first , source, result, provision )) != (struct occi_element *) 0)
-				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_COOL_AGENT, default_tls() )) !=  (struct occi_response *) 0)
 					zzptr = occi_remove_response ( zzptr );
 			zptr = occi_remove_response ( zptr );
 		}
@@ -474,7 +477,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------ */
 	if (!( contract ))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( eptr->zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->zptr = occi_simple_get( contract , _CORDS_COOL_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------- */
@@ -510,7 +513,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------- */
 	/* retrieve the PROVISION instance */
 	/* ------------------------------- */
-	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_COOL_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------------ */
@@ -538,7 +541,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 			node, name, account, &selector ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_COOL_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (( status = cool_duplicate_contract( econtract, contract, eprovision )) != 0)
@@ -749,7 +752,7 @@ private	int	cool_authentication()
 		return( 0 );
 	else if (!( rest_valid_string( Cool.password ) ))
 		return( 0 );
-	else	return( occi_secure_AAA( Cool.user, Cool.password, _CORDS_CONTRACT_AGENT, tls ) );
+	else	return( occi_secure_AAA( Cool.user, Cool.password, _CORDS_COOL_AGENT, tls ) );
 }
 
 /*	--------------------------------------------	*/
@@ -766,7 +769,7 @@ private	int	cool_shutdown( int status )
 		return( 0 );
 	else
 	{
-		(void) occi_release_AAA( Cool.user, Cool.password, _CORDS_CONTRACT_AGENT, tls );
+		(void) occi_release_AAA( Cool.user, Cool.password, _CORDS_COOL_AGENT, tls );
 		return( status );
 	}
 }
