@@ -135,6 +135,19 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
+	else if (!( strcasecmp(p1,"CAPTURE" ) ))
+	{
+		if  (!( strcasecmp( p2, "VM" ) ))
+		{
+
+			if (!( nomfic = az_capture_vm_request( p4, p3, atoi(p5)  ) ))
+				return( failure(27,"cannot create","vm deployment request" ) );
+			else
+			{ 	
+				az_result( az_capture_vm( nomfic, p6, p7 ) );
+				return( 0 );
+			}
+		}
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
@@ -397,9 +410,10 @@ private	int	az_banner()
 	printf("\n          GET    NETWORK ");
 	printf("\n          DELETE NETWORK ");
 	printf("\n   Deployment and Role Operations: VM");
-	printf("\n          CREATE VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
-	printf("\n          LIST   VM <deployment>");
-	printf("\n          GET    VM <deployment> <role>");
+	printf("\n          CREATE  VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
+	printf("\n          CAPTURE VM <undefined> ");
+	printf("\n          LIST    VM <deployment>");
+	printf("\n          GET     VM <deployment> <role>");
 	printf("\n          DELETE VM <deployment> <role>");
 	printf("\n   Affinity Group Operations: GROUP");
 	printf("\n          CREATE GROUP   <name> <description> <location>  ");
