@@ -8,5 +8,8 @@ struct{
 }occiCategoryActionName_map[]={
 	{"amazonEc2", amazonEc2_getname },
 	{"ec2config", ec2config_getname },
+	{"gw", gw_getname },
+	{"linkgw", linkgw_getname },
+	{"intercloudGW", intercloudGW_getname },
 };
 #endif

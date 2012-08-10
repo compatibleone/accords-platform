@@ -104,4 +104,10 @@
 
 #include "amazonEc2.c"
 #include "ec2config.c"
+#include "gw.c"
+#include "linkgw.c"
+#include "intercloudGW.c"
 #endif
+
+
+

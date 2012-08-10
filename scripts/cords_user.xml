@@ -2,6 +2,8 @@
 <cords_user
  id="3d960eb3-cone-4bdd-a7a7-20e9coms85f7" name="service-conets" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-cogw-4bdd-a7a7-20e9coms85f7" name="service-conets-paas" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-paas-4bdd-a7a7-20e9coms85f7" name="service-paasprocci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-como-4bdd-a7a7-20e9coms85f7" name="service-comons" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />

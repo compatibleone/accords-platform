@@ -103,4 +103,10 @@
 	/* ------------- */
 #include "occiamazonEc2.c"
 #include "occiec2config.c"
+#include "occigw.c"
+#include "occilinkgw.c"
+#include "occiintercloudGW.c"
 #endif
+
+
+
