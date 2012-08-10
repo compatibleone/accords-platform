@@ -144,7 +144,49 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_capture_vm( nomfic, p3, p4 ) );
+				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				return( 0 );
+			}
+		}
+	}
+	else if (!( strcasecmp(p1,"START" ) ))
+	{
+		if  (!( strcasecmp( p2, "VM" ) ))
+		{
+
+			if (!( nomfic = az_start_vm_request( ) ))
+				return( failure(27,"cannot create","vm deployment request" ) );
+			else
+			{ 	
+				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				return( 0 );
+			}
+		}
+	}
+	else if (!( strcasecmp(p1,"SHUTDOWN" ) ))
+	{
+		if  (!( strcasecmp( p2, "VM" ) ))
+		{
+
+			if (!( nomfic = az_shutdown_vm_request( ) ))
+				return( failure(27,"cannot create","vm deployment request" ) );
+			else
+			{ 	
+				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				return( 0 );
+			}
+		}
+	}
+	else if (!( strcasecmp(p1,"RESTART" ) ))
+	{
+		if  (!( strcasecmp( p2, "VM" ) ))
+		{
+
+			if (!( nomfic = az_restart_vm_request( ) ))
+				return( failure(27,"cannot create","vm deployment request" ) );
+			else
+			{ 	
+				az_result( az_operation_vm( nomfic, p3, p4 ) );
 				return( 0 );
 			}
 		}
@@ -411,10 +453,13 @@ private	int	az_banner()
 	printf("\n          GET    NETWORK ");
 	printf("\n          DELETE NETWORK ");
 	printf("\n   Deployment and Role Operations: VM");
-	printf("\n          CREATE  VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
-	printf("\n          CAPTURE VM <deployment> <role> <host> <label> <image> <option> ");
-	printf("\n          LIST    VM <deployment>");
-	printf("\n          GET     VM <deployment> <role>");
+	printf("\n          CREATE   VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
+	printf("\n          START    VM <deployment> <role> ");
+	printf("\n          CAPTURE  VM <deployment> <role> <host> <label> <image> <option> ");
+	printf("\n          SHUTDOWN VM <deployment> <role> ");
+	printf("\n          RESTART  VM <deployment> <role> ");
+	printf("\n          LIST     VM <deployment>");
+	printf("\n          GET      VM <deployment> <role>");
 	printf("\n          DELETE VM <deployment> <role>");
 	printf("\n   Affinity Group Operations: GROUP");
 	printf("\n          CREATE GROUP   <name> <description> <location>  ");

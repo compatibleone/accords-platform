@@ -266,6 +266,10 @@ public	struct	az_response *	az_delete_storage_service( char * filename );
 public	struct	az_response *	az_list_storage_services();
 public	struct	az_response *  	az_list_containers( char * account );
 
+public	char * az_start_vm_request();
+public	char * az_shutdown_vm_request();
+public	char * az_restart_vm_request();
+
 public	char * az_capture_vm_request(
 	/* 	struct os_subscription * subptr,	*/
 	char *	hostname,
@@ -290,7 +294,7 @@ public	char * az_delete_network_config_request();
 
 public	struct	az_response * az_create_vm( char * filename );
 public	struct	az_response * az_delete_vm( char * depname, char * rolename );
-public	struct	az_response * az_capture_vm( char * filename, char * depname, char * rolename );
+public	struct	az_response * az_operation_vm( char * filename, char * depname, char * rolename );
 public	struct	az_response * az_get_vm( char * depname, char * rolename );
 public	struct	az_response * az_list_vm( char * depname );;
 

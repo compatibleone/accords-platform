@@ -2780,6 +2780,103 @@ private	void	az_configuration_set( FILE * h, char * hostname, char * user, char 
 	return;
 }
 
+/*	------------------------------------------------	*/
+/*		a z _ s t a r t _ v m _ r e q u e s t		*/
+/*	------------------------------------------------	*/
+public	char * az_start_vm_request()
+{
+	FILE *	h=(FILE *) 0;
+	char *	filename=(char *) 0;
+	char *	password=(char *) 0;
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+	/* ----------------------------------- */
+	/* generate the content of the request */
+	/* ----------------------------------- */
+	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+
+		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+		fprintf(h,"\t<OperationType>StartRoleOperation</OperationType>\n");
+	fprintf(h,"</CaptureRoleOperation>\n");
+	fclose(h);
+	return( filename );
+	}
+}
+
+/*	------------------------------------------------	*/
+/*	  a z _ s h u t d o w n _ v m _ r e q u e s t		*/
+/*	------------------------------------------------	*/
+public	char * az_shutdown_vm_request()
+{
+	FILE *	h=(FILE *) 0;
+	char *	filename=(char *) 0;
+	char *	password=(char *) 0;
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+	/* ----------------------------------- */
+	/* generate the content of the request */
+	/* ----------------------------------- */
+	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+
+		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+		fprintf(h,"\t<OperationType>ShutdownRoleOperation</OperationType>\n");
+	fprintf(h,"</CaptureRoleOperation>\n");
+	fclose(h);
+	return( filename );
+	}
+}
+
+/*	------------------------------------------------	*/
+/*	   a z _ r e s t a r t _ v m _ r e q u e s t		*/
+/*	------------------------------------------------	*/
+public	char * az_restart_vm_request()
+{
+	FILE *	h=(FILE *) 0;
+	char *	filename=(char *) 0;
+	char *	password=(char *) 0;
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+	/* ----------------------------------- */
+	/* generate the content of the request */
+	/* ----------------------------------- */
+	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+
+		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+		fprintf(h,"\t<OperationType>RestartRoleOperation</OperationType>\n");
+	fprintf(h,"</CaptureRoleOperation>\n");
+	fclose(h);
+	return( filename );
+	}
+}
+
+
 /*	---------------------------------------------------	*/
 /*	      a z _ c a p t u r e _ v m _ r e q u e s t		*/
 /*	---------------------------------------------------	*/
@@ -2991,7 +3088,7 @@ public	char * az_create_vm_request(
 /*	----------------------------------------	*/
 /*		a z _ c a p t u r e _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_capture_vm( char * filename, char * depname, char * rolename )
+public	struct	az_response *	az_operation_vm( char * filename, char * depname, char * rolename )
 {
 	char	url[2048];
 	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s/Operations",

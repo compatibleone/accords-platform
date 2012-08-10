@@ -417,6 +417,10 @@ private	struct	rest_response * start_windowsazure(
 	}
 	else if ((status = connect_windowsazure_server( azptr, pptr )) != 0)
 		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
+	else if (!( filename = az_start_vm_request() ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else
 	{
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
@@ -467,7 +471,7 @@ private	struct	rest_response * save_windowsazure(
 
 	else if (!( filename = az_capture_vm_request( pptr->name, pptr->number, pptr->image, 0 ) ))	
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_capture_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else
 	{
@@ -487,6 +491,7 @@ private	struct	rest_response * save_windowsazure(
 /*	-----------------------------------------------------------------	*/
 private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 {
+	char *	filename;
 	char 	reference[2024];
 	int	status;
 	struct	az_response * azptr;
@@ -510,6 +515,10 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* --------------------------------- */
 	/* release the provisioned resources */
 	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( 56 );
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( 56 );
 	if (!( azptr = az_delete_deployment( 
 			pptr->hostedservice, 
 			pptr->id  )))
@@ -564,12 +573,18 @@ private	struct	rest_response * restart_windowsazure(
 {
 	int	status;
 	struct	windowsazure * pptr;
+	char *	filename;
+	struct	az_response * azptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+	else if (!( filename = az_restart_vm_request() ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
@@ -593,12 +608,18 @@ private	struct	rest_response * suspend_windowsazure(
 {
 	int	status;
 	struct	windowsazure * pptr;
+	char *	filename;
+	struct	az_response * azptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+	else if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
