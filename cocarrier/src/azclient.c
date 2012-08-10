@@ -3090,7 +3090,7 @@ public	char * az_create_vm_request(
 public	struct	az_response *	az_operation_vm( char * filename, char * depname, char * rolename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s/Operations",
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s/operations",
 			Waz.hostedservice,depname,rolename);
 	return( azure_create_operation( url, filename ) );
 }

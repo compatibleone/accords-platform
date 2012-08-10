@@ -417,35 +417,37 @@ private	struct	rest_response * start_windowsazure(
 	}
 	else if ((status = connect_windowsazure_server( azptr, pptr )) != 0)
 		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
-	else if (!( filename = az_start_vm_request() ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+
+	if (!( filename = az_start_vm_request() ))
+ 		return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
-	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
-	else
 	{
-		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
-
-		/* ---------------------------- */
-		/* launch the COSACS operations */
-		/* ---------------------------- */
-		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
-		{
-			cosacs_metadata_instructions( 
-				pptr->hostname, _CORDS_CONFIGURATION,
-				reference, WazProcci.publisher, pptr->account );
-		}
-
-		/* --------------------------- */
-		/* now handle the transactions */
-		/* --------------------------- */
-		if (!( rest_valid_string( pptr->price ) ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=start", pptr->account, reference ) )
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else	return( rest_html_response( aptr, 200, "OK" ) );
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	}
+
+	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+
+	/* ---------------------------- */
+	/* launch the COSACS operations */
+	/* ---------------------------- */
+	if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+	{
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_CONFIGURATION,
+			reference, WazProcci.publisher, pptr->account );
+	}
+
+	/* --------------------------- */
+	/* now handle the transactions */
+	/* --------------------------- */
+	if (!( rest_valid_string( pptr->price ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=start", pptr->account, reference ) )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
 /*	-------------------------------------------	*/
@@ -578,7 +580,10 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( 56 );
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
-	 	return( 56 );
+	{
+		if ( status != 404 )
+		 	return( status );
+	}
 	if (!( azptr = az_delete_deployment( 
 			pptr->hostedservice, 
 			pptr->id  )))
