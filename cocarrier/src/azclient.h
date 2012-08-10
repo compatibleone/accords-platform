@@ -36,6 +36,7 @@
 #define	_AZURE_IS_WINDOWS	0x0002
 #define	_AZURE_HARDDISK		0x0004
 #define	_AZURE_READONLY		0x0008
+#define	_AZURE_DELETE_AFTER	0x0010
 #define	_AZURE_LINUX_SSH	0x0100
 #define	_AZURE_WINDOW_RESET	0x1000
 #define	_AZURE_WINDOWS_UPDATE	0x2000
@@ -265,6 +266,12 @@ public	struct	az_response *	az_delete_storage_service( char * filename );
 public	struct	az_response *	az_list_storage_services();
 public	struct	az_response *  	az_list_containers( char * account );
 
+public	char * az_capture_vm_request(
+	/* 	struct os_subscription * subptr,	*/
+	char *	ilabel,
+	char *	iname,
+	int	option );
+
 public	char * az_create_vm_request(
 	/* 	struct os_subscription * subptr,	*/
 	char * name,		
@@ -282,6 +289,7 @@ public	char * az_delete_network_config_request();
 
 public	struct	az_response * az_create_vm( char * filename );
 public	struct	az_response * az_delete_vm( char * depname, char * rolename );
+public	struct	az_response * az_capture_vm( char * filename, char * depname, char * rolename );
 public	struct	az_response * az_get_vm( char * depname, char * rolename );
 public	struct	az_response * az_list_vm( char * depname );;
 

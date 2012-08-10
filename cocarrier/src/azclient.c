@@ -2736,6 +2736,47 @@ public	struct	az_response *	az_create_image( char * filename )
 	else	return( rptr );
 }
 
+/*	---------------------------------------------------	*/
+/*	      a z _ c a p t u r e _ v m _ r e q u e s t		*/
+/*	---------------------------------------------------	*/
+public	char * az_capture_vm_request(
+	/* 	struct os_subscription * subptr,	*/
+	char *	ilabel,
+	char *	iname,
+	int	option )
+{
+	FILE *	h=(FILE *) 0;
+	char *	filename=(char *) 0;
+	char *	password=(char *) 0;
+
+	/* ---------------------------------- */
+	/* build the VM creation request file */
+	/* ---------------------------------- */
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+	/* ----------------------------------- */
+	/* generate the content of the request */
+	/* ----------------------------------- */
+	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+
+		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
+		fprintf(h,"\t<OperationType>CaptureRoleOperation</OperationType>\n");
+		fprintf(h,"\t<PostCaptureOperation>%s</PostCaptureOperation>\n",
+			(option & _AZURE_DELETE_AFTER ? "Delete" : "Reprovision" ));
+		fprintf(h,"<ProvisioningConfiguration>\n");
+
+		fprintf(h,"</ProvisioningConfiguration>\n");
+	fprintf(h,"</CaptureRoleOperation>\n");
+	fclose(h);
+	return( filename );
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
@@ -2934,6 +2975,17 @@ public	char * az_create_vm_request(
 	if ( newdeployment ) liberate( newdeployment );
 	return( filename );
 	}
+}
+
+/*	----------------------------------------	*/
+/*		a z _ c a p t u r e _ vm 			*/
+/*	----------------------------------------	*/
+public	struct	az_response *	az_capture_vm( char * filename, char * depname, char * rolename )
+{
+	char	url[2048];
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s/Operations",
+			Waz.hostedservice,depname,rolename);
+	return( azure_create_operation( url, filename ) );
 }
 
 /*	----------------------------------------	*/
