@@ -42,6 +42,7 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
+import org.ow2.compatibleone.Procci;
 import org.ow2.proactive.compatibleone.exchangeobjects.*;
 import org.ow2.proactive.compatibleone.misc.*;
 import org.ow2.proactive.compatibleone.rm.*;
@@ -51,7 +52,7 @@ import org.ow2.proactive.scripting.*;
 /**
  * This class handles the functionalities and formatting of the messages
  * that are obtained from the occi.scheduler.client.SchedulerClient. */
-public class ProActiveProcci {
+public class ProActiveProcci extends Procci{
 	private static Logger logger =						// Logger. 
 			Logger.getLogger(ProActiveProcci.class.getName()); 
 	private ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -65,7 +66,7 @@ public class ProActiveProcci {
 	/**
 	 * Here command-line parameters are interpreted and an action takes place accordingly. */
 	public void initialize(final String user, final String pass){
-		logger.info("Trying to initialize all...");
+		logger.info("Trying to initialize all (user="+user+" pass="+pass+")...");
 		Callable<String> callable = new Callable<String>(){
 			@Override
 			public String call() throws Exception {
@@ -93,22 +94,27 @@ public class ProActiveProcci {
 	public void command(Arguments args){
 		try{
 			if (args.getBool("list-nodes")){
-				String nodesinfo = listNodes();
+				Object[] params = {};
+				String nodesinfo = list_servers(params);
 				Misc.print(nodesinfo);
 			}else if (args.getBool("get-cosacs")){
 				String os = args.getStr("select-by-os");
 				String hostname = args.getStr("select-by-hostname");
 				String file = args.getStr("select-by-file-existent");
-				String nodeid = getCosacsNode(os, hostname, file);
+				Object[] params = {os, hostname, file};
+				String nodeid = start_server(params);
 				Misc.print(nodeid);
 			}else if (args.getBool("get-node-info")){
-				String nodeinfo = getPublicInfoOfNode(args.getStr("get-node-info"));
+				Object[] params = {args.getStr("get-node-info")};
+				String nodeinfo = get_server(params);
 				Misc.print(nodeinfo);
 			}else if (args.getBool("release-node")){
-				String output = releaseNode(args.getStr("release-node"));
+				Object[] params = {args.getStr("release-node")};
+				String output = stop_server(params);
 				Misc.print(output);
 			}else if (args.getBool("monitor-node")){
-				String output = monitorNode(args.getStr("monitor-node"), args.getStr("mbean"), args.getStr("attribute"));
+				Object[] params = {args.getStr("monitor-node"), args.getStr("mbean"), args.getStr("attribute")};
+				String output = monitor_server(params);
 				Misc.print(output);
 			}else if (args.getBool("get-node-output")){
 				String output = getNodeOutput(args.getStr("get-node-output"));
@@ -127,11 +133,22 @@ public class ProActiveProcci {
 		}
 	}
 	
+	private void checkparameters(Object[] args, int amount) throws Exception{
+		if (args.length != amount){
+			throw new Exception("The amount of parameters passed is " + args.length + " but " + amount + " are required.");
+		}
+	}
 	/**
 	 * Execute in a ProActive node an instance of COSACS module. 
 	 * @return a json obtect telling the result of the operation and some extra data. 
-	 * @throws Exception if anything goes wrong. */
-	public String getCosacsNode(String os, String hostname, String file) throws Exception{
+	 * @throws Exception if anything goes wrong. 
+	 */
+	public String start_server(Object[] args) throws Exception{
+		checkparameters(args, 3);
+		String os = (args[0]==null?null:args[0].toString());
+		String hostname = (args[1]==null?null:args[1].toString());
+		String file = (args[2]==null?null:args[2].toString());
+		
 		if (os==null){
 			os = "linux";
 			logger.warn("No Operative System specified, using as default: " + os);
@@ -205,8 +222,13 @@ public class ProActiveProcci {
 	/**
 	 * Monitors a node.
 	 * @return a json object with a result of the monitoring operation. 
-	 * @throws Exception in case something goes wrong. */
-	public String monitorNode(final String nodeurl, final String mbean, final String attribute){
+	 * @throws Exception in case something goes wrong. 
+	 */
+	public String monitor_server(Object[] args) throws Exception{
+		checkparameters(args, 3);
+		final String nodeurl = args[0].toString();
+		final String mbean = args[1].toString();
+		final String attribute = args[2].toString();
 		
 		logger.info("Trying to monitor a node...");
 		Callable<String> callable = new Callable<String>(){
@@ -237,9 +259,10 @@ public class ProActiveProcci {
 	/**
 	 * Listing of the nodes available in the RM. 
 	 * @return a json object with a list of nodes and some info about them. 
-	 * @throws Exception in case something goes wrong. */
-	public String listNodes(){
-		
+	 * @throws Exception in case something goes wrong. 
+	 */
+	public String list_servers(Object[] args) throws Exception{
+		checkparameters(args, 0);
 		logger.info("Trying to list the nodes...");
 		Callable<String> callable = new Callable<String>(){
 			@Override
@@ -290,8 +313,11 @@ public class ProActiveProcci {
 	/**
 	 * Get public information regarding a node. 
 	 *  
-	 *  */
-	public String getPublicInfoOfNode(final String nodeid){
+	 *  
+	 */
+	public String get_server(Object[] args) throws Exception{
+		checkparameters(args, 1);
+		final String nodeid = args[0].toString();
 		logger.info("Trying to get public information of '" + nodeid + "...");
 		Callable<String> callable = new Callable<String>(){
 			@Override
@@ -319,8 +345,11 @@ public class ProActiveProcci {
 	/**
 	 * This method releases a locked node. 
 	 * @param uuid uuid of the node locked. 
-	 * @return a json object telling the result of the operation. */
-	public String releaseNode(final String uuid){
+	 * @return a json object telling the result of the operation. 
+	 */
+	public String stop_server(Object[] args) throws Exception{
+		checkparameters(args, 1);
+		final String uuid = args[0].toString();
 		logger.info("Trying to release node whose related id is: " + uuid);
 		Callable<String> callable = new Callable<String>(){
 			@Override
@@ -342,4 +371,5 @@ public class ProActiveProcci {
 			return (new ErrorObject(e).toString());
 		}
 	}
+	
 }

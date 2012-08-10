@@ -1,6 +1,11 @@
 #!/bin/bash
 CURRDIR=`dirname $0`
 echo Executing... 
+export JDK=/home/cone/bin/jdk1.6.0_25
+export LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386
+cd $CURRDIR/
 echo $CURRDIR/src/paprocci --config $CURRDIR/../scripts/accords.xml CO-PAPROCCI/1.0
+mkdir -p $CURRDIR/rest
 $CURRDIR/src/paprocci --config $CURRDIR/../scripts/accords.xml CO-PAPROCCI/1.0
+
 

@@ -268,22 +268,6 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 
 
 /*! Function that calls the Java procci layer. */
-public void pa_jvm_create_node()
-{ 
-
-	char* result = NULL;                   // output of the execution of the command 
-
-	fprintf(stderr, "JVM Creating node...");
-	if (jvmp==NULL){
-		// start the JVM
-		jvmp = startjvm();
-		connect_to_provider(jvmp);
-	}
-	start_server(jvmp);
-
-}
-
-/*! Function that calls the Java procci layer. */
 public char * pa_java_procci_call(char * specific_parameters)
 { 
     #define RESULT_SIZE 1024*8
@@ -550,6 +534,23 @@ public	struct	pa_response *	pa_list_servers	( )
 	//return( proactive_list_operation( "/services/hostedservices" ) );
 }
 
+void start_provider_if_needed(){
+	if (jvmp==NULL){
+		fprintf(stderr, "Initializing JVM and provider...\n");
+		// start the JVM
+		char ** args = (char**)malloc(2 * sizeof(char*));
+		args[0] = Wpa.user;
+		args[1] = Wpa.password;
+
+		fprintf(stderr, "Using user='%s', demo='%s'...\n", args[0], args[1]);
+		jvmp = startjvm();
+		connect_to_provider(jvmp, args);
+		free(args);
+		fprintf(stderr, "Done.\n");
+	}else{
+		fprintf(stderr, "Provider initialized, skipping...\n");
+	}
+}
 
 /*	------------------------------------------------------------	*/
 /*			p a _ c r e a t e _ s e r v e r                         */
@@ -558,39 +559,75 @@ public	struct	pa_response *	pa_list_servers	( )
  * Lock a ProActive node using as parameters the constraints given.  */
 public	struct	pa_response * pa_create_server(struct proactive * constr)
 {
-    char * filename = NULL;
-    char * raw_list = NULL;
-    char command[1024];
+	char * filename = NULL;
+	char * raw_list = NULL;
 
-    printf("Simulating creation of a node...\n");
-    pa_jvm_create_node();
-    printf("Returning a NULL node...\n");
+	start_provider_if_needed();
 
-    return NULL;
+	struct pa_response* result = (struct pa_response*) NULL;
+	//sprintf(command,"--get-cosacs --select-by-os %s", constr->image); // Parameters for java layer. 
 
-    struct pa_response* result = (struct pa_response*) NULL;
-    sprintf(command,"--get-cosacs --select-by-os %s", constr->image); // Parameters for java layer. 
-
-    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
-        return NULL;
-    }else if (!(raw_list = pa_java_procci_call(command))){
-        fprintf(stderr, "Problem making call to the java layer...\n");
-        free(result);
-        return NULL;
-    }else{
-        result->nature = _TEXT_JSON;
-        result->content = raw_list;
-        result->xmlroot = NULL;
-        if (!(filename = put_jsonstring_in_file(raw_list))){
-            fprintf(stderr, "Problem putting the json in a file...\n");
-        }else{
-            result->jsonroot = json_parse_file(filename);
-            result->response = NULL;
-        }
-    }
+	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+		return NULL;
+	//}else if (!(raw_list = pa_java_procci_call(command))){
+	}else if (!(raw_list = start_server(jvmp, constr->image))){
+		fprintf(stderr, "Problem making call to the java layer...\n");
+		free(result);
+		return NULL;
+	}else{
+		result->nature = _TEXT_JSON;
+		result->content = raw_list;
+		result->xmlroot = NULL;
+		if (!(filename = put_jsonstring_in_file(raw_list))){
+			fprintf(stderr, "Problem putting the json in a file...\n");
+		}else{
+			result->jsonroot = json_parse_file(filename);
+			result->response = NULL;
+		}
+	}
 	return(result);
 }
 	
+/*	------------------------------------------------------------	*/
+/*			p a _ d e l e t e _ s e r v e r                         */
+/*	------------------------------------------------------------	*/
+/*! Unlock one ProActive node from the Scheduler/RM. */
+public	struct	pa_response *	pa_delete_server( char * id )
+{
+	char * filename = NULL;
+	char * raw_list = NULL;
+	//char command[1024];
+	start_provider_if_needed();
+
+	struct pa_response* result = (struct pa_response*) NULL;
+	if (id != NULL){    // Check valid id. 
+		//sprintf(command,"--release-node %s" , id );  // Build command to call. 
+	}else{
+		fprintf(stderr, "Invalid name for the server...\n");
+		return NULL;
+	}
+
+	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
+		return NULL;
+	//}else if (!(raw_list = pa_java_procci_call(command))){ // Call the java layer with the "delete" command. 
+	}else if (!(raw_list = stop_server(jvmp, id))){
+		fprintf(stderr, "Problem making call to the java layer...\n");
+		free(result);
+		return NULL;
+	}else{      // Prepare the result to return. 
+		result->nature = _TEXT_JSON;
+		result->content = raw_list;
+		result->xmlroot = NULL;
+		if (!(filename = put_jsonstring_in_file(raw_list))){
+			fprintf(stderr, "Problem putting the json in a file...\n");
+		}else{
+			result->jsonroot = json_parse_file(filename);
+			result->response = NULL;
+		}
+	}
+	return(result);
+}
+
 /*	------------------------------------------------------------	*/
 /*			p a _ g e t _ s u b s c r i p t i o n		*/
 /*	------------------------------------------------------------	*/
@@ -702,44 +739,6 @@ public	struct	pa_response *	pa_update_server(  char * id, char * filename )
 		return( rptr );
 	}
 	else	return( rptr );
-}
-
-/*	------------------------------------------------------------	*/
-/*			p a _ d e l e t e _ s e r v e r                         */
-/*	------------------------------------------------------------	*/
-/*! Unlock one ProActive node from the Scheduler/RM. */
-public	struct	pa_response *	pa_delete_server(  char * id )
-{
-    char * filename = NULL;
-    char * raw_list = NULL;
-    char command[1024];
-
-    struct pa_response* result = (struct pa_response*) NULL;
-    if (id != NULL){    // Check valid id. 
-        sprintf(command,"--release-node %s" , id );  // Build command to call. 
-    }else{
-        fprintf(stderr, "Invalid name for the server...\n");
-        return NULL;
-    }
-
-    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
-        return NULL;
-    }else if (!(raw_list = pa_java_procci_call(command))){ // Call the java layer with the "delete" command. 
-        fprintf(stderr, "Problem making call to the java layer...\n");
-        free(result);
-        return NULL;
-    }else{      // Prepare the result to return. 
-        result->nature = _TEXT_JSON;
-        result->content = raw_list;
-        result->xmlroot = NULL;
-        if (!(filename = put_jsonstring_in_file(raw_list))){
-            fprintf(stderr, "Problem putting the json in a file...\n");
-        }else{
-            result->jsonroot = json_parse_file(filename);
-            result->response = NULL;
-        }
-    }
-	return(result);
 }
 
 
