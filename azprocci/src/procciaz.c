@@ -421,6 +421,8 @@ private	struct	rest_response * start_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	else
 	{
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
@@ -447,6 +449,25 @@ private	struct	rest_response * start_windowsazure(
 }
 
 /*	-------------------------------------------	*/
+/*		a z _ n e w _ i m a g e _ n a m e	*/
+/*	-------------------------------------------	*/
+private	char *	az_new_image_name( struct windowsazure * pptr )
+{
+	char *	uuid;
+	char 	buffer[1024];
+	if (!( uuid = rest_allocate_uuid()))
+		return( uuid );
+	else
+	{
+		sprintf(buffer,"%s.vhd",uuid);
+		liberate( uuid );
+		if ( pptr->image )
+			pptr->image = liberate( pptr->image );
+		return((pptr->image = allocate_string( buffer )));
+	}
+}
+
+/*	-------------------------------------------	*/
 /* 	      s a v e  _ w i n d o w s a z u r e	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_windowsazure(
@@ -460,6 +481,7 @@ private	struct	rest_response * save_windowsazure(
 	int	status;
 	struct	windowsazure * pptr;
 	char	* filename;
+	char 	buffer[1024];
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
@@ -469,21 +491,57 @@ private	struct	rest_response * save_windowsazure(
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 
-	else if (!( filename = az_capture_vm_request( pptr->name, pptr->number, pptr->image, 0 ) ))	
+	sprintf(buffer,"accords image %s %s",pptr->name,pptr->id);
+	if (!( pptr->image = az_new_image_name( pptr )))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_windowsazure_image( azptr, pptr );
-		azptr = liberate_az_response( azptr );
-		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		if ( pptr->original )
+			pptr->original = liberate( pptr->original );
+		if (!( pptr->original = allocate_string( pptr->image ) ))
+		 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
+		else 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
+}
+/*	-------------------------------------------	*/
+/* 	 s n a p s h o t _ w i n d o w s a z u r e	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_windowsazure(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	az_response * azptr;
+	int	status;
+	struct	windowsazure * pptr;
+	char	* filename;
+	char	buffer[1024];
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state == _OCCI_IDLE )
+		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+	sprintf(buffer,"accords snapshot %s %s",pptr->name,pptr->id);
+	if (!( pptr->image = az_new_image_name( pptr )))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
+	else 	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -518,6 +576,8 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	if (!( filename = az_shutdown_vm_request() ))
 	 	return( 56 );
 	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( 56 );
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( 56 );
 	if (!( azptr = az_delete_deployment( 
 			pptr->hostedservice, 
@@ -585,6 +645,8 @@ private	struct	rest_response * restart_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	else
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
@@ -620,6 +682,8 @@ private	struct	rest_response * suspend_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
