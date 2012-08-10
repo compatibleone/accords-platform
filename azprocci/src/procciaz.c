@@ -419,7 +419,7 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
 	else if (!( filename = az_start_vm_request() ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
@@ -496,7 +496,7 @@ private	struct	rest_response * save_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
@@ -537,7 +537,7 @@ private	struct	rest_response * snapshot_windowsazure(
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
@@ -575,7 +575,7 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* --------------------------------- */
 	if (!( filename = az_shutdown_vm_request() ))
 	 	return( 56 );
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( 56 );
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( 56 );
@@ -643,7 +643,7 @@ private	struct	rest_response * restart_windowsazure(
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	else if (!( filename = az_restart_vm_request() ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
@@ -680,7 +680,7 @@ private	struct	rest_response * suspend_windowsazure(
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	else if (!( filename = az_shutdown_vm_request() ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( azptr = az_operation_vm( filename, pptr->name, pptr->number ) ))				
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		

@@ -2802,11 +2802,10 @@ public	char * az_start_vm_request()
 	/* generate the content of the request */
 	/* ----------------------------------- */
 	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
-
+	fprintf(h,"<StartRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
 		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 		fprintf(h,"\t<OperationType>StartRoleOperation</OperationType>\n");
-	fprintf(h,"</CaptureRoleOperation>\n");
+	fprintf(h,"</StartRoleOperation>\n");
 	fclose(h);
 	return( filename );
 	}
@@ -2834,11 +2833,11 @@ public	char * az_shutdown_vm_request()
 	/* generate the content of the request */
 	/* ----------------------------------- */
 	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+	fprintf(h,"<ShutdownRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
 
 		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 		fprintf(h,"\t<OperationType>ShutdownRoleOperation</OperationType>\n");
-	fprintf(h,"</CaptureRoleOperation>\n");
+	fprintf(h,"</ShutdownRoleOperation>\n");
 	fclose(h);
 	return( filename );
 	}
@@ -2866,11 +2865,11 @@ public	char * az_restart_vm_request()
 	/* generate the content of the request */
 	/* ----------------------------------- */
 	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
+	fprintf(h,"<RestartRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
 
 		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 		fprintf(h,"\t<OperationType>RestartRoleOperation</OperationType>\n");
-	fprintf(h,"</CaptureRoleOperation>\n");
+	fprintf(h,"</RestartRoleOperation>\n");
 	fclose(h);
 	return( filename );
 	}
