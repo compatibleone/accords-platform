@@ -3418,12 +3418,22 @@ public	struct	az_response *	az_create_deployment( char * filename, char * server
 }
 
 /*	------------------------------------------------------------	*/
-/*				a z _ g e t _ d e p l o y m e n t       */
+/*		a z _ g e t _ d e p l o y m e n t _ s l o t      	*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_deployment( char * server, char * slot )
+public	struct	az_response *	az_get_deployment_slot( char * deployment, char * slot )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , Waz.hostedservice, deployment, slot ); 
+	return( azure_retrieve_operation( buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*				a z _ g e t _ d e p l o y m e n t       */
+/*	------------------------------------------------------------	*/
+public	struct	az_response *	az_get_deployment( char * service, char * deployment )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , service, deployment ); 
 	return( azure_retrieve_operation( buffer ) );
 }
 

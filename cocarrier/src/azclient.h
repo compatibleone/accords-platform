@@ -233,7 +233,7 @@ public	struct	az_response *	az_get_operation_status(char * opid);
 /* ----------- */
 public	struct	az_response *	az_list_deployments(char * server);
 public	struct	az_response *	az_create_deployment( char * filename, char * server, char * slot );
-public	struct	az_response *	az_get_deployment( char * server, char * slot);
+public	struct	az_response *	az_get_deployment( char * service, char * deployment );
 public	struct	az_response *	az_delete_deployment( char * server, char * slot );
 
 public	char * az_create_deployment_request(

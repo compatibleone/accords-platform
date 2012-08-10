@@ -261,7 +261,13 @@ private	int	check_windowsazure_operation( struct az_response * zptr )
 private	int	connect_windowsazure_server( struct az_response * zptr,struct windowsazure * pptr )
 {
 	int	status;
-	char	buffer[2048];
+	struct	url	    * uptr;
+	struct	xml_element * eptr;
+
+	if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+	if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
+	if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
+	if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
 
 	if ((!( pptr ))
 	||  (!( zptr ))
@@ -273,24 +279,69 @@ private	int	connect_windowsazure_server( struct az_response * zptr,struct window
 	else if ((status = check_windowsazure_operation( zptr )) != 200 )
 		return( status );
 		
+	else if (!( zptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		return( 500 );
+	else if (!( zptr->response ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 501 );
+	}
+	else if ( zptr->response->status != 200 )
+	{
+		zptr = liberate_az_response( zptr );
+		return( 502 );
+	}
+	/* -------------------- */
+	/* examine the xml tree */
+	/* -------------------- */
+	else if ((!( eptr = zptr->xmlroot ))
+	     ||  (!( eptr->name )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 518 );
+	}
+	else if ( strcmp( eptr->name, "Deployment") != 0 )
+	{
+		zptr = liberate_az_response( zptr );
+		return( 530 );
+	}
+	/* --------------- */
+	/* collect the URL */
+	/* --------------- */
+	else if ((!( eptr = document_element( eptr, "Url" ) ))
+	     ||  (!( eptr->value )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 530 );
+	}
+	else if (!( pptr->number = allocate_string( eptr->value ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( uptr = analyse_url( pptr->number ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( pptr->hostname = allocate_string(uptr->host) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( pptr->publicaddr = allocate_string( pptr->hostname ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
 	else
 	{
-		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
-		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-
-		sprintf(buffer,"%s.cloudapp.net",pptr->hostedservice);
-
-		if (!( pptr->hostname = allocate_string( buffer) ))
-			return( 505 );
-		else	
-		{
-			pptr->when = time((long *) 0);
-			pptr->state = _OCCI_RUNNING;
-			autosave_windowsazure_nodes();
-			return(0);
-		}
+		uptr = liberate_url( uptr );
+		zptr = liberate_az_response( zptr );
+		pptr->when = time((long *) 0);
+		pptr->state = _OCCI_RUNNING;
+		autosave_windowsazure_nodes();
+		return(0);
 	}
 }
 
