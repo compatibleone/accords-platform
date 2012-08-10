@@ -268,6 +268,7 @@ public	struct	az_response *  	az_list_containers( char * account );
 
 public	char * az_capture_vm_request(
 	/* 	struct os_subscription * subptr,	*/
+	char *	hostname,
 	char *	ilabel,
 	char *	iname,
 	int	option );

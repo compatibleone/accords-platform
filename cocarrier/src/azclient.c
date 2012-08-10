@@ -1,3 +1,4 @@
+
 /* ------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                   */
 /*  (C) 2011 by Iain James MARSHALL (Prologue) <ijm667@hotmail.com>    */  
@@ -2736,11 +2737,55 @@ public	struct	az_response *	az_create_image( char * filename )
 	else	return( rptr );
 }
 
+private	void	az_configuration_set( FILE * h, char * hostname, char * user, char * password, int option )
+{
+	/* ------------------------------------- */
+	/* determine the VM type windows | linux */
+	/* ------------------------------------- */
+	if (!( option & _AZURE_IS_WINDOWS ))
+	{
+		/* ------------------------------------ */
+		/* LINUX SPECIFIC Configuration Section */
+		/* ------------------------------------ */
+		fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration</ConfigurationSetType>\n");
+		fprintf(h,"\t\t<HostName>%s</HostName>\n",hostname);
+		fprintf(h,"\t\t<UserName>%s</UserName>\n",user);
+		fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",password);
+		fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
+			(option & _AZURE_LINUX_SSH ? "true" : "false") );
+
+		/* ----------------------------------- */
+		/* TODO: handle eventual SSH Key Pairs */
+		/* ----------------------------------- */
+		if ( option & _AZURE_LINUX_SSH )
+		{	fprintf(h,"\t\t<SSH/>");	}
+	}
+	else
+	{
+		/* -------------------------------------- */
+		/* WINDOWS SPECIFIC Configuration Section */
+		/* -------------------------------------- */
+		fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration</ConfigurationSetType>\n");
+		fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",hostname);
+		fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",password);
+		fprintf(h,"\t\t<ResetPasswordOnFirstLogon>%s</ResetPasswordOnFirstLogon>\n",
+			(option & _AZURE_WINDOW_RESET ? "true" : "false") );
+		fprintf(h,"\t\t<EnableAutomaticUpdates>%s</EnableAutomaticUpdates>\n",
+			(option & _AZURE_WINDOWS_UPDATE ? "true" : "false") );
+		/* ------------------------------------------------ */
+		/* TODO: the stored certificates need to be handled */
+		/* ------------------------------------------------ */
+		fprintf(h,"\t\t<StoredCertificateSettings/>");
+	}
+	return;
+}
+
 /*	---------------------------------------------------	*/
 /*	      a z _ c a p t u r e _ v m _ r e q u e s t		*/
 /*	---------------------------------------------------	*/
 public	char * az_capture_vm_request(
 	/* 	struct os_subscription * subptr,	*/
+	char *  hostname,
 	char *	ilabel,
 	char *	iname,
 	int	option )
@@ -2769,8 +2814,10 @@ public	char * az_capture_vm_request(
 		fprintf(h,"\t<PostCaptureOperation>%s</PostCaptureOperation>\n",
 			(option & _AZURE_DELETE_AFTER ? "Delete" : "Reprovision" ));
 		fprintf(h,"<ProvisioningConfiguration>\n");
-
+		az_configuration_set( h, hostname, Waz.user, Waz.password, option );
 		fprintf(h,"</ProvisioningConfiguration>\n");
+		fprintf(h,"</TargetImageLabel>%s</TargetImageLabel>\n",ilabel);
+		fprintf(h,"</TargetImageName>%s</TargetImageName>\n",iname);
 	fprintf(h,"</CaptureRoleOperation>\n");
 	fclose(h);
 	return( filename );
@@ -2877,44 +2924,8 @@ public	char * az_create_vm_request(
 			fprintf(h,"\t\t<RoleType>PersistentVMRole</RoleType>\n");
 			fprintf(h,"\t\t<ConfigurationSets>\n");
 			fprintf(h,"\t\t<ConfigurationSet>\n");
-			/* ------------------------------------- */
-			/* determine the VM type windows | linux */
-			/* ------------------------------------- */
-			if (!( option & _AZURE_IS_WINDOWS ))
-			{
-				/* ------------------------------------ */
-				/* LINUX SPECIFIC Configuration Section */
-				/* ------------------------------------ */
-				fprintf(h,"\t\t<ConfigurationSetType>LinuxProvisioningConfiguration</ConfigurationSetType>\n");
-				fprintf(h,"\t\t<HostName>%s</HostName>\n",role);
-				fprintf(h,"\t\t<UserName>%s</UserName>\n",Waz.user);
-				fprintf(h,"\t\t<UserPassword>%s</UserPassword>\n",Waz.password);
-				fprintf(h,"\t\t<DisableSshPasswordAuthentication>%s</DisableSshPasswordAuthentication>\n",
-					(option & _AZURE_LINUX_SSH ? "true" : "false") );
 
-				/* ----------------------------------- */
-				/* TODO: handle eventual SSH Key Pairs */
-				/* ----------------------------------- */
-				if ( option & _AZURE_LINUX_SSH )
-				{	fprintf(h,"\t\t<SSH/>");	}
-			}
-			else
-			{
-				/* -------------------------------------- */
-				/* WINDOWS SPECIFIC Configuration Section */
-				/* -------------------------------------- */
-				fprintf(h,"\t\t<ConfigurationSetType>WindowsProvisioningConfiguration</ConfigurationSetType>\n");
-				fprintf(h,"\t\t<ComputerName>%s</ComputerName>\n",role);
-				fprintf(h,"\t\t<AdminPassword>%s</AdminPassword>\n",Waz.password);
-				fprintf(h,"\t\t<ResetPasswordOnFirstLogon>%s</ResetPasswordOnFirstLogon>\n",
-					(option & _AZURE_WINDOW_RESET ? "true" : "false") );
-				fprintf(h,"\t\t<EnableAutomaticUpdates>%s</EnableAutomaticUpdates>\n",
-					(option & _AZURE_WINDOWS_UPDATE ? "true" : "false") );
-				/* ------------------------------------------------ */
-				/* TODO: the stored certificates need to be handled */
-				/* ------------------------------------------------ */
-				fprintf(h,"\t\t<StoredCertificateSettings/>");
-			}
+			az_configuration_set( h, role, Waz.user, Waz.password, option );
 
 			fprintf(h,"\t\t</ConfigurationSet>\n");
 			if ( rest_valid_string( endpoints ) )

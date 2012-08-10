@@ -464,10 +464,11 @@ private	struct	rest_response * save_windowsazure(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
-/*	else if (!( filename = az_create_image_request( pptr->name, pptr->number ) ))	*/
-/*	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		*/
-/*	else if (!( azptr = az_create_image( filename ) ))				*/
-/*	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		*/
+
+	else if (!( filename = az_capture_vm_request( pptr->name, pptr->number, pptr->image, 0 ) ))	
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_capture_vm( filename, pptr->name, pptr->number ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
 	else
 	{
 		/* --------------------------------- */
