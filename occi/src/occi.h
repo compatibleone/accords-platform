@@ -166,6 +166,7 @@ public	char *	occi_http_capacity( struct occi_category * optr );
 public	char *	occi_http_category( struct occi_category * optr );
 public	char *	occi_http_attribute( struct occi_category * optr, struct occi_attribute * aptr );
 public	char *	occi_http_attribute_value( struct occi_category * optr, struct occi_attribute * aptr, char * vptr );
+public	struct	occi_action *	occi_resolve_action( struct occi_category * cptr, char * name );
 public	struct	occi_attribute * occi_resolve_attribute( struct occi_category * optr, char * nptr );
 public	char *	occi_allocate_uuid();
 public	char *	occi_category_id( char * sptr );

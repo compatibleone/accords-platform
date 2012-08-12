@@ -930,6 +930,32 @@ private void	redirect_occi_az_config_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_az_config(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_az_config_delete(optr,cptr,rptr));
+}
+
+/*	------------------------------	*/
+/*	c r u d   p u t   a c t i o n 	*/
+/*	------------------------------	*/
+private struct rest_response * put_action_az_config(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_az_config_put(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -981,6 +1007,10 @@ public struct occi_category * occi_az_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_az_config)))
+			return( optr );
+		if (!( optr = occi_add_action( optr,"PUT","",put_action_az_config)))
+			return( optr );
 		autoload_az_config_nodes();
 		return(optr);
 	}
@@ -1221,4 +1251,4 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 
 }
 
-#endif	/* _azconfig_c_ */
+#endif	/* _occiazconfig_c_ */

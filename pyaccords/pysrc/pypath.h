@@ -1,7 +1,7 @@
 #ifndef _pypath_h_
 #define _pypath_h_
 
-#define PYPATH "/root/accords-conets/accords-platform"
+#define PYPATH "/home/c2/accords-platform"
 
 
 #endif

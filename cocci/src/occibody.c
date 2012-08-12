@@ -341,11 +341,12 @@ public	char *	occi_html_capacities(
 /*	------------------------------------------------------------	*/
 /*	  		o c c i _ h t m l _ b o d y 			*/
 /*	------------------------------------------------------------	*/
-private	char *	occi_html_body( 
+public	char *	occi_html_body( 
 		struct occi_category * cptr,
 		struct rest_header  * hptr )
 {
 	FILE *	h;
+	char *	extra="";
 	char *	prefix;
 	char *	filename;
 	char	buffer[2048];
@@ -456,13 +457,24 @@ private	char *	occi_html_body(
 					fprintf(h,"<tr><th>%s</th>",name);
 				else	fprintf(h,"<tr><th><a href='%s'>%s</a></th>",vptr,name);
 
-				fprintf(h,"<td><input class=input type=text name='%s' value='%s'>\n",name,vptr);
+				if ( name )
+				{
+					if (!( strcmp(name,"id") ))
+					{
+						extra = "readonly";
+						strcpy(id,vptr);
+					}
+					else if (!( strcmp(name,"state") ))
+						extra = "readonly";
+					else	extra="";
+				}
+				else	extra="";
+
+				fprintf(h,"<td><input class=input %s type=text name='%s' value='%s'>\n",extra,name,vptr);
+
 				/* ---------------------------------------------------------- */
 				/* detect the ID element value and store for eventual actions */
 				/* ---------------------------------------------------------- */
-				if ( name )
-					if (!( strcmp(name,"id") ))
-						strcpy(id,vptr);
 				fprintf(h,"</td></tr>\n");
 				hptr = occi_consume_header( hptr );
 			}
@@ -502,6 +514,19 @@ private	char *	occi_html_body(
 				fprintf(h,"<td><input class=button type=submit value='POST' name='POST'></form>");
 				fprintf(h,"<td><form action='/%s/%s' method='GET' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
 				fprintf(h,"<input class=button type=submit value='GET' name='GET'></form>");
+
+				if ((aptr = occi_resolve_action( cptr, "DELETE" )) != (struct occi_action *) 0)
+				{
+					fprintf(h,"<td><form action='/%s/%s?action=DELETE' method='POST' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
+					fprintf(h,"<input class=button type=submit value='DELETE' name='DELETE'></form>");
+				}
+
+				if ((aptr = occi_resolve_action( cptr, "PUT" )) != (struct occi_action *) 0)
+				{
+					fprintf(h,"<td><form action='/%s/%s?action=PUT' method='POST' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
+					fprintf(h,"<input class=button type=submit value='PUT' name='PUT'></form>");
+				}
+
 				fprintf(h,"</th></tr></table></div></th></tr>\n");
 			}
 
@@ -525,7 +550,11 @@ private	char *	occi_html_body(
 		/* generate the page footer */
 		/* ------------------------ */
 		else if ( locations )
+		{
 			fprintf(h,"</table>\n");
+			fprintf(h,"<tr><th><form action='/%s/%s' method='POST' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
+			fprintf(h,"<input class=button type=submit value='POST' name='POST'></form></tr>");
+		}
 		else	
 		{
 			occi_html_header(h,"Accords OCCI Resource List : ",cptr->id);
@@ -533,6 +562,8 @@ private	char *	occi_html_body(
 			occi_html_publisher(h);
 			fprintf(h,"<tr><th><a href='/%s/'>/%s/</a></th></tr><tr><td><div align=center>\n",cptr->id,cptr->id);
 			fprintf(h,"<table><tr><th>&nbsp;</th></tr></table></div>\n");
+			fprintf(h,"<tr><th><form action='/%s/%s' method='POST' enctype='application/x-www-form-urlencoded'>",cptr->id,id);
+			fprintf(h,"<input class=button type=submit value='POST' name='POST'></form></tr>");
 		}
 		fprintf(h,"</table>\n");
 		occi_html_footer(h);

@@ -244,4 +244,4 @@ public int rest_occi_az_config(FILE * fh,struct az_config * sptr,char * prefix, 
 
 }
 
-#endif	/* _azconfig_c_ */
+#endif	/* _azconfig_cazconfig_c_ */

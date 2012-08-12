@@ -116,6 +116,20 @@ public	struct	occi_category * occi_add_action(struct occi_category * cptr,char *
 }
 
 /*	---------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ a c t i o n		*/
+/*	---------------------------------------------------	*/
+public	struct	occi_action *	occi_resolve_action( struct occi_category * optr, char * name )
+{
+	struct	occi_action * aptr;
+	for ( aptr=optr->firstact;
+		aptr != (struct occi_action *) 0;
+		aptr = aptr->next )
+		if (!( strcmp( aptr->name, name ) ))
+			break;
+	return( aptr );
+}
+
+/*	---------------------------------------------------	*/
 /*		o c c i _ a d d _ a t t r i b u t e     	*/
 /*	---------------------------------------------------	*/
 public	struct	occi_category * occi_add_attribute(struct occi_category * cptr,char * name,int m,int i )
