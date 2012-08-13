@@ -213,6 +213,16 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else if  (!( strcasecmp( p2, "DISK" ) ))
+		{
+			if (!( nomfic = az_add_os_disk_request( p3, p4, p5, atoi(p6) ) ))
+				return( failure(27,"cannot create","DISK request" ) );
+			else
+			{ 	
+				az_result( az_add_os_disk( nomfic ) );
+				return( 0 );
+			}
+		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 		{
 			if (!( nomfic = az_create_deployment_request( p3, p3, p4, p5 ) ))
@@ -288,6 +298,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			az_result( az_get_image( p3 ) );
 		else if (!( strcasecmp( p2, "OS" ) ))
 			az_result( az_get_os_image( p3 ) );
+		else if (!( strcasecmp( p2, "DISK" ) ))
+			az_result( az_get_os_disk( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			az_result( az_retrieve_affinity_group( p3 ) );
 		else if (!( strcasecmp( p2, "STORAGE") ))
@@ -324,6 +336,8 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			az_result( az_delete_vm( p3, p4 ) );
 		else if (!( strcasecmp( p2, "OS" ) ))
 			az_result( az_delete_os_image( p3 ) );
+		else if (!( strcasecmp( p2, "DISK" ) ))
+			az_result( az_delete_os_disk( p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			az_result( az_delete_image( p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
@@ -476,6 +490,9 @@ private	int	az_banner()
 	printf("\n          GET    OS <name> ");
 	printf("\n          DELETE OS <name> ");
 	printf("\n          LIST   DISKS ");
+	printf("\n          GET    DISK <name>");
+	printf("\n          DELETE DISK <name>");
+	printf("\n          CREATE DISK <name> <label> <media> <option>");
 	printf("\n          LIST   CONTAINERS ");
 	printf("\n   Service Deployment Operations: DEPLOYMENT ");
 	printf("\n          CREATE DEPLOYMENT <name> <image> <configuration> <host> <slot> ");

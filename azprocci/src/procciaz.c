@@ -137,7 +137,7 @@ private	int	connect_windowsazure_image( struct az_response * rptr,struct windows
 			}
 			else if (!( strcmp( vptr, "SAVING" )))
 			{
-				sleep(1);
+				sleep( _AZURE_STATUS_POLL );
 				if ( zptr )
 					zptr = liberate_az_response( zptr );
 				if (!( zptr = az_get_image( pptr->image )))
@@ -254,6 +254,50 @@ private	int	check_windowsazure_operation( struct az_response * zptr )
 	
 }
 
+
+/*	-----------------------------------------------------------------	*/
+/* 	r e t r i e v e _ w i n d o w s a z u r e _ r o l e s t a t u s 	*/
+/*	-----------------------------------------------------------------	*/
+private	char *	retrieve_windowsazure_rolestatus( struct az_response * zptr )
+{
+	char *	result;
+	struct	xml_element * eptr;
+	if (!( zptr ))
+		return( (char *) 0 );
+
+	else if (!( zptr->response ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	/* -------------------- */
+	/* examine the xml tree */
+	/* -------------------- */
+	else if ((!( eptr = zptr->xmlroot ))
+	     ||  (!( eptr->name )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	/* ---------------------------- */
+	/* retrieve the instance status */
+	/* ---------------------------- */
+	else if (!( eptr = document_element( eptr->first, "InstanceStatus" ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	else if (!( result = allocate_string( eptr->value ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	else
+	{		
+		zptr = liberate_az_response( zptr );
+		return( result );
+	}
+}
 
 /*	--------------------------------------------------------	*/
 /* 	 c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
@@ -530,6 +574,7 @@ private	struct	rest_response * save_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char *	rolestatus;
 	struct	az_response * azptr;
 	int	status;
 	struct	windowsazure * pptr;
@@ -544,13 +589,82 @@ private	struct	rest_response * save_windowsazure(
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 
-	sprintf(buffer,"accords image %s %s",pptr->name,pptr->id);
-	if (!( pptr->image = az_new_image_name( pptr )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
-	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 500, "Shutdown Message Failure" ) );		
 	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	 	return( rest_html_response( aptr, 500, "Shutdown Operation Failure" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, 500, "Shutdown Check Failure" ) );		
+	}
+
+	/* ---------------------------------- */
+	/* recover the deployment information */
+	/* ---------------------------------- */
+	while (1)
+	{
+		if (!( azptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Information" ) );		
+		else if (!( azptr->response ))
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Response" ) );		
+		}
+		else if ((status = azptr->response->status) != 200 )
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, status, "Deployment Response Failure" ) );		
+		}
+		else if (!( rolestatus = retrieve_windowsazure_rolestatus( azptr ) ))
+		 	return( rest_html_response( aptr, 500, "Deployment Response Role Status Failure" ) );		
+
+		rest_log_message( rolestatus );
+
+		if (!( strcmp( rolestatus, "StoppedVM" ) ))
+			break;
+		else if ((!( strcmp( rolestatus, "DeletingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StoppingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StoppingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "BusyRole"     ) )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		else if ((!( strcmp( rolestatus, "RestartingRole"     ) ))
+		     ||  (!( strcmp( rolestatus, "CyclingRole"        ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "UnresponsiveRole"   ) )))
+		{
+			rolestatus = liberate( rolestatus );
+		 	return( rest_html_response( aptr, 500, "Serious Deployment Role Failure" ) );		
+		}
+		else
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		
+	}
+
+	rolestatus = liberate( rolestatus );
+
+	/* --------------------------------- */
+	/* perform the VM image capture now  */
+	/* --------------------------------- */
+	sprintf(buffer,"%s %s",pptr->name,pptr->id);
+	if (!( pptr->image = az_new_image_name( pptr )))
+	 	return( rest_html_response( aptr, 530, "Bad Request" ) );		
+	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
+	 	return( rest_html_response( aptr, 531, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 532, "Bad Request" ) );		
 	else if ((status = check_windowsazure_operation( azptr )) != 200)
 	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
 	else
@@ -562,6 +676,7 @@ private	struct	rest_response * save_windowsazure(
 		else 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
+
 /*	-------------------------------------------	*/
 /* 	 s n a p s h o t _ w i n d o w s a z u r e	*/
 /*	-------------------------------------------	*/
@@ -585,6 +700,23 @@ private	struct	rest_response * snapshot_windowsazure(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 500, "Shutdown Message Failure" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 500, "Shutdown Operation Failure" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, 500, "Shutdown Check Failure" ) );		
+	}
+
+	/* --------------------------------- */
+	/* perform the VM image capture now  */
+	/* --------------------------------- */
 	sprintf(buffer,"accords snapshot %s %s",pptr->name,pptr->id);
 	if (!( pptr->image = az_new_image_name( pptr )))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		

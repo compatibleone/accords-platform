@@ -36,7 +36,7 @@
 #define	_AZURE_IS_WINDOWS	0x0002
 #define	_AZURE_HARDDISK		0x0004
 #define	_AZURE_READONLY		0x0008
-#define	_AZURE_DELETE_AFTER	0x0010
+#define	_AZURE_REPROVISION 	0x0010
 #define	_AZURE_LINUX_SSH	0x0100
 #define	_AZURE_WINDOW_RESET	0x1000
 #define	_AZURE_WINDOWS_UPDATE	0x2000
@@ -212,12 +212,20 @@ public	struct	az_response *	az_list_images  ();
 public	struct	az_response *	az_create_image( char * filename );
 public	struct	az_response *	az_get_image    ( char * id );
 public	struct	az_response *	az_delete_image ( char * id );
+
+/*	DISK OPERATIONS		*/
+public	struct	az_response * 	az_list_os_disks();
+public	struct	az_response * 	az_get_os_disk(char * name);
+public	struct	az_response * 	az_delete_os_disk(char * disk);
+public	struct	az_response * 	az_add_os_disk( char * filename );
+public	char *			az_add_os_disk_request( char * name, char * description, char * media, int option );
+
+/*	OS OPERATIONS		*/
 public	struct	az_response * 	az_list_os_images();
 public	struct	az_response * 	az_get_os_image(char * name);
-public	struct	az_response * 	az_list_os_disks();
-public	struct	az_response * az_delete_os_image(char * name);
-public	struct	az_response * az_create_os_image(char * filename );
-public	char * 	az_create_os_request(char * name, char * label, char * media, char * os);
+public	struct	az_response * 	az_delete_os_image(char * name);
+public	struct	az_response * 	az_create_os_image(char * filename );
+public	char * 			az_create_os_request(char * name, char * label, char * media, char * os);
 	
 public	char * az_create_image_request(
     char * identity, char * server );

@@ -2908,7 +2908,7 @@ public	char * az_capture_vm_request(
 		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 		fprintf(h,"\t<OperationType>CaptureRoleOperation</OperationType>\n");
 		fprintf(h,"\t<PostCaptureOperation>%s</PostCaptureOperation>\n",
-			(option & _AZURE_DELETE_AFTER ? "Delete" : "Reprovision" ));
+			(option & _AZURE_REPROVISION ? "Reprovision" : "Delete"  ));
 		fprintf(h,"<ProvisioningConfiguration>\n");
 		az_configuration_set( h, hostname, Waz.user, Waz.password, option );
 		fprintf(h,"</ProvisioningConfiguration>\n");
@@ -3371,11 +3371,66 @@ public	struct	az_response * az_list_containers(char * storage)
 }
 
 /*	------------------------------------------------------------	*/
+/*		a z _ a d d _ o s _ d i s k _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char *	az_add_os_disk_request( char * name, char * description, char * media, int option )
+{
+	char *	filename;
+	FILE *	h;
+
+	if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<Disk xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"\t<HasOperatingSysteml>true</HasOperatingSystem>\n");
+		fprintf(h,"\t<Label>%s</Label>\n",description);
+		fprintf(h,"\t<MediaLink>%s</MediaLink>\n",media);
+		fprintf(h,"\t<Name>%s</Name>\n",name);
+		fprintf(h,"\t<OS>%s</OS>\n",( option & _AZURE_IS_WINDOWS ? "Windows" : "Linux" ));
+		fprintf(h,"</Disk>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ a d d _ o s _ d i s k 			*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_add_os_disk( char * filename )
+{
+	return( azure_create_operation("/services/disks",  filename ) ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ d e l e t e _ o s _ d i s k		*/
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_delete_os_disk(char * disk)
+{
+	char	url[2048];
+	sprintf(url,"/services/disks/%s",disk);
+	return( azure_delete_operation(url) ); 
+}
+
+/*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ d i s k s			*/
 /*	------------------------------------------------------------	*/
 public	struct	az_response * az_list_os_disks()
 {
 	return( azure_retrieve_operation("/services/disks") ); 
+}
+
+/*	------------------------------------------------------------	*/
+/*			a z _ g e t _ o s _ d i s k	                */
+/*	------------------------------------------------------------	*/
+public	struct	az_response * az_get_os_disk(char * name)
+{
+	char	url[2048];
+	sprintf(url,"/services/disks/%s",name);
+	return( azure_retrieve_operation(url) ); 
 }
 
 /*	------------------------------------------------------------	*/
