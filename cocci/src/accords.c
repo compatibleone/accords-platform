@@ -27,7 +27,15 @@
 
 private	struct	accords_configuration 	* configuration = (struct accords_configuration *) 0;
 private	char				* section 	= (char *) 0;
+private	char				* identity	= (char *) 0;
 
+public	char *	get_identity()
+{
+	if (!( configuration ))
+		return((char *) 0);
+	else 	return( configuration->identity ); 
+}
+	
 /*	---------------------------------------------------------	*/
 /*	 a c c o r d s _ c o n f i g u r a t i o n _ o p t i o n 	*/
 /*	---------------------------------------------------------	*/
@@ -62,7 +70,7 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 	else if (!( strcmp( aptr, "publisher" ) ))
 		configuration->publisher = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "identity" ) ))
-		configuration->identity = allocate_string( argv[++argi] );
+		identity = configuration->identity = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "zone" ) ))
 		configuration->zone = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "user" ) ))

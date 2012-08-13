@@ -351,8 +351,8 @@ private	int	az_command(int argc, char * argv[] )
 	int	status;
 	int	argi=1;
 	char *	aptr;
-	char *	user="ijm";
-	char *	pass="4362355f-fd84-47c7-a1ca-582a368ddc50";
+	char *	user="test";
+	char *	pass="C1o2_i3p4s";
 	char *	host="https://management.core.windows.net/";
 	char *	thost="https://127.0.0.1:8080/";
 	char *  other="https://windows.azure.com/";
