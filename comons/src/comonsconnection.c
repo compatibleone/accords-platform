@@ -49,8 +49,7 @@ private	void	purge_probe_packets(struct cords_connection * pptr, char * packets,
 			/* ------------------------ */
 			if (!( vptr = eptr->name ))
 				continue;
-			else if ( strcmp(vptr, _CORDS_PACKET ) != 0 )
-				continue;
+
 			/* ------------------------ */
 			/* simply delete the packet */
 			/* ------------------------ */
