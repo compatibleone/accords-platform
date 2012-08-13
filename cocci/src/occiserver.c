@@ -59,6 +59,31 @@ private	struct	accords_authorization * AccordsAuthorization=(struct accords_auth
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
 
+private	struct rest_response * occi_get( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_put( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_post( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_delete( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_head( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ f a i l u r e				*/
 /*	---------------------------------------------------------	*/
@@ -893,6 +918,244 @@ private	struct rest_response * occi_invoke_get(
 }
 
 /*	---------------------------------------------------------	*/
+/*	    	o c c i _ i n v o k e _ p s e u d o 			*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_invoke_pseudo(
+	char *	action,
+	struct rest_header   * hptr,
+	struct occi_category * optr,
+	struct rest_client   * cptr, 
+	struct rest_request  * rptr )
+{
+	struct rest_header   * xptr;
+	int	l;
+	int	i;
+	char *	sptr;
+	char *	wptr;
+	char *	tptr;
+
+	/* ------------------------------------- */
+	/* substitute the method with the action */
+	/* ------------------------------------- */
+	if ( rptr->method )	rptr->method = liberate( rptr->method );
+	rptr->method = action;
+
+	/* ---------------------------------------- */
+	/* if it is a POST : remove the instance id */
+	/* ---------------------------------------- */
+	if (!( strcmp( action, "POST" ) ))
+	{
+		for ( 	sptr=rptr->object, l=0, i=0; 
+			*(sptr+i) != 0;
+			i++ )
+			if ( *(sptr+i) == '/' )
+				l = (i+1);
+		*(sptr+l) = 0;
+	}
+
+	/* ----------------------------- */
+	/* rebuild the parameters string */
+	/* ----------------------------- */
+	if ( rptr->parameters )
+	{
+		rptr->parameters = liberate( rptr->parameters );
+		for (	wptr=(char *) 0, xptr=hptr;
+			xptr != (struct rest_header *) 0;
+			xptr = xptr->next )
+		{
+			if (!( sptr = allocate(
+				strlen( ( xptr->name  ? xptr->name  : "\0" ) ) + 
+				strlen( ( xptr->value ? xptr->value : "\0" ) ) + 2 ) ))
+			{
+				break;
+			}
+			else
+			{
+				sprintf(sptr,"%s=%s",
+					( xptr->name  ? xptr->name  : "\0" ),
+					( xptr->value ? xptr->value : "\0" ));
+				if (!( wptr ))
+					wptr = sptr;
+				else if (!( tptr = allocate( strlen( wptr ) + strlen( sptr ) + 2 ) ))
+					break;
+				else
+				{
+					sprintf(tptr,"%s&%s",wptr,sptr);
+					sptr = liberate( sptr );
+					wptr = liberate( wptr );
+					wptr = tptr;
+				}
+			}
+		}
+		rptr->parameters = wptr;
+	}
+	if ( hptr )	hptr = liberate_rest_headers( hptr );
+
+	/* ------------------------------------ */
+	/* dispatch the adjusted action request */
+	/* ------------------------------------ */
+	if (!( strcmp( action,"POST" ) ))
+		return( occi_post( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"GET" ) ))
+		return( occi_get( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"DELETE" ) ))
+		return( occi_delete( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"PUT" ) ))
+		return( occi_put( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"HEAD" ) ))
+		return( occi_head( optr, cptr, rptr ) );
+	else	return( occi_failure(cptr,  500, "Server Failure" ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ e x t r a c t _ p a r a m e t e r s		*/
+/*	---------------------------------------------------------	*/
+/*	converts a "name=value&name=value" type url string to a		*/
+/*	list of name value header pairs.				*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_header * occi_extract_parameters( char * sptr )
+{
+	char *	wptr;
+	char *	nptr;
+	char *	vptr;
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+
+	if (!( sptr ))
+		return( root );
+	else if (!( wptr = allocate_string( sptr ) ))
+		return( root );
+	else	sptr = wptr;
+
+	while (*wptr)
+	{
+		/* ----------------------- */
+		/* step over name to value */
+		/* ----------------------- */
+		for (	nptr=wptr; *wptr != 0; wptr++ )	
+			if (( *wptr == '=' ) || ( *wptr == '&' ))
+				break;
+
+		if ( *wptr == '=' )
+		{
+			*(wptr++) = 0;
+			/* ----------------------- */
+			/* step over value to name */
+			/* ----------------------- */
+			for (	vptr=wptr; *wptr != 0; wptr++ )
+				if ( *wptr == '&' )
+					break;
+			if ( *wptr == '&' )
+				*(wptr++) = 0;
+		}		
+		/* ---------- */
+		/* null value */
+		/* ---------- */
+		else
+		{
+			vptr = wptr;
+			 if ( *wptr == '&' )						
+				*(wptr++) = 0;
+		}
+
+		/* ----------------- */
+		/* allocate a header */
+		/* ----------------- */
+		if (!( hptr = rest_create_header( nptr, vptr ) ))
+			break;
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+	liberate( sptr );
+	return( root );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ e x t r a c t _ a c t i o n			*/
+/*	---------------------------------------------------------	*/
+private	char *	occi_extract_action( struct rest_header ** hhptr )
+{
+	struct	rest_header * hptr;
+	char *	result=(char *) 0;
+	if (!( hptr = *hhptr ))
+		return( (char *) 0);
+
+	while ( hptr )
+	{
+		if (( hptr->name )
+		&&  (!( strcmp( hptr->name, "action" ) )))
+		{
+			/* -------------------------- */
+			/* duplicate the header value */
+			/* -------------------------- */
+			if (!( result = allocate_string( hptr->value ) ))
+				break;
+
+			/* -------------------------------------- */
+			/* remove the action value from the chain */
+			/* -------------------------------------- */
+			else if (!( hptr->previous ))
+			{
+				*hhptr = hptr->next;
+				hptr->next->previous = (struct rest_header * )0;
+				break;
+			}
+			else
+			{
+			 	hptr->previous->next = hptr->next;
+				if ( hptr->next )
+					hptr->next->previous = hptr->previous;
+				hptr->next = hptr->previous = (struct rest_header * ) 0;
+				liberate_rest_header( hptr );
+				break;
+			}
+		}
+		else	hptr = hptr->next;
+	}
+	return( result );
+}
+
+/*	---------------------------------------------------------	*/
+/*		   o c c i _ p s e u d o _ a c t i o n			*/
+/*	---------------------------------------------------------	*/
+/*	this function performs invocation of POST for a category	*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_pseudo_action(
+	struct occi_category * optr,
+	struct rest_client   * cptr, 
+	struct rest_request  * rptr )
+{
+	struct	rest_header * hptr;
+	char *	action=(char *) 0;
+	if (!( action ))
+		return((struct rest_response *) 0);
+	else if (!( rptr ))
+		return((struct rest_response *) 0);
+	else if (!( rptr->parameters ))
+		return((struct rest_response *) 0);
+	else if (!( hptr = occi_extract_parameters( rptr->parameters ) ))
+		return((struct rest_response *) 0);
+	else if (!(action = occi_extract_action( &hptr ) ))
+	{
+		hptr = liberate_rest_headers( hptr );
+		return((struct rest_response *) 0);
+	}
+	else if ((!( strcmp( action, "POST"   ) ))
+	     ||  (!( strcmp( action, "GET"    ) ))
+	     ||  (!( strcmp( action, "DELETE" ) ))
+	     ||  (!( strcmp( action, "PUT"    ) )))
+		return( occi_invoke_pseudo( action, hptr, optr, cptr, rptr ) );
+	else
+	{
+		hptr = liberate_rest_headers( hptr );
+		return((struct rest_response *) 0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
 /*			o c c i _ i n v o k e _ p o s t 		*/
 /*	---------------------------------------------------------	*/
 /*	this function performs invocation of POST for a category	*/
@@ -904,7 +1167,9 @@ private	struct rest_response * occi_invoke_post(
 {
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_interface * iptr;
-	if (!( iptr = optr->interface ))
+	if (( aptr = occi_pseudo_action( optr, cptr, rptr )) != (struct rest_response *) 0)
+		return( aptr );
+	else if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
 	else if (!( rptr = occi_request_body(optr, rptr) ))
 		return( occi_failure(cptr,  400, "Bad Request : Incorrect Body" ) );
@@ -1168,6 +1433,7 @@ private	int	occi_check_request_authorization(
 		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
 	else 	return( accords_resolve_authorization( hptr->value, _CORDS_CONTRACT_AGENT, default_tls()  ) );
 }
+
 
 /*	---------------------------------------------------------	*/
 /*				o c c i _ g e t				*/

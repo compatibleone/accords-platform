@@ -32,7 +32,7 @@
 /*	------------------------	*/
 /*	VM ROLE Creation Options	*/
 /*	------------------------	*/
-#define	_AZURE_IS_PRODUCTION	0x0001
+#define	_AZURE_IS_STAGING	0x0001
 #define	_AZURE_IS_WINDOWS	0x0002
 #define	_AZURE_HARDDISK		0x0004
 #define	_AZURE_READONLY		0x0008

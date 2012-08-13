@@ -170,4 +170,4 @@ public int rest_occi_cords_packet(FILE * fh,struct cords_packet * sptr,char * pr
 
 }
 
-#endif	/* _packet_c_ */
+#endif	/* _packet_cpacket_c_ */

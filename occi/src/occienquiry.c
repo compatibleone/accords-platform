@@ -1,72 +1,71 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _enquiry_c_
-#define _enquiry_c_
+#ifndef _occienquiry_c_
+#define _occienquiry_c_
 
 #include "enquiry.h"
 
-/*	------------------------	*/
-/*	o c c i _ e n q u i r y 	*/
-/*	------------------------	*/
+/*	------------------------------------	*/
+/*	o c c i _ c o r d s _ e n q u i r y 	*/
+/*	------------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct enquiry * allocate_enquiry();
-struct enquiry * liberate_enquiry(struct enquiry * optr);
-private pthread_mutex_t list_enquiry_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * enquiry_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * enquiry_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_enquiry_node() { return( enquiry_first ); }
+struct cords_enquiry * allocate_cords_enquiry();
+struct cords_enquiry * liberate_cords_enquiry(struct cords_enquiry * optr);
+private pthread_mutex_t list_cords_enquiry_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * cords_enquiry_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * cords_enquiry_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_cords_enquiry_node() { return( cords_enquiry_first ); }
+public struct  occi_kind_node * occi_last_cords_enquiry_node() { return( cords_enquiry_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_enquiry_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_cords_enquiry_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		enquiry_first = nptr->next;
+		cords_enquiry_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		enquiry_last = nptr->previous;
+		cords_enquiry_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_enquiry_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_enquiry_control );
-	nptr = ll_drop_enquiry_node( nptr );
-	pthread_mutex_unlock( &list_enquiry_control );
+private struct occi_kind_node * drop_cords_enquiry_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_cords_enquiry_control );
+	nptr = ll_drop_cords_enquiry_node( nptr );
+	pthread_mutex_unlock( &list_cords_enquiry_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_enquiry_node(char * id) {
+private struct occi_kind_node * ll_locate_cords_enquiry_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
-	for ( nptr = enquiry_first;
+	struct cords_enquiry * pptr;
+	for ( nptr = cords_enquiry_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -75,64 +74,64 @@ private struct occi_kind_node * ll_locate_enquiry_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_enquiry_node(char * id) {
+private struct occi_kind_node * locate_cords_enquiry_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_enquiry_control );
-	nptr = ll_locate_enquiry_node(id);
-	pthread_mutex_unlock( &list_enquiry_control );
+	pthread_mutex_lock( &list_cords_enquiry_control );
+	nptr = ll_locate_cords_enquiry_node(id);
+	pthread_mutex_unlock( &list_cords_enquiry_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_enquiry_node(int mode) {
+private struct occi_kind_node * ll_add_cords_enquiry_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_enquiry()))
+		if (!( nptr->contents = allocate_cords_enquiry()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = enquiry_last ))
-				enquiry_first = nptr;
+			if (!( nptr->previous = cords_enquiry_last ))
+				cords_enquiry_first = nptr;
 			else	nptr->previous->next = nptr;
-			enquiry_last = nptr;
+			cords_enquiry_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_enquiry_node(int mode) {
+private struct occi_kind_node * add_cords_enquiry_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_enquiry_control );
-	nptr = ll_add_enquiry_node( mode );
-	pthread_mutex_unlock( &list_enquiry_control );
+	pthread_mutex_lock( &list_cords_enquiry_control );
+	nptr = ll_add_cords_enquiry_node( mode );
+	pthread_mutex_unlock( &list_cords_enquiry_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_enquiry_name="enquiry.xml";
-private void autoload_enquiry_nodes() {
-	char * fn=autosave_enquiry_name;	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+private char*autosave_cords_enquiry_name="cords_enquiry.xml";
+private void autoload_cords_enquiry_nodes() {
+	char * fn=autosave_cords_enquiry_name;	struct occi_kind_node * nptr;
+	struct cords_enquiry * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"enquirys")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"cords_enquirys")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "enquiry" ) ) continue;
-			else if (!( nptr = add_enquiry_node(0))) break;
+			else if ( strcmp( vptr->name, "cords_enquiry" ) ) continue;
+			else if (!( nptr = add_cords_enquiry_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
@@ -155,21 +154,21 @@ private void autoload_enquiry_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_enquiry_name(char * fn) {
-	autosave_enquiry_name = fn;	return;
+public  void set_autosave_cords_enquiry_name(char * fn) {
+	autosave_cords_enquiry_name = fn;	return;
 }
-public  void autosave_enquiry_nodes() {
-	char * fn=autosave_enquiry_name;	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+public  void autosave_cords_enquiry_nodes() {
+	char * fn=autosave_cords_enquiry_name;	struct occi_kind_node * nptr;
+	struct cords_enquiry * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_enquiry_control );
+	pthread_mutex_lock( &list_cords_enquiry_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<enquirys>\n");
-	for ( nptr = enquiry_first;
+	fprintf(h,"<cords_enquirys>\n");
+	for ( nptr = cords_enquiry_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<enquiry\n");
+		fprintf(h,"<cords_enquiry\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
@@ -190,20 +189,20 @@ public  void autosave_enquiry_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</enquirys>\n");
+	fprintf(h,"</cords_enquirys>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_enquiry_control );
+	pthread_mutex_unlock( &list_cords_enquiry_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_enquiry_field(
+private void set_cords_enquiry_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -226,23 +225,23 @@ private void set_enquiry_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct enquiry * filter_enquiry_info(
+private struct cords_enquiry * filter_cords_enquiry_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct enquiry * pptr;
-		if (!( pptr = allocate_enquiry()))
+	struct cords_enquiry * pptr;
+		if (!( pptr = allocate_cords_enquiry()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_enquiry_field) ))
-		return( liberate_enquiry(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_enquiry_field) ))
+		return( liberate_cords_enquiry(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_enquiry_filter(
-	struct enquiry * pptr,struct enquiry * fptr) {
+private int pass_cords_enquiry_filter(
+	struct cords_enquiry * pptr,struct cords_enquiry * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -291,10 +290,10 @@ private int pass_enquiry_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_occi_response(
+private struct rest_response * cords_enquiry_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct enquiry * pptr)
+	struct cords_enquiry * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
@@ -325,37 +324,37 @@ private struct rest_response * enquiry_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_get_item(
+private struct rest_response * cords_enquiry_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_enquiry_nodes();
-	return( enquiry_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_enquiry_nodes();
+	return( cords_enquiry_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_post_link(
+private struct rest_response * cords_enquiry_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	char * reqhost;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -365,16 +364,16 @@ private struct rest_response * enquiry_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_post_mixin(
+private struct rest_response * cords_enquiry_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	char * reqhost;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -384,7 +383,7 @@ private struct rest_response * enquiry_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_post_action(
+private struct rest_response * cords_enquiry_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -392,10 +391,10 @@ private struct rest_response * enquiry_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -411,26 +410,26 @@ private struct rest_response * enquiry_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_post_item(
+private struct rest_response * cords_enquiry_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_enquiry_node(1)))
+	if (!( nptr = add_cords_enquiry_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_enquiry_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_enquiry_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_enquiry_nodes();
+	autosave_cords_enquiry_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -442,37 +441,37 @@ private struct rest_response * enquiry_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_put_item(
+private struct rest_response * cords_enquiry_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_enquiry_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_enquiry_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_enquiry_nodes();
-	return( enquiry_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_cords_enquiry_nodes();
+	return( cords_enquiry_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_head_item(
+private struct rest_response * cords_enquiry_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
-	if (!( nptr = locate_enquiry_node(id)))
+	struct cords_enquiry * pptr;
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -482,20 +481,20 @@ private struct rest_response * enquiry_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_delete_item(
+private struct rest_response * cords_enquiry_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct enquiry * pptr;
+	struct cords_enquiry * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_enquiry_node(id)))
+	if (!( nptr = locate_cords_enquiry_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_enquiry_node( nptr );
-	autosave_enquiry_nodes();
+	drop_cords_enquiry_node( nptr );
+	autosave_cords_enquiry_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -504,25 +503,25 @@ private struct rest_response * enquiry_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_get_list(
+private struct rest_response * cords_enquiry_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct enquiry * pptr;
-	struct enquiry * fptr;
+	struct cords_enquiry * pptr;
+	struct cords_enquiry * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_enquiry_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_cords_enquiry_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = enquiry_first;
+	for ( sptr = cords_enquiry_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_enquiry_filter( pptr, fptr ) ))
+		if (!( pass_cords_enquiry_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -536,7 +535,7 @@ private struct rest_response * enquiry_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * enquiry_delete_all(
+private struct rest_response * cords_enquiry_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -544,26 +543,26 @@ private struct rest_response * enquiry_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct enquiry * pptr;
-	struct enquiry * fptr;
+	struct cords_enquiry * pptr;
+	struct cords_enquiry * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_enquiry_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_cords_enquiry_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=enquiry_first;
+	nptr=cords_enquiry_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_enquiry_filter( pptr, fptr ) ))) {
+		||  (!( pass_cords_enquiry_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_enquiry_node( nptr );
+			drop_cords_enquiry_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_enquiry_nodes();
+	autosave_cords_enquiry_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -572,7 +571,7 @@ private struct rest_response * enquiry_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_enquiry_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_enquiry_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -587,16 +586,16 @@ private struct rest_response * occi_enquiry_get(void * vptr, struct rest_client 
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( enquiry_get_list( optr, cptr, rptr, aptr ) );
+		return( cords_enquiry_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( enquiry_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_enquiry_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_enquiry_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -611,14 +610,14 @@ private struct rest_response * occi_enquiry_head(void * vptr, struct rest_client
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( enquiry_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_enquiry_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_enquiry_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -633,24 +632,24 @@ private struct rest_response * occi_enquiry_post(void * vptr, struct rest_client
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( enquiry_post_item( optr, cptr, rptr, aptr ) );
+		return( cords_enquiry_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( enquiry_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( enquiry_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( enquiry_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_enquiry_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_enquiry_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -665,14 +664,14 @@ private struct rest_response * occi_enquiry_put(void * vptr, struct rest_client 
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( enquiry_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_enquiry_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_cords_enquiry_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -687,38 +686,51 @@ private struct rest_response * occi_enquiry_delete(void * vptr, struct rest_clie
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( enquiry_delete_all( optr, cptr, rptr, aptr ) );
+		return( cords_enquiry_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( enquiry_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( cords_enquiry_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_enquiry_mt( struct rest_interface * iptr )
+private void	redirect_occi_cords_enquiry_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_enquiry_get;
-	iptr->post = occi_enquiry_post;
-	iptr->put = occi_enquiry_put;
-	iptr->delete = occi_enquiry_delete;
-	iptr->head = occi_enquiry_head;
+	iptr->get = occi_cords_enquiry_get;
+	iptr->post = occi_cords_enquiry_post;
+	iptr->put = occi_cords_enquiry_put;
+	iptr->delete = occi_cords_enquiry_delete;
+	iptr->head = occi_cords_enquiry_head;
 	return;
+}
+
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_enquiry(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_enquiry_delete(optr,cptr,rptr));
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_enquiry */
+/* occi category rest instance builder for : occi_cords_enquiry */
 public struct occi_category * occi_cords_enquiry_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource enquiry";
+	char * f="CompatibleOne OCCI resource cords_enquiry";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_enquiry_mt(optr->interface);
+		redirect_occi_cords_enquiry_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "where",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "what",0,0) ))
@@ -729,16 +741,18 @@ public struct occi_category * occi_cords_enquiry_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_enquiry_nodes();
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_enquiry)))
+			return( optr );
+		autoload_cords_enquiry_nodes();
 		return(optr);
 	}
 
 }
 
-/*	----------------------------------------	*/
-/*	e n q u i r y _ o c c i _ h e a d e r s 	*/
-/*	----------------------------------------	*/
-public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
+/*	----------------------------------------------------	*/
+/*	c o r d s _ e n q u i r y _ o c c i _ h e a d e r s 	*/
+/*	----------------------------------------------------	*/
+public struct rest_header *  cords_enquiry_occi_headers(struct cords_enquiry * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -753,7 +767,7 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"enquiry; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"cords_enquiry; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -764,7 +778,7 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.enquiry.where='%s'\r\n",(sptr->where?sptr->where:""));
+	sprintf(buffer,"occi.cords_enquiry.where='%s'\r\n",(sptr->where?sptr->where:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -775,7 +789,7 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.enquiry.what='%s'\r\n",(sptr->what?sptr->what:""));
+	sprintf(buffer,"occi.cords_enquiry.what='%s'\r\n",(sptr->what?sptr->what:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -786,7 +800,7 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.enquiry.who='%s'\r\n",(sptr->who?sptr->who:""));
+	sprintf(buffer,"occi.cords_enquiry.who='%s'\r\n",(sptr->who?sptr->who:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -797,7 +811,7 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.enquiry.pass='%s'\r\n",(sptr->pass?sptr->pass:""));
+	sprintf(buffer,"occi.cords_enquiry.pass='%s'\r\n",(sptr->pass?sptr->pass:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -808,11 +822,11 @@ public struct rest_header *  enquiry_occi_headers(struct enquiry * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.enquiry.state='%s'\r\n",(sptr->state?sptr->state:""));
+	sprintf(buffer,"occi.cords_enquiry.state='%s'\r\n",(sptr->state?sptr->state:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _enquiry_c_ */
+#endif	/* _occienquiry_c_ */

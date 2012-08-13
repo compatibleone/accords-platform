@@ -148,4 +148,4 @@ public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,c
 
 }
 
-#endif	/* _connection_c_ */
+#endif	/* _connection_cconnection_c_ */

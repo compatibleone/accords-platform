@@ -282,7 +282,7 @@ private	char *	retrieve_windowsazure_rolestatus( struct az_response * zptr )
 	/* ---------------------------- */
 	/* retrieve the instance status */
 	/* ---------------------------- */
-	else if (!( eptr = document_element( eptr->first, "InstanceStatus" ) ))
+	else if (!( eptr = nested_document_element( eptr, "InstanceStatus" ) ))
 	{
 		zptr = liberate_az_response( zptr );
 		return( (char *) 0 );
@@ -469,6 +469,7 @@ private	struct	rest_response * start_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char *	rolestatus;
 	struct	xml_element * eptr;
 	struct	az_response * azptr;
 	struct	windowsazure * pptr;
@@ -522,6 +523,61 @@ private	struct	rest_response * start_windowsazure(
 		if ( status != 404 )
 		 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	}
+
+	/* ---------------------------------- */
+	/* recover the deployment information */
+	/* ---------------------------------- */
+	while (1)
+	{
+		if (!( azptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Information" ) );		
+		else if (!( azptr->response ))
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Response" ) );		
+		}
+		else if ((status = azptr->response->status) != 200 )
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, status, "Deployment Response Failure" ) );		
+		}
+		else if (!( rolestatus = retrieve_windowsazure_rolestatus( azptr ) ))
+		 	return( rest_html_response( aptr, 500, "Deployment Response Role Status Failure" ) );		
+
+		rest_log_message( rolestatus );
+
+		if (!( strcmp( rolestatus, "ReadyRole" ) ))
+			break;
+		else if ((!( strcmp( rolestatus, "RoleStateUnknown"   ) ))
+		     ||  (!( strcmp( rolestatus, "CreatingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "CreatingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "StartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "BusyRole"     ) )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		else if ((!( strcmp( rolestatus, "RestartingRole"     ) ))
+		     ||  (!( strcmp( rolestatus, "CyclingRole"        ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "UnresponsiveRole"   ) )))
+		{
+			rolestatus = liberate( rolestatus );
+		 	return( rest_html_response( aptr, 500, "Serious Deployment Role Failure" ) );		
+		}
+		else
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		
+	}
+
+	rolestatus = liberate( rolestatus );
 
 	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 

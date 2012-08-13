@@ -248,4 +248,4 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 
 }
 
-#endif	/* _contract_c_ */
+#endif	/* _contract_ccontract_c_ */

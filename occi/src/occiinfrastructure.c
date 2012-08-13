@@ -1,26 +1,24 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _infrastructure_c_
-#define _infrastructure_c_
+#ifndef _occiinfrastructure_c_
+#define _occiinfrastructure_c_
 
 #include "infrastructure.h"
 
@@ -37,6 +35,7 @@ private pthread_mutex_t list_cords_infrastructure_control=PTHREAD_MUTEX_INITIALI
 private struct occi_kind_node * cords_infrastructure_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_infrastructure_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_infrastructure_node() { return( cords_infrastructure_first ); }
+public struct  occi_kind_node * occi_last_cords_infrastructure_node() { return( cords_infrastructure_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -700,6 +699,19 @@ private void	redirect_occi_cords_infrastructure_mt( struct rest_interface * iptr
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_infrastructure(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_infrastructure_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -723,6 +735,8 @@ public struct occi_category * occi_cords_infrastructure_builder(char * a,char * 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_infrastructure)))
+			return( optr );
 		autoload_cords_infrastructure_nodes();
 		return(optr);
 	}
@@ -809,4 +823,4 @@ public struct rest_header *  cords_infrastructure_occi_headers(struct cords_infr
 
 }
 
-#endif	/* _infrastructure_c_ */
+#endif	/* _occiinfrastructure_c_ */

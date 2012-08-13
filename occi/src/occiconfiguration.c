@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _configuration_c_
-#define _configuration_c_
+#ifndef _occiconfiguration_c_
+#define _occiconfiguration_c_
 
 #include "configuration.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_configuration_control=PTHREAD_MUTEX_INITIALIZ
 private struct occi_kind_node * cords_configuration_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_configuration_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_configuration_node() { return( cords_configuration_first ); }
+public struct  occi_kind_node * occi_last_cords_configuration_node() { return( cords_configuration_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -658,6 +659,19 @@ private void	redirect_occi_cords_configuration_mt( struct rest_interface * iptr 
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_configuration(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_configuration_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -677,6 +691,8 @@ public struct occi_category * occi_cords_configuration_builder(char * a,char * b
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_configuration)))
+			return( optr );
 		autoload_cords_configuration_nodes();
 		return(optr);
 	}
@@ -741,4 +757,4 @@ public struct rest_header *  cords_configuration_occi_headers(struct cords_confi
 
 }
 
-#endif	/* _configuration_c_ */
+#endif	/* _occiconfiguration_c_ */

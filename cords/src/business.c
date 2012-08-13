@@ -142,4 +142,4 @@ public int rest_occi_cords_business(FILE * fh,struct cords_business * sptr,char 
 
 }
 
-#endif	/* _business_c_ */
+#endif	/* _business_cbusiness_c_ */

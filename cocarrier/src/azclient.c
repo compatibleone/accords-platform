@@ -2904,7 +2904,6 @@ public	char * az_capture_vm_request(
 	/* ----------------------------------- */
 	fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
 	fprintf(h,"<CaptureRoleOperation xmlns=%chttp://schemas.microsoft.com/windowsazure%c\n",0x0022,0x0022);
-
 		fprintf(h,"\txmlns:i=%chttp://www.w3.org/2001/XMLSchema-instance%c>\n",0x0022,0x0022);
 		fprintf(h,"\t<OperationType>CaptureRoleOperation</OperationType>\n");
 		fprintf(h,"\t<PostCaptureOperation>%s</PostCaptureOperation>\n",
@@ -2912,8 +2911,8 @@ public	char * az_capture_vm_request(
 		fprintf(h,"<ProvisioningConfiguration>\n");
 		az_configuration_set( h, hostname, Waz.user, Waz.password, option );
 		fprintf(h,"</ProvisioningConfiguration>\n");
-		fprintf(h,"</TargetImageLabel>%s</TargetImageLabel>\n",ilabel);
-		fprintf(h,"</TargetImageName>%s</TargetImageName>\n",iname);
+		fprintf(h,"<TargetImageLabel>%s</TargetImageLabel>\n",ilabel);
+		fprintf(h,"<TargetImageName>%s</TargetImageName>\n",iname);
 	fprintf(h,"</CaptureRoleOperation>\n");
 	fclose(h);
 	return( filename );
@@ -3002,7 +3001,7 @@ public	char * az_create_vm_request(
 		/* the identity must be unique */
 		/* --------------------------- */
 		fprintf(h,"\t<Name>%s</Name>\n",deployment);
-		if ( option & _AZURE_IS_PRODUCTION )
+		if (!( option & _AZURE_IS_STAGING ))
 			fprintf(h,"\t<DeploymentSlot>Production</DeploymentSlot>\n");
 		else	fprintf(h,"\t<DeploymentSlot>Staging</DeploymentSlot>\n");
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);      

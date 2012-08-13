@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _business_c_
-#define _business_c_
+#ifndef _occibusiness_c_
+#define _occibusiness_c_
 
 #include "business.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_business_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_business_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_business_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_business_node() { return( cords_business_first ); }
+public struct  occi_kind_node * occi_last_cords_business_node() { return( cords_business_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -715,6 +716,19 @@ private void	redirect_occi_cords_business_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_business(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_business_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -740,6 +754,8 @@ public struct occi_category * occi_cords_business_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_business)))
+			return( optr );
 		autoload_cords_business_nodes();
 		return(optr);
 	}
@@ -837,4 +853,4 @@ public struct rest_header *  cords_business_occi_headers(struct cords_business *
 
 }
 
-#endif	/* _business_c_ */
+#endif	/* _occibusiness_c_ */

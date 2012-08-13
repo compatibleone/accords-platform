@@ -116,4 +116,4 @@ public int rest_occi_cords_configuration(FILE * fh,struct cords_configuration * 
 
 }
 
-#endif	/* _configuration_c_ */
+#endif	/* _configuration_cconfiguration_c_ */

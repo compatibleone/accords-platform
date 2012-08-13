@@ -212,4 +212,4 @@ public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, 
 
 }
 
-#endif	/* _proactive_c_ */
+#endif	/* _proactive_cproactive_c_ */

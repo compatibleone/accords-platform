@@ -158,4 +158,4 @@ public int rest_occi_cords_probe(FILE * fh,struct cords_probe * sptr,char * pref
 
 }
 
-#endif	/* _probe_c_ */
+#endif	/* _probe_cprobe_c_ */

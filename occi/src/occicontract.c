@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _contract_c_
-#define _contract_c_
+#ifndef _occicontract_c_
+#define _occicontract_c_
 
 #include "contract.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_contract_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_contract_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_contract_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_contract_node() { return( cords_contract_first ); }
+public struct  occi_kind_node * occi_last_cords_contract_node() { return( cords_contract_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -935,6 +936,19 @@ private void	redirect_occi_cords_contract_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_contract(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_contract_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -988,6 +1002,8 @@ public struct occi_category * occi_cords_contract_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_contract)))
+			return( optr );
 		autoload_cords_contract_nodes();
 		return(optr);
 	}
@@ -1239,4 +1255,4 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 
 }
 
-#endif	/* _contract_c_ */
+#endif	/* _occicontract_c_ */

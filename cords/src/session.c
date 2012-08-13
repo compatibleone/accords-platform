@@ -148,4 +148,4 @@ public int rest_occi_cords_session(FILE * fh,struct cords_session * sptr,char * 
 
 }
 
-#endif	/* _session_c_ */
+#endif	/* _session_csession_c_ */

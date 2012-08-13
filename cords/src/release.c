@@ -116,4 +116,4 @@ public int rest_occi_cords_release(FILE * fh,struct cords_release * sptr,char * 
 
 }
 
-#endif	/* _release_c_ */
+#endif	/* _release_crelease_c_ */

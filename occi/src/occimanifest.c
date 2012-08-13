@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _manifest_c_
-#define _manifest_c_
+#ifndef _occimanifest_c_
+#define _occimanifest_c_
 
 #include "manifest.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_manifest_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_manifest_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_manifest_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_manifest_node() { return( cords_manifest_first ); }
+public struct  occi_kind_node * occi_last_cords_manifest_node() { return( cords_manifest_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -800,6 +801,19 @@ private void	redirect_occi_cords_manifest_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_manifest(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_manifest_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -835,6 +849,8 @@ public struct occi_category * occi_cords_manifest_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_manifest)))
+			return( optr );
 		autoload_cords_manifest_nodes();
 		return(optr);
 	}
@@ -987,4 +1003,4 @@ public struct rest_header *  cords_manifest_occi_headers(struct cords_manifest *
 
 }
 
-#endif	/* _manifest_c_ */
+#endif	/* _occimanifest_c_ */

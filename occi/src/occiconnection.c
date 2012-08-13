@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _connection_c_
-#define _connection_c_
+#ifndef _occiconnection_c_
+#define _occiconnection_c_
 
 #include "connection.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_connection_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_connection_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_connection_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_connection_node() { return( cords_connection_first ); }
+public struct  occi_kind_node * occi_last_cords_connection_node() { return( cords_connection_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -726,6 +727,19 @@ private void	redirect_occi_cords_connection_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_connection(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_connection_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -753,6 +767,8 @@ public struct occi_category * occi_cords_connection_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_connection)))
+			return( optr );
 		autoload_cords_connection_nodes();
 		return(optr);
 	}
@@ -861,4 +877,4 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 
 }
 
-#endif	/* _connection_c_ */
+#endif	/* _occiconnection_c_ */

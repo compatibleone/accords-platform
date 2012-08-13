@@ -182,4 +182,4 @@ public int rest_occi_cords_manifest(FILE * fh,struct cords_manifest * sptr,char 
 
 }
 
-#endif	/* _manifest_c_ */
+#endif	/* _manifest_cmanifest_c_ */
