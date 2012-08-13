@@ -145,6 +145,8 @@ private void autoload_cords_connection_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "session" )) != (struct xml_atribut *) 0)
 				pptr->session = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "pid" )) != (struct xml_atribut *) 0)
+				pptr->pid = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "probes" )) != (struct xml_atribut *) 0)
 				pptr->probes = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -191,6 +193,9 @@ public  void autosave_cords_connection_nodes() {
 		fprintf(h," session=%c",0x0022);
 		fprintf(h,"%s",(pptr->session?pptr->session:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," pid=%c",0x0022);
+		fprintf(h,"%u",pptr->pid);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," probes=%c",0x0022);
 		fprintf(h,"%u",pptr->probes);
 		fprintf(h,"%c",0x0022);
@@ -228,6 +233,8 @@ private void set_cords_connection_field(
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "session" ) ))
 			pptr->session = allocate_string(vptr);
+		if (!( strcmp( nptr, "pid" ) ))
+			pptr->pid = atoi(vptr);
 		if (!( strcmp( nptr, "probes" ) ))
 			pptr->probes = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -298,6 +305,7 @@ private int pass_cords_connection_filter(
 		else if ( strcmp(pptr->session,fptr->session) != 0)
 			return(0);
 		}
+	if (( fptr->pid ) && ( pptr->pid != fptr->pid )) return(0);
 	if (( fptr->probes ) && ( pptr->probes != fptr->probes )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -328,6 +336,9 @@ private struct rest_response * cords_connection_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.session=%s",optr->domain,optr->id,pptr->session);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.pid=%u",optr->domain,optr->id,pptr->pid);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.probes=%u",optr->domain,optr->id,pptr->probes);
@@ -763,6 +774,8 @@ public struct occi_category * occi_cords_connection_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "session",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "pid",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "probes",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -849,6 +862,17 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_connection.session='%s'\r\n",(sptr->session?sptr->session:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_connection.pid='%u'\r\n",sptr->pid);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

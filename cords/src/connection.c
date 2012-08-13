@@ -62,6 +62,7 @@ public struct cords_connection * reset_cords_connection(struct cords_connection 
 		sptr->finish = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->session = (char*) 0;
+		sptr->pid =  0;
 		sptr->probes =  0;
 		sptr->state =  0;
 	}
@@ -114,6 +115,10 @@ public int xmlin_cords_connection(struct cords_connection * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"pid") ))
+		{
+			if ( wptr->value ) { sptr->pid = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"probes") ))
 		{
 			if ( wptr->value ) { sptr->probes = atoi(wptr->value); }
@@ -142,6 +147,7 @@ public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,c
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.finish='%s'\r\n",prefix,nptr,(sptr->finish?sptr->finish:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.pid='%u'\r\n",prefix,nptr,sptr->pid);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

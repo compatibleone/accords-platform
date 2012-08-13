@@ -1047,7 +1047,7 @@ private	int	cords_remove_links( struct xml_element * document, char * agent, cha
 	struct	xml_atribut * aptr;
 	if (!(aptr = document_atribut( document, _CORDS_ID )))
 		return( cords_append_error(document,701,"unresolved element ID") );
-	else if (!( zptr = cords_delete_links( aptr->value, agent,tls ) ))
+	else if (!( zptr = occi_delete_links( aptr->value, agent,tls ) ))
 		return( cords_append_error(document,702,"deleting links") );
 	else	zptr = occi_remove_response( zptr );
 	return(0);
@@ -1083,7 +1083,7 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 		if (!( count ))
 			cords_remove_links( document, agent, tls );
 
-		if (!( zptr = cords_create_link( aptr->value, bptr->value, agent, tls ) ))
+		if (!( zptr = occi_create_link( aptr->value, bptr->value, agent, tls ) ))
 			return( cords_append_error(eptr,703,"creating link") );
 		else
 		{

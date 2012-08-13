@@ -189,7 +189,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 			cptr = occi_remove_client( cptr );
 		}
 
-		if (( zptr = cords_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if (( zptr = occi_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
 		return(0);
@@ -660,7 +660,7 @@ private	char *	cosacs_monitoring_connection( struct occi_response * instruction,
 	{
 		connection = allocate_string( ihost );
 		yptr = occi_remove_response( yptr );
-		if (!( yptr = cords_create_link( session, connection, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		if (!( yptr = occi_create_link( session, connection, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			return( connection );
 		else
 		{

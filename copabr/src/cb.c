@@ -470,7 +470,7 @@ private	int	cords_affectation_instruction(
 			liberate_cordscript_action( action );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -600,7 +600,7 @@ private	int	cords_invocation_instruction(
 			liberate_cordscript_action( action );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -724,7 +724,7 @@ private	int	cords_interface_instruction(
 		liberate_cordscript_action( action );
 		return(53);
 	}
-	else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+	else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -931,7 +931,7 @@ private	int	cords_action_instruction(
 			symbol = liberate( symbol );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			liberate( ivalue );
 			yptr = occi_remove_response( yptr );
@@ -2885,7 +2885,7 @@ private	int	cords_instance_plan(
 	struct	xml_atribut *	aptr;
 	struct	occi_response * zptr;
 
-	if (!( zptr =  cords_create_link( plan, instance, agent, tls ) ))
+	if (!( zptr =  occi_create_link( plan, instance, agent, tls ) ))
 		return(914);
 	else	zptr = occi_remove_response( zptr );
 
@@ -3277,7 +3277,7 @@ public	char *	cords_service_broker(
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else if (!( nptr = document_atribut( mptr, _CORDS_ID ) ))
 			return( cords_terminate_provisioning( 914, &CbC ) );
-		else if (!( zptr =  cords_create_link( service, nptr->value,  agent, tls ) ))
+		else if (!( zptr =  occi_create_link( service, nptr->value,  agent, tls ) ))
 			return( cords_terminate_provisioning( 915, &CbC ) );
 		{
 			zptr = occi_remove_response( zptr );

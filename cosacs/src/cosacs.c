@@ -284,7 +284,7 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 	/* ------------------------------------ */
 	/* send a new link to the COSACS master */
 	/* ------------------------------------ */
-	else if (!( zptr =  cords_create_link( buffer,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( zptr =  occi_create_link( buffer,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );

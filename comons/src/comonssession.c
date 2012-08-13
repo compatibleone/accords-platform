@@ -201,7 +201,7 @@ private	int	delete_monitoring_session(struct occi_category * optr,struct cords_s
 		}
 	}
 	if ( strlen(buffer) )
-		if ((zptr = cords_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if ((zptr = occi_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 	return(0);
 }

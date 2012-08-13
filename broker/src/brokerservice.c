@@ -647,7 +647,7 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	/* delete links from this object */
 	/* ----------------------------- */
 	if ( strlen( buffer ) )
-		if ((zptr = cords_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
 				zptr = occi_remove_response ( zptr );
 
 	/* ------------------------------- */

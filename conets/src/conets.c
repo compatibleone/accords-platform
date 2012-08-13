@@ -161,7 +161,7 @@ private	int	add_firewall_port( struct cords_firewall * pptr, char * source, stru
 	{
 		if ((target = standard_message_link_value( eptr->value )) != (char *) 0)
 		{
-			if ((zptr = cords_create_link( 
+			if ((zptr = occi_create_link( 
 					source, target, 
 					_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			{
@@ -208,7 +208,7 @@ private	struct rest_response * build_firewall(
 		/* ----------------------------------- */
 		sprintf(buffer,"%s/firewall/%s",Conets.identity,pptr->id);
 		pptr->ports=0;
-		if ((zptr = cords_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if ((zptr = occi_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 		for (	fptr = first_standard_message_link( nptr->network.message );
 			fptr != (struct occi_element *) 0;
