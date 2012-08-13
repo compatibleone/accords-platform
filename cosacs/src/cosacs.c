@@ -749,7 +749,9 @@ private	int	intercept_identity( char * vptr )
 		return(0);
 	else
 	{
-		sprintf(buffer,"http://%s:%u",vptr,Cosacs.restport);
+		sprintf(buffer,"%s://%s:%u",
+			(rest_valid_string(default_tls()) ? "https" : "http" )
+			,vptr,Cosacs.restport);
 		if (!( Cosacs.identity = allocate_string( buffer ) ))
 			return(0); 
 		else	return(0);
