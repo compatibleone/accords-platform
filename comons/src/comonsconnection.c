@@ -92,7 +92,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 	char	packets[1024];
 	char *	get_identity();
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
-	while (1)
+	while (!( rest_server_signal()))
 	{
 		for (	nptr=occi_first_link_node();
 			nptr != (struct occi_link_node *) 0;
@@ -257,6 +257,7 @@ private	struct rest_response * stop_connection(
 		if ( pptr->pid )
 		{
 			kill( pptr->pid, SIGTERM );
+			wait(pptr->pid,0);
 			pptr->id = 0;
 		}
 		pptr->state = 0;

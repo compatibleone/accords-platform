@@ -1979,6 +1979,14 @@ private	void	sigint_server_catcher(int s)
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ s e r v e r _ s i g n al 		*/
+/*	------------------------------------------------	*/
+public	int	rest_server_signal()
+{
+	return( _server_sigint );
+}
+
+/*	------------------------------------------------	*/
 /*	    r e s t _ a l l o c a t e _ s e r v e r		*/
 /*	------------------------------------------------	*/
 private	struct	rest_server * rest_allocate_server()

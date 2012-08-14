@@ -304,14 +304,14 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ p r o b e _ w o r k e r			*/
 /*	------------------------------------------------------------------	*/
-private	void	cosacs_probe_worker( struct cords_probe * pptr )
+private	int	cosacs_probe_worker( struct cords_probe * pptr )
 {
 	int	sample=0;
 	char 	filename[1024];
 	char 	buffer[2048];
 	sprintf(filename,"rest/%s.probe",pptr->id);
 	unlink( filename );
-	while (1)
+	while (!( rest_server_signal()))
 	{
 		if ( rest_valid_string( pptr->expression) )
 			sprintf(buffer,"%s >> %s",pptr->expression, filename);
@@ -328,6 +328,7 @@ private	void	cosacs_probe_worker( struct cords_probe * pptr )
 			sleep(pptr->period);
 		}
 	}
+	return(0);
 }
 
 /*	----------------------------------------------------------	*/
@@ -406,8 +407,7 @@ private	struct rest_response * start_probe(
 		case	-1	:
 			return( rest_html_response( aptr, 500, "Probe Process Start Failure" ) );
 		case	0	:
-			cosacs_probe_worker( pptr );
-			exit(0);
+			exit(cosacs_probe_worker( pptr ));
 		default		:
 			pptr->pid = pid;
 			pptr->state = 1;
@@ -437,7 +437,8 @@ private	struct rest_response * stop_probe(
 		if ( pptr->pid )
 		{
 			/* remove the worker */
-			kill( pptr->pid, 9 );
+			kill( pptr->pid, SIGTERM );
+			waitpid(pptr->pid,0);
 			pptr->pid = 0;
 		}
 		pptr->state = 0;
