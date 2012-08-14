@@ -201,6 +201,7 @@ private	struct rest_response * stop_connection(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status=0;
 	struct	cords_connection * pptr;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
@@ -257,7 +258,7 @@ private	struct rest_response * stop_connection(
 		if ( pptr->pid )
 		{
 			kill( pptr->pid, SIGTERM );
-			wait(pptr->pid,0);
+			waitpid(pptr->pid,&status,0);
 			pptr->id = 0;
 		}
 		pptr->state = 0;

@@ -427,6 +427,7 @@ private	struct rest_response * stop_probe(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status=0;
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
@@ -438,7 +439,7 @@ private	struct rest_response * stop_probe(
 		{
 			/* remove the worker */
 			kill( pptr->pid, SIGTERM );
-			waitpid(pptr->pid,0);
+			waitpid(pptr->pid,&status,0);
 			pptr->pid = 0;
 		}
 		pptr->state = 0;
