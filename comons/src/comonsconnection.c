@@ -124,6 +124,87 @@ private	int	connection_worker( struct cords_connection * pptr )
 	return(0);
 }
 	
+
+/*	-------------------------------------------	*/
+/*	   c o n s u m e _ m o n i t o r i n g		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * consume_monitoring( struct cords_connection * pptr, struct rest_response * aptr )
+{
+	switch ((pptr->pid=fork()))
+	{
+	case	0  : 
+		exit( connection_worker( pptr ) );
+	case	-1 : 
+		return( rest_html_response( aptr, 802, "Connection Start Failure" ) );
+	default	   : 
+		autosave_cords_connection_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	   c a p t u r e _ m o n i t o r i n g		*/
+/*	-------------------------------------------	*/
+private	void	capture_monitoring( struct cords_connection * pptr )
+{
+	int	status;
+	/* ------------------------------ */
+	/* disactivate connection monitor */
+	/* ------------------------------ */
+	if ( pptr->pid )
+	{
+		kill( pptr->pid, SIGTERM );
+		waitpid(pptr->pid,&status,0);
+		pptr->id = 0;
+	}
+	return;
+}
+
+/*	-------------------------------------------	*/
+/* 	   c a p t u r e _ c o n n e c t i o n		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * capture_connection(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_connection * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( pptr->pid ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		capture_monitoring( pptr ) ;
+		autosave_cords_connection_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	    c o n s u m e _ c o n n e c t i o n		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * consume_connection(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_connection * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( pptr->pid )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else	return( consume_monitoring( pptr, aptr ) );
+}
+
 /*	-------------------------------------------	*/
 /* 		s t a r t _ c o n n e c t i o n		*/
 /*	-------------------------------------------	*/
@@ -178,16 +259,7 @@ private	struct rest_response * start_connection(
 		}
 		pptr->state = 1;
 		autosave_cords_connection_nodes();
-		switch ((pptr->pid=fork()))
-		{
-		case	0  : 
-			exit( connection_worker( pptr ) );
-		case	-1 : 
-			return( rest_html_response( aptr, 802, "Connection Start Failure" ) );
-		default	   : 
-			autosave_cords_connection_nodes();
-			return( rest_html_response( aptr, 200, "OK" ) );
-		}
+		return( consume_monitoring( pptr, aptr ) );
 	}		
 }
 
@@ -252,15 +324,7 @@ private	struct rest_response * stop_connection(
 				}
 			}
 		}
-		/* ------------------------------ */
-		/* disactivate connection monitor */
-		/* ------------------------------ */
-		if ( pptr->pid )
-		{
-			kill( pptr->pid, SIGTERM );
-			waitpid(pptr->pid,&status,0);
-			pptr->id = 0;
-		}
+		capture_monitoring( pptr );
 		pptr->state = 0;
 		autosave_cords_connection_nodes();
 		if ( strlen(buffer) )
@@ -287,6 +351,10 @@ public	struct occi_category * comons_connection_builder( char * domain )
 		if (!( optr = occi_add_action( optr,"start","",start_connection)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"stop","",stop_connection)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"capture","",capture_connection)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"consume","",consume_connection)))
 			return( optr );
 		else	return( optr );
 	}
