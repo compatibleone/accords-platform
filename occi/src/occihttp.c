@@ -30,7 +30,8 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
 	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";\r\n",
-		optr->id,optr->scheme,optr->class,optr->rel );
+		optr->id,optr->scheme,optr->class,
+		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
 	if ( optr->first )
 	{
