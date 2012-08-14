@@ -48,6 +48,111 @@ private	struct	occi_manager OcciManager =
 
 #include "occiauth.c"
 
+
+private	char * CoesUser="coes";
+private	char * CoesPass="coes";
+
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
+/*	------------------------------------------------------------	*/
+/*	the pyocni module on which coes is built needs a special id	*/
+/*	or it wont work, this is a work around till we deal with it	*/
+/*	later on ....							*/
+/*	------------------------------------------------------------	*/
+private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
+{
+	char *	auth;
+	struct	rest_header * wptr;
+	struct	rest_header * xptr;
+	if (!( CoesUser ))
+		return( hptr );
+	else if (!( CoesPass ))
+		return( hptr );
+	else if (!( auth =rest_encode_credentials( CoesUser, CoesPass ) ))
+		return( hptr );
+	else if (!( wptr = rest_create_header( _HTTP_AUTHORIZATION, auth ) ))
+	{
+		auth = liberate( auth );
+		return( hptr );
+	}
+	else if (!( xptr = hptr ))
+		return( wptr );
+	else
+	{
+		while ( xptr->next )
+			xptr = xptr->next;
+		xptr->next = wptr;
+		wptr->previous = xptr;
+		return( hptr );
+	}
+}
+
+/*	---	*/
+/*	GET	*/
+/*	---	*/
+public	struct	rest_response * 
+	occi_client_get_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_get_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	------	*/
+/*	DELETE	*/
+/*	------	*/
+public	struct	rest_response * 
+	occi_client_delete_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_delete_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	----	*/
+/*	HEAD	*/
+/*	----	*/
+public	struct	rest_response * 
+	occi_client_head_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_head_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	----	*/
+/*	POST	*/
+/*	----	*/
+public	struct	rest_response * 
+	occi_client_post_request(
+		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
+}
+
+
+/*	---	*/
+/*	PUT	*/
+/*	---	*/
+public	struct	rest_response * 
+	occi_client_put_request(
+		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
+}
+
+#define	rest_client_get_request occi_client_get_request
+#define	rest_client_head_request occi_client_head_request
+#define	rest_client_put_request occi_client_put_request
+#define	rest_client_post_request occi_client_post_request
+#define	rest_client_delete_request occi_client_delete_request
+
 /*	-----------------------------------------------------------------	*/
 /*	o c c i _ c h e c k _ r e s p o n s e _ a u t h o r i z a t i o n	*/
 /*	-----------------------------------------------------------------	*/
