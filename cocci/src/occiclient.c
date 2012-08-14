@@ -60,7 +60,7 @@ private	struct	rest_header * occi_special_authorisation( struct rest_header * hp
 {
 	struct	rest_header * wptr;
 	struct	rest_header * xptr;
-	if (!( wptr = rest_create_header( _HTTP_CONTENT_TYPE, "text/occi" ) ))
+	if (!( wptr = rest_create_header( _HTTP_ACCEPT, "text/occi" ) ))
 	{
 		return( hptr );
 	}
