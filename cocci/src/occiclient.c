@@ -49,10 +49,6 @@ private	struct	occi_manager OcciManager =
 #include "occiauth.c"
 
 
-private	char * CoesUser=(char *) 0;
-private	char * CoesPass=(char *) 0;
-
-
 /*	------------------------------------------------------------	*/
 /*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
 /*	------------------------------------------------------------	*/
@@ -62,18 +58,10 @@ private	char * CoesPass=(char *) 0;
 /*	------------------------------------------------------------	*/
 private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
 {
-	char *	auth;
 	struct	rest_header * wptr;
 	struct	rest_header * xptr;
-	if (!( CoesUser ))
-		return( hptr );
-	else if (!( CoesPass ))
-		return( hptr );
-	else if (!( auth =rest_encode_credentials( CoesUser, CoesPass ) ))
-		return( hptr );
-	else if (!( wptr = rest_create_header( _HTTP_AUTHORIZATION, auth ) ))
+	if (!( wptr = rest_create_header( _HTTP_CONTENT_TYPE, "text/occi" ) ))
 	{
-		auth = liberate( auth );
 		return( hptr );
 	}
 	else if (!( xptr = hptr ))
