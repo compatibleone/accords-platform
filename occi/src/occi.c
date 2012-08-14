@@ -141,6 +141,8 @@ public	struct	occi_category * occi_add_attribute(struct occi_category * cptr,cha
 		return( occi_remove_category( cptr ) );
 	else
 	{
+		if ( *(aptr->name+strlen(aptr->name)-1) == '.' )
+			*(aptr->name+strlen(aptr->name)-1) = 0;
 		aptr->mandatory = m;
 		aptr->immutable = i;
 		return( cptr );
@@ -161,7 +163,7 @@ public	struct	occi_category *	occi_parse_attributes( struct occi_category * optr
 	{
 		while (( *sptr == ' ' ) || ( *sptr == '"')) sptr++;
 		nptr = sptr;
-		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '{')) sptr++;
+		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '"' ) && ( *sptr != '{')) sptr++;
 		if ((c = *sptr) != 0) *(sptr++) = 0;
 		if ( c == '{' )
 		{
