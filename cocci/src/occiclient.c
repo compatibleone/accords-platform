@@ -49,8 +49,8 @@ private	struct	occi_manager OcciManager =
 #include "occiauth.c"
 
 
-private	char * CoesUser="coes";
-private	char * CoesPass="coes";
+private	char * CoesUser=(char *) 0;
+private	char * CoesPass=(char *) 0;
 
 
 /*	------------------------------------------------------------	*/
