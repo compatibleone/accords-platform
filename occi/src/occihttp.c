@@ -29,7 +29,7 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 	char  *	term;
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
-	sprintf(buffer,"%s; scheme=\"%s\"; class=%s; rel=\"%s\";",
+	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";\r\n",
 		optr->id,optr->scheme,optr->class,
 		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
@@ -86,7 +86,7 @@ public	char *	occi_http_category( struct occi_category * optr )
 {
 	char	buffer[8192];
 	char  *	term;
-	sprintf(buffer,"%s; scheme=\"%s\"; class=%s; rel=\"%s\";",
+	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";",
 		optr->id,optr->scheme,optr->class,
 		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
@@ -138,7 +138,7 @@ public	char *	occi_http_link( struct occi_category * optr, char * target, char *
 
 		/* generate the link content */
 		/* ------------------------- */
-		sprintf(buffer,"<%s>; rel=\"%s%s\"; self=\"%s\"; category=\"%s\";",
+		sprintf(buffer,"<%s>;\r\n rel=\"%s%s\";\r\n self=\"%s\";\r\n category=\"%s\";",
 			target, "http://scheme.compatibleone.fr/occi/compatible#",sptr,
 			id, optr->scheme );
 		liberate( mptr );
