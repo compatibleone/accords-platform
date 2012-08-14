@@ -48,22 +48,13 @@ private	struct	occi_manager OcciManager =
 
 #include "occiauth.c"
 
-
-/*	------------------------------------------------------------	*/
-/*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
-/*	------------------------------------------------------------	*/
-/*	the pyocni module on which coes is built needs a special id	*/
-/*	or it wont work, this is a work around till we deal with it	*/
-/*	later on ....							*/
-/*	------------------------------------------------------------	*/
-private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
+private	struct	rest_header * occi_append_header( struct rest_header * hptr, char * nptr, char * vptr )
 {
 	struct	rest_header * wptr;
 	struct	rest_header * xptr;
-	if (!( wptr = rest_create_header( _HTTP_ACCEPT, "text/occi" ) ))
-	{
+
+	if (!( wptr = rest_create_header( nptr, vptr ) ))
 		return( hptr );
-	}
 	else if (!( xptr = hptr ))
 		return( wptr );
 	else
@@ -74,6 +65,23 @@ private	struct	rest_header * occi_special_authorisation( struct rest_header * hp
 		wptr->previous = xptr;
 		return( hptr );
 	}
+}
+
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
+/*	------------------------------------------------------------	*/
+/*	the pyocni module on which coes is built needs a special id	*/
+/*	or it wont work, this is a work around till we deal with it	*/
+/*	later on ....							*/
+/*	------------------------------------------------------------	*/
+private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
+{
+	if (!( hptr = occi_append_header( hptr, _HTTP_ACCEPT, "text/occi" ) ))
+		return( hptr );
+	else if (!( hptr = occi_append_header( hptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
+		return( hptr );
+	else	return( hptr );
 }
 
 /*	---	*/
