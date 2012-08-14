@@ -47,7 +47,7 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 			strcat( buffer, "." );
 			strcat( buffer, mptr->name );
 			if ( mptr->mandatory )
-				strcat( buffer,"{mandatory}" );
+				strcat( buffer,"{required}" );
 			if ( mptr->immutable )
 				strcat( buffer,"{immutable}" );
 			term=",";

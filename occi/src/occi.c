@@ -168,10 +168,16 @@ public	struct	occi_category *	occi_parse_attributes( struct occi_category * optr
 			vptr = sptr;
 			while (( *sptr ) && ( *sptr != '}')) sptr++;
 			if ( *sptr ) *(sptr++) = 0;
-			if (!( strncmp(vptr,"mandatory",strlen("mandatory")) ))
+			if (!( strncmp(vptr,"required",strlen("required")) ))
 				m = 1;
+			else if (!( strncmp(vptr,"mandatory",strlen("mandatory")) ))
+				m = 1;
+			else if (!( strncmp(vptr,"optional",strlen("optional")) ))
+				m = 0;
 			else if (!( strncmp(vptr,"immutable",strlen("immutable")) ))
 				i = 1;
+			else if (!( strncmp(vptr,"mutable",strlen("mutable")) ))
+				i = 0;
 		}
 		else	m=i=0;
 		if (!( optr = occi_add_attribute( optr, nptr, m, i ) ))
