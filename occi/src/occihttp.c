@@ -87,7 +87,8 @@ public	char *	occi_http_category( struct occi_category * optr )
 	char	buffer[8192];
 	char  *	term;
 	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";",
-		optr->id,optr->scheme,optr->class,optr->rel );
+		optr->id,optr->scheme,optr->class,
+		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
 	return( allocate_string( buffer ) );
 }
