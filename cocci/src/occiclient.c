@@ -48,6 +48,11 @@ private	struct	occi_manager OcciManager =
 
 #include "occiauth.c"
 
+/*	------------------------------------------------------------	*/
+/*		   o c c i _ a p p e n d _ h e a d e r			*/
+/*	------------------------------------------------------------	*/
+private	int	py_ocni_bugfix=0;
+
 private	struct	rest_header * occi_append_header( struct rest_header * hptr, char * nptr, char * vptr )
 {
 	struct	rest_header * wptr;
@@ -67,7 +72,6 @@ private	struct	rest_header * occi_append_header( struct rest_header * hptr, char
 	}
 }
 
-
 /*	------------------------------------------------------------	*/
 /*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
 /*	------------------------------------------------------------	*/
@@ -77,7 +81,9 @@ private	struct	rest_header * occi_append_header( struct rest_header * hptr, char
 /*	------------------------------------------------------------	*/
 private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
 {
-	if (!( hptr = occi_append_header( hptr, _HTTP_ACCEPT, "text/occi" ) ))
+	if (!( py_ocni_bugfix ))
+		return( hptr );
+	else if (!( hptr = occi_append_header( hptr, _HTTP_ACCEPT, "text/occi" ) ))
 		return( hptr );
 	else if (!( hptr = occi_append_header( hptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
 		return( hptr );

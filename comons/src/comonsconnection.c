@@ -3,6 +3,8 @@
 
 #include "cp.h"
 
+private	int	purge_packets=0;
+
 /*	--------------------------------------------	*/
 /*	    p u r g e _ p r o b e _ p a c k e t s	*/
 /*	--------------------------------------------	*/
@@ -259,7 +261,9 @@ private	struct rest_response * start_connection(
 		}
 		pptr->state = 1;
 		autosave_cords_connection_nodes();
-		return( consume_monitoring( pptr, aptr ) );
+		if (!( purge_packets ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( consume_monitoring( pptr, aptr ) );
 	}		
 }
 
