@@ -6,6 +6,7 @@ echo "<infrastructure name=\"accords:component\">" >> accords-$1.xml
 	echo "<storage name=\"accords:component\" size=\"10G\"/>" >> accords-$1.xml
 	echo "<network name=\"$2\" label=\"ethernet\" vlan=\"100M\">" >> accords-$1.xml
 		echo "<port name=\"ssh\" protocol=\"tcp\" from=\"22\" to=\"22\"/>" >> accords-$1.xml
+		echo "<port name=\"http\" protocol=\"tcp\" from=\"80\" to=\"80\"/>" >> accords-$1.xml
 		echo "<port name=\"cosacs\" protocol=\"tcp\" from=\"8286\" to=\"8286\"/>" >> accords-$1.xml
 		echo "<port name=\"publisher\" protocol=\"tcp\" from=\"8086\" to=\"8086\" range=\"0.0.0.0/0\"/>" >> accords-$1.xml
 		echo "<port name=\"platform\" protocol=\"tcp\" from=\"8087\" to=\"8087\" range=\"0.0.0.0/0\"/>" >> accords-$1.xml

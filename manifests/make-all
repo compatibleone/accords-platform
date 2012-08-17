@@ -9,14 +9,14 @@ echo "   and an eventual security parameter for security mode       "
 echo "--------------------------------------------------------------"
 echo "validate to proceed only if you really know what you are doing"
 read var
-echo "--------------------------------------------------------------"
-echo "please specify the host operating system: (debian, ubuntu etc)"
-echo "--------------------------------------------------------------"
+echo "-------------------------------------------------------------------------------"
+echo "please specify the host operating system: (debian, ubuntu, ubuntu64, useit etc)"
+echo "-------------------------------------------------------------------------------"
 read var
 export makesystem=$var
-echo "--------------------------------------------------------------"
-echo "indicate the provisioning platform:(openstack, opennebula etc)"
-echo "--------------------------------------------------------------"
+echo "-----------------------------------------------------------------------------"
+echo "indicate the provisioning platform:(openstack, opennebula, windowsazure  etc)"
+echo "-----------------------------------------------------------------------------"
 read var
 export makeplatform=$var
 export makeuser=$1
