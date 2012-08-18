@@ -383,7 +383,7 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			continue;
 		else if ( strcmp( dptr->name, "OSImage" ) != 0 )
 			continue;
-		else if (!( bptr = document_element( dptr, "Label" ) ))
+		else if (!( bptr = document_element( dptr, "Name" ) ))
 		{
 			image.id = liberate( image.id );
 			continue;
@@ -421,7 +421,9 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 			continue;
 		else if ( strcmp( dptr->name, "OSImage" ) != 0 )
 			continue;
+
 		memset( &image, 0, sizeof( struct az_image_infos ));
+
 		if (!( bptr = document_element( dptr, "Label" ) ))
 			continue;
 		else	image.name = occi_unquoted_value(bptr->value);
@@ -434,6 +436,12 @@ private	char *	resolve_windowsazure_image( struct cords_az_contract * cptr, stru
 		else	image.id = occi_unquoted_value(bptr->value);
 
 		if  (!( strncasecmp( request.name,  image.name, strlen( request.name  ) )))
+		{
+			best.id = image.id;
+			best.name = image.name;
+			break;
+		}		
+		else if  (!( strncasecmp( request.name,  image.id, strlen( request.name  ) )))
 		{
 			best.id = image.id;
 			best.name = image.name;
