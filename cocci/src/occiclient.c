@@ -51,7 +51,7 @@ private	struct	occi_manager OcciManager =
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a p p e n d _ h e a d e r			*/
 /*	------------------------------------------------------------	*/
-private	int	py_ocni_bugfix=0;
+private	int	py_ocni_bugfix=1;
 
 private	struct	rest_header * occi_append_header( struct rest_header * hptr, char * nptr, char * vptr )
 {
