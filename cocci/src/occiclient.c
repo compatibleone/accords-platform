@@ -479,7 +479,7 @@ public  char *	occi_extract_location( struct occi_response * rptr )
 		for (	eptr = rptr->first;
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
-			if (!( strcmp( eptr->name, "location" )))
+			if (!( strcasecmp( eptr->name, "location" )))
 				return( eptr->value );
 		return((char *) 0);
 	}
