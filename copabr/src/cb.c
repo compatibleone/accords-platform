@@ -1807,9 +1807,6 @@ private	char * 	cords_contract_provider(
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "account", App->account ) ))
 		return((char *) 0);
-	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "placement",
-			 ( App->selector.solution ? App->selector.solution : "" ) ) ))
-		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "profile", pptr->value ) ))
 		return((char *) 0);
 
@@ -1828,6 +1825,8 @@ private	char * 	cords_contract_provider(
 		return( host );
 	else
 	{
+		if ( App->selector.solution  )
+			(void) document_add_atribut( dptr, _CORDS_PLACEMENT, App->selector.solution );
 		sprintf(buffer,"%s/%s/%s",zptr,cptr->value,host);
 		return(allocate_string(buffer) );
 	}
