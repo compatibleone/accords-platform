@@ -474,7 +474,7 @@ public  char *	occi_extract_location( struct occi_response * rptr )
 	struct	rest_response * aptr;
 	struct	occi_element  * eptr;
 	struct	rest_header   * hptr;
-	if (( aptr = rptr->response ) != (struct rest_response *) 0)
+	if (!( aptr = rptr->response ))
 	{
 		for (	eptr = rptr->first;
 			eptr != (struct occi_element *) 0;
