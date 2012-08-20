@@ -36,6 +36,7 @@ struct	cords_placement_criteria
 	char *		operator;	/* by named operator		*/
 	char *		zone;		/* by geographical zone		*/
 	char *		security;	/* by security considerations	*/
+	char *		solution;	/* placement ID of solution	*/
 	char *		algorithm;	/* the placement algorithm	*/
 };
 

@@ -1590,8 +1590,16 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!( selector->solution = allocate_string( id )))
+			{
+				yptr = occi_remove_response( yptr );
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
 			else
 			{
+
 				/* ------------------------------ */
 				/* build the placement identifier */
 				/* ------------------------------ */
@@ -1684,6 +1692,7 @@ private	void	reset_placement_criteria( struct cords_placement_criteria * selecto
 	selector->operator	=
 	selector->zone		=
 	selector->security	=
+	selector->solution	= 
 	selector->algorithm	= (char *) 0;	
 	return;
 }

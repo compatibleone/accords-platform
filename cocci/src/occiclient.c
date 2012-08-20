@@ -474,12 +474,12 @@ public  char *	occi_extract_location( struct occi_response * rptr )
 	struct	rest_response * aptr;
 	struct	occi_element  * eptr;
 	struct	rest_header   * hptr;
-	if (!( aptr = rptr->response ))
+	if (( aptr = rptr->response ) != (struct rest_response *) 0)
 	{
 		for (	eptr = rptr->first;
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
-			if (!( strcasecmp( eptr->name, "location" )))
+			if (!( strcasecmp( eptr->name, _HTTP_LOCATION )))
 				return( eptr->value );
 		return((char *) 0);
 	}
@@ -757,7 +757,7 @@ public	struct	occi_response *	occi_create_json_response(
 				continue;
 			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
 				continue;
-			else if (!( strcmp( nptr, "location" ) ))
+			else if (!( strcasecmp( nptr, _HTTP_LOCATION ) ))
 			{
 				for (	bptr = cptr->first;
 					bptr != (struct data_element *) 0;
@@ -833,7 +833,7 @@ public	struct	occi_response *	occi_create_old_json_response(
 			continue;
 		else if (!( nptr = occi_unquoted_value( cptr->name ) ))
 			continue;
-		else if (!( strcmp( nptr, "location" ) ))
+		else if (!( strcasecmp( nptr, _HTTP_LOCATION ) ))
 		{
 			for (	bptr = cptr->first;
 				bptr != (struct data_element *) 0;
