@@ -137,6 +137,7 @@ private	struct rest_extension * broker_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the broker service category		*/
 /*	------------------------------------------------------------------	*/
+#include "brokerprovider.c"		
 #include "brokerservice.c"		
 #include "brokerplan.c"		
 
@@ -167,13 +168,12 @@ private	int	broker_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_provider_builder( Broker.domain,"provider" ) ))
+	if (!( optr = broker_provider_builder( Broker.domain,"provider" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
 
 	if (!( optr = occi_cords_profile_builder( Broker.domain,"profile" ) ))
 		return( 27 );
