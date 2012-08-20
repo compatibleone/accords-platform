@@ -110,8 +110,7 @@ public 	void			occi_drop_default_headers();
 public	struct	occi_response * occi_delete_links( char * from, char * agent, char * tls );
 public	struct	occi_response * occi_delete_link( char * from, char * to, char * agent, char * tls );
 public	struct	occi_response * occi_create_link( char * from, char * to, char * agent, char * tls );
-
-
+public	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr );
 public  char *	occi_extract_location( struct occi_response * rptr );
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,

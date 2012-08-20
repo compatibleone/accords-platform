@@ -1424,6 +1424,25 @@ private	struct	occi_request  * cords_add_provider_attribute(
 /*	---------------------------------------------------------	*/
 /*		c o r d s _ c o e s _ o p e r a t i o n			*/
 /*	---------------------------------------------------------	*/
+private	int	cords_validate_action( 
+	struct occi_client * kptr,
+	char * category,
+	char * action )
+{
+	struct	occi_action *	aptr;
+	struct	occi_category * cptr;
+	if (!( cptr = occi_resolve_category( kptr->firstcat, category ) ))
+		return(0);
+	else if (!( aptr = occi_resolve_action( cptr, action ) ))
+		return( 0 );
+	else	return( 1);
+}
+
+
+
+/*	---------------------------------------------------------	*/
+/*		c o r d s _ c o e s _ o p e r a t i o n			*/
+/*	---------------------------------------------------------	*/
 /*	this function provides linkage to COES placement engine		*/
 /*	for the selection of the provider to be used by broker		*/		
 /*	---------------------------------------------------------	*/
@@ -1431,6 +1450,7 @@ private	char *	cords_coes_operation(
 	struct cords_placement_criteria * selector, 
 	char * agent, char * tls )
 {
+	struct	occi_action	* aptr;
 	struct	occi_client 	* kptr;
 	struct	occi_request	* qptr;
 	struct	occi_response 	* zptr;
@@ -1606,14 +1626,25 @@ private	char *	cords_coes_operation(
 				rest_add_http_prefix( buffer, 1024, id );
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
 
-				/* --------------------------- */
-				/* invoke the placement choice */
-				/* --------------------------- */
-				if (!( yptr = cords_invoke_action( buffer, _CORDS_CHOOSE, agent, tls ) ))
-					continue;
-				else	yptr = occi_remove_response( yptr );
+				/* ------------------------------------ */
+				/* check for existance of choose method */
+				/* ------------------------------------ */
+				if ( cords_validate_action( 
+					kptr, _CORDS_PLACEMENT, 
+					_CORDS_CHOOSE ) )
+				{
+					/* --------------------------- */
+					/* invoke the placement choice */
+					/* --------------------------- */
+					if (!( yptr = cords_invoke_action( 
+							buffer, 
+							_CORDS_CHOOSE, agent, tls ) ))
+						continue;
+					else	yptr = occi_remove_response( yptr );
+				}
+
+				kptr = occi_remove_client( kptr );
 
 				/* --------------------- */
 				/* retrieve the solution */

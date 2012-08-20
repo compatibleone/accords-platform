@@ -390,7 +390,7 @@ public	struct	occi_element  *	occi_response_element(struct occi_response * rptr,
 /*	------------------------------------------------------------	*/
 /*		o c c i _ r e s ol v e _ c a t e g o r y 		*/
 /*	------------------------------------------------------------	*/
-private	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr )
+public	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr )
 {
 	for (	;
 		cptr != (struct occi_category *) 0;
