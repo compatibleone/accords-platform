@@ -481,11 +481,15 @@ public  char *	occi_extract_location( struct occi_response * rptr )
 			eptr = eptr->next )
 			if (!( strcasecmp( eptr->name, _HTTP_LOCATION )))
 				return( eptr->value );
+			else if (!( strcasecmp( eptr->name, _OCCI_LOCATION )))
+				return( eptr->value );
 		return((char *) 0);
 	}
-	else if (!( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION ) ))
-		return((char *) 0);
-	else	return( hptr->value );
+	else if (( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION )) != (struct rest_header *) 0)
+		return( hptr->value );
+	else if (( hptr = rest_resolve_header( aptr->first, _HTTP_LOCATION )) != (struct rest_header *) 0)
+		return( hptr->value );
+	else	return((char *) 0);
 }
 
 /*	------------------------------------------------------------	*/
