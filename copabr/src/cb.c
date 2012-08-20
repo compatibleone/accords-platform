@@ -1807,6 +1807,9 @@ private	char * 	cords_contract_provider(
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "account", App->account ) ))
 		return((char *) 0);
+	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "placement",
+			 ( App->selector.solution ? App->selector.solution : "" ) ) ))
+		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "profile", pptr->value ) ))
 		return((char *) 0);
 

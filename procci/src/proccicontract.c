@@ -312,6 +312,22 @@ private	struct	rest_response * start_contract(
 			}
 
 			/* ------------------------ */
+			/* consume placement quotas */
+			/* ------------------------ */
+			if ( pptr->placement )
+			{
+				if (!(zptr = cords_invoke_action( pptr->placement, "consume", 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Failure to Consume Placement Quota" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Consume Quota Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
+
+			/* ------------------------ */
 			/* start monitoring session */
 			/* ------------------------ */
 			if ( pptr->session )
@@ -562,6 +578,22 @@ private	struct	rest_response * stop_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
+			/* ------------------------ */
+			/* consume placement quotas */
+			/* ------------------------ */
+			if ( pptr->placement )
+			{
+				if (!(zptr = cords_invoke_action( pptr->placement, "restore", 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Failure to Restore Placement Quota" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Restore Quota Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
+
 			reset_contract( pptr );
 			autosave_cords_contract_nodes();
 		}
@@ -761,6 +793,16 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 		if (( zptr = occi_simple_delete( pptr->session, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 		pptr->session = liberate( pptr->session );
+	}
+
+	/* ------------------------ */
+	/* consume placement quotas */
+	/* ------------------------ */
+	if ( pptr->placement )
+	{
+		if ((zptr = cords_invoke_action( pptr->placement, "release", 
+			_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response ( zptr );
 	}
 
 	/* -------------------------------------- */
