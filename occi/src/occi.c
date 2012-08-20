@@ -193,6 +193,27 @@ public	struct	occi_category *	occi_parse_attributes( struct occi_category * optr
 /*	---------------------------------------------------	*/
 public	struct	occi_category *	occi_parse_actions( struct occi_category * optr, char * sptr )
 {
+	char *	vptr;
+	char *	nptr;
+	int	c;
+	while ( *sptr )
+	{
+		while (( *sptr == ' ' ) || ( *sptr == '"')) sptr++;
+		nptr = sptr;
+		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '"' ) && ( *sptr != '{')) sptr++;
+		if ((c = *sptr) != 0) *(sptr++) = 0;
+		for ( 	vptr=nptr;
+			*vptr != 0;
+			vptr++ )
+		{
+			if ( *vptr == '#' )
+				break;
+		}
+		if ( *vptr == '#' )
+			nptr = (vptr+1);
+		if (!( optr = occi_add_action( optr, nptr, (char *) 0, (void *) 0 ) ))
+			break;
+	}
 	return( optr );
 }
 

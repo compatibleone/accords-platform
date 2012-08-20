@@ -1503,7 +1503,7 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", "" ) ))
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", "default" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );

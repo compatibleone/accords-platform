@@ -25,23 +25,32 @@
 /*	---------------------------------------------------	*/
 public	char *	occi_http_capacity( struct occi_category * optr )
 {
+	char *	result=(char *) 0;
+	char *	wptr;
 	char	buffer[8192];
 	char  *	term;
+	int	i;
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
+
 	sprintf(buffer,"%s; scheme=\"%s\"; class=%s; rel=\"%s\";",
 		optr->id,optr->scheme,optr->class,
 		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
+	if (!( result = allocate_string( buffer ) ))
+		return( result );
+
 	if ( optr->first )
 	{
-		strcat( buffer, " attributes");
-		term = "=";
+		strcpy( buffer, " attributes");
+		if (!( result = join_string( result, buffer )))
+			return( result );
+		term = "=\"";
 		for (	mptr = optr->first;
 			mptr != (struct occi_attribute *) 0;
 			mptr = mptr->next )
 		{
-			strcat( buffer, term );
+			strcpy( buffer, term );
 			strcat( buffer, optr->domain );
 			strcat( buffer, "." );
 			strcat( buffer, optr->id   );
@@ -51,31 +60,50 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 				strcat( buffer,"{required}" );
 			if ( mptr->immutable )
 				strcat( buffer,"{immutable}" );
+			if (!( result = join_string( result, buffer )))
+				return( result );
 			term=",";
 		}
-		strcat( buffer, ";" );
-
+		strcpy( buffer, "\";" );
+		if (!( result = join_string( result, buffer )))
+			return( result );
 	}
 	if ( optr->firstact )
 	{
-		strcat( buffer, " actions");
-		term = "=";
+		strcpy( buffer, " actions");
+		if (!( result = join_string( result, buffer )))
+			return( result );
+		term = "=\"";
 		for (	fptr = optr->firstact;
 			fptr != (struct occi_action *) 0;
 			fptr = fptr->next )
 		{
-			strcat( buffer, term );
+			strcpy( buffer, term );
+			strcat( buffer, optr->scheme );
+			strcat( buffer, optr->id );
+			for ( 	i=0;
+				buffer[i] != 0;
+				i++ )
+			{
+				if ( buffer[i] == '#' )
+					buffer[i] = '/';
+			}
+			strcat( buffer, "/action#" );
 			strcat( buffer, fptr->name );
+			if (!( result = join_string( result, buffer )))
+				return( result );
 			term=",";
 		}
-		strcat( buffer, ";" );
+		strcpy( buffer, "\";" );
+		if (!( result = join_string( result, buffer )))
+			return( result );
 	}
 
-	strcat( buffer, " location=\"" );
+	strcpy( buffer, " location=\"" );
 	strcat( buffer, optr->location );
 	strcat( buffer, "\";" );
 
-	return( allocate_string( buffer ) );
+	return( join_string( result, buffer ));
 
 }
 
