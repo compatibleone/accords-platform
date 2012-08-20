@@ -349,6 +349,80 @@ private	int	create_placement_solution(
 }
 
 /*	-------------------------------------------	*/
+/* 	    c o n s u m e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement has been provisioned and is	*/
+/*	now active and deployed.			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * consume_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return(0);
+	else if ( pptr->state != 1 )
+		return(0);
+	else 
+	{
+		pptr->state++;
+		return( 0 );
+	}
+}
+	
+/*	-------------------------------------------	*/
+/* 	    r e s t o r e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement is reserved but no longer is	*/
+/*	provisioned and deployed.			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * restore_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return(0);
+	else if ( pptr->state != 2 )
+		return(0);
+	else 
+	{
+		pptr->state--;
+		return( 0 );
+	}
+}
+	
+/*	-------------------------------------------	*/
+/* 	    r e l e a s e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement is no longer reserved		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * release_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return(0);
+	else if (!( pptr->state ))
+		return(0);
+	else 
+	{
+		pptr->state=0;
+		return( 0 );
+	}
+}
+	
+/*	-------------------------------------------	*/
 /* 	      c h o o s e  _ p l a c e m e n t 		*/
 /*	-------------------------------------------	*/
 private	struct rest_response * choose_placement(
@@ -359,7 +433,6 @@ private	struct rest_response * choose_placement(
 		void * vptr )
 {
 	struct	cords_placement * pptr;
-	char	buffer[1024];
 	int	status;
 	if (!( pptr = vptr ))
 		return(0);
@@ -367,7 +440,11 @@ private	struct rest_response * choose_placement(
 		return(0);
 	else if ((status = create_placement_solution(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( rest_html_response( aptr, status, "PLACEMENT FAILURE" ) );
-	else 	return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state = 1;
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -456,6 +533,12 @@ private	int	coes_operation( char * nptr )
 	optr->callback  = &placement_interface;
 
 	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"consume","",consume_placement)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"restore","",restore_placement)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"release","",release_placement)))
 		return( 28 );
 
 	if (!( optr = comons_connection_builder( Coes.domain ) ))
