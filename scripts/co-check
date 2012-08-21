@@ -1,0 +1,140 @@
+#!/bin/sh
+#---------------------------------------------
+# Accords Platform Installation Validity Check
+#---------------------------------------------
+
+verbose=1
+level=
+
+function success()
+{
+	if [ -z "$verbose" ]; then
+		verbose=0
+	else
+		echo "--" $1 ": OK" 
+	fi
+}
+
+function failure()
+{
+	echo "------------------------------------------"
+	echo "The category $1 is missing                "
+	echo "The category server $2 is not running and "
+	echo "needs to be restarted.                    "
+	echo "------------------------------------------"
+	if [ -z "$level" ]; then
+		echo "Launching run-$2                          "
+		echo "------------------------------------------"
+		level=1
+		sleep 1
+		/usr/local/bin/run-$2 &
+		sleep 5
+		echo "Rechecking $1 $2                          " 
+		echo "------------------------------------------"
+		sleep 2
+		check $1 $2
+		level=
+	else
+		echo "Validate to restart  the accords platform "
+		echo "------------------------------------------"
+		read p
+		echo "------------------------------------------"
+		echo "Shuting down the Accords Platform in 5 sec"
+		echo "------------------------------------------"
+		sleep 5
+		co-stop
+		echo "------------------------------------------"
+		echo " Awaiting TIME-WAIT and CLOSE completion  "
+		echo "------------------------------------------"
+		sleep 30
+		echo "Starting up the Accords Platform in 5 sec"
+		echo "------------------------------------------"
+		sleep 5
+		co-start
+		exit 0
+	fi
+}
+
+function check()
+{
+v=`/usr/local/bin/co-resolver $1`
+
+if [ -z "$v" ]; then
+	failure $1 $2
+else
+	success $1
+fi
+
+}
+
+function verification()
+{
+	check	import		parser
+	check	manifest	parser
+	check	node		procci
+	check	infrastructure	procci
+	check	compute		procci
+	check	storage		procci
+	check	network		conets
+	check	port		conets
+	check	image		ezvm
+	check	system		ezvm
+	check	package		ezvm
+	check	configuration	parser
+	check	action		broker
+	check	release		parser
+	check	interface	parser
+	check	security	coss
+	check	account		coobas
+	check	user		coss
+
+	check	plan		broker
+	check 	service		broker
+	check 	instance	broker
+	check	contract	procci
+	check	instruction	parser
+	check	firewall	conets
+	check	authorization	coss
+	check	session		comons
+
+	check	provider	broker
+	check	profile 	broker
+	check	consumer	comons
+
+	check	placement	coes
+	check	quota		coes
+	check 	algorithm	coes
+
+	check	schedule	cosched
+	check	vm		ezvm
+
+	check	application	coips
+	check	event		comons
+	check	alert		comons
+
+	check	price		coobas
+	check	invoice		coobas
+	
+	check	agreement	slam
+	check	terms		slam
+	check	term		slam
+	check	variable	slam
+	check	guarantee	slam
+	check	business	slam
+}
+
+if [ -z "$verbose" ]; then
+	verbose=
+else
+	echo "-- Verification of Accords Platform Category Managers --"
+fi
+
+verification
+
+if [ -z "$verbose" ]; then
+	verbose=
+else
+	echo "-- Verification Terminated -- "	
+fi
+
+
