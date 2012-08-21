@@ -179,74 +179,131 @@ public	struct	standard_node *	drop_standard_node( struct standard_node *  nptr )
 /*	-----------------------------------------------------------------	*/
 /*			g e t _ s t a n d a r d _ n o d e			*/
 /*	-----------------------------------------------------------------	*/
-public	struct	standard_node * get_standard_node( char * id , char * agent, char * tls )
+public	struct	standard_node * get_standard_node( char * id , char * agent, char * tls, int * result )
 {
 	struct	standard_node 	* nptr;
 	int	status;
 
+	*result = 0;
+
 	if (!( nptr = allocate_standard_node()))
+	{
+		*result=1;
 		return( nptr );
+	}
 
 	/* ---------------------------- */
 	/* recover the node description */
 	/* ---------------------------- */
 	else if ((status = get_standard_message( &nptr->node, id, agent, tls )) != 0)
+	{
+		*result=2;
 		return( drop_standard_node( nptr ) );
-
+	}
+	else if (!( id = occi_extract_atribut( nptr->node.message, "occi", 
+		_CORDS_NODE, _CORDS_TYPE ) ))
+	{
+		*result=21;
+		return( drop_standard_node( nptr ) );
+	}
+	else if ( strcasecmp( id, "simple" ) )
+	{
+		*result=0;
+		return( drop_standard_node( nptr ) );
+	}
+	
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
 	if (!( id = occi_extract_atribut( nptr->node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
+	{
+		*result=3;
 		return( drop_standard_node( nptr ) );
+	}
 	else if ((status = get_standard_message( &nptr->infrastructure, id, agent, tls )) != 0)
+	{
+		*result=4;
 		return( drop_standard_node( nptr ) );
+	}
 
 	/* ------------------------------- */
 	/* recover the compute description */
 	/* ------------------------------- */
 	if (!( id = occi_extract_atribut( nptr->infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_COMPUTE ) ))
+	{
+		*result=5;
 		return( drop_standard_node( nptr ) );
+	}
 	else if ((status = get_standard_message( &nptr->compute, id, agent, tls )) != 0)
+	{
+		*result=6;
 		return( drop_standard_node( nptr ) );
+	}
 
 	/* ------------------------------- */
 	/* recover the network description */
 	/* ------------------------------- */
 	if (!( id = occi_extract_atribut( nptr->infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_NETWORK ) ))
+	{
+		*result=7;
 		return( drop_standard_node( nptr ) );
+	}
 	else if ((status = get_standard_message( &nptr->network, id, agent, tls )) != 0)
+	{
+		*result=8;
 		return( drop_standard_node( nptr ) );
+	}
 
 	/* ------------------------------- */
 	/* recover the storage description */
 	/* ------------------------------- */
 	if (!( id = occi_extract_atribut( nptr->infrastructure.message, "occi", 
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
+	{
+		*result=9;
 		return( drop_standard_node( nptr ) );
+	}
 	else if ((status = get_standard_message( &nptr->storage, id, agent, tls )) != 0)
+	{
+		*result=10;
 		return( drop_standard_node( nptr ) );
+	}
 
 	/* ----------------------------- */
 	/* recover the image description */
 	/* ----------------------------- */
 	if (!( id = occi_extract_atribut( nptr->node.message, "occi", 
 		_CORDS_NODE, _CORDS_IMAGE ) ))
+	{
+		*result=11;
 		return( drop_standard_node( nptr ) );
+	}
 	else if ((status = get_standard_message( &nptr->image, id, agent, tls )) != 0)
+	{
+		*result=12;
 		return( drop_standard_node( nptr ) );
+	}
 
 	/* ------------------------------ */
 	/* recover the system description */
 	/* ------------------------------ */
 	if (!( id = occi_extract_atribut( nptr->image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
+	{
+		*result=13;
 		return( drop_standard_node( nptr ) );
-	else if ((status = get_standard_message( &nptr->system, id, agent, tls )) != 0)
-		return( drop_standard_node( nptr ) );
+	}
 
+	else if ((status = get_standard_message( &nptr->system, id, agent, tls )) != 0)
+	{
+		*result=14;
+		return( drop_standard_node( nptr ) );
+	}
+
+	*result=0;
 	return( nptr );	
 
 }

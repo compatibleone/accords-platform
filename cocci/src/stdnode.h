@@ -47,7 +47,7 @@ public	struct 	occi_element * 	next_standard_message_link( struct occi_element *
 public	char *	standard_message_link_value( char * sptr );
 public	struct	standard_node * liberate_standard_node( struct	standard_node *  nptr );
 public	struct	standard_node * allocate_standard_node();
-public	struct	standard_node *	get_standard_node( char * id, char * agent, char * tls );
+public	struct	standard_node *	get_standard_node( char * id, char * agent, char * tls, int * result );
 public	struct	standard_node *	drop_standard_node( struct standard_node *  nptr );
 
 #endif	/* _stdnode_h */

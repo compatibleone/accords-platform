@@ -199,8 +199,12 @@ private	struct rest_response * build_firewall(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( pptr->node ))
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		return( rest_html_response( aptr, 400, "Incorrect Request ID" ) );
+	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls(), &status ) ))
+	{
+		if ( status )
+			return( rest_html_response( aptr, 400+status, "Incorrect Request ID" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	else
 	{
 		/* ----------------------------------- */
