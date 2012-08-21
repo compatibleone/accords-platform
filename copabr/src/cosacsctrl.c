@@ -77,17 +77,17 @@ private	char * 	cosacs_http_prefix()
 public	int	use_cosacs_agent( char * sptr )
 {
 	(void) read_secure_cosacs();
-	if (!( rest_valid_string_value( sptr, "cosacs" ) ))
+	if ( rest_valid_string_value( sptr, "cosacs" ) )
 	{
 		_is_secure_cosacs=_secure_cosacs;
 		return(1);
 	}
-	else if (!( rest_valid_string_value( sptr, "http:cosacs" ) ))
+	else if ( rest_valid_string_value( sptr, "http:cosacs" ) )
 	{
 		_is_secure_cosacs=0;
 		return( 1 );
 	}
-	else if (!( rest_valid_string_value( sptr, "https:cosacs" ) ))
+	else if ( rest_valid_string_value( sptr, "https:cosacs" ) )
 	{
 		_is_secure_cosacs=1;
 		return( 1 );
