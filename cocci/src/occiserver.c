@@ -1788,6 +1788,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		occi_alert
 	};
 
+	set_default_agent( nptr );
+
 	if ( tls )
 		if (!( strlen(tls) ))
 			tls = (char *) 0;

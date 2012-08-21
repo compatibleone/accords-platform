@@ -47,25 +47,52 @@ private	void	cosacs_synchronise()
 }
 
 /*	-------------------------------------------------	*/
-/*		c o s a c s _ h t t p _ p r e f i x		*/
+/*		r e a d _ s e c u r e _ c o s a c s		*/
 /*	-------------------------------------------------	*/
 private	int	_secure_cosacs=-1;
-
+private	int	_is_secure_cosacs=-1;
 private	int	read_secure_cosacs()
 {
 	char *	eptr=(char *) 0;
-	if ( _secure_cosacs != -1 )
-		return( _secure_cosacs );
+	if ( _is_secure_cosacs != -1 )
+		return( _is_secure_cosacs );
 	else if (!( eptr = getenv("SECURECOSACS") ))
-		return((_secure_cosacs=1));
-	else 	return((_secure_cosacs=atoi(eptr)));
+		return((_is_secure_cosacs=_secure_cosacs=1));
+	else 	return((_is_secure_cosacs=_secure_cosacs=atoi(eptr)));
 }
 
+/*	-------------------------------------------------	*/
+/*		c o s a c s _ h t t p _ p r e f i x		*/
+/*	-------------------------------------------------	*/
 private	char * 	cosacs_http_prefix()
 {
 	if ( read_secure_cosacs() )
 		return( "https" );
 	else	return( "http"  );
+}
+
+/*	-------------------------------------------------	*/
+/*		u s e _ c o s a c s _ a g e n t			*/
+/*	-------------------------------------------------	*/
+public	int	use_cosacs_agent( char * sptr )
+{
+	(void) read_secure_cosacs();
+	if (!( rest_valid_string_value( sptr, "cosacs" ) ))
+	{
+		_is_secure_cosacs=_secure_cosacs;
+		return(1);
+	}
+	else if (!( rest_valid_string_value( sptr, "http:cosacs" ) ))
+	{
+		_is_secure_cosacs=0;
+		return( 1 );
+	}
+	else if (!( rest_valid_string_value( sptr, "https:cosacs" ) ))
+	{
+		_is_secure_cosacs=1;
+		return( 1 );
+	}
+	else	return( 0 );
 }
 
 /*	-------------------------------------------------	*/

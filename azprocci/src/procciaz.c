@@ -584,7 +584,7 @@ private	struct	rest_response * start_windowsazure(
 	/* ---------------------------- */
 	/* launch the COSACS operations */
 	/* ---------------------------- */
-	if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+	if ( use_cosacs_agent( pptr->agent ) )
 	{
 		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
 		{
@@ -810,7 +810,7 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* ------------------------------------------- */
 	/* perform pre-release actions for destruction */
 	/* ------------------------------------------- */
-	if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+	if ( use_cosacs_agent( pptr->agent ) )
 	{
 		cosacs_metadata_instructions( 
 			pptr->hostname, _CORDS_RELEASE,

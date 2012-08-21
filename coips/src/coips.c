@@ -532,7 +532,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 		aptr->state |= _COIPS_IMAGE_OK;
 		return(0);
 	}
-	else if ( strcasecmp( agent, "COSACS" ) != 0 )
+	else if (!( use_cosacs_agent( agent ) ))
 	{
 		zptr = occi_remove_response( zptr );
 		aptr->state |= _COIPS_IMAGE_OK;

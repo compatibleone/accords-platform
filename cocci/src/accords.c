@@ -28,12 +28,38 @@
 private	struct	accords_configuration 	* configuration = (struct accords_configuration *) 0;
 private	char				* section 	= (char *) 0;
 private	char				* identity	= (char *) 0;
+private	char				* default_agent	= (char *) 0;
 
+/*	---------------------------------------------------------	*/
+/*			g e t _ i d e n t i t y				*/
+/*	---------------------------------------------------------	*/
 public	char *	get_identity()
 {
 	if (!( configuration ))
 		return((char *) 0);
 	else 	return( configuration->identity ); 
+}
+	
+/*	---------------------------------------------------------	*/
+/*		g e t _ d e f a u l t _ a g e n t			*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_agent()
+{
+	return( default_agent );
+}
+
+/*	---------------------------------------------------------	*/
+/*		s e t _ d e f a u l t _ a g e n t			*/
+/*	---------------------------------------------------------	*/
+public	int	set_default_agent(char * sptr)
+{
+	if ( default_agent )
+		default_agent = liberate( default_agent );
+	if (!( sptr ))
+		return( 0 );
+	else if (!( default_agent = allocate_string( sptr ) ))
+		return(27);
+	else	return(0);	
 }
 	
 /*	---------------------------------------------------------	*/

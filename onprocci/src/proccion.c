@@ -344,7 +344,7 @@ private	struct	rest_response * start_opennebula(
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+			if ( use_cosacs_agent( pptr->agent ) )
 			{
 				if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
 				{
@@ -612,7 +612,7 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 	else
 	{
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+		if ( use_cosacs_agent( pptr->agent ) )
 		{
 			cosacs_metadata_instructions( 
 				pptr->hostname, 

@@ -1225,7 +1225,7 @@ private	struct	rest_response * start_openstack(
 		/* ---------------------------- */
 		/* launch the COSACS operations */
 		/* ---------------------------- */
-		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+		if ( use_cosacs_agent( pptr->agent ) )
 		{
 			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
 			{
@@ -1243,7 +1243,7 @@ private	struct	rest_response * start_openstack(
 			/* ------------------------------------- */
 			/* release the COSACS client information */
 			/* ------------------------------------- */
-			if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+			if ( use_cosacs_agent( pptr->agent ) )
 			{
 				cosacs_release_interface( pptr->hostname );
 			}
@@ -1525,7 +1525,7 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ------------------------------------------- */
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+		if ( use_cosacs_agent( pptr->agent ) )
 		{
 			cosacs_metadata_instructions( 
 				pptr->hostname, _CORDS_RELEASE,

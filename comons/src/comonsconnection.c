@@ -92,7 +92,6 @@ private	int	connection_worker( struct cords_connection * pptr )
 	struct	cords_xlink	* lptr;
 	char *	wptr;
 	char	packets[1024];
-	char *	get_identity();
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (!( rest_server_signal()))
 	{

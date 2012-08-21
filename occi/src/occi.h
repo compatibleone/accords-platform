@@ -40,8 +40,13 @@ public	struct	occi_link_node * allocate_occi_link_node();
 public	struct	occi_link_node * liberate_occi_link_node(struct	occi_link_node * n);
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
 
-#define	_CORDS_SERVICE_AGENT 	"CO-RDS-SERVICE/1.0"
-#define	_CORDS_CONTRACT_AGENT 	"CO-RDS-CONTRACT/1.0"
+public	char *	get_identity();
+public	char * 	get_default_agent();
+public	int	set_default_agent( char * nptr);
+
+
+#define	_CORDS_SERVICE_AGENT 	get_default_agent()
+#define	_CORDS_CONTRACT_AGENT 	get_default_agent()
 #define	_CORDS_BROKER_AGENT 	"CO-RDS-BROKER/1.0"
 #define	_CORDS_PARSER_AGENT 	"CO-RDS-PARSER/1.0"
 #define	_CORDS_OS_AGENT 	"CO-RDS-OS/1.0"

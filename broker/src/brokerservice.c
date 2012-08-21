@@ -692,7 +692,7 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 			pptr->plan,
 			pptr->manifest,
 			pptr->sla,
-			_CORDS_BROKER_AGENT,
+			_CORDS_CONTRACT_AGENT,
 			default_tls(), 
 			(struct xml_element **) 0 ) ))
 		return( 999 );

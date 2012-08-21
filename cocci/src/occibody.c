@@ -367,7 +367,6 @@ public	char *	occi_html_body(
 	struct	cords_xlink	* lptr;
 	int	linkto=0;
 	int	allow_methods=1;
-	char *	get_identity();
 
 	id[0] = 0;
 
