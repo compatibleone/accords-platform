@@ -59,6 +59,8 @@ public struct proactive * liberate_proactive(struct proactive * sptr)
 			 sptr->workload = liberate(sptr->workload);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
 		sptr = liberate( sptr );
 	}
 	return((struct proactive *) 0);
@@ -86,6 +88,7 @@ public struct proactive * reset_proactive(struct proactive * sptr)
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
 		sptr->account = (char*) 0;
+		sptr->agent = (char*) 0;
 		sptr->when =  0;
 		sptr->status =  0;
 	}
@@ -170,6 +173,10 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -206,6 +213,7 @@ public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
 	return(0);

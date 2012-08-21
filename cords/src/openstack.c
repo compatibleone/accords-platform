@@ -79,6 +79,8 @@ public struct openstack * liberate_openstack(struct openstack * sptr)
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
 		sptr = liberate( sptr );
 	}
 	return((struct openstack *) 0);
@@ -116,6 +118,7 @@ public struct openstack * reset_openstack(struct openstack * sptr)
 		sptr->zone = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->agent = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -240,6 +243,10 @@ public int xmlin_openstack(struct openstack * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -286,6 +293,7 @@ public int rest_occi_openstack(FILE * fh,struct openstack * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

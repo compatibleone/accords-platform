@@ -11,6 +11,7 @@ struct	cords_image
 	char *	vm;
 	char *	created;
 	char *	updated;
+	char *	agent;
 	int	packages;
 	int	state;
 };

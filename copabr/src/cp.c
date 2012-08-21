@@ -1018,6 +1018,27 @@ public	struct	occi_response * cords_schedule_action( char * resource, char * act
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*		c o r d s _ v a l i d a t e _ a c t i o n		*/
+/*	---------------------------------------------------------	*/
+public	int	cords_validate_action( 
+	struct occi_client * kptr,
+	char * category,
+	char * action,
+	char * url )
+{
+	struct	occi_action *	aptr;
+	struct	occi_category * cptr;
+	if ((!( kptr ))
+	&&  (!( kptr = occi_create_client( url, _CORDS_CONTRACT_AGENT, default_tls() ) )))
+		return(0);	
+	else if (!( cptr = occi_resolve_category( kptr->firstcat, category ) ))
+		return(0);
+	else if (!( aptr = occi_resolve_action( cptr, action ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
 /*	---------------------------------------------------	*/
 /*	 	c o r d s _ i n v o k e _ a c t i o n 		*/
 /*	---------------------------------------------------	*/

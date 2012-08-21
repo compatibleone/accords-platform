@@ -88,6 +88,20 @@ public	int	rest_valid_string( char * vptr )
 }
 
 /*	------------------------------------------------	*/
+/*	 r e s t _ v a l i d _ s t r i n g _ v a l u e 		*/
+/*	------------------------------------------------	*/
+public	int	rest_valid_string_value( char * sptr, char *vptr  )
+{
+	if (!( rest_valid_string( sptr ) ))
+		return( 0 );
+	else if (!( vptr ))
+		return( 0 );
+	else if (!( strcasecmp( sptr, vptr ) ))
+		return( 1 );
+	else	return( 0 );
+}
+
+/*	------------------------------------------------	*/
 /*		r e s t _ h t t p _ p r e f i x 		*/
 /*	------------------------------------------------	*/
 public	char *	rest_http_prefix()

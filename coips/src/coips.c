@@ -493,6 +493,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	char *	linkvalue = (char *) 0;
 	char *	package   = (char *) 0;
 	char *	cosacs	  = (char *) 0;
+	char *	agent	  = (char *) 0;
 	char *	vptr	  = (char *) 0;
 	int	packages=0;
 	struct	occi_response * zptr;
@@ -520,6 +521,23 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 		return( 800 );
 	else if ( zptr->response->status > 299 )
 		return( 800 + (zptr->response->status-200) );
+
+	/* ---------------------------------- */
+	/* retrieve the image use cosacs flag */
+	/* ---------------------------------- */
+	else if (!( agent = occi_extract_atribut( zptr, "occi", 
+		_CORDS_IMAGE, "agent" ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		aptr->state |= _COIPS_IMAGE_OK;
+		return(0);
+	}
+	else if ( strcasecmp( agent, "COSACS" ) != 0 )
+	{
+		zptr = occi_remove_response( zptr );
+		aptr->state |= _COIPS_IMAGE_OK;
+		return(0);
+	}
 
 	/* ---------------------------------------- */
 	/* check first for packages to be installed */

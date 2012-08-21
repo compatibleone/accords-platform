@@ -37,6 +37,8 @@ struct	windowsazure
 	char *	flavor;
 	char *	publicnetwork;
 
+	char *	agent;
+
 	int	when;
 
 	int	state;

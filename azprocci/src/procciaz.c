@@ -584,11 +584,14 @@ private	struct	rest_response * start_windowsazure(
 	/* ---------------------------- */
 	/* launch the COSACS operations */
 	/* ---------------------------- */
-	if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+	if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
 	{
-		cosacs_metadata_instructions( 
-			pptr->hostname, _CORDS_CONFIGURATION,
-			reference, WazProcci.publisher, pptr->account );
+		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_CONFIGURATION,
+				reference, WazProcci.publisher, pptr->account );
+		}
 	}
 
 	/* --------------------------- */
@@ -807,9 +810,12 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* ------------------------------------------- */
 	/* perform pre-release actions for destruction */
 	/* ------------------------------------------- */
-	cosacs_metadata_instructions( 
-		pptr->hostname, _CORDS_RELEASE,
-		reference, WazProcci.publisher, pptr->account );
+	if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+	{
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_RELEASE,
+			reference, WazProcci.publisher, pptr->account );
+	}
 
 	/* --------------------------------- */
 	/* release the provisioned resources */

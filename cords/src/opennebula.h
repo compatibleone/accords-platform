@@ -28,6 +28,7 @@ struct	opennebula
 	char *	firewall;
 	char *	group;
 	char *	configuration;
+	char *	agent;
 	int	when;
 	int	state;
 };

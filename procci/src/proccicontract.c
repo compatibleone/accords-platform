@@ -316,15 +316,21 @@ private	struct	rest_response * start_contract(
 			/* ------------------------ */
 			if ( pptr->placement )
 			{
-				if (!(zptr = cords_invoke_action( pptr->placement, "consume", 
-					_CORDS_CONTRACT_AGENT, default_tls() )))
-					return( rest_html_response( aptr, 900, "Failure to Consume Placement Quota" ) );
-				else if ((status = zptr->response->status) > 299 )
+				if ( cords_validate_action( 
+					(struct occi_client *) 0,
+					_CORDS_PLACEMENT, _CORDS_CONSUME, 
+					pptr->placement ) )
 				{
-					zptr = occi_remove_response ( zptr );
-					return( rest_html_response( aptr, status, "Consume Quota Action Invocation Error" ) );
+					if (!(zptr = cords_invoke_action( pptr->placement, "consume", 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+						return( rest_html_response( aptr, 900, "Failure to Consume Placement Quota" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "Consume Quota Action Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
 				}
-				else	zptr = occi_remove_response ( zptr );
 			}
 
 			/* ------------------------ */
@@ -579,19 +585,25 @@ private	struct	rest_response * stop_contract(
 				else	zptr = occi_remove_response ( zptr );
 			}
 			/* ------------------------ */
-			/* consume placement quotas */
+			/* restore placement quotas */
 			/* ------------------------ */
 			if ( pptr->placement )
 			{
-				if (!(zptr = cords_invoke_action( pptr->placement, "restore", 
-					_CORDS_CONTRACT_AGENT, default_tls() )))
-					return( rest_html_response( aptr, 900, "Failure to Restore Placement Quota" ) );
-				else if ((status = zptr->response->status) > 299 )
+				if ( cords_validate_action( 
+					(struct occi_client *) 0,
+					_CORDS_PLACEMENT, _CORDS_RESTORE,
+					pptr->placement ) )
 				{
-					zptr = occi_remove_response ( zptr );
-					return( rest_html_response( aptr, status, "Restore Quota Action Invocation Error" ) );
+					if (!(zptr = cords_invoke_action( pptr->placement, _CORDS_RESTORE, 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+						return( rest_html_response( aptr, 900, "Failure to Restore Placement Quota" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "Restore Quota Action Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
 				}
-				else	zptr = occi_remove_response ( zptr );
 			}
 
 			reset_contract( pptr );
@@ -800,9 +812,15 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ------------------------ */
 	if ( pptr->placement )
 	{
-		if ((zptr = cords_invoke_action( pptr->placement, "release", 
-			_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-			zptr = occi_remove_response ( zptr );
+		if ( cords_validate_action( 
+			(struct occi_client *) 0,
+			_CORDS_PLACEMENT, _CORDS_RELEASE,
+			pptr->placement ) )
+		{
+			if ((zptr = cords_invoke_action( pptr->placement, _CORDS_RELEASE, 
+				_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
+		}
 	}
 
 	/* -------------------------------------- */

@@ -45,6 +45,8 @@ public struct cords_image * liberate_cords_image(struct cords_image * sptr)
 			 sptr->created = liberate(sptr->created);
 		if ( sptr->updated )
 			 sptr->updated = liberate(sptr->updated);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_image *) 0);
@@ -65,6 +67,7 @@ public struct cords_image * reset_cords_image(struct cords_image * sptr)
 		sptr->vm = (char*) 0;
 		sptr->created = (char*) 0;
 		sptr->updated = (char*) 0;
+		sptr->agent = (char*) 0;
 		sptr->packages =  0;
 		sptr->state =  0;
 	}
@@ -121,6 +124,10 @@ public int xmlin_cords_image(struct cords_image * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->updated = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"packages") ))
 		{
 			if ( wptr->value ) { sptr->packages = atoi(wptr->value); }
@@ -150,6 +157,7 @@ public int rest_occi_cords_image(FILE * fh,struct cords_image * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.vm='%s'\r\n",prefix,nptr,(sptr->vm?sptr->vm:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%s'\r\n",prefix,nptr,(sptr->created?sptr->created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.updated='%s'\r\n",prefix,nptr,(sptr->updated?sptr->updated:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.packages='%u'\r\n",prefix,nptr,sptr->packages);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

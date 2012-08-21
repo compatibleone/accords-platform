@@ -344,14 +344,17 @@ private	struct	rest_response * start_opennebula(
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+			if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
 			{
-				cosacs_metadata_instructions( 
-					pptr->hostname, 
-					_CORDS_CONFIGURATION,
-					reference, 
-					OnProcci.publisher,
-					pptr->account );
+				if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+				{
+					cosacs_metadata_instructions( 
+						pptr->hostname, 
+						_CORDS_CONFIGURATION,
+						reference, 
+						OnProcci.publisher,
+						pptr->account );
+				}
 			}
 		}
 		osptr = liberate_on_response( osptr );
@@ -609,12 +612,15 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 	else
 	{
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		cosacs_metadata_instructions( 
-			pptr->hostname, 
-			_CORDS_RELEASE,
-			reference, 
-			OnProcci.publisher,
-			pptr->account );
+		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, 
+				_CORDS_RELEASE,
+				reference, 
+				OnProcci.publisher,
+				pptr->account );
+		}
 		return( on_delete_server( pptr->number ) );
 	}
 }

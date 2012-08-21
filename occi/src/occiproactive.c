@@ -161,6 +161,8 @@ private void autoload_proactive_nodes() {
 				pptr->workload = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
@@ -231,6 +233,9 @@ public  void autosave_proactive_nodes() {
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -284,6 +289,8 @@ private void set_proactive_field(
 			pptr->workload = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
@@ -410,6 +417,13 @@ private int pass_proactive_filter(
 		else if ( strcmp(pptr->account,fptr->account) != 0)
 			return(0);
 		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
@@ -464,6 +478,9 @@ private struct rest_response * proactive_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -915,6 +932,8 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
@@ -1089,6 +1108,17 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.proactive.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.proactive.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

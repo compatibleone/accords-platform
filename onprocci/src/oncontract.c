@@ -566,6 +566,15 @@ public	int	create_opennebula_contract(
 	else if (!( contract.image.message = occi_simple_get( contract.image.id, agent, tls ) ))
 		return( terminate_opennebula_contract( 1582, &contract ) );
 
+	/* ------------------------ */
+	/* retrieve the cosacs flag */
+	/* ------------------------ */
+	else if ((!( pptr->agent = occi_extract_atribut( contract.image.message, "occi", 
+		_CORDS_IMAGE, "agent" ) ))
+	     &&  (!( pptr->agent = allocate_string("cosacs") )))
+		return( terminate_opennebula_contract( 1283, &contract ) );
+
+
 	else if (!( contract.system.id = occi_extract_atribut( contract.image.message, "occi", 
 		_CORDS_IMAGE, _CORDS_SYSTEM ) ))
 		return( terminate_opennebula_contract( 1583, &contract ) );

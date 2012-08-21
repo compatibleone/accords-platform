@@ -1420,26 +1420,6 @@ private	struct	occi_request  * cords_add_provider_attribute(
 	else	return( qptr );		
 }
 
-
-/*	---------------------------------------------------------	*/
-/*		c o r d s _ c o e s _ o p e r a t i o n			*/
-/*	---------------------------------------------------------	*/
-private	int	cords_validate_action( 
-	struct occi_client * kptr,
-	char * category,
-	char * action )
-{
-	struct	occi_action *	aptr;
-	struct	occi_category * cptr;
-	if (!( cptr = occi_resolve_category( kptr->firstcat, category ) ))
-		return(0);
-	else if (!( aptr = occi_resolve_action( cptr, action ) ))
-		return( 0 );
-	else	return( 1);
-}
-
-
-
 /*	---------------------------------------------------------	*/
 /*		c o r d s _ c o e s _ o p e r a t i o n			*/
 /*	---------------------------------------------------------	*/
@@ -1632,7 +1612,7 @@ private	char *	cords_coes_operation(
 				/* ------------------------------------ */
 				if ( cords_validate_action( 
 					kptr, _CORDS_PLACEMENT, 
-					_CORDS_CHOOSE ) )
+					_CORDS_CHOOSE, buffer ) )
 				{
 					/* --------------------------- */
 					/* invoke the placement choice */
@@ -1825,8 +1805,16 @@ private	char * 	cords_contract_provider(
 		return( host );
 	else
 	{
-		if ( App->selector.solution  )
-			(void) document_add_atribut( dptr, _CORDS_PLACEMENT, App->selector.solution );
+		/* ---------------------------------------------------- */
+		/* store the placement attribute in the parent contract */
+		/* ---------------------------------------------------- */
+		if (( App->selector.solution  )
+		&&  ( dptr->parent )
+		&&  ( dptr->parent->name )
+		&&  (!( strcmp( dptr->parent->name, _CORDS_CONTRACT) )))
+		{
+			(void) document_add_atribut( dptr->parent, _CORDS_PLACEMENT, App->selector.solution );
+		}
 		sprintf(buffer,"%s/%s/%s",zptr,cptr->value,host);
 		return(allocate_string(buffer) );
 	}

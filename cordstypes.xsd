@@ -204,6 +204,7 @@
 			name="vm" 
 			type="xsd:string"
 			default="cordscript: vm.new(id.value,provider.value); vm.build();"/>
+		<xsd:attribute name="agent" type="xsd:string" default="cosacs"/>
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>

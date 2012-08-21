@@ -363,13 +363,14 @@ private	struct rest_response * consume_placement(
 {
 	struct	cords_placement * pptr;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
 	else if ( pptr->state != 1 )
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else 
 	{
-		pptr->state++;
-		return( 0 );
+		pptr->state=2;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 	
@@ -388,13 +389,14 @@ private	struct rest_response * restore_placement(
 {
 	struct	cords_placement * pptr;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
 	else if ( pptr->state != 2 )
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else 
 	{
-		pptr->state--;
-		return( 0 );
+		pptr->state=1;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 	
@@ -412,13 +414,14 @@ private	struct rest_response * release_placement(
 {
 	struct	cords_placement * pptr;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
 	else if (!( pptr->state ))
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else 
 	{
 		pptr->state=0;
-		return( 0 );
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 	
@@ -435,14 +438,15 @@ private	struct rest_response * choose_placement(
 	struct	cords_placement * pptr;
 	int	status;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
 	else if ( pptr->state > 0 )
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = create_placement_solution(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( rest_html_response( aptr, status, "PLACEMENT FAILURE" ) );
 	else 
 	{
 		pptr->state = 1;
+		autosave_cords_placement_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }

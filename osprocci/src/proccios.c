@@ -1225,11 +1225,14 @@ private	struct	rest_response * start_openstack(
 		/* ---------------------------- */
 		/* launch the COSACS operations */
 		/* ---------------------------- */
-		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
 		{
-			cosacs_metadata_instructions( 
-				pptr->hostname, _CORDS_CONFIGURATION,
-				reference, OsProcci.publisher, pptr->account );
+			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+			{
+				cosacs_metadata_instructions( 
+					pptr->hostname, _CORDS_CONFIGURATION,
+					reference, OsProcci.publisher, pptr->account );
+			}
 		}
 
 		/* ------------------------------------- */
@@ -1240,7 +1243,10 @@ private	struct	rest_response * start_openstack(
 			/* ------------------------------------- */
 			/* release the COSACS client information */
 			/* ------------------------------------- */
-			cosacs_release_interface( pptr->hostname );
+			if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+			{
+				cosacs_release_interface( pptr->hostname );
+			}
 
 			/* -------------------------------- */
 			/* disassociate address from server */
@@ -1518,9 +1524,13 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* perform pre-release actions for destruction */
 		/* ------------------------------------------- */
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		cosacs_metadata_instructions( 
-			pptr->hostname, _CORDS_RELEASE,
-			reference, OsProcci.publisher, pptr->account );
+
+		if ( rest_valid_string_value( pptr->agent,"cosacs" ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_RELEASE,
+				reference, OsProcci.publisher, pptr->account );
+		}
 
 		/* ------------------------------------------ */
 		/* disconnect the floating IP from the server */

@@ -79,6 +79,8 @@ public struct opennebula * liberate_opennebula(struct opennebula * sptr)
 			 sptr->group = liberate(sptr->group);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
 		sptr = liberate( sptr );
 	}
 	return((struct opennebula *) 0);
@@ -116,6 +118,7 @@ public struct opennebula * reset_opennebula(struct opennebula * sptr)
 		sptr->firewall = (char*) 0;
 		sptr->group = (char*) 0;
 		sptr->configuration = (char*) 0;
+		sptr->agent = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -240,6 +243,10 @@ public int xmlin_opennebula(struct opennebula * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -286,6 +293,7 @@ public int rest_occi_opennebula(FILE * fh,struct opennebula * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

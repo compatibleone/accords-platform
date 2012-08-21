@@ -52,6 +52,9 @@
 #define	_CORDS_INSTANCE	"instance"
 #define	_CORDS_BUILD	"build"
 #define	_CORDS_CHOOSE	"choose"
+#define	_CORDS_CONSUME	"consume"
+#define	_CORDS_RESTORE	"restore"
+#define	_CORDS_RELEASE	"release"
 
 /*	-------------------------	*/
 /*	cords atribut identifiers	*/

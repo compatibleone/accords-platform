@@ -147,6 +147,8 @@ private void autoload_cords_image_nodes() {
 				pptr->created = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "updated" )) != (struct xml_atribut *) 0)
 				pptr->updated = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "packages" )) != (struct xml_atribut *) 0)
 				pptr->packages = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -196,6 +198,9 @@ public  void autosave_cords_image_nodes() {
 		fprintf(h," updated=%c",0x0022);
 		fprintf(h,"%s",(pptr->updated?pptr->updated:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," packages=%c",0x0022);
 		fprintf(h,"%u",pptr->packages);
 		fprintf(h,"%c",0x0022);
@@ -235,6 +240,8 @@ private void set_cords_image_field(
 			pptr->created = allocate_string(vptr);
 		if (!( strcmp( nptr, "updated" ) ))
 			pptr->updated = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "packages" ) ))
 			pptr->packages = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -312,6 +319,13 @@ private int pass_cords_image_filter(
 		else if ( strcmp(pptr->updated,fptr->updated) != 0)
 			return(0);
 		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
 	if (( fptr->packages ) && ( pptr->packages != fptr->packages )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -345,6 +359,9 @@ private struct rest_response * cords_image_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.updated=%s",optr->domain,optr->id,pptr->updated);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.packages=%u",optr->domain,optr->id,pptr->packages);
@@ -782,6 +799,8 @@ public struct occi_category * occi_cords_image_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "updated",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "packages",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -879,6 +898,17 @@ public struct rest_header *  cords_image_occi_headers(struct cords_image * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_image.updated='%s'\r\n",(sptr->updated?sptr->updated:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_image.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

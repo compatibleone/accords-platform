@@ -83,6 +83,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->publicnetwork )
 			 sptr->publicnetwork = liberate(sptr->publicnetwork);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
 		sptr = liberate( sptr );
 	}
 	return((struct windowsazure *) 0);
@@ -122,6 +124,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->media = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->publicnetwork = (char*) 0;
+		sptr->agent = (char*) 0;
 		sptr->when =  0;
 		sptr->state =  0;
 	}
@@ -254,6 +257,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->publicnetwork = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -302,6 +309,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.media='%s'\r\n",prefix,nptr,(sptr->media?sptr->media:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicnetwork='%s'\r\n",prefix,nptr,(sptr->publicnetwork?sptr->publicnetwork:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
