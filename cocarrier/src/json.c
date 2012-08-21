@@ -41,6 +41,26 @@ private	struct	data_element * json_get_matrix( FILE * h, struct data_element * p
 private	struct	data_element * json_get_complex( FILE * h, struct data_element * parent  );
 private	struct	data_element * json_get_element( FILE * h, struct data_element * parent  );
 
+
+/*	------------------------------------------------	*/
+/*		j s o n _ i n i t i a l i s e			*/ 
+/*	------------------------------------------------	*/
+private	FILE * json_initialise(char * filename)
+{
+	ungotc = 0;
+	return( fopen( filename, "r" ) );
+}
+
+/*	------------------------------------------------	*/
+/*		j s o n _ t er m in a t e			*/
+/*	------------------------------------------------	*/
+private	void	json_terminate(FILE * h)
+{
+	fclose( h );
+	ungotc = 0;
+	return;
+}
+
 /*	------------------------------------------------	*/
 /*		j s o n _ u n g e t c h				*/
 /*	------------------------------------------------	*/
@@ -312,7 +332,6 @@ private	struct	data_element * json_get_matrix( FILE * h, struct data_element * p
 	}	
 }
 
-
 /*	------------------------------------------------	*/
 /*		j s o n _ p a r s e _ f i l e 			*/
 /*	------------------------------------------------	*/
@@ -323,7 +342,7 @@ public	struct	data_element *	json_parse_file( char * filename )
 	struct	data_element * dptr=(struct data_element *) 0;
 	if (( dptr = allocate_data_element( dptr )) != (struct data_element *) 0)
 	{
-		if (!( h = fopen( filename, "r" )))
+		if (!( h = json_initialise( filename )))
 			dptr = liberate_data_element( dptr );
 		else
 		{
@@ -333,7 +352,7 @@ public	struct	data_element *	json_parse_file( char * filename )
 				dptr = liberate_data_element( dptr );
 			else if (!( dptr = json_get_complex(h,dptr) ))
 				failure(33,"incorrect file",filename);
-			fclose(h);
+			json_terminate( h );
 		}
 	}
 	return( dptr );
