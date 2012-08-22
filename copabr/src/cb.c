@@ -3377,23 +3377,16 @@ private	int	cords_retrieve_conditions(
 		/* ------------------------- */
 		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
 			return( 908 );
-		else if (!( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )))
+		else if (( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )) != (char *) 0)
+		{
+			if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
+				status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
+			else if (!( strcmp( vptr, _CORDS_GUARANTEES ) ))
+				status = cords_analyse_warranty( host, id, aptr, warranty, agent, tls );
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
 			continue;
-		else if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
-		{
-			status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
-			aptr = occi_remove_response( aptr );
-			id = liberate( id );
-			return( status );
 		}
-		else if (!( strcmp( vptr, _CORDS_GUARANTEE ) ))
-		{
-			status = cords_analyse_warranty( host, id, aptr, warranty, agent, tls );
-			aptr = occi_remove_response( aptr );
-			id = liberate( id );
-			return( status );
-		}
-		else	continue;
 	}
 	return( 0 );
 }
