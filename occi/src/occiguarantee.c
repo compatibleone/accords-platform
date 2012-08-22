@@ -1,24 +1,26 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _occiguarantee_c_
-#define _occiguarantee_c_
+#ifndef _guarantee_c_
+#define _guarantee_c_
 
 #include "guarantee.h"
 
@@ -35,7 +37,6 @@ private pthread_mutex_t list_cords_guarantee_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_guarantee_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_guarantee_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_guarantee_node() { return( cords_guarantee_first ); }
-public struct  occi_kind_node * occi_last_cords_guarantee_node() { return( cords_guarantee_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -141,14 +142,12 @@ private void autoload_cords_guarantee_nodes() {
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "obligated" )) != (struct xml_atribut *) 0)
 				pptr->obligated = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
-				pptr->service = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "importance" )) != (struct xml_atribut *) 0)
+				pptr->importance = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "scope" )) != (struct xml_atribut *) 0)
 				pptr->scope = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "condition" )) != (struct xml_atribut *) 0)
-				pptr->condition = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "objective" )) != (struct xml_atribut *) 0)
-				pptr->objective = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "variable" )) != (struct xml_atribut *) 0)
+				pptr->variable = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "values" )) != (struct xml_atribut *) 0)
 				pptr->values = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -189,17 +188,14 @@ public  void autosave_cords_guarantee_nodes() {
 		fprintf(h," obligated=%c",0x0022);
 		fprintf(h,"%s",(pptr->obligated?pptr->obligated:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," service=%c",0x0022);
-		fprintf(h,"%s",(pptr->service?pptr->service:""));
+		fprintf(h," importance=%c",0x0022);
+		fprintf(h,"%s",(pptr->importance?pptr->importance:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," scope=%c",0x0022);
 		fprintf(h,"%s",(pptr->scope?pptr->scope:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," condition=%c",0x0022);
-		fprintf(h,"%s",(pptr->condition?pptr->condition:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," objective=%c",0x0022);
-		fprintf(h,"%s",(pptr->objective?pptr->objective:""));
+		fprintf(h," variable=%c",0x0022);
+		fprintf(h,"%s",(pptr->variable?pptr->variable:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," values=%c",0x0022);
 		fprintf(h,"%u",pptr->values);
@@ -234,14 +230,12 @@ private void set_cords_guarantee_field(
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "obligated" ) ))
 			pptr->obligated = allocate_string(vptr);
-		if (!( strcmp( nptr, "service" ) ))
-			pptr->service = allocate_string(vptr);
+		if (!( strcmp( nptr, "importance" ) ))
+			pptr->importance = allocate_string(vptr);
 		if (!( strcmp( nptr, "scope" ) ))
 			pptr->scope = allocate_string(vptr);
-		if (!( strcmp( nptr, "condition" ) ))
-			pptr->condition = allocate_string(vptr);
-		if (!( strcmp( nptr, "objective" ) ))
-			pptr->objective = allocate_string(vptr);
+		if (!( strcmp( nptr, "variable" ) ))
+			pptr->variable = allocate_string(vptr);
 		if (!( strcmp( nptr, "values" ) ))
 			pptr->values = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -298,11 +292,11 @@ private int pass_cords_guarantee_filter(
 		else if ( strcmp(pptr->obligated,fptr->obligated) != 0)
 			return(0);
 		}
-	if (( fptr->service )
-	&&  (strlen( fptr->service ) != 0)) {
-		if (!( pptr->service ))
+	if (( fptr->importance )
+	&&  (strlen( fptr->importance ) != 0)) {
+		if (!( pptr->importance ))
 			return(0);
-		else if ( strcmp(pptr->service,fptr->service) != 0)
+		else if ( strcmp(pptr->importance,fptr->importance) != 0)
 			return(0);
 		}
 	if (( fptr->scope )
@@ -312,18 +306,11 @@ private int pass_cords_guarantee_filter(
 		else if ( strcmp(pptr->scope,fptr->scope) != 0)
 			return(0);
 		}
-	if (( fptr->condition )
-	&&  (strlen( fptr->condition ) != 0)) {
-		if (!( pptr->condition ))
+	if (( fptr->variable )
+	&&  (strlen( fptr->variable ) != 0)) {
+		if (!( pptr->variable ))
 			return(0);
-		else if ( strcmp(pptr->condition,fptr->condition) != 0)
-			return(0);
-		}
-	if (( fptr->objective )
-	&&  (strlen( fptr->objective ) != 0)) {
-		if (!( pptr->objective ))
-			return(0);
-		else if ( strcmp(pptr->objective,fptr->objective) != 0)
+		else if ( strcmp(pptr->variable,fptr->variable) != 0)
 			return(0);
 		}
 	if (( fptr->values ) && ( pptr->values != fptr->values )) return(0);
@@ -352,16 +339,13 @@ private struct rest_response * cords_guarantee_occi_response(
 	sprintf(cptr->buffer,"%s.%s.obligated=%s",optr->domain,optr->id,pptr->obligated);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.service=%s",optr->domain,optr->id,pptr->service);
+	sprintf(cptr->buffer,"%s.%s.importance=%s",optr->domain,optr->id,pptr->importance);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.condition=%s",optr->domain,optr->id,pptr->condition);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.objective=%s",optr->domain,optr->id,pptr->objective);
+	sprintf(cptr->buffer,"%s.%s.variable=%s",optr->domain,optr->id,pptr->variable);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.values=%u",optr->domain,optr->id,pptr->values);
@@ -761,19 +745,6 @@ private void	redirect_occi_cords_guarantee_mt( struct rest_interface * iptr )
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_cords_guarantee(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_cords_guarantee_delete(optr,cptr,rptr));
-}
-
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -793,20 +764,16 @@ public struct occi_category * occi_cords_guarantee_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "obligated",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "importance",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "scope",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "condition",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "objective",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "variable",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "values",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_guarantee)))
-			return( optr );
 		autoload_cords_guarantee_nodes();
 		return(optr);
 	}
@@ -875,7 +842,7 @@ public struct rest_header *  cords_guarantee_occi_headers(struct cords_guarantee
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_guarantee.service='%s'\r\n",(sptr->service?sptr->service:""));
+	sprintf(buffer,"occi.cords_guarantee.importance='%s'\r\n",(sptr->importance?sptr->importance:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -897,18 +864,7 @@ public struct rest_header *  cords_guarantee_occi_headers(struct cords_guarantee
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_guarantee.condition='%s'\r\n",(sptr->condition?sptr->condition:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_guarantee.objective='%s'\r\n",(sptr->objective?sptr->objective:""));
+	sprintf(buffer,"occi.cords_guarantee.variable='%s'\r\n",(sptr->variable?sptr->variable:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -937,4 +893,4 @@ public struct rest_header *  cords_guarantee_occi_headers(struct cords_guarantee
 
 }
 
-#endif	/* _occiguarantee_c_ */
+#endif	/* _guarantee_c_ */

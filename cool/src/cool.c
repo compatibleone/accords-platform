@@ -283,14 +283,17 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 /*	---------------------------------------------------	*/
 /*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------------	*/
-private	char *	negotiate_elastic_contract(char * node,char * name, char * user, struct cords_placement_criteria * selector)
+private	char *	negotiate_elastic_contract(
+	char * node,char * name, char * user, 
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract");
 	if (!( document = cords_instance_node(
-		selector, name, node, _CORDS_COOL_AGENT, default_tls(), (char *) 0, user, user, user) ))
+		selector, warranty, name, node, _CORDS_COOL_AGENT, default_tls(), (char *) 0, user, user, user) ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -486,7 +489,9 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	char *	eprovision=(char *) 0;
 	int	status;
 	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 
 	/* ------------------------------ */
 	/* retrieve the CONTRACT instance */
@@ -554,7 +559,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			node, name, account, &selector ) ))
+			node, name, account, &selector, &warranty ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_COOL_AGENT, default_tls() ) ))

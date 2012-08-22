@@ -1,24 +1,26 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _occiconnection_c_
-#define _occiconnection_c_
+#ifndef _connection_c_
+#define _connection_c_
 
 #include "connection.h"
 
@@ -35,7 +37,6 @@ private pthread_mutex_t list_cords_connection_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_connection_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_connection_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_connection_node() { return( cords_connection_first ); }
-public struct  occi_kind_node * occi_last_cords_connection_node() { return( cords_connection_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -145,6 +146,10 @@ private void autoload_cords_connection_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "session" )) != (struct xml_atribut *) 0)
 				pptr->session = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "control" )) != (struct xml_atribut *) 0)
+				pptr->control = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "monitor" )) != (struct xml_atribut *) 0)
+				pptr->monitor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "pid" )) != (struct xml_atribut *) 0)
 				pptr->pid = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "probes" )) != (struct xml_atribut *) 0)
@@ -193,6 +198,12 @@ public  void autosave_cords_connection_nodes() {
 		fprintf(h," session=%c",0x0022);
 		fprintf(h,"%s",(pptr->session?pptr->session:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," control=%c",0x0022);
+		fprintf(h,"%s",(pptr->control?pptr->control:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," monitor=%c",0x0022);
+		fprintf(h,"%s",(pptr->monitor?pptr->monitor:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," pid=%c",0x0022);
 		fprintf(h,"%u",pptr->pid);
 		fprintf(h,"%c",0x0022);
@@ -233,6 +244,10 @@ private void set_cords_connection_field(
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "session" ) ))
 			pptr->session = allocate_string(vptr);
+		if (!( strcmp( nptr, "control" ) ))
+			pptr->control = allocate_string(vptr);
+		if (!( strcmp( nptr, "monitor" ) ))
+			pptr->monitor = allocate_string(vptr);
 		if (!( strcmp( nptr, "pid" ) ))
 			pptr->pid = atoi(vptr);
 		if (!( strcmp( nptr, "probes" ) ))
@@ -305,6 +320,20 @@ private int pass_cords_connection_filter(
 		else if ( strcmp(pptr->session,fptr->session) != 0)
 			return(0);
 		}
+	if (( fptr->control )
+	&&  (strlen( fptr->control ) != 0)) {
+		if (!( pptr->control ))
+			return(0);
+		else if ( strcmp(pptr->control,fptr->control) != 0)
+			return(0);
+		}
+	if (( fptr->monitor )
+	&&  (strlen( fptr->monitor ) != 0)) {
+		if (!( pptr->monitor ))
+			return(0);
+		else if ( strcmp(pptr->monitor,fptr->monitor) != 0)
+			return(0);
+		}
 	if (( fptr->pid ) && ( pptr->pid != fptr->pid )) return(0);
 	if (( fptr->probes ) && ( pptr->probes != fptr->probes )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -336,6 +365,12 @@ private struct rest_response * cords_connection_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.session=%s",optr->domain,optr->id,pptr->session);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.control=%s",optr->domain,optr->id,pptr->control);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.monitor=%s",optr->domain,optr->id,pptr->monitor);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.pid=%u",optr->domain,optr->id,pptr->pid);
@@ -738,19 +773,6 @@ private void	redirect_occi_cords_connection_mt( struct rest_interface * iptr )
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_cords_connection(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_cords_connection_delete(optr,cptr,rptr));
-}
-
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -774,14 +796,16 @@ public struct occi_category * occi_cords_connection_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "session",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "control",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "monitor",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "pid",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "probes",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_connection)))
-			return( optr );
 		autoload_cords_connection_nodes();
 		return(optr);
 	}
@@ -872,6 +896,28 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_connection.control='%s'\r\n",(sptr->control?sptr->control:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_connection.monitor='%s'\r\n",(sptr->monitor?sptr->monitor:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_connection.pid='%u'\r\n",sptr->pid);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -901,4 +947,4 @@ public struct rest_header *  cords_connection_occi_headers(struct cords_connecti
 
 }
 
-#endif	/* _occiconnection_c_ */
+#endif	/* _connection_c_ */

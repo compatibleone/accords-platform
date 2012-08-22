@@ -263,14 +263,17 @@ private char *	build_application_node(char * image, char * provider )
 /* ------------------------- */
 /* negotiate the contracts   */
 /* ------------------------- */
-private	char *	negotiate_application_contract(char * node,struct cords_placement_criteria * selector)
+private	char *	negotiate_application_contract(
+	char * node,
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("coips:negotiate_application_contract");
 	if (!( document = cords_instance_node(
-		selector, node, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, "coips", "coips", "coips") ))
+		selector, warranty, node, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, "coips", "coips", "coips") ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -500,8 +503,10 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
 	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
 
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 
 	/* ---------------------- */
 	/* check if already built */
@@ -568,7 +573,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	if ( aptr->state & _COIPS_NODE_BUILT )
 	{	
-		if (!( contract = negotiate_application_contract(node,&selector)))
+		if (!( contract = negotiate_application_contract(node,&selector,&warranty)))
 			returnValue =  801;
 		else if (!( aptr->provision = allocate_string( contract ) ))
 			returnValue =  802;

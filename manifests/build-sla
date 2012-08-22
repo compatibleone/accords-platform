@@ -21,7 +21,11 @@ echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
 echo "<terms name=\"$1:guarantees\" type=\"guarantees\">" >> sla-$1.xml 
 echo "<term name=\"$1:guarantee1\">" >> sla-$1.xml 
-echo "<guarantee name=\"$1:g1\" scope=\"default\"/>" >> sla-$1.xml 
+echo "<guarantee name=\"$1:g1\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml 
+echo "<variable  name=\"$1:gv1\" property=\"cpu\" condition=\"less\" value=\"50\"/>" >> sla-$1.xml
+echo "<business  name=\"$1:bv1\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
+echo "<business  name=\"$1:bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
+echo "</guarantee>" >> sla-$1.xml
 echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
 echo "</agreement>" >> sla-$1.xml

@@ -72,15 +72,15 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsGuarantee">
+		<xsd:element name="variable" type="cordsVariable" minOccurs="1" maxOccurs="1" />
 		<xsd:element name="business" type="cordsBusiness" minOccurs="1" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="obligated" type="xsd:string"/>
-		<xsd:attribute name="service" type="xsd:string"/>
+		<xsd:attribute name="importance" type="xsd:string"/>
 		<xsd:attribute name="scope" type="xsd:string"/>
-		<xsd:attribute name="condition" type="xsd:string"/>
-		<xsd:attribute name="objective" type="xsd:string"/>
+		<xsd:attribute name="variable" type="xsd:string"/>
 		<xsd:attribute name="values" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
@@ -88,10 +88,10 @@
 	<xsd:complexType name="cordsBusiness">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="expression" type="xsd:string"/>
-		<xsd:attribute name="condition" type="xsd:string"/>
-		<xsd:attribute name="value" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="nature" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="expression" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 

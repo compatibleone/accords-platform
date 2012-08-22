@@ -76,6 +76,10 @@
 #define	_CORDS_VARIABLE		"variable"
 #define	_CORDS_CONDITIONS	"conditions"
 #define	_CORDS_PROPERTY		"property"
+#define	_CORDS_GUARANTEE	"guarantee"
+#define	_CORDS_IMPORTANCE	"importance"
+#define	_CORDS_CONDITION	"condition"
+#define	_CORDS_OBJECTIVE	"objective"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

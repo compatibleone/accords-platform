@@ -8,6 +8,7 @@ struct	cords_monitor
 	char *	agreement;
 	char *	account;
 	char *	service;
+	char *	connection;
 	char *	report;
 	int	controls;
 	int	state;

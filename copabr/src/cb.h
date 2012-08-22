@@ -40,6 +40,29 @@ struct	cords_placement_criteria
 	char *		algorithm;	/* the placement algorithm	*/
 };
 
+struct	cords_guarantee_criteria;
+struct	cords_guarantee_element
+{
+	struct	cords_guarantee_element * previous;
+	struct	cords_guarantee_element * next;
+	struct	cords_guarantee_criteria* parent;
+
+	char *		reference;	/* guarantee instance identity	*/
+	char *		importance;	/* importance of the condition	*/
+	char *		obligated;	/* the obligated party account	*/
+	char *		scope;		/* the involved service items	*/
+	char *		property;	/* the name of the metric 	*/
+	char *		condition;	/* the involved condition	*/
+	char *		objective;	/* the involved value		*/
+};
+
+struct	cords_guarantee_criteria
+{
+	int		elements;
+	struct	cords_guarantee_element * first;
+	struct	cords_guarantee_element * last;
+};
+
 struct	cords_provisioning
 {
 	char			* planID;
@@ -96,6 +119,7 @@ struct	cords_node_descriptor
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/
 
 	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
 
 };
 
@@ -133,6 +157,7 @@ public	int	get_provisioning_status();
 
 public	struct	xml_element * cords_instance_node( 
 		struct cords_placement_criteria * selector,
+		struct cords_guarantee_criteria * warrenty,
 		char * host,
 		char * id,
 		char * agent,

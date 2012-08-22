@@ -6,9 +6,9 @@ struct	cords_business
 	char *	id;
 	char *	name;
 	char *	description;
+	char *	nature;
+	char *	type;
 	char *	expression;
-	char *	condition;
-	char * 	value;
 	int	state;
 };
 
