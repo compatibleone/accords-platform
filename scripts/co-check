@@ -121,6 +121,10 @@ function verification()
 	check	variable	slam
 	check	guarantee	slam
 	check	business	slam
+	check	openstack	osprocci
+	check	opennebula	onprocci
+	check	windowsazure	azprocci
+
 }
 
 if [ -z "$verbose" ]; then

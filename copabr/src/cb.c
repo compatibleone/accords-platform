@@ -3212,7 +3212,7 @@ private	int	cords_analyse_warranty(
 					/* ------------------------------ */
 					/* retrieve the obligated value   */
 					/* ------------------------------ */
-					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_IMPORTANCE )) != (char *) 0)
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_OBLIGATED )) != (char *) 0)
 						if (!( wptr->obligated = allocate_string( nptr ) ))
 							return( 927 );
 
@@ -3226,7 +3226,7 @@ private	int	cords_analyse_warranty(
 					/* ---------------------------------------------------- */
 					/* retrieve the condition identifier and resolve fields */
 					/* ---------------------------------------------------- */
-					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_CONDITION )) != (char *) 0)
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_VARIABLE )) != (char *) 0)
 					{
 						if (!( xptr = occi_simple_get( nptr, agent, tls ) ))
 							return( 908 );
@@ -3237,7 +3237,7 @@ private	int	cords_analyse_warranty(
 							/* --------------------------------------------------- */
 							if (( nptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_PROPERTY )) != (char *) 0)
 							{
-								if (( vptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_OBJECTIVE )) != (char *) 0)
+								if (( vptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
 								{
 									if (( cptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_CONDITION )) != (char *) 0)
 									{
@@ -3458,6 +3458,57 @@ private	char *	cords_valid_identifier( char * id )
 	else 	return( id );
 }
 
+
+/*	-------------------------------------------------------		*/
+/*	    c o r d s _ s e r v i c e _ g u a r a n t e e s		*/
+/*	-------------------------------------------------------		*/
+private	int	cords_service_guarantees( 
+	char * host, 
+	struct xml_element * document, 
+	struct cords_guarantee_criteria * warranty, 
+	char * agent, char * tls )
+{
+	struct	xml_element * xptr;
+	struct	xml_atribut * aptr;
+	struct	cordscript_action * csptr=(struct cordscript_action*) 0;
+	struct	cords_guarantee_element * gptr;
+	char	statement[4096];
+	/* ------------- */
+	/* for all nodes */
+	/* ------------- */
+	for (	xptr = document->first;
+		xptr != (struct xml_element *) 0;
+		xptr = xptr->next )
+	{
+		/* detect a guarantee */
+		/* ------------------ */
+		for (	gptr=warranty->first;
+			gptr != (struct cords_guarantee_element *) 0;
+			gptr = gptr->next )
+		{
+			if (!( gptr->scope ))
+				continue;
+
+			else if (!( aptr = document_atribut( xptr, _CORDS_NAME ) ))
+				continue;
+			else if (( strcmp( gptr->scope, "default"   ) != 0 )
+			     &&  ( strcmp( gptr->scope, aptr->value ) != 0 ))
+				continue;
+			else if (!( gptr->property ))
+				continue;
+			else
+			{
+				sprintf(statement,"%s.monitor(slam.%s);",
+					aptr->value, gptr->property );
+				if ((csptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+					cords_action_instruction( host, document, csptr,_CORDS_CONFIGURATION, agent, tls );
+			}
+		}  
+
+	}
+	return( 0 );
+}
+
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ s e r v i c e _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
@@ -3523,6 +3574,17 @@ public	char *	cords_service_broker(
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
 
+	/* ----------------------------- */
+	/* retrieve the release instance */
+	/* ----------------------------- */
+	if ((( CbC.releaseID = occi_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_RELEASE)) != (char *) 0)
+	&& (( CbC.releaseID = cords_valid_identifier( CbC.releaseID )) != (char *) 0))
+	{
+		if (!( CbC.release = cords_retrieve_instance( host, CbC.releaseID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
+
 	/* ------------------------------- */
 	/* retrieve the interface instance */
 	/* ------------------------------- */
@@ -3584,6 +3646,22 @@ public	char *	cords_service_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
+
+	/* -------------------------------------------- */
+	/* perform SLA guarantee instruction processing */
+	/* -------------------------------------------- */
+	if ((( sla ) && ( CgC.first ))
+	&&  ((status = cords_service_guarantees( host, CbC.document, &CgC, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+
+	/* -------------------------------------- */
+	/* perform release instruction processing */
+	/* -------------------------------------- */
+	if (( CbC.release )
+	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+	
+
 	/* -------------------------------------------- */
 	/* perform interface methods action  processing */
 	/* -------------------------------------------- */
@@ -3739,6 +3817,13 @@ public	char *	cords_manifest_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
+	/* -------------------------------------------- */
+	/* perform SLA guarantee instruction processing */
+	/* -------------------------------------------- */
+	if ((( sla ) && ( CgC.first ))
+	&&  ((status = cords_service_guarantees( host, CbC.document, &CgC, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+
 	/* -------------------------------------- */
 	/* perform release instruction processing */
 	/* -------------------------------------- */

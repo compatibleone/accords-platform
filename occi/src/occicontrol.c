@@ -139,10 +139,16 @@ private void autoload_cords_control_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "monitor" )) != (struct xml_atribut *) 0)
 				pptr->monitor = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "guarantee" )) != (struct xml_atribut *) 0)
-				pptr->guarantee = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "probes" )) != (struct xml_atribut *) 0)
-				pptr->probes = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "probe" )) != (struct xml_atribut *) 0)
+				pptr->probe = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "metric" )) != (struct xml_atribut *) 0)
+				pptr->metric = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "property" )) != (struct xml_atribut *) 0)
+				pptr->property = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "condition" )) != (struct xml_atribut *) 0)
+				pptr->condition = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "objective" )) != (struct xml_atribut *) 0)
+				pptr->objective = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -178,11 +184,20 @@ public  void autosave_cords_control_nodes() {
 		fprintf(h," monitor=%c",0x0022);
 		fprintf(h,"%s",(pptr->monitor?pptr->monitor:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," guarantee=%c",0x0022);
-		fprintf(h,"%s",(pptr->guarantee?pptr->guarantee:""));
+		fprintf(h," probe=%c",0x0022);
+		fprintf(h,"%s",(pptr->probe?pptr->probe:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," probes=%c",0x0022);
-		fprintf(h,"%u",pptr->probes);
+		fprintf(h," metric=%c",0x0022);
+		fprintf(h,"%s",(pptr->metric?pptr->metric:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," property=%c",0x0022);
+		fprintf(h,"%s",(pptr->property?pptr->property:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," condition=%c",0x0022);
+		fprintf(h,"%s",(pptr->condition?pptr->condition:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," objective=%c",0x0022);
+		fprintf(h,"%s",(pptr->objective?pptr->objective:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -212,10 +227,16 @@ private void set_cords_control_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "monitor" ) ))
 			pptr->monitor = allocate_string(vptr);
-		if (!( strcmp( nptr, "guarantee" ) ))
-			pptr->guarantee = allocate_string(vptr);
-		if (!( strcmp( nptr, "probes" ) ))
-			pptr->probes = atoi(vptr);
+		if (!( strcmp( nptr, "probe" ) ))
+			pptr->probe = allocate_string(vptr);
+		if (!( strcmp( nptr, "metric" ) ))
+			pptr->metric = allocate_string(vptr);
+		if (!( strcmp( nptr, "property" ) ))
+			pptr->property = allocate_string(vptr);
+		if (!( strcmp( nptr, "condition" ) ))
+			pptr->condition = allocate_string(vptr);
+		if (!( strcmp( nptr, "objective" ) ))
+			pptr->objective = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -263,14 +284,41 @@ private int pass_cords_control_filter(
 		else if ( strcmp(pptr->monitor,fptr->monitor) != 0)
 			return(0);
 		}
-	if (( fptr->guarantee )
-	&&  (strlen( fptr->guarantee ) != 0)) {
-		if (!( pptr->guarantee ))
+	if (( fptr->probe )
+	&&  (strlen( fptr->probe ) != 0)) {
+		if (!( pptr->probe ))
 			return(0);
-		else if ( strcmp(pptr->guarantee,fptr->guarantee) != 0)
+		else if ( strcmp(pptr->probe,fptr->probe) != 0)
 			return(0);
 		}
-	if (( fptr->probes ) && ( pptr->probes != fptr->probes )) return(0);
+	if (( fptr->metric )
+	&&  (strlen( fptr->metric ) != 0)) {
+		if (!( pptr->metric ))
+			return(0);
+		else if ( strcmp(pptr->metric,fptr->metric) != 0)
+			return(0);
+		}
+	if (( fptr->property )
+	&&  (strlen( fptr->property ) != 0)) {
+		if (!( pptr->property ))
+			return(0);
+		else if ( strcmp(pptr->property,fptr->property) != 0)
+			return(0);
+		}
+	if (( fptr->condition )
+	&&  (strlen( fptr->condition ) != 0)) {
+		if (!( pptr->condition ))
+			return(0);
+		else if ( strcmp(pptr->condition,fptr->condition) != 0)
+			return(0);
+		}
+	if (( fptr->objective )
+	&&  (strlen( fptr->objective ) != 0)) {
+		if (!( pptr->objective ))
+			return(0);
+		else if ( strcmp(pptr->objective,fptr->objective) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -293,10 +341,19 @@ private struct rest_response * cords_control_occi_response(
 	sprintf(cptr->buffer,"%s.%s.monitor=%s",optr->domain,optr->id,pptr->monitor);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.guarantee=%s",optr->domain,optr->id,pptr->guarantee);
+	sprintf(cptr->buffer,"%s.%s.probe=%s",optr->domain,optr->id,pptr->probe);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.probes=%u",optr->domain,optr->id,pptr->probes);
+	sprintf(cptr->buffer,"%s.%s.metric=%s",optr->domain,optr->id,pptr->metric);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.property=%s",optr->domain,optr->id,pptr->property);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.condition=%s",optr->domain,optr->id,pptr->condition);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.objective=%s",optr->domain,optr->id,pptr->objective);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -723,9 +780,15 @@ public struct occi_category * occi_cords_control_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "monitor",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "guarantee",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "probe",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "probes",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "metric",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "property",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "condition",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "objective",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -788,7 +851,7 @@ public struct rest_header *  cords_control_occi_headers(struct cords_control * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_control.guarantee='%s'\r\n",(sptr->guarantee?sptr->guarantee:""));
+	sprintf(buffer,"occi.cords_control.probe='%s'\r\n",(sptr->probe?sptr->probe:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -799,7 +862,40 @@ public struct rest_header *  cords_control_occi_headers(struct cords_control * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_control.probes='%u'\r\n",sptr->probes);
+	sprintf(buffer,"occi.cords_control.metric='%s'\r\n",(sptr->metric?sptr->metric:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_control.property='%s'\r\n",(sptr->property?sptr->property:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_control.condition='%s'\r\n",(sptr->condition?sptr->condition:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_control.objective='%s'\r\n",(sptr->objective?sptr->objective:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

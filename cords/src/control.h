@@ -6,8 +6,11 @@ struct	cords_control
 	char *	id;
 	char *	name;
 	char *	monitor;
-	char *	guarantee;
-	int	probes;
+	char *	probe;
+	char *	metric;
+	char *	property;
+	char *	condition;
+	char *	objective;
 	int	state;
 };
 

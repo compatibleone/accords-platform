@@ -10,7 +10,6 @@ struct	cords_connection
 	char *	finish;
 	char *	account;
 	char *	session;
-	char *	control;
 	char *	monitor;
 	int	pid;
 	int	probes;

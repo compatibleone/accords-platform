@@ -41,6 +41,8 @@ public struct cords_monitor * liberate_cords_monitor(struct cords_monitor * sptr
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->service )
 			 sptr->service = liberate(sptr->service);
+		if ( sptr->connection )
+			 sptr->connection = liberate(sptr->connection);
 		if ( sptr->report )
 			 sptr->report = liberate(sptr->report);
 		sptr = liberate( sptr );
@@ -61,6 +63,7 @@ public struct cords_monitor * reset_cords_monitor(struct cords_monitor * sptr)
 		sptr->agreement = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->service = (char*) 0;
+		sptr->connection = (char*) 0;
 		sptr->report = (char*) 0;
 		sptr->controls =  0;
 		sptr->state =  0;
@@ -110,6 +113,10 @@ public int xmlin_cords_monitor(struct cords_monitor * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"connection") ))
+		{
+			if ( wptr->value ) { sptr->connection = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"report") ))
 		{
 			if ( wptr->value ) { sptr->report = allocate_string(wptr->value); }
@@ -141,6 +148,7 @@ public int rest_occi_cords_monitor(FILE * fh,struct cords_monitor * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.report='%s'\r\n",prefix,nptr,(sptr->report?sptr->report:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.controls='%u'\r\n",prefix,nptr,sptr->controls);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);

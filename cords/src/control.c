@@ -37,8 +37,16 @@ public struct cords_control * liberate_cords_control(struct cords_control * sptr
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->monitor )
 			 sptr->monitor = liberate(sptr->monitor);
-		if ( sptr->guarantee )
-			 sptr->guarantee = liberate(sptr->guarantee);
+		if ( sptr->probe )
+			 sptr->probe = liberate(sptr->probe);
+		if ( sptr->metric )
+			 sptr->metric = liberate(sptr->metric);
+		if ( sptr->property )
+			 sptr->property = liberate(sptr->property);
+		if ( sptr->condition )
+			 sptr->condition = liberate(sptr->condition);
+		if ( sptr->objective )
+			 sptr->objective = liberate(sptr->objective);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_control *) 0);
@@ -55,8 +63,11 @@ public struct cords_control * reset_cords_control(struct cords_control * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->monitor = (char*) 0;
-		sptr->guarantee = (char*) 0;
-		sptr->probes =  0;
+		sptr->probe = (char*) 0;
+		sptr->metric = (char*) 0;
+		sptr->property = (char*) 0;
+		sptr->condition = (char*) 0;
+		sptr->objective = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -96,13 +107,25 @@ public int xmlin_cords_control(struct cords_control * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->monitor = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"guarantee") ))
+		else if (!( strcmp(wptr->name,"probe") ))
 		{
-			if ( wptr->value ) { sptr->guarantee = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->probe = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"probes") ))
+		else if (!( strcmp(wptr->name,"metric") ))
 		{
-			if ( wptr->value ) { sptr->probes = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->metric = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"property") ))
+		{
+			if ( wptr->value ) { sptr->property = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"condition") ))
+		{
+			if ( wptr->value ) { sptr->condition = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"objective") ))
+		{
+			if ( wptr->value ) { sptr->objective = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -125,8 +148,11 @@ public int rest_occi_cords_control(FILE * fh,struct cords_control * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.monitor='%s'\r\n",prefix,nptr,(sptr->monitor?sptr->monitor:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.guarantee='%s'\r\n",prefix,nptr,(sptr->guarantee?sptr->guarantee:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.probe='%s'\r\n",prefix,nptr,(sptr->probe?sptr->probe:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.property='%s'\r\n",prefix,nptr,(sptr->property?sptr->property:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.condition='%s'\r\n",prefix,nptr,(sptr->condition?sptr->condition:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.objective='%s'\r\n",prefix,nptr,(sptr->objective?sptr->objective:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

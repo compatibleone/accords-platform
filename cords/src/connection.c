@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _connection_c_
@@ -45,8 +43,6 @@ public struct cords_connection * liberate_cords_connection(struct cords_connecti
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->session )
 			 sptr->session = liberate(sptr->session);
-		if ( sptr->control )
-			 sptr->control = liberate(sptr->control);
 		if ( sptr->monitor )
 			 sptr->monitor = liberate(sptr->monitor);
 		sptr = liberate( sptr );
@@ -68,7 +64,6 @@ public struct cords_connection * reset_cords_connection(struct cords_connection 
 		sptr->finish = (char*) 0;
 		sptr->account = (char*) 0;
 		sptr->session = (char*) 0;
-		sptr->control = (char*) 0;
 		sptr->monitor = (char*) 0;
 		sptr->pid =  0;
 		sptr->probes =  0;
@@ -123,10 +118,6 @@ public int xmlin_cords_connection(struct cords_connection * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"control") ))
-		{
-			if ( wptr->value ) { sptr->control = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"monitor") ))
 		{
 			if ( wptr->value ) { sptr->monitor = allocate_string(wptr->value); }
@@ -163,7 +154,6 @@ public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,c
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.finish='%s'\r\n",prefix,nptr,(sptr->finish?sptr->finish:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.control='%s'\r\n",prefix,nptr,(sptr->control?sptr->control:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.monitor='%s'\r\n",prefix,nptr,(sptr->monitor?sptr->monitor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.pid='%u'\r\n",prefix,nptr,sptr->pid);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.probes='%u'\r\n",prefix,nptr,sptr->probes);
@@ -172,4 +162,4 @@ public int rest_occi_cords_connection(FILE * fh,struct cords_connection * sptr,c
 
 }
 
-#endif	/* _connection_c_ */
+#endif	/* _connection_cconnection_c_ */

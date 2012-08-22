@@ -81,6 +81,7 @@
 #define	_CORDS_IMPORTANCE	"importance"
 #define	_CORDS_CONDITION	"condition"
 #define	_CORDS_OBJECTIVE	"objective"
+#define	_CORDS_OBLIGATED	"obligated"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

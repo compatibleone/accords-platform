@@ -143,6 +143,8 @@ private void autoload_cords_monitor_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "service" )) != (struct xml_atribut *) 0)
 				pptr->service = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "connection" )) != (struct xml_atribut *) 0)
+				pptr->connection = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "report" )) != (struct xml_atribut *) 0)
 				pptr->report = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "controls" )) != (struct xml_atribut *) 0)
@@ -188,6 +190,9 @@ public  void autosave_cords_monitor_nodes() {
 		fprintf(h," service=%c",0x0022);
 		fprintf(h,"%s",(pptr->service?pptr->service:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," connection=%c",0x0022);
+		fprintf(h,"%s",(pptr->connection?pptr->connection:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," report=%c",0x0022);
 		fprintf(h,"%s",(pptr->report?pptr->report:""));
 		fprintf(h,"%c",0x0022);
@@ -226,6 +231,8 @@ private void set_cords_monitor_field(
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "service" ) ))
 			pptr->service = allocate_string(vptr);
+		if (!( strcmp( nptr, "connection" ) ))
+			pptr->connection = allocate_string(vptr);
 		if (!( strcmp( nptr, "report" ) ))
 			pptr->report = allocate_string(vptr);
 		if (!( strcmp( nptr, "controls" ) ))
@@ -291,6 +298,13 @@ private int pass_cords_monitor_filter(
 		else if ( strcmp(pptr->service,fptr->service) != 0)
 			return(0);
 		}
+	if (( fptr->connection )
+	&&  (strlen( fptr->connection ) != 0)) {
+		if (!( pptr->connection ))
+			return(0);
+		else if ( strcmp(pptr->connection,fptr->connection) != 0)
+			return(0);
+		}
 	if (( fptr->report )
 	&&  (strlen( fptr->report ) != 0)) {
 		if (!( pptr->report ))
@@ -325,6 +339,9 @@ private struct rest_response * cords_monitor_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.service=%s",optr->domain,optr->id,pptr->service);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.connection=%s",optr->domain,optr->id,pptr->connection);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.report=%s",optr->domain,optr->id,pptr->report);
@@ -761,6 +778,8 @@ public struct occi_category * occi_cords_monitor_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "connection",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "report",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "controls",0,0) ))
@@ -838,6 +857,17 @@ public struct rest_header *  cords_monitor_occi_headers(struct cords_monitor * s
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_monitor.service='%s'\r\n",(sptr->service?sptr->service:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_monitor.connection='%s'\r\n",(sptr->connection?sptr->connection:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
