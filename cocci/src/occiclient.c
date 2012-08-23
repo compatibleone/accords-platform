@@ -330,6 +330,27 @@ public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr )
 }
 
 /*	------------------------------------------------------------	*/
+/*		   o c c i _ a p p e n d _ e l e m e n t		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_element * occi_append_element( struct occi_element * eptr, char * nptr, char * vptr )
+{
+	struct	occi_element * dptr;
+	struct	occi_element * root;
+	if (!( dptr = occi_create_element( nptr, vptr ) ))
+		return( eptr );
+	else if (!(root = eptr))
+		return( dptr );
+	else
+	{
+		while ( eptr->next )
+			eptr = eptr->next;
+		dptr->previous = eptr;
+		eptr->next = dptr;
+		return( root );
+	}	
+}
+
+/*	------------------------------------------------------------	*/
 /*		o c c i _ r e q u e s t _ e l e m e n t			*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_element  *	occi_request_element(struct occi_request * rptr, char * nptr, char * vptr )

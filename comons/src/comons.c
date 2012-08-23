@@ -86,8 +86,8 @@ private	void	comons_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.05");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.06");
+	printf("\n   Beta Version : 23/08/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -141,6 +141,7 @@ private	struct rest_extension * comons_extension( void * v,struct rest_server * 
 
 #include "comonssession.c"
 #include "comonsevent.c"
+#include "comonsmonitor.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o m o n s _ o p e r a t i o n				*/
@@ -156,7 +157,7 @@ private	int	comons_operation( char * nptr )
 	/* -------------------------------------- */
 	/* monitoring monitor category management */
 	/* -------------------------------------- */
-	if (!( optr = occi_cords_monitor_builder( Comons.domain, "monitor" ) ))
+	if (!( optr = occi_cords_monitor_builder( Comons.domain, _CORDS_MONITOR ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -165,17 +166,10 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
-	/* -------------------------------------- */
-	/* monitoring control category management */
-	/* -------------------------------------- */
-	if (!( optr = occi_cords_control_builder( Comons.domain, "control" ) ))
+	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_monitor)))
 		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
-	optr->access |= _OCCI_NO_PRICING;
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_monitor)))
+		return( 27 );
 
 	/* ------------------------------------ */
 	/* monitoring event category management */
@@ -190,7 +184,7 @@ private	int	comons_operation( char * nptr )
 	/* --------------------------------------- */
 	/* monitoring consumer category management */
 	/* --------------------------------------- */
-	if (!( optr = occi_cords_consumer_builder( Comons.domain, "consumer" ) ))
+	if (!( optr = occi_cords_consumer_builder( Comons.domain, _CORDS_CONSUMER ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -212,7 +206,7 @@ private	int	comons_operation( char * nptr )
 	/* ------------------------------------- */
 	/* monitoring metric category management */
 	/* ------------------------------------- */
-	if (!( optr = occi_cords_metric_builder( Comons.domain, "metric" ) ))
+	if (!( optr = occi_cords_metric_builder( Comons.domain, _CORDS_METRIC ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -221,7 +215,7 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_cords_alert_builder( Comons.domain, "alert" ) ))
+	if (!( optr = occi_cords_alert_builder( Comons.domain, _CORDS_ALERT ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -230,7 +224,7 @@ private	int	comons_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_cords_report_builder( Comons.domain, "report" ) ))
+	if (!( optr = occi_cords_report_builder( Comons.domain, _CORDS_REPORT ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

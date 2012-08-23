@@ -77,6 +77,7 @@
 #define	_CORDS_CONDITIONS	"conditions"
 #define	_CORDS_PROPERTY		"property"
 #define	_CORDS_GUARANTEE	"guarantee"
+#define	_CORDS_BUSINESS 	"business"
 #define	_CORDS_GUARANTEES	"guarantees"
 #define	_CORDS_IMPORTANCE	"importance"
 #define	_CORDS_CONDITION	"condition"
@@ -138,6 +139,7 @@
 	
 #define	_CORDS_EVENT		"event"
 #define	_CORDS_MONITOR		"monitor"
+#define	_CORDS_CONTROL		"control"
 #define	_CORDS_REPORT		"report"
 #define	_CORDS_SESSION		"session"
 #define	_CORDS_PACKET		"packet"

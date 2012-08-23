@@ -5,12 +5,21 @@ struct	cords_control
 {
 	char *	id;
 	char *	name;
-	char *	monitor;
-	char *	probe;
-	char *	metric;
+	char *	contract;
+	char *	agreement;
 	char *	property;
 	char *	condition;
 	char *	objective;
+	char *	reference;
+	char *	importance;
+	char *	obligated;
+	char *	scope;
+	char *	session;
+	char *	account;
+	char *	monitor;
+	char *	connection;
+	char *	metric;
+	char *	probe;
 	int	state;
 };
 

@@ -98,6 +98,7 @@ public	struct	occi_response * allocate_occi_response();
 public	struct	occi_element  *	occi_request_element( struct occi_request * rptr, char * nptr, char * vptr );
 public	struct	occi_element  *	occi_response_element(struct occi_response * rptr, char * nptr, char * vptr);
 public	struct	occi_element  * occi_locate_element( struct occi_element * eptr, char * sptr );
+public	struct	occi_element  * occi_append_element( struct occi_element * eptr, char * nptr, char * vptr );
 public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr );
 public	struct	occi_element  * occi_append_headers(struct occi_request * rptr,struct occi_element * hptr);
 public	struct	occi_element  * occi_remove_elements( struct occi_element * eptr );

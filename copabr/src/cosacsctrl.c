@@ -156,7 +156,7 @@ private	struct	occi_client * cosacs_occi_create_client( char * url, char * agent
 /*	-----------------------------------------------------------	*/
 /*		c o s a c s _ c r e a t e _ p r o b e 			*/
 /*	-----------------------------------------------------------	*/
-public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * connection, char * metric, char * period)
+public	char *	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * connection, char * metric, char * period)
 {
 	char	buffer[1024];
 	char 	work[1024];
@@ -186,16 +186,16 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* create client and request then POST */
 	/* ----------------------------------- */
 	if (!( cptr = cosacs_occi_create_client( buffer, agent, cosacs_tls() ) ))
-		return(1100);
+		return((char *) 0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(1101);
+		return((char *) 0);
 	else if ((!(dptr=occi_request_element(rptr,"occi.probe.name"  , work   ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.metric", metric ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.period", "1"    ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.connection", connection ) )))
 	{
 		rptr = occi_remove_request( rptr );
-		return(1102);
+		return((char *) 0);
 	}
 	else
 	{
@@ -207,7 +207,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 		{
 			zptr = occi_remove_response( zptr );
 			cptr = occi_remove_client( cptr );
-			return( 1103 );
+			return((char *) 0);
 		}
 		else
 		{
@@ -219,7 +219,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 		if (( zptr = occi_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
-		return(0);
+		return(allocate_string( buffer ));
 	}
 }
 
@@ -698,6 +698,142 @@ private	char *	cosacs_monitoring_connection( struct occi_response * instruction,
 }
 
 /*	-----------------------------------------------------------	*/
+/*	     c o s a c s _ c o n n e c t i o n _ m o n i t o r		*/
+/*	-----------------------------------------------------------	*/
+/*	this function will update a connection monitor with the SLO	*/
+/*	control element which will itself be updated to reference	*/
+/*	the resolved metric, connection, session and probe.		*/
+/*	------------------------------------------------------------	*/ 
+private	char *	cosacs_connection_monitor( 
+	char *	account, 
+	char *	session, 
+	char *	connection, 
+	char *	probe, 
+	char *	metric, 
+	char *	control )
+{
+	char	buffer[2048];
+	char *	ihost;
+	char *	monitor=(char *) 0;
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	struct	occi_element  * eptr;
+	struct	occi_element  * fptr;
+	struct	occi_element  * dptr;
+
+	/* ----------------------- */
+	/* retrieve the connection */
+	/* ----------------------- */
+	if (!( zptr = occi_simple_get( connection, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return((char *) 0);
+
+	/* ----------------------- */
+	/* retrieve the monitor id */
+	/* ----------------------- */
+	else if (!(fptr = occi_locate_element( zptr->first, "occi.connection.monitor" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return((char *) 0);
+	}
+	else if (!( rest_valid_string( fptr->value ) ))
+	{
+		/* ------------------------------------------------------------------------- */
+		/* select / resolve the instruction category service provider identification */
+		/* ------------------------------------------------------------------------- */
+		if (!( ihost = occi_resolve_category_provider( _CORDS_MONITOR, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		 	return( 0 );
+		else	sprintf(buffer,"%s/%s/",ihost,_CORDS_MONITOR);
+
+		liberate( ihost );
+
+		/* ----------------------- */
+		/* create missing monitor  */
+		/* ----------------------- */
+		if ((!( dptr = occi_create_element(       "occi.monitor.account",    account	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.monitor.session",    session	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.monitor.connection", connection	) )))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( yptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( ihost = occi_extract_location( yptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			yptr = occi_remove_response( yptr );
+			return((char *) 0);
+		}
+		/* ------------------------------------ */
+		/* link the connection to the session   */
+		/* ------------------------------------ */
+		else if (!( monitor = allocate_string( ihost ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			yptr = occi_remove_response( yptr );
+			return((char *) 0);
+		}
+		else	yptr = occi_remove_response ( yptr );
+
+		/* --------------------------------- */
+		/* update connection with monitor id */
+		/* --------------------------------- */
+		if (!( eptr = occi_create_element( "occi.connection.monitor", monitor ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( yptr = occi_simple_put( connection, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else	yptr = occi_remove_response ( yptr );
+	}
+
+	/* ------------------------------------------- */
+	/* allocate the monitor id for eventual return */
+	/* ------------------------------------------- */
+	else if (!( monitor = allocate_string( fptr->value ) ))
+		return((char *) 0);
+
+	/* ----------------------- */
+	/* clean up previous phase */
+	/* ----------------------- */
+	zptr = occi_remove_response( zptr );
+
+	/* --------------------------------------------------- */
+	/* update the control with probe and other information */
+	/* --------------------------------------------------- */
+	if ((!( dptr = occi_create_element(  "occi.control.probe",     probe  	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.metric",     metric 	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.account",    account	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.monitor",    monitor	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.session",    session	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.connection", connection	) )))
+	{
+		monitor = liberate( monitor );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_simple_put( control, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		monitor = liberate( monitor );
+		return((char *) 0);
+	}
+	else	yptr = occi_remove_response ( yptr );
+
+	/* -------------------- */
+	/* link monitor control */
+	/* -------------------- */
+	if (!( yptr = occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+
+	return( monitor );
+}
+
+/*	-----------------------------------------------------------	*/
 /* 	 c o s a c s _ m o n i t o r i n g _ i n s t r u c t i o n 	*/
 /*	-----------------------------------------------------------	*/
 private	int	cosacs_monitoring_instruction( 
@@ -712,7 +848,10 @@ private	int	cosacs_monitoring_instruction(
 	char *	session=(char *) 0;
 	char *	connection=(char *) 0;
 	char *	contract=(char *) 0;
+	char *	control=(char *) 0;
+	char *	monitor=(char *) 0;
 	char *	metric=(char *) 0;
+	char *	probe=(char *) 0;
 
 	/* ---------------------------------------- */
 	/* retrieve the generic contract identifier */
@@ -729,6 +868,14 @@ private	int	cosacs_monitoring_instruction(
 	/* ---------------------------------------------- */
 	if (!( session = cosacs_monitoring_session( contract, account )))
 		return( 118 );
+
+	/* --------------------------------------------- */
+	/* retrieve an eventual SLA SLO control instance */
+	/* --------------------------------------------- */
+	if (( fptr = occi_locate_element( instruction->first, "occi.instruction.value" )) != (struct occi_element *) 0)
+		if ( rest_valid_string( fptr->value ) )
+			if (!( control = allocate_string( fptr->value ) ))
+				return( 118 );
 
 	/* --------------------------------------------------------- */
 	/* retrieve or create and link a connection for this session */
@@ -757,8 +904,16 @@ private	int	cosacs_monitoring_instruction(
 	/* ------------------------------------------------- */
 	/* create a new probe for this connection and metric */
 	/* ------------------------------------------------- */
-	else	return( cosacs_create_probe( cosacs, fptr->value, gptr->value, connection, metric, _COSACS_PERIOD ) );
-
+	else if (!( probe = cosacs_create_probe( cosacs, fptr->value, gptr->value, connection, metric, _COSACS_PERIOD )))
+		return( 118 );
+	else if (!( control ))
+		return( 0 );
+	/* ------------------------------------------------------- */
+	/* create or update the connection monitor with this probe */
+	/* ------------------------------------------------------- */
+	else if (!( monitor = cosacs_connection_monitor( account, session, connection, probe, metric, control ) ))
+		return( 118 );
+	else	return( 0 );
 }
 
 

@@ -47,6 +47,7 @@ struct	cords_guarantee_element
 	struct	cords_guarantee_element * next;
 	struct	cords_guarantee_criteria* parent;
 
+	char *		agreement;	/* reference to parent SLA	*/
 	char *		reference;	/* guarantee instance identity	*/
 	char *		importance;	/* importance of the condition	*/
 	char *		obligated;	/* the obligated party account	*/
