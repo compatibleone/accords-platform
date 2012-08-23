@@ -11,7 +11,7 @@ function success()
 	if [ -z "$verbose" ]; then
 		verbose=0
 	else
-		echo "--" $1 ": OK" 
+		echo "--" $1 $2 ": OK" 
 	fi
 }
 
@@ -23,6 +23,7 @@ function failure()
 	echo "needs to be restarted.                    "
 	echo "------------------------------------------"
 	if [ -z "$level" ]; then
+		echo "failure " $3
 		echo "Launching run-$2                          "
 		echo "------------------------------------------"
 		level=1
@@ -60,9 +61,9 @@ function check()
 v=`/usr/local/bin/co-resolver $1`
 
 if [ -z "$v" ]; then
-	failure $1 $2
+	failure $1 $2 $v
 else
-	success $1
+	success $1 $v
 fi
 
 }

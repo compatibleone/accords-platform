@@ -926,7 +926,13 @@ private	int	cords_action_instruction(
 				continue;
 			else if (!(symbol = cords_resolve_consumer_id( rvalue->prefix, agent, tls ) ))
 				continue;
-			else	ivalue = allocate_string("");
+			else if (!( rvalue->next ))
+				ivalue = allocate_string("");
+			else
+			{
+				rvalue  = rvalue->next;
+				ivalue = allocate_string( rvalue->prefix );
+			}
 		}
 		else
 		{

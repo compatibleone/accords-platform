@@ -343,6 +343,8 @@ private	int	os_command(int argc, char * argv[] )
 				verbose = 1;
 			else if (!( strcasecmp( aptr,"debug" ) ))
 				debug=1;
+			else if (!( strcasecmp( aptr, "echo" ) ))
+				json_set_echo(1);
 			else	return(failure(30,"incorrect","option"));
 			continue;
 		}
