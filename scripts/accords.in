@@ -48,6 +48,12 @@ domain=occi
 operator=accords
 password=co-system
 
+if [ -z "$tls" ]; then
+    tempo=1
+else
+    tempo=2
+fi
+
 if [ -z "$target" ]; then
     target=accords.xml
 fi
@@ -85,103 +91,103 @@ _co_start() {
 
     echo "Starting accords publication services"
     @bindir@/run-publisher &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords file services"
     @bindir@/run-fileserver &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords security services"
     @bindir@/run-coss &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords monitoring services"
     @bindir@/run-comons &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords accounting services"
     @bindir@/run-coobas &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords networking services"
     @bindir@/run-conets &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords elasticity services"
     @bindir@/run-coes &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords energy efficiency services"
     @bindir@/run-coees &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords image storage services"
     @bindir@/run-ezvm &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords image production services"
     @bindir@/run-coips &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords parser services"
     @bindir@/run-parser &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords broker services"
     @bindir@/run-broker &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords procci services"
     @bindir@/run-procci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords scheduling services"
     @bindir@/run-cosched &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open stack services"
     @bindir@/run-osprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords proactive services"
     run-paprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords test occi open stack server"
     @bindir@/run-testosocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords occi open stack services"
     @bindir@/run-osocciprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open nebula services"
     @bindir@/run-onprocci &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords windows azure services"
     @bindir@/run-azprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords delta cloud services"
     @bindir@/run-dcprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords sla services"
     @bindir@/run-slam &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords paas procci services"
     @bindir@/run-paasprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords procci example"
     @bindir@/run-example &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords software configuration services"
     @bindir@/run-cosacs &
-    sleep 1
+    sleep $tempo
 
     echo "ACCORDS ready"
     @bindir@/co-status
@@ -565,7 +571,7 @@ _stop_service() {
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
     fi
-    sleep 1
+    sleep $tempo
 }
 
 _mksecs() {
