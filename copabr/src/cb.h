@@ -86,6 +86,8 @@ struct	cords_provisioning
 	char			* instID;
 	struct	occi_response 	* instance;
 	struct	xml_element 	* document;
+	struct	cords_placement_criteria * placement;
+	struct	cords_guarantee_criteria * warranty;
 	int			nodes;
 };
 

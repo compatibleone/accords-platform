@@ -85,6 +85,59 @@ public	int	get_provisioning_status()
 	return( provisioning_status );
 }
 
+/*	--------------------------------------------------------	*/
+/*	l i b e r a t e _ p l a c e m e n t _ c o n d i t i o n		*/
+/*	--------------------------------------------------------	*/
+private	void	liberate_placement_conditions(
+		struct cords_placement_criteria * placement )
+{
+	if ( placement )
+	{
+		if ( placement->algorithm )
+			placement->algorithm = liberate( placement->algorithm );
+		if ( placement->operator )
+			placement->operator = liberate( placement->operator );
+		if ( placement->zone )
+			placement->zone = liberate( placement->zone );
+		if ( placement->opinion )
+			placement->opinion = liberate( placement->opinion );
+		if ( placement->energy )
+			placement->energy = liberate( placement->energy );
+		if ( placement->security )
+			placement->security = liberate( placement->security );
+		if ( placement->price )
+			placement->price = liberate( placement->price );
+	}
+	return;
+}
+
+/*	----------------------------------------------------------	*/
+/*	   l i b e r t e _ g u a r a n t e e _ e l e m e n t 		*/
+/*	----------------------------------------------------------	*/
+private	struct cords_guarantee_element * liberate_guarantee_element( struct cords_guarantee_element * eptr )
+{
+	if ( eptr )
+	{
+		if ( eptr->reference )
+			eptr->reference = liberate( eptr->reference );
+		if ( eptr->obligated )
+			eptr->obligated = liberate( eptr->obligated );
+		if ( eptr->condition )
+			eptr->condition = liberate( eptr->condition );
+		if ( eptr->property )
+			eptr->property = liberate( eptr->property );
+		if ( eptr->objective )
+			eptr->objective = liberate( eptr->objective );
+		if ( eptr->scope )
+			eptr->scope = liberate( eptr->scope );
+		if ( eptr->importance )
+			eptr->importance = liberate( eptr->importance );
+		eptr = liberate( eptr );
+	}
+	return((struct cords_guarantee_element *) 0);
+}
+
+
 /*	-------------------------------------------------------		*/
 /*	t e r m i n a t e _ c o r d s _ p r o v i s i o n i n g		*/
 /*	-------------------------------------------------------		*/
@@ -95,6 +148,7 @@ private	char * 	cords_terminate_provisioning(
 		struct cords_provisioning * pptr )
 {
 	char * service=(char *) 0;
+	struct cords_guarantee_element * gptr;
 
 	if ( pptr->confID )
 		pptr->confID = liberate( pptr->confID );
@@ -142,6 +196,19 @@ private	char * 	cords_terminate_provisioning(
 	else if ( pptr->instID )
 		pptr->instID = liberate( pptr->instID );
 	
+	if ( pptr->placement )
+		liberate_placement_conditions( pptr->placement );
+
+	if ( pptr->warranty )
+	{
+		while ((gptr = pptr->warranty->first) != (struct cords_guarantee_element *) 0)
+		{
+			pptr->warranty->first = gptr->next;
+			liberate_guarantee_element( gptr );
+		}
+		pptr->warranty->last = pptr->warranty->first;
+	}
+
 	return( service );
 }
 
@@ -3065,32 +3132,6 @@ private	struct cords_guarantee_element * allocate_guarantee_element( struct cord
 	}
 }
 
-/*	----------------------------------------------------------	*/
-/*	   l i b e r t e _ g u a r a n t e e _ e l e m e n t 		*/
-/*	----------------------------------------------------------	*/
-private	struct cords_guarantee_element * liberate_guarantee_element( struct cords_guarantee_element * eptr )
-{
-	if ( eptr )
-	{
-		if ( eptr->reference )
-			eptr->reference = liberate( eptr->reference );
-		if ( eptr->obligated )
-			eptr->obligated = liberate( eptr->obligated );
-		if ( eptr->condition )
-			eptr->condition = liberate( eptr->condition );
-		if ( eptr->property )
-			eptr->property = liberate( eptr->property );
-		if ( eptr->objective )
-			eptr->objective = liberate( eptr->objective );
-		if ( eptr->scope )
-			eptr->scope = liberate( eptr->scope );
-		if ( eptr->importance )
-			eptr->importance = liberate( eptr->importance );
-		eptr = liberate( eptr );
-	}
-	return((struct cords_guarantee_element *) 0);
-}
-
 /*	-------------------------------------------------	*/
 /*	c o r d s _ p l a c e m e n t _ c o n d i t i o n	*/
 /*	-------------------------------------------------	*/
@@ -3542,6 +3583,8 @@ public	char *	cords_service_broker(
 	memset(&CbC,0, sizeof( struct cords_provisioning ) );
 	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
 	memset(&CgC,0, sizeof( struct cords_guarantee_criteria ) );
+	CbC.placement = &CpC;
+	CbC.warranty  = &CgC;
 
 	if ( check_verbose() )
 		printf("   CORDS Service Broker ( %s ) Phase 1 : Preparation \n", agent);
