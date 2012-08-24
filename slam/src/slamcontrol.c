@@ -390,7 +390,7 @@ private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, ch
 	{
 		*data = dptr->value;
 
-		if (((dptr = occi_locate_element( message->first, "occi.packet.data" )) != (struct occi_element *) 0)
+		if (((dptr = occi_locate_element( message->first, "occi.packet.sequence" )) != (struct occi_element *) 0)
 		&&  ( rest_valid_string( dptr->value ) != 0 ))
 			*sequence = atoi( dptr->value );
 

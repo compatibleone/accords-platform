@@ -132,15 +132,17 @@ public	int	rest_normalise_value( char * sptr, int normal )
 
 	value = atoi(sptr);
 
-	while (( *sptr >= '0' ) && ( *sptr <= '9' ) && ( *sptr == '.') && (*sptr == ' ')) sptr++;
+	while ( (( *sptr >= '0' ) && ( *sptr <= '9' )) || ( *sptr == '.') || (*sptr == ' ')) sptr++;
 
-	if ( *sptr == 'T' )
+	if (( *sptr == 'T' ) || ( *sptr == 't' ))
 		factor = 1000000000;
-	else if ( *sptr == 'G' )
+	else if (( *sptr == 'G' ) || ( *sptr == 'g' ))
 		factor = 1000000;
-	else if ( *sptr == 'M' )
+	else if (( *sptr == 'M' ) || ( *sptr == 'm' ))
 		factor = 1000;
-	else if ( *sptr == 'K' )
+	else if (( *sptr == 'K' ) || ( *sptr == 'k' ))
+		factor = 1;
+	else if (( *sptr == 'U' ) || ( *sptr == 'u' ))
 		factor = 1;
 	else if ( *sptr == 0x0025 )
 		factor = 1;
