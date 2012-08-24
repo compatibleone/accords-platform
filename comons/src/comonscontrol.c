@@ -1,5 +1,5 @@
-#ifndef	_slamcontrol_c
-#define	_slamcontrol_c
+#ifndef	_comonscontrol_c
+#define	_comonscontrol_c
 
 #define	_CONTROL_SIGNAL SIGKILL
 
@@ -195,7 +195,7 @@ private	void	issue_control_reward( struct cords_control * pptr, char * packet, s
 	/* ---------------------------------------------- */
 	/* invoke the business values of the penalty type */
 	/* ---------------------------------------------- */
-	invoke_business_values( _CORDS_PENALTY, pptr, packet, message, data, sequence );
+	invoke_business_values( _CORDS_REWARD, pptr, packet, message, data, sequence );
 
 	/* ------------------------ */
 	/* simply delete the packet */
@@ -645,7 +645,7 @@ private	struct rest_response * stop_control(
 	}		
 }
 
-	/* -------------- */
-#endif	/* _slamcontrol_c */
-	/* -------------- */
+	/* ---------------- */
+#endif	/* _comonscontrol_c */
+	/* ---------------- */
 

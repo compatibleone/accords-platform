@@ -139,7 +139,6 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 /* 	  actions and methods required for the slam instance category		*/
 /*	------------------------------------------------------------------	*/
 #include "comonsconnection.c"
-#include "slamcontrol.c"
 #include "penalty.c"
 #include "occipenalty.c"
 
@@ -208,19 +207,6 @@ private	int	slam_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
-
-	if (!( optr = occi_cords_control_builder( Slam.domain, _CORDS_CONTROL ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
-
-	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_control)))
-		return( 27 );
-	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_control)))
-		return( 27 );
 
 	if (!( optr = comons_connection_builder( Slam.domain ) ))
 		return( 27 );

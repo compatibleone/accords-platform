@@ -75,6 +75,7 @@
 #define	_CORDS_SLA		"sla"
 #define	_CORDS_VARIABLE		"variable"
 #define	_CORDS_PENALTY		"penalty"
+#define	_CORDS_REWARD		"reward"
 #define	_CORDS_CONDITIONS	"conditions"
 #define	_CORDS_PROPERTY		"property"
 #define	_CORDS_GUARANTEE	"guarantee"

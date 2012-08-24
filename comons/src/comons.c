@@ -142,6 +142,7 @@ private	struct rest_extension * comons_extension( void * v,struct rest_server * 
 #include "comonssession.c"
 #include "comonsevent.c"
 #include "comonsmonitor.c"
+#include "comonscontrol.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o m o n s _ o p e r a t i o n				*/
@@ -169,6 +170,22 @@ private	int	comons_operation( char * nptr )
 	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_monitor)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_monitor)))
+		return( 27 );
+
+	/* -------------------------------------- */
+	/* monitoring control category management */
+	/* -------------------------------------- */
+	if (!( optr = occi_cords_control_builder( Comons.domain, _CORDS_CONTROL ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_control)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_control)))
 		return( 27 );
 
 	/* ------------------------------------ */
