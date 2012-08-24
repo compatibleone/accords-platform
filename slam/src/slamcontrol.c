@@ -3,6 +3,8 @@
 
 #define	_CONTROL_SIGNAL SIGKILL
 
+#include "cb.h"
+
 /*	---------------------------------------------------	*/
 /*	     p u r g e _ c o n t r o l _ p a c k e t s		*/
 /*	---------------------------------------------------	*/
@@ -71,23 +73,129 @@ private	void	purge_control_packets(struct cords_control * pptr, char * packets, 
 }
 
 /*	--------------------------------------------------------	*/
+/*	      e x e c u t e _ b u s i n e s s _ v a l u e  		*/
+/*	--------------------------------------------------------	*/
+private	void	execute_business_value( 
+		char * expression,
+		char * nature, 
+		struct occi_response * guarantee,
+		struct occi_response * business,
+		char * packetid, 
+		struct occi_response * message, 
+		char * packetdata, 
+		int sequence )
+{
+	char 	buffer[4096];
+	if (!( expression ))
+		return;
+	else if (!( strncasecmp( expression, "cordscript:", strlen("cordscript:")  ) ))
+	{
+		sprintf(buffer,"sla %s seq=%u",nature,sequence);
+		rest_log_message( buffer );
+		rest_log_message( expression );
+		return;
+	}
+	else
+	{
+		sprintf(buffer,"sla %s seq=%u ",nature,sequence);
+		rest_log_message( buffer );
+		rest_log_message( expression );
+		return;
+	}
+
+}
+
+/*	--------------------------------------------------------	*/
+/*		i n v o k e _ b u s i n e s s _ v a l u e s 		*/
+/*	--------------------------------------------------------	*/
+private	void	invoke_business_values( char * nature, struct cords_control * pptr, char * packet, struct occi_response * message, char * data, int sequence )
+{
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	struct	occi_element 	* eptr;
+	struct	occi_element 	* dptr;
+	char *	sptr;
+
+	/* ----------------------------------------------------- */
+	/* retrieve the list of business values defined for the  */
+	/* guarantee indicated by the control reference property */
+	/* ----------------------------------------------------- */
+	if (!( rest_valid_string( pptr->reference )))
+		return;
+	else if (!( zptr = occi_simple_get( pptr->reference, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return;
+	else
+	{
+		/* ----------------------------------- */
+		/* for each business value in the list */
+		/* ----------------------------------- */
+		for (	eptr = cords_first_link( zptr );
+			eptr != (struct occi_element *) 0;
+			eptr = cords_next_link( eptr ))
+		{
+			if (!( eptr->value ))
+				continue;
+			else if (!( sptr =  occi_unquoted_link( eptr->value ) ))
+				continue;
+			else if (!( yptr = occi_simple_get( sptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			{
+				liberate( sptr );
+				continue;
+			}
+			else if (!( dptr = occi_locate_element( yptr->first, "occi.business.nature" ) ))
+			{
+				yptr = occi_remove_response( yptr );
+				liberate( sptr );
+				continue;
+			}
+			else if (!( dptr->value ))
+			{
+				yptr = occi_remove_response( yptr );
+				liberate( sptr );
+				continue;
+			}
+			else if ( strcasecmp( dptr->value, nature ) != 0)
+			{
+				yptr = occi_remove_response( yptr );
+				liberate( sptr );
+				continue;
+			}
+			else if (!( dptr = occi_locate_element( yptr->first, "occi.business.expression" ) ))
+			{
+				yptr = occi_remove_response( yptr );
+				liberate( sptr );
+				continue;
+			}
+			else
+			{
+				/* --------------------------------------- */
+				/* we now have a business value expression */
+				/* of the right kind that needs evaluated  */
+				/* --------------------------------------- */
+				execute_business_value( dptr->value, nature, zptr, yptr, packet, message, data, sequence );
+				yptr = occi_remove_response( yptr );
+				liberate( sptr );
+				continue;
+			}
+		}
+		return;
+	}
+}
+
+/*	--------------------------------------------------------	*/
 /*		i s s u e _ c o n t r o l _ r e w a r d			*/
 /*	--------------------------------------------------------	*/
-private	void	issue_control_reward( struct cords_control * pptr, char * packet, struct occi_response * message, char * data )
+private	void	issue_control_reward( struct cords_control * pptr, char * packet, struct occi_response * message, char * data, int sequence )
 {
 	struct	occi_response * zptr;
 	char	buffer[208];
 
-	/* ----------------------------------- */
-	/* TODO : Scan list of Business Values */
-	/* to detect the penalties inccured by */
-	/* the obligated party for failure to  */
-	/* comply with objectives.             */
-	/* ----------------------------------- */
-	/* for now we simply delete the packet */
-	/* ----------------------------------- */
-
 	sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
+
+	/* ---------------------------------------------- */
+	/* invoke the business values of the penalty type */
+	/* ---------------------------------------------- */
+	invoke_business_values( _CORDS_PENALTY, pptr, packet, message, data, sequence );
 
 	/* ------------------------ */
 	/* simply delete the packet */
@@ -108,7 +216,7 @@ private	void	issue_control_reward( struct cords_control * pptr, char * packet, s
 /*	--------------------------------------------------------	*/
 /*		i s s u e _ c o n t r o l _ p e n a l t y 		*/
 /*	--------------------------------------------------------	*/
-private	void	issue_control_penalty( struct cords_control * pptr, char * packet, struct occi_response * message, char * data )
+private	void	issue_control_penalty( struct cords_control * pptr, char * packet, struct occi_response * message, char * data, int sequence )
 {
 	struct	occi_response * zptr;
 	struct	occi_element * dptr;
@@ -116,10 +224,17 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	char	buffer[2048];
 	char	penalty[2048];
 	char	now[64];
+	char	what[64];
 
-	sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
-	sprintf(penalty, "%s/%s/",get_identity(),_CORDS_PENALTY);
-	sprintf(now,"%lu",time((long*) 0));
+	sprintf(buffer, "%s/%s/%s"	,get_identity(),_CORDS_CONTROL,pptr->id);
+	sprintf(penalty,"%s/%s/"	,get_identity(),_CORDS_PENALTY);
+	sprintf(what,	"%u"		,sequence);
+	sprintf(now,	"%lu"		,time((long*) 0));
+
+	/* ---------------------------------------------- */
+	/* invoke the business values of the penalty type */
+	/* ---------------------------------------------- */
+	invoke_business_values( _CORDS_PENALTY, pptr, packet, message, data, sequence );
 
 	/* --------------------------------------------------------------------- */
 	/* create a penalty category instance to show the arrival of the penalty */
@@ -127,8 +242,9 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	if ((!( dptr = occi_create_element(       "occi.penalty.account",    	pptr->account	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.agreement",  	pptr->agreement	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.contract",	pptr->contract	) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.control", 	buffer		) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.sequence", 	what		) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.data", 		data		) )))
 	{
 		message = occi_remove_response( message );
@@ -152,7 +268,6 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 		return;
 	}
 	else	zptr = occi_remove_response( zptr );
-
 
 	/* ------------------------ */
 	/* - delete link from probe */
@@ -184,51 +299,63 @@ private	int	compare_packet_data( int compare, char * lptr, char * rptr )
 {
 	int	result=0;
 	char *	vptr;
+	int	lvalue=0;
+	int	rvalue=0;
 
+	/* -------------------------------- */
+	/* normalise the probe sample value */
+	/* -------------------------------- */
 	vptr = lptr;
 	while ( *vptr == ' ' ) vptr++;
+	lvalue = rest_normalise_value( vptr, 'U' );		
 
+	/* -------------------------------- */
+	/* normalise the sl objective value */
+	/* -------------------------------- */
+	vptr = rptr;
+	while ( *vptr == ' ' ) vptr++;
+	rvalue = rest_normalise_value( vptr, 'U' );		
+		
+	liberate( lptr );
+
+	/* ------------------------------- */
+	/* evaluate conditional expression */
+	/* ------------------------------- */
 	switch ( compare )
 	{
 	case	1 :
-		if ( atoi(vptr) == atoi( rptr ) )
-			result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue == rvalue )
+			return(1);
+		else	return(0);
 	case	6 :
-		if ( atoi(vptr) != atoi( rptr ) )
-			result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue != rvalue )
+			return(1);
+		else	return(0);
 	case	2 :
-		if ( atoi(vptr) > atoi( rptr ) )
-			result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue > rvalue )
+			return(1);
+		else	return(0);
 	case	5 :
-		if ( atoi(vptr) <= atoi( rptr ) )
-				result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue <= rvalue )
+			return(1);
+		else	return(0);
 	case	4 :
-		if ( atoi(vptr) < atoi( rptr ) )
-			result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue < rvalue )
+			return(1);
+		else	return(0);
 	case	3 :
-		if ( atoi(vptr) >= atoi( rptr ) )
-			result = 1;
-		else	result = 0;
-		break;
+		if ( lvalue >= rvalue )
+			return(1);
+		else	return(0);
+	default	:
+		return(0);
 	}
-	liberate( lptr );
-	return( result );
 }
 
 /*	---------------------------------------------------	*/
 /*		e v a l u a t e _ p a c k e t _ d a t a		*/
 /*	---------------------------------------------------	*/
-private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, char ** data, struct occi_response * message )
+private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, char ** data, int * sequence, struct occi_response * message )
 {
 	struct	occi_element * dptr;
 	char *	vptr;
@@ -237,6 +364,7 @@ private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, ch
 	char *	cptr;
 
 	*data = (char *) 0;
+	*sequence = 0;
 
 	/* -------------------------------------------------- */
 	/* the packet is ok if the evaluation is not possible */
@@ -261,6 +389,10 @@ private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, ch
 	else
 	{
 		*data = dptr->value;
+
+		if (((dptr = occi_locate_element( message->first, "occi.packet.data" )) != (struct occi_element *) 0)
+		&&  ( rest_valid_string( dptr->value ) != 0 ))
+			*sequence = atoi( dptr->value );
 
 		if ((!( strcasecmp( cptr, "eq" ) ))
 		||  (!( strcasecmp( cptr, "equal" ) )))
@@ -304,6 +436,7 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 	struct	occi_element  * dptr;
 	char *	vptr;
 	char *	data=(char *) 0;
+	int	sequence=0;
 
 	if (!( kptr = occi_create_client( packets, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return;
@@ -347,9 +480,9 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 
 			/* evaluate packet data to be true */
 			/* ------------------------------- */
-			else if ( evaluate_packet_data( pptr, eptr->value, &data, zptr ) )
-				issue_control_reward( pptr, eptr->value, zptr, data );
-			else	issue_control_penalty( pptr, eptr->value, zptr, data );
+			else if ( evaluate_packet_data( pptr, eptr->value, &data, &sequence, zptr ) )
+				issue_control_reward( pptr, eptr->value, zptr, data, sequence );
+			else	issue_control_penalty( pptr, eptr->value, zptr, data, sequence );
 
 		}				
 		yptr = occi_remove_response( yptr );

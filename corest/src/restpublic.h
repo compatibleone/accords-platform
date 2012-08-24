@@ -121,6 +121,7 @@ public	int	rest_valid_string_value( char * sptr, char * vptr );
 public	char *	rest_encode_html( char * sptr );
 public	char *	rest_decode_html( char * sptr );
 public	int	rest_server_signal();
+public	int	rest_normalise_value( char * sptr, int factor );
 
 #endif	/* _restpublic_h */
 	/* ------------- */

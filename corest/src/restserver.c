@@ -101,6 +101,53 @@ public	int	rest_valid_string_value( char * sptr, char *vptr  )
 	else	return( 0 );
 }
 
+/*	---------------------------------------------------	*/
+/*		r e s t _ n o r m a l i s e _ v a l u e 	*/
+/*	---------------------------------------------------	*/
+/*	this function takes a value string as its parameter	*/
+/*	which may or not be terminated by a T,G,M,K which	*/
+/*	indicates an explicite quantity. A default quantity	*/
+/*	type is passed as the second parameter to be used	*/
+/*	in case no explicite value is present.			*/
+/*	The function returns the normalisation of the value	*/
+/*	---------------------------------------------------	*/
+public	int	rest_normalise_value( char * sptr, int normal )
+{
+	int	factor=1;
+	int	value=0;
+
+	if ( normal == 'T' )
+		factor = 1000000000;
+	else if ( normal == 'G' )
+		factor = 1000000;
+	else if ( normal == 'M' )
+		factor = 1000;
+	else if ( normal == 'K' )
+		factor = 1;
+	else if ( normal == 'U' )
+		factor = 1;
+	else if ( normal == 0x0025 )
+		factor = 1;
+	else	factor = 1;
+
+	value = atoi(sptr);
+
+	while (( *sptr >= '0' ) && ( *sptr <= '9' ) && ( *sptr == '.') && (*sptr == ' ')) sptr++;
+
+	if ( *sptr == 'T' )
+		factor = 1000000000;
+	else if ( *sptr == 'G' )
+		factor = 1000000;
+	else if ( *sptr == 'M' )
+		factor = 1000;
+	else if ( *sptr == 'K' )
+		factor = 1;
+	else if ( *sptr == 0x0025 )
+		factor = 1;
+
+	return( value * factor );
+}
+
 /*	------------------------------------------------	*/
 /*		r e s t _ h t t p _ p r e f i x 		*/
 /*	------------------------------------------------	*/

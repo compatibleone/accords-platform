@@ -143,46 +143,6 @@ private	char *	az_normalise_name( char * wptr, int maxlength )
 	return( sptr );
 }
 
-/*	---------------------------------------------------	*/
-/*		o s _ n o r m a l i s e _ v a l u e 		*/
-/*	---------------------------------------------------	*/
-/*	this function takes a value string as its parameter	*/
-/*	which may or not be terminated by a T,G,M,K which	*/
-/*	indicates an explicite quantity. A default quantity	*/
-/*	type is passed as the second parameter to be used	*/
-/*	in case no explicite value is present.			*/
-/*	The function returns the normalisation of the value	*/
-/*	---------------------------------------------------	*/
-private	int	az_normalise_value( char * sptr, int normal )
-{
-	int	factor=1;
-	int	value=0;
-	if ( normal == 'T' )
-		factor = 1000000000;
-	else if ( normal == 'G' )
-		factor = 1000000;
-	else if ( normal == 'M' )
-		factor = 1000;
-	else if ( normal == 'K' )
-		factor = 1;
-	else	factor = 1;
-
-	value = atoi(sptr);
-
-	while (( *sptr >= '0' ) && ( *sptr <= '9' )) sptr++;
-
-	if ( *sptr == 'T' )
-		factor = 1000000000;
-	else if ( *sptr == 'G' )
-		factor = 1000000;
-	else if ( *sptr == 'M' )
-		factor = 1000;
-	else if ( *sptr == 'K' )
-		factor = 1;
-
-	return( value * factor );
-}
-
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ w i n d o w s a z u r e _ f l a v o r 		*/
@@ -199,22 +159,22 @@ private	char *	resolve_windowsazure_flavor( struct cords_az_contract * cptr )
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
-	else	request.memory = az_normalise_value( vptr,'G' );
+	else	request.memory = rest_normalise_value( vptr,'G' );
 
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_CORES ) ))
 		request.cores = 0;
-	else	request.cores = az_normalise_value( vptr,'U' );
+	else	request.cores = rest_normalise_value( vptr,'U' );
 
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_SPEED ) ))
 		request.speed = 0;
-	else	request.speed = az_normalise_value(vptr,'G');
+	else	request.speed = rest_normalise_value(vptr,'G');
 	
 	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
-	else	request.storage = az_normalise_value(vptr,'G');
+	else	request.storage = rest_normalise_value(vptr,'G');
 
 	if (!( wptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
