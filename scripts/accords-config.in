@@ -75,7 +75,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-paasprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
