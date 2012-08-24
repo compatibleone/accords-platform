@@ -102,12 +102,7 @@ private	struct rest_response * stop_monitor(
 				liberate( wptr );
 				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 801, "Control Stop Failure" ) );
-				else
-				{
-					zptr = occi_remove_response( zptr );
-					if (( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-						zptr = occi_remove_response( zptr );
-				}
+				else	zptr = occi_remove_response( zptr );
 			}
 		}
 		pptr->state = 0;
@@ -122,4 +117,5 @@ private	struct rest_response * stop_monitor(
 	/* ---------------- */
 #endif	/* _comonsmonitor_c */
 	/* ---------------- */
+
 
