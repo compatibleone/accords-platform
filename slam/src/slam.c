@@ -201,7 +201,7 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback = (void *) 0;
 
-	if (!( optr = occi_cords_control_builder( Slam.domain, _CORDS_CONTROL ) ))
+	if (!( optr = occi_cords_penalty_builder( Slam.domain, _CORDS_PENALTY ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -209,7 +209,7 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_penalty_builder( Slam.domain, _CORDS_PENALTY ) ))
+	if (!( optr = occi_cords_control_builder( Slam.domain, _CORDS_CONTROL ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
