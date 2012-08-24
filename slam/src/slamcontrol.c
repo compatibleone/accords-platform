@@ -118,7 +118,7 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	char	now[64];
 
 	sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
-	sprintf(penalty, "%s/%s/%s",get_identity(),_CORDS_PENALTY);
+	sprintf(penalty, "%s/%s/",get_identity(),_CORDS_PENALTY);
 	sprintf(now,"%lu",time((long*) 0));
 
 	/* --------------------------------------------------------------------- */
