@@ -111,19 +111,46 @@ private	void	issue_control_reward( struct cords_control * pptr, char * packet, s
 private	void	issue_control_penalty( struct cords_control * pptr, char * packet, struct occi_response * message )
 {
 	struct	occi_response * zptr;
-	char	buffer[208];
+	struct	occi_element * dptr;
+	char *	ihost;
+	char	buffer[2048];
+	char	now[64];
 
 	sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
+	sprintf(now,"%lu",time((long*) 0));
 
-	/* ----------------------------------- */
-	/* TODO : Scan list of Business Values */
-	/* to detect the penalties inccured by */
-	/* the obligated party for failure to  */
-	/* comply with objectives.             */
-	/* ----------------------------------- */
-	/* for now we just link the offending  */
-	/* data packet to the control.	       */
-	/* ----------------------------------- */
+	/* --------------------------------------------------------------------- */
+	/* create a penalty category instance to show the arrival of the penalty */
+	/* --------------------------------------------------------------------- */
+	if ((!( dptr = occi_create_element(       "occi.penalty.account",    	pptr->account	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.agreement",  	pptr->agreement	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.contract",	pptr->contract	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.control", 	buffer		) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.packet", 	packet		) )))
+	{
+		message = occi_remove_response( message );
+		return;
+	}
+	else if (!( zptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		message = occi_remove_response( message );
+		return;
+	}
+	else if (!( ihost = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		message = occi_remove_response( message );
+		return;
+	}
+	else if (!( ihost = allocate_string( ihost ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		message = occi_remove_response( message );
+		return;
+	}
+	else	zptr = occi_remove_response( zptr );
+
 
 	/* ------------------------ */
 	/* - delete link from probe */
@@ -134,9 +161,10 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	/* ------------------------ */
 	/* - create link to control */
 	/* ------------------------ */
-	if ((zptr = occi_create_link( buffer, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+	if ((zptr = occi_create_link( buffer, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		zptr = occi_remove_response( zptr );
 
+	ihost = liberate( ihost );
 	message = occi_remove_response( message );
 	return;
 }

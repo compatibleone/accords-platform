@@ -845,6 +845,8 @@ public	char *	rest_decode_html( char * sptr )
 	{
 		if (!( c = ( *(sptr++) & 0x00FF ) ))
 			break;
+		else if ( c == '+' )
+			*(wptr++) = ' ';
 		else if ( c != '%' )
 			*(wptr++) = c;
 		else

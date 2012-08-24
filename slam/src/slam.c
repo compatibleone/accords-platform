@@ -140,6 +140,8 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 /*	------------------------------------------------------------------	*/
 #include "comonsconnection.c"
 #include "slamcontrol.c"
+#include "penalty.c"
+#include "occipenalty.c"
 
 /*	------------------------------------------------------------------	*/
 /*			s l a m _ o p e r a t i o n				*/
@@ -200,6 +202,14 @@ private	int	slam_operation( char * nptr )
 	optr->callback = (void *) 0;
 
 	if (!( optr = occi_cords_control_builder( Slam.domain, _CORDS_CONTROL ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_cords_penalty_builder( Slam.domain, _CORDS_PENALTY ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

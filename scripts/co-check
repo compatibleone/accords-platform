@@ -124,6 +124,7 @@ function verification()
 	check	guarantee	slam
 	check	business	slam
 	check	control		slam
+	check	penalty		slam
 
 	check	openstack	osprocci
 	check	opennebula	onprocci
