@@ -95,11 +95,15 @@ function verification()
 	check	instruction	parser
 	check	firewall	conets
 	check	authorization	coss
-	check	session		comons
 
 	check	provider	broker
 	check	profile 	broker
+
+	check	monitor		comons
+	check	session		comons
 	check	consumer	comons
+	check	event		comons
+	check	alert		comons
 
 	check	placement	coes
 	check	quota		coes
@@ -109,8 +113,6 @@ function verification()
 	check	vm		ezvm
 
 	check	application	coips
-	check	event		comons
-	check	alert		comons
 
 	check	price		coobas
 	check	invoice		coobas
@@ -121,6 +123,7 @@ function verification()
 	check	variable	slam
 	check	guarantee	slam
 	check	business	slam
+	check	control		slam
 
 	check	openstack	osprocci
 	check	opennebula	onprocci

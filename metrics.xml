@@ -2,15 +2,105 @@
 
 <import name="metrics" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
 
-<metric name="activity" period="60" samples="1" expression="top -b -n1 | grep users"/>
-<metric name="cpu" period="60" samples="1" expression="top -b -n1 | grep Cpu"/>
-<metric name="memory" period="60" samples="1" expression="top -b -n1 | grep Mem | grep total "/>
-<metric name="tasks" period="60" samples="1" expression="top -b -n1 | grep Tasks"/>
-<metric name="swap" period="60" samples="1" expression="top -b -n1 | grep Swap"/>
-<metric name="net:rx" period="60" samples="1" expression="ifconfig eth0 | grep RX"/>
-<metric name="net:tx" period="60" samples="1" expression="ifconfig eth0 | grep TX"/>
-<metric name="net:err" period="60" samples="1" expression="ifconfig eth0 | grep collisions"/>
-<metric name="net:status" period="60" samples="1" expression="ifconfig eth0 | grep Metric"/>
+<metric name="activity" period="60" samples="1" 
+	expression="top -b -n1 | grep users"/>
+
+<metric name="net:stat:listen" period="60" samples="1"
+	expression="netstat -a | grep LISTEN | wc -l"/>
+
+<metric name="net:stat:established" period="60" samples="1"
+	expression="netstat -a | grep ESTABLISHED | wc -l"/>
+
+<metric name="net:stat:timewait" period="60" samples="1"
+	expression="netstat -a | grep TIME_WAIT | wc -l"/>
+
+<metric name="net:stat:tcp" period="60" samples="1"
+	expression="netstat -a | grep tcp | wc -l"/>
+
+<metric name="net:stat:udp" period="60" samples="1"
+	expression="netstat -a | grep udp | wc -l"/>
+
+<metric name="net:stat:unix" period="60" samples="1"
+	expression="netstat -a | grep unix | wc -l"/>
+
+<metric name="user:count" period="60" samples="1" 
+	expression="top -b -n1 | grep users | cut -f 2 -d , "/>
+
+<metric name="cpu" period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu"/>
+
+<metric name="cpu:speed" period="60" samples="1" 
+	expression="grep MHz /proc/cpuinfo  | cut -f 2 -d : "/>
+
+<metric name="cpu:cores" period="60" samples="1" 
+	expression="grep processor /proc/cpuinfo | wc -l"/>
+
+<metric name="cpu:vendor" period="60" samples="1" 
+	expression="grep vendor /proc/cpuinfo  | cut -f 2 -d : "/>
+
+<metric name="cpu:user" period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu | cut -f 1 -d , | cut -f 2 -d : "/>
+<metric name="cpu:system" period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu | cut -f 2 -d , "/>
+<metric name="cpu:active" period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu | cut -f 3 -d , "/>
+<metric name="cpu:idle"	period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu | cut -f 4 -d , "/>
+<metric name="cpu:wait" period="60" samples="1" 
+	expression="top -b -n1 | grep Cpu | cut -f 5 -d , "/>
+
+<metric name="memory" period="60" samples="1" 
+	expression="top -b -n1 | grep Mem | grep total"/>
+<metric name="memory:total" period="60" samples="1" 
+	expression="top -b -n1 | grep Mem | grep total | cut -f 1 -d , | cut -f 2 -d : "/>
+<metric name="memory:used" period="60" samples="1" 
+	expression="top -b -n1 | grep Mem | grep total | cut -f 2 -d "/>
+<metric name="memory:free" period="60" samples="1" 
+	expression="top -b -n1 | grep Mem | grep total | cut -f 3 -d "/>
+<metric name="memory:buffers" period="60" samples="1" 
+	expression="top -b -n1 | grep Mem | grep total | cut -f 4 -d "/>
+
+<metric name="tasks" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks"/>
+<metric name="tasks:total" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks | cut -f 1 -d , | cut -f 2 -d : "/>
+<metric name="tasks:running" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks | cut -f 2 -d "/>
+<metric name="tasks:sleeping" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks | cut -f 3 -d "/>
+<metric name="tasks:stopped" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks | cut -f 4 -d "/>
+<metric name="tasks:zombies" period="60" samples="1" 
+	expression="top -b -n1 | grep Tasks | cut -f 5 -d "/>
+
+<metric name="swap" period="60" samples="1" 
+	expression="top -b -n1 | grep Swap"/>
+<metric name="swap:total" period="60" samples="1" 
+	expression="top -b -n1 | grep Swap | cut -f 1 -d , | cut -f 2 -d : "/>
+<metric name="swap:used" period="60" samples="1"
+	expression="top -b -n1 | grep Swap cut -f 2 -d "/>
+<metric name="swap:free" period="60" samples="1" 
+	expression="top -b -n1 | grep Swap cut -f 3 -d "/>
+<metric name="swap:cached" period="60" samples="1" 
+	expression="top -b -n1 | grep Swap cut -f 4 -d "/>
+
+<metric name="net:eth0:rx" period="60" samples="1" 
+	expression="ifconfig eth0 | grep RX"/>
+<metric name="net:eth0:tx" period="60" samples="1" 
+	expression="ifconfig eth0 | grep TX"/>
+<metric name="net:eth0:err" period="60" samples="1" 
+	expression="ifconfig eth0 | grep collisions"/>
+<metric name="net:eth0:status" period="60" samples="1" 
+	expression="ifconfig eth0 | grep Metric"/>
+
+<metric name="net:lo:rx" period="60" samples="1" 
+	expression="ifconfig lo | grep RX"/>
+<metric name="net:lo:tx" period="60" samples="1" 
+	expression="ifconfig lo | grep TX"/>
+<metric name="net:lo:err" period="60" samples="1" 
+	expression="ifconfig lo | grep collisions"/>
+<metric name="net:lo:status" period="60" samples="1" 
+	expression="ifconfig lo | grep Metric"/>
 
 </import>
 
