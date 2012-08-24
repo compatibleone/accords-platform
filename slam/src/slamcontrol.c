@@ -114,9 +114,11 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	struct	occi_element * dptr;
 	char *	ihost;
 	char	buffer[2048];
+	char	penalty[2048];
 	char	now[64];
 
 	sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
+	sprintf(penalty, "%s/%s/%s",get_identity(),_CORDS_PENALTY);
 	sprintf(now,"%lu",time((long*) 0));
 
 	/* --------------------------------------------------------------------- */
@@ -132,7 +134,7 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 		message = occi_remove_response( message );
 		return;
 	}
-	else if (!( zptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( zptr = occi_simple_post( penalty, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		message = occi_remove_response( message );
 		return;
