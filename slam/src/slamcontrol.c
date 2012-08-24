@@ -73,7 +73,7 @@ private	void	purge_control_packets(struct cords_control * pptr, char * packets, 
 /*	--------------------------------------------------------	*/
 /*		i s s u e _ c o n t r o l _ r e w a r d			*/
 /*	--------------------------------------------------------	*/
-private	void	issue_control_reward( struct cords_control * pptr, char * packet, struct occi_response * message )
+private	void	issue_control_reward( struct cords_control * pptr, char * packet, struct occi_response * message, char * data )
 {
 	struct	occi_response * zptr;
 	char	buffer[208];
@@ -108,7 +108,7 @@ private	void	issue_control_reward( struct cords_control * pptr, char * packet, s
 /*	--------------------------------------------------------	*/
 /*		i s s u e _ c o n t r o l _ p e n a l t y 		*/
 /*	--------------------------------------------------------	*/
-private	void	issue_control_penalty( struct cords_control * pptr, char * packet, struct occi_response * message )
+private	void	issue_control_penalty( struct cords_control * pptr, char * packet, struct occi_response * message, char * data )
 {
 	struct	occi_response * zptr;
 	struct	occi_element * dptr;
@@ -129,7 +129,7 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.contract",	pptr->contract	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.penalty.control", 	buffer		) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.packet", 	packet		) )))
+	||  (!( dptr = occi_append_element( dptr, "occi.penalty.data", 		data		) )))
 	{
 		message = occi_remove_response( message );
 		return;
@@ -158,6 +158,12 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	/* - delete link from probe */
 	/* ------------------------ */
 	if ((zptr = occi_delete_link( pptr->probe, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
+
+	/* ------------------------ */
+	/* simply delete the packet */
+	/* ------------------------ */
+	if ((zptr = occi_simple_delete( packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		zptr = occi_remove_response( zptr );
 
 	/* ------------------------ */
@@ -222,13 +228,15 @@ private	int	compare_packet_data( int compare, char * lptr, char * rptr )
 /*	---------------------------------------------------	*/
 /*		e v a l u a t e _ p a c k e t _ d a t a		*/
 /*	---------------------------------------------------	*/
-private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, struct occi_response * message )
+private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, char ** data, struct occi_response * message )
 {
 	struct	occi_element * dptr;
 	char *	vptr;
 	char *	sptr;
 	char *	optr;
 	char *	cptr;
+
+	*data = (char *) 0;
 
 	/* -------------------------------------------------- */
 	/* the packet is ok if the evaluation is not possible */
@@ -252,6 +260,7 @@ private	int	evaluate_packet_data( struct cords_control * pptr, char * packet, st
 		return( 1 );
 	else
 	{
+		*data = dptr->value;
 
 		if ((!( strcasecmp( cptr, "eq" ) ))
 		||  (!( strcasecmp( cptr, "equal" ) )))
@@ -294,6 +303,7 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 	struct	occi_element  * eptr;
 	struct	occi_element  * dptr;
 	char *	vptr;
+	char *	data=(char *) 0;
 
 	if (!( kptr = occi_create_client( packets, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return;
@@ -337,9 +347,9 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 
 			/* evaluate packet data to be true */
 			/* ------------------------------- */
-			else if ( evaluate_packet_data( pptr, eptr->value, zptr ) )
-				issue_control_reward( pptr, eptr->value, zptr );
-			else	issue_control_penalty( pptr, eptr->value, zptr );
+			else if ( evaluate_packet_data( pptr, eptr->value, &data, zptr ) )
+				issue_control_reward( pptr, eptr->value, zptr, data );
+			else	issue_control_penalty( pptr, eptr->value, zptr, data );
 
 		}				
 		yptr = occi_remove_response( yptr );

@@ -9,7 +9,8 @@ struct	cords_penalty
 	char *	agreement;
 	char *	contract;
 	char *	control;
-	char *	packet;
+	char *	data;
+	int	sequence;
 	int	timestamp;
 	int	state;
 };

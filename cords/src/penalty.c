@@ -43,8 +43,8 @@ public struct cords_penalty * liberate_cords_penalty(struct cords_penalty * sptr
 			 sptr->contract = liberate(sptr->contract);
 		if ( sptr->control )
 			 sptr->control = liberate(sptr->control);
-		if ( sptr->packet )
-			 sptr->packet = liberate(sptr->packet);
+		if ( sptr->data )
+			 sptr->data = liberate(sptr->data);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_penalty *) 0);
@@ -64,7 +64,8 @@ public struct cords_penalty * reset_cords_penalty(struct cords_penalty * sptr)
 		sptr->agreement = (char*) 0;
 		sptr->contract = (char*) 0;
 		sptr->control = (char*) 0;
-		sptr->packet = (char*) 0;
+		sptr->data = (char*) 0;
+		sptr->sequence =  0;
 		sptr->timestamp =  0;
 		sptr->state =  0;
 	}
@@ -117,9 +118,13 @@ public int xmlin_cords_penalty(struct cords_penalty * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->control = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"packet") ))
+		else if (!( strcmp(wptr->name,"data") ))
 		{
-			if ( wptr->value ) { sptr->packet = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->data = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"sequence") ))
+		{
+			if ( wptr->value ) { sptr->sequence = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"timestamp") ))
 		{
@@ -149,7 +154,8 @@ public int rest_occi_cords_penalty(FILE * fh,struct cords_penalty * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contract='%s'\r\n",prefix,nptr,(sptr->contract?sptr->contract:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.control='%s'\r\n",prefix,nptr,(sptr->control?sptr->control:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.packet='%s'\r\n",prefix,nptr,(sptr->packet?sptr->packet:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.data='%s'\r\n",prefix,nptr,(sptr->data?sptr->data:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.sequence='%u'\r\n",prefix,nptr,sptr->sequence);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.timestamp='%u'\r\n",prefix,nptr,sptr->timestamp);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

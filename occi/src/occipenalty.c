@@ -145,8 +145,10 @@ private void autoload_cords_penalty_nodes() {
 				pptr->contract = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "control" )) != (struct xml_atribut *) 0)
 				pptr->control = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "packet" )) != (struct xml_atribut *) 0)
-				pptr->packet = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "data" )) != (struct xml_atribut *) 0)
+				pptr->data = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "sequence" )) != (struct xml_atribut *) 0)
+				pptr->sequence = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "timestamp" )) != (struct xml_atribut *) 0)
 				pptr->timestamp = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -193,8 +195,11 @@ public  void autosave_cords_penalty_nodes() {
 		fprintf(h," control=%c",0x0022);
 		fprintf(h,"%s",(pptr->control?pptr->control:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," packet=%c",0x0022);
-		fprintf(h,"%s",(pptr->packet?pptr->packet:""));
+		fprintf(h," data=%c",0x0022);
+		fprintf(h,"%s",(pptr->data?pptr->data:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," sequence=%c",0x0022);
+		fprintf(h,"%u",pptr->sequence);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," timestamp=%c",0x0022);
 		fprintf(h,"%u",pptr->timestamp);
@@ -233,8 +238,10 @@ private void set_cords_penalty_field(
 			pptr->contract = allocate_string(vptr);
 		if (!( strcmp( nptr, "control" ) ))
 			pptr->control = allocate_string(vptr);
-		if (!( strcmp( nptr, "packet" ) ))
-			pptr->packet = allocate_string(vptr);
+		if (!( strcmp( nptr, "data" ) ))
+			pptr->data = allocate_string(vptr);
+		if (!( strcmp( nptr, "sequence" ) ))
+			pptr->sequence = atoi(vptr);
 		if (!( strcmp( nptr, "timestamp" ) ))
 			pptr->timestamp = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -305,13 +312,14 @@ private int pass_cords_penalty_filter(
 		else if ( strcmp(pptr->control,fptr->control) != 0)
 			return(0);
 		}
-	if (( fptr->packet )
-	&&  (strlen( fptr->packet ) != 0)) {
-		if (!( pptr->packet ))
+	if (( fptr->data )
+	&&  (strlen( fptr->data ) != 0)) {
+		if (!( pptr->data ))
 			return(0);
-		else if ( strcmp(pptr->packet,fptr->packet) != 0)
+		else if ( strcmp(pptr->data,fptr->data) != 0)
 			return(0);
 		}
+	if (( fptr->sequence ) && ( pptr->sequence != fptr->sequence )) return(0);
 	if (( fptr->timestamp ) && ( pptr->timestamp != fptr->timestamp )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -344,7 +352,10 @@ private struct rest_response * cords_penalty_occi_response(
 	sprintf(cptr->buffer,"%s.%s.control=%s",optr->domain,optr->id,pptr->control);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.packet=%s",optr->domain,optr->id,pptr->packet);
+	sprintf(cptr->buffer,"%s.%s.data=%s",optr->domain,optr->id,pptr->data);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.sequence=%u",optr->domain,optr->id,pptr->sequence);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.timestamp=%u",optr->domain,optr->id,pptr->timestamp);
@@ -780,7 +791,9 @@ public struct occi_category * occi_cords_penalty_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "control",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "packet",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "data",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "sequence",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "timestamp",0,0) ))
 			return(optr);
@@ -878,7 +891,18 @@ public struct rest_header *  cords_penalty_occi_headers(struct cords_penalty * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_penalty.packet='%s'\r\n",(sptr->packet?sptr->packet:""));
+	sprintf(buffer,"occi.cords_penalty.data='%s'\r\n",(sptr->data?sptr->data:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_penalty.sequence='%u'\r\n",sptr->sequence);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
