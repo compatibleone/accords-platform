@@ -39,8 +39,8 @@ public struct cords_monitor * liberate_cords_monitor(struct cords_monitor * sptr
 			 sptr->agreement = liberate(sptr->agreement);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
-		if ( sptr->service )
-			 sptr->service = liberate(sptr->service);
+		if ( sptr->session )
+			 sptr->session = liberate(sptr->session);
 		if ( sptr->connection )
 			 sptr->connection = liberate(sptr->connection);
 		if ( sptr->report )
@@ -62,7 +62,7 @@ public struct cords_monitor * reset_cords_monitor(struct cords_monitor * sptr)
 		sptr->name = (char*) 0;
 		sptr->agreement = (char*) 0;
 		sptr->account = (char*) 0;
-		sptr->service = (char*) 0;
+		sptr->session = (char*) 0;
 		sptr->connection = (char*) 0;
 		sptr->report = (char*) 0;
 		sptr->controls =  0;
@@ -109,9 +109,9 @@ public int xmlin_cords_monitor(struct cords_monitor * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"service") ))
+		else if (!( strcmp(wptr->name,"session") ))
 		{
-			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"connection") ))
 		{
@@ -147,7 +147,7 @@ public int rest_occi_cords_monitor(FILE * fh,struct cords_monitor * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.report='%s'\r\n",prefix,nptr,(sptr->report?sptr->report:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.controls='%u'\r\n",prefix,nptr,sptr->controls);

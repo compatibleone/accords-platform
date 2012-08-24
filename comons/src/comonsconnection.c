@@ -5,10 +5,10 @@
 
 private	int	purge_packets=0;
 
-/*	--------------------------------------------	*/
-/*	    p u r g e _ p r o b e _ p a c k e t s	*/
-/*	--------------------------------------------	*/
-private	void	purge_probe_packets(struct cords_connection * pptr, char * packets, char * probe )
+/*	---------------------------------------------------	*/
+/*	    p u r g e _ c o n n e c t i o n _ p a c k e t s	*/
+/*	---------------------------------------------------	*/
+private	void	purge_connection_packets(struct cords_connection * pptr, char * packets, char * probe )
 {
 	struct	occi_client   * kptr;
 	struct	occi_request  * qptr;
@@ -115,7 +115,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 			else 
 			{	
 				liberate( wptr );
-				purge_probe_packets( pptr, packets, lptr->target );
+				purge_connection_packets( pptr, packets, lptr->target );
 				sleep(inner);
 				continue;
 			}

@@ -7,7 +7,7 @@ struct	cords_monitor
 	char *	name;
 	char *	agreement;
 	char *	account;
-	char *	service;
+	char *	session;
 	char *	connection;
 	char *	report;
 	int	controls;

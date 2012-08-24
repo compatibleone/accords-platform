@@ -95,6 +95,7 @@ public struct cords_control * reset_cords_control(struct cords_control * sptr)
 		sptr->connection = (char*) 0;
 		sptr->metric = (char*) 0;
 		sptr->probe = (char*) 0;
+		sptr->process =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -190,6 +191,10 @@ public int xmlin_cords_control(struct cords_control * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->probe = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"process") ))
+		{
+			if ( wptr->value ) { sptr->process = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -225,6 +230,7 @@ public int rest_occi_cords_control(FILE * fh,struct cords_control * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.probe='%s'\r\n",prefix,nptr,(sptr->probe?sptr->probe:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.process='%u'\r\n",prefix,nptr,sptr->process);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
