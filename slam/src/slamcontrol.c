@@ -506,38 +506,54 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 /*	-------------------------------------------	*/
 private	int	control_worker( struct cords_control * pptr )
 {
-	int	inner=2;
-	int	outer=5;
+	int	tempo=60;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
+	struct	occi_response 	* zptr; 
+	struct	occi_element	* dptr;
 	char *	wptr;
 	char	packets[1024];
+
+	sleep(2);
 
 	if (!( pptr ))
 		return( 0 );
 	else if (!( rest_valid_string( pptr->probe )))
 		return(0);
+	else if (!( rest_valid_string( pptr->metric ) ))
+		tempo = 60;
+	else if (!( zptr = occi_simple_get( pptr->metric, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		tempo = 60;
+	else if ((!( dptr = occi_locate_element( zptr->first, "occi.metric.period" ) ))
+	     ||  (!( rest_valid_string( dptr->value ) )))
+	{
+		zptr = occi_remove_response( zptr );
+		tempo = 60;
+	}
 	else
 	{
-		sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
-		while (1)
-		{
-			/* ------------------------------------- */
-			/* if no penalties or rewards just purge */
-			/* ------------------------------------- */
-			if (!( rest_valid_string( pptr->reference ) ))
-			{
-				purge_control_packets( pptr, packets, pptr->probe );
-				sleep(inner);
-			}
-			else
-			{
-				evaluate_control_packets( pptr, packets, pptr->probe );
-				sleep(inner);
-			}
-		}
-		return(0);
+		tempo = atoi( dptr->value );
+		zptr = occi_remove_response( zptr );
 	}
+
+	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
+	while (1)
+	{
+		/* ------------------------------------- */
+		/* if no penalties or rewards just purge */
+		/* ------------------------------------- */
+		if (!( rest_valid_string( pptr->reference ) ))
+		{
+			purge_control_packets( pptr, packets, pptr->probe );
+			sleep(tempo);
+		}
+		else
+		{
+			evaluate_control_packets( pptr, packets, pptr->probe );
+			sleep(tempo);
+		}
+	}
+	return(0);
 }
 
 	
