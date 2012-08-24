@@ -1,5 +1,5 @@
-#ifndef	_comonscontrol_c
-#define	_comonscontrol_c
+#ifndef	_slamcontrol_c
+#define	_slamcontrol_c
 
 #define	_CONTROL_SIGNAL SIGKILL
 
@@ -645,7 +645,7 @@ private	struct rest_response * stop_control(
 	}		
 }
 
-	/* ---------------- */
-#endif	/* _comonscontrol_c */
-	/* ---------------- */
+	/* -------------- */
+#endif	/* _slamcontrol_c */
+	/* -------------- */
 
