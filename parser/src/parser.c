@@ -188,7 +188,9 @@ private	int	delete_instruction(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( rest_valid_string( pptr->value ) ))
 		return( 0 );
-	else if ( strcmp( pptr->symbol, _CORDS_MONITOR ) != 0 )
+	else if ( strcmp( pptr->method, _CORDS_MONITOR ) != 0 )
+		return( 0 );
+	else if ( strcmp( pptr->type, _CORDS_MONITOR ) != 0 )
 		return( 0 );
 	else
 	{
