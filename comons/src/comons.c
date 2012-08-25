@@ -163,8 +163,8 @@ private	int	comons_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
-	optr->access |= _OCCI_NO_PRICING;
+	optr->callback = &monitor_interface;
+	optr->access  |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_monitor)))
 		return( 27 );

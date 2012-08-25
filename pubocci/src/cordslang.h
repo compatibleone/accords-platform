@@ -91,6 +91,8 @@
 /*	-------------------------	*/
 #define	_CORDS_PUBLICATION	"publication"
 
+#define	_CORDS_IMPORT		"import"
+
 #define	_CORDS_MANIFEST		"manifest"
 #define	_CORDS_DESCRIPTION	"description"
 #define	_CORDS_SECURITY		"security"

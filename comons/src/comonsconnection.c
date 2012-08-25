@@ -276,6 +276,78 @@ private	struct rest_response * start_connection(
 	}		
 }
 
+
+
+/*	------------------------------------------------	*/
+/* 	  s t o p _ c o n n e c t i o n _  p r o b e s 		*/
+/*	------------------------------------------------	*/
+private	int	stop_connection_probes( struct cords_connection * pptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	char *	wptr;
+	char	buffer[2048];
+
+	buffer[0] = 0;
+	for (	pptr->probes=0,
+		nptr=occi_last_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->previous )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else
+		{	
+			strcpy(buffer,lptr->source);
+			liberate( wptr );
+			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
+				return( 801 );
+			else
+			{
+				zptr = occi_remove_response( zptr );
+				if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					zptr = occi_remove_response( zptr );
+					if ( pptr->probes )
+						pptr->probes--;
+				}
+			}
+		}
+	}
+
+	if (!( rest_valid_string( pptr->monitor ) ))
+		capture_monitoring( pptr );
+	pptr->state = 0;
+	autosave_cords_connection_nodes();
+	if ( strlen(buffer) )
+		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	if ( rest_valid_string( pptr->monitor ) )
+	{
+		if (!(zptr = cords_invoke_action( pptr->monitor, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
+			return( 801 );
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			return( 0 );
+		}
+	}
+	else 	return( 0 );
+}		
+
 /*	-------------------------------------------	*/
 /* 		s t o p _ c o n n e c t i o n		*/
 /*	-------------------------------------------	*/
@@ -286,80 +358,96 @@ private	struct rest_response * stop_connection(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	int	status=0;
 	struct	cords_connection * pptr;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
-	struct	occi_response * zptr;
-	struct	occi_element  * eptr;
-	char *	wptr;
-	char	buffer[2048];
+	int	status=0;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if (!( pptr->state ))
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		buffer[0] = 0;
-		for (	pptr->probes=0,
-			nptr=occi_last_link_node();
-			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->previous )
-		{
-			if (!( lptr = nptr->contents ))
-				continue;
-			else if (!( lptr->source ))
-				continue;
-			else if (!( lptr->target ))
-				continue;
-			else if (!( wptr = occi_category_id( lptr->source ) ))
-				continue;
-			else if ( strcmp( wptr, pptr->id ) != 0)
-			{
-				liberate( wptr );
-				continue;
-			}
-			else
-			{	
-				strcpy(buffer,lptr->source);
-				liberate( wptr );
-				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
-					return( rest_html_response( aptr, 801, "Probe Stop Failure" ) );
-				else
-				{
-					zptr = occi_remove_response( zptr );
-					if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-					{
-						zptr = occi_remove_response( zptr );
-						if ( pptr->probes )
-							pptr->probes--;
-					}
-				}
-			}
-		}
-
-		if (!( rest_valid_string( pptr->monitor ) ))
-			capture_monitoring( pptr );
-
-		pptr->state = 0;
-		autosave_cords_connection_nodes();
-		if ( strlen(buffer) )
-			if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
-				zptr = occi_remove_response( zptr );
-
-		if ( rest_valid_string( pptr->monitor ) )
-		{
-			if (!(zptr = cords_invoke_action( pptr->monitor, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
-				return( rest_html_response( aptr, 801, "Monitor Stop Failure" ) );
-			else
-			{
-				zptr = occi_remove_response( zptr );
-				return( rest_html_response( aptr, 200, "OK" ) );
-			}
-		}
-		else 	return( rest_html_response( aptr, 200, "OK" ) );
-	}		
+		if (!( status = stop_connection_probes( pptr )))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, status, "Failure" ) );
+	}
 }
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n n e c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	create_connection(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_connection * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n n e c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	retrieve_connection(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_connection * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n n e c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	update_connection(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_connection * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n n e c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	delete_connection(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_connection * pptr;
+	struct	occi_response * zptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else
+	{
+		if ( pptr->state )
+			stop_connection_probes( pptr );
+		if ( pptr->monitor )
+		{
+			if ((zptr = occi_simple_delete( pptr->monitor, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+			pptr->monitor = liberate( pptr->monitor );
+		}
+		return(0);
+	}
+}
+
+private	struct	occi_interface	connection_interface = {
+	create_connection,
+	retrieve_connection,
+	update_connection,
+	delete_connection
+	};
+
+
+
 
 /*	------------------------------------------------------------------	*/
 /*		c o m o n s _ c o n n e c t i o n _ b u i l d e r		*/
@@ -372,7 +460,7 @@ public	struct occi_category * comons_connection_builder( char * domain )
 		return( optr );
 	else
 	{
-		optr->callback = (void *) 0;
+		optr->callback = &connection_interface;
 		optr->access |= ( _OCCI_NO_PRICING | _OCCI_PRIVATE | _OCCI_CONSUMER );
 
 		if (!( optr = occi_add_action( optr,_CORDS_START,"",start_connection)))

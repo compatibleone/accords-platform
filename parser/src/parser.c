@@ -28,6 +28,7 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
 
 struct	accords_configuration Parser = {
 	0,0,
@@ -131,6 +132,80 @@ private	struct rest_extension * parser_extension( void * v,struct rest_server * 
 	return( xptr );
 }
 
+/*	-------------------------------------------	*/
+/* 	     c r e a t e _ in s t r u c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	create_instruction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_instruction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	   r e t r i e v e _ in s t r u c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	retrieve_instruction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_instruction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	    u p d a t e _ in s t r u c t i o n  	*/
+/*	-------------------------------------------	*/
+private	int	update_instruction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_instruction * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	     d e l e t e _ in s t r u c t i o n	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_instruction(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node 		* nptr;
+	struct	cords_instruction 	* pptr;
+	struct occi_response 		* zptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( rest_valid_string( pptr->value ) ))
+		return( 0 );
+	else if ( strcmp( pptr->symbol, _CORDS_MONITOR ) != 0 )
+		return( 0 );
+	else
+	{
+		if ((zptr = occi_simple_delete( pptr->value, _CORDS_CONTRACT_AGENT, default_tls )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+		pptr->value = liberate( pptr->value );
+		return( 0 );
+	}
+}
+
+private	struct	occi_interface	instruction_interface = {
+	create_instruction,
+	retrieve_instruction,
+	update_instruction,
+	delete_instruction
+	};
+
 /*	------------------------------------------------------------------	*/
 /*			b r o k e r _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -142,7 +217,7 @@ private	int	parser_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_parser.xml");
 
-	if (!( optr = occi_cords_manifest_builder( Parser.domain,"manifest" ) ))
+	if (!( optr = occi_cords_manifest_builder( Parser.domain, _CORDS_MANIFEST ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -153,7 +228,7 @@ private	int	parser_operation( char * nptr )
 	if ( Parser.autopub )
 		optr->access   |= _OCCI_AUTO_PUBLISH;
 
-	if (!( optr = occi_cords_configuration_builder( Parser.domain, "configuration" ) ))
+	if (!( optr = occi_cords_configuration_builder( Parser.domain, _CORDS_CONFIGURATION ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -161,7 +236,7 @@ private	int	parser_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_release_builder( Parser.domain, "release" ) ))
+	if (!( optr = occi_cords_release_builder( Parser.domain, _CORDS_RELEASE ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -169,7 +244,7 @@ private	int	parser_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_interface_builder( Parser.domain, "interface" ) ))
+	if (!( optr = occi_cords_interface_builder( Parser.domain, _CORDS_INTERFACE ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -177,36 +252,20 @@ private	int	parser_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_instruction_builder( Parser.domain,"instruction" ) ))
+	if (!( optr = occi_cords_instruction_builder( Parser.domain, _CORDS_INSTRUCTION ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &instruction_interface;
 
-	if (!( optr = occi_cords_import_builder( Parser.domain, "import" ) ))
+	if (!( optr = occi_cords_import_builder( Parser.domain, _CORDS_IMPORT ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
-	if (!( optr = occi_cords_constraint_builder( Parser.domain,"constraint" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
-
-	if (!( optr = occi_cords_requirement_builder( Parser.domain,"requirement" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
 
 	rest_initialise_log( Parser.monitor );
 
