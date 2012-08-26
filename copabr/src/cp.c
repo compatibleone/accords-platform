@@ -2599,10 +2599,16 @@ private	int 	ll_cords_parse_element(
 		/* ------------------------------------------ */
 		if (( aptr = document_atribut( document, _CORDS_NAME )) != (struct xml_atribut *) 0)
 		{
+			/* avoid overloading the simple type */
+			/* --------------------------------- */
+		     	if ((!( strcmp( document->name, _CORDS_MANIFEST ) ))
+		     	&&  (!( strcmp( aptr->value, _CORDS_SIMPLE      ) )))
+				return(cords_append_error(document,744,"manifest 'simple' is a reserved name"));
+
 			/* ----------------------------- */
 			/* set the domain name value now */
 			/* ----------------------------- */
-			if (!( domain ))
+			else if (!( domain ))
 				domain = aptr->value;
 			else if (!( aptr = cords_domain_name( aptr, domain ) ))
 				return(cords_append_error(document,715,"prefixing domain"));
