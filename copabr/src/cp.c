@@ -2526,6 +2526,36 @@ private	struct occi_response * cords_integrate_fields(
 	return( zptr );
 }
 
+
+/*	-----------------------------------------	*/
+/*	c o r d s _ s i m p l e _ m a n i f e s t	*/
+/*	-----------------------------------------	*/
+private	int	cords_simple_manifest( struct xml_element * document, struct xml_atribut * aptr )
+{
+	char *	sptr;
+	if (!( document ))
+		return( 0 );
+	else if (!( rest_valid_string( document->name) ))
+		return( 0 );
+     	else if ( strcmp( document->name, _CORDS_MANIFEST ) != 0 )
+		return( 0 );
+	else if (!( aptr ))
+		return( 0 );
+	else if (!( rest_valid_string( aptr->name ) ))
+		return( 0 );
+	else if ( strcmp( aptr->name, _CORDS_NAME ) != 0 )
+		return( 0 );
+	else if (!( rest_valid_string( aptr->value ) ))
+		return( 0 );
+	else if (!( sptr = allocate_string( aptr->value ) ))
+		return( 0 );
+	else if (!( occi_unquoted_value( sptr ) ))
+		return( 0 );
+	else if (!( strcmp( sptr, _CORDS_SIMPLE      ) ))
+		return( 1) ;
+	else	return( 0 );
+}
+
 /*	---------------------------------------------------	*/
 /*		c o r d s _ p a r s e _ e l e m e n t		*/
 /*	---------------------------------------------------	*/
@@ -2599,10 +2629,10 @@ private	int 	ll_cords_parse_element(
 		/* ------------------------------------------ */
 		if (( aptr = document_atribut( document, _CORDS_NAME )) != (struct xml_atribut *) 0)
 		{
+			/* --------------------------------- */
 			/* avoid overloading the simple type */
 			/* --------------------------------- */
-		     	if ((!( strcmp( document->name, _CORDS_MANIFEST ) ))
-		     	&&  (!( strcmp( aptr->value, _CORDS_SIMPLE      ) )))
+			if ( cords_simple_manifest( document , aptr ) )
 				return(cords_append_error(document,744,"manifest 'simple' is a reserved name"));
 
 			/* ----------------------------- */
