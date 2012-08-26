@@ -2549,11 +2549,18 @@ private	int	cords_simple_manifest( struct xml_element * document, struct xml_atr
 		return( 0 );
 	else if (!( sptr = allocate_string( aptr->value ) ))
 		return( 0 );
-	else if (!( occi_unquoted_value( sptr ) ))
+	else if (!( sptr = occi_unquoted_value( sptr ) ))
 		return( 0 );
 	else if (!( strcmp( sptr, _CORDS_SIMPLE      ) ))
+	{
+		sptr = liberate( sptr );
 		return( 1) ;
-	else	return( 0 );
+	}
+	else
+	{
+		sptr = liberate( sptr );
+		return( 0 );
+	}
 }
 
 /*	---------------------------------------------------	*/
