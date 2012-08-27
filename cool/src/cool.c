@@ -748,6 +748,8 @@ private	int	cool_operation( char * nptr )
 {
 	char *	eptr;
 
+	set_default_agent( nptr );
+
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
