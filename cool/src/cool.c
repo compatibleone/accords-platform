@@ -51,9 +51,6 @@ struct	accords_configuration Cool = {
 	(struct occi_category *) 0
 	};
 
-#define	_CORDS_COOL_AGENT	"COOL-AGENT/1.0a"
-
-
 public	int	check_debug()		{	return(Cool.debug);		}
 public	int	check_verbose()		{	return(Cool.verbose);		}
 public	char *	default_publisher()	{	return(Cool.publisher);		}
@@ -95,8 +92,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.02");
-	printf("\n   Beta Version : 09/08/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.01");
+	printf("\n   Beta Version : 25/07/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -223,50 +220,34 @@ private	struct elastic_contract * next_elastic_contract()
 /*	--------------------------------------------	*/
 /*	  u s e _ e l a s t i c _ c o n t r a c t	*/
 /*	--------------------------------------------	*/
-private	int	update_elastic_contract( struct elastic_contract * eptr )
-{
-	struct	occi_response * zptr;
-	char *	result;
-	/* --------------------------------- */
-	/* retrieve the contract information */
-	/* --------------------------------- */
-	if (!( eptr->contract ))
-		return( 0 );
-	else if (!( zptr = occi_simple_get( eptr->contract , _CORDS_COOL_AGENT, default_tls() ) ))
-		return( 0 );
-
-	/* --------------------------- */
-	/* the contract hostname value */
-	/* --------------------------- */
-	if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
-					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
-		return( 0 );
-	else if (!( eptr->hostname = allocate_string( result ) ))
-		return( 0 );
-	else 	return( rest_valid_string( eptr->hostname ) );
-}
-
-/*	--------------------------------------------	*/
-/*	  u s e _ e l a s t i c _ c o n t r a c t	*/
-/*	--------------------------------------------	*/
 private	struct elastic_contract * use_elastic_contract( struct elastic_contract * eptr, char * contract)
 {
 	struct	occi_response * zptr;
 	char *	result;
 
+	/* --------------------------------- */
+	/* retrieve the contract information */
+	/* --------------------------------- */
+	if (!( contract ))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* --------------------------- */
+	/* the contract hostname value */
+	/* --------------------------- */
+	else if (!( result = occi_extract_atribut( 
+					zptr, Cool.domain, 
+					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( eptr->hostname = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
 	/* ----------------------------- */
 	/* store the contract identifier */
 	/* ----------------------------- */
-	if ( eptr->contract ) eptr->contract = liberate( eptr->contract );
-
 	if (!( eptr->contract = allocate_string( contract ) ))
 		return( liberate_elastic_contract( eptr ) );
-
-	/* ----------------------------------------- */
-	/* update the contract host name information */
-	/* ----------------------------------------- */
-	(void) update_elastic_contract( eptr );
 
 	/* ------------------------------- */
 	/* append to the list of contracts */
@@ -283,17 +264,15 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 /*	---------------------------------------------------	*/
 /*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------------	*/
-private	char *	negotiate_elastic_contract(
-	char * node,char * name, char * user, 
-	struct cords_placement_criteria * selector,
-	struct cords_guarantee_criteria * warranty)
+private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
+struct cords_placement_criteria * selector, struct cords_guarantee_criteria * warranty)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract");
 	if (!( document = cords_instance_node(
-		selector, warranty, name, node, _CORDS_COOL_AGENT, default_tls(), (char *) 0, user, user, user) ))
+		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -314,8 +293,15 @@ private	char *	negotiate_elastic_contract(
 }
 
 /*	--------------------------------------------------	*/
-/*	  c o o l _ d u p l i c a t e _ c o n t r a c t		*/
+/*	 c o o l _ t r a n f o r m _ in s t r u c t i o n	*/
 /*	--------------------------------------------------	*/
+/* 	duplicates the occi element list of an instruction	*/
+/*	and filters out the id and status, replacing the 	*/
+/*	previous provision with the new provider and then	*/
+/*	transforming all others	instructions that reference 	*/
+/*	the previous source contract to refer to the new 	*/
+/*	target contract.							*/
+/*	--------------------------------------------------	*/ 
 private	struct	occi_element * cool_transform_instruction( 
 		struct occi_element * eptr, 
 		char * source, char * result, char * provision )
@@ -391,7 +377,7 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	/* ---------------------------------------------------------------- */
 	/* select / retrieve instruction category service provider identity */
 	/* ---------------------------------------------------------------- */
-	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_COOL_AGENT, default_tls() ) ))
+	if (!( ihost = occi_resolve_category_provider( _CORDS_INSTRUCTION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	 	return( 401 );
 
 	/* ---------------------------------------------------------------- */
@@ -401,7 +387,7 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	liberate( ihost );
 	length = strlen(instruction);
 
-	if (!( kptr = occi_create_client( instruction, _CORDS_COOL_AGENT, default_tls() ) ))
+	if (!( kptr = occi_create_client( instruction, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( 401 );
 
 	else if (!(qptr = occi_create_request( 
@@ -447,14 +433,14 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 		/* ----------------------------------------- */
 		/* retrieve the current instruction instance */
 		/* ----------------------------------------- */
-		if (( zptr = occi_simple_get( buffer, _CORDS_COOL_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		{
 			/* ------------------------------------------------------------ */
 			/* duplicate and transform the information of this instruction  */ 
 			/* the new contract and its associated provisioning contract	*/
 			/* ------------------------------------------------------------ */
 			if (( fptr = cool_transform_instruction( zptr->first , source, result, provision )) != (struct occi_element *) 0)
-				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_COOL_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
 					zzptr = occi_remove_response ( zzptr );
 			zptr = occi_remove_response ( zptr );
 		}
@@ -490,15 +476,15 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	int	status;
 	struct	cords_placement_criteria selector;
 	struct	cords_guarantee_criteria warranty;
-	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
+	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
 	/* ------------------------------ */
 	/* retrieve the CONTRACT instance */
 	/* ------------------------------ */
 	if (!( contract ))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( eptr->zptr = occi_simple_get( contract , _CORDS_COOL_AGENT, default_tls() ) ))
+	else if (!( eptr->zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------- */
@@ -534,7 +520,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------- */
 	/* retrieve the PROVISION instance */
 	/* ------------------------------- */
-	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_COOL_AGENT, default_tls() ) ))
+	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------------ */
@@ -562,7 +548,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 			node, name, account, &selector, &warranty ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_COOL_AGENT, default_tls() ) ))
+	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (( status = cool_duplicate_contract( econtract, contract, eprovision )) != 0)
@@ -595,8 +581,6 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 private	struct elastic_contract * add_elastic_contract( char * contract, int allocate )
 {
 	struct	elastic_contract * eptr;
-	rest_log_message( "elastic contract" );
-	rest_log_message( contract );
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 		
@@ -641,18 +625,14 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 
 	if (!( eptr = next_elastic_contract() )) 
 		return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
+	else if (!( eptr->hostname ))
+		return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
 
-	if (!( rest_valid_string( eptr->hostname ) ))
-		if (!( update_elastic_contract( eptr ) ))
-			return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
-
-	if (!( aptr = rest_allocate_response(cptr)))
+	else if (!( aptr = rest_allocate_response(cptr)))
 		return( lb_failure(cptr,  500, "Server Failure : Out of Memory" ) );
 	else
 	{
 		sprintf(buffer,"%s://%s:%u",eptr->service,eptr->hostname,eptr->port);
-		rest_log_message("Cool Redirect");
-		rest_log_message(buffer);
 		if (!( hptr = rest_response_header( aptr, _HTTP_LOCATION, buffer )))
 		{
 			aptr = rest_liberate_response( aptr );
@@ -758,48 +738,6 @@ private	int	load_balancer( char * nptr )
 	return( rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi ) );
 }
 
-/*	-------------------------------------------------	*/
-/*	     c o o l _ a u t h e n t i c a t i o n		*/
-/*	-------------------------------------------------	*/
-private	int	cool_authentication()
-{
-	char *	tls;
-
-	if (!( rest_valid_string( Cool.publisher ) ))
-		return( 30 );
-	else
-	{
-		initialise_occi_resolver ( Cool.publisher, (char *) 0, (char *) 0, (char *) 0 );
-		initialise_occi_publisher( Cool.publisher, (char *) 0, (char *) 0, (char *) 0 );
-	}
-
-	if (!( rest_valid_string((tls = default_tls()) )))
-		return( 0 );
-	else if (!( rest_valid_string( Cool.user ) ))
-		return( 0 );
-	else if (!( rest_valid_string( Cool.password ) ))
-		return( 0 );
-	else	return( occi_secure_AAA( Cool.user, Cool.password, _CORDS_COOL_AGENT, tls ) );
-}
-
-/*	--------------------------------------------	*/
-/*		c o o l _ s h u t d o w n 		*/
-/*	--------------------------------------------	*/
-private	int	cool_shutdown( int status )
-{
-	char *	tls;
-	if (!( rest_valid_string((tls = default_tls()) )))
-		return( 0 );
-	else if (!( rest_valid_string( Cool.user ) ))
-		return( 0 );
-	else if (!( rest_valid_string( Cool.password ) ))
-		return( 0 );
-	else
-	{
-		(void) occi_release_AAA( Cool.user, Cool.password, _CORDS_COOL_AGENT, tls );
-		return( status );
-	}
-}
 
 /*	--------------------------------------------	*/
 /*	c o o l _ o p e r a t i o n 			*/
@@ -808,7 +746,6 @@ private	int	cool_shutdown( int status )
 /*	--------------------------------------------	*/
 private	int	cool_operation( char * nptr )
 {
-	int	status;
 	char *	eptr;
 
 	if (!( eptr = getenv( "elastic_floor" ) ))
@@ -820,21 +757,17 @@ private	int	cool_operation( char * nptr )
 	else	Elastic.ceiling = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_strategy" ) ))
-		Elastic.strategy = 0;
-	else	Elastic.strategy = atoi(eptr);
+		Elastic.floor = 0;
+	else	Elastic.floor = atoi(eptr);
 
-	if ((status = cool_authentication()) != 0)
-		return( cool_shutdown( status ) );
-
-	else if (!( eptr = getenv( "elastic_contract" ) ))
-		return( cool_shutdown( 118 ) );
-
+	if (!( eptr = getenv( "elastic_contract" ) ))
+		return( 118 );
 	else if (!( add_elastic_contract( eptr, 0 ) ))
-		return( cool_shutdown( 27 ) );
+		return( 27 );
 
 	rest_initialise_log( Cool.monitor );
 
-	return( cool_shutdown( load_balancer( nptr ) ) );
+	return( load_balancer( nptr ) );
 }
 
 /*	------------------------------------------- 	*/
