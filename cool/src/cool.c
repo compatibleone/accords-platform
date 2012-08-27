@@ -93,7 +93,7 @@ private	void	cool_configuration()
 private	int	cool_banner()
 {
 	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.01");
-	printf("\n   Beta Version : 25/07/2012 ");
+	printf("\n   Beta Version : 27/08/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -757,8 +757,8 @@ private	int	cool_operation( char * nptr )
 	else	Elastic.ceiling = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_strategy" ) ))
-		Elastic.floor = 0;
-	else	Elastic.floor = atoi(eptr);
+		Elastic.strategy = 0;
+	else	Elastic.strategy = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( 118 );
