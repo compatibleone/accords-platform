@@ -29,6 +29,8 @@ struct	elastic_contract
 	char *		hostname;
 	char *		service;
 
+	char *		agreement;
+	char *		parentservice;
 	char *		profile;
 	char *		provision;
 	char *		account;

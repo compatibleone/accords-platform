@@ -220,6 +220,10 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 		/* ------------------------------- */
 		/* clean up the negotiation fields */
 		/* ------------------------------- */
+		if ( eptr->parentservice )
+			eptr->parentservice = liberate( eptr->parentservice );
+		if ( eptr->agreement )
+			eptr->agreement = liberate( eptr->agreement );
 		if ( eptr->service )
 			eptr->service = liberate( eptr->service );
 		if ( eptr->contract )
@@ -326,14 +330,14 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 /*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------------	*/
 private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
-struct cords_placement_criteria * selector, struct cords_guarantee_criteria * warranty)
+	struct cords_placement_criteria * selector, struct cords_guarantee_criteria * warranty,char * agreement)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	cool_log_message("cool:negotiate_elastic_contract",0);
 	if (!( document = cords_instance_node(
-		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
+		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), agreement, user, user, user) ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -721,6 +725,27 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	else if (!( eptr->profile = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
+	/* ----------------------- */
+	/* retrieve the SERVICE ID */
+	/* ----------------------- */
+	if (( result = occi_extract_atribut( 
+					eptr->zptr, Cool.domain, 
+					_CORDS_CONTRACT, _CORDS_PARENTSERVICE )) != (char *) 0)
+	{
+		if (!( eptr->parentservice = allocate_string( result )))
+			return( liberate_elastic_contract( eptr ) );
+		else	warranty.service = eptr->parentservice;
+	}
+
+	/* ----------------------- */
+	/* retrieve the AGREEMENT  */
+	/* ----------------------- */
+	if (( result = occi_extract_atribut( 
+					eptr->zptr, Cool.domain, 
+					_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char *) 0)
+		if (!( eptr->agreement = allocate_string( result )))
+			return( liberate_elastic_contract( eptr ) );
+
 	/* ---------------------------- */
 	/* retrieve the NODE identifier */
 	/* ---------------------------- */
@@ -775,7 +800,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			eptr->node, eptr->name, eptr->accountname, &selector, &warranty ) ))
+			eptr->node, eptr->name, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
