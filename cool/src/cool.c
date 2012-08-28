@@ -72,6 +72,15 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+private	void	cool_log_message( char * message, int priority )
+{
+	if ( priority )
+		rest_log_message( message );
+	else if ( check_debug() )
+		rest_log_message( message );
+	return;
+}
+
 /*	---------------------------------------------------------------	*/  
 /*	c o o l _ c o n f i g u r a t i o n				*/
 /*	---------------------------------------------------------------	*/  
@@ -189,6 +198,8 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 				/* ----------------------------- */
 				/* stop the elastic contract now */
 				/* ----------------------------- */
+				cool_log_message("invoke elastic_contract stop",1);
+
 				if ((zptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
 
@@ -199,6 +210,8 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			/* ----------------------- */
 			/* delete the contract now */
 			/* ----------------------- */
+			cool_log_message("deleting elastic_contract",0);
+
 			if ((zptr = occi_simple_delete( eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 				zptr = occi_remove_response( zptr );
 	
@@ -318,7 +331,7 @@ struct cords_placement_criteria * selector, struct cords_guarantee_criteria * wa
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
-	if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract");
+	cool_log_message("cool:negotiate_elastic_contract",0);
 	if (!( document = cords_instance_node(
 		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, user, user, user) ))
 		return( (char *) 0 );
@@ -335,7 +348,7 @@ struct cords_placement_criteria * selector, struct cords_guarantee_criteria * wa
 	else
 	{
 		document = document_drop( document );
-		if ( check_debug() ) rest_log_message("cool:negotiate_elastic_contract:done");
+		cool_log_message("cool:negotiate_elastic_contract:done",0);
 		return(contract);
 	}
 }
@@ -358,7 +371,7 @@ private	struct	occi_element * cool_transform_instruction(
 	struct	occi_element * foot=(struct occi_element *) 0;
 	struct	occi_element * work=(struct occi_element *) 0;
 
-	rest_log_message("cool transform instruction");
+	cool_log_message("transform instruction",0);
 
 	for (	;
 		eptr != (struct occi_element *) 0;
@@ -407,7 +420,7 @@ private	struct	occi_element * cool_transform_instruction(
 /*	--------------------------------------------------	*/
 /*	  c o o l _ d u p l i c a t e _ c o n t r a c t		*/
 /*	--------------------------------------------------	*/
-private	int	cool_duplicate_contract( char * source, char * result, char * provision )
+private	int	cool_duplicate_contract( char * result, char * source, char * provision )
 {
 
 	char	*	ihost;
@@ -424,7 +437,7 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	char	tempname[4096];
 	int	length=0;
 
-	rest_log_message("cool duplicate contract");
+	cool_log_message("duplicate contract",0);
 
 	/* ---------------------------------------------------------------- */
 	/* select / retrieve instruction category service provider identity */
@@ -526,7 +539,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
-	rest_log_message("new_elastic_contract");
+	cool_log_message("new_elastic_contract",0);
 
 	/* ------------------------------ */
 	/* retrieve the CONTRACT instance */
@@ -621,7 +634,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* ------------------------------- */
 		/* start the new CONTRACT instance */
 		/* ------------------------------- */
-		rest_log_message("invoke elastic_contract start ");
+		cool_log_message("invoke elastic_contract start ",1);
 
 		if ((zptr = cords_invoke_action( econtract, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
@@ -691,6 +704,10 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 	else
 	{
 		sprintf(buffer,"%s://%s:%u",eptr->service,eptr->hostname,eptr->port);
+
+		cool_log_message( "redirection",1);
+		cool_log_message( buffer, 1 );
+
 		if (!( hptr = rest_response_header( aptr, _HTTP_LOCATION, buffer )))
 		{
 			aptr = rest_liberate_response( aptr );
@@ -779,7 +796,6 @@ private	int	load_balancer( char * nptr )
 		(void *) 0
 	};
 
-
 	/* -------------------------------------------- */
 	/* ensure TLS is correct either NULL or Valid   */
 	/* -------------------------------------------- */
@@ -817,7 +833,10 @@ private	int	load_balancer( char * nptr )
 	/* --------------------------------- */
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
-	return( rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi ) );
+	cool_log_message( "rest server starting", 0 );
+	status = rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi );
+	cool_log_message( "rest server shutdown", 0 );
+	return( status );
 }
 
 
@@ -868,11 +887,13 @@ private	int	cool_operation( char * nptr )
 		return( 27 );
 
 	/* ----------------------------- */
-	/* put the load balencer online  */
+	/* put the load balancer online  */
 	/* ----------------------------- */
 	rest_initialise_log( Cool.monitor );
 
+	cool_log_message( "load balancer starting",1 );
 	status = load_balancer( nptr );
+	cool_log_message( "load balancer shutdown",1 );
 
 	/* ----------------------------- */
 	/* release the elastic contracts */

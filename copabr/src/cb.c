@@ -3810,6 +3810,15 @@ public	char *	cords_service_broker(
 			CbC.document->last = mptr;
 			id = liberate( id );
 			CbC.nodes++;
+			/* ------------------------ */
+			/* add the service identity */
+			/* and eventual sla infos   */
+			/* ------------------------ */
+			if ( rest_valid_string( service ) )
+				document_add_atribut( mptr, "parent", service );
+			if ( rest_valid_string( sla ) )
+				document_add_atribut( mptr, "sla", service );
+
 			continue;
 		}
 	}
@@ -3970,6 +3979,15 @@ public	char *	cords_manifest_broker(
 			CbC.document->last = mptr;
 			id = liberate( id );
 			CbC.nodes++;
+			/* ------------------------ */
+			/* add the service identity */
+			/* and eventual sla infos   */
+			/* ------------------------ */
+			if ( rest_valid_string( plan ) )
+				document_add_atribut( mptr, "parent", plan );
+			if ( rest_valid_string( sla ) )
+				document_add_atribut( mptr, "sla", sla );
+
 			continue;
 		}
 	}

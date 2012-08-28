@@ -22,6 +22,8 @@ struct	cords_contract
 	char *	service;
 	char *	firewall;
 	char *	placement;
+	char *	parent;
+	char *	sla;
 	int	instructions;
 	int	commons;
 	int	when;
