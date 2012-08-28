@@ -60,6 +60,7 @@ struct	cords_guarantee_element
 struct	cords_guarantee_criteria
 {
 	int		elements;
+	char *		service;	
 	struct	cords_guarantee_element * first;
 	struct	cords_guarantee_element * last;
 };
@@ -104,6 +105,7 @@ struct	cords_node_descriptor
 	char 			* accountName;	/* name of account for which service is engaged		*/
 	char			* nameApp;
 	char 			* typeApp;
+	char			* service;	/* the parent service identifier for the contract	*/
 	char			* scopeApp;	/* the node scope : normal/common 			*/
 	char			* accessApp;	/* the node access: public/private 			*/
 	char			* hid;
@@ -120,7 +122,7 @@ struct	cords_node_descriptor
 	struct	occi_response 	* system;	/* the system from the image				*/
 	struct	occi_response 	* package;	/* the package from the image				*/
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/
-
+	
 	struct	cords_placement_criteria selector;
 	struct	cords_guarantee_criteria warranty;
 
@@ -136,8 +138,8 @@ public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
 public	struct	xml_element  * cords_build_service( 
 	char * 	name, char * plan, char * manifest, char * sla, char * account, char * tarification );
 
-public	struct	xml_element * 	cords_build_contract( 
-	char * 	node, 	char * name, char * provider );
+private	struct	xml_element * 	cords_build_contract( 
+	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider );
 
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 

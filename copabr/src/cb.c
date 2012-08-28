@@ -2135,7 +2135,10 @@ private	char *	cords_resolve_profile( struct occi_response * node, char * defaut
 /*	cords request/plan.						*/
 /*	-------------------------------------------------------		*/
 public	struct	xml_element * 	cords_build_contract( 
-		char * node, 	char * name, 
+		char * node, 	
+		char * name, 
+		char * agreement,
+		char * parentservice,
 		char * provider )
 {
 	struct	xml_element * eptr;
@@ -2148,6 +2151,10 @@ public	struct	xml_element * 	cords_build_contract(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NAME, name ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NODE, node ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_AGREEMENT, ( agreement ? agreement : "") ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_PARENTSERVICE, (parentservice ? parentservice : "") ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_SERVICE, "" ) ))
 		return(document_drop( eptr ));
@@ -2238,7 +2245,7 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	else if (!( document = cords_build_contract( id, App->nameApp, _CORDS_ANY ) ))
+	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2298,7 +2305,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2417,13 +2424,14 @@ private	struct	xml_element * cords_terminate_private_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * common )
 {
 	struct	occi_response * yptr;
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2555,6 +2563,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	int	location,
 	char *	common )
 {
@@ -2562,7 +2571,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
 	{
 		liberate( common );
 		cords_terminate_instance_node( App );
@@ -2665,7 +2674,7 @@ private	struct	xml_element * 	cords_simple_private_common_contract(
 		if (!( common = cords_build_simple_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
-	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
+	return( cords_terminate_private_common_contract( App, id, agent, tls, sla, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2749,7 +2758,7 @@ private	struct	xml_element * 	cords_complex_private_common_contract(
 	if ( document )
 		document = document_drop( document );
 
-	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
+	return( cords_terminate_private_common_contract( App, id, agent, tls,sla, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2778,7 +2787,7 @@ private	struct	xml_element * 	cords_complex_public_common_contract(
 	if ( document )
 		document = document_drop( document );
 
-	return( cords_terminate_public_common_contract( App, id, agent, tls, location, common ) );
+	return( cords_terminate_public_common_contract( App, id, agent, tls, sla, location, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2802,7 +2811,7 @@ private	struct	xml_element * 	cords_simple_public_common_contract(
 		else if (!( common = allocate_string( common ) ))
 			return( (struct xml_element *) 0 );
 	}
-	return( cords_terminate_public_common_contract( App, id, agent, tls, location, common ) );
+	return( cords_terminate_public_common_contract( App, id, agent, tls, sla, location, common ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -2924,6 +2933,9 @@ public	struct	xml_element * cords_instance_node(
 	memcpy( &App.selector, selector, sizeof( struct cords_placement_criteria ) );
 	memcpy( &App.warranty, warranty, sizeof( struct cords_guarantee_criteria ) );
 	App.scope = _SCOPE_NORMAL | _ACCESS_PRIVATE;
+
+	if ( warranty )
+		App.service = warranty->service;
 
 	if ( check_verbose() )	printf("   CORDS Node \n");
 
@@ -3716,7 +3728,8 @@ public	char *	cords_service_broker(
 	memset(&CgC,0, sizeof( struct cords_guarantee_criteria ) );
 	CbC.placement = &CpC;
 	CbC.warranty  = &CgC;
-
+	CgC.service   = service;
+	
 	if ( check_verbose() )
 		printf("   CORDS Service Broker ( %s ) Phase 1 : Preparation \n", agent);
 
@@ -3810,15 +3823,6 @@ public	char *	cords_service_broker(
 			CbC.document->last = mptr;
 			id = liberate( id );
 			CbC.nodes++;
-			/* ------------------------ */
-			/* add the service identity */
-			/* and eventual sla infos   */
-			/* ------------------------ */
-			if ( rest_valid_string( service ) )
-				document_add_atribut( mptr, "parent", service );
-			if ( rest_valid_string( sla ) )
-				document_add_atribut( mptr, "sla", service );
-
 			continue;
 		}
 	}
@@ -3878,6 +3882,7 @@ public	char *	cords_manifest_broker(
 	memset(&CbC,0, sizeof( struct cords_provisioning ) );
 	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
 	memset(&CgC,0, sizeof( struct cords_guarantee_criteria ) );
+	CbC.warranty = &CgC;
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 1 : Preparation \n", agent);
@@ -3957,6 +3962,7 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( 911, &CbC ) );
 	else if (!( CbC.instID = occi_unquoted_value( aptr->value ) ))
 		return( cords_terminate_provisioning( 912, &CbC ) );
+	else	CgC.service = CbC.instID;
 
 	for (	eptr=cords_first_link( CbC.manifest );
 		eptr != (struct occi_element *) 0;
@@ -3979,15 +3985,6 @@ public	char *	cords_manifest_broker(
 			CbC.document->last = mptr;
 			id = liberate( id );
 			CbC.nodes++;
-			/* ------------------------ */
-			/* add the service identity */
-			/* and eventual sla infos   */
-			/* ------------------------ */
-			if ( rest_valid_string( plan ) )
-				document_add_atribut( mptr, "parent", plan );
-			if ( rest_valid_string( sla ) )
-				document_add_atribut( mptr, "sla", sla );
-
 			continue;
 		}
 	}

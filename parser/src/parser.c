@@ -194,7 +194,7 @@ private	int	delete_instruction(struct occi_category * optr, void * vptr)
 		return( 0 );
 	else
 	{
-		if ((zptr = occi_simple_delete( pptr->value, _CORDS_CONTRACT_AGENT, default_tls )) != (struct occi_response *) 0)
+		if ((zptr = occi_simple_delete( pptr->value, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 		pptr->value = liberate( pptr->value );
 		return( 0 );

@@ -85,6 +85,7 @@
 #define	_CORDS_CONDITION	"condition"
 #define	_CORDS_OBJECTIVE	"objective"
 #define	_CORDS_OBLIGATED	"obligated"
+#define	_CORDS_PARENTSERVICE	"parentservice"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

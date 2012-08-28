@@ -398,7 +398,8 @@ private	char *	cool_transform_control( char * control, char * source, char * tar
 		if ((!( dptr->name ))
 		||  (!( dptr->value)))
 			continue;
-		else if ((!( strcmp( dptr->name, "occi.control.property" 	) ))
+		else if ((!( strcmp( dptr->name, "occi.control.agreement" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.property" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.condition" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.objective" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.reference" 	) ))
