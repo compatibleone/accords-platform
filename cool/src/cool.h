@@ -29,6 +29,13 @@ struct	elastic_contract
 	char *		hostname;
 	char *		service;
 
+	char *		profile;
+	char *		provision;
+	char *		account;
+	char *		accountname;
+	char *		node;
+	char *		name;
+
 	int		port;
 	int		lastused;
 	int		hitcount;
@@ -39,6 +46,7 @@ struct	elastic_contract
 	/* 3 temporary messages for control */
 	/* of contract negotitation process */
 	/* -------------------------------- */
+	struct	occi_response * wptr;
 	struct	occi_response * xptr;
 	struct	occi_response * yptr;
 	struct	occi_response * zptr;

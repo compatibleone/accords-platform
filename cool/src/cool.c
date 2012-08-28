@@ -147,7 +147,7 @@ private	struct	elastic_control Elastic =
 {
 	1,	/* floor 			*/
 	2, 	/* ceiling			*/
-	1,	/* total			*/
+	0,	/* total			*/
 	0,	/* strategy: 0= round robin	*/
 	0,0,0,0,
 	(struct elastic_contract *) 0,
@@ -184,6 +184,20 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			eptr->yptr = occi_remove_response( eptr->yptr );
 		if ( eptr->xptr )
 			eptr->xptr = occi_remove_response( eptr->xptr );
+		if ( eptr->wptr )
+			eptr->wptr = occi_remove_response( eptr->wptr );
+		if ( eptr->profile )
+			eptr->profile = liberate( eptr->profile );
+		if ( eptr->provision )
+			eptr->provision = liberate( eptr->provision );
+		if ( eptr->account )
+			eptr->account = liberate( eptr->account );
+		if ( eptr->accountname )
+			eptr->accountname = liberate( eptr->accountname );
+		if ( eptr->node )
+			eptr->node = liberate( eptr->node );
+		if ( eptr->name )
+			eptr->name = liberate( eptr->name );
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -310,6 +324,8 @@ private	struct	occi_element * cool_transform_instruction(
 	struct	occi_element * foot=(struct occi_element *) 0;
 	struct	occi_element * work=(struct occi_element *) 0;
 
+	rest_log_message("cool transform instruction");
+
 	for (	;
 		eptr != (struct occi_element *) 0;
 		eptr = eptr->next )
@@ -373,6 +389,8 @@ private	int	cool_duplicate_contract( char * source, char * result, char * provis
 	char	buffer[4096];
 	char	tempname[4096];
 	int	length=0;
+
+	rest_log_message("cool duplicate contract");
 
 	/* ---------------------------------------------------------------- */
 	/* select / retrieve instruction category service provider identity */
@@ -466,11 +484,6 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 {
 	struct	occi_response * zptr=(struct occi_response *) 0;
 	char *	result=(char *) 0;
-	char *	profile=(char *) 0;
-	char *	provision=(char *) 0;
-	char *	account=(char *) 0;
-	char *	node=(char *) 0;
-	char *	name=(char *) 0;
 	char *	econtract=(char *) 0;
 	char *	eprovision=(char *) 0;
 	int	status;
@@ -478,6 +491,8 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	struct	cords_guarantee_criteria warranty;
 	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+
+	rest_log_message("new_elastic_contract");
 
 	/* ------------------------------ */
 	/* retrieve the CONTRACT instance */
@@ -494,7 +509,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 					eptr->zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_PROFILE )))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( profile = allocate_string( result ) ))
+	else if (!( eptr->profile = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ---------------------------- */
@@ -504,23 +519,23 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 					eptr->zptr, Cool.domain, 
 					_CORDS_CONTRACT, _CORDS_NODE )))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( node = allocate_string( result ) ))
+	else if (!( eptr->node = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	/* -------------------------------- */
-	/* extract the PROVISION identifier */
-	/* -------------------------------- */
+	/* ------------------------------- */
+	/* extract the PROVIDER identifier */
+	/* ------------------------------- */
 	else if (!( result = occi_extract_atribut( 
 					eptr->zptr, Cool.domain, 
-					_CORDS_CONTRACT, _CORDS_PROVISION )))
+					_CORDS_CONTRACT, _CORDS_PROVIDER )))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( provision = allocate_string( result ) ))
+	else if (!( eptr->provision = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------------- */
 	/* retrieve the PROVISION instance */
 	/* ------------------------------- */
-	else if (!( eptr->yptr = occi_simple_get( provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( eptr->yptr = occi_simple_get( eptr->provision, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	/* ------------------------------ */
@@ -528,24 +543,30 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	/* ------------------------------ */
 	else if (!( result = occi_extract_atribut( 
 					eptr->yptr, Cool.domain, 
-					profile, _CORDS_ACCOUNT )))
+					eptr->profile, _CORDS_ACCOUNT )))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( account = allocate_string( result ) ))
+	else if (!( eptr->account = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
+
+	else if (!( eptr->wptr = occi_simple_get( eptr->account, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( eptr->accountname = occi_extract_atribut( eptr->wptr, Cool.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+		return( liberate_elastic_contract( eptr ) );
+
 
 	/* ------------------------- */
 	/* extract the CONTRACT name */
 	/* ------------------------- */
 	else if (!( result = occi_extract_atribut( 
 					eptr->yptr, Cool.domain, 
-					profile, _CORDS_NAME )))
+					eptr->profile, _CORDS_NAME )))
 		return( liberate_elastic_contract( eptr ) );
 
-	else if (!( name = allocate_string( result ) ))
+	else if (!( eptr->name = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			node, name, account, &selector, &warranty ) ))
+			eptr->node, eptr->name, eptr->accountname, &selector, &warranty ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
@@ -561,10 +582,13 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		if ( eptr->zptr ) eptr->zptr = occi_remove_response( eptr->zptr );
 		if ( eptr->yptr ) eptr->yptr = occi_remove_response( eptr->yptr );
 		if ( eptr->xptr ) eptr->xptr = occi_remove_response( eptr->xptr );
+		if ( eptr->wptr ) eptr->wptr = occi_remove_response( eptr->wptr );
 
 		/* ------------------------------- */
 		/* start the new CONTRACT instance */
 		/* ------------------------------- */
+		rest_log_message("invoke elastic_contract start ");
+
 		if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
@@ -721,9 +745,33 @@ private	int	load_balancer( char * nptr )
 		(void *) 0
 	};
 
-	if ( Cool.tls )
-		if (!( strlen(Cool.tls) ))
-			Cool.tls = (char *) 0;
+
+	/* -------------------------------------------- */
+	/* ensure TLS is correct either NULL or Valid   */
+	/* -------------------------------------------- */
+	if (!( rest_valid_string( Cool.tls ) ))
+		Cool.tls = (char *) 0;
+
+	/* -------------------------------------------- */
+	/* the ceiling must be higher or equal to floor */
+	/* -------------------------------------------- */
+	if ( Elastic.floor > Elastic.ceiling )
+		Elastic.floor = Elastic.ceiling;
+
+	/* ------------------------------------------- */
+	/* ensure valid contract identifier available  */
+	/* ------------------------------------------- */
+	if ((!( Elastic.first ))
+	||  (!( Elastic.first->contract )))
+		return( 118 );
+
+	/* ------------------------------------------- */
+	/* raise the contract count to reach the floor */
+	/* ------------------------------------------- */
+	while ( Elastic.total < Elastic.floor )
+		if (!( add_elastic_contract( Elastic.first->contract, 1 ) ))
+			return( 127 );
+
 
 	Osi.authorise = (void *) 0;
 
@@ -747,8 +795,17 @@ private	int	load_balancer( char * nptr )
 private	int	cool_operation( char * nptr )
 {
 	char *	eptr;
+	int	status;
 
 	set_default_agent( nptr );
+
+	/* --------------------------------------------- */
+	/* initialise the resolver and publisher default */
+	/* --------------------------------------------- */
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if ((status = occi_publisher_default()) != 0 )
+		return( status );
 
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
