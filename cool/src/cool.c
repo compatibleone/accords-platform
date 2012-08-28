@@ -491,14 +491,24 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 			continue;
 		else
 		{
-			strcat( buffer, vptr );
+			strcat( instruction, vptr );
 			liberate( vptr );
 		}
 
 		/* ----------------------------------------- */
 		/* retrieve the current instruction instance */
 		/* ----------------------------------------- */
-		if (( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_simple_get( instruction, _CORDS_CONTRACT_AGENT, default_tls() );
+
+		/* ----------------------- */
+		/* quick reset of base url */
+		/* ----------------------- */
+		instruction[length] = 0;
+
+		/* ----------------------------------- */
+		/* transform the retrieved instruction */
+		/* ----------------------------------- */
+		if ( zptr != (struct occi_response *) 0)
 		{
 			/* ------------------------------------------------------------ */
 			/* duplicate and transform the information of this instruction  */ 
@@ -507,13 +517,10 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 			if (( fptr = cool_transform_instruction( zptr->first , source, result, provision )) != (struct occi_element *) 0)
 				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
 					zzptr = occi_remove_response ( zzptr );
+
 			zptr = occi_remove_response ( zptr );
 		}
 
-		/* ----------------------- */
-		/* quick reset of base url */
-		/* ----------------------- */
-		buffer[length] = 0;
 	}
 
 	yptr = occi_remove_response ( yptr );
