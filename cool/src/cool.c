@@ -427,11 +427,13 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 	char 	*	vptr;
 	struct	occi_response * zptr=(struct occi_response *) 0;
 	struct	occi_response * zzptr=(struct occi_response *) 0;
+	struct	occi_response * zyptr=(struct occi_response *) 0;
 	struct	occi_response * yptr=(struct occi_response *) 0;
 	struct	occi_element  * fptr=(struct occi_element  *) 0;
 	struct	occi_element  * eptr=(struct occi_element  *) 0;
 	struct	occi_client   * kptr=(struct occi_client   *) 0;
 	struct	occi_request  * qptr=(struct occi_request  *) 0;
+	char *	iid;
 	char	instruction[4096];
 	char	buffer[4096];
 	char	tempname[4096];
@@ -515,9 +517,30 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 			/* the new contract and its associated provisioning contract	*/
 			/* ------------------------------------------------------------ */
 			if (( fptr = cool_transform_instruction( zptr->first , source, result, provision )) != (struct occi_element *) 0)
-				if  ((zzptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
-					zzptr = occi_remove_response ( zzptr );
+			{
+				if  ((zyptr = occi_simple_post( instruction, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+				{
+					/* ---------------------------------------- */
+					/* extract the instruction ID from response */
+					/* ---------------------------------------- */
 
+					if (!( iid = occi_extract_location( zyptr ) ))
+						zyptr = occi_remove_response( zyptr );
+					else if (!( iid = allocate_string( iid ) ))
+						zyptr = occi_remove_response( zyptr );
+					else
+					{
+						zyptr = occi_remove_response( zyptr );
+
+						/* ---------------------------------------- */
+						/* link the instruction to the new contract */
+						/* ---------------------------------------- */
+						if ((zzptr = occi_create_link( result, iid, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+							zzptr = occi_remove_response ( zzptr );
+						iid = liberate( iid );
+					}
+				}
+			}
 			zptr = occi_remove_response ( zptr );
 		}
 
