@@ -59,8 +59,10 @@ struct	elastic_control
 	int		ceiling;
 	int		total;
 	int		strategy;
+
 	int		hitcount;
 	int		maxrate;
+
 	int		maxhit;
 	int		lasthit;
 

@@ -149,7 +149,10 @@ private	struct	elastic_control Elastic =
 	2, 	/* ceiling			*/
 	0,	/* total			*/
 	0,	/* strategy: 0= round robin	*/
-	0,0,0,0,
+	0,	/* hit count			*/
+	10,	/* max rate			*/
+	0,
+	0,
 	(struct elastic_contract *) 0,
 	(struct elastic_contract *) 0,
 	(struct elastic_contract *) 0
@@ -172,8 +175,38 @@ private	struct rest_response * lb_failure(struct rest_client * cptr,  int status
 /*	--------------------------------------------------------------	*/
 private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contract * eptr)
 {
+	struct	occi_response * zptr;
 	if ( eptr )
 	{
+		/* ----------------------------- */
+		/* clean up the elastic contract */
+		/* ----------------------------- */
+		if (( eptr->allocated)
+		&&  ( eptr->contract ))
+		{
+			if ( eptr->hostname )
+			{
+				/* ----------------------------- */
+				/* stop the elastic contract now */
+				/* ----------------------------- */
+				if ((zptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+					zptr = occi_remove_response( zptr );
+
+				eptr->hostname = liberate( eptr->hostname );
+
+			}
+
+			/* ----------------------- */
+			/* delete the contract now */
+			/* ----------------------- */
+			if ((zptr = occi_simple_delete( eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+	
+		}
+
+		/* ------------------------------- */
+		/* clean up the negotiation fields */
+		/* ------------------------------- */
 		if ( eptr->service )
 			eptr->service = liberate( eptr->service );
 		if ( eptr->contract )
@@ -198,6 +231,7 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			eptr->node = liberate( eptr->node );
 		if ( eptr->name )
 			eptr->name = liberate( eptr->name );
+
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -608,7 +642,7 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 		
-	else if ( allocate )
+	else if ((eptr->allocated = allocate))
 		return( new_elastic_contract( eptr, contract ) );
 	else	return( use_elastic_contract( eptr, contract ) );
 }
@@ -794,6 +828,7 @@ private	int	load_balancer( char * nptr )
 /*	--------------------------------------------	*/
 private	int	cool_operation( char * nptr )
 {
+	struct	elastic_contract * ecptr;
 	char *	eptr;
 	int	status;
 
@@ -807,6 +842,9 @@ private	int	cool_operation( char * nptr )
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
+	/* ------------------------------ */
+	/* analyse the elasticity options */
+	/* ------------------------------ */
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
@@ -815,18 +853,37 @@ private	int	cool_operation( char * nptr )
 		Elastic.ceiling = 1;
 	else	Elastic.ceiling = atoi(eptr);
 
+	if (!( eptr = getenv( "elastic_maxrate" ) ))
+		Elastic.maxrate = 10;
+	else	Elastic.maxrate = atoi(eptr);
+
 	if (!( eptr = getenv( "elastic_strategy" ) ))
 		Elastic.strategy = 0;
 	else	Elastic.strategy = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( 118 );
+
 	else if (!( add_elastic_contract( eptr, 0 ) ))
 		return( 27 );
 
+	/* ----------------------------- */
+	/* put the load balencer online  */
+	/* ----------------------------- */
 	rest_initialise_log( Cool.monitor );
 
-	return( load_balancer( nptr ) );
+	status = load_balancer( nptr );
+
+	/* ----------------------------- */
+	/* release the elastic contracts */
+	/* ----------------------------- */
+	while ((ecptr = Elastic.first) != (struct elastic_contract *) 0)
+	{
+		Elastic.first = ecptr->next;
+		ecptr = liberate_elastic_contract( ecptr );
+	}
+
+	return( status );
 }
 
 /*	------------------------------------------- 	*/
