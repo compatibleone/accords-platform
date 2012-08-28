@@ -589,13 +589,13 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* ------------------------------- */
 		rest_log_message("invoke elastic_contract start ");
 
-		if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if ((zptr = cords_invoke_action( econtract, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
 		/* ---------------------------- */
 		/* add the new ELASTIC CONTRACT */
 		/* ---------------------------- */
-		return( use_elastic_contract( eptr, contract ) );	
+		return( use_elastic_contract( eptr, econtract ) );	
 	}
 }
 
