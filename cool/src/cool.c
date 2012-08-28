@@ -354,6 +354,99 @@ struct cords_placement_criteria * selector, struct cords_guarantee_criteria * wa
 }
 
 /*	--------------------------------------------------	*/
+/*	   c o o l _ t r a n s f o r m _ c o n t r o l 		*/
+/*	--------------------------------------------------	*/
+private	char *	cool_transform_control( char * control, char * source, char * target )
+{
+	struct	occi_response	* zptr;
+	struct	occi_element	* dptr;
+	struct	occi_response	* xptr;
+	struct	occi_element	* fptr;
+	char *	ihost=(char *) 0;
+	char *	result=(char *) 0;
+	char	buffer[2048];
+
+	/* --------------------------- */
+	/* retrieve the source control */
+	/* --------------------------- */
+	if  (!(zptr = occi_simple_get( control, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return((char *) 0);
+
+	else if ((!( zptr->response )) || ( zptr->response->status > 299 ))
+	{
+		zptr = occi_remove_response( zptr );
+		return((char *) 0);
+	}
+
+	/* ------------------------------------ */
+	/* initate the control creation message */
+	/* ------------------------------------ */
+	if ((!( fptr = occi_create_element(       "occi.control.name",     target ) ))
+	||  (!( fptr = occi_append_element( fptr, "occi.control.contract", target ) )))
+	{
+		zptr = occi_remove_response( zptr );
+		return((char *) 0);
+	}
+
+	/* ------------------------------------------------ */
+	/* duplicate the elements of the control to be kept */
+	/* ------------------------------------------------ */
+	for (	dptr = zptr->first;
+		dptr != (struct occi_element *) 0;
+		dptr = dptr->next )
+	{
+		if ((!( dptr->name ))
+		||  (!( dptr->value)))
+			continue;
+		else if ((!( strcmp( dptr->name, "occi.control.property" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.condition" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.objective" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.reference" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.importance" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.obligated" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.scope" 		) )))
+		{
+			if (!( fptr = occi_append_element( fptr, dptr->name, dptr->value ) ))
+			{
+				zptr = occi_remove_response( zptr );
+				return((char *) 0);
+			}
+		}
+	}
+
+	/* ---------------------------- */
+	/* clean up from previous phase */
+	/* ---------------------------- */
+	zptr = occi_remove_response( zptr );
+
+	/* ------------------------------------------- */
+	/* recover the identity of the CONTROL manager */
+	/* ------------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_CONTROL, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_CONTROL);
+		liberate( ihost );
+	}
+
+	/* ---------------------------------------- */
+	/* creat the new control and extract the ID */
+	/* ---------------------------------------- */
+	if  ((xptr = occi_simple_post( buffer, fptr, _CORDS_CONTRACT_AGENT, default_tls() )) !=  (struct occi_response *) 0)
+	{
+		/* ---------------------------------------- */
+		/* extract the instruction ID from response */
+		/* ---------------------------------------- */
+		if (( result = occi_extract_location( xptr )) != (char *) 0)
+			result = allocate_string( result );
+		xptr = occi_remove_response( xptr );
+	}
+
+	return( result );
+}
+
+/*	--------------------------------------------------	*/
 /*	 c o o l _ t r a n f o r m _ in s t r u c t i o n	*/
 /*	--------------------------------------------------	*/
 /* 	duplicates the occi element list of an instruction	*/
@@ -367,6 +460,9 @@ private	struct	occi_element * cool_transform_instruction(
 		struct occi_element * eptr, 
 		char * source, char * result, char * provision )
 {
+	int	ismonitor=0;
+	char *	control=(char *) 0;
+	char *	newcontrol=(char *) 0;
 	struct	occi_element * root=(struct occi_element *) 0;
 	struct	occi_element * foot=(struct occi_element *) 0;
 	struct	occi_element * work=(struct occi_element *) 0;
@@ -388,7 +484,17 @@ private	struct	occi_element * cool_transform_instruction(
 			continue;
 		else if (!( strcmp( eptr->name, "occi.core.status" ) ))
 			continue;
-		else if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
+
+		/* ------------------------------- */
+		/* detect a monitoring instruction */
+		/* ------------------------------- */
+		if ((!( strcmp( eptr->name, "occi.instruction.method" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
+			ismonitor=1;
+
+		else if ((!( strcmp( eptr->name, "occi.instruction.type" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
+			ismonitor=1;
+
+		if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
 		{
 			/* ---------------------------------------------------------------- */
 			/* create a new element and replace the reference to the provision  */
@@ -396,16 +502,41 @@ private	struct	occi_element * cool_transform_instruction(
 			if (!( work = occi_create_element( eptr->name, provision ) ))
 				continue;
 		}
-		else
+
+		/* --------------------------------------------------------------- */
+		/* detect a value for a monitor which needs control transformation */
+		/* --------------------------------------------------------------- */
+		else if (!( strcmp( eptr->name, "occi.instruction.value" ) ))
 		{
+			if ( ismonitor )
+			{
+				/* ------------------------------------------ */
+				/* duplicate the control with new contract ID */
+				/* ------------------------------------------ */
+				if (!( newcontrol = cool_transform_control( eptr->value, source, result ) ))
+					continue;
+				/* ---------------------------------------------------------------- */
+				/* create a new element and replace the reference to the provision  */
+				/* ---------------------------------------------------------------- */
+				else if (!( work = occi_create_element( eptr->name, newcontrol ) ))
+					continue;
+			}
 			/* ---------------------------------------------------------------- */
 			/* create a new element and replace a reference to the old contract */
 			/* ---------------------------------------------------------------- */
-			if (!( work = occi_create_element( 
+			else if (!( work = occi_create_element( 
 					eptr->name, 
 					( strcmp( eptr->value, source ) ? eptr->value : result ) ) ))
 				continue;
-		}
+		}		
+		/* ---------------------------------------------------------------- */
+		/* create a new element and replace a reference to the old contract */
+		/* ---------------------------------------------------------------- */
+		else if (!( work = occi_create_element( 
+				eptr->name, 
+				( strcmp( eptr->value, source ) ? eptr->value : result ) ) ))
+			continue;
+
 		/* ------------------------------ */
 		/* append to the new element list */
 		/* ------------------------------ */
