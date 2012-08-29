@@ -176,7 +176,6 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	(char*) 0, /* template contract id 	*/
 	(char*) 0, /* template contract name	*/
-	(char*) 0, /* elastic  contract name	*/
 	(char*) 0, /* parent service		*/
 	(char*) 0, /* service level agreement	*/
 	0,	   /* total start duration	*/
@@ -359,14 +358,6 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		else if (!( Elastic.contractname = allocate_string( result ) ))
 			return( liberate_elastic_contract( eptr ) );
 
-		/* ----------------------------------------------------- */
-		/* build the special name for eventual elastic contracts */
-		/* ----------------------------------------------------- */
-		sprintf(buffer,"elastic:%s",Elastic.contractname );
-
-		if (!( Elastic.elasticname = allocate_string( buffer ) ))
-			return( liberate_elastic_contract( eptr ) );
-
 		/* ------------------------- */
 		/* the agreement is optional */
 		/* ------------------------- */
@@ -389,7 +380,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* ---------------------------------------------------------------- */
 	/* add the contract to the list of contracts managed by the service */
 	/* ---------------------------------------------------------------- */
-	if ( eptr->allocated )
+	if ( eptr->allocated & 1 )
 		if ((zptr = occi_create_link( Elastic.parentservice, eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 
@@ -784,6 +775,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	int	status;
 	struct	cords_placement_criteria selector;
 	struct	cords_guarantee_criteria warranty;
+
 	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
@@ -869,7 +861,6 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	else if (!( eptr->accountname = occi_extract_atribut( eptr->wptr, Cool.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 		return( liberate_elastic_contract( eptr ) );
 
-
 	/* ------------------------- */
 	/* extract the CONTRACT name */
 	/* ------------------------- */
@@ -882,7 +873,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			eptr->node, Elastic.elasticname, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
+			eptr->node, Elastic.contractname, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
@@ -924,7 +915,7 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 		
-	else if ((eptr->allocated = allocate))
+	else if ((eptr->allocated = allocate) & 1)
 		return( new_elastic_contract( eptr, contract ) );
 	else	return( use_elastic_contract( eptr, contract ) );
 }
@@ -938,6 +929,61 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 /*	---------------------------------------------------	*/
 private	int	retrieve_elastic_contracts()
 {
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	struct	occi_element  * dptr;
+	struct	occi_element  * eptr;
+	if (!( Elastic.parentservice ))
+		return( 0 );
+	else if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( 0 );
+	else
+	{
+		for (	dptr = cords_first_link( zptr );
+			dptr != (struct occi_element *) 0;
+			dptr = cords_next_link( dptr ) )
+		{
+			if ((!( dptr->name ))
+			||  (!( dptr->value)))
+				continue;
+			/* ---------------------------------- */
+			/* filter out the one we already have */
+			/* ---------------------------------- */
+			else if (!( strcmp( dptr->value, Elastic.contract ) ))
+				continue;
+			else if (!( yptr = occi_simple_get( dptr->value, _CORDS_CONTRACT_AGENT, default_tls() )))
+				continue;
+			/* -------------------------------- */
+			/* locate identical named contracts */
+			/* -------------------------------- */
+			else if ((!( eptr = occi_locate_element( yptr->first, "occi.contract.name" ) ))
+			     ||  (!( rest_valid_string( eptr->value ) ))
+			     ||  ( strcmp( eptr->value, Elastic.contractname ) != 0 ))
+			{
+				yptr = occi_remove_response( yptr );
+				continue;
+			}
+			else
+			{
+				add_elastic_contract( dptr->value, 2 );
+				if ((!( eptr = occi_locate_element( yptr->first, "occi.contract.state" ) ))
+				||  (!( rest_valid_string( eptr->value ) ))
+				||  ( atoi( eptr->value ) != 0 ))
+				{
+					yptr = occi_remove_response( yptr );
+					continue;
+				}
+				else
+				{
+					yptr = occi_remove_response( yptr );
+					if (( yptr = cords_invoke_action( dptr->value, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+						yptr = occi_remove_response( yptr );
+					continue;
+				}
+			}
+		}
+	}
+	zptr = occi_remove_response( zptr );
 	return( 1 );
 }
 

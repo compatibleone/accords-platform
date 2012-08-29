@@ -83,7 +83,6 @@ struct	elastic_control
 	/* ------------------------------------ */
 	char	*	contract;
 	char 	*	contractname;
-	char 	*	elasticname;
 	char	*	parentservice;
 	char	*	agreement;
 	int		total_start_duration;
