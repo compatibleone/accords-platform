@@ -991,6 +991,7 @@ private	int	retrieve_elastic_contracts()
 				else
 				{
 					yptr = occi_remove_response( yptr );
+					cool_log_message("invoke elastic_contract start ",1);
 					if (( yptr = cords_invoke_action( dptr->value, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 						yptr = occi_remove_response( yptr );
 					continue;
@@ -1194,6 +1195,8 @@ private	int	cool_operation( char * nptr )
 	int	status;
 
 	set_default_agent( nptr );
+
+	rest_initialise_log(Cool.monitor);
 
 	/* --------------------------------------------- */
 	/* initialise the resolver and publisher default */
