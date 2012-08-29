@@ -942,6 +942,7 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 /*	---------------------------------------------------	*/
 private	int	retrieve_elastic_contracts()
 {
+	char	*	id;
 	struct	occi_response * zptr;
 	struct	occi_response * yptr;
 	struct	occi_element  * dptr;
@@ -949,8 +950,7 @@ private	int	retrieve_elastic_contracts()
 	cool_log_message( "retrieve elastic contracts", 0 );
 	if (!( Elastic.parentservice ))
 		return( 0 );
-	cool_log_message( "Elastic.parentservice", 0 );
-	if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
+	else if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
 		return( 0 );
 	else
 	{
@@ -961,13 +961,21 @@ private	int	retrieve_elastic_contracts()
 			if ((!( dptr->name ))
 			||  (!( dptr->value)))
 				continue;
+			else if (!( id =  occi_unquoted_link( dptr->value ) ))
+				continue;
 			/* ---------------------------------- */
 			/* filter out the one we already have */
 			/* ---------------------------------- */
-			else if (!( strcmp( dptr->value, Elastic.contract ) ))
+			else if (!( strcmp( id, Elastic.contract ) ))
+			{
+				id = liberate( id );
 				continue;
-			else if (!( yptr = occi_simple_get( dptr->value, _CORDS_CONTRACT_AGENT, default_tls() )))
+			}
+			else if (!( yptr = occi_simple_get( id, _CORDS_CONTRACT_AGENT, default_tls() )))
+			{
+				id = liberate( id );
 				continue;
+			}
 			/* -------------------------------- */
 			/* locate identical named contracts */
 			/* -------------------------------- */
@@ -975,16 +983,18 @@ private	int	retrieve_elastic_contracts()
 			     ||  (!( rest_valid_string( eptr->value ) ))
 			     ||  ( strcmp( eptr->value, Elastic.contractname ) != 0 ))
 			{
+				id = liberate( id );
 				yptr = occi_remove_response( yptr );
 				continue;
 			}
 			else
 			{
-				add_elastic_contract( dptr->value, 2 );
+				add_elastic_contract( id, 2 );
 				if ((!( eptr = occi_locate_element( yptr->first, "occi.contract.state" ) ))
 				||  (!( rest_valid_string( eptr->value ) ))
 				||  ( atoi( eptr->value ) != 0 ))
 				{
+					id = liberate( id );
 					yptr = occi_remove_response( yptr );
 					continue;
 				}
@@ -992,8 +1002,9 @@ private	int	retrieve_elastic_contracts()
 				{
 					yptr = occi_remove_response( yptr );
 					cool_log_message("invoke elastic_contract start ",1);
-					if (( yptr = cords_invoke_action( dptr->value, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+					if (( yptr = cords_invoke_action( id, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 						yptr = occi_remove_response( yptr );
+					id = liberate( id );
 					continue;
 				}
 			}
