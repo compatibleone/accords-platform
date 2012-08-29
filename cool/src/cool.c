@@ -72,11 +72,16 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+/*	---------------------------------------------------------------	*/  
+/*			c o o l _ l o g _ m e s s a g e			*/
+/*	---------------------------------------------------------------	*/  
 private	void	cool_log_message( char * message, int priority )
 {
+#ifdef	_FINAL_VERSION
 	if ( priority )
 		rest_log_message( message );
 	else if ( check_debug() )
+#endif
 		rest_log_message( message );
 	return;
 }
@@ -912,6 +917,10 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 private	struct elastic_contract * add_elastic_contract( char * contract, int allocate )
 {
 	struct	elastic_contract * eptr;
+
+	cool_log_message("add_elastic_contract",1);
+	cool_log_message( contract ,1);
+
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 		
@@ -933,9 +942,11 @@ private	int	retrieve_elastic_contracts()
 	struct	occi_response * yptr;
 	struct	occi_element  * dptr;
 	struct	occi_element  * eptr;
+	cool_log_message( "retrieve elastic contracts", 0 );
 	if (!( Elastic.parentservice ))
 		return( 0 );
-	else if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
+	cool_log_message( "Elastic.parentservice", 0 );
+	if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
 		return( 0 );
 	else
 	{
