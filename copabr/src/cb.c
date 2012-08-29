@@ -2144,7 +2144,8 @@ public	struct	xml_element * 	cords_build_contract(
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
-
+	char	fbuffer[356];
+	sprintf(fbuffer,"%u",flags);
 	if (!( eptr = allocate_element()))
 		return((struct xml_element *) 0);
 	else if (!( eptr->name = allocate_string( _CORDS_CONTRACT ) ))
@@ -2166,6 +2167,8 @@ public	struct	xml_element * 	cords_build_contract(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_ROOTPASS, "" ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_PROFILE, provider ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_FLAGS, fbuffer ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_TARIFICATION, "" ) ))
 		return(document_drop( eptr ));

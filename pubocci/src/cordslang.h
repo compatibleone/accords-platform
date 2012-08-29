@@ -91,6 +91,7 @@
 #define	_CORDS_STARTDURATION	"startduration"
 #define	_CORDS_STOPDURATION	"stopduration"
 #define	_CORDS_SAVEDURATION	"saveduration"
+#define	_CORDS_FLAGS		"flags"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/
