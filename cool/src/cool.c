@@ -336,17 +336,21 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	if (( result = occi_extract_atribut( 
 			zptr, Cool.domain, 
 			_CORDS_CONTRACT, _CORDS_STOPDURATION )) != (char * ) 0)
-		eptr->startduration = atoi( result );
+		eptr->stopduration = atoi( result );
 
 	/* -------------------------------- */
 	/* if this is the template contract */
 	/* -------------------------------- */
 	if (!( eptr->allocated ))
 	{
+		if (!( Elastic.contract = allocate_string( contract )))
+			return( liberate_elastic_contract( eptr ) );
+
+
 		/* ------------------------------ */
 		/* the parent service is required */
 		/* ------------------------------ */
-		if (!( result = occi_extract_atribut( 
+		else if (!( result = occi_extract_atribut( 
 				zptr, Cool.domain, 
 				_CORDS_CONTRACT, _CORDS_PARENTSERVICE )))
 			return( liberate_elastic_contract( eptr ) );
@@ -356,7 +360,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* ----------------------------- */
 		/* the contract name is required */
 		/* ----------------------------- */
-		if (!( result = occi_extract_atribut( 
+		else if (!( result = occi_extract_atribut( 
 				zptr, Cool.domain, 
 				_CORDS_CONTRACT, _CORDS_NAME )))
 			return( liberate_elastic_contract( eptr ) );
@@ -366,7 +370,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* ------------------------- */
 		/* the agreement is optional */
 		/* ------------------------- */
-		if (( result = occi_extract_atribut( 
+		else if (( result = occi_extract_atribut( 
 				zptr, Cool.domain, 
 				_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
 			if (!( Elastic.agreement = allocate_string( result ) ))
