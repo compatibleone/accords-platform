@@ -24,6 +24,8 @@
 
 #define	_CORDS_NS	"http://www.compatibleone.fr/schemes/cords.xsd"
 
+#define	_INHIBIT_AUTOSTART	1
+
 /*	------------------------	*/
 /*	 cords attribute values		*/
 /*	------------------------	*/
@@ -86,6 +88,9 @@
 #define	_CORDS_OBJECTIVE	"objective"
 #define	_CORDS_OBLIGATED	"obligated"
 #define	_CORDS_PARENTSERVICE	"parentservice"
+#define	_CORDS_STARTDURATION	"startduration"
+#define	_CORDS_STOPDURATION	"stopduration"
+#define	_CORDS_SAVEDURATION	"saveduration"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

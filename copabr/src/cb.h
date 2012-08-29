@@ -28,6 +28,7 @@
 
 struct	cords_placement_criteria
 {
+	int		flags;		/* eventual special options	*/
 	char *		node;		/* node description		*/
 	char *		price;		/* by price			*/
 	char *		energy;		/* by energy			*/
@@ -101,6 +102,7 @@ struct	cords_provisioning
 struct	cords_node_descriptor
 {
 	int			scope;
+	int			flags;		/* contract special flags				*/
 	char 			* account;	/* account for which service is engaged			*/
 	char 			* accountName;	/* name of account for which service is engaged		*/
 	char			* nameApp;
@@ -139,7 +141,7 @@ public	struct	xml_element  * cords_build_service(
 	char * 	name, char * plan, char * manifest, char * sla, char * account, char * tarification );
 
 private	struct	xml_element * 	cords_build_contract( 
-	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider );
+	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider, int flags );
 
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 

@@ -17,7 +17,6 @@ echo "<image name=\"${makesystem}:publisher\">" >> accords-$1.xml
 echo "</image>" >> accords-$1.xml
 echo "</node>" >> accords-$1.xml
 echo "<configuration name=\"accords:publisher\">" >> accords-$1.xml
-	echo "<action expression=\"publisher.monitor(slam.cpu);\"/>" >> accords-$1.xml 
 	echo "<action expression=\"publisher.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-publisher');\"/>" >> accords-$1.xml
 	echo "<action expression=\"publisher.fork('bash run-publisher');\"/>" >> accords-$1.xml
 echo "</configuration>" >> accords-$1.xml

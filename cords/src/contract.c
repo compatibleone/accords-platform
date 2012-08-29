@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _contract_c_
@@ -104,6 +106,10 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->placement = (char*) 0;
 		sptr->parentservice = (char*) 0;
 		sptr->agreement = (char*) 0;
+		sptr->flags =  0;
+		sptr->startduration =  0;
+		sptr->stopduration =  0;
+		sptr->saveduration =  0;
 		sptr->instructions =  0;
 		sptr->commons =  0;
 		sptr->when =  0;
@@ -214,6 +220,22 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->agreement = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"flags") ))
+		{
+			if ( wptr->value ) { sptr->flags = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"startduration") ))
+		{
+			if ( wptr->value ) { sptr->startduration = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"stopduration") ))
+		{
+			if ( wptr->value ) { sptr->stopduration = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"saveduration") ))
+		{
+			if ( wptr->value ) { sptr->saveduration = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"instructions") ))
 		{
 			if ( wptr->value ) { sptr->instructions = atoi(wptr->value); }
@@ -264,6 +286,10 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.placement='%s'\r\n",prefix,nptr,(sptr->placement?sptr->placement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.parentservice='%s'\r\n",prefix,nptr,(sptr->parentservice?sptr->parentservice:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.flags='%u'\r\n",prefix,nptr,sptr->flags);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.startduration='%u'\r\n",prefix,nptr,sptr->startduration);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.stopduration='%u'\r\n",prefix,nptr,sptr->stopduration);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.saveduration='%u'\r\n",prefix,nptr,sptr->saveduration);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.commons='%u'\r\n",prefix,nptr,sptr->commons);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);

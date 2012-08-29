@@ -8,7 +8,6 @@ echo "<system name=\"${makesystem}_with_cosacs\"/>" >> accords-$1.xml
 echo "</image>" >> accords-$1.xml 
 echo "</node>" >> accords-$1.xml 
 echo "<configuration name=\"${makesystem}:$1\">" >> accords-$1.xml 
-echo "<action expression=\"$1.monitor(slam.memory);\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.configure(accords:publisher.publisher.hostname);\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-$1');\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.fork('bash run-$1');\"/>" >> accords-$1.xml 

@@ -43,6 +43,8 @@ struct	elastic_contract
 	int		hitcount;
 	int		allocated;
 	int		usage;
+	int		startduration;
+	int		stopduration;
 
 	/* -------------------------------- */
 	/* 3 temporary messages for control */
@@ -57,20 +59,51 @@ struct	elastic_contract
 	
 struct	elastic_control 
 {
+	/* ------------------------------------ */
+	/* will be provided through environment	*/
+	/* ------------------------------------ */
 	int		floor;
 	int		ceiling;
 	int		total;
 	int		strategy;
+	int		upper;
+	int		lower;
+	int		unit;
+	int		period;
 
+	/* ------------------------------------ */
+	/* will be calculated during operation  */
+	/* ------------------------------------ */
+	int		units;
+	int		firstunit;
+	int		lastunit;
+
+	/* ------------------------------------ */
+	/* to be retrieved from first contract  */
+	/* ------------------------------------ */
+	char	*	contract;
+	char 	*	contractname;
+	char 	*	elasticname;
+	char	*	parentservice;
+	char	*	agreement;
+	int		total_start_duration;
+	int		total_stop_duration;
+	int		average_start_duration;
+	int		average_stop_duration;
+
+	/* ------------------------------------ */
+	/* operational load balancing variables */
+	/* ------------------------------------ */
 	int		hitcount;
-	int		maxrate;
-
 	int		maxhit;
 	int		lasthit;
 
 	struct	elastic_contract * first;
 	struct	elastic_contract * last;
 	struct	elastic_contract * current;
+
+	int	*	unitdata;
+
 };
 
 	/* ------- */

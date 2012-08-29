@@ -24,6 +24,10 @@ struct	cords_contract
 	char *	placement;
 	char *	parentservice;
 	char *	agreement;
+	int	flags;
+	int	startduration;
+	int	stopduration;
+	int	saveduration;
 	int	instructions;
 	int	commons;
 	int	when;

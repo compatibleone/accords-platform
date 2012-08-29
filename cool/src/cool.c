@@ -101,8 +101,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.01");
-	printf("\n   Beta Version : 27/08/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.02");
+	printf("\n   Beta Version : 29/08/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -154,17 +154,44 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 /*	-------------------------------------------	*/
 private	struct	elastic_control Elastic = 
 {
-	1,	/* floor 			*/
-	2, 	/* ceiling			*/
-	0,	/* total			*/
-	0,	/* strategy: 0= round robin	*/
-	0,	/* hit count			*/
-	10,	/* max rate			*/
-	0,
-	0,
-	(struct elastic_contract *) 0,
-	(struct elastic_contract *) 0,
-	(struct elastic_contract *) 0
+	/* ------------------------------------ */
+	/* will be provided through environment	*/
+	/* ------------------------------------ */
+	1,	/* elastic floor 		*/
+	2, 	/* elastic ceiling		*/
+	0,	/* elastic total		*/
+	0,	/* elastic strategy		*/
+	10,	/* elastic elastic upper	*/
+	2,	/* lower			*/
+	10,	/* elastic unit			*/
+	60,	/* elastic period		*/
+	/* ------------------------------------ */
+	/* will be calculated during operation  */
+	/* ------------------------------------ */
+	6,	/* elastic units		*/
+	0,	/* first unit			*/
+	5,	/* last unit			*/
+	/* ------------------------------------ */
+	/* to be retrieved from first contract  */
+	/* ------------------------------------ */
+	(char*) 0, /* template contract id 	*/
+	(char*) 0, /* template contract name	*/
+	(char*) 0, /* elastic  contract name	*/
+	(char*) 0, /* parent service		*/
+	(char*) 0, /* service level agreement	*/
+	0,	   /* total start duration	*/
+	0,	   /* total stop duration	*/
+	0,	   /* average start duration	*/
+	0,	   /* average stop duration	*/
+	/* ------------------------------------ */
+	/* operational load balancing variables */
+	/* ------------------------------------ */
+	0,	/* total hit count		*/
+	0,	/* max hit count per period	*/
+	0,	/* last hit time		*/
+	(struct elastic_contract *) 0, /* first	*/
+	(struct elastic_contract *) 0, /* last  */
+	(struct elastic_contract *) 0  /* next  */
 };
 
 /*	---------------------------------------------------------	*/
@@ -190,32 +217,8 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 		/* ----------------------------- */
 		/* clean up the elastic contract */
 		/* ----------------------------- */
-		if (( eptr->allocated)
-		&&  ( eptr->contract ))
-		{
-			if ( eptr->hostname )
-			{
-				/* ----------------------------- */
-				/* stop the elastic contract now */
-				/* ----------------------------- */
-				cool_log_message("invoke elastic_contract stop",1);
-
-				if ((zptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-					zptr = occi_remove_response( zptr );
-
-				eptr->hostname = liberate( eptr->hostname );
-
-			}
-
-			/* ----------------------- */
-			/* delete the contract now */
-			/* ----------------------- */
-			cool_log_message("deleting elastic_contract",0);
-
-			if ((zptr = occi_simple_delete( eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-				zptr = occi_remove_response( zptr );
-	
-		}
+		if ( eptr->hostname )
+			eptr->hostname = liberate( eptr->hostname );
 
 		/* ------------------------------- */
 		/* clean up the negotiation fields */
@@ -287,6 +290,7 @@ private	struct elastic_contract * next_elastic_contract()
 /*	--------------------------------------------	*/
 private	struct elastic_contract * use_elastic_contract( struct elastic_contract * eptr, char * contract)
 {
+	char	buffer[2048];
 	struct	occi_response * zptr;
 	char *	result;
 
@@ -298,21 +302,80 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	else if (!( zptr = occi_simple_get( contract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	/* --------------------------- */
-	/* the contract hostname value */
-	/* --------------------------- */
-	else if (!( result = occi_extract_atribut( 
-					zptr, Cool.domain, 
-					_CORDS_CONTRACT, _CORDS_HOSTNAME )))
+	/* ----------------------------- */
+	/* store the contract identifier */
+	/* ----------------------------- */
+	else if (!( eptr->contract = allocate_string( contract ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	/* ---------------------------------------------- */
+	/* retrieve and store the contract hostname value */
+	/* ---------------------------------------------- */
+	if (!( result = occi_extract_atribut( 
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_HOSTNAME )))
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( eptr->hostname = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	/* ----------------------------- */
-	/* store the contract identifier */
-	/* ----------------------------- */
-	if (!( eptr->contract = allocate_string( contract ) ))
-		return( liberate_elastic_contract( eptr ) );
+	/* ---------------------------------------------- */
+	/* retrieve and store the start and stop duration */
+	/* ---------------------------------------------- */
+	if (( result = occi_extract_atribut( 
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_STARTDURATION )) != (char * ) 0)
+		eptr->startduration = atoi( result );
+
+	/* ---------------------------------------------- */
+	/* retrieve and store the start and stop duration */
+	/* ---------------------------------------------- */
+	if (( result = occi_extract_atribut( 
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_STOPDURATION )) != (char * ) 0)
+		eptr->startduration = atoi( result );
+
+	/* -------------------------------- */
+	/* if this is the template contract */
+	/* -------------------------------- */
+	if (!( eptr->allocated ))
+	{
+		/* ------------------------------ */
+		/* the parent service is required */
+		/* ------------------------------ */
+		if (!( result = occi_extract_atribut( 
+				zptr, Cool.domain, 
+				_CORDS_CONTRACT, _CORDS_PARENTSERVICE )))
+			return( liberate_elastic_contract( eptr ) );
+		else if (!( Elastic.parentservice = allocate_string( result ) ))
+			return( liberate_elastic_contract( eptr ) );
+
+		/* ----------------------------- */
+		/* the contract name is required */
+		/* ----------------------------- */
+		if (!( result = occi_extract_atribut( 
+				zptr, Cool.domain, 
+				_CORDS_CONTRACT, _CORDS_NAME )))
+			return( liberate_elastic_contract( eptr ) );
+		else if (!( Elastic.contractname = allocate_string( result ) ))
+			return( liberate_elastic_contract( eptr ) );
+
+		/* ----------------------------------------------------- */
+		/* build the special name for eventual elastic contracts */
+		/* ----------------------------------------------------- */
+		sprintf(buffer,"elastic:%s",Elastic.contractname );
+
+		if (!( Elastic.elasticname = allocate_string( buffer ) ))
+			return( liberate_elastic_contract( eptr ) );
+
+		/* ------------------------- */
+		/* the agreement is optional */
+		/* ------------------------- */
+		if (( result = occi_extract_atribut( 
+				zptr, Cool.domain, 
+				_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
+			if (!( Elastic.agreement = allocate_string( result ) ))
+				return( liberate_elastic_contract( eptr ) );
+	}
 
 	/* ------------------------------- */
 	/* append to the list of contracts */
@@ -323,7 +386,21 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	Elastic.last = eptr;
 	Elastic.total++;
 
+	/* ---------------------------------------------------------------- */
+	/* add the contract to the list of contracts managed by the service */
+	/* ---------------------------------------------------------------- */
+	if ( eptr->allocated )
+		if ((zptr = occi_create_link( Elastic.parentservice, eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+
+	/* --------------------------------------------- */
+	/* calculate averages, heuristics and statistics */
+	/* --------------------------------------------- */
+
+	zptr = occi_remove_response( zptr );
 	return(eptr);
+	
+
 }
 
 /*	---------------------------------------------------	*/
@@ -336,9 +413,14 @@ private	char *	negotiate_elastic_contract(char * node,char * name, char * user,
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	cool_log_message("cool:negotiate_elastic_contract",0);
+
+	if ( selector )
+		selector->flags = _INHIBIT_AUTOSTART;
+
 	if (!( document = cords_instance_node(
 		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), agreement, user, user, user) ))
 		return( (char *) 0 );
+
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
 		document = document_drop( document );
@@ -800,7 +882,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			eptr->node, eptr->name, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
+			eptr->node, Elastic.elasticname, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
@@ -825,7 +907,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 
 		if ((zptr = cords_invoke_action( econtract, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
-
+		
 		/* ---------------------------- */
 		/* add the new ELASTIC CONTRACT */
 		/* ---------------------------- */
@@ -847,6 +929,18 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 	else	return( use_elastic_contract( eptr, contract ) );
 }
 
+/*	---------------------------------------------------	*/
+/*	r e t r i e v e _ e l a s t i c _ c o n t r a c t s	*/
+/*	---------------------------------------------------	*/
+/*	this is used to retrieve the collection of contract	*/
+/*	category instances that were appended to the parent	*/
+/*	service during an eventual preceding operation.		*/
+/*	---------------------------------------------------	*/
+private	int	retrieve_elastic_contracts()
+{
+	return( 1 );
+}
+
 /*	---------------------------------------------------------	*/
 /*		l b _ u p d a t e _ s t a t i s t i c s 			*/
 /*	---------------------------------------------------------	*/
@@ -863,7 +957,7 @@ private	void	lb_update_statistics()
 	if ( Elastic.hitcount > Elastic.maxhit )
 		Elastic.maxhit = Elastic.hitcount;
 
-	if ( Elastic.hitcount > Elastic.maxrate )
+	if ( Elastic.hitcount > Elastic.upper )
 		if ( Elastic.total < Elastic.ceiling )
 			add_elastic_contract( Elastic.first->contract, 1 );
 	return;
@@ -1059,18 +1153,33 @@ private	int	cool_operation( char * nptr )
 		Elastic.ceiling = 1;
 	else	Elastic.ceiling = atoi(eptr);
 
-	if (!( eptr = getenv( "elastic_maxrate" ) ))
-		Elastic.maxrate = 10;
-	else	Elastic.maxrate = atoi(eptr);
+	if (!( eptr = getenv( "elastic_upper" ) ))
+		Elastic.upper = 10;
+	else	Elastic.upper = atoi(eptr);
+
+	if (!( eptr = getenv( "elastic_lower" ) ))
+		Elastic.lower = 2;
+	else	Elastic.lower = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_strategy" ) ))
 		Elastic.strategy = 0;
 	else	Elastic.strategy = atoi(eptr);
 
+	if (!( eptr = getenv( "elastic_unit" ) ))
+		Elastic.unit = 10;
+	else	Elastic.unit = atoi(eptr);
+
+	if (!( eptr = getenv( "elastic_period" ) ))
+		Elastic.period = 60;
+	else	Elastic.period = atoi(eptr);
+
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( 118 );
 
 	else if (!( add_elastic_contract( eptr, 0 ) ))
+		return( 27 );
+
+	else if (!( retrieve_elastic_contracts() ))
 		return( 27 );
 
 	/* ----------------------------- */

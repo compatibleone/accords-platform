@@ -187,6 +187,7 @@ private	int	update_instruction_values(
 private	int	service_action( struct cords_service * pptr, char * id, char * action )
 {
 	int	items=0;
+	int	flags=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_link_node  * nptr;
@@ -235,9 +236,31 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
+		if (!( zptr = occi_simple_get( lptr->target, _CORDS_SERVICE_AGENT, default_tls() ) ))
+			continue;
+		else
+		{
+			if (!( eptr = occi_locate_element( zptr->first, "occi.contract.flags" ) ))
+				flags = 0;
+			else if (!( rest_valid_string( eptr->value ) ))
+				flags = 0;
+			else	flags = atoi( eptr->value );
 
-		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-			zptr = occi_remove_response( zptr );
+			/* ----------------------------------------------- */
+			/* start not inhibited so contract will be updated */
+			/* ----------------------------------------------- */
+			if (!( flags & _INHIBIT_AUTOSTART ))
+				zptr = occi_remove_response ( zptr );
+		}
+
+		/* --------------------------------------------------- */
+		/* launch / invoke the required action on the contract */
+		/* --------------------------------------------------- */
+		if (!( flags & _INHIBIT_AUTOSTART ))
+		{
+			if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+		}
 
 		if ( pptr->contracts++ ) fprintf(h,",\n" );
 
@@ -249,8 +272,10 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 		/* ------------------------------------------------- */
 		/* retrieve the resulting contract category instance */
 		/* ------------------------------------------------- */
-		if ((zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, "" )) 
-			!= (struct occi_response *) 0)
+		if (!( flags & _INHIBIT_AUTOSTART ))
+			zptr = occi_simple_get( lptr->target , _CORDS_SERVICE_AGENT, default_tls() );
+
+		if ( zptr )
 		{
 			items=0;
 
@@ -258,7 +283,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 			/* first save each property of the contract category instance */
 			/* to the service report file for use by co-command functions */
 			/* ---------------------------------------------------------- */
-			for ( eptr=zptr->first;
+			for ( 	eptr = zptr->first;
 				eptr != (struct occi_element *) 0;
 				eptr = eptr->next )
 			{
@@ -279,7 +304,9 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 			/* ---------------------------------------------------------- */
 			/* update configuration instruction values from this contract */
 			/* ---------------------------------------------------------- */
-			update_instruction_values( zptr, lptr->target, _CORDS_SERVICE_AGENT );
+			if (!( flags & _INHIBIT_AUTOSTART ))
+				update_instruction_values( zptr, lptr->target, _CORDS_SERVICE_AGENT );
+
 			zptr = occi_remove_response ( zptr );
 			
 		}

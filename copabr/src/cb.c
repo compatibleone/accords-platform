@@ -2139,7 +2139,8 @@ public	struct	xml_element * 	cords_build_contract(
 		char * name, 
 		char * agreement,
 		char * parentservice,
-		char * provider )
+		char * provider,
+		int	flags )
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
@@ -2245,7 +2246,7 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY ) ))
+	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->flags) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2305,7 +2306,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2431,7 +2432,7 @@ private	struct	xml_element * cords_terminate_private_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2571,7 +2572,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		liberate( common );
 		cords_terminate_instance_node( App );
@@ -2933,6 +2934,7 @@ public	struct	xml_element * cords_instance_node(
 	memcpy( &App.selector, selector, sizeof( struct cords_placement_criteria ) );
 	memcpy( &App.warranty, warranty, sizeof( struct cords_guarantee_criteria ) );
 	App.scope = _SCOPE_NORMAL | _ACCESS_PRIVATE;
+	App.flags = selector->flags;
 
 	if ( warranty )
 		App.service = warranty->service;

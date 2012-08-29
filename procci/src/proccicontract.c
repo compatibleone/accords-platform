@@ -270,6 +270,7 @@ private	struct	rest_response * start_contract(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
+			pptr->when  = time((long*)0); 
 			if ( is_common_contract( pptr ) )
 			{
 				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_START,
@@ -348,7 +349,7 @@ private	struct	rest_response * start_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			
+			pptr->startduration = (time((long*)0) - pptr->when);
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			pptr->commons= 1;
@@ -528,6 +529,7 @@ private	struct	rest_response * stop_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			pptr->when  = time((long*)0); 
 			/* ------------------------ */
 			/* stop monitoring session */
 			/* ------------------------ */
@@ -605,7 +607,7 @@ private	struct	rest_response * stop_contract(
 					else	zptr = occi_remove_response ( zptr );
 				}
 			}
-
+			pptr->stopduration = (time((long*)0) - pptr->when);
 			reset_contract( pptr );
 			autosave_cords_contract_nodes();
 		}
@@ -632,6 +634,7 @@ private	struct	rest_response * save_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			pptr->when  = time((long*) 0);
 			if ( is_common_contract( pptr ) )
 			{
 				if (!( zptr = cords_invoke_action( pptr->common, _CORDS_SAVE, 
@@ -670,6 +673,7 @@ private	struct	rest_response * save_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
+			pptr->saveduration = (time((long*)0) - pptr->when);
 			pptr->when  = time((long*) 0);
 			autosave_cords_contract_nodes();
 		}
