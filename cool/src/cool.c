@@ -473,6 +473,11 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 			if (!( Elastic.agreement = allocate_string( result ) ))
 				return( liberate_elastic_contract( eptr ) );
 
+		/* ------------------------------- */
+		/* indicate the template is active */
+		/* ------------------------------- */
+		eptr->isactive = 1;
+
 		cool_retrieve_durations( eptr, zptr );
 
 	}
