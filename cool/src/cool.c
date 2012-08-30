@@ -314,11 +314,15 @@ private	void	cool_average_durations()
 {
 	char	buffer[1024];
 	struct elastic_contract * eptr;
+
+	cool_log_message("calculate_average_durations",1);
+
 	Elastic.active			=
 	Elastic.total_start_duration	=
 	Elastic.total_stop_duration	=
 	Elastic.average_start_duration	=
 	Elastic.average_stop_duration	= 0;
+
 
 	for (	eptr=Elastic.first;
 		eptr != (struct elastic_contract *) 0;
@@ -344,6 +348,7 @@ private	void	cool_average_durations()
 			Elastic.average_stop_duration,Elastic.total_stop_duration,Elastic.active);
 		cool_log_message( buffer, 1 );
 	}
+
 	return;	
 }
 
@@ -355,10 +360,13 @@ private	void	cool_retrieve_durations(
 		struct occi_response * yptr )
 {
 	char *	result;
+
 	if (!( eptr ))
 		return;
 	else if (!( yptr ))
 		return;
+
+	cool_log_message("retrieve_durations",1);
 
 	/* ---------------------------------------------- */
 	/* retrieve and store the start and stop duration */
@@ -391,6 +399,8 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	char	buffer[2048];
 	struct	occi_response * zptr;
 	char *	result;
+
+	cool_log_message("use_elastic_contract",1);
 
 	/* --------------------------------- */
 	/* retrieve the contract information */
@@ -473,8 +483,11 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* the primary template contract nor the recovered contracts.	    */ 
 	/* ---------------------------------------------------------------- */
 	if ( eptr->allocated & 1 )
+	{
+		cool_log_message("link_elastic_contract",1);
 		if ((zptr = occi_create_link( Elastic.parentservice, eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
+	}
 
 	zptr = occi_remove_response( zptr );
 	return(eptr);
@@ -485,8 +498,11 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 /*	---------------------------------------------------	*/
 /*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------------	*/
-private	char *	negotiate_elastic_contract(char * node,char * name, char * user, 
-	struct cords_placement_criteria * selector, struct cords_guarantee_criteria * warranty,char * agreement)
+private	char *	negotiate_elastic_contract(
+			char * node,char * name, char * user, 
+			struct cords_placement_criteria * selector, 
+			struct cords_guarantee_criteria * warranty,
+			char * agreement)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
@@ -856,7 +872,9 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 private	int	start_elastic_contract( struct elastic_contract * eptr )
 {
 	struct	occi_response * yptr;
-	cool_log_message("invoke elastic_contract start ",1);
+
+	cool_log_message("start_elastic_contract",1);
+
 	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )))
 		return(( eptr->isactive = 0 ));
 	else 
@@ -892,7 +910,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
 
-	cool_log_message("new_elastic_contract",0);
+	cool_log_message("new_elastic_contract",1);
 
 	/* ------------------------------ */
 	/* retrieve the CONTRACT instance */
@@ -1026,9 +1044,11 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 private	struct elastic_contract * add_elastic_contract( char * contract, int allocate )
 {
 	struct	elastic_contract * eptr;
+	char	buffer[245];
 
-	cool_log_message("add_elastic_contract",1);
-	cool_log_message( contract ,1);
+	sprintf(buffer,"add_elastic_contract(%u)",allocate);
+	cool_log_message(buffer,1);
+	cool_log_message(contract,1);
 
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
@@ -1045,6 +1065,11 @@ private	struct elastic_contract * scaleup_elastic_contract( char * contract, int
 {
 	struct 	elastic_contract * eptr;
 	struct	occi_response * yptr;
+	char	buffer[245];
+
+	sprintf(buffer,"scaleup_elastic_contract(%u)",allocate);
+	cool_log_message(buffer,1);
+
 	for (	eptr = Elastic.first;
 		eptr != (struct elastic_contract *) 0;
 		eptr = eptr->next )
@@ -1073,7 +1098,9 @@ private	int	retrieve_elastic_contracts()
 	struct	occi_response * yptr;
 	struct	occi_element  * dptr;
 	struct	occi_element  * eptr;
+
 	cool_log_message( "retrieve elastic contracts", 0 );
+
 	if (!( Elastic.parentservice ))
 		return( 0 );
 	else if (!( zptr = occi_simple_get( Elastic.parentservice, _CORDS_CONTRACT_AGENT, default_tls() )))
@@ -1340,9 +1367,10 @@ private	int	cool_operation( char * nptr )
 	int	status;
 
 	set_default_agent( nptr );
-
 	rest_initialise_log(Cool.monitor);
 
+	cool_log_message( "operation", 0 );
+	
 	/* --------------------------------------------- */
 	/* initialise the resolver and publisher default */
 	/* --------------------------------------------- */
