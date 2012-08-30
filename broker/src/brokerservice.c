@@ -533,13 +533,11 @@ private	struct	rest_response * restart_service(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
 	{
-		if ( pptr->state == _OCCI_SUSPENDED )
-		{
-			service_action( pptr, pptr->id, _CORDS_RESTART );
-			pptr->when  = time((long*) 0);
-			pptr->state = _OCCI_RUNNING;
-			autosave_cords_service_nodes();
-		}
+		reverse_service_action( pptr, pptr->id, _CORDS_STOP  );
+		service_action( pptr, pptr->id, _CORDS_START );
+		pptr->when  = time((long*) 0);
+		pptr->state = _OCCI_RUNNING;
+		autosave_cords_service_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
