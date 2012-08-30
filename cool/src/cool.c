@@ -164,7 +164,6 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	1,	/* elastic floor 		*/
 	2, 	/* elastic ceiling		*/
-	0,	/* elastic total		*/
 	0,	/* elastic strategy		*/
 	10,	/* elastic elastic upper	*/
 	2,	/* lower			*/
@@ -183,7 +182,8 @@ private	struct	elastic_control Elastic =
 	(char*) 0, /* template contract name	*/
 	(char*) 0, /* parent service		*/
 	(char*) 0, /* service level agreement	*/
-	0,	   /* active contracts		*/
+	0,	   /* total count of contracts	*/
+	0,	   /* count of active contracts	*/
 	0,	   /* total start duration	*/
 	0,	   /* total stop duration	*/
 	0,	   /* average start duration	*/
@@ -302,6 +302,50 @@ private	struct elastic_contract * next_elastic_contract()
 	else	return( (Elastic.current = Elastic.current->next ) );
 }
 
+/*	--------------------------------------------	*/
+/*	c o o l _ a v e r a g e _ d u r a t i o n s	*/
+/*	--------------------------------------------	*/
+/*	calculates the average start/stop durations	*/
+/*	for current collection of active contracts.	*/
+/*	This gives a precise indication of how long	*/
+/*	it would take to start a new contract.		*/
+/*	--------------------------------------------	*/
+private	void	cool_average_durations()
+{
+	char	buffer[1024];
+	struct elastic_contract * eptr;
+	Elastic.active			=
+	Elastic.total_start_duration	=
+	Elastic.total_stop_duration	=
+	Elastic.average_start_duration	=
+	Elastic.average_stop_duration	= 0;
+
+	for (	eptr=Elastic.first;
+		eptr != (struct elastic_contract *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->isactive ))
+			continue;
+		else
+		{
+			Elastic.active++;
+			Elastic.total_start_duration += eptr->startduration;
+			Elastic.total_stop_duration += eptr->stopduration;
+		}
+	}
+	if ( Elastic.active )
+	{
+		Elastic.average_start_duration = (Elastic.total_start_duration / Elastic.active);
+		Elastic.average_stop_duration  = (Elastic.total_stop_duration  / Elastic.active);
+		sprintf(buffer,"average_start_duration=%u( tot=%u / nb=%u )",
+			Elastic.average_start_duration,Elastic.total_start_duration,Elastic.active);
+		cool_log_message( buffer, 1 );
+		sprintf(buffer,"average_stop_duration=%u( tot=%u / nb=%u )",
+			Elastic.average_stop_duration,Elastic.total_stop_duration,Elastic.active);
+		cool_log_message( buffer, 1 );
+	}
+	return;	
+}
 
 /*	---------------------------------------------	*/
 /*	c o o l _ r e t r i e v e _ d u r a t i o n s	*/
@@ -332,50 +376,11 @@ private	void	cool_retrieve_durations(
 		_CORDS_CONTRACT, _CORDS_STOPDURATION )) != (char * ) 0)
 		eptr->stopduration = atoi( result );
 
+	/* --------------------------- */
+	/* calculate the statistic now */
+	/* --------------------------- */
+	cool_average_durations();
 	return;
-}
-
-
-/*	--------------------------------------------	*/
-/*	c o o l _ a v e r a g e _ d u r a t i o n s	*/
-/*	--------------------------------------------	*/
-/*	calculates the average start/stop durations	*/
-/*	for current collection of active contracts.	*/
-/*	This gives a precise indication of how long	*/
-/*	it would take to start a new contract.		*/
-/*	--------------------------------------------	*/
-private	void	cool_average_durations()
-{
-	char	buffer[1024];
-	struct elastic_contract * eptr;
-	Elastic.active_contracts	=
-	Elastic.total_start_duration	=
-	Elastic.total_stop_duration	=
-	Elastic.average_start_duration	=
-	Elastic.average_stop_duration	= 0;
-
-	for (	eptr=Elastic.first;
-		eptr != (struct elastic_contract *) 0;
-		eptr = eptr->next )
-	{
-		if (!( eptr->isactive ))
-			continue;
-		Elastic.active_contracts++;
-		Elastic.total_start_duration += eptr->startduration;
-		Elastic.total_stop_duration += eptr->stopduration;
-	}
-	if ( Elastic.active_contracts )
-	{
-		Elastic.average_start_duration = (Elastic.total_start_duration / Elastic.active_contracts);
-		Elastic.average_stop_duration  = (Elastic.total_stop_duration  / Elastic.active_contracts);
-		sprintf(buffer,"average_start_duration=%u( tot=%u / nb=%u )",
-			Elastic.average_start_duration,Elastic.total_start_duration,Elastic.active_contracts );
-		cool_log_message( buffer, 1 );
-		sprintf(buffer,"average_stop_duration=%u( tot=%u / nb=%u )",
-			Elastic.average_stop_duration,Elastic.total_stop_duration,Elastic.active_contracts );
-		cool_log_message( buffer, 1 );
-	}
-	return;	
 }
 
 /*	--------------------------------------------	*/
@@ -411,6 +416,15 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 	else if (!( eptr->hostname = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
+
+	/* ------------------------------- */
+	/* append to the list of contracts */
+	/* ------------------------------- */
+	if (!( eptr->previous = Elastic.last ))
+		Elastic.first = eptr;
+	else	eptr->previous->next = eptr;
+	Elastic.last = eptr;
+	Elastic.total++;
 
 	/* -------------------------------- */
 	/* if this is the template contract */
@@ -449,30 +463,18 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 			if (!( Elastic.agreement = allocate_string( result ) ))
 				return( liberate_elastic_contract( eptr ) );
 
-		else	cool_retrieve_durations( eptr, zptr );
+		cool_retrieve_durations( eptr, zptr );
 
 	}
 
-	/* ------------------------------- */
-	/* append to the list of contracts */
-	/* ------------------------------- */
-	if (!( eptr->previous = Elastic.last ))
-		Elastic.first = eptr;
-	else	eptr->previous->next = eptr;
-	Elastic.last = eptr;
-	Elastic.total++;
-
 	/* ---------------------------------------------------------------- */
 	/* add the contract to the list of contracts managed by the service */
+	/* this must be performed for newly allocated contracts and not for */
+	/* the primary template contract nor the recovered contracts.	    */ 
 	/* ---------------------------------------------------------------- */
 	if ( eptr->allocated & 1 )
 		if ((zptr = occi_create_link( Elastic.parentservice, eptr->contract, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
-
-	/* --------------------------------------------- */
-	/* calculate averages, heuristics and statistics */
-	/* --------------------------------------------- */
-	cool_average_durations();
 
 	zptr = occi_remove_response( zptr );
 	return(eptr);
@@ -1124,7 +1126,7 @@ private	int	retrieve_elastic_contracts()
 						cptr->isactive = 1;
 						continue;
 					}
-					else if ( Elastic.total >= Elastic.floor )
+					else if ( Elastic.active >= Elastic.floor )
 					{
 						id = liberate( id );
 						yptr = occi_remove_response( yptr );
@@ -1163,7 +1165,7 @@ private	void	lb_update_statistics()
 		Elastic.maxhit = Elastic.hitcount;
 
 	if ( Elastic.hitcount > Elastic.upper )
-		if ( Elastic.total < Elastic.ceiling )
+		if ( Elastic.active < Elastic.ceiling )
 			scaleup_elastic_contract( Elastic.first->contract, 1 );
 	return;
 }
@@ -1304,7 +1306,7 @@ private	int	load_balancer( char * nptr )
 	/* ------------------------------------------- */
 	/* raise the contract count to reach the floor */
 	/* ------------------------------------------- */
-	while ( Elastic.total < Elastic.floor )
+	while ( Elastic.active < Elastic.floor )
 		if (!( scaleup_elastic_contract( Elastic.first->contract, 1 ) ))
 			return( 127 );
 

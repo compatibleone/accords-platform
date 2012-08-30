@@ -65,7 +65,6 @@ struct	elastic_control
 	/* ------------------------------------ */
 	int		floor;
 	int		ceiling;
-	int		total;
 	int		strategy;
 	int		upper;
 	int		lower;
@@ -87,7 +86,8 @@ struct	elastic_control
 	char	*	parentservice;
 	char	*	agreement;
 
-	int		active_contracts;
+	int		total;
+	int		active;
 	int		total_start_duration;
 	int		total_stop_duration;
 	int		average_start_duration;
