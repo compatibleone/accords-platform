@@ -35,16 +35,17 @@
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
 /*	------------------------------------------------------------	*/
 private	struct	occi_manager OcciManager = 
-	{
-		(struct rest_header *) 0,
-		(struct occi_client *) 0,
-		(struct occi_client *) 0,
-		"CO-OCCI-MAN",
-		_OCCI_MIME_OCCI,
-		_OCCI_MIME_JSON,
-		0,
-		1	/* optimised */
-	};
+{
+	(struct rest_header *) 0,
+	(struct occi_client *) 0,
+	(struct occi_client *) 0,
+	"CO-OCCI-MAN",
+	_OCCI_MIME_OCCI,
+	_OCCI_MIME_JSON,
+	(char *) 0,		/* event log address */
+	0,
+	1			/* optimised */
+};
 
 #include "occiauth.c"
 
@@ -1952,6 +1953,19 @@ public	struct	occi_element * occi_locate_element( struct occi_element * eptr, ch
 
 
 /*	-------------------------------------------------------		*/
+/*		c o r d s _ e v e n t _ m a n a g e r			*/
+/*	-------------------------------------------------------		*/
+private	char *	cords_event_manager( char * agent, char * tls )
+{
+	char *	ihost;
+	if (!( OcciManager.eventlog ))
+		if (!( OcciManager.eventlog = rest_log_comons_identity(_CORDS_EVENT,agent, tls) ))
+			return( (char *) 0 );
+
+	return( allocate_string( OcciManager.eventlog ) );
+}
+
+/*	-------------------------------------------------------		*/
 /*		    c o r d s _ p o s t _ e v e n t			*/
 /*	-------------------------------------------------------		*/
 public	int	cords_post_event( char * message, char * nature, char * agent, char * tls )
@@ -1969,12 +1983,16 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 	struct	cordscript_element * rvalue;
 	char	buffer[2048];
 
-	if (!( ihost = rest_log_comons_identity(_CORDS_EVENT,agent, tls) ))
+	/* ----------------------------------- */
+	/* retrieve the event category manager */
+	/* ----------------------------------- */
+	if (!( ihost = cords_event_manager( agent, tls ) ))
 		return(46);
-
-	sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);
-
-	liberate( ihost );
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);
+		liberate( ihost );
+	}
 
 	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 		return(46);

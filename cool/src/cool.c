@@ -183,6 +183,7 @@ private	struct	elastic_control Elastic =
 	(char*) 0, /* template contract name	*/
 	(char*) 0, /* parent service		*/
 	(char*) 0, /* service level agreement	*/
+	0,	   /* active contracts		*/
 	0,	   /* total start duration	*/
 	0,	   /* total stop duration	*/
 	0,	   /* average start duration	*/
@@ -256,6 +257,18 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 		if ( eptr->name )
 			eptr->name = liberate( eptr->name );
 
+		/* --------------------------------------------- */
+		/* remove from the linked list if it is attached */
+		/* --------------------------------------------- */
+		if (( eptr->previous ) || ( eptr->next ))
+		{
+			if (!( eptr->previous ))
+				Elastic.first = eptr->next;
+			else	eptr->previous->next = eptr->next;
+			if (!( eptr->next ))
+				Elastic.last = eptr->previous;
+			else	eptr->next->previous = eptr->previous;
+		}
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -289,6 +302,82 @@ private	struct elastic_contract * next_elastic_contract()
 	else	return( (Elastic.current = Elastic.current->next ) );
 }
 
+
+/*	---------------------------------------------	*/
+/*	c o o l _ r e t r i e v e _ d u r a t i o n s	*/
+/*	---------------------------------------------	*/
+private	void	cool_retrieve_durations( 
+		struct elastic_contract * eptr , 
+		struct occi_response * yptr )
+{
+	char *	result;
+	if (!( eptr ))
+		return;
+	else if (!( yptr ))
+		return;
+
+	/* ---------------------------------------------- */
+	/* retrieve and store the start and stop duration */
+	/* ---------------------------------------------- */
+	if (( result = occi_extract_atribut( 
+			yptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_STARTDURATION )) != (char * ) 0)
+		eptr->startduration = atoi( result );
+
+	/* ---------------------------------------------- */
+	/* retrieve and store the start and stop duration */
+	/* ---------------------------------------------- */
+	if (( result = occi_extract_atribut( 
+		yptr, Cool.domain, 
+		_CORDS_CONTRACT, _CORDS_STOPDURATION )) != (char * ) 0)
+		eptr->stopduration = atoi( result );
+
+	return;
+}
+
+
+/*	--------------------------------------------	*/
+/*	c o o l _ a v e r a g e _ d u r a t i o n s	*/
+/*	--------------------------------------------	*/
+/*	calculates the average start/stop durations	*/
+/*	for current collection of active contracts.	*/
+/*	This gives a precise indication of how long	*/
+/*	it would take to start a new contract.		*/
+/*	--------------------------------------------	*/
+private	void	cool_average_durations()
+{
+	char	buffer[1024];
+	struct elastic_contract * eptr;
+	Elastic.active_contracts	=
+	Elastic.total_start_duration	=
+	Elastic.total_stop_duration	=
+	Elastic.average_start_duration	=
+	Elastic.average_stop_duration	= 0;
+
+	for (	eptr=Elastic.first;
+		eptr != (struct elastic_contract *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->isactive ))
+			continue;
+		Elastic.active_contracts++;
+		Elastic.total_start_duration += eptr->startduration;
+		Elastic.total_stop_duration += eptr->stopduration;
+	}
+	if ( Elastic.active_contracts )
+	{
+		Elastic.average_start_duration = (Elastic.total_start_duration / Elastic.active_contracts);
+		Elastic.average_stop_duration  = (Elastic.total_stop_duration  / Elastic.active_contracts);
+		sprintf(buffer,"average_start_duration=%u( tot=%u / nb=%u )",
+			Elastic.average_start_duration,Elastic.total_start_duration,Elastic.active_contracts );
+		cool_log_message( buffer, 1 );
+		sprintf(buffer,"average_stop_duration=%u( tot=%u / nb=%u )",
+			Elastic.average_stop_duration,Elastic.total_stop_duration,Elastic.active_contracts );
+		cool_log_message( buffer, 1 );
+	}
+	return;	
+}
+
 /*	--------------------------------------------	*/
 /*	  u s e _ e l a s t i c _ c o n t r a c t	*/
 /*	--------------------------------------------	*/
@@ -309,8 +398,9 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* ----------------------------- */
 	/* store the contract identifier */
 	/* ----------------------------- */
-	else if (!( eptr->contract = allocate_string( contract ) ))
-		return( liberate_elastic_contract( eptr ) );
+	else if (!( eptr->contract ))
+		if (!( eptr->contract = allocate_string( contract ) ))
+			return( liberate_elastic_contract( eptr ) );
 
 	/* ---------------------------------------------- */
 	/* retrieve and store the contract hostname value */
@@ -322,22 +412,6 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	else if (!( eptr->hostname = allocate_string( result ) ))
 		return( liberate_elastic_contract( eptr ) );
 
-	/* ---------------------------------------------- */
-	/* retrieve and store the start and stop duration */
-	/* ---------------------------------------------- */
-	if (( result = occi_extract_atribut( 
-			zptr, Cool.domain, 
-			_CORDS_CONTRACT, _CORDS_STARTDURATION )) != (char * ) 0)
-		eptr->startduration = atoi( result );
-
-	/* ---------------------------------------------- */
-	/* retrieve and store the start and stop duration */
-	/* ---------------------------------------------- */
-	if (( result = occi_extract_atribut( 
-			zptr, Cool.domain, 
-			_CORDS_CONTRACT, _CORDS_STOPDURATION )) != (char * ) 0)
-		eptr->stopduration = atoi( result );
-
 	/* -------------------------------- */
 	/* if this is the template contract */
 	/* -------------------------------- */
@@ -345,7 +419,6 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	{
 		if (!( Elastic.contract = allocate_string( contract )))
 			return( liberate_elastic_contract( eptr ) );
-
 
 		/* ------------------------------ */
 		/* the parent service is required */
@@ -375,6 +448,9 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 				_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
 			if (!( Elastic.agreement = allocate_string( result ) ))
 				return( liberate_elastic_contract( eptr ) );
+
+		else	cool_retrieve_durations( eptr, zptr );
+
 	}
 
 	/* ------------------------------- */
@@ -396,6 +472,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* --------------------------------------------- */
 	/* calculate averages, heuristics and statistics */
 	/* --------------------------------------------- */
+	cool_average_durations();
 
 	zptr = occi_remove_response( zptr );
 	return(eptr);
@@ -769,6 +846,31 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 	return(0);
 }
 
+/*	-------------------------------------------------	*/
+/*	   s t a r t _ e l a s t i c _ c o n t r a c t		*/
+/*	-------------------------------------------------	*/
+/*	invoke the start action then recover statistics		*/
+/*	-------------------------------------------------	*/
+private	int	start_elastic_contract( struct elastic_contract * eptr )
+{
+	struct	occi_response * yptr;
+	cool_log_message("invoke elastic_contract start ",1);
+	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return(( eptr->isactive = 0 ));
+	else 
+	{
+		yptr = occi_remove_response( yptr );
+		if (!( yptr = occi_simple_get( eptr->contract, _CORDS_CONTRACT_AGENT, default_tls() )))
+			return(( eptr->isactive = 0 ));
+		else 
+		{
+			cool_retrieve_durations( eptr, yptr );
+			yptr = occi_remove_response( yptr );
+			return(( eptr->isactive = 1 ));
+		}
+	}
+}
+
 /*	---------------------------------------------	*/
 /*	  n e w _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
@@ -900,18 +1002,19 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		if ( eptr->xptr ) eptr->xptr = occi_remove_response( eptr->xptr );
 		if ( eptr->wptr ) eptr->wptr = occi_remove_response( eptr->wptr );
 
-		/* ------------------------------- */
-		/* start the new CONTRACT instance */
-		/* ------------------------------- */
-		cool_log_message("invoke elastic_contract start ",1);
+		/* ----------------------------- */
+		/* store contract name and start */
+		/* ----------------------------- */
+		if (!( eptr->contract = allocate_string( econtract ) ))
+			return( liberate_elastic_contract( eptr ) );
+		else if (!( start_elastic_contract( eptr ) ))
+			return( liberate_elastic_contract( eptr ) );
 
-		if ((zptr = cords_invoke_action( econtract, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-			zptr = occi_remove_response( zptr );
+		/* -------------------------------- */
+		/* add to list of elastic contracts */
+		/* -------------------------------- */
+		else	return( use_elastic_contract( eptr, econtract ) );	
 		
-		/* ---------------------------- */
-		/* add the new ELASTIC CONTRACT */
-		/* ---------------------------- */
-		return( use_elastic_contract( eptr, econtract ) );	
 	}
 }
 
@@ -927,10 +1030,30 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
-		
 	else if ((eptr->allocated = allocate) & 1)
 		return( new_elastic_contract( eptr, contract ) );
 	else	return( use_elastic_contract( eptr, contract ) );
+}
+
+
+/*	-------------------------------------------------	*/
+/*	 s c a l e u p _ e l a s t i c _ c o n t r a c t	*/
+/*	-------------------------------------------------	*/
+private	struct elastic_contract * scaleup_elastic_contract( char * contract, int allocate )
+{
+	struct 	elastic_contract * eptr;
+	struct	occi_response * yptr;
+	for (	eptr = Elastic.first;
+		eptr != (struct elastic_contract *) 0;
+		eptr = eptr->next )
+	{
+		if ( eptr->isactive )
+			continue;
+		else if (!( start_elastic_contract( eptr ) ))
+			continue;
+		else	return( eptr );
+	}
+	return( add_elastic_contract( contract, allocate ) );
 }
 
 /*	---------------------------------------------------	*/
@@ -943,6 +1066,7 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 private	int	retrieve_elastic_contracts()
 {
 	char	*	id;
+	struct elastic_contract * cptr;
 	struct	occi_response * zptr;
 	struct	occi_response * yptr;
 	struct	occi_element  * dptr;
@@ -989,23 +1113,31 @@ private	int	retrieve_elastic_contracts()
 			}
 			else
 			{
-				add_elastic_contract( id, 2 );
-				if ((!( eptr = occi_locate_element( yptr->first, "occi.contract.state" ) ))
-				||  (!( rest_valid_string( eptr->value ) ))
-				||  ( atoi( eptr->value ) != 0 ))
+				if ((cptr = add_elastic_contract( id, 2 )) != (struct elastic_contract *) 0)
 				{
-					id = liberate( id );
-					yptr = occi_remove_response( yptr );
-					continue;
-				}
-				else
-				{
-					yptr = occi_remove_response( yptr );
-					cool_log_message("invoke elastic_contract start ",1);
-					if (( yptr = cords_invoke_action( id, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+					if ((!( eptr = occi_locate_element( yptr->first, "occi.contract.state" ) ))
+					||  (!( rest_valid_string( eptr->value ) ))
+					||  ( atoi( eptr->value ) != 0 ))
+					{
+						id = liberate( id );
 						yptr = occi_remove_response( yptr );
-					id = liberate( id );
-					continue;
+						cptr->isactive = 1;
+						continue;
+					}
+					else if ( Elastic.total >= Elastic.floor )
+					{
+						id = liberate( id );
+						yptr = occi_remove_response( yptr );
+						cptr->isactive = 0;
+						continue;
+					}
+					else
+					{
+						start_elastic_contract( cptr );
+						yptr = occi_remove_response( yptr );
+						id = liberate( id );
+						continue;
+					}
 				}
 			}
 		}
@@ -1032,7 +1164,7 @@ private	void	lb_update_statistics()
 
 	if ( Elastic.hitcount > Elastic.upper )
 		if ( Elastic.total < Elastic.ceiling )
-			add_elastic_contract( Elastic.first->contract, 1 );
+			scaleup_elastic_contract( Elastic.first->contract, 1 );
 	return;
 }
 
@@ -1173,7 +1305,7 @@ private	int	load_balancer( char * nptr )
 	/* raise the contract count to reach the floor */
 	/* ------------------------------------------- */
 	while ( Elastic.total < Elastic.floor )
-		if (!( add_elastic_contract( Elastic.first->contract, 1 ) ))
+		if (!( scaleup_elastic_contract( Elastic.first->contract, 1 ) ))
 			return( 127 );
 
 

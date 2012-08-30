@@ -11,6 +11,7 @@ struct	occi_manager
 	char 			* name;
 	char			* mimetype;
 	char			* accepts;
+	char			* eventlog;
 	int			  clients;
 	int			  optimise;
 };

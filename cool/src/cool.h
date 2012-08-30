@@ -38,6 +38,7 @@ struct	elastic_contract
 	char *		node;
 	char *		name;
 
+	int		isactive;
 	int		port;
 	int		lastused;
 	int		hitcount;
@@ -85,6 +86,8 @@ struct	elastic_control
 	char 	*	contractname;
 	char	*	parentservice;
 	char	*	agreement;
+
+	int		active_contracts;
 	int		total_start_duration;
 	int		total_stop_duration;
 	int		average_start_duration;
