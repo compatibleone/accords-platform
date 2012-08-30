@@ -1374,8 +1374,6 @@ private	int	cool_operation( char * nptr )
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
 
-	cool_log_message( "operation", 0 );
-	
 	/* --------------------------------------------- */
 	/* initialise the resolver and publisher default */
 	/* --------------------------------------------- */
@@ -1383,6 +1381,8 @@ private	int	cool_operation( char * nptr )
 
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
+
+	cool_log_message( "operation", 0 );
 
 	/* ------------------------------ */
 	/* analyse the elasticity options */
