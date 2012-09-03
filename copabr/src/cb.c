@@ -1993,7 +1993,9 @@ private	char * cords_accept_provider( char * category, struct occi_response * zp
 /*	The resolver will be used to localise agencys which 		*/
 /*	will be tried in turn to localise provider descriptions		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_research_provider( char * defaut, char * agent, char * tls )
+private	char *	cords_research_provider( 
+			char * defaut,
+			char * agent, char * tls )
 {
 	struct	occi_response * zptr;
 	struct	occi_response * yptr;
@@ -2091,7 +2093,11 @@ private	char *	cords_research_provider( char * defaut, char * agent, char * tls 
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ r e s o l v e _ p r o v i d e r		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_resolve_provider( struct occi_response * node, char * defaut, char * agent,char * tls )
+private	char *	cords_resolve_provider( 
+			struct occi_response * node, 
+			char * defaut,
+			struct cords_placement_criteria * selector,
+			char * agent,char * tls )
 {
 	char	*	value;
 	/* ----------------------------------------- */
@@ -2101,8 +2107,12 @@ private	char *	cords_resolve_provider( struct occi_response * node, char * defau
 		return( cords_research_provider(defaut,agent, tls) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( cords_research_provider(defaut,agent, tls) );
-	else if (!( strcmp(value,_CORDS_ANY) ))
-		return( cords_research_provider(defaut,agent, tls) );
+	else if (!( strcasecmp(value,_CORDS_ANY) ))
+	{
+		if ( selector->provider )
+			return( selector->provider );
+		else	return( cords_research_provider(defaut,agent, tls) );
+	}
 	else
 	{
 		if ( check_verbose() )
@@ -2990,7 +3000,7 @@ public	struct	xml_element * cords_instance_node(
 	/* -------------------------------- */
 	/* recover provider information now */
 	/* -------------------------------- */
-	if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent, tls )))
+	if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, &App.selector, agent, tls )))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -3188,6 +3198,8 @@ private	int	cords_placement_condition(
 {
 	if (!( strcmp( nptr, "occi.placement.algorithm" ) ))
 		placement->algorithm = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.provider" ) ))
+		placement->provider = allocate_string( vptr );
 	else if (!( strcmp( nptr, "occi.placement.operator" ) ))
 		placement->operator = allocate_string( vptr );
 	else if (!( strcmp( nptr, "occi.placement.zone" ) ))

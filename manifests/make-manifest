@@ -50,9 +50,7 @@ echo "<node name=\"accords:paprocci\" scope=normal access=public type=\"accords:
 bash build-manifest paasprocci 8087
 echo "<node name=\"accords:paasprocci\" scope=normal access=public type=\"accords:paasprocci\"/>" >> accords-provisioning.xml
 bash build-manifest dcprocci 8087
-echo "<node name=\"accords:dcprocci\" scope=normal access=public type=\"accords:dcprocci\"/>" >> accords-provisioning.xml
 bash build-manifest azprocci 8087
-echo "<node name=\"accords:azprocci\" scope=normal access=public type=\"accords:azprocci\"/>" >> accords-provisioning.xml
 echo "<configuration name=\"accords:provisioning\"/>" >> accords-provisioning.xml
 echo "<security name=\"accords:security\"/>" >> accords-provisioning.xml
 echo "<account name=\"accords:account\"/>" >> accords-provisioning.xml
