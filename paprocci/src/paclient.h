@@ -110,10 +110,10 @@ public	struct	pa_response *	pa_list_locations();
 /* servers */
 /* ------- */
 public	struct	pa_response *	pa_list_servers	();
-public	struct	pa_response *	pa_create_server(struct proactive * constr); // To be extended in the future. 
+public	struct	pa_response *	pa_create_server(struct proactive * constr);
+public	struct	pa_response *	pa_delete_server(struct proactive * constr);
 public	struct	pa_response *	pa_get_server	( char * id );
 public	struct	pa_response *	pa_update_server( char * id, char * filename );
-public	struct	pa_response *	pa_delete_server( char * id );
 
 
 /* ------- */

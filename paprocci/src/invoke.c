@@ -1,43 +1,15 @@
 #include <invoke.h>
+#include <proactive.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
 #define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
 
-void destroy_jvm(JNIEnv * env, JavaVM * jvm){
-	jclass cls;
-	jmethodID methodid;
-	// Find the class to interact with. 
-	cls = (*env)->FindClass(env, STARTER_CLASS);
-	if (cls == NULL) {
-		fprintf(stderr, "Problem while finding the class...\n");
-		exit(0);
-	}else{
-		fprintf(stderr, "Class found.\n");
-	}
-
-	methodid = (*env)->GetStaticMethodID(env, cls, "exit", "()V");
-
-	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method.\n");
-	}
-
-	(*env)->CallStaticVoidMethod(env, cls, methodid);
-
-	fprintf(stderr, "Executed the method to exit the JVM...\n");
-
-	fprintf(stderr, "Looking for exceptions...\n");
-	if ((*env)->ExceptionOccurred(env)) {
-		(*env)->ExceptionDescribe(env);
-	}
-	fprintf(stderr, "Done.\n");
-	//printf("Destroying JVM...\n");
-	//(*jvm)->DestroyJavaVM(jvm);
-	//fprintf(stderr, "Done.\n");
-	exit(0);
-}
-
+/**
+ * Get a list of .jar files to add them to the CLASSPATH for the VM to use them. 
+ * DO NOT MODIFY THIS FUNCTION.
+ */
 char* getjars(const char* targetdir){
 	DIR *dir;
 	struct dirent *ent;
@@ -83,178 +55,11 @@ char* getjars(const char* targetdir){
 	return buffer;
 }
 
-
-char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
-	jstring jstr1;
-	jstring jstr2;
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	fprintf(stderr, "Executing %s...\n", mname);
-	
-	jclass cls = (*env)->FindClass(env, "org/ow2/compatibleone/Procci");
-	if (cls == NULL) {
-		fprintf(stderr, "Problem while finding the interface Procci...\n");
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Class found.\n");
-	}
-
-	jmethodID methodid = (*env)->GetMethodID(env, cls, mname, msign);
-	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method %s.\n", mname);
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Method %s found.\n", mname);
-	}
-
-	//jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	//jobjectArray methodargs = (*env)->NewObjectArray(env, 0, sclass, NULL);
-
-	//(*env)->SetObjectArrayElement(env, methodargs,0,arg1);
-	//(*env)->SetObjectArrayElement(env, methodargs,1,arg2);
-
-	jobject result = (*env)->CallObjectMethod(env, procci, methodid, margs);
-	fprintf(stderr, "Looking for exceptions...\n");
-	if ((*env)->ExceptionOccurred(env)) {
-		(*env)->ExceptionDescribe(env);
-		return NULL;
-	}else{
-		fprintf(stderr, "Method %s executed.\n", mname);
-		const char *str = (*env)->GetStringUTFChars(env,result,0);
-		char * ret = (char*)malloc(strlen(str)+1);
-		strcpy(ret, str);
-		(*env)->ReleaseStringUTFChars(env, result, str);
-		return ret;
-	}
-}
-
-char * start_server(struct jvm_struct * jvmp, char* os) {
-
-	jstring jstr1;
-	jstring jstr2;
-	jstring jstr3;
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 3, sclass, NULL);
-
-	jstr1 = (*env)->NewStringUTF(env, os);
-	//jstr2 = (*env)->NewStringUTF(env, "demo");
-	//jstr3 = (*env)->NewStringUTF(env, "demo");
-
-	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
-	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr2);
-	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr3);
-
-	return call_java_procci(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
-}
-
-char * stop_server(struct jvm_struct * jvmp, char* id) {
-
-	jstring jstr1;
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);
-
-	jstr1 = (*env)->NewStringUTF(env, id);
-
-	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
-
-	return call_java_procci(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
-}
-
-void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
-	// args: user demo
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-
-	fprintf(stderr, "Executing connect_to_provider...\n");
-
-	jclass cls = (*env)->FindClass(env, STARTER_CLASS);
-	if (cls == NULL) {
-		fprintf(stderr, "Problem while finding the class...\n");
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Class found.\n");
-	}
-
-	jmethodID methodid = (*env)->GetStaticMethodID(env, cls, "start", "([Ljava/lang/Object;)Lorg/ow2/compatibleone/Procci;");
-	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method start.\n");
-		destroy_jvm(env, jvm);
-	}
-
-	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 2, sclass, NULL);
-
-	jstring jstr1 = (*env)->NewStringUTF(env, args[0]);
-	jstring jstr2 = (*env)->NewStringUTF(env, args[1]);
-
-	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
-	(*env)->SetObjectArrayElement(env, margs,1,jstr2);
-
-	jobject result; 
-	result = (*env)->CallStaticObjectMethod(env, cls, methodid, margs);
-
-	if ((*env)->ExceptionOccurred(env)) {
-		fprintf(stderr, "Exception got when trying to connect to provider...\n");
-		(*env)->ExceptionDescribe(env);
-	}
-
-	if (result == NULL) {
-	    fprintf(stderr, "Could not get a result.\n");
-	}
-	jvmp->procci = result;
-	fprintf(stderr, "Connected to ProActive...\n");
-
-	
-	/************TEST*****************/
-
-	/*
-	fprintf(stderr, "NOW EXPERIMENT\n");
-	cls = (*env)->FindClass(env, "org/ow2/proactive/compatibleone/pajavaprocci/ProActiveProcci");
-	if (cls == NULL) {
-		fprintf(stderr, "Problem while finding the class ProActiveProcci...\n");
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Class found.\n");
-	}
-
-	methodid = (*env)->GetMethodID(env, cls, "a", "([Ljava/lang/Object;)Ljava/lang/String;");
-	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method a.\n");
-		destroy_jvm(env, jvm);
-	}
-
-	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray arr = (*env)->NewObjectArray(env, 2, sclass, NULL);
-
-	//To populate the array, use SetObjectArrayElement() to put a String
-	(*env)->SetObjectArrayElement(env, arr,0,jstr1);
-	(*env)->SetObjectArrayElement(env, arr,1,jstr2);
-
-
-	fprintf(stderr, "Method a found....\n");
-	result = (*env)->CallObjectMethod(env, result, methodid, arr);
-	fprintf(stderr, "Method a executed....\n");
-	//const char *str= (*env)->GetStringUTFChars(env,result,0);
-	
-	//printf("Result: %s\n", str);
-	//need to release this string when done with it in order to avoid memory leak
-	//(*env)->ReleaseStringUTFChars(env, result, str);
-
-	//destroy_jvm(env, jvm);
-	*/
-}
-
-struct jvm_struct * startjvm() {
+/**
+ * Start the JVM where the Java side of this procci will run.
+ * DO NOT MODIFY THIS FUNCTION.
+ */
+struct jvm_struct * start_jvm() {
 	jint res;
 	JNIEnv *env;
 	JavaVM *jvm;
@@ -318,6 +123,198 @@ struct jvm_struct * startjvm() {
 	ret->env = env;
 	ret->procci = NULL;
 	return ret;
+}
+/**
+ * Try to exit gracefully, calling first the exit() method of the Starter class
+ * to clean the JVM. 
+ * DO NOT MODIFY THIS FUNCTION.
+ */
+void destroy_jvm(JNIEnv * env, JavaVM * jvm){
+	jclass cls;
+	jmethodID methodid;
+	// Find the class to interact with. 
+	cls = (*env)->FindClass(env, STARTER_CLASS);
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the class...\n");
+		exit(0);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	methodid = (*env)->GetStaticMethodID(env, cls, "exit", "()V");
+
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method.\n");
+	}
+
+	(*env)->CallStaticVoidMethod(env, cls, methodid);
+
+	fprintf(stderr, "Executed the method to exit the JVM...\n");
+
+	fprintf(stderr, "Looking for exceptions...\n");
+	if ((*env)->ExceptionOccurred(env)) {
+		(*env)->ExceptionDescribe(env);
+	}
+	fprintf(stderr, "Done.\n");
+	//printf("Destroying JVM...\n");
+	//(*jvm)->DestroyJavaVM(jvm);
+	//fprintf(stderr, "Done.\n");
+	exit(0);
+}
+
+
+/** 
+ * Make a call to the java layer.  
+ * @param mname defines the name of the method to invoke
+ * @param msign defines signature of the method to invoke
+ * @param margs defines the concrete arguments to invoke the method
+ * @return the json String of the result of the call.
+ * DO NOT MODIFY THIS FUNCTION.
+ */
+char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
+	jstring jstr1;
+	jstring jstr2;
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	fprintf(stderr, "Executing %s...\n", mname);
+	
+	jclass cls = (*env)->FindClass(env, "org/ow2/compatibleone/Procci");
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the interface Procci...\n");
+		destroy_jvm(env, jvm);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	jmethodID methodid = (*env)->GetMethodID(env, cls, mname, msign);
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method %s.\n", mname);
+		destroy_jvm(env, jvm);
+	}else{
+		fprintf(stderr, "Method '%s' found.\n", mname);
+	}
+
+	jobject result = (*env)->CallObjectMethod(env, procci, methodid, margs);
+	fprintf(stderr, "Looking for exceptions...\n");
+	if ((*env)->ExceptionOccurred(env)) {
+		(*env)->ExceptionDescribe(env);
+		return NULL;
+	}else{
+		fprintf(stderr, "Method '%s' executed.\n", mname);
+		const char *str = (*env)->GetStringUTFChars(env,result,0);
+		char * ret = (char*)malloc(strlen(str)+1);
+		strcpy(ret, str);
+		(*env)->ReleaseStringUTFChars(env, result, str);
+		return ret;
+	}
+}
+
+/**** ADJUST THE FOLLOWING TO YOUR NEEDS ****/
+
+/**
+ * Initial connection to the cloud service provider.
+ * It uses the Starter class to start up a procci connected to the provider.
+ * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
+ */
+void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+
+	fprintf(stderr, "Executing connect_to_provider...\n");
+
+	jclass cls = (*env)->FindClass(env, STARTER_CLASS);
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the class...\n");
+		destroy_jvm(env, jvm);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	jmethodID methodid = (*env)->GetStaticMethodID(env, cls, "start", "([Ljava/lang/Object;)Lorg/ow2/compatibleone/Procci;");
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method start.\n");
+		destroy_jvm(env, jvm);
+	}
+
+	// **** START MODIFYING HERE ***
+	// Modify this section according to the arguments required for the 
+	// connection to the cloud services provider.
+	// For this case the arguments used are: user demo
+	jclass sclass = (*env)->FindClass(env, "java/lang/String");
+	jobjectArray margs = (*env)->NewObjectArray(env, 2, sclass, NULL); // Using 2 arguments.
+
+	jstring jstr1 = (*env)->NewStringUTF(env, args[0]); // Creating argument 0.
+	jstring jstr2 = (*env)->NewStringUTF(env, args[1]); // Creating argument 1.
+
+	(*env)->SetObjectArrayElement(env, margs,0,jstr1); // Setting up argument 0.
+	(*env)->SetObjectArrayElement(env, margs,1,jstr2); // Setting up argument 1.
+
+	// **** STOP MODIFYING HERE ***
+
+	jobject result; 
+	result = (*env)->CallStaticObjectMethod(env, cls, methodid, margs);
+
+	if ((*env)->ExceptionOccurred(env)) {
+		fprintf(stderr, "Exception got when trying to connect to provider...\n");
+		(*env)->ExceptionDescribe(env);
+	}
+
+	if (result == NULL) {
+	    fprintf(stderr, "Could not get a result.\n");
+	}
+	jvmp->procci = result;
+	fprintf(stderr, "Connected to cloud services provider...\n");
+
+}
+
+/**
+ * Start a VM.
+ * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
+ */
+char * start_server(struct jvm_struct * jvmp, struct proactive * constr) {
+
+	jstring jstr1;
+	jstring jstr2;
+	jstring jstr3;
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	jclass sclass = (*env)->FindClass(env, "java/lang/String");
+	jobjectArray margs = (*env)->NewObjectArray(env, 3, sclass, NULL);
+
+	jstr1 = (*env)->NewStringUTF(env, constr->image);
+	//jstr2 = (*env)->NewStringUTF(env, "demo");
+	//jstr3 = (*env)->NewStringUTF(env, "demo");
+
+	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
+	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr2);
+	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr3);
+
+	return call_java_procci(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
+}
+
+/**
+ * Stop a VM.
+ * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
+ */
+char * stop_server(struct jvm_struct * jvmp, struct proactive * constr) {
+
+	jstring jstr1;
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	jclass sclass = (*env)->FindClass(env, "java/lang/String");
+	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);
+
+	jstr1 = (*env)->NewStringUTF(env, constr->number);
+
+	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
+
+	return call_java_procci(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
 }
 
 

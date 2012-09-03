@@ -106,7 +106,7 @@ private	int	check_output_pa_delete_server( struct pa_response * server_created)
 /*! This function fills in the struct proactive* given by usign the information that lies into 
  * the pa_response structure + calling the server to get info about the ProActive node. 
  * It also frees some proactive* structure fields. */
-private	int	connect_proactive_server( struct pa_response * server_created,struct proactive * server_data )
+private	int	parse_create_server_response( struct pa_response * server_created,struct proactive * server_data )
 {
 	struct	pa_response * zptr;
 	struct	pa_response * yptr;
@@ -283,7 +283,7 @@ private	struct	rest_response * start_proactive(
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_proactive_server( paptr, pptr ); // Returns 0 if everything okay.
+		status = parse_create_server_response( paptr, pptr ); // Returns 0 if everything okay.
 		paptr = liberate_pa_response( paptr );
 		if (status) // If something went wrong (status != 0)
         {
@@ -424,7 +424,7 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
-		if ((osptr=pa_delete_server( pptr->number )) != (struct pa_response *) 0)
+		if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
 		{
 			/* ----------------------------- */
 			/* await server instance removal */
@@ -472,7 +472,7 @@ private	struct	rest_response * stop_proactive(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where the user:pass is)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = pa_delete_server( pptr->number )))
+	else if (!( osptr = pa_delete_server(pptr)))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{

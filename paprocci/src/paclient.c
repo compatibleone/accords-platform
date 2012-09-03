@@ -543,7 +543,7 @@ void start_provider_if_needed(){
 		args[1] = Wpa.password;
 
 		fprintf(stderr, "Using user='%s', demo='%s'...\n", args[0], args[1]);
-		jvmp = startjvm();
+		jvmp = start_jvm();
 		connect_to_provider(jvmp, args);
 		free(args);
 		fprintf(stderr, "Done.\n");
@@ -565,12 +565,15 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 	start_provider_if_needed();
 
 	struct pa_response* result = (struct pa_response*) NULL;
-	//sprintf(command,"--get-cosacs --select-by-os %s", constr->image); // Parameters for java layer. 
+
+	if (constr == NULL){    // Check valid category instance. 
+		fprintf(stderr, "Invalid category instance...\n");
+		return NULL;
+	}
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	//}else if (!(raw_list = pa_java_procci_call(command))){
-	}else if (!(raw_list = start_server(jvmp, constr->image))){
+	}else if (!(raw_list = start_server(jvmp, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;
@@ -592,25 +595,23 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 /*			p a _ d e l e t e _ s e r v e r                         */
 /*	------------------------------------------------------------	*/
 /*! Unlock one ProActive node from the Scheduler/RM. */
-public	struct	pa_response *	pa_delete_server( char * id )
+public	struct	pa_response *	pa_delete_server(struct proactive * constr)
 {
 	char * filename = NULL;
 	char * raw_list = NULL;
-	//char command[1024];
+	
 	start_provider_if_needed();
 
 	struct pa_response* result = (struct pa_response*) NULL;
-	if (id != NULL){    // Check valid id. 
-		//sprintf(command,"--release-node %s" , id );  // Build command to call. 
-	}else{
-		fprintf(stderr, "Invalid name for the server...\n");
+
+	if (constr == NULL){    // Check valid category instance. 
+		fprintf(stderr, "Invalid category instance...\n");
 		return NULL;
 	}
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	//}else if (!(raw_list = pa_java_procci_call(command))){ // Call the java layer with the "delete" command. 
-	}else if (!(raw_list = stop_server(jvmp, id))){
+	}else if (!(raw_list = stop_server(jvmp, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;
