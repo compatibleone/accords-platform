@@ -1,10 +1,13 @@
 #include <invoke.h>
 #include <proactive.h>
+#include <paconfig.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
 #define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
+
+
 
 /**
  * Get a list of .jar files to add them to the CLASSPATH for the VM to use them. 
@@ -211,7 +214,8 @@ char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jo
 	}
 }
 
-/**** ADJUST THE FOLLOWING TO YOUR NEEDS ****/
+/**** ADJUST THE FOLLOWING CODE ACCORDING TO YOUR NEEDS ****/
+
 
 /**
  * Initial connection to the cloud service provider.
@@ -270,17 +274,44 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 }
 
 /**
+ * Initialize the procci and connects it to the provider if needed. 
+ * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
+ */
+struct jvm_struct * start_provider_if_needed(struct pa_config * config, struct jvm_struct ** jvmpp){
+	if (*jvmpp==NULL){
+		fprintf(stderr, "Initializing JVM and provider...\n");
+		// start the JVM
+		char ** args = (char**)malloc(2 * sizeof(char*));
+		args[0] = config->user;
+		args[1] = config->password;
+
+		fprintf(stderr, "Using user='%s', demo='%s'...\n", args[0], args[1]);
+		*jvmpp = start_jvm();
+		connect_to_provider(*jvmpp, args);
+		free(args);
+		fprintf(stderr, "JVM and provider were initialized successfully.\n");
+	}else{
+		fprintf(stderr, "Provider initialized, skipping...\n");
+	}
+	return *jvmpp;
+}
+
+/**
  * Start a VM.
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
-char * start_server(struct jvm_struct * jvmp, struct proactive * constr) {
+char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct proactive * constr) {
 
 	jstring jstr1;
 	jstring jstr2;
 	jstring jstr3;
+	
+	struct jvm_struct * jvmp = start_provider_if_needed(config, jvmpp);
+
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
 	jobject procci = jvmp->procci;
+
 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 3, sclass, NULL);
@@ -300,9 +331,12 @@ char * start_server(struct jvm_struct * jvmp, struct proactive * constr) {
  * Stop a VM.
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
-char * stop_server(struct jvm_struct * jvmp, struct proactive * constr) {
+char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct proactive * constr) {
 
 	jstring jstr1;
+
+	struct jvm_struct * jvmp = start_provider_if_needed(config, jvmpp);
+
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
 	jobject procci = jvmp->procci;

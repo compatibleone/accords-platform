@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.ow2.compatibleone.Procci;
+import org.ow2.proactive.compatibleone.exceptions.ElementNotFoundException;
 import org.ow2.proactive.compatibleone.exchangeobjects.*;
 import org.ow2.proactive.compatibleone.misc.*;
 import org.ow2.proactive.compatibleone.rm.*;
@@ -140,7 +141,7 @@ public class ProActiveProcci extends Procci{
 	}
 	/**
 	 * Execute in a ProActive node an instance of COSACS module. 
-	 * @return a json obtect telling the result of the operation and some extra data. 
+	 * @return a json object telling the result of the operation and some extra data. 
 	 * @throws Exception if anything goes wrong. 
 	 */
 	public String start_server(Object[] args) throws Exception{
@@ -153,9 +154,19 @@ public class ProActiveProcci extends Procci{
 			os = "linux";
 			logger.warn("No Operative System specified, using as default: " + os);
 		}
-		final String path_sep = props.getProperty("compatibleone.cosacs."+os+".path-separator");
-		final String app_path = props.getProperty("compatibleone.cosacs."+os+".path");
-		final String app_args = props.getProperty("compatibleone.cosacs."+os+".args");
+		
+		final String path_sep;
+		final String app_path;
+		final String app_args;
+		
+		try{
+			path_sep = props.getProperty("compatibleone.cosacs."+os+".path-separator");
+			app_path = props.getProperty("compatibleone.cosacs."+os+".path");
+			app_args = props.getProperty("compatibleone.cosacs."+os+".args");
+		}catch(ElementNotFoundException e){
+			throw new ElementNotFoundException("Key not defined for the Operative System required ('" + os + "')... " + e.getMessage());
+		}
+		
 		final String nodetoken = props.getProperty("compatibleone.nodes.token");
 		
 		SelectionScript selection = null;

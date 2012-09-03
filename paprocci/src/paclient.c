@@ -266,58 +266,6 @@ private	struct	pa_response * proactive_list_operation( char * buffer )
 	else	return( rptr );
 }
 
-
-/*! Function that calls the Java procci layer. */
-public char * pa_java_procci_call(char * specific_parameters)
-{ 
-    #define RESULT_SIZE 1024*8
-
-    char* javaprocci = NULL;               // example: /home/mjost/Projects/gitorious/proactive/procci/co-proactive-procci/procci "
-    char* general_parameters = NULL;       // example: --host xx -- user xx --pass xx 
-    char* all_command = NULL;              // all the command together, including the specific_parameters
-    char* result = NULL;                   // output of the execution of the command 
-
-    fprintf(stderr, "Calling the Java ProActive Procci...");
-    if      (!(javaprocci = getenv("PA_PROCCI_PATH"))){
-        fprintf(stderr, "Environment variable PA_PROCCI_PATH not defined...");
-        return NULL;
-    }else if(!(general_parameters = allocate(100 + strlen(Wpa.user) + strlen(Wpa.password)))){
-        return NULL;
-    }else if(sprintf(general_parameters, " --user %s --pass %s ", Wpa.user, Wpa.password)<0){
-        return NULL;
-    }else if((all_command = allocate(strlen(javaprocci) + strlen(general_parameters) + strlen(specific_parameters) + 16))==0){
-        return NULL;
-    }else if(sprintf(all_command, "%s %s %s", javaprocci, general_parameters, specific_parameters)<0){
-        return NULL;
-    }else{
-        FILE* pf = NULL;
-        size_t size = 0;
-
-        fprintf(stderr, "ProActive Java call: '%s'\n", all_command);
-
-        pf = popen(all_command, "r");
-        if (!pf){
-            fprintf(stderr, "Could not open pipe for output.\n");
-            return NULL;
-        }
-
-        ssize_t bytes_read = getdelim(&result, &size, '\0',  pf);
-        if(bytes_read != -1){
-            // ok
-            fprintf(stderr, "Java-Procci stdout: %s", result);
-        }else{
-            result = NULL;
-            fprintf(stderr, "Java-Procci stdout: <empty>");
-        }
-
-        if (pclose(pf) !=0){
-            fprintf(stderr, "Error: Failed to close command stream.\n");
-        }
-        return result;
-    }
-
-}
-
 /*	------------------------------------------------------------	*/
 /*		p r o a c t i v e  _ re t r i e v e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
@@ -482,6 +430,14 @@ public	struct	pa_response *	pa_list_locations()
 	return((struct pa_response *) 0);
 }
 
+/*	------------------------------------------------------------	*/
+/*			p a _ l i s t _ s e r v e r s			*/
+/*	------------------------------------------------------------	*/
+public	struct	pa_response *	pa_list_servers	( )
+{
+	return((struct pa_response *) 0);
+}
+
 private char * put_jsonstring_in_file(char * jsontext){
     char * tempfile = rest_temporary_filename("txt");
 
@@ -502,55 +458,20 @@ private char * put_jsonstring_in_file(char * jsontext){
 }
 
 
-/*	------------------------------------------------------------	*/
-/*			p a _ l i s t _ s e r v e r s			*/
-/*	------------------------------------------------------------	*/
-/*! List nodes available. */
-public	struct	pa_response *	pa_list_servers	( )
-{
-    //printf("ProActive Listing servers (ProActive nodes)... Using host %s  user %s  pass %s  version %s\n", Wpa.host, Wpa.user, Wpa.password, Wpa.version);
-    char * filename = NULL;
-    char * raw_list = NULL;
-
-    struct pa_response* result = (struct pa_response*) NULL;
-    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
-        return NULL;
-    }else if (!(raw_list = pa_java_procci_call("--list-nodes"))){ // Parameters for java layer. 
-        fprintf(stderr, "Problem making call to the java layer...\n");
-        free(result);
-        return NULL;
-    }else{
-        result->nature = _TEXT_JSON;
-        result->content = raw_list;
-        result->xmlroot = NULL;
-        if (!(filename = put_jsonstring_in_file(raw_list))){
-            fprintf(stderr, "Problem putting the json in a file...\n");
-        }else{
-            result->jsonroot = json_parse_file(filename);
-            result->response = NULL;
-        }
-    }
-	return(result);
-	//return( proactive_list_operation( "/services/hostedservices" ) );
-}
-
+/*
 void start_provider_if_needed(){
 	if (jvmp==NULL){
-		fprintf(stderr, "Initializing JVM and provider...\n");
-		// start the JVM
 		char ** args = (char**)malloc(2 * sizeof(char*));
 		args[0] = Wpa.user;
 		args[1] = Wpa.password;
-
 		fprintf(stderr, "Using user='%s', demo='%s'...\n", args[0], args[1]);
 		jvmp = start_jvm();
 		connect_to_provider(jvmp, args);
-		free(args);
-		fprintf(stderr, "Done.\n");
 	}else{
-		fprintf(stderr, "Provider initialized, skipping...\n");
 	}
 }
+*/
+
 
 /*	------------------------------------------------------------	*/
 /*			p a _ c r e a t e _ s e r v e r                         */
@@ -562,7 +483,7 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 	char * filename = NULL;
 	char * raw_list = NULL;
 
-	start_provider_if_needed();
+	//start_provider_if_needed();
 
 	struct pa_response* result = (struct pa_response*) NULL;
 
@@ -573,7 +494,7 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	}else if (!(raw_list = start_server(jvmp, constr))){
+	}else if (!(raw_list = start_server(&Wpa, &jvmp, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;
@@ -600,7 +521,7 @@ public	struct	pa_response *	pa_delete_server(struct proactive * constr)
 	char * filename = NULL;
 	char * raw_list = NULL;
 	
-	start_provider_if_needed();
+	//start_provider_if_needed();
 
 	struct pa_response* result = (struct pa_response*) NULL;
 
@@ -611,7 +532,7 @@ public	struct	pa_response *	pa_delete_server(struct proactive * constr)
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	}else if (!(raw_list = stop_server(jvmp, constr))){
+	}else if (!(raw_list = stop_server(&Wpa, &jvmp, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;
@@ -634,8 +555,7 @@ public	struct	pa_response *	pa_delete_server(struct proactive * constr)
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_get_subscription()
 {
-
-	return( proactive_list_operation( "" ));
+	return((struct pa_response *) 0);
 }
 
 /*	------------------------------------------------------------	*/
@@ -643,20 +563,15 @@ public	struct	pa_response *	pa_get_subscription()
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_list_deployments(char * server)
 {
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots" , server ); 
-	return( proactive_list_operation( buffer ) );
+	return((struct pa_response *) 0);
 }
-
 
 /*	------------------------------------------------------------	*/
 /*				p a _ g e t _ d e p l o y m e n t 			*/
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_get_deployment( char * server, char * slot )
 {
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
-	return( proactive_retrieve_operation( buffer ) );
+	return((struct pa_response *) 0);
 }
 
 /*	------------------------------------------------------------	*/
@@ -664,82 +579,15 @@ public	struct	pa_response *	pa_get_deployment( char * server, char * slot )
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_delete_deployment( char * server, char * slot )
 {
-	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
-	return( proactive_delete_operation( buffer ) );
+	return((struct pa_response *) 0);
 }
-
-/*! 
- * Get information about one node already locked
- * and returns this information. */
-public	struct	pa_response *	pa_get_server	(  char * id )
-{
-
-	// information used before:  nptr, Wpa.tls, Wpa.agent, hptr 
-
-    char * filename = NULL;
-    char * raw_list = NULL;
-    char command[1024];
-
-    struct pa_response* result = (struct pa_response*) NULL;
-    if (id != NULL){
-        sprintf(command,"-y list_information_about_this_node %s" , id ); 
-    }else{
-        fprintf(stderr, "Invalid id for the server...\n");
-        return NULL;
-    }
-
-    if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
-        return NULL;
-    }else if (!(raw_list = pa_java_procci_call(command))){
-        fprintf(stderr, "Problem making call to the java layer...\n");
-        free(result);
-        return NULL;
-    }else{
-        result->nature = _TEXT_JSON;
-        result->content = raw_list;
-        result->xmlroot = NULL;
-        if (!(filename = put_jsonstring_in_file(raw_list))){
-            fprintf(stderr, "Problem putting the json in a file...\n");
-        }else{
-            fprintf(stderr, "Filename: %s\n", filename);
-            result->jsonroot = json_parse_file(filename);
-            result->response = NULL;
-        }
-    }
-	return(result);
-}
-
 
 /*	------------------------------------------------------------	*/
 /*			p a _ u p d a t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	pa_response *	pa_update_server(  char * id, char * filename )
 {
-	struct	pa_response	*	rptr=(struct pa_response *) 0;
-	struct	url		*	uptr;
-	char	buffer[1024];
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/services/hostedservices/%s",id);
-	if (!( hptr = pa_authenticate() ))
-		return( rptr );
-	else if (!( uptr = analyse_url( Wpa.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = pa_client_put_request( nptr, Wpa.tls, Wpa.agent,filename, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return((struct pa_response *) 0);
 }
 
 

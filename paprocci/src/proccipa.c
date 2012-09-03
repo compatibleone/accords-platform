@@ -175,25 +175,13 @@ private	int	parse_create_server_response( struct pa_response * server_created,st
 				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
-			else if (!( strcmp( vptr, "PREPARING" )))                   // Check if the node is in Pending status, if so wait and re-ask. 
-			{
-				sleep(1);
-				if ( zptr )
-					zptr = liberate_pa_response( zptr );
-				if (!( zptr = pa_get_server( server_data->number ))) // Here re-connect to the server and get UP-TO-DATE info about the ProActive node to check status. 
-				{
-					reset_structure_proactive_server( server_data );
-					return( 555 );
-				}
-				else	yptr = zptr;
-			}
-			else if (!( strcmp( vptr, "RUNNING" )))                  // Check if the node is in Running (correct) status, if so, exit the loop. 
+			else if (!( strcmp( vptr, "RUNNING" )))         // Check if the node is in Running (correct) status, if so, exit the loop. 
 				break;
-			else if (!( strcmp( vptr, "IDLE" )))                  // Check if the node is in Finished status (which is not correct). 
-            {
-                reset_structure_proactive_server( server_data );
-                return( 555 );
-            }
+			else                  				// Else... 
+			{
+				reset_structure_proactive_server( server_data );
+				return( 555 );
+			}
 		}
 		if ( server_data->hostname ) server_data->hostname = liberate( server_data->hostname );
 		if ( server_data->reference ) server_data->reference = liberate( server_data->reference );
