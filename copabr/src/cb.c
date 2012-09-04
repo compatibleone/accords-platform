@@ -3638,6 +3638,105 @@ private	char *	cords_build_control( char * contract, char * sla, struct cords_gu
 	}
 }
 
+/*	-------------------------------------------------------		*/
+/*		c o r d s _ c h e c k _ s c o p e			*/
+/*	-------------------------------------------------------		*/
+private	int	cords_check_scope( char * test, char * scope )
+{
+	if (!( strcasecmp( scope, "default") ))
+		return(1);
+	else if (!( strcasecmp( scope, "any") ))
+		return(1);
+	else if (!( strcasecmp( scope, "all") ))
+		return(1);
+	else if (!( strcmp( test, scope ) ))
+		return(1);
+	else	return(0);
+}
+
+/*	-------------------------------------------------------		*/
+/*	    c o r d s _ v a l i d a t e _ s c o p e 			*/
+/*	-------------------------------------------------------		*/
+/*	we arrive here with a node name and a scope description		*/
+/*	if the scope is null, default, any and all then OK		*/
+/*	if the scope is an exact match with node name then OK		*/
+/*	otherwise the complex scope string may specify a mix of		*/
+/*	equations or negations where an exact match will respond	*/
+/*	as required by its prefix or absence. The list of scope		*/
+/*	elements may be comma, semicolon or space separated:		*/
+/*									*/
+/*		"=one,!two;!three =four"				*/
+/*									*/
+/*	-------------------------------------------------------		*/
+ 
+private	int	cords_validate_scope( char * test, char * scope )
+{
+	int	result=0;
+	int	negation=0;
+	char *	root;
+	char *	sptr;
+	char *	wptr;
+	/* --------------------------- */
+	/* ensure scope : remove space */
+	/* --------------------------- */
+	if (!( scope ))
+		return(1);
+	else 
+	{
+		while ( *scope == ' ' ) scope++;
+	}
+
+	/* --------------------------- */
+	/* handle the easy stuff first */
+	/* --------------------------- */
+	if ( cords_check_scope( test, scope ) )
+		return( 1 );
+	/* -------------------------- */
+	/* handle the hard stuff next */		
+	/* -------------------------- */
+	else if (!( sptr = allocate_string( scope ) ))
+		return(1);
+	else	root = sptr;
+
+	while ( *sptr )
+	{
+		switch ( *sptr )
+		{
+		case	'!'	:
+			negation = 1;
+			sptr++;
+			while ( *sptr == ' ' ) sptr++;
+			break;
+		case	'='	:
+			negation = 0;
+			sptr++;
+			while ( *sptr == ' ' ) sptr++;
+			break;
+		default		:
+			negation=0;
+			break;
+		}
+
+		for ( wptr=sptr; *wptr != 0; wptr++ )
+			if (( *wptr == ',' )
+			||  ( *wptr == ' ' )
+			||  ( *wptr == ';' ))
+				break;
+
+		if ( *wptr )
+			*(wptr++) = 0;
+		if ((result = cords_check_scope( test, sptr )) != 0)
+			break;
+		else
+		{
+			result = negation = 0;
+			sptr = wptr;
+			continue;
+		}
+	}
+	liberate( root );
+	return( ( negation ? !result : result ) );
+}
 
 /*	-------------------------------------------------------		*/
 /*	    c o r d s _ s e r v i c e _ g u a r a n t e e s		*/
@@ -3674,10 +3773,7 @@ private	int	cords_service_guarantees(
 
 			else if (!( aptr = document_atribut( xptr, _CORDS_NAME ) ))
 				continue;
-			else if (( strcasecmp( gptr->scope, "default"   ) != 0 )
-			     &&  ( strcasecmp( gptr->scope, "any"       ) != 0 )
-			     &&  ( strcasecmp( gptr->scope, "all"       ) != 0 )
-			     &&  ( strcmp( gptr->scope, aptr->value     ) != 0 ))
+			else if (!( cords_validate_scope( aptr->value, gptr->scope ) ))
 				continue;
 			else if (!( gptr->property ))
 				continue;
