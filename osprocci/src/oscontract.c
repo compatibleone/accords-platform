@@ -50,6 +50,7 @@ struct	os_compute_infos
 	int	speed;
 	int	memory;
 	int	storage;
+	char 	architecture[256];
 	char *	id;
 };
 
@@ -132,6 +133,19 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
 	else	request.storage = rest_normalise_value(vptr,'G');
+
+	/* --------------------------------------------- */
+	/* collect and control the architecture required */
+	/* --------------------------------------------- */
+	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
+		strcpy(request.architecture,"x86" );
+	else if ((!(strcasecmp( vptr, "x86"    ) ))
+	     ||  (!(strcasecmp( vptr, "x86_32" ) ))
+	     ||  (!(strcasecmp( vptr, "x86_64" ) ))
+	     ||  (!(strcasecmp( vptr, "txt86"  ) )))
+		strcpy(request.architecture,vptr  );
+	else	strcpy(request.architecture,"x86" );
 	
 	/* ----------------------------------------- */
 	/* for structures in flavor message response */
@@ -156,13 +170,21 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 		if (!( vptr = json_atribut( dptr, "vcpus" ) ))
 			flavor.cores = 0;
 		else	flavor.cores = rest_normalise_value(vptr,'U');
+
 		if (!( vptr = json_atribut( dptr, "speed" ) ))
 			flavor.speed = 0;
 		else	flavor.speed = rest_normalise_value(vptr,'G');
+
+		if (!( vptr = json_atribut( dptr, "architecture" ) ))
+			strcpy(flavor.architecture,"x86" );
+		else	strcpy(flavor.architecture,vptr  );
+
 		/* ------------------------------------ */
 		/* compare the request and the response */
 		/* ------------------------------------ */
-		if (( request.storage ) && ( flavor.storage < request.storage ))
+		if ( strncasecmp( flavor.architecture, request.architecture, strlen(request.architecture) ) != 0 ) 
+			continue;
+		else if (( request.storage ) && ( flavor.storage < request.storage ))
 			continue;
 		else if (( request.memory  ) && ( flavor.memory < request.memory ))
 			continue;
