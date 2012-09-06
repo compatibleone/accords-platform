@@ -277,7 +277,7 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
  * Initialize the procci and connects it to the provider if needed. 
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
-struct jvm_struct * start_provider_if_needed(struct pa_config * config, struct jvm_struct ** jvmpp){
+struct jvm_struct * initialize_provider_if_needed(struct pa_config * config, struct jvm_struct ** jvmpp){
 	if (*jvmpp==NULL){
 		fprintf(stderr, "Initializing JVM and provider...\n");
 		// start the JVM
@@ -298,6 +298,10 @@ struct jvm_struct * start_provider_if_needed(struct pa_config * config, struct j
 
 /**
  * Start a VM.
+ * @param config procci configuration structure.
+ * @param jvmpp procci JVM structure.
+ * @param constr constraints for this virtual machine. 
+ * @return the resulting json object of the java call.
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct proactive * constr) {
@@ -306,21 +310,22 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	jstring jstr2;
 	jstring jstr3;
 	
-	struct jvm_struct * jvmp = start_provider_if_needed(config, jvmpp);
+	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
 	jobject procci = jvmp->procci;
 
-
+	// The Java method to call is 'String start_server(Object[] args)'.
+	// We prepare the arguments to invoke it. 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 3, sclass, NULL);
 
-	jstr1 = (*env)->NewStringUTF(env, constr->image);
+	jstr1 = (*env)->NewStringUTF(env, constr->image);	// Set argument. 
 	//jstr2 = (*env)->NewStringUTF(env, "demo");
 	//jstr3 = (*env)->NewStringUTF(env, "demo");
 
-	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
+	(*env)->SetObjectArrayElement(env, margs,0,jstr1);	// Put argument into the array.
 	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr2);
 	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr3);
 
@@ -335,7 +340,7 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 
 	jstring jstr1;
 
-	struct jvm_struct * jvmp = start_provider_if_needed(config, jvmpp);
+	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;

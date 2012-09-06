@@ -1,0 +1,24 @@
+README
+------
+
+This is a layer of the CompatibleOne ProActive Procci, that directly gets connected to Scheduler/RM to perform actions required by ACCORDS (through the C CompatibleOne ProActive Procci).
+
+COMPILATION
+-----------
+
+To compile this example (assuming $JPAPROCCI contains the root path of it):
+1. Edit accordingly the following configuration file: 
+	$ vim $JPAPROCCI/build.properties
+2. Compile the project. 
+	$ cd $JPAPROCCI 
+	$ ant dist
+
+To make this project run: 
+1. Set up the following configuration files: 
+	$ vim $JPAPROCCI/conf/procci.properties
+	$ vim $JPAPROCCI/conf/ProActiveConfiguration.xml
+Remember to put in your ~/.ssh your keys, BOTH id_rsa and id_rsa.pub and point to them in the ProActiveConfiguration.xml file.
+2. Run: 
+	$ $JPAPORCCI/bin/procci ---
+
+

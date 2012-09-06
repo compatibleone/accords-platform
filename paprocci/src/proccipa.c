@@ -86,7 +86,7 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 }
 
 /*! Check if the output of the pa_delete_server function was correct. */
-private	int	check_output_pa_delete_server( struct pa_response * server_created)
+private	int	parse_delete_server_response( struct pa_response * server_created)
 {
 	char *	vptr; // Auxiliar variable. 
 
@@ -246,104 +246,51 @@ private	struct	rest_response * start_proactive(
 		struct rest_client * cptr, 
 		struct rest_request * rptr, 
 		struct rest_response * aptr, 
-		void * vptr )               // It is void* , but is casted to a struct proactive* since the request comes
+		void * vptr )       // It is void* , but is casted to a struct proactive* since the request comes
                                     // from the occiserver, which receives something generic (related maybe to OpenStack, or OpenNebula, or any other).
 {
 	struct	pa_response * paptr;
 	struct	proactive * pptr;
-	int		status;
-    //char    *   idptr;
-    char        reference[512];
-	char	*	filename;
-	char 	*	personality="";
-	char 	*	resource=_CORDS_LAUNCH_CFG;
+	int	status;
+	char	reference[512];
+
 	printf("start_proactive\n");
-	if (!( pptr = vptr ))                                                       // Can't provide null.
+	if (!( pptr = vptr ))							// Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
+	else if ( pptr->status != _OCCI_IDLE )     
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)	// Set up configuration according to profile (where the user and pass are).
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( paptr = pa_create_server(pptr)))                           // Request of a node using constraints. 
+	else if (!( paptr = pa_create_server(pptr)))				// Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
+		/* ------------------------------- */
+		/* parse data obtained from server */
+		/* ------------------------------- */
 		status = parse_create_server_response( paptr, pptr ); // Returns 0 if everything okay.
 		paptr = liberate_pa_response( paptr );
 		if (status) // If something went wrong (status != 0)
-        {
-            fprintf(stderr, "Something went wrong connecting to proactive %d...\n", status);
-            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
-        }
-        /*****COSACS*******/ 
+		{
+			fprintf(stderr, "Something went wrong connecting to proactive %d...\n", status);
+			return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+		}
+		sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
+		/* ---------------------------- */
+		/* launch the COSACS operations */
+		/* ---------------------------- */
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_CONFIGURATION,
+			reference, WpaProcci.publisher );
 
-        sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
-        /* --------------------------------- */
-        /* retrieve crucial data from server */
-        /* --------------------------------- */
-        //if (!( status = connect_openstack_server( osptr, pptr ) ))
-        //{
-            /* -------------------------------------------- */
-            /* attempt to associate the floating IP address */
-            /* -------------------------------------------- */
-            //if ( pptr->floating )
-            //   if ((status = associate_server_address( pptr )) != 0 )
-            //        return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
-
-            /* ---------------------------- */
-            /* launch the COSACS operations */
-            /* ---------------------------- */
-            cosacs_metadata_instructions( 
-                    pptr->hostname, _CORDS_CONFIGURATION,
-                    reference, WpaProcci.publisher );
-
-            /* ------------------------------------- */
-            /* release the public IP if not required */
-            /* ------------------------------------- */
-            //if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
-            //{
-            //    release_floating_address( pptr );
-            //    if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-            //    if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
-            //    {
-            //        reset_openstack_server( pptr );
-            //        return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
-            //    }
-            //}
-            /* ----------------------- */
-            /* create server meta data */
-            /* ----------------------- */
-            //if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
-            //    return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
-
-            //else if (!( metafilename = os_create_metadata_request( personality ) ))
-            //    return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
-            //else if (!( metaptr = os_create_metadata( idptr, metafilename )))
-            //    return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
-            //else
-            //{
-            //    metaptr = liberate_os_response( metaptr );
-            //    liberate( metafilename );
-        //    }
-        //}
-        //osptr = liberate_os_response( osptr );
-        if (!( status ))  
-        {
-
-            return( rest_html_response( aptr, 200, "OK" ) );
-        //    if (!( os_valid_price( pptr->price ) ))
-        //        return( rest_html_response( aptr, 200, "OK" ) );
-        //    else if ( occi_send_transaction( _CORDS_PROACTIVE, pptr->price, "action=start", pptr->account, reference ) )
-        //        return( rest_html_response( aptr, 200, "OK" ) );
-        //    else    return( rest_html_response( aptr, 200, "OK" ) );
-        }
-        else
-        {    
-            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
-        }
+		if (!( status ))  
+		{
+			return( rest_html_response( aptr, 200, "OK" ) );
+		}
+		else
+		{    
+			return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+		}
     }
 
 
@@ -359,34 +306,7 @@ private	struct	rest_response * save_proactive(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	pa_response * osptr;
-	int		status;
-	struct	proactive * pptr;
-	char	*	filename;
-
     return( rest_html_response( aptr, 404, "Invalid Action" ) ); 
-    
-	//if (!( pptr = vptr ))
-	 	//return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	//else if ( pptr->status == _OCCI_IDLE )
-		//return( rest_html_response( aptr, 400, "Contract Not Active" ) );
-	//else if ((status = use_proactive_configuration( pptr->profile )) != 0)
-		//return( rest_html_response( aptr, status, "Not Found" ) );
-	//else if (!( filename = pa_create_image_request( pptr->name, pptr->number ) ))
-	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//else if (!( osptr = pa_create_image( filename ) ))
-	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//else
-	//{
-		///* --------------------------------- */
-		///* retrieve crucial data from server */
-		///* --------------------------------- */
-		//status = connect_proactive_image( osptr, pptr );
-		//osptr = liberate_pa_response( osptr );
-		//if (!( status ))
-			//return( rest_html_response( aptr, 200, "OK" ) );
-		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//}
 }
 
 /*	--------------------------------------------------------	*/
@@ -401,14 +321,6 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 		return((struct pa_response *) 0);
 	else
 	{
-		/* ------------------------------------------ */
-		/* disconnect the floating IP from the server */
-		/* ------------------------------------------ */
-		//if ( pptr->floatingid )
-		//{
-		//	occi_flush_client( pptr->floating, _COSACS_PORT );
-		//	release_floating_address( pptr );
-		//}
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
@@ -458,13 +370,13 @@ private	struct	rest_response * stop_proactive(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where user and pass are)
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else if (!( osptr = pa_delete_server(pptr)))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-        if (check_output_pa_delete_server(osptr) != 0){ // If something went wrong...
+        if (parse_delete_server_response(osptr) != 0){ // If something went wrong...
             return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
         }
 		if ( pptr->status != _OCCI_IDLE )
@@ -639,7 +551,7 @@ private	int	create_proactive(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( pptr->node )) // mmm check it
+	else if (!( pptr->node )) 
 		return( 0 ); 
 	else	return(create_proactive_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WpaProcci.tls));
 }
@@ -769,7 +681,7 @@ private	int	set_default_proactive(struct occi_category * optr, void * vptr)
 /* 	b u i l d _ p r o a c t i v e _ c o n f i g u r a t i o n	*/
 /*	---------------------------------------------------------	*/
 /*	this category handles the configuration of the interface	*/
-/*	to the oepn stack server for the preceeding category of		*/
+/*	to the proactive  server for the preceeding category of		*/
 /*	provisioning instance requests.					*/
 /*	---------------------------------------------------------	*/
 public	struct	occi_category * build_proactive_configuration( char * domain )

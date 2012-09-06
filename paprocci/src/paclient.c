@@ -476,14 +476,15 @@ void start_provider_if_needed(){
 /*	------------------------------------------------------------	*/
 /*			p a _ c r e a t e _ s e r v e r                         */
 /*	------------------------------------------------------------	*/
-/*! 
- * Lock a ProActive node using as parameters the constraints given.  */
+/** 
+ * Lock a ProActive node using as parameters the constraints given.  
+ * @param constr constraints for the node to provide.
+ * @return the parsed information about the reservation process.
+ */
 public	struct	pa_response * pa_create_server(struct proactive * constr)
 {
 	char * filename = NULL;
 	char * raw_list = NULL;
-
-	//start_provider_if_needed();
 
 	struct pa_response* result = (struct pa_response*) NULL;
 
