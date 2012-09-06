@@ -1,0 +1,810 @@
+#!/bin/sh
+#
+# Wrapper for accords commands
+#
+# Copyright: 
+#   Prologue 2011
+#   Mandriva 2011
+#   Bull 2012
+#
+# Author: 
+#   Jean Parpaillon
+#   Jamie Marshall
+#   Liliana Cabalantti
+#
+
+set -e
+
+export PATH=@sitepath@:$PATH
+
+confdir=@pkgsysconfdir@
+if test -e ./accords.ini; then
+    . ./accords.ini
+elif test -e $confdir/accords.ini; then
+    . $confdir/accords.ini
+fi
+
+# -------------------------------------
+# to activate the security using nethsm
+# set nethsm to 1
+# then specify the security directory.
+# -------------------------------------
+# nethsm=1
+# tls=security
+# -------------------------------------
+# sans security 
+# -------------------------------------
+nethsm=
+tls=
+# -------------------------------------
+zone="europe"
+trace=1
+threads=1
+verbose=0
+debug=0
+domain=occi
+operator=accords
+password=co-system
+
+if [ -z "$target" ]; then
+    target=accords.xml
+fi
+
+if [ -z "$resthost" ]; then
+    resthost=127.0.0.1
+fi
+
+if [ -z "$restport" ]; then
+    restport=8086
+fi
+
+if [ -z "$publisher" ]; then
+	if [ -z "$tls" ]; then
+	    publisher=http://$resthost:$restport
+	else
+	    publisher=https://$resthost:$restport
+	fi
+fi
+
+if [ -z "$monitor" ]; then
+    monitor=$trace
+fi
+
+###
+### Aliases
+###
+### The script must be called through one of the following aliases.
+###
+# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-cosched run-publisher accords-config"
+aliases="@aliases@"
+
+_co_start() {
+    echo "Starting ACCORDS"
+
+    echo "Starting accords publication services"
+    @bindir@/run-publisher &
+    sleep 1
+
+    echo "Starting accords file services"
+    @bindir@/run-fileserver &
+    sleep 1
+    
+    echo "Starting accords security services"
+    @bindir@/run-coss &
+    sleep 1
+
+    echo "Starting accords monitoring services"
+    @bindir@/run-comons &
+    sleep 1
+    
+    echo "Starting accords accounting services"
+    @bindir@/run-coobas &
+    sleep 1
+    
+    echo "Starting accords networking services"
+    @bindir@/run-conets &
+    sleep 1
+
+    echo "Starting accords elasticity services"
+    @bindir@/run-coes &
+    sleep 1
+    
+    echo "Starting accords energy efficiency services"
+    @bindir@/run-coees &
+    sleep 1
+    
+    echo "Starting accords image storage services"
+    @bindir@/run-ezvm &
+    sleep 1
+
+    echo "Starting accords image production services"
+    @bindir@/run-coips &
+    sleep 1
+
+    echo "Starting accords parser services"
+    @bindir@/run-parser &
+    sleep 1
+
+    echo "Starting accords broker services"
+    @bindir@/run-broker &
+    sleep 1
+
+    echo "Starting accords procci services"
+    @bindir@/run-procci &
+    sleep 1
+
+    echo "Starting accords scheduling services"
+    @bindir@/run-cosched &
+    sleep 1
+
+    echo "Starting accords open stack services"
+    @bindir@/run-osprocci &
+    sleep 1
+
+    echo "Starting accords proactive services"
+    run-paprocci &
+    sleep 1
+
+    echo "Starting accords test occi open stack server"
+    @bindir@/run-testosocci &
+    sleep 1
+
+    echo "Starting accords occi open stack services"
+    @bindir@/run-osocciprocci &
+    sleep 1
+
+    echo "Starting accords open nebula services"
+    @bindir@/run-onprocci &
+    sleep 1
+    
+    echo "Starting accords windows azure services"
+    @bindir@/run-azprocci &
+    sleep 1
+
+    echo "Starting accords delta cloud services"
+    @bindir@/run-dcprocci &
+    sleep 1
+
+    echo "Starting accords sla services"
+    @bindir@/run-slam &
+    sleep 1
+
+    echo "Starting accords procci example"
+    @bindir@/run-example &
+    sleep 1
+
+    echo "Starting accords software configuration services"
+    @bindir@/run-cosacs &
+    sleep 1
+
+    echo "ACCORDS ready"
+    @bindir@/co-status
+}
+
+_co_broker() {
+    if [ -z "$tls" ]; then
+	@bindir@/testcb --publisher "$publisher" --verbose plan_$1.xml
+    else
+	@bindir@/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+    fi
+} 
+
+_co_command() {
+    if [ -z "$tls" ]; then
+	@bindir@/command --publisher "$publisher" $*
+    else
+	@bindir@/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+    fi
+}
+
+_co_parser() {
+    if [ -z "$tls" ]; then
+	@bindir@/testcp --publisher "$publisher" --verbose $2 $1.xml
+    else
+	@bindir@/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
+    fi
+}
+
+_co_resolver() {
+    if [ -z "$tls" ]; then
+	@bindir@/testresolver --publisher "$publisher" $*
+    else
+	@bindir@/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+    fi
+}
+
+_co_status() {
+    echo "-----------------------------"
+    echo " Accords Platform Components "
+    echo "-----------------------------"
+    if [ "$(uname -s)" = 'Linux' ] ; then
+	netstat -a -p | grep LISTEN | grep publisher
+	netstat -a -p | grep LISTEN | grep fileserver
+	netstat -a -p | grep LISTEN | grep coss
+	netstat -a -p | grep LISTEN | grep comons
+	netstat -a -p | grep LISTEN | grep conets
+	netstat -a -p | grep LISTEN | grep coobas
+	netstat -a -p | grep LISTEN | grep coes
+	netstat -a -p | grep LISTEN | grep coees
+	netstat -a -p | grep LISTEN | grep parser
+	netstat -a -p | grep LISTEN | grep broker
+	netstat -a -p | grep LISTEN | grep procci
+	netstat -a -p | grep LISTEN | grep cosched
+	netstat -a -p | grep LISTEN | grep ezvm
+	netstat -a -p | grep LISTEN | grep coips
+	netstat -a -p | grep LISTEN | grep cosacs
+    elif [ "$(uname -s)" = 'Darwin' ] ; then
+	lsof -i | grep LISTEN | grep publisher || true
+	lsof -i | grep LISTEN | grep fileserver || true
+	lsof -i | grep LISTEN | grep coss || true
+	lsof -i | grep LISTEN | grep comons || true
+	lsof -i | grep LISTEN | grep conets || true
+	lsof -i | grep LISTEN | grep coobas || true
+	lsof -i | grep LISTEN | grep coes || true
+	lsof -i | grep LISTEN | grep coees || true
+	lsof -i | grep LISTEN | grep parser || true
+	lsof -i | grep LISTEN | grep broker || true
+	lsof -i | grep LISTEN | grep procci || true
+	lsof -i | grep LISTEN | grep cosched || true
+	lsof -i | grep LISTEN | grep ezvm || true
+	lsof -i | grep LISTEN | grep coips || true
+	lsof -i | grep LISTEN | grep cosacs || true
+    else
+	echo "Unsupported OS ($(uname -s))"
+	exit 1
+    fi
+}
+
+_co_stop() {
+    _stop_service cosacs
+    _stop_service example
+    _stop_service slam
+    _stop_service onprocci
+    _stop_service osocciprocci
+    _stop_service testosocci
+    _stop_service dcprocci
+    _stop_service osprocci
+    _stop_service paprocci
+    _stop_service azprocci
+    _stop_service cosched
+    _stop_service procci
+    _stop_service broker
+    _stop_service parser
+    _stop_service ezvm
+    _stop_service coips
+    _stop_service coees
+    _stop_service coes
+    _stop_service conets
+    _stop_service coobas
+    _stop_service comons
+    _stop_service coss
+    _stop_service fileserver
+    _stop_service publisher
+}
+
+_run_azprocci() {
+    @bindir@/azprocci --config $target CO-AZPROCCI/1.0
+} 
+
+_run_broker() {
+    @bindir@/broker --config $target CO-BROKER/1.0
+} 
+
+_run_coes() {
+    @bindir@/coes --config $target CO-ES/1.0
+} 
+
+_run_coees() {
+    @bindir@/coees --config $target CO-EES/1.0
+} 
+
+_run_comons() {
+    @bindir@/comons --config $target CO-MONS/1.0
+}
+
+_run_conets() {
+    @bindir@/conets --config $target CO-NETS/1.0
+}
+
+_run_coobas() {
+    @bindir@/coobas --config $target CO-BAS/1.0
+}
+
+_run_cosacs() {
+    @bindir@/cosacs --config $target CO-SACS/1.0
+}
+
+_run_coss() {
+    @bindir@/coss --config $target CO-SS/1.0
+}
+
+_run_ezvm() {
+    @bindir@/ezvm --config $target CO-EZVM/1.0
+}
+
+_run_coips() {
+    @bindir@/coips --config $target CO-IPS/1.0
+}
+
+_run_fileserver() {
+    @bindir@/fileserver --config $target CO-FS/1.0
+}
+
+_run_onprocci() {
+    @bindir@/onprocci --config $target CO-ONPROCCI/1.0
+}
+
+_run_osprocci() {
+    @bindir@/osprocci --config $target CO-OSPROCCI/1.0
+}
+
+_run_paprocci() {
+    paprocci --config $target CO-PAPROCCI/1.0
+}
+
+_run_osocciprocci() {
+    @bindir@/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+}
+
+_run_testosocci() {
+    @bindir@/testosocci --config $target CO-TESTOSOCCI/1.0
+}
+
+_run_slam() {
+    @bindir@/slam --config $target CO-SLAM/1.0
+}
+
+_run_example() {
+    @bindir@/example --config $target CO-EXAMPLE/1.0
+}
+
+_run_dcprocci() {
+    @bindir@/dcprocci --config $target CO-DCPROCCI/1.0
+}
+
+_run_parser() {
+    @bindir@/parser --config $target CO-PARSER/1.0
+}
+
+_run_procci() {
+    @bindir@/procci --config $target CO-PROCCI/1.0
+}
+_run_cosched() {
+    @bindir@/cosched --config $target CO-SCHED/1.0
+}
+ 
+_run_publisher() {
+    @bindir@/publisher --config $target CO-PUB/1.0
+}
+
+_run_fileserver() {
+    @bindir@/fileserver --config $target CO-FS/1.0
+}
+
+_make_security_files() {
+	_mksecs publisher 0
+	_mksecs fileserver 0
+	_mksecs coss 0
+	_mksecs comons 1
+	_mksecs coes 1
+	_mksecs coees 1
+	_mksecs coobas 1
+	_mksecs conets 1
+	_mksecs broker 1
+	_mksecs ezvm 1
+	_mksecs coips 1
+	_mksecs cosacs 1
+	_mksecs parser 1
+	_mksecs procci 1
+	_mksecs cosched 1
+	_mksecs osprocci 1
+	_mksecs paprocci 1
+	_mksecs testosocci 1
+	_mksecs osocciprocci 1
+	_mksecs onprocci 1
+	_mksecs azprocci 1
+	_mksecs dcprocci 1
+	_mksecs slam 1
+	_mksecs example 1
+	_mksecs command
+    
+	_mksect testcp 1
+	_mksect testpa 1
+	_mksect testcb 1
+	_mksect teston 1
+	_mksect testos 1
+	_mksect testresolver 1
+	_mksect command 1
+}
+
+_accords_config() {
+    if test `id -u` -eq 0; then
+	export secdir=security
+    else
+	export secdir=security
+    fi
+
+    if [ -z "$tls" ]; then
+	echo "Accords Security Not Required"
+    else
+	echo "Creating Accords Security Files"
+    
+	export calist=Certificates.crt
+	export pass=Accords
+
+	if [ -z "$nethsm" ]; then 
+		export options=13
+
+	else
+		export options=525
+	fi
+    
+
+	if test -d $secdir; then
+	   if [ -z "$nethsm" ]; then
+	    	echo "ACCORDS security dir exists ($secdir): please remove it first !"
+	    	exit 1
+	   else
+	    	echo "ACCORDS security dir exists ($secdir): certificates have not been regenerated !"
+		_make_security_files
+	   fi
+	else
+	    	mkdir -p $secdir
+		_make_security_files
+
+		echo "Creating Accords Certificats"
+	
+		export bits=2048
+		export days=365
+		export sslconfig=./openssl.cnf
+
+		_mkcert coss
+		_mkcert coes
+		_mkcert coees
+		_mkcert coobas
+		_mkcert comons
+		_mkcert conets
+		_mkcert broker
+		_mkcert parser
+		_mkcert ezvm
+		_mkcert coips
+		_mkcert publisher
+		_mkcert fileserver
+		_mkcert procci
+		_mkcert cosched
+		_mkcert osprocci
+		_mkcert testosocci
+		_mkcert osocciprocci
+		_mkcert onprocci
+		_mkcert paprocci
+		_mkcert azprocci
+		_mkcert dcprocci
+		_mkcert slam
+		_mkcert example
+		_mkcert cosacs
+	
+		_mkcert testcp
+		_mkcert testcb
+		_mkcert testos
+		_mkcert testpa
+		_mkcert teston
+		_mkcert testresolver
+		_mkcert command
+	fi
+    fi
+
+    echo "Creating Accords Port Configuration : ports.xml"
+
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ports.xml
+    echo "<import name=\"accords-ports\" xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> ports.xml
+    echo "<network name=\"accords-platform\">" >> ports.xml
+
+    echo "Creating Accords Global Configuration File: $target"
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $target
+    echo "<accords>" >> $target
+
+    _mkpub publisher
+    _mkmon coss 
+    _mkmon comons 
+    _mkcfg coes 
+    _mkcfg conets 
+    _mkcfg coobas 
+    _mkcfg parser 
+    _mkcfg broker 
+    _mkcfg procci 
+    _mkcfg osprocci  
+    _mkcfg paprocci  
+    _mkcfg testosocci
+    _mkcfg osocciprocci  
+    _mkcfg onprocci
+    _mkcfg azprocci
+    _mkcfg dcprocci
+    _mkcfg fileserver
+    _mkcfg ezvm
+    _mkcfg coips
+    _mkcfg coees 
+    _mkcfg cosched
+    _mkcfg slam
+    _mkcfg example
+    _mkcosacs cosacs
+
+    echo "</accords>" >> $target
+    echo "</network>" >> ports.xml
+    echo "</import>" >> ports.xml
+}
+
+###
+### Helper functions
+###
+_usage() {
+    echo "Usage: this script must be called through one of the following name:"
+    for alias in $aliases; do
+	echo " * $alias"
+    done
+}
+
+_stop_service() {
+    service=$1
+    echo "Stopping service: $service"
+    if [ "$(uname -s)" = 'Linux' ] ; then
+	killall -q $service || true
+	killall -q lt-$service || true
+    elif [ "$(uname -s)" = 'Darwin' ] ; then
+	killall $service >/dev/null 2>&1 || true
+	killall lt-$service >/dev/null 2>&1 || true
+    else
+	echo "Unsupported OS ($(uname -s))"
+	exit 1
+    fi
+    sleep 1
+}
+
+_mksecs() {
+    module=$1
+    auth=$2
+    echo "<tls key='$secdir/"${module}"PrivateKey.pem'" > $secdir/${module}Tls.xml
+    echo "     certificate='$secdir/"${module}"Certificate.pem'" >> $secdir/${module}Tls.xml
+    echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
+    echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
+    echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
+    chmod 0640 $secdir/${module}Tls.xml
+}
+
+_mksect() {
+    module=$1
+    auth=$2
+    echo "<tls key='$secdir/"${module}"PrivateKey.pem'" > $secdir/${module}Tls.xml
+    echo "     certificate='$secdir/"${module}"Certificate.pem'" >> $secdir/${module}Tls.xml
+    echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
+    echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
+    echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     option='"$optiont"' />" >> $secdir/${module}Tls.xml
+    chmod 0640 $secdir/${module}Tls.xml
+}
+
+_mkcert() {
+    echo "Creating certificate for module $1"
+    module=$1
+    if test ! -e $sslconfig; then
+	echo "Can not find openSSL config file: $sslconfig"
+	exit 1
+    fi
+
+    if [ -z "$nethsm" ]; then
+
+	openssl req -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem 2> /dev/null
+    else
+	openssl req -engine pkcs11 -keyform e -config $sslconfig \
+	    -newkey $bits -x509 -days $days -sha1 \
+	    -keyout ${secdir}/${module}PrivateKey.pem -out ${secdir}/${module}Certificate.pem
+    fi
+    chmod 0400 ${secdir}/${module}PrivateKey.pem
+    chmod 0444 ${secdir}/${module}Certificate.pem
+}
+
+_mktls() {
+    module=$1
+    if test -z "$tls"; then
+	echo "         tls=''/>" >> $target
+    else
+	echo "         tls='"$tls"/"${module}"Tls.xml'/>" >> $target
+    fi
+}
+
+_mkpub() {
+    module=$1
+    echo "<"${module} >> $target
+    echo "    publisher=''"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity=''" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+    echo "</"${module}">" >> $target
+    echo "<port name=\"${module}\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+}
+
+_mkmon() {
+    module=$1
+    export restport=$(($restport+1))
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":"$restport"'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+    echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+}
+
+_mkcosacs() {
+    module=$1
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":8286'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='8286'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$trace"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+    echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\"8286\" to=\"8286\"/>" >> ports.xml
+}
+
+_mkcfg() {
+    module=$1
+    export restport=$(($restport+1))
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"$operator"'"           >> $target
+    echo "    identity='"$resthost":"$restport"'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$monitor"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+    echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+}
+
+if test "`basename $0`" != "accords-config"; then
+    if test ! -e $target; then
+	echo "Can not find target file: $target."
+	echo "Please run accords-config first !"
+	exit 1
+    fi
+fi
+
+case `basename $0` in
+    co-start) 
+	_co_start $*
+	;;
+    co-broker) 
+	_co_broker $*
+	;;
+    co-command) 
+	_co_command $*
+	;;
+    co-parser) 
+	_co_parser $*
+	;;
+    co-resolver)
+	_co_resolver $*
+	;;
+    co-status)
+	_co_status $*
+	;;
+    co-stop)
+	_co_stop $*
+	;;
+    run-paprocci) 
+	_run_paprocci $*
+	;;
+    run-azprocci) 
+	_run_azprocci $*
+	;;
+    run-broker)
+	_run_broker $*
+	;;
+    run-coes)
+	_run_coes $*
+	;;
+    run-coees)
+	_run_coees $*
+	;;
+    run-comons)
+	_run_comons $*
+	;;
+    run-conets)
+	_run_conets $*
+	;;
+    run-coobas)
+	_run_coobas $*
+	;;
+    run-coss)
+	_run_coss $*
+	;;
+    run-ezvm)
+	_run_ezvm $*
+	;;
+    run-coips)
+	_run_coips $*
+	;;
+    run-fileserver)
+	_run_fileserver $*
+	;;
+    run-onprocci)
+	_run_onprocci $*
+	;;
+    run-osprocci)
+	_run_osprocci $*
+	;;
+    run-osocciprocci)
+	_run_osocciprocci $*
+	;;
+    run-testosocci)
+	_run_testosocci $*
+	;;
+    run-slam)
+	_run_slam $*
+	;;
+    run-example)
+	_run_example $*
+	;;
+    run-dcprocci)
+	_run_dcprocci $*
+	;;
+    run-parser)
+	_run_parser $*
+	;;
+    run-procci)
+	_run_procci $*
+	;;
+    run-cosched)
+	_run_cosched $*
+	;;
+    run-cosacs)
+	_run_cosacs $*
+	;;
+    run-publisher)
+	_run_publisher $*
+	;;
+    accords-config)
+	_accords_config $*
+	;;
+    *)
+	_usage
+	exit 1
+	;;
+esac
+
+exit 0

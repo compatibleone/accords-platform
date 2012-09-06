@@ -24,6 +24,8 @@ struct	proactive
 
 	char *	hostname;
 	char *	workload;
+	char *	account;
+	char *	agent;
 
 	int	when;
 

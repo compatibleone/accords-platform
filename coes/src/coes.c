@@ -134,6 +134,8 @@ private	struct rest_extension * coes_extension( void * v,struct rest_server * sp
 	return( xptr );
 }
 
+#include "comonsconnection.c"
+
 /*	-----------------------------------------------------------	*/
 /*			s e l e c t _ p l a c e m e n t			*/
 /*	-----------------------------------------------------------	*/
@@ -347,6 +349,83 @@ private	int	create_placement_solution(
 }
 
 /*	-------------------------------------------	*/
+/* 	    c o n s u m e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement has been provisioned and is	*/
+/*	now active and deployed.			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * consume_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state != 1 )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state=2;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+	
+/*	-------------------------------------------	*/
+/* 	    r e s t o r e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement is reserved but no longer is	*/
+/*	provisioned and deployed.			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * restore_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state != 2 )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state=1;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+	
+/*	-------------------------------------------	*/
+/* 	    r e l e a s e  _ p l a c e m e n t 		*/
+/*	-------------------------------------------	*/
+/*	the placement is no longer reserved		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * release_placement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_placement * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state=0;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+	
+/*	-------------------------------------------	*/
 /* 	      c h o o s e  _ p l a c e m e n t 		*/
 /*	-------------------------------------------	*/
 private	struct rest_response * choose_placement(
@@ -357,15 +436,19 @@ private	struct rest_response * choose_placement(
 		void * vptr )
 {
 	struct	cords_placement * pptr;
-	char	buffer[1024];
 	int	status;
 	if (!( pptr = vptr ))
-		return(0);
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
 	else if ( pptr->state > 0 )
-		return(0);
+		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = create_placement_solution(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( rest_html_response( aptr, status, "PLACEMENT FAILURE" ) );
-	else 	return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state = 1;
+		autosave_cords_placement_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -455,15 +538,26 @@ private	int	coes_operation( char * nptr )
 
 	if (!( optr = occi_add_action( optr,_CORDS_CHOOSE,"",choose_placement)))
 		return( 28 );
+	else if (!( optr = occi_add_action( optr,"consume","",consume_placement)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"restore","",restore_placement)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"release","",release_placement)))
+		return( 28 );
 
-	if (!( optr = occi_cords_connection_builder( Coes.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Coes.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= (_OCCI_PRIVATE | _OCCI_CONSUMER);
+
+	if (!( optr = comons_packet_builder( Coes.domain, "packet_coes.xml" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
 		return( 27 );

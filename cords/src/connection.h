@@ -6,10 +6,13 @@ struct	cords_connection
 {
 	char *	id;
 	char *	name;
-	char *	date;
-	char *	service;
+	char *	start;
+	char *	finish;
+	char *	account;
 	char *	session;
-	char *	stream;
+	char *	monitor;
+	int	pid;
+	int	probes;
 	int	state;
 };
 

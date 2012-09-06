@@ -1,0 +1,365 @@
+#!/bin/sh
+#
+# Setup ACCORDS
+#
+# Copyright: 
+#   Prologue 2011
+#   Mandriva 2011
+#   Bull 2012
+# Author: 
+#   Jean Parpaillon
+#   Jamie Marshall
+#   Liliana Cabalantti
+
+set -e
+
+export PATH=@sitepath@:$PATH
+
+if test -e ./accords.ini; then
+    . ./accords.ini
+elif test -e @pkgsysconfdir@/accords.ini; then
+    . @pkgsysconfdir@/accords.ini
+fi
+
+# -------------------------------------
+# to activate the security using nethsm
+# set nethsm to 1
+# then specify the security directory.
+# -------------------------------------
+# nethsm=1
+# tls=security
+# -------------------------------------
+# sans security 
+# -------------------------------------
+nethsm=
+tls=
+# -------------------------------------
+zone="europe"
+trace=1
+threads=1
+verbose=0
+debug=0
+domain=occi
+operator=accords
+password=co-system
+
+if [ -z "$target" ]; then
+    target=a/home/c2/poc/ccords.xml
+fi
+
+if [ -z "$resthost" ]; then
+    resthost=127.0.0.1
+fi
+
+if [ -z "$restport" ]; then
+    restport=8086
+fi
+
+if [ -z "$publisher" ]; then
+	if [ -z "$tls" ]; then
+	    publisher=http://$resthost:$restport
+	else
+	    publisher=https://$resthost:$restport
+	fi
+fi
+
+if [ -z "$monitor" ]; then
+    monitor=$trace
+fi
+
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-publisher"
+
+_usage() {
+    echo "Usage: this script must be called through one of the following name:"
+    for alias in $aliases; do
+	echo " * $alias"
+    done
+}
+
+_co-start() {
+    echo "Starting ACCORDS"
+
+    echo "Starting accords publication services"
+    ./run-publisher &
+    sleep 1
+
+    echo "Starting accords file services"
+    ./run-fileserver & 
+    sleep 1
+    
+    echo "Starting accords security services"
+    ./run-coss &
+    sleep 1
+
+    echo "Starting accords monitoring services"
+    ./run-comons &
+    sleep 1
+    
+    echo "Starting accords accounting services"
+    ./run-coobas &
+    sleep 1
+    
+    echo "Starting accords networking services"
+    ./run-conets &
+    sleep 1
+
+    echo "Starting accords elasticity services"
+    ./run-coes &
+    sleep 1
+    
+    echo "Starting accords energy efficiency services"
+    ./run-coees &
+    sleep 1
+    
+    echo "Starting accords image storage services"
+    ./run-ezvm &
+    sleep 1
+
+    echo "Starting accords image production services"
+    ./run-coips &
+    sleep 1
+
+    echo "Starting accords parser services"
+    ./run-parser &
+    sleep 1
+
+    echo "Starting accords broker services"
+    ./run-broker &
+    sleep 1
+
+    echo "Starting accords procci services"
+    ./run-procci &
+    sleep 1
+
+    echo "Starting accords scheduling services"
+    ./run-cosched &
+    sleep 1
+
+    echo "Starting accords open stack services"
+    ./run-osprocci &
+    sleep 1
+
+    echo "Starting accords proactive services"
+    run-paprocci &
+    sleep 1
+
+    echo "Starting accords test occi open stack server"
+    ./run-testosocci &
+    sleep 1
+
+    echo "Starting accords test occi open stack server"
+    ./run-testosocci &
+    sleep 1
+
+    echo "Starting accords sla services"
+    ./run-osocciprocci &
+    sleep 1
+
+    echo "Starting accords open nebula services"
+    ./run-onprocci &
+    sleep 1
+    
+    echo "Starting accords windows azure services"
+    ./run-azprocci &
+    sleep 1
+
+    echo "ACCORDS ready"
+    ./co-status
+}
+
+_co-broker() {
+    
+} 
+
+_co-command() {
+
+}
+
+_co-parser() {
+
+}
+
+_co-resolver() {
+
+}
+
+_co-status() {
+    echo "-----------------------------"
+    echo " Accords Platform Components "
+    echo "-----------------------------"
+    netstat -a -p | grep LISTEN | grep publisher
+    netstat -a -p | grep LISTEN | grep fileserver
+    netstat -a -p | grep LISTEN | grep coss
+    netstat -a -p | grep LISTEN | grep comons
+    netstat -a -p | grep LISTEN | grep conets
+    netstat -a -p | grep LISTEN | grep coobas
+    netstat -a -p | grep LISTEN | grep coes
+    netstat -a -p | grep LISTEN | grep coees
+    netstat -a -p | grep LISTEN | grep parser
+    netstat -a -p | grep LISTEN | grep broker
+    netstat -a -p | grep LISTEN | grep procci
+    netstat -a -p | grep LISTEN | grep cosched
+    netstat -a -p | grep LISTEN | grep ezvm
+    netstat -a -p | grep LISTEN | grep coips
+}
+
+co-stop() {
+    killall example
+    sleep 1
+    killall slam
+    sleep 1
+    killall onprocci
+    sleep 1
+    killall dcprocci
+    sleep 1
+    killall osocciprocci
+    sleep 1
+    killall testosocci
+    sleep 1
+    killall osprocci
+    sleep 1
+    killall paprocci
+    sleep 1
+    killall azprocci
+    sleep 1
+    killall cosched
+    sleep 1
+    killall procci
+    sleep 1
+    killall broker
+    sleep 1
+    killall parser
+    sleep 1
+    killall coips
+    sleep 1
+    killall ezvm
+    sleep 1
+    killall coees
+    sleep 1
+    killall coes
+    sleep 1
+    killall conets
+    sleep 1
+    killall coobas
+    sleep 1
+    killall comons
+    sleep 1
+    killall coss
+    sleep 1
+    killall fileserver
+    sleep 1
+    killall publisher
+}
+
+_run-azprocci() {
+    /usr/local/bin/azprocci --config $target CO-AZPROCCI/1.0
+} 
+
+_run-broker() {
+    /usr/local/bin/broker --config $target CO-BROKER/1.0
+} 
+
+_run-coes() {
+    /usr/local/bin/coes --config $target CO-ES/1.0
+} 
+
+_run-coees() {
+    /usr/local/bin/coees --config $target CO-EES/1.0
+} 
+
+_run-comons() {
+    /usr/local/bin/comons --config $target CO-MONS/1.0
+}
+
+_run-conets() {
+    /usr/local/bin/conets --config $target CO-NETS/1.0
+}
+
+_run-coobas() {
+    /usr/local/bin/coobas --config $target CO-BAS/1.0
+}
+
+_run-coss() {
+    /usr/local/bin/coss --config $target CO-SS/1.0
+}
+
+_run-ezvm() {
+    /usr/local/bin/ezvm --config $target CO-EZVM/1.0
+}
+
+_run-coips() {
+    /usr/local/bin/coips --config $target CO-IPS/1.0
+}
+
+_run-fileserver() {
+    /usr/local/bin/fileserver --config $target CO-FS/1.0
+}
+
+_run-onprocci() {
+    /usr/local/bin/onprocci --config $target CO-ONPROCCI/1.0
+}
+
+_run-osprocci() {
+    /usr/local/bin/osprocci --config $target CO-OSPROCCI/1.0
+}
+
+_run-dcprocci() {
+    /usr/local/bin/dcprocci --config $target CO-DCPROCCI/1.0
+}
+
+_run-paprocci() {
+    paprocci --config $target CO-PAPROCCI/1.0
+}
+
+_run-osocciprocci() {
+    /usr/local/bin/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+}
+
+_run-testosocci() {
+    /usr/local/bin/testosocci --config $target CO-TESTOSOCCI/1.0
+}
+
+_run-slam() {
+    /usr/local/bin/slam --config $target CO-SLAM/1.0
+}
+
+_run-example() {
+    /usr/local/bin/example --config $target CO-EXAMPLE/1.0
+}
+
+_run-parser() {
+    /usr/local/bin/parser --config $target CO-PARSER/1.0
+}
+
+_run-procci() {
+    /usr/local/bin/procci --config $target CO-PROCCI/1.0
+}
+ 
+_run-cosched() {
+    /usr/local/bin/cosched --config $target CO-SCHED/1.0
+}
+ 
+_run-publisher() {
+   /usr/local/bin/publisher --config $target CO-PUB/1.0
+}
+
+_run-fileserver() {
+
+}
+
+command=
+for alias in $aliases; do
+    if test "$alias" = "$0"; then
+	command=$0
+	break
+    fi
+done
+
+if test -z "$command"; then
+    _usage
+    exit 1
+fi
+
+_$command
+
+exit 0

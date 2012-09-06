@@ -35,18 +35,126 @@
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
 /*	------------------------------------------------------------	*/
 private	struct	occi_manager OcciManager = 
-	{
-		(struct rest_header *) 0,
-		(struct occi_client *) 0,
-		(struct occi_client *) 0,
-		"CO-OCCI-MAN",
-		_OCCI_MIME_OCCI,
-		_OCCI_MIME_JSON,
-		0,
-		1	/* optimised */
-	};
+{
+	(struct rest_header *) 0,
+	(struct occi_client *) 0,
+	(struct occi_client *) 0,
+	"CO-OCCI-MAN",
+	_OCCI_MIME_OCCI,
+	_OCCI_MIME_JSON,
+	(char *) 0,		/* event log address */
+	0,
+	1			/* optimised */
+};
 
 #include "occiauth.c"
+
+/*	------------------------------------------------------------	*/
+/*		   o c c i _ a p p e n d _ h e a d e r			*/
+/*	------------------------------------------------------------	*/
+private	int	py_ocni_bugfix=1;
+
+private	struct	rest_header * occi_append_header( struct rest_header * hptr, char * nptr, char * vptr )
+{
+	struct	rest_header * wptr;
+	struct	rest_header * xptr;
+
+	if (!( wptr = rest_create_header( nptr, vptr ) ))
+		return( hptr );
+	else if (!( xptr = hptr ))
+		return( wptr );
+	else
+	{
+		while ( xptr->next )
+			xptr = xptr->next;
+		xptr->next = wptr;
+		wptr->previous = xptr;
+		return( hptr );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	     o c c i _ s p e c i a l _ a u t h o r i s a t i o n	*/
+/*	------------------------------------------------------------	*/
+/*	the pyocni module on which coes is built needs a special id	*/
+/*	or it wont work, this is a work around till we deal with it	*/
+/*	later on ....							*/
+/*	------------------------------------------------------------	*/
+private	struct	rest_header * occi_special_authorisation( struct rest_header * hptr )
+{
+	if (!( py_ocni_bugfix ))
+		return( hptr );
+	else if (!( hptr = occi_append_header( hptr, _HTTP_ACCEPT, "text/occi" ) ))
+		return( hptr );
+	else if (!( hptr = occi_append_header( hptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
+		return( hptr );
+	else	return( hptr );
+}
+
+/*	---	*/
+/*	GET	*/
+/*	---	*/
+public	struct	rest_response * 
+	occi_client_get_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_get_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	------	*/
+/*	DELETE	*/
+/*	------	*/
+public	struct	rest_response * 
+	occi_client_delete_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_delete_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	----	*/
+/*	HEAD	*/
+/*	----	*/
+public	struct	rest_response * 
+	occi_client_head_request(
+		char * target, char * tls, char * nptr, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_head_request( target, tls, nptr, hptr ) );
+}
+
+
+/*	----	*/
+/*	POST	*/
+/*	----	*/
+public	struct	rest_response * 
+	occi_client_post_request(
+		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
+}
+
+
+/*	---	*/
+/*	PUT	*/
+/*	---	*/
+public	struct	rest_response * 
+	occi_client_put_request(
+		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
+{
+	hptr = occi_special_authorisation( hptr );
+	return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
+}
+
+#define	rest_client_get_request occi_client_get_request
+#define	rest_client_head_request occi_client_head_request
+#define	rest_client_put_request occi_client_put_request
+#define	rest_client_post_request occi_client_post_request
+#define	rest_client_delete_request occi_client_delete_request
 
 /*	-----------------------------------------------------------------	*/
 /*	o c c i _ c h e c k _ r e s p o n s e _ a u t h o r i z a t i o n	*/
@@ -223,6 +331,27 @@ public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr )
 }
 
 /*	------------------------------------------------------------	*/
+/*		   o c c i _ a p p e n d _ e l e m e n t		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_element * occi_append_element( struct occi_element * eptr, char * nptr, char * vptr )
+{
+	struct	occi_element * dptr;
+	struct	occi_element * root;
+	if (!( dptr = occi_create_element( nptr, vptr ) ))
+		return( eptr );
+	else if (!(root = eptr))
+		return( dptr );
+	else
+	{
+		while ( eptr->next )
+			eptr = eptr->next;
+		dptr->previous = eptr;
+		eptr->next = dptr;
+		return( root );
+	}	
+}
+
+/*	------------------------------------------------------------	*/
 /*		o c c i _ r e q u e s t _ e l e m e n t			*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_element  *	occi_request_element(struct occi_request * rptr, char * nptr, char * vptr )
@@ -283,7 +412,7 @@ public	struct	occi_element  *	occi_response_element(struct occi_response * rptr,
 /*	------------------------------------------------------------	*/
 /*		o c c i _ r e s ol v e _ c a t e g o r y 		*/
 /*	------------------------------------------------------------	*/
-private	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr )
+public	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr )
 {
 	for (	;
 		cptr != (struct occi_category *) 0;
@@ -372,13 +501,17 @@ public  char *	occi_extract_location( struct occi_response * rptr )
 		for (	eptr = rptr->first;
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
-			if (!( strcmp( eptr->name, "location" )))
+			if (!( strcasecmp( eptr->name, _HTTP_LOCATION )))
+				return( eptr->value );
+			else if (!( strcasecmp( eptr->name, _OCCI_LOCATION )))
 				return( eptr->value );
 		return((char *) 0);
 	}
-	else if (!( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION ) ))
-		return((char *) 0);
-	else	return( hptr->value );
+	else if (( hptr = rest_resolve_header( aptr->first, _OCCI_LOCATION )) != (struct rest_header *) 0)
+		return( hptr->value );
+	else if (( hptr = rest_resolve_header( aptr->first, _HTTP_LOCATION )) != (struct rest_header *) 0)
+		return( hptr->value );
+	else	return((char *) 0);
 }
 
 /*	------------------------------------------------------------	*/
@@ -497,7 +630,9 @@ public	struct	occi_response *	occi_create_default_response(
 						break;
 				if ( *vptr == '=' )
 					*(vptr++) = 0;
-				if (!(eptr=occi_response_element(aptr,nptr,vptr)))
+				eptr=occi_response_element(aptr,nptr,vptr);
+				nptr = liberate( nptr );
+				if (!( eptr ))
 					break;
 			}
 		}
@@ -648,7 +783,7 @@ public	struct	occi_response *	occi_create_json_response(
 				continue;
 			else if (!( nptr = occi_unquoted_value( cptr->name ) ))
 				continue;
-			else if (!( strcmp( nptr, "location" ) ))
+			else if (!( strcasecmp( nptr, _HTTP_LOCATION ) ))
 			{
 				for (	bptr = cptr->first;
 					bptr != (struct data_element *) 0;
@@ -724,7 +859,7 @@ public	struct	occi_response *	occi_create_old_json_response(
 			continue;
 		else if (!( nptr = occi_unquoted_value( cptr->name ) ))
 			continue;
-		else if (!( strcmp( nptr, "location" ) ))
+		else if (!( strcasecmp( nptr, _HTTP_LOCATION ) ))
 		{
 			for (	bptr = cptr->first;
 				bptr != (struct data_element *) 0;
@@ -1293,6 +1428,23 @@ public	struct	occi_client *	occi_resolve_client( char * host )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ r e l e a s e _  c l i e n t		*/
+/*	------------------------------------------------------------	*/
+/*	this function is required when an OCCI component such as a	*/
+/*	COSACS server is private and will no longer need to be used	*/
+/*	the client must be released in order to avoid problems due	*/
+/*	to incorrect use of the OCCI Client structure. 			*/
+/*	Many thanks to Thanks Jean Michel Leonard for finding this	*/
+/*	------------------------------------------------------------	*/
+public	int	occi_release_client( char * host )
+{
+	struct	occi_client *	cptr;
+	if (( cptr = occi_resolve_client( host )) != (struct occi_client *) 0)
+		occi_delete_client( cptr );
+	return(0);
+}
+
+/*	------------------------------------------------------------	*/
 /*			o c c i _ c r e a t e _ c l i e n t		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_create_client( char * host, char * agent, char * tls )
@@ -1801,6 +1953,19 @@ public	struct	occi_element * occi_locate_element( struct occi_element * eptr, ch
 
 
 /*	-------------------------------------------------------		*/
+/*		c o r d s _ e v e n t _ m a n a g e r			*/
+/*	-------------------------------------------------------		*/
+private	char *	cords_event_manager( char * agent, char * tls )
+{
+	char *	ihost;
+	if (!( OcciManager.eventlog ))
+		if (!( OcciManager.eventlog = rest_log_comons_identity(_CORDS_EVENT,agent, tls) ))
+			return( (char *) 0 );
+
+	return( allocate_string( OcciManager.eventlog ) );
+}
+
+/*	-------------------------------------------------------		*/
 /*		    c o r d s _ p o s t _ e v e n t			*/
 /*	-------------------------------------------------------		*/
 public	int	cords_post_event( char * message, char * nature, char * agent, char * tls )
@@ -1818,12 +1983,16 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 	struct	cordscript_element * rvalue;
 	char	buffer[2048];
 
-	if (!( ihost = rest_log_comons_identity(_CORDS_EVENT,agent, tls) ))
+	/* ----------------------------------- */
+	/* retrieve the event category manager */
+	/* ----------------------------------- */
+	if (!( ihost = cords_event_manager( agent, tls ) ))
 		return(46);
-
-	sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);
-
-	liberate( ihost );
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_EVENT);
+		liberate( ihost );
+	}
 
 	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 		return(46);
@@ -1889,13 +2058,13 @@ private	struct occi_element * cords_link_element(
 }
 
 /*	---------------------------------------------------	*/
-/*	 	  c o r d s _ c r e a t e _ l i n k		*/
+/*	 	  o c c i _ c r e a t e _ l i n k		*/
 /*	---------------------------------------------------	*/
 /*	issues a POST request for the creation of a link  	*/
 /*	"from" a category instance "to" the indicated other	*/
 /*	category instance.					*/
 /*	---------------------------------------------------	*/	
-public	struct	occi_response * cords_create_link( char * from, char * to, char * agent, char * tls )
+public	struct	occi_response * occi_create_link( char * from, char * to, char * agent, char * tls )
 {
 	struct	occi_element  	* fptr;
 	struct	occi_response 	* zptr;
@@ -1905,7 +2074,7 @@ public	struct	occi_response * cords_create_link( char * from, char * to, char * 
 	char 			* linkhost;
 
 	if ( check_debug() )
-		printf("cords_create_link(%s,%s)\n",from,to);
+		printf("occi_create_link(%s,%s)\n",from,to);
 	if (!( lptr = analyse_url( from )))
 		return((struct occi_response *) 0);
 	else if (!( lptr = validate_url( lptr )))
@@ -1929,13 +2098,13 @@ public	struct	occi_response * cords_create_link( char * from, char * to, char * 
 }
 
 /*	---------------------------------------------------	*/
-/*	 	  c o r d s _ d e l e t e _ l i n k s		*/
+/*	 	  o c c i _ d e l e t e _ l i n k s		*/
 /*	---------------------------------------------------	*/
 /*	issues a DELETE request to perform the deletion of 	*/
 /*	all links of a category instance by specifying the 	*/
 /*	"from" attribute of the parent category instance.	*/
 /*	---------------------------------------------------	*/	
-public	struct	occi_response * cords_delete_links( char * from, char * agent, char * tls )
+public	struct	occi_response * occi_delete_links( char * from, char * agent, char * tls )
 {
 	struct	occi_element  	* fptr;
 	struct	occi_response 	* zptr;
@@ -1945,7 +2114,7 @@ public	struct	occi_response * cords_delete_links( char * from, char * agent, cha
 	char 			* linkhost;
 
 	if ( check_debug() )
-		printf("cords_delete_links(%s)\n",from);
+		printf("occi_delete_links(%s)\n",from);
 	if (!( lptr = analyse_url( from )))
 		return((struct occi_response *) 0);
 	else if (!( lptr = validate_url( lptr )))
@@ -1960,6 +2129,45 @@ public	struct	occi_response * cords_delete_links( char * from, char * agent, cha
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return((struct occi_response *) 0);
 	else if (!( fptr = cords_link_element( rptr, "source", from ) ))
+		return((struct occi_response *) 0);
+	else if (!( zptr = occi_client_delete( cptr, rptr ) ))
+		return(zptr);
+	else	return(zptr);
+}
+/*	---------------------------------------------------	*/
+/*	 	  o c c i _ d e l e t e _ l i n k s		*/
+/*	---------------------------------------------------	*/
+/*	issues a DELETE request to perform the deletion of 	*/
+/*	the link  of a category instance by specifying the 	*/
+/*	"from" and "to" attributes of parent category.		*/
+/*	---------------------------------------------------	*/	
+public	struct	occi_response * occi_delete_link( char * from, char * to, char * agent, char * tls )
+{
+	struct	occi_element  	* fptr;
+	struct	occi_response 	* zptr;
+	struct	occi_request 	* rptr;
+	struct	occi_client	* cptr;
+	struct	url		*  lptr;
+	char 			* linkhost;
+
+	if ( check_debug() )
+		printf("occi_delete_link(%s)\n",from);
+	if (!( lptr = analyse_url( from )))
+		return((struct occi_response *) 0);
+	else if (!( lptr = validate_url( lptr )))
+		return((struct occi_response *) 0);
+	else 	lptr->object = liberate( lptr->object );
+	if (!( lptr->object = allocate_string( _OCCI_XLINK )))
+		return((struct occi_response *) 0);
+	else if (!( linkhost = serialise_url( lptr,"" )))
+		return((struct occi_response *) 0);
+	else if (!( cptr = occi_create_client( linkhost, agent, tls ) ))
+		return((struct occi_response *) 0);
+	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		return((struct occi_response *) 0);
+	else if (!( fptr = cords_link_element( rptr, "source", from ) ))
+		return((struct occi_response *) 0);
+	else if (!( fptr = cords_link_element( rptr, "target", to ) ))
 		return((struct occi_response *) 0);
 	else if (!( zptr = occi_client_delete( cptr, rptr ) ))
 		return(zptr);

@@ -55,7 +55,7 @@ public int is_ip_available(char *ip, char * agent, char * tls, char * version)
 	if ( check_verbose() )
 		printf("   OCCI Conets ( %s, %s )\n","ipaddress",agent);
 
-	initialise_occi_resolver( tls , (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( _DEFAULT_PUBLISHER , (char *) 0, (char *) 0, (char *) 0 );
 
 
 	if (!( aptr = occi_resolver("ipaddress" , agent ) ))
@@ -394,7 +394,7 @@ public char * retrieve_domain(char * attribval, char * agent, char * tls)
 	if ( check_verbose() )
 		printf("   OCCI Conets ( %s, %s )\n","domain",agent);
 
-	initialise_occi_resolver( tls , (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( _DEFAULT_PUBLISHER , (char *) 0, (char *) 0, (char *) 0 );
 
 
 	if (!( aptr = occi_resolver("domain" , agent ) ))
@@ -470,7 +470,7 @@ public char * retrieve_iprange(char * version, char * type, char * agent, char *
 	if ( check_verbose() )
 		printf("   OCCI Conets ( %s, %s )\n","iprange",agent);
 
-	initialise_occi_resolver( tls , (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 
 	if (!( aptr = occi_resolver("iprange" , agent ) ))

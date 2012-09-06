@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiproactive_c_
@@ -37,6 +35,7 @@ private pthread_mutex_t list_proactive_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * proactive_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * proactive_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_proactive_node() { return( proactive_first ); }
+public struct  occi_kind_node * occi_last_proactive_node() { return( proactive_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -166,6 +165,10 @@ private void autoload_proactive_nodes() {
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
 				pptr->workload = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
@@ -242,6 +245,12 @@ public  void autosave_proactive_nodes() {
 		fprintf(h," workload=%c",0x0022);
 		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -299,6 +308,10 @@ private void set_proactive_field(
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
 			pptr->workload = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "status" ) ))
@@ -439,6 +452,20 @@ private int pass_proactive_filter(
 		else if ( strcmp(pptr->workload,fptr->workload) != 0)
 			return(0);
 		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
 	return(1);
@@ -499,6 +526,12 @@ private struct rest_response * proactive_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -898,6 +931,19 @@ private void	redirect_occi_proactive_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_proactive(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_proactive_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -941,10 +987,16 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_proactive)))
+			return( optr );
 		autoload_proactive_nodes();
 		return(optr);
 	}
@@ -1135,6 +1187,28 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.proactive.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.proactive.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.proactive.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

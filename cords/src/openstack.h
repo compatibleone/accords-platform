@@ -36,6 +36,8 @@ struct	openstack
 	char *	hostname;
 	char *	workload;
 
+	char *	agent;
+
 	int	when;
 
 	int	state;

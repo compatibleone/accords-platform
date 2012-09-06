@@ -22,6 +22,8 @@ struct	occi_category
 	void			* interface;
 	void			* callback;
 	void			* payload;
+	char *	(*html_rendering)(struct occi_category * cptr,struct rest_header  * hptr );
+
 };
 
 public	struct	occi_category * allocate_occi_category();

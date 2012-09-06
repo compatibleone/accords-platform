@@ -1,26 +1,24 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _business_c_
-#define _business_c_
+#ifndef _occibusiness_c_
+#define _occibusiness_c_
 
 #include "business.h"
 
@@ -37,6 +35,7 @@ private pthread_mutex_t list_cords_business_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_business_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_business_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_business_node() { return( cords_business_first ); }
+public struct  occi_kind_node * occi_last_cords_business_node() { return( cords_business_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -140,6 +139,12 @@ private void autoload_cords_business_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
+				pptr->nature = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
+				pptr->type = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "expression" )) != (struct xml_atribut *) 0)
+				pptr->expression = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -175,6 +180,15 @@ public  void autosave_cords_business_nodes() {
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," nature=%c",0x0022);
+		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," type=%c",0x0022);
+		fprintf(h,"%s",(pptr->type?pptr->type:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," expression=%c",0x0022);
+		fprintf(h,"%s",(pptr->expression?pptr->expression:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -203,6 +217,12 @@ private void set_cords_business_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "nature" ) ))
+			pptr->nature = allocate_string(vptr);
+		if (!( strcmp( nptr, "type" ) ))
+			pptr->type = allocate_string(vptr);
+		if (!( strcmp( nptr, "expression" ) ))
+			pptr->expression = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -250,6 +270,27 @@ private int pass_cords_business_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
+	if (( fptr->nature )
+	&&  (strlen( fptr->nature ) != 0)) {
+		if (!( pptr->nature ))
+			return(0);
+		else if ( strcmp(pptr->nature,fptr->nature) != 0)
+			return(0);
+		}
+	if (( fptr->type )
+	&&  (strlen( fptr->type ) != 0)) {
+		if (!( pptr->type ))
+			return(0);
+		else if ( strcmp(pptr->type,fptr->type) != 0)
+			return(0);
+		}
+	if (( fptr->expression )
+	&&  (strlen( fptr->expression ) != 0)) {
+		if (!( pptr->expression ))
+			return(0);
+		else if ( strcmp(pptr->expression,fptr->expression) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -270,6 +311,15 @@ private struct rest_response * cords_business_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.type=%s",optr->domain,optr->id,pptr->type);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.expression=%s",optr->domain,optr->id,pptr->expression);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -666,6 +716,19 @@ private void	redirect_occi_cords_business_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_business(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_business_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -683,8 +746,16 @@ public struct occi_category * occi_cords_business_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "expression",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_business)))
+			return( optr );
 		autoload_cords_business_nodes();
 		return(optr);
 	}
@@ -742,6 +813,39 @@ public struct rest_header *  cords_business_occi_headers(struct cords_business *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_business.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_business.type='%s'\r\n",(sptr->type?sptr->type:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_business.expression='%s'\r\n",(sptr->expression?sptr->expression:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_business.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -749,4 +853,4 @@ public struct rest_header *  cords_business_occi_headers(struct cords_business *
 
 }
 
-#endif	/* _business_c_ */
+#endif	/* _occibusiness_c_ */

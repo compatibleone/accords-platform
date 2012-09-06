@@ -37,6 +37,8 @@ fi
 nethsm=
 tls=
 # -------------------------------------
+resthost=127.0.0.1
+secdir=$tls
 zone="europe"
 trace=1
 threads=1
@@ -45,6 +47,12 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
+
+if [ -z "$tls" ]; then
+    tempo=1
+else
+    tempo=2
+fi
 
 if [ -z "$target" ]; then
     target=accords.xml
@@ -75,7 +83,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-cosched run-publisher accords-config"
+# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-paasprocci run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
 _co_start() {
@@ -83,99 +91,103 @@ _co_start() {
 
     echo "Starting accords publication services"
     @bindir@/run-publisher &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords file services"
     @bindir@/run-fileserver &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords security services"
     @bindir@/run-coss &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords monitoring services"
     @bindir@/run-comons &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords accounting services"
     @bindir@/run-coobas &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords networking services"
     @bindir@/run-conets &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords elasticity services"
     @bindir@/run-coes &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords energy efficiency services"
     @bindir@/run-coees &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords image storage services"
     @bindir@/run-ezvm &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords image production services"
     @bindir@/run-coips &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords parser services"
     @bindir@/run-parser &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords broker services"
     @bindir@/run-broker &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords procci services"
     @bindir@/run-procci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords scheduling services"
     @bindir@/run-cosched &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open stack services"
     @bindir@/run-osprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords proactive services"
     run-paprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords test occi open stack server"
     @bindir@/run-testosocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords occi open stack services"
     @bindir@/run-osocciprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open nebula services"
     @bindir@/run-onprocci &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords windows azure services"
     @bindir@/run-azprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords delta cloud services"
     @bindir@/run-dcprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords sla services"
     @bindir@/run-slam &
-    sleep 1
+    sleep $tempo
+
+    echo "Starting accords paas procci services"
+    @bindir@/run-paasprocci &
+    sleep $tempo
 
     echo "Starting accords procci example"
     @bindir@/run-example &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords software configuration services"
     @bindir@/run-cosacs &
-    sleep 1
+    sleep $tempo
 
     echo "ACCORDS ready"
     @bindir@/co-status
@@ -259,6 +271,7 @@ _co_stop() {
     _stop_service cosacs
     _stop_service example
     _stop_service slam
+    _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -354,6 +367,10 @@ _run_slam() {
     @bindir@/slam --config $target CO-SLAM/1.0
 }
 
+_run_paasprocci() {
+    @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
+}
+
 _run_example() {
     @bindir@/example --config $target CO-EXAMPLE/1.0
 }
@@ -405,6 +422,7 @@ _make_security_files() {
 	_mksecs azprocci 1
 	_mksecs dcprocci 1
 	_mksecs slam 1
+	_mksecs paasprocci 1
 	_mksecs example 1
 	_mksecs command
     
@@ -418,11 +436,6 @@ _make_security_files() {
 }
 
 _accords_config() {
-    if test `id -u` -eq 0; then
-	export secdir=security
-    else
-	export secdir=security
-    fi
 
     if [ -z "$tls" ]; then
 	echo "Accords Security Not Required"
@@ -480,6 +493,7 @@ _accords_config() {
 		_mkcert azprocci
 		_mkcert dcprocci
 		_mkcert slam
+		_mkcert paasprocci
 		_mkcert example
 		_mkcert cosacs
 	
@@ -525,6 +539,7 @@ _accords_config() {
     _mkcfg coees 
     _mkcfg cosched
     _mkcfg slam
+    _mkcfg paasprocci
     _mkcfg example
     _mkcosacs cosacs
 
@@ -556,7 +571,7 @@ _stop_service() {
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
     fi
-    sleep 1
+    sleep $tempo
 }
 
 _mksecs() {
@@ -776,6 +791,9 @@ case `basename $0` in
 	;;
     run-slam)
 	_run_slam $*
+	;;
+    run-paasprocci)
+	_run_paasprocci $*
 	;;
     run-example)
 	_run_example $*

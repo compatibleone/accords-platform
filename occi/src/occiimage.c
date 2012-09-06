@@ -1,26 +1,24 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _image_c_
-#define _image_c_
+#ifndef _occiimage_c_
+#define _occiimage_c_
 
 #include "image.h"
 
@@ -37,6 +35,7 @@ private pthread_mutex_t list_cords_image_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_image_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_image_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_image_node() { return( cords_image_first ); }
+public struct  occi_kind_node * occi_last_cords_image_node() { return( cords_image_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -148,6 +147,8 @@ private void autoload_cords_image_nodes() {
 				pptr->created = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "updated" )) != (struct xml_atribut *) 0)
 				pptr->updated = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "packages" )) != (struct xml_atribut *) 0)
 				pptr->packages = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -197,6 +198,9 @@ public  void autosave_cords_image_nodes() {
 		fprintf(h," updated=%c",0x0022);
 		fprintf(h,"%s",(pptr->updated?pptr->updated:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," packages=%c",0x0022);
 		fprintf(h,"%u",pptr->packages);
 		fprintf(h,"%c",0x0022);
@@ -236,6 +240,8 @@ private void set_cords_image_field(
 			pptr->created = allocate_string(vptr);
 		if (!( strcmp( nptr, "updated" ) ))
 			pptr->updated = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "packages" ) ))
 			pptr->packages = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -313,6 +319,13 @@ private int pass_cords_image_filter(
 		else if ( strcmp(pptr->updated,fptr->updated) != 0)
 			return(0);
 		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
 	if (( fptr->packages ) && ( pptr->packages != fptr->packages )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -346,6 +359,9 @@ private struct rest_response * cords_image_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.updated=%s",optr->domain,optr->id,pptr->updated);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.packages=%u",optr->domain,optr->id,pptr->packages);
@@ -745,6 +761,19 @@ private void	redirect_occi_cords_image_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_image(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_image_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -770,10 +799,14 @@ public struct occi_category * occi_cords_image_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "updated",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "packages",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_image)))
+			return( optr );
 		autoload_cords_image_nodes();
 		return(optr);
 	}
@@ -875,6 +908,17 @@ public struct rest_header *  cords_image_occi_headers(struct cords_image * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_image.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_image.packages='%u'\r\n",sptr->packages);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -893,4 +937,4 @@ public struct rest_header *  cords_image_occi_headers(struct cords_image * sptr)
 
 }
 
-#endif	/* _image_c_ */
+#endif	/* _occiimage_c_ */

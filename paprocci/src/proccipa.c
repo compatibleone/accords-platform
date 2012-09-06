@@ -23,6 +23,10 @@
 #include "paclient.h"
 #include "cordslang.h"
 
+#include "proactive.h"
+#include "proactive.c"
+#include "occiproactive.c"
+
 /*! 
  * Return the occi_kind_node content such that its name matches the given string parameter. 
  * The content is always a pa_config*.  
@@ -100,6 +104,7 @@ private	int	parse_delete_server_response( struct pa_response * server_created)
     return (0); 
 
 }
+
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ p r o a c t i v e _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
@@ -617,6 +622,7 @@ private	struct	occi_interface	proactive_interface = {
 public	struct	occi_category * build_proactive( char * domain )
 {
 	struct	occi_category * optr;
+
 	if (!( optr = occi_proactive_builder( domain,"proactive" ) ))
 		return( optr );
 	else

@@ -72,6 +72,85 @@ public	int	rest_thread_control(int new_value)
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ v a l i d _ s t r i n g		*/
+/*	------------------------------------------------	*/
+public	int	rest_valid_string( char * vptr )
+{
+	if (!( vptr ))
+		return( 0 );
+	else if (!( strlen( vptr ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, "(null)" ) ))
+		return( 0 );
+	else if (!( strcmp( vptr, "(none)" ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	------------------------------------------------	*/
+/*	 r e s t _ v a l i d _ s t r i n g _ v a l u e 		*/
+/*	------------------------------------------------	*/
+public	int	rest_valid_string_value( char * sptr, char *vptr  )
+{
+	if (!( rest_valid_string( sptr ) ))
+		return( 0 );
+	else if (!( vptr ))
+		return( 0 );
+	else if (!( strcasecmp( sptr, vptr ) ))
+		return( 1 );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------	*/
+/*		r e s t _ n o r m a l i s e _ v a l u e 	*/
+/*	---------------------------------------------------	*/
+/*	this function takes a value string as its parameter	*/
+/*	which may or not be terminated by a T,G,M,K which	*/
+/*	indicates an explicite quantity. A default quantity	*/
+/*	type is passed as the second parameter to be used	*/
+/*	in case no explicite value is present.			*/
+/*	The function returns the normalisation of the value	*/
+/*	---------------------------------------------------	*/
+public	int	rest_normalise_value( char * sptr, int normal )
+{
+	int	factor=1;
+	int	value=0;
+
+	if ( normal == 'T' )
+		factor = 1000000000;
+	else if ( normal == 'G' )
+		factor = 1000000;
+	else if ( normal == 'M' )
+		factor = 1000;
+	else if ( normal == 'K' )
+		factor = 1;
+	else if ( normal == 'U' )
+		factor = 1;
+	else if ( normal == 0x0025 )
+		factor = 1;
+	else	factor = 1;
+
+	value = atoi(sptr);
+
+	while ( (( *sptr >= '0' ) && ( *sptr <= '9' )) || ( *sptr == '.') || (*sptr == ' ')) sptr++;
+
+	if (( *sptr == 'T' ) || ( *sptr == 't' ))
+		factor = 1000000000;
+	else if (( *sptr == 'G' ) || ( *sptr == 'g' ))
+		factor = 1000000;
+	else if (( *sptr == 'M' ) || ( *sptr == 'm' ))
+		factor = 1000;
+	else if (( *sptr == 'K' ) || ( *sptr == 'k' ))
+		factor = 1;
+	else if (( *sptr == 'U' ) || ( *sptr == 'u' ))
+		factor = 1;
+	else if ( *sptr == 0x0025 )
+		factor = 1;
+
+	return( value * factor );
+}
+
+/*	------------------------------------------------	*/
 /*		r e s t _ h t t p _ p r e f i x 		*/
 /*	------------------------------------------------	*/
 public	char *	rest_http_prefix()
@@ -79,11 +158,7 @@ public	char *	rest_http_prefix()
 	char *	prefix;
 	if (!( prefix = default_tls() ))
 		prefix = "http";
-	else if (!( strlen( prefix ) ))
-		prefix = "http";
-	else if (!( strcmp( prefix, "(none)" )))
-		prefix = "http";
-	else if (!( strcmp( prefix, "(null)" )))
+	else if (!( rest_valid_string( prefix ) ))
 		prefix = "http";
 	else	prefix = "https";
 	return( prefix );
@@ -519,6 +594,30 @@ public struct rest_header * rest_postfix_header( struct rest_header * foot, char
 }
 
 /*	------------------------------------------------	*/
+/*	  r e s t _ d u p l i c a t e _ h e a d e r s 		*/
+/*	------------------------------------------------	*/
+public	struct	rest_header * rest_duplicate_headers( struct rest_header * hptr )
+{
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	rest_header * wptr=(struct rest_header *) 0;
+	for (	;
+		hptr != (struct rest_header *) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( wptr = rest_create_header( hptr->name, hptr->value ) ))
+			break;
+		else if (!( wptr->previous = foot ))
+			root = wptr;
+		else	wptr->previous->next = wptr;
+		foot = wptr;
+	}
+	return( root );
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ h e a d e r 		*/
 /*	------------------------------------------------	*/
 public	struct	rest_header * rest_response_header(struct rest_response * aptr, char * nptr, char * vptr )
@@ -622,6 +721,18 @@ public	struct	rest_response * rest_allocate_response(struct rest_client * cptr)
 }
 
 /*	------------------------------------------------	*/
+/*	   r e s t _ l i b e r a t e _ r e s p o n s e		*/
+/*	------------------------------------------------	*/
+public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr)
+{
+	if ( aptr )
+	{
+		liberate_rest_response( aptr );
+		return((struct rest_response *) 0);
+	}
+}		
+
+/*	------------------------------------------------	*/
 /*		r e s t _ h t m l _ f a i l u r e		*/
 /*	------------------------------------------------	*/
 private	char * rest_html_failure( int status, char * message )
@@ -723,6 +834,94 @@ public	struct rest_response * rest_authentication_challenge(struct rest_client *
 		return( aptr );	
 	else	return( aptr );
 }		
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ e n c o d e _ h t m l 			*/
+/*	---------------------------------------------------------	*/
+public	char *	rest_encode_html( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( wptr = allocate( strlen( sptr ) * 3 ) ))
+		return( wptr );
+	else	rptr = wptr;
+
+	while( *sptr )
+	{
+		if (!( c = ( *(sptr++) & 0x00FF ) ))
+			break;
+		else if (( c >= '0' ) && ( c <= '9' ))
+			*(wptr++) = c;
+		else if (( c >= 'a' ) && ( c <= 'z' ))
+			*(wptr++) = c;
+		else if (( c >= 'A' ) && ( c <= 'Z' ))
+			*(wptr++) = c;
+		else if ( c == ' ' )
+			*(wptr++) = '+';
+		else if (( c == '.' ) || ( c == '_' ) || ( c == '-' ))
+			*(wptr++) = c;
+		else 
+		{
+			sprintf(wptr, "%c%02.2X",'%',c);
+			wptr += strlen(wptr);
+		}
+	}
+	*(wptr++) = 0;
+	wptr = allocate_string( rptr );
+	liberate( rptr );
+	return( wptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		r e s t _ d e c o d e _ h t m l 			*/
+/*	---------------------------------------------------------	*/
+public	char *	rest_decode_html( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	int	x;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( wptr = allocate_string( sptr ) ))
+		return( wptr );
+	else	rptr = wptr;
+
+	while( *sptr )
+	{
+		if (!( c = ( *(sptr++) & 0x00FF ) ))
+			break;
+		else if ( c == '+' )
+			*(wptr++) = ' ';
+		else if ( c != '%' )
+			*(wptr++) = c;
+		else
+		{
+			c = *(sptr++);
+			if ((c >= '0') && (x <= '9'))
+				x = ((c - '0') * 16);
+			else if ((c >= 'a') && (x <= 'f'))
+				x = (((c - 'a') + 10) * 16);
+			else if ((c >= 'A') && (x <= 'F'))
+				x = (((c - 'A') + 10) * 16);
+			c = *(sptr++);
+			if ((c >= '0') && (x <= '9'))
+				x += (c - '0');
+			else if ((c >= 'a') && (x <= 'f'))
+				x += ((c - 'a') + 10);
+			else if ((c >= 'A') && (x <= 'F'))
+				x += ((c - 'A') + 10);
+			*(wptr++) = x;
+		}
+	}
+	*(wptr++) = 0;
+	wptr = allocate_string( rptr );
+	liberate( rptr );
+	return( wptr );
+}
 
 /*	---------------------------------------------------------	*/
 /*		r e s t _ e n c o d e _ c r e d e n t i a l s		*/
@@ -1452,7 +1651,7 @@ private	int	rest_process_message(
 		rest_log_debug("rest: liberate request");
 		liberate_rest_request( rptr );
 		rest_log_debug("rest: liberate response");
-		liberate_rest_response( aptr );
+		rest_liberate_response( aptr );
 		rest_drop_client( cptr );
 		rest_log_debug("rest: process message done");
 		return(0);
@@ -1756,11 +1955,13 @@ private	int	rest_accept_connection( struct rest_server * sptr )
 			sprintf(buffer,"rest server(%u): tls socket(%u) handshake(%u) failure(%u)",
 				getpid(),cptr->net.socket,sptr->tlsconf->option, handshakes);
 			rest_log_debug( buffer );
-			failure(550, buffer );
 			rest_drop_client( cptr );
 		}
-		sprintf(buffer,"server: accept (tls) (socket=%u)",cptr->net.socket);
-		rest_log_debug(buffer);
+		else
+		{
+			sprintf(buffer,"server: accept (tls) (socket=%u)",cptr->net.socket);
+			rest_log_debug(buffer);
+		}
 		return( 0 );
 	}
 }
@@ -1843,6 +2044,14 @@ private	void	sigint_server_catcher(int s)
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ s e r v e r _ s i g n al 		*/
+/*	------------------------------------------------	*/
+public	int	rest_server_signal()
+{
+	return( _server_sigint );
+}
+
+/*	------------------------------------------------	*/
 /*	    r e s t _ a l l o c a t e _ s e r v e r		*/
 /*	------------------------------------------------	*/
 private	struct	rest_server * rest_allocate_server()
@@ -1915,6 +2124,9 @@ public	struct	rest_client * rest_drop_client( struct rest_client * cptr )
 	char 			buffer[1024];
 	struct	rest_server * 	sptr;
 
+	if (!( cptr ))
+		return( cptr );
+
 	if ((sptr = cptr->parent))
 		lock_rest_server( sptr );
 
@@ -1923,7 +2135,7 @@ public	struct	rest_client * rest_drop_client( struct rest_client * cptr )
 	{
 		sprintf(buffer,"connection close (socket=%u)",cptr->net.socket);
 		rest_log_debug( buffer );
-		connection_close( &cptr->net,0);
+		connection_close( &cptr->net,1);
 	}
 	cptr = drop_rest_client( cptr );
 	if ( sptr )
@@ -1991,8 +2203,14 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 				else	break;
 			}
 			else if ( status == -1 ) 
-				break;
-
+			{
+				if ( errno != EINTR )
+				{
+					rest_log_debug("rest server select interrupt errno != EINTR");
+					break;
+				}
+				else	continue;
+			}
 			else if ( sptr->active )
 			{
 				rest_log_debug( "server: accept message" );

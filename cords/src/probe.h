@@ -6,9 +6,13 @@ struct	cords_probe
 {
 	char *	id;
 	char *	name;
-	char *	period;
 	char *	metric;
-	char *	stream;
+	char *	connection;
+	char *	expression;
+	int	samples;
+	int	period;
+	int	pid;
+	int	packets;
 	int	state;
 };
 

@@ -27,6 +27,7 @@
 public	struct	xml_element * document_parse_file( char * sptr );
 public	struct	xml_element * document_drop( struct xml_element * document );
 public	struct	xml_element * document_element( struct xml_element * document, char * token );
+public	struct	xml_element * nested_document_element( struct xml_element * document, char * token );
 public	struct	xml_atribut * document_atribut( struct xml_element * document, char * token );
 public	struct	xml_element * document_prefix_element( struct xml_element * dptr, char * nptr );
 public	struct	xml_element * document_add_element( struct xml_element * dptr, char * nptr );

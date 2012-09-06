@@ -18,6 +18,14 @@ struct	az_config
 	char	*	subscription;
 	char	*	certificate;
 	char 	*	tls;
+
+	char 	*	hostedservice;
+	char 	*	storageaccount;
+	char 	*	location;
+	char 	*	group;
+
+	int		services;
+
 	int		current;
 };
 

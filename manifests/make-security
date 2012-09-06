@@ -1,0 +1,32 @@
+if [ -d $makesecurity ]; then
+	echo "security files ready"
+else
+	echo "building security options"
+	mkdir $makesecurity
+	cp ../Certificates.crt $makesecurity
+	bash build-security cosacs
+	bash build-security publisher
+	bash build-security azprocci
+	bash build-security broker
+	bash build-security coees
+	bash build-security coes
+	bash build-security comons
+	bash build-security conets
+	bash build-security coobas
+	bash build-security cosched
+	bash build-security coss
+	bash build-security dcprocci
+	bash build-security ezvm
+	bash build-security coips
+	bash build-security cool
+	bash build-security onprocci
+	bash build-security osocciprocci
+	bash build-security osprocci
+	bash build-security paprocci
+	bash build-security parser
+	bash build-security procci
+	bash build-security slam
+	bash build-security paasprocci
+fi
+
+

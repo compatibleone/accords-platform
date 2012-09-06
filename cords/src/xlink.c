@@ -120,4 +120,4 @@ public int rest_occi_cords_xlink(FILE * fh,struct cords_xlink * sptr,char * pref
 
 }
 
-#endif	/* _xlink_c_ */
+#endif	/* _xlink_cxlink_c_ */

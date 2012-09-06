@@ -263,14 +263,17 @@ private char *	build_application_node(char * image, char * provider )
 /* ------------------------- */
 /* negotiate the contracts   */
 /* ------------------------- */
-private	char *	negotiate_application_contract(char * node,struct cords_placement_criteria * selector)
+private	char *	negotiate_application_contract(
+	char * node,
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty)
 {
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
 	if ( check_debug() ) rest_log_message("coips:negotiate_application_contract");
 	if (!( document = cords_instance_node(
-		selector, node, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, "coips", "coips", "coips") ))
+		selector, warranty, node, node, _CORDS_CONTRACT_AGENT, default_tls(), (char *) 0, "coips", "coips", "coips") ))
 		return( (char *) 0 );
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
 	{
@@ -297,8 +300,10 @@ private	char *	negotiate_application_contract(char * node,struct cords_placement
 /* ------------------------- */
 private char * 	provision_application_contract(char *contract)
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract");
-	cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "start", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:provision_application_contract:done");
 	coips_synchronise();
 	return(contract);
@@ -352,8 +357,10 @@ private	char * 	install_application_package( char * cosacs , char * package )
 /* ------------------------- */
 private void	save_application_image( char * contract )
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:save_image");
-	cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:save_image:done");
 	coips_synchronise();
 	return;
@@ -364,8 +371,10 @@ private void	save_application_image( char * contract )
 /* ------------------------- */
 private	void 	stop_application_provisioning(  char * contract )
 {
+	struct	occi_response * zptr;
 	if ( check_debug() ) rest_log_message("coips:stop_server");
-	cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() );
+	if ((zptr = cords_invoke_action( contract, "stop", _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 	if ( check_debug() ) rest_log_message("coips:stop_server:done");
 	coips_synchronise();
 	return;
@@ -487,14 +496,17 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	char *	linkvalue = (char *) 0;
 	char *	package   = (char *) 0;
 	char *	cosacs	  = (char *) 0;
+	char *	agent	  = (char *) 0;
 	char *	vptr	  = (char *) 0;
 	int	packages=0;
 	struct	occi_response * zptr;
 	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
 	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
 
 	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
 
 	/* ---------------------- */
 	/* check if already built */
@@ -514,6 +526,23 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 		return( 800 );
 	else if ( zptr->response->status > 299 )
 		return( 800 + (zptr->response->status-200) );
+
+	/* ---------------------------------- */
+	/* retrieve the image use cosacs flag */
+	/* ---------------------------------- */
+	else if (!( agent = occi_extract_atribut( zptr, "occi", 
+		_CORDS_IMAGE, "agent" ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		aptr->state |= _COIPS_IMAGE_OK;
+		return(0);
+	}
+	else if (!( use_cosacs_agent( agent ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		aptr->state |= _COIPS_IMAGE_OK;
+		return(0);
+	}
 
 	/* ---------------------------------------- */
 	/* check first for packages to be installed */
@@ -544,7 +573,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	if ( aptr->state & _COIPS_NODE_BUILT )
 	{	
-		if (!( contract = negotiate_application_contract(node,&selector)))
+		if (!( contract = negotiate_application_contract(node,&selector,&warranty)))
 			returnValue =  801;
 		else if (!( aptr->provision = allocate_string( contract ) ))
 			returnValue =  802;

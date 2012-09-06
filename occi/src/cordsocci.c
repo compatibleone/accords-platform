@@ -36,6 +36,7 @@
 #include "occiprovider.c"
 #include "occiapplication.c"
 #include "occiconfiguration.c"
+#include "occirelease.c"
 #include "occiinstruction.c"
 #include "occivalue.c"
 #include "occiconstraint.c"
@@ -48,6 +49,7 @@
 #include "occiport.c"
 #include "occifirewall.c"
 #include "occipackage.c"
+#include "occipacket.c"
 #include "occiparameter.c"
 #include "occiplan.c"
 #include "occiprofile.c"
@@ -72,6 +74,7 @@
 #include "occievent.c"
 #include "occialert.c"
 #include "occimonitor.c"
+#include "occicontrol.c"
 
 #include "occiinterface.c"
 #include "occisession.c"
@@ -100,4 +103,10 @@
 	/* ------------- */
 #include "occiamazonEc2.c"
 #include "occiec2config.c"
+#include "occigw.c"
+#include "occilinkgw.c"
+#include "occiintercloudGW.c"
 #endif
+
+
+

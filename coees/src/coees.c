@@ -134,6 +134,8 @@ private	struct rest_extension * coees_extension( void * v,struct rest_server * s
 	return( xptr );
 }
 
+#include "comonsconnection.c"
+
 /*	------------------------------------------------------------------	*/
 /*			c o e e s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -153,14 +155,19 @@ private	int	coees_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_connection_builder( Coees.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Coees.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= (_OCCI_PRIVATE | _OCCI_CONSUMER);
+
+	if (!( optr = comons_packet_builder( Coees.domain, "packet_coees.xml" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	rest_initialise_log( Coees.monitor );
 

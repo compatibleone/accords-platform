@@ -148,6 +148,7 @@ private	struct rest_extension * conets_extension( void * v,struct rest_server * 
 /*	------------------------------------------------------------------	*/
 #include "conetsdomain.c"
 #include "conetsip.c"
+#include "comonsconnection.c"
 
 /*	-------------------------------------------	*/
 /*	      a d d _ f i r e w a l l _ p o r t		*/
@@ -160,7 +161,7 @@ private	int	add_firewall_port( struct cords_firewall * pptr, char * source, stru
 	{
 		if ((target = standard_message_link_value( eptr->value )) != (char *) 0)
 		{
-			if ((zptr = cords_create_link( 
+			if ((zptr = occi_create_link( 
 					source, target, 
 					_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			{
@@ -198,8 +199,12 @@ private	struct rest_response * build_firewall(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( pptr->node ))
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		return( rest_html_response( aptr, 400, "Incorrect Request ID" ) );
+	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls(), &status ) ))
+	{
+		if ( status )
+			return( rest_html_response( aptr, 400+status, "Incorrect Request ID" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	else
 	{
 		/* ----------------------------------- */
@@ -207,7 +212,7 @@ private	struct rest_response * build_firewall(
 		/* ----------------------------------- */
 		sprintf(buffer,"%s/firewall/%s",Conets.identity,pptr->id);
 		pptr->ports=0;
-		if ((zptr = cords_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if ((zptr = occi_delete_links( buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 		for (	fptr = first_standard_message_link( nptr->network.message );
 			fptr != (struct occi_element *) 0;
@@ -302,14 +307,19 @@ private	int	conets_operation( char * nptr )
 	if (!( optr = occi_add_action( optr,_CORDS_BUILD,"",build_firewall)))
 		return( 28 );
 
-	if (!( optr = occi_cords_connection_builder( Conets.domain, "connection" ) ))
+	if (!( optr = comons_connection_builder( Conets.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback = (void *) 0;
-	optr->access |= ( _OCCI_PRIVATE | _OCCI_CONSUMER );
+
+	if (!( optr = comons_packet_builder( Conets.domain, "packet_conets.xml" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	if (!( optr = occi_cords_iprange_builder( Conets.domain, "iprange" ) ))
 		return( 27 );

@@ -326,6 +326,7 @@ private	char * cordscript_methodname[] =
 	(char *)	"monitor",
 	(char *)	"system",
 	(char *)	"fork",
+	(char *)	"kill",
 	(char *)	"new",
 	(char *)	"delete",
 	(char *)	"start",
@@ -375,6 +376,8 @@ public	char *	cordscript_method( int	symbol )
 		return( "system" );
 	else if ( symbol == _CORDSCRIPT_FORK )
 		return( "fork" );
+	else if ( symbol == _CORDSCRIPT_KILL )
+		return( "kill" );
 	else if ( symbol > _CORDSCRIPT_INVOKE )
 		return( "none" );
 	else	return( cordscript_methodname[ symbol ] );
@@ -443,6 +446,7 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 				if (!( aptr->lvalue->value = allocate_string( Csp.token ) ))
 					return( liberate_cordscript_actions( root ) );
 				else if (( aptr->type == _CORDSCRIPT_SYSTEM )
+				     ||  ( aptr->type == _CORDSCRIPT_KILL   ) 
 				     ||  ( aptr->type == _CORDSCRIPT_FORK   )) 
 				{
 					if (!( aptr->rvalue = cordscript_term() ))
@@ -454,6 +458,7 @@ public	struct	cordscript_action * cordscript_parse_statement( char * statement )
 					{
 						if (( aptr->type == _CORDSCRIPT_SYSTEM )
 						||  ( aptr->type == _CORDSCRIPT_FORK )
+						||  ( aptr->type == _CORDSCRIPT_KILL )
 						||  ( aptr->type == _CORDSCRIPT_MONITOR )
 						||  ( aptr->type == _CORDSCRIPT_CONFIGURE ))
 							return( liberate_cordscript_actions( root ) );
@@ -638,6 +643,8 @@ public	void	cordscript_show( struct cordscript_action * aptr )
 		else if ( aptr->type == _CORDSCRIPT_SYSTEM )
 			cordscript_show_command( aptr );
 		else if ( aptr->type == _CORDSCRIPT_FORK )
+			cordscript_show_command( aptr );
+		else if ( aptr->type == _CORDSCRIPT_KILL )
 			cordscript_show_command( aptr );
 		else if ( aptr->type == _CORDSCRIPT_AFFECT )
 			cordscript_show_affect( aptr );

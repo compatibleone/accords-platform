@@ -34,6 +34,8 @@ fi
 nethsm=
 tls=
 # -------------------------------------
+resthost=127.0.0.1
+secdir=$tls
 zone="europe"
 trace=1
 threads=1
@@ -43,8 +45,14 @@ domain=occi
 operator=accords
 password=co-system
 
+if [ -z "$tls" ]; then
+    tempo=1
+else
+    tempo=2
+fi
+
 if [ -z "$target" ]; then
-    target=a/home/c2/poc/ccords.xml
+    target=a/home/c2/poc/accords.xml
 fi
 
 if [ -z "$resthost" ]; then
@@ -67,7 +75,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-paasprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -81,87 +89,87 @@ _co-start() {
 
     echo "Starting accords publication services"
     ./run-publisher &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords file services"
     ./run-fileserver & 
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords security services"
     ./run-coss &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords monitoring services"
     ./run-comons &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords accounting services"
     ./run-coobas &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords networking services"
     ./run-conets &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords elasticity services"
     ./run-coes &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords energy efficiency services"
     ./run-coees &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords image storage services"
     ./run-ezvm &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords image production services"
     ./run-coips &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords parser services"
     ./run-parser &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords broker services"
     ./run-broker &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords procci services"
     ./run-procci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords scheduling services"
     ./run-cosched &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open stack services"
     ./run-osprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords proactive services"
     run-paprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords test occi open stack server"
     ./run-testosocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords test occi open stack server"
     ./run-testosocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords sla services"
     ./run-osocciprocci &
-    sleep 1
+    sleep $tempo
 
     echo "Starting accords open nebula services"
     ./run-onprocci &
-    sleep 1
+    sleep $tempo
     
     echo "Starting accords windows azure services"
     ./run-azprocci &
-    sleep 1
+    sleep $tempo
 
     echo "ACCORDS ready"
     ./co-status
@@ -205,49 +213,51 @@ _co-status() {
 
 co-stop() {
     killall example
-    sleep 1
+    sleep $tempo
+    killall paasprocci
+    sleep $tempo
     killall slam
-    sleep 1
+    sleep $tempo
     killall onprocci
-    sleep 1
+    sleep $tempo
     killall dcprocci
-    sleep 1
+    sleep $tempo
     killall osocciprocci
-    sleep 1
+    sleep $tempo
     killall testosocci
-    sleep 1
+    sleep $tempo
     killall osprocci
-    sleep 1
+    sleep $tempo
     killall paprocci
-    sleep 1
+    sleep $tempo
     killall azprocci
-    sleep 1
+    sleep $tempo
     killall cosched
-    sleep 1
+    sleep $tempo
     killall procci
-    sleep 1
+    sleep $tempo
     killall broker
-    sleep 1
+    sleep $tempo
     killall parser
-    sleep 1
+    sleep $tempo
     killall coips
-    sleep 1
+    sleep $tempo
     killall ezvm
-    sleep 1
+    sleep $tempo
     killall coees
-    sleep 1
+    sleep $tempo
     killall coes
-    sleep 1
+    sleep $tempo
     killall conets
-    sleep 1
+    sleep $tempo
     killall coobas
-    sleep 1
+    sleep $tempo
     killall comons
-    sleep 1
+    sleep $tempo
     killall coss
-    sleep 1
+    sleep $tempo
     killall fileserver
-    sleep 1
+    sleep $tempo
     killall publisher
 }
 
@@ -321,6 +331,10 @@ _run-testosocci() {
 
 _run-slam() {
     /usr/local/bin/slam --config $target CO-SLAM/1.0
+}
+
+_run-paasprocci() {
+    /usr/local/bin/paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
 _run-example() {

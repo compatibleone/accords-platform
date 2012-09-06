@@ -1,0 +1,8 @@
+if [ -z "$makesecurity" ]; then
+	tar -czf update-cosacs.tgz build-config-cosacs style.css cosacs *.so.* 
+else
+	tar -czf update-cosacs.tgz build-config-cosacs style.css $makesecurity/cosacs* $makesecurity/Certificates.crt cosacs *.so.* 
+fi
+
+
+

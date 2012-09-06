@@ -170,6 +170,21 @@ private	void	show_url( struct url * uptr )
 }	
 
 /*	-------------------------------------------------	*/
+/*		r e p l a c e _ u r l _ o b j e c t		*/
+/*	-------------------------------------------------	*/
+public	char 	  * replace_url_object( struct url * uptr, char * xptr )
+{
+	if (!( uptr ))
+		return( (char *) 0);
+	else
+	{
+		if ( uptr->object )
+			uptr->object = liberate( uptr->object );
+		return((uptr->object = allocate_string( xptr )));
+	}
+}
+
+/*	-------------------------------------------------	*/
 /*		     s e r i a l i s e  _ u r l			*/
 /*	-------------------------------------------------	*/
 public char 	  * serialise_url( struct url * uptr, char * xptr )
@@ -216,7 +231,7 @@ public char 	  * serialise_url_host_port( struct url * uptr )
 /*		     a p p e n d  _ u r l			*/
 /*	-------------------------------------------------	*/
 /*	appends the second parameter to the first one and	*/
-/*	liberates the firs tone then resturns allocation	*/
+/*	liberates the first one then returns allocation		*/
 /*	of new string						*/
 /*	-------------------------------------------------	*/
 public char 	  * append_url( char * sptr, char * xptr )
@@ -288,7 +303,7 @@ private	struct	rest_client * rest_allocate_client()
 }
 
 /*	------------------------------------------------	*/
-/*	    r e s t _ l i b e r a t e _ s e r v e r		*/
+/*	    r e s t _ l i b e r a t e _ c l i e n t 		*/
 /*	------------------------------------------------	*/
 private	struct	rest_client * rest_liberate_client( struct rest_client * cptr )
 {
@@ -331,6 +346,7 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 	else if (!( tls ))
 		return( cptr );
+
 	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
 	{
 		if ( check_debug() )
@@ -349,12 +365,24 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 /*	------------------------------------------------	*/
 /*	    r e s t _ t r y _ o p e n _ c l i e n t		*/
 /*	------------------------------------------------	*/
+/*	attempts to open a client connection using coscs	*/
+/*	and needs to do very careful connect polling to		*/
+/*	avoid crashing the:					*/
+/*	A) callers TCP stack					*/
+/*	B) the targets router					*/
+/*	C) the targets network address translation		*/
+/*	D) the target machines TCP stack			*/
+/*	E) anyone else who might be in the way			*/
+/*	------------------------------------------------	*/
 private	struct rest_client * 	rest_try_open_client( char * host, int port, char * tls, int timeout, int retry )
 {
 	struct rest_client *  cptr;
 	char	buffer[1024]; 
+	int	status;
+
 	if (!( port ))
 		return((struct rest_client*) 0); 
+
 	else if (!( cptr = rest_allocate_client() ))
 	{
 		if ( check_debug() )
@@ -369,27 +397,49 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 	}
 	while ( retry-- )
 	{
-		if (!( socket_try_connect( cptr->net.socket, host, port, timeout  ) ))
+		if (( status = socket_try_connect( cptr->net.socket, host, port, ( timeout > 1 ? timeout / 2 : 1 ) )) == 1)
+		{
+			/* ------- */
+			/* success */
+			/* ------- */
+			break;
+		}
+		else if ( status == 0 )
+		{
+			/* ------- */
+			/* failure */
+			/* ------- */
+			sleep(( timeout > 1 ? timeout / 2 : 1 ));
 			continue;
-		else	break;
+		}
+		else
+		{
+			/* --------------------- */
+			/* unrecoverable failure */
+			/* --------------------- */
+			return( rest_liberate_client( cptr ) );
+		}
 	}
+
+	/* -------------------------------------- */
+	/* if the number of retries has timed out */
+	/* -------------------------------------- */
 	if (!( retry ))
 		return( rest_liberate_client( cptr ) );
-
-	if (!( tls ))
-		return( cptr );
-	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
-	{
-		if ( check_debug() )
-			failure(27,"rest","tls configuration");
-		return( rest_liberate_client( cptr ) );
-	}
 	else
 	{
-		tls_configuration_use( cptr->tlsconf );
-		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
-			return( rest_liberate_client( cptr ) );
-		else	return( cptr );
+		/* ------------------------------------ */
+		/* drop this connection it may be dirty */
+		/* ------------------------------------ */
+		cptr = rest_liberate_client( cptr );
+		/* ------------------------ */
+		/* allow the dust to settle */
+		/* ------------------------ */
+		sleep(2);
+		/* ----------------------- */
+		/* and try a standard open */
+		/* ----------------------- */
+		return( rest_open_client( host, port, tls ) );
 	}
 }
 
@@ -794,7 +844,15 @@ public	struct	rest_response * rest_client_get_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -840,7 +898,15 @@ public	struct	rest_response * rest_client_try_get_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -880,7 +946,15 @@ public	struct	rest_response * rest_client_delete_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 }
 
@@ -919,7 +993,15 @@ public	struct	rest_response * rest_client_head_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 }
 
@@ -960,7 +1042,15 @@ public	struct	rest_response * rest_client_post_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }
@@ -1002,7 +1092,15 @@ public	struct	rest_response * rest_client_put_request(
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
 	}
 
 }

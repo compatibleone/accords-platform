@@ -2,9 +2,11 @@
 # ACCORDS Makefile.am
 #
 # Copyright 2011, Mandriva, All rights reserved
+# Copyright 2012, Prologue, All rights reserved
 #
 # Authors:
 #   Jean Parpaillon <jparpaillon@mandriva.com>
+#   Iain James Marshall <ijm667@hotmail.com>
 #
 ACLOCAL_AMFLAGS = -I m4
 
@@ -50,6 +52,12 @@ SUBDIRS += cosched
 endif
 if ENABLE_SLAM
 SUBDIRS += slam
+endif
+if ENABLE_PAASPROCCI
+SUBDIRS += paasprocci
+endif
+if ENABLE_COOL
+SUBDIRS += cool
 endif
 if ENABLE_EXAMPLE
 SUBDIRS += example
@@ -105,9 +113,6 @@ endif
 if ENABLE_COMMAND
 SUBDIRS += command
 endif
-if ENABLE_TESTDC
-SUBDIRS += testdc
-endif
 if ENABLE_TESTOS
 SUBDIRS += testos
 endif
@@ -120,14 +125,17 @@ endif
 if ENABLE_TESTCB
 SUBDIRS += testcb
 endif
-if ENABLE_TESTAZ
-SUBDIRS += testaz
-endif
 if ENABLE_FILESERVER
 SUBDIRS += fileserver
 endif
 if ENABLE_TESTRESOLVER
 SUBDIRS += testresolver
+endif
+if ENABLE_TESTAZ
+SUBDIRS += testaz
+endif
+if ENABLE_TESTDC
+SUBDIRS += testdc
 endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd accords.spec.in

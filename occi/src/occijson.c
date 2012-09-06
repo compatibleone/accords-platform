@@ -187,7 +187,7 @@ private	char * occi_json_attributes( struct occi_category * optr )
 			return( rptr );
 
 		else if (!( wptr = occi_json_namevalue( 
-				"mutable", (aptr->immutable?"false":"true") ) ))
+				"immutable", (aptr->immutable?"true":"false") ) ))
 			return( liberate( rptr ) );
 
 		else if (!( rptr = join_string( rptr, "," ) ))

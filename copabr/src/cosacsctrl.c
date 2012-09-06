@@ -35,6 +35,7 @@
 /*	------------------------------------	*/
 #define	_COSACS_HOST "127.0.0.1"
 #define	_COSACS_ITERATIONS 10
+#define	_COSACS_PERIOD "2"
 
 /*	-------------------------------------------------	*/
 /*		c o s a c s _ s y n c h r o n i s e		*/
@@ -42,6 +43,80 @@
 private	void	cosacs_synchronise()
 {
 	sleep(1);
+	return;
+}
+
+/*	-------------------------------------------------	*/
+/*		r e a d _ s e c u r e _ c o s a c s		*/
+/*	-------------------------------------------------	*/
+private	int	_secure_cosacs=-1;
+private	int	_is_secure_cosacs=-1;
+private	int	read_secure_cosacs()
+{
+	char *	eptr=(char *) 0;
+	if ( _is_secure_cosacs != -1 )
+		return( _is_secure_cosacs );
+	else if (!( eptr = getenv("SECURECOSACS") ))
+		return((_is_secure_cosacs=_secure_cosacs=1));
+	else 	return((_is_secure_cosacs=_secure_cosacs=atoi(eptr)));
+}
+
+/*	-------------------------------------------------	*/
+/*		c o s a c s _ h t t p _ p r e f i x		*/
+/*	-------------------------------------------------	*/
+private	char * 	cosacs_http_prefix()
+{
+	if ( read_secure_cosacs() )
+		return( "https" );
+	else	return( "http"  );
+}
+
+/*	-------------------------------------------------	*/
+/*		u s e _ c o s a c s _ a g e n t			*/
+/*	-------------------------------------------------	*/
+public	int	use_cosacs_agent( char * sptr )
+{
+	(void) read_secure_cosacs();
+	if ( rest_valid_string_value( sptr, "cosacs" ) )
+	{
+		_is_secure_cosacs=_secure_cosacs;
+		return(1);
+	}
+	else if ( rest_valid_string_value( sptr, "http:cosacs" ) )
+	{
+		_is_secure_cosacs=0;
+		return( 1 );
+	}
+	else if ( rest_valid_string_value( sptr, "https:cosacs" ) )
+	{
+		_is_secure_cosacs=1;
+		return( 1 );
+	}
+	else	return( 0 );
+}
+
+/*	-------------------------------------------------	*/
+/*			c o s a c s _ t l s 			*/
+/*	-------------------------------------------------	*/
+private	char * 	cosacs_tls()
+{
+	if ( read_secure_cosacs() )
+		return( default_tls() );
+	else	return( (char *) 0 );
+}
+
+
+/*	-----------------------------------------------		*/
+/*	r e l e a s e _ c o s a c s _ i n t e r f a c e		*/
+/*	-----------------------------------------------		*/
+/*	releases the OCCI client interface for private		*/
+/*	provisioned VM's because the IP can be reused.		*/
+/*	-----------------------------------------------		*/
+public	void	cosacs_release_interface( char * host )
+{
+	char	buffer[2048];
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_METADATA);
+	occi_release_client( buffer );
 	return;
 }
 
@@ -81,14 +156,12 @@ private	struct	occi_client * cosacs_occi_create_client( char * url, char * agent
 /*	-----------------------------------------------------------	*/
 /*		c o s a c s _ c r e a t e _ p r o b e 			*/
 /*	-----------------------------------------------------------	*/
-public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * stream, char * metric)
+public	char *	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, char * connection, char * metric, char * period)
 {
 	char	buffer[1024];
 	char 	work[1024];
 	char *	agent=_CORDS_CONTRACT_AGENT;
-
 	char *	host=_COSACS_HOST; 
-
 	struct	occi_client * cptr;
 	struct	occi_request * rptr;
 	struct	occi_response * zptr;
@@ -100,7 +173,7 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
 
-	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_PROBE);
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_PROBE);
 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -112,24 +185,41 @@ public	int	cosacs_create_probe( char * cosacs, char * prefix, char * symbol, cha
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
-		return(1100);
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, cosacs_tls() ) ))
+		return((char *) 0);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
-		return(1101);
+		return((char *) 0);
 	else if ((!(dptr=occi_request_element(rptr,"occi.probe.name"  , work   ) ))
 	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.metric", metric ) ))
-	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.stream", stream ) )))
+	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.period", "1"    ) ))
+	     ||  (!(dptr=occi_request_element(rptr,"occi.probe.connection", connection ) )))
 	{
 		rptr = occi_remove_request( rptr );
-		return(1102);
+		return((char *) 0);
 	}
 	else
 	{
 		zptr = occi_client_post( cptr, rptr );
 		cosacs_synchronise();
-		zptr = occi_remove_response( zptr );
 		rptr = occi_remove_request( rptr );
-		return(0);
+
+		if (!( host = occi_extract_location( zptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			cptr = occi_remove_client( cptr );
+			return((char *) 0);
+		}
+		else
+		{
+			strcpy(buffer, host );
+			zptr = occi_remove_response( zptr );
+			cptr = occi_remove_client( cptr );
+		}
+
+		if (( zptr = occi_create_link( connection, buffer, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+
+		return(allocate_string( buffer ));
 	}
 }
 
@@ -157,7 +247,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_METADATA);
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_METADATA);
 
 	if ( prefix )
 		sprintf(work,"%s_%s",prefix,symbol);
@@ -181,7 +271,7 @@ public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, 
 	/* ----------------------------------- */
 	/* create client and request then POST */
 	/* ----------------------------------- */
-	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, cosacs_tls() ) ))
 	{
 		rest_log_debug("failure::cosacs::occi_create_client");
 		return(1100);
@@ -237,7 +327,7 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/%s/",rest_http_prefix(),host,_COSACS_PORT,_CORDS_SCRIPT);
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_SCRIPT);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */
@@ -245,7 +335,7 @@ public	int	cosacs_create_script( char * cosacs, char * action, char * parameters
 	if ( check_debug() )
 		printf("create_cosacs_script(%s,%s,%s,%s)\n",buffer,action,parameters,type);
 
-	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, cosacs_tls() ) ))
 		return(1100);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(1101);
@@ -278,9 +368,9 @@ public	int	cosacs_test_interface( char * cosacs, int timeout, int retry )
 	struct	rest_response * rptr;
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s:%u/-/",host,_COSACS_PORT);
+	sprintf(buffer,"%s://%s:%u/-/",cosacs_http_prefix(),host,_COSACS_PORT);
 
-	if (!( rptr = rest_client_try_get_request( buffer, default_tls(), agent, hptr, timeout, retry ) ))
+	if (!( rptr = rest_client_try_get_request( buffer, cosacs_tls(), agent, hptr, timeout, retry ) ))
 		return(0);
 	else	
 	{
@@ -308,7 +398,7 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 	/* ----------------------- */
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s:%u/%s/",host,_COSACS_PORT,_CORDS_FILE);
+	sprintf(buffer,"%s://%s:%u/%s/",cosacs_http_prefix(),host,_COSACS_PORT,_CORDS_FILE);
 
 	/* ----------------------------------- */
 	/* create client and request then POST */
@@ -316,7 +406,7 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 	if ( check_debug() )
 		printf("create_cosacs_file(%s,%s,%s)\n",buffer,remotename,type);
 
-	if (!( cptr = cosacs_occi_create_client( buffer, agent, default_tls() ) ))
+	if (!( cptr = cosacs_occi_create_client( buffer, agent, cosacs_tls() ) ))
 		return(1100);
 	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return(1101);
@@ -337,6 +427,497 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 }
 
 /*	-----------------------------------------------------------	*/
+/* 	     c o s a c s _ m o n i t o r i n g _ s e s s i o n		*/
+/*	-----------------------------------------------------------	*/
+private	char *	cosacs_monitoring_session( char * contract, char * account )
+{
+	struct	occi_response * zptr;
+	struct 	occi_element * eptr;
+	struct 	occi_element * dptr;
+	struct 	occi_element * fptr;
+	struct 	occi_element * nptr;
+	char *	session=(char *) 0;
+	char	buffer[2048];
+	char *	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+
+	/* --------------------------------- */
+	/* read the contract instance record */
+	/* --------------------------------- */
+	if (!( zptr = occi_simple_get( contract, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		return( (char *) 0 );
+	}
+
+	/* -------------------------- */
+	/* retrieve the session field */
+	/* -------------------------- */
+	else if (!(fptr = occi_locate_element( zptr->first, "occi.contract.session" )))
+	{
+		zptr = occi_remove_response ( zptr );
+		return((char *) 0);
+	}
+
+	/* -------------------------------------- */
+	/* validate and return session identifier */
+	/* -------------------------------------- */
+	else if ( rest_valid_string( fptr->value ) )
+	{
+		session = allocate_string( fptr->value );
+		zptr = occi_remove_response ( zptr );
+		return( session );
+	}		
+
+	/* ------------------------------- */
+	/* create a new monitoring session */
+	/* ------------------------------- */
+	else if (!(nptr = occi_locate_element( zptr->first, "occi.contract.name" )))
+	{
+		zptr = occi_remove_response ( zptr );
+		return((char *) 0);
+	}
+
+	/* ------------------------ */
+	/* retrieve session service */
+	/* ------------------------ */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_SESSION, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		zptr = occi_remove_response ( zptr );
+		return((char *) 0);
+	}
+	sprintf(buffer,"%s/%s/",ihost,_CORDS_SESSION);
+	liberate( ihost );
+
+	/* --------------------- */
+	/* create an OCCI Client */
+	/* --------------------- */
+	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		zptr = occi_remove_response ( zptr );
+		return((char *) 0);
+	}
+	/* ---------------------- */
+	/* create an OCCI Request */
+	/* ---------------------- */
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		zptr = occi_remove_response ( zptr );
+		return((char *) 0);
+	}
+	/* ---------------------------------- */
+	/* initialise the session information */
+	/* ---------------------------------- */
+	else if ((!(dptr=occi_request_element(qptr,"occi.session.contract"  	, contract  	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.session.name"   	, nptr->value	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.session.account"   	, nptr->value	) )))
+	{
+		kptr = occi_remove_client( kptr );
+		zptr = occi_remove_response ( zptr );
+		qptr = occi_remove_request  ( qptr );
+		return((char *) 0);
+	}
+	/* ----------------------------- */
+	/* create the session record now */
+	/* ----------------------------- */
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		kptr = occi_remove_client( kptr );
+		zptr = occi_remove_response ( zptr );
+		qptr = occi_remove_request  ( qptr );
+		return((char *) 0);
+	}
+	/* ------------------------------- */
+	/* retrieve the session identifier */
+	/* ------------------------------- */
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		kptr = occi_remove_client( kptr );
+		zptr = occi_remove_response ( zptr );
+		qptr = occi_remove_request  ( qptr );
+		return((char *) 0);
+	}
+	/* ------------------------------ */
+	/* allocate the session id result */
+	/* ------------------------------ */
+	else if (!( session = allocate_string( ihost ) ))
+	{
+		kptr = occi_remove_client( kptr );
+		zptr = occi_remove_response ( zptr );
+		qptr = occi_remove_request  ( qptr );
+		yptr = occi_remove_response ( yptr );
+		return((char *) 0);
+	}
+	else
+	{
+		kptr = occi_remove_client( kptr );
+		yptr = occi_remove_response ( yptr );
+		qptr = occi_remove_request  ( qptr );
+		zptr = occi_remove_response ( zptr );
+	}
+
+	/* --------------------------------------- */
+	/* update the contract instance session id */
+	/* --------------------------------------- */
+	if (!( eptr = occi_create_element( "occi.contract.session", session ) ))
+		return((char *) 0);
+
+	else if (!( zptr = occi_simple_put( contract, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return((char *) 0);
+	else
+	{
+		/* --------------------------------- */
+		/* and return the new session result */
+		/* --------------------------------- */
+		zptr = occi_remove_response ( zptr );
+		return( session );
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/* 	  c o s a c s _ m o n i t o r i n g _ c o n n e c t i o n	*/
+/*	-----------------------------------------------------------	*/
+private	char *	cosacs_monitoring_connection( struct occi_response * instruction, char * session, char * account )
+{
+	struct	occi_response * zptr;
+	struct 	occi_element * eptr;
+	struct 	occi_element * dptr;
+	struct 	occi_element * nptr;
+	char *	consumer=(char *) 0;
+	char * connection=(char *) 0;
+	char	buffer[2048];
+	char *	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+
+	/* -------------------------------------------------- */
+	/* resolve the consumer identity from the instruction */
+	/* -------------------------------------------------- */
+	if (!(eptr = occi_locate_element( instruction->first, "occi.instruction.symbol" )))
+		return((char *) 0);
+	else if (!( consumer = occi_resolve_consumer_identity( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return((char *) 0);
+	else	sprintf(buffer,"%s/%s/",consumer,_CORDS_CONNECTION);
+
+	/* --------------------- */
+	/* create an OCCI Client */
+	/* --------------------- */
+	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return((char *) 0);
+
+	/* ---------------------- */
+	/* create an OCCI Request */
+	/* ---------------------- */
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+
+	/* ---------------------------------- */
+	/* initialise the session information */
+	/* ---------------------------------- */
+	else if (!(dptr=occi_request_element(qptr,"occi.connection.session"  	, session  	) ))
+	{
+		kptr = occi_remove_client( kptr );
+		qptr = occi_remove_request  ( qptr );
+		return((char *) 0);
+	}
+
+	/* ------------------------------------------------- */
+	/* attempt to localise a connection for this session */
+	/* ------------------------------------------------- */
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		kptr = occi_remove_client( kptr );
+		qptr = occi_remove_request  ( qptr );
+		return((char *) 0);
+	}
+
+	/* ------------------------------------- */
+	/* scan result for a connection location */
+	/* ------------------------------------- */
+	for (	eptr = yptr->first;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else	break;
+	}
+
+	/* ---------------------------- */
+	/* return the response if found */
+	/* ---------------------------- */
+	if ( eptr )
+	{
+		connection = allocate_string( eptr->value );
+		kptr = occi_remove_client( kptr );
+		qptr = occi_remove_request  ( qptr );
+		yptr = occi_remove_response( yptr );
+		return( connection );
+	}
+	else
+	{
+		kptr = occi_remove_client( kptr );
+		qptr = occi_remove_request  ( qptr );
+		yptr = occi_remove_response( yptr );
+	}
+	/* ------------------------------------ */
+	/* create a connection for this session */
+	/* ------------------------------------ */
+	if (!(dptr=occi_create_element("occi.connection.session", session ) ))
+		return( (char *) 0 );
+	else if (!( yptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( (char *) 0 );
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		return((char *) 0);
+	}
+	/* ------------------------------------ */
+	/* link the connection to the session   */
+	/* ------------------------------------ */
+	else
+	{
+		connection = allocate_string( ihost );
+		yptr = occi_remove_response( yptr );
+		if (!( yptr = occi_create_link( session, connection, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			return( connection );
+		else
+		{
+			yptr = occi_remove_response( yptr );
+			return( connection );
+		}
+	}
+}
+
+/*	-----------------------------------------------------------	*/
+/*	     c o s a c s _ c o n n e c t i o n _ m o n i t o r		*/
+/*	-----------------------------------------------------------	*/
+/*	this function will update a connection monitor with the SLO	*/
+/*	control element which will itself be updated to reference	*/
+/*	the resolved metric, connection, session and probe.		*/
+/*	------------------------------------------------------------	*/ 
+private	char *	cosacs_connection_monitor( 
+	char *	account, 
+	char *	session, 
+	char *	connection, 
+	char *	probe, 
+	char *	metric, 
+	char *	control )
+{
+	char	buffer[2048];
+	char *	ihost;
+	char *	monitor=(char *) 0;
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	struct	occi_element  * eptr;
+	struct	occi_element  * fptr;
+	struct	occi_element  * dptr;
+
+	/* ----------------------- */
+	/* retrieve the connection */
+	/* ----------------------- */
+	if (!( zptr = occi_simple_get( connection, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return((char *) 0);
+
+	/* ----------------------- */
+	/* retrieve the monitor id */
+	/* ----------------------- */
+	else if (!(fptr = occi_locate_element( zptr->first, "occi.connection.monitor" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return((char *) 0);
+	}
+	else if (!( rest_valid_string( fptr->value ) ))
+	{
+		/* ------------------------------------------------------------------------- */
+		/* select / resolve the instruction category service provider identification */
+		/* ------------------------------------------------------------------------- */
+		if (!( ihost = occi_resolve_category_provider( _CORDS_MONITOR, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		 	return( 0 );
+		else	sprintf(buffer,"%s/%s/",ihost,_CORDS_MONITOR);
+
+		liberate( ihost );
+
+		/* ----------------------- */
+		/* create missing monitor  */
+		/* ----------------------- */
+		if ((!( dptr = occi_create_element(       "occi.monitor.account",    account	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.monitor.session",    session	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.monitor.connection", connection	) )))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( yptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( ihost = occi_extract_location( yptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			yptr = occi_remove_response( yptr );
+			return((char *) 0);
+		}
+		/* ------------------------------------ */
+		/* link the connection to the session   */
+		/* ------------------------------------ */
+		else if (!( monitor = allocate_string( ihost ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			yptr = occi_remove_response( yptr );
+			return((char *) 0);
+		}
+		else	yptr = occi_remove_response ( yptr );
+
+		/* --------------------------------- */
+		/* update connection with monitor id */
+		/* --------------------------------- */
+		if (!( eptr = occi_create_element( "occi.connection.monitor", monitor ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else if (!( yptr = occi_simple_put( connection, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return((char *) 0);
+		}
+		else	yptr = occi_remove_response ( yptr );
+	}
+
+	/* ------------------------------------------- */
+	/* allocate the monitor id for eventual return */
+	/* ------------------------------------------- */
+	else if (!( monitor = allocate_string( fptr->value ) ))
+		return((char *) 0);
+
+	/* ----------------------- */
+	/* clean up previous phase */
+	/* ----------------------- */
+	zptr = occi_remove_response( zptr );
+
+	/* --------------------------------------------------- */
+	/* update the control with probe and other information */
+	/* --------------------------------------------------- */
+	if ((!( dptr = occi_create_element(  "occi.control.probe",     probe  	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.metric",     metric 	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.account",    account	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.monitor",    monitor	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.session",    session	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.connection", connection	) )))
+	{
+		monitor = liberate( monitor );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_simple_put( control, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		monitor = liberate( monitor );
+		return((char *) 0);
+	}
+	else	yptr = occi_remove_response ( yptr );
+
+	/* -------------------- */
+	/* link monitor control */
+	/* -------------------- */
+	if (!( yptr = occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+
+	return( monitor );
+}
+
+/*	-----------------------------------------------------------	*/
+/* 	 c o s a c s _ m o n i t o r i n g _ i n s t r u c t i o n 	*/
+/*	-----------------------------------------------------------	*/
+private	int	cosacs_monitoring_instruction( 
+		char * cosacs,
+		char * provision,
+		char * account,
+		struct occi_response * instruction )
+{
+	struct	occi_element * fptr;
+	struct	occi_element * gptr;
+
+	char *	session=(char *) 0;
+	char *	connection=(char *) 0;
+	char *	contract=(char *) 0;
+	char *	control=(char *) 0;
+	char *	monitor=(char *) 0;
+	char *	metric=(char *) 0;
+	char *	probe=(char *) 0;
+
+	/* ---------------------------------------- */
+	/* retrieve the generic contract identifier */
+	/* ---------------------------------------- */
+	if (!(fptr = occi_locate_element( instruction->first, "occi.instruction.target" )))
+		return( 118 );
+	else if (!( fptr->value ))
+		return( 118 );
+	else if (!( contract = allocate_string( fptr->value ) ))
+		return( 118 );
+
+	/* ---------------------------------------------- */
+	/* retrieve or create a session for this contract */
+	/* ---------------------------------------------- */
+	if (!( session = cosacs_monitoring_session( contract, account )))
+		return( 118 );
+
+	/* --------------------------------------------- */
+	/* retrieve an eventual SLA SLO control instance */
+	/* --------------------------------------------- */
+	if (( fptr = occi_locate_element( instruction->first, "occi.instruction.value" )) != (struct occi_element *) 0)
+		if ( rest_valid_string( fptr->value ) )
+			if (!( control = allocate_string( fptr->value ) ))
+				return( 118 );
+
+	/* --------------------------------------------------------- */
+	/* retrieve or create and link a connection for this session */
+	/* --------------------------------------------------------- */
+	else if (!( connection = cosacs_monitoring_connection( instruction, session, account )))
+		return( 118 );
+
+	/* -------------------------------- */
+	/* retrieve the consumer identifier */
+	/* -------------------------------- */
+	else if (!(fptr = occi_locate_element( instruction->first, "occi.instruction.symbol" )))
+		return( 118 );
+
+	/* -------------------------------- */
+	/* retrieve  the  metric identifier */
+	/* -------------------------------- */
+	else if (!(gptr = occi_locate_element( instruction->first, "occi.instruction.property" )))
+		return( 118 );
+
+	/* ----------------------------- */
+	/* resolve the metric identifier */
+	/* ----------------------------- */
+	else if (!( metric = occi_resolve_metric( gptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( 118 );
+
+	/* ------------------------------------------------- */
+	/* create a new probe for this connection and metric */
+	/* ------------------------------------------------- */
+	else if (!( probe = cosacs_create_probe( cosacs, fptr->value, gptr->value, connection, metric, _COSACS_PERIOD )))
+		return( 118 );
+	else if (!( control ))
+		return( 0 );
+	/* ------------------------------------------------------- */
+	/* create or update the connection monitor with this probe */
+	/* ------------------------------------------------------- */
+	else if (!( monitor = cosacs_connection_monitor( account, session, connection, probe, metric, control ) ))
+		return( 118 );
+	else	return( 0 );
+}
+
+
+/*	-----------------------------------------------------------	*/
 /* 	  c o s a c s _ m e t a d a t a _ i n s t r u c t i o n s 	*/
 /*	-----------------------------------------------------------	*/
 /*	This function provides instruction processing on a provider	*/
@@ -346,8 +927,9 @@ public	int	cosacs_create_file( char * cosacs, char * remotename, char * localnam
 public	int	cosacs_metadata_instructions( 
 		char * cosacs, 
 		char * nature,
-		char * contract, 
-		char * publisher )
+		char * contract,
+		char * publisher,
+		char * account )
 {
 
 	char	*	ihost;
@@ -485,6 +1067,7 @@ public	int	cosacs_metadata_instructions(
 				zptr = occi_remove_response ( zptr );
 			else if ((!( strcasecmp( fptr->value, "system" ) ))
 			     ||  (!( strcasecmp( fptr->value, "fork"   ) ))
+			     ||  (!( strcasecmp( fptr->value, "kill"   ) ))
 			     ||  (!( strcasecmp( fptr->value, "process") ))
 			     ||  (!( strcasecmp( fptr->value, "command") )))
 			{
@@ -524,28 +1107,7 @@ public	int	cosacs_metadata_instructions(
 			}
 
 			else if (!(  strcasecmp( fptr->value, "monitor" ) ))
-			{
-				/* collect the configuration details */
-				/* --------------------------------- */
-				if (!(fptr = occi_locate_element( zptr->first, "occi.instruction.symbol" )))
-					zptr = occi_remove_response ( zptr );
-				else if (!( stream = occi_resolve_consumer( fptr->value, _CORDS_CONTRACT_AGENT, default_tls() )))
-					zptr = occi_remove_response ( zptr );
-				else if (!(gptr = occi_locate_element( zptr->first, "occi.instruction.property" )))
-					zptr = occi_remove_response ( zptr );
-				else if (!(jptr = occi_locate_element( zptr->first, "occi.instruction.value" )))
-					zptr = occi_remove_response ( zptr );
-				else
-				{
-					/* ------------------------------------------------------------ */
-					/* Create a COSACS Probe instance for the stream and metric ids */
-					/* ------------------------------------------------------------ */
-					cosacs_create_probe( cosacs, fptr->value, gptr->value, stream, metric );
-					zzptr = occi_remove_response ( zzptr );
-					zptr = occi_remove_response ( zptr );
-					stream = liberate( stream );
-				}
-			}
+				cosacs_monitoring_instruction(cosacs, contract, account, zptr );
 
 			else	zptr = occi_remove_response ( zptr );
 		}

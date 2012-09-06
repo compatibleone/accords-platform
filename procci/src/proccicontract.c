@@ -92,7 +92,7 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 /*	of the same collection through the provider	*/
 /*	contract id.					*/
 /*	-------------------------------------------	*/
-private	int	contract_instructions( char * contract, char * provision )
+private	int	contract_instructions( struct cords_contract * pptr, char * contract, char * provision )
 {
 
 	char	*	ihost;
@@ -148,7 +148,8 @@ private	int	contract_instructions( char * contract, char * provision )
 	/* ---------------------------------------------------- */
 	/* for each of the instructions of the current contract */
 	/* ---------------------------------------------------- */
-	for (	eptr = yptr->first;
+	for (	pptr->instructions=0,
+		eptr = yptr->first;
 		eptr != (struct occi_element*) 0;
 		eptr = eptr->next )
 	{
@@ -183,6 +184,7 @@ private	int	contract_instructions( char * contract, char * provision )
 				zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() );
 				zzptr = occi_remove_response ( zzptr );
 				zptr = occi_remove_response ( zptr );
+				pptr->instructions++;
 			}
 		}
 
@@ -257,9 +259,10 @@ private	struct	rest_response * start_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	char	fullid[2048];
-	int	urser=0;
 
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -267,25 +270,86 @@ private	struct	rest_response * start_contract(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
+			pptr->when  = time((long*)0); 
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_START,
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_START,
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
-				contract_instructions( fullid, pptr->provider );
-				cords_invoke_action( pptr->provider, _CORDS_START, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				contract_instructions( pptr, fullid, pptr->provider );
+				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 				retrieve_provider_information( pptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_START, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
+
+			/* ------------------------ */
+			/* consume placement quotas */
+			/* ------------------------ */
+			if ( pptr->placement )
+			{
+				if ( cords_validate_action( 
+					(struct occi_client *) 0,
+					_CORDS_PLACEMENT, _CORDS_CONSUME, 
+					pptr->placement ) )
+				{
+					if (!(zptr = cords_invoke_action( pptr->placement, "consume", 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+						return( rest_html_response( aptr, 900, "Failure to Consume Placement Quota" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "Consume Quota Action Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
+				}
+			}
+
+			/* ------------------------ */
+			/* start monitoring session */
+			/* ------------------------ */
+			if ( pptr->session )
+			{
+				if (!(zptr = cords_invoke_action( pptr->session, _CORDS_START, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
+			pptr->startduration = (time((long*)0) - pptr->when);
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			pptr->commons= 1;
@@ -309,6 +373,8 @@ private	struct	rest_response * restart_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -318,19 +384,40 @@ private	struct	rest_response * restart_contract(
 		{
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_RESTART, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_RESTART, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_RESTART, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_RESTART, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
@@ -352,6 +439,8 @@ private	struct	rest_response * suspend_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -361,19 +450,40 @@ private	struct	rest_response * suspend_contract(
 		{
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_SUSPEND,
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_SUSPEND,
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_SUSPEND, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_SUSPEND, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_SUSPEND, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_SUSPEND, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
@@ -411,32 +521,93 @@ private	struct	rest_response * stop_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			pptr->when  = time((long*)0); 
+			/* ------------------------ */
+			/* stop monitoring session */
+			/* ------------------------ */
+			if ( pptr->session )
+			{
+				if (!(zptr = cords_invoke_action( pptr->session, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
 			if ( pptr->commons )
 				pptr->commons--;
 			if ( pptr->commons )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_STOP,
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_STOP,
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_STOP, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_STOP, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_STOP, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
+			/* ------------------------ */
+			/* restore placement quotas */
+			/* ------------------------ */
+			if ( pptr->placement )
+			{
+				if ( cords_validate_action( 
+					(struct occi_client *) 0,
+					_CORDS_PLACEMENT, _CORDS_RESTORE,
+					pptr->placement ) )
+				{
+					if (!(zptr = cords_invoke_action( pptr->placement, _CORDS_RESTORE, 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+						return( rest_html_response( aptr, 900, "Failure to Restore Placement Quota" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "Restore Quota Action Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
+				}
+			}
+			pptr->stopduration = (time((long*)0) - pptr->when);
 			reset_contract( pptr );
 			autosave_cords_contract_nodes();
 		}
@@ -454,6 +625,8 @@ private	struct	rest_response * save_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -461,23 +634,46 @@ private	struct	rest_response * save_contract(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			pptr->when  = time((long*) 0);
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_SAVE, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->common, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_SAVE, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 				retrieve_provider_information( pptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_SAVE, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->service, _CORDS_SAVE, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
+			pptr->saveduration = (time((long*)0) - pptr->when);
 			pptr->when  = time((long*) 0);
 			autosave_cords_contract_nodes();
 		}
@@ -495,6 +691,8 @@ private	struct	rest_response * snapshot_contract(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status;
+	struct	occi_response * zptr;
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -504,19 +702,40 @@ private	struct	rest_response * snapshot_contract(
 		{
 			if ( is_common_contract( pptr ) )
 			{
-				cords_invoke_action( pptr->common, _CORDS_SNAPSHOT, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->common, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ((!( pptr->type ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
-				cords_invoke_action( pptr->provider, _CORDS_SNAPSHOT, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 			}
 			else if ( pptr->service )
 			{
-				cords_invoke_action( pptr->service, _CORDS_SNAPSHOT, 
-					_CORDS_CONTRACT_AGENT, default_tls() );
+				if (!( zptr = cords_invoke_action( pptr->service, _CORDS_SNAPSHOT, 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
 				retrieve_provider_information( pptr );
 			}
 			pptr->when  = time((long*) 0);
@@ -531,9 +750,13 @@ private	struct	rest_response * snapshot_contract(
 /*	-----------------------------------------------------------	*/
 private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
 {
+	struct	occi_response 	* zptr;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	char 			* wptr;
+	char			buffer[2048];
+
+	buffer[0] = 0;
 
 	/* ------------------------------------------------------- */
 	/* delete the contract if simple or complex but not common */
@@ -570,9 +793,46 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 		else
 		{
 			liberate( wptr );
-			occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() );
+			if (!( buffer[0] ))
+				strcpy(buffer, lptr->source );
+			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
+				continue;
+			else	zptr = occi_remove_response( zptr );
 		}
 	}
+
+	/* -------------------------------------------- */
+	/* delete a monitoring session if one is active */
+	/* -------------------------------------------- */
+	if ( pptr->session )
+	{
+		if (( zptr = occi_simple_delete( pptr->session, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+		pptr->session = liberate( pptr->session );
+	}
+
+	/* ------------------------ */
+	/* consume placement quotas */
+	/* ------------------------ */
+	if ( pptr->placement )
+	{
+		if ( cords_validate_action( 
+			(struct occi_client *) 0,
+			_CORDS_PLACEMENT, _CORDS_RELEASE,
+			pptr->placement ) )
+		{
+			if ((zptr = cords_invoke_action( pptr->placement, _CORDS_RELEASE, 
+				_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
+		}
+	}
+
+	/* -------------------------------------- */
+	/* delete eventual links from this object */
+	/* -------------------------------------- */
+	if ( strlen(buffer) )
+		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
 	return(0);
 }

@@ -40,8 +40,13 @@ public	struct	occi_link_node * allocate_occi_link_node();
 public	struct	occi_link_node * liberate_occi_link_node(struct	occi_link_node * n);
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
 
-#define	_CORDS_SERVICE_AGENT 	"CO-RDS-SERVICE/1.0"
-#define	_CORDS_CONTRACT_AGENT 	"CO-RDS-CONTRACT/1.0"
+public	char *	get_identity();
+public	char * 	get_default_agent();
+public	int	set_default_agent( char * nptr);
+
+
+#define	_CORDS_SERVICE_AGENT 	get_default_agent()
+#define	_CORDS_CONTRACT_AGENT 	get_default_agent()
 #define	_CORDS_BROKER_AGENT 	"CO-RDS-BROKER/1.0"
 #define	_CORDS_PARSER_AGENT 	"CO-RDS-PARSER/1.0"
 #define	_CORDS_OS_AGENT 	"CO-RDS-OS/1.0"
@@ -81,6 +86,7 @@ public	char *	default_operator();
 #define	_OCCI_NO_AUTHORIZE	64	/* inhibit category authorize failure	*/
 #define	_OCCI_CONSUMER	 	128	/* publish monitoring consumer		*/
 #define	_OCCI_PROVIDER	 	256	/* publish resources provider 		*/
+#define	_OCCI_CONTRACT	 	512	/* publish resources under contract	*/
 
 #define	_OCCI_IDLE		0	/* the resource is idle			*/
 #define	_OCCI_ACTIVE		1	/* the resource is active		*/
@@ -111,6 +117,7 @@ public	char *	default_operator();
 #define	_OCCI_APP_JSON		"application/json"
 #define	_OCCI_TEXT_JSON		"text/json"
 #define	_OCCI_MIME_JSON		"text/json"
+#define	_OCCI_TEXT_FORM		"application/x-www-form-urlencoded"
 
 #define	_OCCI_OCCI_XML		"application/xml+occi"
 #define	_OCCI_APP_XML		"application/xml"
@@ -164,6 +171,7 @@ public	char *	occi_http_capacity( struct occi_category * optr );
 public	char *	occi_http_category( struct occi_category * optr );
 public	char *	occi_http_attribute( struct occi_category * optr, struct occi_attribute * aptr );
 public	char *	occi_http_attribute_value( struct occi_category * optr, struct occi_attribute * aptr, char * vptr );
+public	struct	occi_action *	occi_resolve_action( struct occi_category * cptr, char * name );
 public	struct	occi_attribute * occi_resolve_attribute( struct occi_category * optr, char * nptr );
 public	char *	occi_allocate_uuid();
 public	char *	occi_category_id( char * sptr );

@@ -3,7 +3,9 @@
 # accords platform base manifest 
 # ----------------------------------
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-platform.xml
+bash build-manifest-publisher publisher PUB_Compatible
 echo "<manifest name=\"accords:platform\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-platform.xml
+bash build-manifest cool 8087
 bash build-manifest coss 8087
 echo "<node name=\"accords:coss\" scope=normal access=public type=\"accords:coss\"/>" >> accords-platform.xml
 bash build-manifest comons 8087
@@ -45,12 +47,10 @@ bash build-manifest onprocci 8087
 echo "<node name=\"accords:onprocci\" scope=normal access=public type=\"accords:onprocci\"/>" >> accords-provisioning.xml
 bash build-manifest paprocci 8087
 echo "<node name=\"accords:paprocci\" scope=normal access=public type=\"accords:paprocci\"/>" >> accords-provisioning.xml
+bash build-manifest paasprocci 8087
+echo "<node name=\"accords:paasprocci\" scope=normal access=public type=\"accords:paasprocci\"/>" >> accords-provisioning.xml
 bash build-manifest dcprocci 8087
-echo "<node name=\"accords:dcprocci\" scope=normal access=public type=\"accords:dcprocci\"/>" >> accords-provisioning.xml
-bash build-manifest osocciprocci 8087
-echo "<node name=\"accords:osocciprocci\" scope=normal access=public type=\"accords:osocciprocci\"/>" >> accords-provisioning.xml
 bash build-manifest azprocci 8087
-echo "<node name=\"accords:azprocci\" scope=normal access=public type=\"accords:azprocci\"/>" >> accords-provisioning.xml
 echo "<configuration name=\"accords:provisioning\"/>" >> accords-provisioning.xml
 echo "<security name=\"accords:security\"/>" >> accords-provisioning.xml
 echo "<account name=\"accords:account\"/>" >> accords-provisioning.xml

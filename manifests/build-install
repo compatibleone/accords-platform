@@ -1,7 +1,7 @@
 target=install-$1.sh
 echo "#!bash" 		>  $target
 echo "#---------------" >> $target
-echo "wget http://www.compatibleone.fr/accords-platform/package-$1.tgz" >> $target
+echo "wget http://www.compatibleone.fr/accords-platform/$makesystem/package-$1.tgz" >> $target
 echo "tar -xzvf package-$1.tgz" >> $target
 echo "install -d rest" >> $target
 echo "install -d service" >> $target

@@ -98,6 +98,7 @@ public	struct	occi_response * allocate_occi_response();
 public	struct	occi_element  *	occi_request_element( struct occi_request * rptr, char * nptr, char * vptr );
 public	struct	occi_element  *	occi_response_element(struct occi_response * rptr, char * nptr, char * vptr);
 public	struct	occi_element  * occi_locate_element( struct occi_element * eptr, char * sptr );
+public	struct	occi_element  * occi_append_element( struct occi_element * eptr, char * nptr, char * vptr );
 public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr );
 public	struct	occi_element  * occi_append_headers(struct occi_request * rptr,struct occi_element * hptr);
 public	struct	occi_element  * occi_remove_elements( struct occi_element * eptr );
@@ -107,10 +108,10 @@ public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
 public 	struct	rest_header   * occi_add_default_header(struct rest_header  * hptr);
 public 	void			occi_drop_default_headers();
-public	struct	occi_response * cords_delete_links( char * from, char * agent, char * tls );
-public	struct	occi_response * cords_create_link( char * from, char * to, char * agent, char * tls );
-
-
+public	struct	occi_response * occi_delete_links( char * from, char * agent, char * tls );
+public	struct	occi_response * occi_delete_link( char * from, char * to, char * agent, char * tls );
+public	struct	occi_response * occi_create_link( char * from, char * to, char * agent, char * tls );
+public	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr );
 public  char *	occi_extract_location( struct occi_response * rptr );
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,

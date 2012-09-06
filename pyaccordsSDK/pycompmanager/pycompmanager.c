@@ -1,25 +1,20 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* module to interface Accords platform  for Python                             */
-/* Hamid MEDJAHED & Elyes ZEKRI for (C) 2011 Prologue                           */
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------- */
+/* ACCORDS Platform                                                              */
+/* module to interface Accords platform  for Python                              */
+/* Hamid MEDJAHED & Elyes ZEKRI for (C) 2011 Prologue                            */
+/* ----------------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
 
 #include <Python.h>
 #include "compmanager.h"
@@ -34,9 +29,16 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
 
  if (! PyArg_ParseTuple( args,"sssi",&categoryName, &categoryAttributes,&categoryActions,&flag)) return NULL;
  dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag);
- if(dim <= 0) return NULL;
- printf(" %s OCCI category is created\n",categoryName); 
- return Py_BuildValue("i", dim);
+ if(dim <= 0) 
+ {
+   printf("Failure to create %s OCCI category\n",categoryName);
+   return Py_BuildValue("i", dim);
+ }
+ else
+ {
+  printf(" %s OCCI category is created\n",categoryName); 
+  return Py_BuildValue("i", dim);
+ }
 
 }
 
@@ -49,8 +51,16 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   int flag;
   if (! PyArg_ParseTuple( args,"sii",&categoryName,&indice,&flag)) return NULL;
   a=deleteCategory(categoryName,indice,flag);
-  printf("%s OCCI category is removed\n",categoryName);
-  return Py_BuildValue("i",a);
+  if(a)
+  {
+   printf("%s OCCI category is removed\n",categoryName);
+   return Py_BuildValue("i",a);
+  }
+  else
+  {
+    printf("Failure to remove %s category\n",categoryName);
+    return Py_BuildValue("i",a);
+  }
 
 }
 
@@ -59,11 +69,20 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  int a;          
  char * moduleName;
  char * categoryNameList;
- char * categoryActionNumberList; 
- if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&categoryActionNumberList)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList,categoryActionNumberList);
- printf(" %s component is created\n",moduleName);
- return Py_BuildValue("i", a);
+ char * flaglist;
+ 
+ if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&flaglist)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList,flaglist);
+ if(a)
+ {
+   printf(" %s component is created\n",moduleName);
+   return Py_BuildValue("i", a);
+ }
+ else
+ {
+  printf(" Failure to create %s component\n",moduleName);
+  return Py_BuildValue("i", a);
+ }
 
 }
 
@@ -76,9 +95,17 @@ static PyObject *pycompmanager_removeComponent(PyObject *self, PyObject *args)
  if (! PyArg_ParseTuple( args,"s",&moduleName)) return NULL;
  
  a=deleteModule(moduleName);
- printf(" %s component is removed\n",moduleName);
- return Py_BuildValue("i", a);
-
+ if(a)
+ {
+  printf(" %s component is removed\n",moduleName);
+  return Py_BuildValue("i", a);
+ }
+ else
+ {
+  printf(" Failure to remove %s component\n",moduleName);
+  return Py_BuildValue("i", a);
+ }
+ 
 }
 
 static PyObject *pycompmanager_commit(PyObject *self, PyObject *args)

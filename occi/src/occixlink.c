@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _xlink_c_
-#define _xlink_c_
+#ifndef _occixlink_c_
+#define _occixlink_c_
 
 #include "xlink.h"
 
@@ -698,4 +698,4 @@ public struct rest_header *  cords_xlink_occi_headers(struct cords_xlink * sptr)
 
 }
 
-#endif	/* _xlink_c_ */
+#endif	/* _occixlink_c_ */

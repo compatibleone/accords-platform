@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _enquiry_c_
@@ -26,10 +24,10 @@
 
 #include "enquiry.h"
 
-/*	--------------------------------	*/
-/*	l i b e r a t e _ e n q u i r y 	*/
-/*	--------------------------------	*/
-public struct enquiry * liberate_enquiry(struct enquiry * sptr)
+/*	--------------------------------------------	*/
+/*	l i b e r a t e _ c o r d s _ e n q u i r y 	*/
+/*	--------------------------------------------	*/
+public struct cords_enquiry * liberate_cords_enquiry(struct cords_enquiry * sptr)
 {
 	if ( sptr )
 	{
@@ -47,14 +45,14 @@ public struct enquiry * liberate_enquiry(struct enquiry * sptr)
 			 sptr->state = liberate(sptr->state);
 		sptr = liberate( sptr );
 	}
-	return((struct enquiry *) 0);
+	return((struct cords_enquiry *) 0);
 
 }
 
-/*	--------------------------	*/
-/*	r e s e t _ e n q u i r y 	*/
-/*	--------------------------	*/
-public struct enquiry * reset_enquiry(struct enquiry * sptr)
+/*	--------------------------------------	*/
+/*	r e s e t _ c o r d s _ e n q u i r y 	*/
+/*	--------------------------------------	*/
+public struct cords_enquiry * reset_cords_enquiry(struct cords_enquiry * sptr)
 {
 	if ( sptr )
 	{
@@ -69,21 +67,21 @@ public struct enquiry * reset_enquiry(struct enquiry * sptr)
 
 }
 
-/*	--------------------------------	*/
-/*	a l l o c a t e _ e n q u i r y 	*/
-/*	--------------------------------	*/
-public struct enquiry * allocate_enquiry()
+/*	--------------------------------------------	*/
+/*	a l l o c a t e _ c o r d s _ e n q u i r y 	*/
+/*	--------------------------------------------	*/
+public struct cords_enquiry * allocate_cords_enquiry()
 {
-	struct enquiry * sptr;
-	if (!( sptr = allocate( sizeof( struct enquiry ) ) ))
+	struct cords_enquiry * sptr;
+	if (!( sptr = allocate( sizeof( struct cords_enquiry ) ) ))
 		return( sptr );
-	else	return( reset_enquiry(sptr) );
+	else	return( reset_cords_enquiry(sptr) );
 }
 
-/*	--------------------------	*/
-/*	x m l i n _ e n q u i r y 	*/
-/*	--------------------------	*/
-public int xmlin_enquiry(struct enquiry * sptr,struct xml_element * eptr)
+/*	--------------------------------------	*/
+/*	x m l i n _ c o r d s _ e n q u i r y 	*/
+/*	--------------------------------------	*/
+public int xmlin_cords_enquiry(struct cords_enquiry * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -119,10 +117,10 @@ public int xmlin_enquiry(struct enquiry * sptr,struct xml_element * eptr)
 
 }
 
-/*	----------------------------------	*/
-/*	r e s t _ o c c i _ e n q u i r y 	*/
-/*	----------------------------------	*/
-public int rest_occi_enquiry(FILE * fh,struct enquiry * sptr,char * prefix, char * nptr)
+/*	----------------------------------------------	*/
+/*	r e s t _ o c c i _ c o r d s _ e n q u i r y 	*/
+/*	----------------------------------------------	*/
+public int rest_occi_cords_enquiry(FILE * fh,struct cords_enquiry * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -138,4 +136,4 @@ public int rest_occi_enquiry(FILE * fh,struct enquiry * sptr,char * prefix, char
 
 }
 
-#endif	/* _enquiry_c_ */
+#endif	/* _enquiry_cenquiry_c_ */

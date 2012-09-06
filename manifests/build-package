@@ -1,3 +1,7 @@
 cp /usr/local/bin/$1 .
-tar -czf package-$1.tgz build-config style.css run-$1 $1 $2 $3 $4 $5 $6 $7 $8 $9
+if [ -z "$makesecurity" ] ; then
+	tar -czf update-$1.tgz build-config style.css run-$1 $1 $2 $3 $4 $5 $6 $7 $8 $9
+else
+	tar -czf update-$1.tgz build-config style.css $makesecurity/$1* $makesecurity/Certificates.crt run-$1 $1 $2 $3 $4 $5 $6 $7 $8 $9
+fi
 

@@ -19,8 +19,8 @@
 /* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _contract_c_
-#define _contract_c_
+#ifndef _occicontract_c_
+#define _occicontract_c_
 
 #include "contract.h"
 
@@ -37,6 +37,7 @@ private pthread_mutex_t list_cords_contract_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_contract_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_contract_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_contract_node() { return( cords_contract_first ); }
+public struct  occi_kind_node * occi_last_cords_contract_node() { return( cords_contract_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -158,6 +159,8 @@ private void autoload_cords_contract_nodes() {
 				pptr->access = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "common" )) != (struct xml_atribut *) 0)
 				pptr->common = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "session" )) != (struct xml_atribut *) 0)
+				pptr->session = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "scope" )) != (struct xml_atribut *) 0)
 				pptr->scope = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
@@ -166,6 +169,22 @@ private void autoload_cords_contract_nodes() {
 				pptr->service = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
 				pptr->firewall = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "placement" )) != (struct xml_atribut *) 0)
+				pptr->placement = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "parentservice" )) != (struct xml_atribut *) 0)
+				pptr->parentservice = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agreement" )) != (struct xml_atribut *) 0)
+				pptr->agreement = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "flags" )) != (struct xml_atribut *) 0)
+				pptr->flags = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "startduration" )) != (struct xml_atribut *) 0)
+				pptr->startduration = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "stopduration" )) != (struct xml_atribut *) 0)
+				pptr->stopduration = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "saveduration" )) != (struct xml_atribut *) 0)
+				pptr->saveduration = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "instructions" )) != (struct xml_atribut *) 0)
+				pptr->instructions = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "commons" )) != (struct xml_atribut *) 0)
 				pptr->commons = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -232,6 +251,9 @@ public  void autosave_cords_contract_nodes() {
 		fprintf(h," common=%c",0x0022);
 		fprintf(h,"%s",(pptr->common?pptr->common:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," session=%c",0x0022);
+		fprintf(h,"%s",(pptr->session?pptr->session:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," scope=%c",0x0022);
 		fprintf(h,"%s",(pptr->scope?pptr->scope:""));
 		fprintf(h,"%c",0x0022);
@@ -243,6 +265,30 @@ public  void autosave_cords_contract_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," firewall=%c",0x0022);
 		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," placement=%c",0x0022);
+		fprintf(h,"%s",(pptr->placement?pptr->placement:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," parentservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->parentservice?pptr->parentservice:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," agreement=%c",0x0022);
+		fprintf(h,"%s",(pptr->agreement?pptr->agreement:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," flags=%c",0x0022);
+		fprintf(h,"%u",pptr->flags);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," startduration=%c",0x0022);
+		fprintf(h,"%u",pptr->startduration);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," stopduration=%c",0x0022);
+		fprintf(h,"%u",pptr->stopduration);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," saveduration=%c",0x0022);
+		fprintf(h,"%u",pptr->saveduration);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," instructions=%c",0x0022);
+		fprintf(h,"%u",pptr->instructions);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," commons=%c",0x0022);
 		fprintf(h,"%u",pptr->commons);
@@ -296,6 +342,8 @@ private void set_cords_contract_field(
 			pptr->access = allocate_string(vptr);
 		if (!( strcmp( nptr, "common" ) ))
 			pptr->common = allocate_string(vptr);
+		if (!( strcmp( nptr, "session" ) ))
+			pptr->session = allocate_string(vptr);
 		if (!( strcmp( nptr, "scope" ) ))
 			pptr->scope = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
@@ -304,6 +352,22 @@ private void set_cords_contract_field(
 			pptr->service = allocate_string(vptr);
 		if (!( strcmp( nptr, "firewall" ) ))
 			pptr->firewall = allocate_string(vptr);
+		if (!( strcmp( nptr, "placement" ) ))
+			pptr->placement = allocate_string(vptr);
+		if (!( strcmp( nptr, "parentservice" ) ))
+			pptr->parentservice = allocate_string(vptr);
+		if (!( strcmp( nptr, "agreement" ) ))
+			pptr->agreement = allocate_string(vptr);
+		if (!( strcmp( nptr, "flags" ) ))
+			pptr->flags = atoi(vptr);
+		if (!( strcmp( nptr, "startduration" ) ))
+			pptr->startduration = atoi(vptr);
+		if (!( strcmp( nptr, "stopduration" ) ))
+			pptr->stopduration = atoi(vptr);
+		if (!( strcmp( nptr, "saveduration" ) ))
+			pptr->saveduration = atoi(vptr);
+		if (!( strcmp( nptr, "instructions" ) ))
+			pptr->instructions = atoi(vptr);
 		if (!( strcmp( nptr, "commons" ) ))
 			pptr->commons = atoi(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -418,6 +482,13 @@ private int pass_cords_contract_filter(
 		else if ( strcmp(pptr->common,fptr->common) != 0)
 			return(0);
 		}
+	if (( fptr->session )
+	&&  (strlen( fptr->session ) != 0)) {
+		if (!( pptr->session ))
+			return(0);
+		else if ( strcmp(pptr->session,fptr->session) != 0)
+			return(0);
+		}
 	if (( fptr->scope )
 	&&  (strlen( fptr->scope ) != 0)) {
 		if (!( pptr->scope ))
@@ -446,6 +517,32 @@ private int pass_cords_contract_filter(
 		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
 			return(0);
 		}
+	if (( fptr->placement )
+	&&  (strlen( fptr->placement ) != 0)) {
+		if (!( pptr->placement ))
+			return(0);
+		else if ( strcmp(pptr->placement,fptr->placement) != 0)
+			return(0);
+		}
+	if (( fptr->parentservice )
+	&&  (strlen( fptr->parentservice ) != 0)) {
+		if (!( pptr->parentservice ))
+			return(0);
+		else if ( strcmp(pptr->parentservice,fptr->parentservice) != 0)
+			return(0);
+		}
+	if (( fptr->agreement )
+	&&  (strlen( fptr->agreement ) != 0)) {
+		if (!( pptr->agreement ))
+			return(0);
+		else if ( strcmp(pptr->agreement,fptr->agreement) != 0)
+			return(0);
+		}
+	if (( fptr->flags ) && ( pptr->flags != fptr->flags )) return(0);
+	if (( fptr->startduration ) && ( pptr->startduration != fptr->startduration )) return(0);
+	if (( fptr->stopduration ) && ( pptr->stopduration != fptr->stopduration )) return(0);
+	if (( fptr->saveduration ) && ( pptr->saveduration != fptr->saveduration )) return(0);
+	if (( fptr->instructions ) && ( pptr->instructions != fptr->instructions )) return(0);
 	if (( fptr->commons ) && ( pptr->commons != fptr->commons )) return(0);
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -497,6 +594,9 @@ private struct rest_response * cords_contract_occi_response(
 	sprintf(cptr->buffer,"%s.%s.common=%s",optr->domain,optr->id,pptr->common);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.session=%s",optr->domain,optr->id,pptr->session);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -507,6 +607,30 @@ private struct rest_response * cords_contract_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.placement=%s",optr->domain,optr->id,pptr->placement);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.parentservice=%s",optr->domain,optr->id,pptr->parentservice);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agreement=%s",optr->domain,optr->id,pptr->agreement);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.flags=%u",optr->domain,optr->id,pptr->flags);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.startduration=%u",optr->domain,optr->id,pptr->startduration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.stopduration=%u",optr->domain,optr->id,pptr->stopduration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.saveduration=%u",optr->domain,optr->id,pptr->saveduration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.instructions=%u",optr->domain,optr->id,pptr->instructions);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.commons=%u",optr->domain,optr->id,pptr->commons);
@@ -944,6 +1068,8 @@ public struct occi_category * occi_cords_contract_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "common",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "session",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "scope",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
@@ -951,6 +1077,22 @@ public struct occi_category * occi_cords_contract_builder(char * a,char * b) {
 		if (!( optr = occi_add_attribute(optr, "service",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "placement",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "parentservice",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agreement",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "flags",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "startduration",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "stopduration",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "saveduration",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "instructions",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "commons",0,0) ))
 			return(optr);
@@ -1114,6 +1256,17 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_contract.session='%s'\r\n",(sptr->session?sptr->session:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_contract.scope='%s'\r\n",(sptr->scope?sptr->scope:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1158,6 +1311,94 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_contract.placement='%s'\r\n",(sptr->placement?sptr->placement:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.parentservice='%s'\r\n",(sptr->parentservice?sptr->parentservice:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.agreement='%s'\r\n",(sptr->agreement?sptr->agreement:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.flags='%u'\r\n",sptr->flags);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.startduration='%u'\r\n",sptr->startduration);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.stopduration='%u'\r\n",sptr->stopduration);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.saveduration='%u'\r\n",sptr->saveduration);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_contract.instructions='%u'\r\n",sptr->instructions);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_contract.commons='%u'\r\n",sptr->commons);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1187,4 +1428,4 @@ public struct rest_header *  cords_contract_occi_headers(struct cords_contract *
 
 }
 
-#endif	/* _contract_c_ */
+#endif	/* _occicontract_c_ */

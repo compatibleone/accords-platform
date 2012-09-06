@@ -86,8 +86,8 @@ private	void	slam_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.02");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.03");
+	printf("\n   Beta Version : 23/08/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -138,6 +138,10 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 /*	------------------------------------------------------------------	*/
 /* 	  actions and methods required for the slam instance category		*/
 /*	------------------------------------------------------------------	*/
+#include "comonsconnection.c"
+#include "slamcontrol.c"
+#include "penalty.c"
+#include "occipenalty.c"
 
 /*	------------------------------------------------------------------	*/
 /*			s l a m _ o p e r a t i o n				*/
@@ -150,8 +154,7 @@ private	int	slam_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_slam.xml");
 
-
-	if (!( optr = occi_cords_agreement_builder( Slam.domain, "agreement" ) ))
+	if (!( optr = occi_cords_agreement_builder( Slam.domain, _CORDS_AGREEMENT ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -159,7 +162,7 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_terms_builder( Slam.domain, "terms" ) ))
+	if (!( optr = occi_cords_terms_builder( Slam.domain, _CORDS_TERMS ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -167,14 +170,14 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_term_builder( Slam.domain, "term" ) ))
+	if (!( optr = occi_cords_term_builder( Slam.domain, _CORDS_TERM ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_variable_builder( Slam.domain, "variable" ) ))
+	if (!( optr = occi_cords_variable_builder( Slam.domain, _CORDS_VARIABLE ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -182,7 +185,7 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_guarantee_builder( Slam.domain, "guarantee" ) ))
+	if (!( optr = occi_cords_guarantee_builder( Slam.domain, _CORDS_GUARANTEE ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -190,13 +193,48 @@ private	int	slam_operation( char * nptr )
 	last = optr;
 	optr->callback = (void *) 0;
 
-	if (!( optr = occi_cords_business_builder( Slam.domain, "business" ) ))
+	if (!( optr = occi_cords_business_builder( Slam.domain, _CORDS_BUSINESS ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback = (void *) 0;
+
+	if (!( optr = occi_cords_control_builder( Slam.domain, _CORDS_CONTROL ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_control)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_control)))
+		return( 27 );
+
+	if (!( optr = occi_cords_penalty_builder( Slam.domain, _CORDS_PENALTY ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+
+	if (!( optr = comons_connection_builder( Slam.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = comons_packet_builder( Slam.domain, "packet_slam.xml" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	rest_initialise_log(Slam.monitor);
 

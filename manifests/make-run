@@ -1,3 +1,4 @@
+bash build-run-cosacs cosacs
 bash build-run publisher
 bash build-run azprocci
 bash build-run broker
@@ -18,4 +19,7 @@ bash build-run paprocci
 bash build-run parser
 bash build-run procci
 bash build-run slam
+bash build-run paasprocci
+bash build-run-cool
+bash build-run-tools
 

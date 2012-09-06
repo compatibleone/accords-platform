@@ -22,6 +22,10 @@
 
 #include "azclient.h"
 #include "cordslang.h"
+#include "cosacsctrl.h"
+#include "stdnode.h"
+
+#define	_AZURE_STATUS_POLL	5
 
 /* ---------------------------------------------------------------------------------- */
 /* if ((status = az_initialise_client( user, pass, host, agent, version, tls )) != 0) */
@@ -45,20 +49,28 @@ private	struct	az_config * resolve_az_configuration( char * sptr )
 	return((struct az_config *) 0);
 }
 
+
 /*	--------------------------------------------------------	*/
 /* 	 u s e _ w i n d o w s a z u r e _ c o n f i g u r a t i o n 		*/
 /*	--------------------------------------------------------	*/
 private	int	use_windowsazure_configuration( char * sptr )
 {
 	struct	az_config * pptr;
+	int	status;
 
 	if (!( pptr = resolve_az_configuration( sptr )))
 	 	return( 404 );
 
-	else 	return( az_initialise_client( 
+	else if ((status = az_initialise_client( 
 			pptr->user, pptr->password, 
 			pptr->host, pptr->agent, pptr->version, pptr->tls,
-			pptr->namespace, pptr->subscription ));
+			pptr->namespace, pptr->subscription )) != 0)
+		return(status);
+	else if (!( pptr->hostedservice ))
+		return(0);
+	else if ((status = az_initialise_service( pptr->hostedservice )) != 0)
+		return( status );
+	else	return( 0 );
 }
 
 /*	--------------------------------------------------------	*/
@@ -125,7 +137,7 @@ private	int	connect_windowsazure_image( struct az_response * rptr,struct windows
 			}
 			else if (!( strcmp( vptr, "SAVING" )))
 			{
-				sleep(1);
+				sleep( _AZURE_STATUS_POLL );
 				if ( zptr )
 					zptr = liberate_az_response( zptr );
 				if (!( zptr = az_get_image( pptr->image )))
@@ -142,126 +154,234 @@ private	int	connect_windowsazure_image( struct az_response * rptr,struct windows
 	}
 }
 
-/*	--------------------------------------------------------	*/
-/* 	     c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
-/*	--------------------------------------------------------	*/
-private	int	connect_windowsazure_server( struct az_response * rptr,struct windowsazure * pptr )
+/*	-------------------------------------------------------		*/
+/*	c h e c k _ w i n d o w s a z u r e _ o p e r a t i o n		*/
+/*	-------------------------------------------------------		*/
+private	int	check_windowsazure_operation( struct az_response * zptr )
 {
-	struct	az_response * zptr;
-	struct	az_response * yptr;
-	char *	vptr;
-	if (!( pptr ))
-		return( 118 );
+	struct	rest_header * hptr;
+	struct	xml_element * eptr;
+	char	buffer[2048];
+	int	status;
+
+	if ((!( zptr ))
+	||  (!( zptr->response )))
+		return(599);
+
+	switch((status = zptr->response->status))
+	{
+	case	200	:	/* OK 		*/
+		zptr = liberate_az_response( zptr );
+		return(200);
+
+	case	201	:	/* Created 	*/
+	case	202	:	/* Accepted 	*/
+		/* locate a request id header 	*/
+		if (!( hptr = rest_resolve_header( zptr->response->first, "x-ms-request-id" ) ))
+		{
+			zptr = liberate_az_response( zptr );
+			return(200);
+		}
+		else if (!( hptr->value ))
+		{
+			zptr = liberate_az_response( zptr );
+			return(200);
+		}
+		else
+		{
+			strcpy( buffer, hptr->value );
+			break;
+		}
+	default		:
+		zptr = liberate_az_response( zptr );
+		return( status );
+	}
+
+	while(1)
+	{
+		zptr = liberate_az_response( zptr );
+		if (!( zptr = az_get_operation_status( buffer )))
+			return( 518 );
+		else if (!( zptr->response ))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 501 );
+		}
+		else if ((zptr->response->status) != 200 )
+		{
+			zptr = liberate_az_response( zptr );
+			return( status );
+		}
+		else if (!( zptr->xmlroot ))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 502 );
+		}
+		else if ((!( eptr = document_element( zptr->xmlroot, "Status" ) ))
+		     ||  (!( eptr->value )))
+		{
+			zptr = liberate_az_response( zptr );
+			return( 503 );
+		}
+		else if ((!( strcasecmp( eptr->value, "SUCCEEDED" )))
+		     ||  (!( strcasecmp( eptr->value, "SUCCESS"   ))))
+			break;
+		else if ((!( strcasecmp( eptr->value, "FAILED"    )))
+		     ||  (!( strcasecmp( eptr->value, "FAILURE"   ))))
+			break;
+		else if (!( strcasecmp( eptr->value, "INPROGRESS" )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			continue;
+		}
+		else	continue;
+	}
+	/* ---------------------------------------------------------- */
+	/* recover and return the status code of the original request */
+	/* ---------------------------------------------------------- */
+	if ((!( eptr = document_element( zptr->xmlroot, "HttpStatusCode" ) ))
+	||  (!( eptr->value ))
+	||  (!( status = atoi( eptr->value ) )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 504 );
+	}
 	else
 	{
-		/* ---------------------------------------------------- */
-		/* we must now analyse the response from the open stack	*/
-		/* and collect the valuable data : admin pass is only 	*/
-		/* available at this point and cannot be retrieved by	*/
-		/* any other means so it must not be lost.		*/ 
-		/* ---------------------------------------------------- */
-		if ( pptr->number ) 
-			pptr->number = liberate( pptr->number );
+		zptr = liberate_az_response( zptr );
+		return( status );
+	}
+	
+}
 
-		if ( pptr->rootpass ) 
-			pptr->rootpass = liberate( pptr->rootpass );
 
-		if (!( vptr = json_atribut( rptr->jsonroot, "id") ))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		else if (!( pptr->number = allocate_string(vptr)))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		else if (!( vptr = json_atribut( rptr->jsonroot, "adminPass") ))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		else if (!( pptr->rootpass  = allocate_string(vptr)))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		autosave_windowsazure_nodes();
-		/* ----------------------------------------------------- */
-		/* we must now await ACTIVE status to be able to collect */
-		/* the final identification information to complete the  */
-		/* windowsazure provisioning request.			 */
-		/* ----------------------------------------------------- */
-		yptr = rptr;
-		zptr = (struct az_response *) 0;
-		while (1)
-		{
-			if (!( vptr = json_atribut( yptr->jsonroot, "status" )))
-			{
-				reset_windowsazure_server( pptr );
-				return( 27 );
-			}
-			else if (!( strcmp( vptr, "BUILD" )))
-			{
-				sleep(1);
-				if ( zptr )
-					zptr = liberate_az_response( zptr );
-				if (!( zptr = az_get_server( pptr->number )))
-				{
-					reset_windowsazure_server( pptr );
-					return( 555 );
-				}
-				else	yptr = zptr;
-			}
-			else if (!( strcmp( vptr, "ACTIVE" )))
-				break;
-		}
-		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
-		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
-		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		else if (!( pptr->reference = allocate_string(vptr)))
-		{
-			reset_windowsazure_server( pptr );
-			return( 27 );
-		}
-		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0)
-		{
-			if (!( pptr->privateaddr  = allocate_string(vptr)))
-			{
-				reset_windowsazure_server( pptr );
-				return( 27 );
-			}
-		}
-		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0)
-		{
-			if (!( pptr->publicaddr  = allocate_string(vptr)))
-			{
-				reset_windowsazure_server( pptr );
-				return( 27 );
-			}
-		}
-		if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
-		{
-			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
-			{
-				reset_windowsazure_server( pptr );
-				return( 27 );
-			}
-		}
-		else if (( pptr->privateaddr ) && ( strlen( pptr->privateaddr ) != 0))
-		{
-			if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
-			{
-				reset_windowsazure_server( pptr );
-				return( 27 );
-			}
-		}
+/*	-----------------------------------------------------------------	*/
+/* 	r e t r i e v e _ w i n d o w s a z u r e _ r o l e s t a t u s 	*/
+/*	-----------------------------------------------------------------	*/
+private	char *	retrieve_windowsazure_rolestatus( struct az_response * zptr )
+{
+	char *	result;
+	struct	xml_element * eptr;
+	if (!( zptr ))
+		return( (char *) 0 );
+
+	else if (!( zptr->response ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	/* -------------------- */
+	/* examine the xml tree */
+	/* -------------------- */
+	else if ((!( eptr = zptr->xmlroot ))
+	     ||  (!( eptr->name )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	/* ---------------------------- */
+	/* retrieve the instance status */
+	/* ---------------------------- */
+	else if (!( eptr = nested_document_element( eptr, "InstanceStatus" ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	else if (!( result = allocate_string( eptr->value ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( (char *) 0 );
+	}
+	else
+	{		
+		zptr = liberate_az_response( zptr );
+		return( result );
+	}
+}
+
+/*	--------------------------------------------------------	*/
+/* 	 c o n n e c t _ w i n d o w s a z u r e _ s e r v e r		*/
+/*	--------------------------------------------------------	*/
+private	int	connect_windowsazure_server( struct az_response * zptr,struct windowsazure * pptr )
+{
+	int	status;
+	struct	url	    * uptr;
+	struct	xml_element * eptr;
+
+	if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+	if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
+	if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
+	if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
+
+	if ((!( pptr ))
+	||  (!( zptr ))
+	||  (!( zptr->response )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 500 );
+	}
+	else if ((status = check_windowsazure_operation( zptr )) != 200 )
+		return( status );
+		
+	else if (!( zptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		return( 500 );
+	else if (!( zptr->response ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 501 );
+	}
+	else if ( zptr->response->status != 200 )
+	{
+		zptr = liberate_az_response( zptr );
+		return( 502 );
+	}
+	/* -------------------- */
+	/* examine the xml tree */
+	/* -------------------- */
+	else if ((!( eptr = zptr->xmlroot ))
+	     ||  (!( eptr->name )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 518 );
+	}
+	else if ( strcmp( eptr->name, "Deployment") != 0 )
+	{
+		zptr = liberate_az_response( zptr );
+		return( 530 );
+	}
+	/* --------------- */
+	/* collect the URL */
+	/* --------------- */
+	else if ((!( eptr = document_element( eptr, "Url" ) ))
+	     ||  (!( eptr->value )))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 530 );
+	}
+	else if (!( pptr->number = allocate_string( eptr->value ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( uptr = analyse_url( pptr->number ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( pptr->hostname = allocate_string(uptr->host) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else if (!( pptr->publicaddr = allocate_string( pptr->hostname ) ))
+	{
+		zptr = liberate_az_response( zptr );
+		return( 527 );
+	}
+	else
+	{
+		uptr = liberate_url( uptr );
+		zptr = liberate_az_response( zptr );
 		pptr->when = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
 		autosave_windowsazure_nodes();
@@ -269,8 +389,78 @@ private	int	connect_windowsazure_server( struct az_response * rptr,struct window
 	}
 }
 
+/*	----------------------------------------------------------------	*/
+/*	     b u i l d _ w i n d o w s a z u r e _ f i r e w a l l		*/
+/*	----------------------------------------------------------------	*/
+private	char *	build_windowsazure_firewall(/* struct os_subscription * subptr,*/ struct windowsazure * pptr )
+{
+	int	status;
+	char *	sptr;
+	char *	filename;
+	FILE *	h;
+	char *	rulename;
+	char *	rulefrom;
+	char *	ruleproto;
+	char *	ruleto;
+	struct	occi_element * eptr;
+	struct	standard_message firewall;
+	struct	standard_message port;
+
+	memset( &firewall, 0, sizeof(struct standard_message));
+	memset( &port, 0, sizeof(struct standard_message));
+
+	/* ---------------------------------------------------- */
+	/* prepare the file containing the firewall description */
+	/* ---------------------------------------------------- */
+	if (!( filename = rest_temporary_filename( ".xml" )))
+		return( filename );
+	else if (!( h = az_start_endpoints( filename )))
+		return( liberate( filename ) );
+	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+		return( liberate( filename ) );
+	{
+		/* -------------------------- */
+		/* create the security group  */
+		/* -------------------------- */
+		for (	eptr = first_standard_message_link( firewall.message );
+			eptr != (struct occi_element *) 0;
+			eptr = next_standard_message_link( eptr ) )
+		{
+			/* ------------------------ */
+			/* retrieve the port record */
+			/* ------------------------ */
+			if (!( sptr = standard_message_link_value( eptr->value )))
+				continue;
+			else if ((status = get_standard_message( &port, sptr, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
+				continue;
+
+			/* ---------------------------------- */
+			/* retrieve the port rule information */
+			/* ---------------------------------- */
+			if ((!( rulename = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_NAME ) ))
+			||  (!( ruleproto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_PROTOCOL ) ))
+			||  (!( rulefrom = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_FROM ) ))
+			||  (!( ruleto = occi_extract_atribut( port.message, "occi", 
+				_CORDS_PORT, _CORDS_TO   ) )) )
+			{
+				release_standard_message( &port );
+				release_standard_message( &firewall );
+				filename = liberate(filename);
+				break;
+			}
+			else	az_create_endpoint( h, rulename, atoi(rulefrom), atoi(rulefrom), ruleproto );
+		}
+		az_close_endpoints( h );
+		return( filename );
+	}
+
+}
+
 /*	-------------------------------------------	*/
-/* 	      s t a r t  _ w i n d o w s a z u r e	  	*/
+/* 	   s t a r t  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * start_windowsazure(
 		struct occi_category * optr, 
@@ -279,39 +469,162 @@ private	struct	rest_response * start_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
+	char *	rolestatus;
+	struct	xml_element * eptr;
+	struct	az_response * azptr;
 	struct	windowsazure * pptr;
-	int		status;
-	char	*	filename;
-	char 	*	personality="";
-	char 	*	resource=_CORDS_LAUNCH_CFG;
+	int	status;
+	char	* filename;
+	char	reference[512];
+	char	buffer[2048];
+
 	if (!( pptr = vptr ))
-	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	 	return( rest_html_response( aptr, 404, "WINDOWS AZURE Invalid Action" ) );
 	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = az_create_server_request( 
-		pptr->id, pptr->image, pptr->flavor, personality, resource ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = az_create_server( filename )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else
+		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Hosted Service Failure" ) );
+	else if (!(filename = build_windowsazure_firewall( /* subptr,*/ pptr )))
+		return( rest_html_response( aptr, 888, "WINDOWS AZURE Firewall Failure" ) );
+	else if (!( filename = az_create_vm_request(
+		pptr->id,  pptr->name,
+		pptr->image, pptr->media, pptr->flavor,
+		pptr->publicnetwork,
+		(char *) 0, 0, filename )))
+		return( rest_html_response( aptr, 500, "Error Creating WINDOWS AZURE VM Request" ) );
+	else if (!( azptr = az_create_vm( filename ) ))
+		return( rest_html_response( aptr, 501, "Error Creating WINDOWS AZURE VM" ) );
+	else if (!( azptr->response ))
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_windowsazure_server( osptr, pptr );
-		osptr = liberate_az_response( osptr );
-		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		azptr = liberate_az_response( azptr );
+		return( rest_html_response( aptr, 501, "No Response Creating WINDOWS AZURE VM" ) );
+	}
+	else if ((status = azptr->response->status) > 299 )
+	{
+		if (!( azptr->xmlroot ))
+			strcpy(buffer,"Failure Creating WINDOWS AZURE VM");
+		else if (!( eptr = document_element( azptr->xmlroot, "Message" ) ))
+			strcpy(buffer,"Failure Creating WINDOWS AZURE VM");
+		else	strcpy(buffer,eptr->value);
+		azptr = liberate_az_response( azptr );
+		return( rest_html_response( aptr, status, buffer ) );
+	}
+	else if ((status = connect_windowsazure_server( azptr, pptr )) != 0)
+		return( rest_html_response( aptr, status, "Connection to WINDOWS AZURE VM" ) );
+
+	if (!( filename = az_start_vm_request() ))
+ 		return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	}
 
+	/* ---------------------------------- */
+	/* recover the deployment information */
+	/* ---------------------------------- */
+	while (1)
+	{
+		if (!( azptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Information" ) );		
+		else if (!( azptr->response ))
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Response" ) );		
+		}
+		else if ((status = azptr->response->status) != 200 )
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, status, "Deployment Response Failure" ) );		
+		}
+		else if (!( rolestatus = retrieve_windowsazure_rolestatus( azptr ) ))
+		 	return( rest_html_response( aptr, 500, "Deployment Response Role Status Failure" ) );		
+
+		rest_log_message( rolestatus );
+
+		if (!( strcmp( rolestatus, "ReadyRole" ) ))
+			break;
+		else if ((!( strcmp( rolestatus, "RoleStateUnknown"   ) ))
+		     ||  (!( strcmp( rolestatus, "CreatingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "CreatingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "StartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "BusyRole"     ) )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		else if ((!( strcmp( rolestatus, "RestartingRole"     ) ))
+		     ||  (!( strcmp( rolestatus, "CyclingRole"        ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "UnresponsiveRole"   ) )))
+		{
+			rolestatus = liberate( rolestatus );
+		 	return( rest_html_response( aptr, 500, "Serious Deployment Role Failure" ) );		
+		}
+		else
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		
+	}
+
+	rolestatus = liberate( rolestatus );
+
+	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+
+	/* ---------------------------- */
+	/* launch the COSACS operations */
+	/* ---------------------------- */
+	if ( use_cosacs_agent( pptr->agent ) )
+	{
+		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_CONFIGURATION,
+				reference, WazProcci.publisher, pptr->account );
+		}
+	}
+
+	/* --------------------------- */
+	/* now handle the transactions */
+	/* --------------------------- */
+	if (!( rest_valid_string( pptr->price ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=start", pptr->account, reference ) )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
 /*	-------------------------------------------	*/
-/* 	      s a v e  _ w i n d o w s a z u r e	  	*/
+/*		a z _ n e w _ i m a g e _ n a m e	*/
+/*	-------------------------------------------	*/
+private	char *	az_new_image_name( struct windowsazure * pptr )
+{
+	char *	uuid;
+	char 	buffer[1024];
+	if (!( uuid = rest_allocate_uuid()))
+		return( uuid );
+	else
+	{
+		sprintf(buffer,"%s.vhd",uuid);
+		liberate( uuid );
+		if ( pptr->image )
+			pptr->image = liberate( pptr->image );
+		return((pptr->image = allocate_string( buffer )));
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	      s a v e  _ w i n d o w s a z u r e	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_windowsazure(
 		struct occi_category * optr, 
@@ -320,35 +633,213 @@ private	struct	rest_response * save_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
-	int		status;
+	char *	rolestatus;
+	struct	az_response * azptr;
+	int	status;
 	struct	windowsazure * pptr;
-	char	*	filename;
+	char	* filename;
+	char 	buffer[1024];
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( filename = az_create_image_request( pptr->name, pptr->number ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( osptr = az_create_image( filename ) ))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 500, "Shutdown Message Failure" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 500, "Shutdown Operation Failure" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, 500, "Shutdown Check Failure" ) );		
+	}
+
+	/* ---------------------------------- */
+	/* recover the deployment information */
+	/* ---------------------------------- */
+	while (1)
+	{
+		if (!( azptr = az_get_deployment( pptr->hostedservice, pptr->id ) ))
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Information" ) );		
+		else if (!( azptr->response ))
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, 500, "Failure Retrieving Deployment Response" ) );		
+		}
+		else if ((status = azptr->response->status) != 200 )
+		{
+			azptr = liberate_az_response( azptr );
+		 	return( rest_html_response( aptr, status, "Deployment Response Failure" ) );		
+		}
+		else if (!( rolestatus = retrieve_windowsazure_rolestatus( azptr ) ))
+		 	return( rest_html_response( aptr, 500, "Deployment Response Role Status Failure" ) );		
+
+		rest_log_message( rolestatus );
+
+		if (!( strcmp( rolestatus, "StoppedVM" ) ))
+			break;
+		else if ((!( strcmp( rolestatus, "DeletingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StoppingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "StoppingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "BusyRole"     ) )))
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		else if ((!( strcmp( rolestatus, "RestartingRole"     ) ))
+		     ||  (!( strcmp( rolestatus, "CyclingRole"        ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingRole" ) ))
+		     ||  (!( strcmp( rolestatus, "FailedStartingVM"   ) ))
+		     ||  (!( strcmp( rolestatus, "UnresponsiveRole"   ) )))
+		{
+			rolestatus = liberate( rolestatus );
+		 	return( rest_html_response( aptr, 500, "Serious Deployment Role Failure" ) );		
+		}
+		else
+		{
+			sleep( _AZURE_STATUS_POLL );
+			rolestatus = liberate( rolestatus );
+			continue;
+		}
+		
+	}
+
+	rolestatus = liberate( rolestatus );
+
+	/* --------------------------------- */
+	/* perform the VM image capture now  */
+	/* --------------------------------- */
+	sprintf(buffer,"%s %s",pptr->name,pptr->id);
+	if (!( pptr->image = az_new_image_name( pptr )))
+	 	return( rest_html_response( aptr, 530, "Bad Request" ) );		
+	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
+	 	return( rest_html_response( aptr, 531, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 532, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_windowsazure_image( osptr, pptr );
-		osptr = liberate_az_response( osptr );
-		if (!( status ))
-			return( rest_html_response( aptr, 200, "OK" ) );
-		else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		if ( pptr->original )
+			pptr->original = liberate( pptr->original );
+		if (!( pptr->original = allocate_string( pptr->image ) ))
+		 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
+		else 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	      s t o p  _ w i n d o w s a z u r e	  	*/
+/* 	 s n a p s h o t _ w i n d o w s a z u r e	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * snapshot_windowsazure(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	az_response * azptr;
+	int	status;
+	struct	windowsazure * pptr;
+	char	* filename;
+	char	buffer[1024];
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state == _OCCI_IDLE )
+		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
+	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 500, "Shutdown Message Failure" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 500, "Shutdown Operation Failure" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( rest_html_response( aptr, 500, "Shutdown Check Failure" ) );		
+	}
+
+	/* --------------------------------- */
+	/* perform the VM image capture now  */
+	/* --------------------------------- */
+	sprintf(buffer,"accords snapshot %s %s",pptr->name,pptr->id);
+	if (!( pptr->image = az_new_image_name( pptr )))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( filename = az_capture_vm_request( pptr->name, buffer, pptr->image, 0 ) ))	
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Image Capture Failure" ) );		
+	else 	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	   s t o p _ w i n d o w s a z u r e _ p r o v i s i o n i n g		*/
+/*	-----------------------------------------------------------------	*/
+private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
+{
+	char *	filename;
+	char 	reference[2024];
+	int	status;
+	struct	az_response * azptr;
+
+	/* ------------------------ */
+	/* prepare the subscription */
+	/* ------------------------ */
+	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+		return(118);
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return(27);
+	else	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+
+	/* ------------------------------------------- */
+	/* perform pre-release actions for destruction */
+	/* ------------------------------------------- */
+	if ( use_cosacs_agent( pptr->agent ) )
+	{
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_RELEASE,
+			reference, WazProcci.publisher, pptr->account );
+	}
+
+	/* --------------------------------- */
+	/* release the provisioned resources */
+	/* --------------------------------- */
+	if (!( filename = az_shutdown_vm_request() ))
+	 	return( 56 );
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( 56 );
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	{
+		if ( status != 404 )
+		 	return( status );
+	}
+	if (!( azptr = az_delete_deployment( 
+			pptr->hostedservice, 
+			pptr->id  )))
+		return(40);
+	else if ((status = check_windowsazure_operation( azptr )) != 200 )
+		return(56);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	     s t o p  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * stop_windowsazure(
 		struct occi_category * optr, 
@@ -357,31 +848,31 @@ private	struct	rest_response * stop_windowsazure(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	az_response * osptr;
-	int		status;
+	char	reference[512];
+	struct	az_response * azptr;
+	int	status;
 	struct	windowsazure * pptr;
 	if (!( pptr = vptr ))
-	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	 	return( rest_html_response( aptr, 404, "Invalid WINDOWS AZUREAction" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
-		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = az_delete_server( pptr->number )))
-	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else
+	else 
 	{
-		if ( pptr->state != _OCCI_IDLE )
-		{
-			reset_windowsazure_server( pptr );
-			pptr->when = time((long *) 0);
-			osptr = liberate_az_response( osptr );
-		}
-		return( rest_html_response( aptr, 200, "OK" ) );
+		stop_windowsazure_provisioning( pptr );
+		reset_windowsazure_server( pptr );
+		pptr->when = time((long *) 0);
+		autosave_windowsazure_nodes();
+		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
+		if (!( rest_valid_string( pptr->price ) ))
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else if ( occi_send_transaction( _CORDS_WINDOWSAZURE, pptr->price, "action=stop", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e s t a r t  _ w i n d o w s a z u r e	  	*/
+/* 	 r e s t a r t  _ w i n d o w s a z u r e	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * restart_windowsazure(
 		struct occi_category * optr, 
@@ -392,10 +883,20 @@ private	struct	rest_response * restart_windowsazure(
 {
 	int	status;
 	struct	windowsazure * pptr;
+	char *	filename;
+	struct	az_response * azptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+	else if (!( filename = az_restart_vm_request() ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	else
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
@@ -408,7 +909,7 @@ private	struct	rest_response * restart_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	     s u s p e n d  _ w i n d o w s a z u r e	  	*/
+/* 	  s u s p e n d  _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * suspend_windowsazure(
 		struct occi_category * optr, 
@@ -419,10 +920,20 @@ private	struct	rest_response * suspend_windowsazure(
 {
 	int	status;
 	struct	windowsazure * pptr;
+	char *	filename;
+	struct	az_response * azptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( rest_html_response( aptr, status, "Not Found" ) );
+	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
+	else if (!( filename = az_shutdown_vm_request() ))
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if (!( azptr = az_operation_vm( filename, pptr->id, pptr->name ) ))				
+	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
+	else if ((status = check_windowsazure_operation( azptr )) != 200)
+	 	return( rest_html_response( aptr, status, "Operation Failure" ) );		
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
@@ -466,7 +977,7 @@ private	struct	rest_response * hardboot_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	     r e b u i l d_ w i n d o w s a z u r e  		*/
+/* 	   r e b u i l d_ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * rebuild_windowsazure(
 		struct occi_category * optr, 
@@ -482,7 +993,7 @@ private	struct	rest_response * rebuild_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e s i z e _ w i n d o w s a z u r e  		*/
+/* 	    r e s i z e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * resize_windowsazure(
 		struct occi_category * optr, 
@@ -498,7 +1009,7 @@ private	struct	rest_response * resize_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	    c o n f i r m _ w i n d o w s a z u r e  		*/
+/* 	  c o n f i r m _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * confirm_windowsazure(
 		struct occi_category * optr, 
@@ -514,7 +1025,7 @@ private	struct	rest_response * confirm_windowsazure(
 }
 
 /*	-------------------------------------------	*/
-/* 	      r e v e r t _ w i n d o w s a z u r e  		*/
+/* 	  r e v e r t _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * revert_windowsazure(
 		struct occi_category * optr, 
@@ -529,9 +1040,10 @@ private	struct	rest_response * revert_windowsazure(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+#include "azcontract.c"
 
 /*	-------------------------------------------	*/
-/* 	      c r e a t e _ w i n d o w s a z u r e  		*/
+/* 	  c r e a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	create_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -541,11 +1053,11 @@ private	int	create_windowsazure(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return(create_windowsazure_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
 }
 
 /*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ w i n d o w s a z u r e  	*/
+/* 	 r e t r i e v e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -559,7 +1071,7 @@ private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
 }
 
 /*	-------------------------------------------	*/
-/* 	      u p d a t e _ w i n d o w s a z u r e 	 	*/
+/* 	   u p d a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	update_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -569,11 +1081,10 @@ private	int	update_windowsazure(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
-}
+	else	return(0);}
 
 /*	-------------------------------------------	*/
-/* 	      d e l e t e _ w i n d o w s a z u r e  		*/
+/* 	   d e l e t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 private	int	delete_windowsazure(struct occi_category * optr, void * vptr)
 {
@@ -583,7 +1094,7 @@ private	int	delete_windowsazure(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return(delete_windowsazure_contract(optr, pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
 }
 
 private	struct	occi_interface	windowsazure_interface = {
@@ -594,7 +1105,7 @@ private	struct	occi_interface	windowsazure_interface = {
 	};
 
 /*	-------------------------------------------	*/
-/* 	       b u i l d _ w i n d o w s a z u r e  		*/
+/* 	    b u i l d _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
 /*	this function is to be called to build the	*/
 /*	complete windowsazure occi category to offer	*/
@@ -638,9 +1149,9 @@ public	struct	occi_category * build_windowsazure( char * domain )
 	}
 }
 
-/*	-------------------------------------------	*/
+/*	------------------------------------------------	*/
 /*	 s e t _ d e f a u l t _ w i n d o w s a z u r e	*/
-/*	-------------------------------------------	*/
+/*	------------------------------------------------	*/
 private	int	set_default_windowsazure(struct occi_category * optr, void * vptr)
 {
 	struct	occi_kind_node * nptr;

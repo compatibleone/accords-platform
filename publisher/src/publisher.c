@@ -822,6 +822,9 @@ private	int	publisher_operation( char * nptr )
 
 	set_autosave_cords_xlink_name("links_publisher.xml");
 
+	/* ----------------------------- */
+	/* general publications category */
+	/* ----------------------------- */
 	if (!( optr = occi_cords_publication_builder( Publisher.domain,"publication" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -866,6 +869,8 @@ private	int	publisher_operation( char * nptr )
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,"stop","",stop_agency)))
 		return( 27 );
+
+	Publisher.monitor &= ~2;
 
 	rest_initialise_log(Publisher.monitor);
 

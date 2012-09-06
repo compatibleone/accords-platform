@@ -200,7 +200,7 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr)
 		else 
 		{
 			pptr->started = time((long *) 0);
-			if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_BROKER_AGENT, default_tls() ) ))
+			if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			{
 				pptr->completed = time((long *) 0);
 				root = liberate( root );

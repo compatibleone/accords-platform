@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _service_c_
@@ -71,6 +69,7 @@ public struct cords_service * reset_cords_service(struct cords_service * sptr)
 		sptr->price = (char*) 0;
 		sptr->session = (char*) 0;
 		sptr->when =  0;
+		sptr->instructions =  0;
 		sptr->contracts =  0;
 		sptr->state =  0;
 	}
@@ -135,6 +134,10 @@ public int xmlin_cords_service(struct cords_service * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"instructions") ))
+		{
+			if ( wptr->value ) { sptr->instructions = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"contracts") ))
 		{
 			if ( wptr->value ) { sptr->contracts = atoi(wptr->value); }
@@ -166,10 +169,11 @@ public int rest_occi_cords_service(FILE * fh,struct cords_service * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contracts='%u'\r\n",prefix,nptr,sptr->contracts);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _service_c_ */
+#endif	/* _service_cservice_c_ */

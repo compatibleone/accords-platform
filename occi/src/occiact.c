@@ -22,6 +22,8 @@
 
 #include "occiact.h"
 
+public	char *	occi_html_body(struct occi_category * cptr,struct rest_header  * hptr );
+
 /*	________________________________________	*/
 /*	l i b e r a t e _ o c c i _ a c t i o n 	*/
 /*	________________________________________	*/
@@ -56,6 +58,7 @@ public struct occi_action * reset_occi_action(struct occi_action * sptr)
 		sptr->first = (struct occi_parameter*) 0;
 		sptr->last = (struct occi_parameter*) 0;
 		sptr->name = (char*) 0;
+		sptr->html_rendering = occi_html_body;
 	}
 	return(sptr);
 

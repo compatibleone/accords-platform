@@ -24,6 +24,8 @@
 
 #define	_CORDS_NS	"http://www.compatibleone.fr/schemes/cords.xsd"
 
+#define	_INHIBIT_AUTOSTART	1
+
 /*	------------------------	*/
 /*	 cords attribute values		*/
 /*	------------------------	*/
@@ -52,6 +54,9 @@
 #define	_CORDS_INSTANCE	"instance"
 #define	_CORDS_BUILD	"build"
 #define	_CORDS_CHOOSE	"choose"
+#define	_CORDS_CONSUME	"consume"
+#define	_CORDS_RESTORE	"restore"
+#define	_CORDS_RELEASE	"release"
 
 /*	-------------------------	*/
 /*	cords atribut identifiers	*/
@@ -71,13 +76,29 @@
 #define	_CORDS_INITIATOR	"initiator"
 #define	_CORDS_SLA		"sla"
 #define	_CORDS_VARIABLE		"variable"
+#define	_CORDS_PENALTY		"penalty"
+#define	_CORDS_REWARD		"reward"
 #define	_CORDS_CONDITIONS	"conditions"
 #define	_CORDS_PROPERTY		"property"
+#define	_CORDS_GUARANTEE	"guarantee"
+#define	_CORDS_BUSINESS 	"business"
+#define	_CORDS_GUARANTEES	"guarantees"
+#define	_CORDS_IMPORTANCE	"importance"
+#define	_CORDS_CONDITION	"condition"
+#define	_CORDS_OBJECTIVE	"objective"
+#define	_CORDS_OBLIGATED	"obligated"
+#define	_CORDS_PARENTSERVICE	"parentservice"
+#define	_CORDS_STARTDURATION	"startduration"
+#define	_CORDS_STOPDURATION	"stopduration"
+#define	_CORDS_SAVEDURATION	"saveduration"
+#define	_CORDS_FLAGS		"flags"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/
 /*	-------------------------	*/
 #define	_CORDS_PUBLICATION	"publication"
+
+#define	_CORDS_IMPORT		"import"
 
 #define	_CORDS_MANIFEST		"manifest"
 #define	_CORDS_DESCRIPTION	"description"
@@ -90,6 +111,7 @@
 /*	------------------------	*/
 #define	_CORDS_NODE		"node"
 #define	_CORDS_PROVIDER		"provider"
+#define	_CORDS_PROVISION	"provision"
 #define	_CORDS_PROFILE 		"profile"
 #define	_CORDS_INFRASTRUCTURE	"infrastructure"
 #define	_CORDS_COMPUTE		"compute"
@@ -102,6 +124,7 @@
 #define	_CORDS_PORT		"port"
 
 #define	_CORDS_CONFIGURATION	"configuration"
+#define	_CORDS_RELEASE		"release"
 #define	_CORDS_INTERFACE	"interface"
 #define	_CORDS_ACTION		"action"
 #define	_CORDS_PARAMETER	"parameter"
@@ -127,11 +150,12 @@
 	
 #define	_CORDS_EVENT		"event"
 #define	_CORDS_MONITOR		"monitor"
+#define	_CORDS_CONTROL		"control"
 #define	_CORDS_REPORT		"report"
 #define	_CORDS_SESSION		"session"
+#define	_CORDS_PACKET		"packet"
 #define	_CORDS_CONSUMER		"consumer"
 #define	_CORDS_CONNECTION	"connection"
-#define	_CORDS_STREAM		"stream"
 #define	_CORDS_PROBE		"probe"
 #define	_CORDS_METRIC		"metric"
 #define	_CORDS_ALERT		"alert"

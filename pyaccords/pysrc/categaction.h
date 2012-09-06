@@ -6,12 +6,18 @@ struct{
     char *name;
     void *func;    
 }occiCategoryAction_map[]={
-	{"amazonEc2_action0", amazonEc2_action0 },
-	{"amazonEc2_action1", amazonEc2_action1 },
-	{"amazonEc2_action2", amazonEc2_action2 },
-	{"amazonEc2_action3", amazonEc2_action3 },
-	{"amazonEc2_action4", amazonEc2_action4 },
-	{"amazonEc2_action5", amazonEc2_action5 },
-	{"ec2config_action0", ec2config_action0 },
+	{"amazonEc2_start", start_amazonEc2},
+	{"amazonEc2_stop", stop_amazonEc2},
+	{"amazonEc2_save", save_amazonEc2},
+	{"amazonEc2_snapshot", snapshot_amazonEc2},
+	{"amazonEc2_suspend", suspend_amazonEc2},
+	{"amazonEc2_restart", restart_amazonEc2},
+	{"ec2config_current", current_ec2config},
+	{"gw_start", start_gw },
+	{"gw_stop", stop_gw },
+	{"linkgw_start", start_linkgw },
+	{"linkgw_stop", stop_linkgw },
+	{"intercloudGW_start", start_intercloudGW },
+	{"intercloudGW_stop", stop_intercloudGW },
 };
 #endif

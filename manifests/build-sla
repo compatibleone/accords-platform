@@ -19,11 +19,7 @@ echo "<variable name=\"$1:v1\" property=\"occi.placement.algorithm\" condition=\
 echo "<variable name=\"$1:v2\" property=\"occi.placement.zone\" condition=\"eq\" value=\"europe\"/>" >> sla-$1.xml 
 echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
-echo "<terms name=\"$1:guarantees\" type=\"guarantees\">" >> sla-$1.xml 
-echo "<term name=\"$1:guarantee1\">" >> sla-$1.xml 
-echo "<guarantee name=\"$1:g1\" scope=\"default\"/>" >> sla-$1.xml 
-echo "</term>" >> sla-$1.xml
-echo "</terms>" >> sla-$1.xml
+echo "<terms name=\"accords:guarantees\" type=\"guarantees\"/>" >> sla-$1.xml 
 echo "</agreement>" >> sla-$1.xml
 
 

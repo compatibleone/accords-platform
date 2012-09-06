@@ -40,9 +40,9 @@ the 3rd argument is the provisionning flag
       
 Generate an ACCORDS component/OCCI Server 
 -----------------------------------------
-(where '2' indicates the category action number)
+(where the 3rd argument (1) indicates the category will be published as a provider)
             
->>>pycompmanager.generateComponent(“myComponent”, “myCategory”, "2")
+>>>pycompmanager.generateComponent(“myComponent”, “myCategory”, 1)
       
             
   

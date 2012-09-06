@@ -1,0 +1,13 @@
+echo "rm -f update-cool.tgz" > run-cool
+echo "wget http://www.compatibleone.fr/accords-platform/${makesystem}/update-cool.tgz" >> run-cool
+echo "tar -xzvf update-cool.tgz" >> run-cool
+echo "export pubhost=\$publisher" >> run-cool
+echo "export thisport=\$1" >> run-cool
+echo "bash build-config-cool \$thisport europe \$cosacs \$publisher " >> run-cool
+echo "install -d /home/cosacs/service" >> run-cool
+echo "install -d /home/cosacs/rest" >> run-cool
+echo "cp cool /usr/local/bin" >> run-cool
+echo "/usr/local/bin/cool --config config-cool.xml cool/1.0a" >> run-cool
+chmod +x run-cool
+
+

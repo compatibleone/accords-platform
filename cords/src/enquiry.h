@@ -2,7 +2,7 @@
 #ifndef	_enquiry_h
 #define	_enquiry_h
 
-struct	enquiry
+struct	cords_enquiry
 {
 	char	*	id;
 	char	*	where;

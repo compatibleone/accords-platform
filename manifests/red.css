@@ -1,0 +1,57 @@
+table 	{
+	width: 80%;
+	border-style: none;
+	}
+
+th 	{
+	background-color: #FFEEEE;
+	color: #440000;
+	padding: 2mm;
+	border-style: solid;
+	border-color: #330000;
+	border-width: 1px;
+	}
+
+.input 	{
+	border-width: 1px;
+	border-style: solid;
+	width: 14cm;
+	}
+.button	{
+	border-width: 1px;
+	background-color: #FFDDDD;
+	border-style: outset;
+	width: 30mm;
+	}
+.action	{
+	border-width: 1px;
+	background-color: #FFDDDD;
+	border-style: outset;
+	width: 8cm;
+	}
+
+td 	{
+	padding: 2mm;
+	background-color: #FFF6F6;
+	border-style: none;
+	width: 70%;
+	}
+
+.title {
+	font-size: 18pt;
+	}
+
+.header {
+	font-size: 16pt;
+
+	}
+
+.description {
+	font-size: 12pt;
+	padding: 5mm;
+	border-style: dotted;
+	border-color: #880000;
+	}
+
+
+

@@ -162,7 +162,7 @@ private	struct rest_response * build_vm(
 		return( rest_html_response( aptr, 400, "incorrect provider" ) );
 	else if (!( pptr->application ))
 		return( rest_html_response( aptr, 400, "incorrect application" ) );
-	else if (!( zptr = cords_invoke_action( pptr->application, _CORDS_BUILD, _CORDS_BROKER_AGENT, default_tls() ) ))
+	else if (!( zptr = cords_invoke_action( pptr->application, _CORDS_BUILD, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( rest_html_response( aptr, 400, "build failure" ) );
 	else if (!( zptr->response ))
 	{
@@ -177,7 +177,7 @@ private	struct rest_response * build_vm(
 	else
 	{
 		zptr = occi_remove_response( zptr );
-		if (!( zptr = occi_simple_get( pptr->application, _CORDS_BROKER_AGENT, default_tls() ) ))
+		if (!( zptr = occi_simple_get( pptr->application, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			return( rest_html_response( aptr, 440, "build failure" ) );
 		else if (!( sptr = occi_extract_atribut( zptr, "occi", _CORDS_APPLICATION, "url" )))
 		{

@@ -25,56 +25,85 @@
 /*	---------------------------------------------------	*/
 public	char *	occi_http_capacity( struct occi_category * optr )
 {
+	char *	result=(char *) 0;
+	char *	wptr;
 	char	buffer[8192];
 	char  *	term;
+	int	i;
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
-	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";\r\n",
-		optr->id,optr->scheme,optr->class,optr->rel );
+
+	sprintf(buffer,"%s; scheme=\"%s\"; class=%s; rel=\"%s\";",
+		optr->id,optr->scheme,optr->class,
+		( rest_valid_string( optr->rel ) ? optr->rel : "") );
+
+	if (!( result = allocate_string( buffer ) ))
+		return( result );
 
 	if ( optr->first )
 	{
-		strcat( buffer, " attributes");
-		term = "=";
+		strcpy( buffer, " attributes");
+		if (!( result = join_string( result, buffer )))
+			return( result );
+		term = "=\"";
 		for (	mptr = optr->first;
 			mptr != (struct occi_attribute *) 0;
 			mptr = mptr->next )
 		{
-			strcat( buffer, term );
+			strcpy( buffer, term );
 			strcat( buffer, optr->domain );
 			strcat( buffer, "." );
 			strcat( buffer, optr->id   );
 			strcat( buffer, "." );
 			strcat( buffer, mptr->name );
 			if ( mptr->mandatory )
-				strcat( buffer,"{mandatory}" );
+				strcat( buffer,"{required}" );
 			if ( mptr->immutable )
 				strcat( buffer,"{immutable}" );
+			if (!( result = join_string( result, buffer )))
+				return( result );
 			term=",";
 		}
-		strcat( buffer, ";\r\n" );
-
+		strcpy( buffer, "\";" );
+		if (!( result = join_string( result, buffer )))
+			return( result );
 	}
 	if ( optr->firstact )
 	{
-		strcat( buffer, " actions");
-		term = "=";
+		strcpy( buffer, " actions");
+		if (!( result = join_string( result, buffer )))
+			return( result );
+		term = "=\"";
 		for (	fptr = optr->firstact;
 			fptr != (struct occi_action *) 0;
 			fptr = fptr->next )
 		{
-			strcat( buffer, term );
+			strcpy( buffer, term );
+			strcat( buffer, optr->scheme );
+			strcat( buffer, optr->id );
+			for ( 	i=0;
+				buffer[i] != 0;
+				i++ )
+			{
+				if ( buffer[i] == '#' )
+					buffer[i] = '/';
+			}
+			strcat( buffer, "/action#" );
 			strcat( buffer, fptr->name );
+			if (!( result = join_string( result, buffer )))
+				return( result );
 			term=",";
 		}
-		strcat( buffer, ";\r\n" );
+		strcpy( buffer, "\";" );
+		if (!( result = join_string( result, buffer )))
+			return( result );
 	}
 
-	strcat( buffer, " location=\"" );
+	strcpy( buffer, " location=\"" );
 	strcat( buffer, optr->location );
 	strcat( buffer, "\";" );
 
-	return( allocate_string( buffer ) );
+	return( join_string( result, buffer ));
 
 }
 
@@ -85,8 +114,9 @@ public	char *	occi_http_category( struct occi_category * optr )
 {
 	char	buffer[8192];
 	char  *	term;
-	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";",
-		optr->id,optr->scheme,optr->class,optr->rel );
+	sprintf(buffer,"%s; scheme=\"%s\"; class=%s; rel=\"%s\";",
+		optr->id,optr->scheme,optr->class,
+		( rest_valid_string( optr->rel ) ? optr->rel : "") );
 
 	return( allocate_string( buffer ) );
 }
@@ -136,7 +166,7 @@ public	char *	occi_http_link( struct occi_category * optr, char * target, char *
 
 		/* generate the link content */
 		/* ------------------------- */
-		sprintf(buffer,"<%s>;\r\n rel=\"%s%s\";\r\n self=\"%s\";\r\n category=\"%s\";",
+		sprintf(buffer,"<%s>; rel=\"%s%s\"; self=\"%s\"; category=\"%s\";",
 			target, "http://scheme.compatibleone.fr/occi/compatible#",sptr,
 			id, optr->scheme );
 		liberate( mptr );

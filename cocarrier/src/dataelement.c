@@ -104,23 +104,25 @@ public struct data_element * drop_data_element(struct data_element * sptr)
 {
 	if ( sptr )
 	{
-		if (!( sptr->parent )) return(sptr);
-		if (!( sptr->previous ))
+		if ( sptr->parent )
 		{
-			if (!( sptr->parent->first = sptr->next ))
-				sptr->parent->last = (struct data_element *) 0;
-			else	sptr->parent->first->previous = (struct data_element *) 0;
+			if (!( sptr->previous ))
+			{
+				if (!( sptr->parent->first = sptr->next ))
+					sptr->parent->last = (struct data_element *) 0;
+				else	sptr->parent->first->previous = (struct data_element *) 0;
+			}
+			else if (!( sptr->previous->next = sptr->next ))
+				sptr->parent->last = sptr->previous;
+			if (!( sptr->next ))
+			{
+				if (!( sptr->parent->last = sptr->previous ))
+					sptr->parent->first = (struct data_element *) 0;
+				else	sptr->parent->last->next = (struct data_element *) 0;
+			}
+			else if (!( sptr->next->previous = sptr->previous ))
+				sptr->parent->first = sptr->next;
 		}
-		else if (!( sptr->previous->next = sptr->next ))
-			sptr->parent->last = sptr->previous;
-		if (!( sptr->next ))
-		{
-			if (!( sptr->parent->last = sptr->previous ))
-				sptr->parent->first = (struct data_element *) 0;
-			else	sptr->parent->last->next = (struct data_element *) 0;
-		}
-		else if (!( sptr->next->previous = sptr->previous ))
-			sptr->parent->first = sptr->next;
 		sptr = liberate_data_element(sptr);
 	}
 	return((struct data_element *) 0);

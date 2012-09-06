@@ -25,20 +25,6 @@
 #include "occiresolver.h"
 #include "cosacsctrl.h"
 
-/*	------------------------------------------	*/
-/*		o n _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	on_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
 /* ---------------------------------------------------------------------------- */
 /*			x m l _ a t r i b u t _ v a l u e			*/
 /* ---------------------------------------------------------------------------- */
@@ -301,15 +287,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 		/* ------------------------------------------------- */
 		pptr->when = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
-		if ( check_debug() )
-		{
-			rest_log_message("*** ON PROCCI Instance is UP and RUNNING ***");
-		}
 		autosave_opennebula_nodes();
-		if ( check_debug() )
-		{
-			rest_log_message("*** ON PROCCI connect_opennebula_server( exit ) ***");
-		}
 		return(0);
 	}
 }
@@ -357,7 +335,6 @@ private	struct	rest_response * start_opennebula(
 	}
 	else
 	{
-		liberate( filename );
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
@@ -367,26 +344,29 @@ private	struct	rest_response * start_opennebula(
 			/* ----------------------- */
 			/* create server meta data */
 			/* ----------------------- */
-			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+			if ( use_cosacs_agent( pptr->agent ) )
 			{
-				cosacs_metadata_instructions( 
-					pptr->hostname, 
-					_CORDS_CONFIGURATION,
-					reference, 
-					OnProcci.publisher );
+				if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+				{
+					cosacs_metadata_instructions( 
+						pptr->hostname, 
+						_CORDS_CONFIGURATION,
+						reference, 
+						OnProcci.publisher,
+						pptr->account );
+				}
 			}
 		}
 		osptr = liberate_on_response( osptr );
 		if (!( status ))
-		if (!( status ))
 		{
-			if (!( on_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}
-		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Stack" ) );
+		else  	return( rest_html_response( aptr, 400, "Bad Request : Connect Open Nebula" ) );
 	}
 
 }
@@ -433,26 +413,22 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 	struct	on_response * rptr;
 	char *	vptr;
 	if (!( filename = on_shutdown_compute_request( pptr->number ) ))
-		return(0);
+		return(118);
 	else if (!( rptr = on_shutdown_compute( pptr->number, filename ) ))
-	{
-		filename = liberate( filename );
-		return(0);
-	}
+		return(119);
 	else
 	{
-		filename = liberate( filename );
 		rptr = liberate_on_response( rptr );
 		while (1)
 		{
 			if (!( rptr = on_get_server( pptr->number )))
 			{
-				return(0);
+				return(120);
 			}
 			else if (!( vptr = xml_element_value( rptr->xmlroot, "STATE" )))
 			{
 				rptr = liberate_on_response( rptr );
-				return(0);
+				return(121);
 			}
 			else if (!( strcmp( vptr, "DONE" )))
 			{
@@ -476,6 +452,39 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 }
 
 /*	-------------------------------------------	*/
+/*		o n _ i m a g e _ a c c e s s		*/
+/*	-------------------------------------------	*/
+private	int	on_image_access( char * image, int mode )
+{
+	struct on_response * onptr;
+	char *	filename;
+	if ( mode )
+	{
+		if (!( filename = on_public_image_request( image ) ))
+			return(0);
+		else if (!( onptr = on_public_image( image, filename ) ))
+			return( 0 );
+		else	
+		{
+			onptr = liberate_on_response( onptr );
+			return(1);
+		}
+	}
+	else
+	{
+		if (!( filename = on_private_image_request( image ) ))
+			return(0);
+		else if (!( onptr = on_private_image( image, filename ) ))
+			return( 0 );
+		else	
+		{
+			onptr = liberate_on_response( onptr );
+			return(1);
+		}
+	}
+}
+
+/*	-------------------------------------------	*/
 /* 	      s a v e  _ o p e n n e b u l a	  	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * save_opennebula(
@@ -486,7 +495,7 @@ private	struct	rest_response * save_opennebula(
 		void * vptr )
 {
 	char		reference[512];
-	struct	on_response * osptr;
+	struct	on_response * onptr;
 	int		status;
 	struct	opennebula * pptr;
 	char	*	filename;
@@ -499,20 +508,20 @@ private	struct	rest_response * save_opennebula(
 		return( rest_html_response( aptr, status, "configuration not found" ) );
 	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->name, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image message failure" ) );
-	else if (!( osptr = on_create_image( pptr->number, filename ) ))
+	else if (!( onptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
-	else if (!( osptr->response ))
+	else if (!( onptr->response ))
 	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
-	else if ( osptr->response->status >= 400 )
+	else if ( onptr->response->status >= 400 )
 	{
-		aptr = rest_html_response( aptr, osptr->response->status + 1000, "create image request" );
-		osptr = liberate_on_response( osptr );
+		aptr = rest_html_response( aptr, onptr->response->status + 1000, "create image request" );
+		onptr = liberate_on_response( onptr );
 		return( aptr );
 	}
-	else if (!( osptr = on_connect_image( pptr, osptr ) ))
+	else if (!( onptr = on_connect_image( pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if (!( on_shutdown_image( pptr ) ))
-	 	return( rest_html_response( aptr, 1406, "shutdown failure" ) );
+	else if ((status = on_shutdown_image( pptr )) != 0)
+	 	return( rest_html_response( aptr, 1400 + status, "save shutdown failure" ) );
 	else
 	{
 		/* ----------------------------- */
@@ -523,11 +532,17 @@ private	struct	rest_response * save_opennebula(
 		{ 
 			if ( pptr->original ) 
 				pptr->original = liberate( pptr->original );
+
 			pptr->original = allocate_string( pptr->image );
+
+			/* -------------------------------------------- */
+			/* its a save operation and MUST be made public */
+			/* -------------------------------------------- */
+			on_image_access( pptr->image, 1 );
 		}
-		osptr = liberate_on_response( osptr );
+		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if (!( on_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -546,7 +561,7 @@ private	struct	rest_response * snapshot_opennebula(
 		void * vptr )
 {
 	char		reference[512];
-	struct	on_response * osptr;
+	struct	on_response * onptr;
 	int		status;
 	struct	opennebula * pptr;
 	char	*	filename;
@@ -559,24 +574,24 @@ private	struct	rest_response * snapshot_opennebula(
 		return( rest_html_response( aptr, status, "configuration not found" ) );
 	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->id, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image request failure" ) );
-	else if (!( osptr = on_create_image( pptr->number, filename ) ))
+	else if (!( onptr = on_create_image( pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
-	else if (!( osptr->response ))
+	else if (!( onptr->response ))
 	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
-	else if ( osptr->response->status >= 400 )
+	else if ( onptr->response->status >= 400 )
 	{
-		aptr = rest_html_response( aptr, osptr->response->status + 1000, "create image request" );
-		osptr = liberate_on_response( osptr );
+		aptr = rest_html_response( aptr, onptr->response->status + 1000, "create image request" );
+		onptr = liberate_on_response( onptr );
 		return( aptr );
 	}
-	else if (!( osptr = on_connect_image( pptr, osptr ) ))
+	else if (!( onptr = on_connect_image( pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if (!( on_shutdown_image( pptr ) ))
-	 	return( rest_html_response( aptr, 1406, "shutdown failure" ) );
+	else if ((status = on_shutdown_image( pptr )) != 0)
+	 	return( rest_html_response( aptr, 1400+status, "snapshot shutdown failure" ) );
 	{
-		osptr = liberate_on_response( osptr );
+		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if (!( on_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -590,10 +605,24 @@ private	struct	rest_response * snapshot_opennebula(
 private	struct on_response * stop_opennebula_provisioning( struct opennebula * pptr )
 {
 	int	status;
-	struct	on_response * osptr;
+	struct	on_response * onptr;
+	char		reference[512];
 	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
 		return((struct on_response *) 0);
-	else 	return( on_delete_server( pptr->number ) );
+	else
+	{
+		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		if ( use_cosacs_agent( pptr->agent ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, 
+				_CORDS_RELEASE,
+				reference, 
+				OnProcci.publisher,
+				pptr->account );
+		}
+		return( on_delete_server( pptr->number ) );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -607,14 +636,14 @@ private	struct	rest_response * stop_opennebula(
 		void * vptr )
 {
 	char		reference[512];
-	struct	on_response * osptr;
+	struct	on_response * onptr;
 	int		status;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!(osptr = stop_opennebula_provisioning( pptr )))
+	else if (!(onptr = stop_opennebula_provisioning( pptr )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
@@ -623,11 +652,11 @@ private	struct	rest_response * stop_opennebula(
 		{
 			reset_opennebula_server( pptr );
 			pptr->when = time((long *) 0);
-			osptr = liberate_on_response( osptr );
+			onptr = liberate_on_response( onptr );
 			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-			if (!( on_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=start", pptr->account, reference ) )
+			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=stop", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else	return( rest_html_response( aptr, 200, "OK" ) );
 		}

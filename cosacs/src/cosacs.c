@@ -28,10 +28,13 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
 
-#define	_COSACS_START "cosacs:start"
+#define	_COSACS_START 		"cosacs:start"
+#define	_COSACS_SHITDOWN	"cosacs:shutdown"
+#define	_COSACS_LOCAL		"127.0.0.1"
 
-struct	accords_configuration Cosacs = {
+private	struct	accords_configuration Cosacs = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -49,6 +52,8 @@ struct	accords_configuration Cosacs = {
 	(struct occi_category *) 0
 	};
 
+private	char * CosacsContract=(char *) 0;
+
 public	int	check_debug()		{	return(Cosacs.debug);		}
 public	int	check_verbose()		{	return(Cosacs.verbose);		}
 public	char *	default_publisher()	{	return(Cosacs.publisher);	}
@@ -56,6 +61,9 @@ public	char *	default_operator()	{	return(Cosacs.operator);	}
 public	char *	default_tls()		{	return(Cosacs.tls);		}
 public	char *	default_zone()		{	return(Cosacs.zone);		}
 
+/*	---------------------------------------------	*/  
+/*			f a i l u r e			*/
+/*	---------------------------------------------	*/  
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -82,16 +90,18 @@ private	void	cosacs_load()
 	return;
 }
 
-private	int	banner()
+/*	---------------------------------------------	*/  
+/*		c o s a c s _ b a n n e r		*/
+/*	---------------------------------------------	*/  
+private	int	cosacs_banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.05");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.08");
+	printf("\n   Beta Version : 01/08/2012");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
 	return(0);
-
 }
 
 /*	------------------------------------------------------------------	*/
@@ -134,8 +144,243 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 }
 
 /*	------------------------------------------------------------------	*/
-/* 	  actions and methods required for the cosacs instance category		*/
+/*			c o s a c s _ f i l e _ e n c o d e			*/
 /*	------------------------------------------------------------------	*/
+private	char *	cosacs_file_encode( char * filename )
+{
+	FILE * h;
+	int	bytes;
+	char	buffer[8193];
+	if (!( h = fopen( filename, "r" )))
+		return((char *) 0);
+	else if (!( bytes = fread(buffer,1,8192,h) ))
+	{
+		fclose(h);
+		return((char *) 0);
+	}
+	else	
+	{
+		fclose(h);
+		buffer[bytes] = 0;
+		return( rest_encode_html( buffer ) );
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*		c o s a c s _ p o s t _ s a m p l e s		*/
+/*	---------------------------------------------------	*/
+private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char * filename )
+{
+	struct	url *	uptr;
+	struct	occi_element * dptr;
+	struct	occi_client * kptr;
+	char *	host;
+	char *	ihost;
+	char *	vptr;
+	char	now[64];
+	char	buffer[1024];
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_request  * qptr;
+
+	/* ------------------------------------- */
+	/* prepare the date stamp and packet URL */
+	/* ------------------------------------- */
+	sprintf(now,"%u",time((long*) 0));
+	sprintf(buffer,"/%s/",_CORDS_PACKET);
+	if (!( pptr->connection ))
+		return;
+	else if (!( uptr = analyse_url( pptr->connection ) ))
+		return;
+	else if (!( replace_url_object( uptr, buffer ) ))
+		return;
+	else if (!( host = serialise_url( uptr, (char *) 0 ) ))
+		return;
+	else	uptr = liberate_url( uptr );
+
+	/* ------------------------------------- */
+	/* prepare the local cosacs identity URL */
+	/* ------------------------------------- */
+	if (!( rest_valid_string( Cosacs.identity ) ))
+	{
+		host = liberate( host );
+		return;
+	}
+	else	sprintf(buffer,"%s/%s/%s",Cosacs.identity,_CORDS_PROBE,pptr->id);
+
+	/* ------------------------------------- */
+	/* send the data packet  to the consumer */
+	/* ------------------------------------- */
+	if (!( kptr = occi_create_client( host, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		host = liberate( host );
+		return;
+	}
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		host = liberate( host );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.packet.probe"  	, buffer 	  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.connection"   	, pptr->connection) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.metric"  	, pptr->metric    ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.start"		, now 		  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.packet.finish"		, now 		  ) )))
+	{
+		host = liberate( host );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	host = liberate( host );
+	sprintf(now,"%u",samples);
+	if (!(dptr=occi_request_element(qptr,"occi.packet.samples"  	, now )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	sprintf(now,"%u",++pptr->packets);
+	if (!(dptr=occi_request_element(qptr,"occi.packet.sequence"  	, now )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!( vptr = cosacs_file_encode( filename )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else if (!(dptr=occi_request_element(qptr,"occi.packet.data"  	, vptr )))
+	{
+		vptr = liberate( vptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else	vptr = liberate( vptr );
+
+	if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+
+	/* -------------------------------------- */
+	/* recover response packet identifier URL */
+	/* -------------------------------------- */
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+
+	/* ------------------------------------ */
+	/* send a new link to the COSACS master */
+	/* ------------------------------------ */
+	else if (!( zptr =  occi_create_link( buffer,  ihost, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return;
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o s a c s _ p r o b e _ w o r k e r			*/
+/*	------------------------------------------------------------------	*/
+private	int	cosacs_probe_worker( struct cords_probe * pptr )
+{
+	int	sample=0;
+	char 	filename[1024];
+	char 	buffer[2048];
+	sprintf(filename,"rest/%s.probe",pptr->id);
+	unlink( filename );
+	while (!( rest_server_signal()))
+	{
+		if ( rest_valid_string( pptr->expression) )
+			sprintf(buffer,"%s >> %s",pptr->expression, filename);
+		else	sprintf(buffer,"date >> %s",filename);
+		system( buffer );
+		if ( ++sample >= pptr->samples )
+		{
+			cosacs_post_samples( pptr, sample,filename);
+			sample=0;
+			unlink( filename );
+		}
+		if ( pptr->period )
+		{
+			sleep(pptr->period);
+		}
+	}
+	return(0);
+}
+
+/*	----------------------------------------------------------	*/
+/*		c o s a c s _ v a l i d a t e _ p r o b e		*/
+/*	----------------------------------------------------------	*/
+private	int cosacs_validate_probe( struct cords_probe * pptr )
+{
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+
+	if (!( pptr ))
+		return( 0 );
+	else if (!( pptr->metric ))
+		return( 0 );
+	else if (!( zptr = occi_simple_get( pptr->metric, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( 0 );
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.expression" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->expression = allocate_string( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.period" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->period = atoi( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!(eptr = occi_locate_element( zptr->first, "occi.metric.samples" )))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else if (!( pptr->samples = atoi( eptr->value ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( 1 );
+	}
+}
 
 /*	-------------------------------------------	*/
 /* 		s t a r t _ p r o b e			*/
@@ -147,10 +392,29 @@ private	struct rest_response * start_probe(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	pid;
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( cosacs_validate_probe( pptr ) ))
+		return( rest_html_response( aptr, 802, "Probe Validation Failure" ) );
+	else
+	{
+		switch ((pid = fork()))
+		{
+		case	-1	:
+			return( rest_html_response( aptr, 500, "Probe Process Start Failure" ) );
+		case	0	:
+			exit(cosacs_probe_worker( pptr ));
+		default		:
+			pptr->pid = pid;
+			pptr->state = 1;
+			autosave_cords_probe_nodes();
+			return( rest_html_response( aptr, 200, "OK" ) );
+		}
+	}		
 }
 
 /*	-------------------------------------------	*/
@@ -163,10 +427,25 @@ private	struct rest_response * stop_probe(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	int	status=0;
 	struct	cords_probe * pptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
-	else	return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		if ( pptr->pid )
+		{
+			/* remove the worker */
+			kill( pptr->pid, SIGTERM );
+			waitpid(pptr->pid,&status,0);
+			pptr->pid = 0;
+		}
+		pptr->state = 0;
+		autosave_cords_probe_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}		
 }
 
 /*	-------------------------------------------	*/
@@ -277,14 +556,25 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 				execmode = 0;
 			else if (!( strcmp( "system", sptr->nature ) ))
 				execmode = 0;
+			else if (!( strcmp( "kill", sptr->nature ) ))
+				execmode = 2;
 			else if (!( strcmp( "fork", sptr->nature ) ))
 				execmode = 1;
 			else if (!( strcmp( "process", sptr->nature ) ))
 				execmode = 1;
 			else	execmode = 0;
-			if ( execmode )
+			switch( execmode )
+			{
+			case	1	:
 				fprintf(h,"%s&\n",sptr->syntax);
-			else	fprintf(h,"%s\n",sptr->syntax);
+				break;
+			case	0	:	
+				fprintf(h,"%s\n",sptr->syntax);
+				break;
+			case	2	:
+				fprintf(h,"killall -15 %s\n",sptr->syntax);
+				break;
+			}
 			sptr->state = 1;
 			scripts++;
 		}
@@ -420,6 +710,199 @@ private	struct	occi_interface	cords_script_interface = {
 	delete_cords_script
 	};
 
+/*	-------------------------------------------------	*/
+/*	     c o s a c s _ u s e _ p u b l i s h e r		*/
+/*	-------------------------------------------------	*/
+/*	this is necessary when security enforcement is to	*/
+/*	be performed by all cooperating modules requiring	*/
+/*	the standard authentication, authorization action	*/
+/*	to be performed.					*/
+/*	-------------------------------------------------	*/
+private	int	cosacs_use_publisher()
+{
+	char *	tls;
+	if (!( rest_valid_string( Cosacs.publisher ) ))
+		return( 0 );
+	else
+	{
+		initialise_occi_resolver ( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+		initialise_occi_publisher( Cosacs.publisher, (char *) 0, (char *) 0, (char *) 0 );
+	}
+
+	if (!( rest_valid_string((tls = default_tls()) )))
+		return( 0 );
+	else if (!( rest_valid_string( Cosacs.user ) ))
+		return( 0 );
+	else if (!( rest_valid_string( Cosacs.password ) ))
+		return( 0 );
+	else	return( occi_secure_AAA( Cosacs.user, Cosacs.password, _CORDS_CONTRACT_AGENT, tls ) );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ i d e n t i t y		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_identity( char * vptr )
+{
+	char	buffer[1024];
+
+	if (!( strcmp( vptr, _COSACS_LOCAL ) ))
+		return( 0 );
+	else if ( rest_valid_string( Cosacs.identity ) )
+		return(0);
+	else
+	{
+		sprintf(buffer,"%s://%s:%u",
+			(rest_valid_string(default_tls()) ? "https" : "http" )
+			,vptr,Cosacs.restport);
+		if (!( Cosacs.identity = allocate_string( buffer ) ))
+			return(0); 
+		else	return(0);
+	}
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ p u b l i s h e r		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_publisher( char * vptr )
+{
+	if ( rest_valid_string( Cosacs.publisher ) )
+		return(0);
+	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
+		return(0); 
+	else	return( cosacs_use_publisher() );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ c o n t r a c t		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_contract( char * vptr )
+{
+	if ( rest_valid_string( CosacsContract ) )
+		return(0);
+	else if (!( CosacsContract = allocate_string( vptr ) ))
+		return(0); 
+	else	return(0);
+}
+
+/*	-------------------------------------------------	*/
+/*	  i n t e r c e p t _ a u t h o r i z a t i o n		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_authorization( char * vptr )
+{
+	return( occi_resolve_authorization( vptr ) );
+}
+
+/*	-------------------------------------------------	*/
+/*		i n t e r c e p t _ m e t a d a t a		*/
+/*	-------------------------------------------------	*/
+/*	interception of cosacs specific metadata is to be	*/
+/*	performed for the recovery of operational values	*/
+/*	that are know only to the contract negotiator		*/
+/*	that spawned the hosting virtual machine.		*/
+/*	-------------------------------------------------	*/
+private	int	intercept_metadata( char * nptr, char * vptr )
+{
+	/* --------------------------------- */
+	/* no name nor value then do nothing */
+	/* --------------------------------- */
+	if (!( nptr )) 		return(0);
+	else if (!( vptr ))	return(0);
+
+	/* ----------------------------------- */
+	/* detect the cosacs identity variable */
+	/* ----------------------------------- */
+	if (!( strcmp( nptr,"cosacs" ) ))
+		return( intercept_identity( vptr ) );
+
+	/* ------------------------------------ */
+	/* detect the cosacs publisher identity */
+	/* ------------------------------------ */
+	else if (!( strcmp( nptr,"publisher" ) ))
+		return( intercept_publisher( vptr ) );
+
+	/* ------------------------------------------ */
+	/* detect the cosacs host contract identifier */
+	/* ------------------------------------------ */
+	else if (!( strcmp( nptr,"contract" ) ))
+		return( intercept_contract( vptr ) );
+
+	/* -------------------------------------------- */
+	/* detect the callers authorization declaration */
+	/* -------------------------------------------- */
+	else if (!( strcmp( nptr,"authorization" ) ))
+		return( intercept_authorization( vptr ) );
+
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	create_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if (!( rest_valid_string( pptr->name ) ))
+		return( 0 );
+	else if (!( rest_valid_string( pptr->value ) ))
+		return( 0 );
+	else	return( intercept_metadata( pptr->name, pptr->value ) );
+}
+
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n t r a c t  		*/
+/*	-------------------------------------------	*/
+private	int	update_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n t r a c t	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_metadata(struct occi_category * optr, void * vptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_metadata * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+private	struct	occi_interface	cords_metadata_interface = 
+{
+	create_metadata,
+	retrieve_metadata,
+	update_metadata,
+	delete_metadata
+};
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ o p e r a t i o n				*/
@@ -441,7 +924,8 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
+	optr->callback  = &cords_metadata_interface;
 
 	if (!( optr = occi_cords_file_builder( Cosacs.domain, "file" ) ))
 		return( 27 );
@@ -449,6 +933,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------------------------------- */
@@ -460,6 +945,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = &cords_script_interface;
 
 	/* ----------------------------------------------------------- */
@@ -471,6 +957,7 @@ private	int	cosacs_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+	optr->access |= ( _OCCI_CONTRACT | _OCCI_NO_PRICING );
 	optr->callback  = (void *) 0;
 
 	/* ---------------------------------------- */
@@ -488,14 +975,25 @@ private	int	cosacs_operation( char * nptr )
 	/* ------------------------------------------ */
 	rest_initialise_log(Cosacs.monitor);
 
-	return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first,(char *) 0 ) );
+	if (!( rest_valid_string( Cosacs.identity ) ))
+		return( occi_server(  nptr, Cosacs.restport, Cosacs.tls, Cosacs.threads, first, (char *) 0 ) );
+	else
+	{
+		initialise_occi_publisher( Cosacs.publisher, (char*) 0, (char *) 0, (char *) 0);
+
+		return( publishing_occi_server(
+			Cosacs.user, Cosacs.password,
+			Cosacs.identity,  nptr, 
+			Cosacs.restport, Cosacs.tls, 
+			Cosacs.threads, first ) );
+	}
 
 }
 
 /*	------------------------------------------------------------------	*/
-/*				c o s a c s 					*/
+/*			c o s a c s _ c o m m a n d				*/
 /*	------------------------------------------------------------------	*/
-private	int	cosacs(int argc, char * argv[] )
+private	int	cosacs_command(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
@@ -537,8 +1035,8 @@ private	int	cosacs(int argc, char * argv[] )
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
-		return( banner() );
-	else	return( cosacs( argc, argv ) );
+		return( cosacs_banner() );
+	else	return( cosacs_command( argc, argv ) );
 }
 
 

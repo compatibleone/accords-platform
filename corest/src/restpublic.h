@@ -51,6 +51,9 @@ public	struct rest_response *
 public	struct	rest_header * 
 	rest_response_header( struct rest_response * aptr, char * nptr, char * vptr );
 
+public	struct	rest_header * 
+	rest_duplicate_headers( struct rest_header * hptr );
+
 public	struct	rest_client *
 	rest_drop_client( struct rest_client * cptr);
 
@@ -110,6 +113,15 @@ public	char *
 
 public	void	
 	rest_add_http_prefix(char * buffer, int buflen, char * host );
+
+public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
+
+public	int	rest_valid_string( char * vptr );
+public	int	rest_valid_string_value( char * sptr, char * vptr );
+public	char *	rest_encode_html( char * sptr );
+public	char *	rest_decode_html( char * sptr );
+public	int	rest_server_signal();
+public	int	rest_normalise_value( char * sptr, int factor );
 
 #endif	/* _restpublic_h */
 	/* ------------- */

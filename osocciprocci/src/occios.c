@@ -486,7 +486,8 @@ private	struct	rest_response * start_occi_openstack(
 		/* ---------------------------- */
 		cosacs_metadata_instructions( 
 			pptr->hostname, _CORDS_CONFIGURATION,
-			pptr->reference, OsOcciProcci.publisher );
+			pptr->reference, OsOcciProcci.publisher,
+			pptr->account );
 
 		/* ------------------------------------- */
 		/* release the public IP if not required */

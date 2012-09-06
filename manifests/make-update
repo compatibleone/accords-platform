@@ -1,14 +1,17 @@
+bash build-update-cosacs
 bash build-update publisher
 bash build-update coss cords_user.xml
 bash build-update comons
-bash build-update coobas
+bash build-update coobas cords_price.xml
 bash build-update coes
 bash build-update coees
 bash build-update conets
 bash build-update cosched
 bash build-update slam
+bash build-update paasprocci
 bash build-update ezvm
 bash build-update coips
+bash build-update-cool
 bash build-update broker
 bash build-update parser
 bash build-update procci
@@ -18,5 +21,6 @@ bash build-update azprocci
 bash build-update dcprocci
 bash build-update osocciprocci
 bash build-update paprocci
+bash build-update-tools
 
 

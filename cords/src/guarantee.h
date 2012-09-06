@@ -8,10 +8,9 @@ struct	cords_guarantee
 	char * 	name;		
 	char * 	description;	
 	char * 	obligated;	
-	char * 	service;	
-	char * 	scope;		
-	char * 	condition;	
-	char * 	objective;	
+	char * 	importance;	
+	char * 	scope;
+	char *	variable;		
 	int	values;		
 	int	state;		
 				

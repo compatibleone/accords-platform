@@ -1,0 +1,20 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Compatible One PAAS Resource and Request Description Schema Version 1.01
+			Provisionary Version 26th July 2012
+			Enforced by the ACCORDS Parser
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/paastypes.xsd"/>
+
+	<xsd:element name="paas_manifest" type="paas_manifest"/>
+
+</xsd:schema>
+
+
+
+
+

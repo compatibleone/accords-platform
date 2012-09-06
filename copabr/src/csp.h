@@ -40,16 +40,17 @@
 #define	_CORDSCRIPT_MONITOR	2
 #define	_CORDSCRIPT_SYSTEM 	3
 #define	_CORDSCRIPT_FORK   	4
-#define	_CORDSCRIPT_NEW   	5
-#define	_CORDSCRIPT_DELETE     	6
-#define	_CORDSCRIPT_START   	7
-#define	_CORDSCRIPT_STOP   	8
-#define	_CORDSCRIPT_SAVE   	9
-#define	_CORDSCRIPT_SNAPSHOT  	10
-#define	_CORDSCRIPT_BUILD   	11
-#define	_CORDSCRIPT_INSTANCE   	12
-#define	_CORDSCRIPT_RESOLVE   	13
-#define	_CORDSCRIPT_INVOKE   	14
+#define	_CORDSCRIPT_KILL   	5
+#define	_CORDSCRIPT_NEW   	6
+#define	_CORDSCRIPT_DELETE     	7
+#define	_CORDSCRIPT_START   	8
+#define	_CORDSCRIPT_STOP   	9
+#define	_CORDSCRIPT_SAVE   	10
+#define	_CORDSCRIPT_SNAPSHOT  	11
+#define	_CORDSCRIPT_BUILD   	12
+#define	_CORDSCRIPT_INSTANCE   	13
+#define	_CORDSCRIPT_RESOLVE   	14
+#define	_CORDSCRIPT_INVOKE   	15
 
 public	struct	cordscript_action *	cordscript_parse_statement( char * statement );
 public	int				cordscript_parse_method( char * token );

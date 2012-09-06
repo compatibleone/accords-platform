@@ -28,6 +28,7 @@
 
 struct	cords_placement_criteria
 {
+	int		flags;		/* eventual special options	*/
 	char *		node;		/* node description		*/
 	char *		price;		/* by price			*/
 	char *		energy;		/* by energy			*/
@@ -36,7 +37,33 @@ struct	cords_placement_criteria
 	char *		operator;	/* by named operator		*/
 	char *		zone;		/* by geographical zone		*/
 	char *		security;	/* by security considerations	*/
+	char *		solution;	/* placement ID of solution	*/
 	char *		algorithm;	/* the placement algorithm	*/
+};
+
+struct	cords_guarantee_criteria;
+struct	cords_guarantee_element
+{
+	struct	cords_guarantee_element * previous;
+	struct	cords_guarantee_element * next;
+	struct	cords_guarantee_criteria* parent;
+
+	char *		agreement;	/* reference to parent SLA	*/
+	char *		reference;	/* guarantee instance identity	*/
+	char *		importance;	/* importance of the condition	*/
+	char *		obligated;	/* the obligated party account	*/
+	char *		scope;		/* the involved service items	*/
+	char *		property;	/* the name of the metric 	*/
+	char *		condition;	/* the involved condition	*/
+	char *		objective;	/* the involved value		*/
+};
+
+struct	cords_guarantee_criteria
+{
+	int		elements;
+	char *		service;	
+	struct	cords_guarantee_element * first;
+	struct	cords_guarantee_element * last;
 };
 
 struct	cords_provisioning
@@ -55,11 +82,15 @@ struct	cords_provisioning
 	struct	occi_response 	* security;
 	char			* confID;
 	struct	occi_response 	* configuration;
+	char			* releaseID;
+	struct	occi_response 	* release;
 	char			* interID;
 	struct	occi_response 	* interface;
 	char			* instID;
 	struct	occi_response 	* instance;
 	struct	xml_element 	* document;
+	struct	cords_placement_criteria * placement;
+	struct	cords_guarantee_criteria * warranty;
 	int			nodes;
 };
 
@@ -71,10 +102,12 @@ struct	cords_provisioning
 struct	cords_node_descriptor
 {
 	int			scope;
+	int			flags;		/* contract special flags				*/
 	char 			* account;	/* account for which service is engaged			*/
 	char 			* accountName;	/* name of account for which service is engaged		*/
 	char			* nameApp;
 	char 			* typeApp;
+	char			* service;	/* the parent service identifier for the contract	*/
 	char			* scopeApp;	/* the node scope : normal/common 			*/
 	char			* accessApp;	/* the node access: public/private 			*/
 	char			* hid;
@@ -91,8 +124,9 @@ struct	cords_node_descriptor
 	struct	occi_response 	* system;	/* the system from the image				*/
 	struct	occi_response 	* package;	/* the package from the image				*/
 	struct	occi_response 	* contract;	/* the resulting contract/machine instance controller 	*/
-
+	
 	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
 
 };
 
@@ -106,8 +140,8 @@ public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
 public	struct	xml_element  * cords_build_service( 
 	char * 	name, char * plan, char * manifest, char * sla, char * account, char * tarification );
 
-public	struct	xml_element * 	cords_build_contract( 
-	char * 	node, 	char * name, char * provider );
+private	struct	xml_element * 	cords_build_contract( 
+	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider, int flags );
 
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 
@@ -130,6 +164,7 @@ public	int	get_provisioning_status();
 
 public	struct	xml_element * cords_instance_node( 
 		struct cords_placement_criteria * selector,
+		struct cords_guarantee_criteria * warrenty,
 		char * host,
 		char * id,
 		char * agent,

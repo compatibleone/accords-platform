@@ -22,28 +22,11 @@
 
 #include "osclient.h"
 
-#define	_CORDS_NULL "(null)"
-#define	_CORDS_NONE "none"
 char *                  occi_unquoted_value( char * sptr );
 
+private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
-
-/*	------------------------------------------------	*/
-/*		o s _ v a l i d _ s t r i n g			*/
-/*	------------------------------------------------	*/
-private	int	os_valid_string( char * vptr )
-{
-	if (!( vptr ))
-		return( 0 );
-	else if (!( strlen( vptr ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NULL ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NONE ) ))
-		return( 0 );
-	else	return( 1 );
-}
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o s _ r e s p o n s e			*/
@@ -131,6 +114,27 @@ private	struct	os_response * os_check( struct rest_response * aptr )
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*		o s _ c l i e n t _ r a t e _ l i m i t e d		*/
+/*	---------------------------------------------------------	*/
+private	int	os_client_rate_limited( struct rest_response * rptr )
+{
+	if (!( rptr ))
+		return(0);
+	else if ( rptr->status < 400 )
+		return(0);
+	else if ( rptr->status != 413 )
+		return(0);
+	{
+		/* -------------------------- */
+		/* rate limiting is in effect */
+		/* -------------------------- */
+		rptr = liberate_rest_response( rptr );
+		sleep(rate_recovery);
+		return( 1 );
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*		 o s _ c l i e n t _ g e t _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
@@ -138,7 +142,28 @@ public	struct	os_response *
 	os_client_get_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_get_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	while ((rptr = rest_client_get_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -148,7 +173,28 @@ public	struct	os_response *
 	os_client_head_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_head_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	while (( rptr = rest_client_head_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -158,7 +204,29 @@ public	struct	os_response *
 	os_client_delete_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
-	return( os_check( rest_client_delete_request( target, tls, nptr, hptr ) ) );
+	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	while (( rptr = rest_client_delete_request( target, tls, nptr, hptr )) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		else if (!( copy ))
+			continue;
+		else if (!( hptr = rest_duplicate_headers( copy ) ))
+			return((struct os_response *) 0);
+		else	continue;
+	}			
+
+	if (( hptr )
+	&&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -168,7 +236,41 @@ public	struct	os_response *
 	os_client_post_request(
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
-	return( os_check( rest_client_post_request( target, tls, nptr, filename, hptr ) ) );
+	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+	char		      * body=(char *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	if (( filename )
+	&&  (!( body = allocate_string( filename ) )))
+	{
+		copy = liberate_rest_headers( copy );
+		return((struct os_response *) 0);
+	}
+
+	while (( rptr = rest_client_post_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		if ( copy  )
+			if (!( hptr = rest_duplicate_headers( copy ) ))
+				return((struct os_response *) 0);
+		if ( body )
+			if (!( filename = allocate_string( body ) ))
+				return((struct os_response *) 0);
+
+	}			
+
+	if (( filename ) &&  ( body ))
+		body = liberate( body );
+
+	if (( hptr ) &&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
+	return( os_check( rptr ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -178,8 +280,42 @@ public	struct	os_response *
 	os_client_put_request(
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
-	return( os_check( rest_client_put_request( target, tls, nptr, filename, hptr ) ) );
+	struct	rest_response * rptr;
+	struct	rest_header   * copy=(struct rest_header *) 0;
+	char		      * body=(char *) 0;
+
+	if (( hptr )
+	&&  (!( copy = rest_duplicate_headers( hptr ) )))
+		return((struct os_response *) 0);
+
+	if (( filename )
+	&&  (!( body = allocate_string( filename ) )))
+	{
+		copy = liberate_rest_headers( copy );
+		return((struct os_response *) 0);
+	}
+
+	while (( rptr = rest_client_put_request( target, tls, nptr, filename, hptr )) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		if ( copy  )
+			if (!( hptr = rest_duplicate_headers( copy ) ))
+				return((struct os_response *) 0);
+		if ( body )
+			if (!( filename = allocate_string( body ) ))
+				return((struct os_response *) 0);
+	}			
+
+	if (( filename ) && ( body ))
+		body = liberate( body );
+
+	if (( hptr ) &&  ( copy ))
+		copy = liberate_rest_headers( copy );
+
+	return( os_check( rptr ) );
 }
+
 
 /*	-------------------------------------------	*/
 /*	 k e y s t o n e _ a u t h _ m e s s a g e 	*/
@@ -271,10 +407,8 @@ public	int	check_keystone_authorization(struct os_subscription * sptr)
 		else if (!( rptr = rest_client_post_request( 
 			buffer, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 		{
-			liberate_rest_header( hptr );
 			return( 0 );
 		}
-		else	hptr = liberate_rest_header( hptr );
 
 		if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
 		{
@@ -1384,17 +1518,17 @@ public	char * os_create_server_request(
 			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
-		if ( os_valid_string( address ) )
+		if ( rest_valid_string( address ) )
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
 		}
-		if ( os_valid_string( zone ) )
+		if ( rest_valid_string( zone ) )
 		{
 			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
 		}			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
 
-		if ( os_valid_string( group ) )
+		if ( rest_valid_string( group ) )
 		{
 			fprintf(h,"\t<security_groups>\n");
 			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);

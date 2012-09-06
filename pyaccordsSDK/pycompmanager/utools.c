@@ -1,53 +1,50 @@
-/* ---------------------------------------------------------------------------- */
-/* tools to generate a new gategory for Accords platform                        */
-/* Hamid MEDJAHED for (C) 2011 Prologue              		                */
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------- */
+/* ACCORDS Platform                                                        	 */
+/* module to interface Accords platform  for Python                              */
+/* Copyright 2012  Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue               */
+/* ----------------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");               */
+/* you may not use this file except in compliance with the License.              */
+/* You may obtain a copy of the License at                                       */
+/*                                                                               */
+/*       http://www.apache.org/licenses/LICENSE-2.0                              */
+/*                                                                               */
+/* Unless required by applicable law or agreed to in writing, software           */
+/* distributed under the License is distributed on an "AS IS" BASIS,             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
+/* See the License for the specific language governing permissions and           */
+/* limitations under the License.                                                */
+/*-------------------------------------------------------------------------------*/
+
 
 #include "utools.h"
+#include "allocate.h"
 
-
-/******************************************************************************************************************/
-/* Function to inserte category include files in cords.h occibuilder.h and cordsbase.c                            */
-/* pathf: char * the project directory name                                                                       */
-/* categoryName: char * the name of the category                                                                  */
-/* return 1 if successfully inserted                                                                              */
-/******************************************************************************************************************/
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to inserte category include files in cords.h occibuilder.h and cordsbase.c                       */
+/* pathf: char * the project directory name                                                                  */
+/* categoryName: char * the name of the category                                                             */
+/* return 1 if successfully inserted                                                                         */
+/*-----------------------------------------------------------------------------------------------------------*/
 int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 {
- char cordsh[TAILLE];
- char cordshname[TAILLE];
- char occibuilder[TAILLE];
- char occibuilderb[TAILLE];
- char occibuildername[TAILLE];
- char cordsbase[TAILLE];
- char cordsbasename[TAILLE];
- char occicords[TAILLE];
- char occicordsname[TAILLE];
- char pyint[TAILLE];
- char pyintname[TAILLE];
- char pyListcateg[TAILLE];
- char pyListcategname[TAILLE];
- char pylistactionname[TAILLE];
- char pylistaction[TAILLE];
+ char cordsh[DIM];
+ char cordshname[DIM];
+ char occibuilder[DIM];
+ char occibuilderb[DIM];
+ char occibuildername[DIM];
+ char cordsbase[DIM];
+ char cordsbasename[DIM];
+ char occicords[DIM];
+ char occicordsname[DIM];
+ char pyint[DIM];
+ char pyintname[DIM];
+ char pyListcateg[DIM];
+ char pyListcategname[DIM];
+ char pylistactionname[DIM];
+ char pylistaction[DIM];
  
- if(indice==1)
+ if(indice)
  {
   sprintf(pylistactionname,"#include \"%sAction.c\"",categoryName);
   sprintf(pylistaction,"%s/%s",pathf,PY_ACT_LIST);
@@ -57,7 +54,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
 
  sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
- if(flag==0) sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
+ if(!flag) sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
  sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
  
  sprintf(cordshname,"#include \"%s.h\"",categoryName);
@@ -72,46 +69,53 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  sprintf(pyint,"%s/%s",pathf,PY_CRUD_INCLUDE);
  sprintf(pyintname,"#include \"%sInterface.c\"",categoryName);
  
-
-
- if(flag==0)insertInFile(cordsh,cordshname,categoryName,0,flag);
- if(flag==0)insertInFile(occibuilder,occibuildername,categoryName,1,flag);
- insertInFile(occibuilderb,occibuildername,categoryName,1,flag);
-
- insertInFile(cordsbase,cordsbasename,categoryName,0,flag);
- insertInFile(occicords,occicordsname,categoryName,0,flag);
-
- insertInFile(pyint,pyintname,categoryName,0,flag);
-
- insertInFile(pyListcateg,pyListcategname,categoryName,0,flag);
-
- if (indice==1) insertInFile(pylistaction,pylistactionname,categoryName,0,flag);
-
-
- return 1;
+ if(indice) 
+ {
+   if(!(insertInFile(pylistaction,pylistactionname,categoryName)))
+      return 0;
+ }
+ 
+ if(!flag)
+ {
+     if(!(insertInFile(cordsh,cordshname,categoryName)))
+         return 0;
+     else if(!(insertInFileOcciStruct(occibuilder,occibuildername,categoryName)))
+         return 0;
+ }
+ 
+ if(!(insertInFilePyStruct(occibuilderb,occibuildername,categoryName)))
+    return 0;
+ else if(!(insertInFile(cordsbase,cordsbasename,categoryName)))
+    return 0;
+ else if(!(insertInFile(occicords,occicordsname,categoryName)))
+    return 0;
+ else if(!(insertInFile(pyint,pyintname,categoryName)))
+    return 0;
+ else if(!(insertInFile(pyListcateg,pyListcategname,categoryName)))
+    return 0;
+ else
+   return 1;
 }
 
-/********************************************************************************************************************/
-/* Function to insert a line in a file                                                                              */
-/* pathf: char *  the path file name                                                                                */
-/* categoryName: char * the name of the category                                                                    */
-/* indoice: int  to select a processing                                                                             */
-/* retutn 1 if successfully done                                                                                    */
-/********************************************************************************************************************/
-int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indice, int flag)
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to insert a line in a file                                                                       */
+/* pathf: char *  the path file name                                                                         */
+/* categoryName: char * the name of the category                                                             */
+/* retutn 1 if successfully done                                                                             */
+/*-----------------------------------------------------------------------------------------------------------*/
+int insertInFile(char pathf[],char categoryName[],char categoryNames[])
 {
   int a=0;
   FILE *fIn;
   FILE *fOut;
-  char line[TAILLE];
+  char line[DIM];
   char strcats[10];
   listc categoryN;
-  
+  char pathtmp[DIM];
 
-  if(indice==1)
-  {
-    resetList(&categoryN);
-  }
+  resetList(&categoryN);
+
+  sprintf(pathtmp,"%s/pyaccords/pysrc/myfile.tmp",PYPATH);
 
   if((fIn=fopen(pathf,"r"))==NULL)
   {
@@ -119,7 +123,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
    return 0;
   }
 
-  if((fOut=fopen("text.tmp","w"))==NULL)
+  if((fOut=fopen(pathtmp,"w"))==NULL)
   {
    fclose(fIn);
    printf("Error inserInFile :No such file or directory\n");
@@ -127,98 +131,237 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[],int indic
   }
 
  
-  while(fgets(line,sizeof(line), fIn))
+  while(fgets(line,sizeof(line), fIn) != NULL)
   {
-   line[strlen(line)]=0;
-   if(searchWord(categoryNames,line)==1)
-   {
-    a=1;
-    fprintf(fOut,"%s",line);
-    if(indice==1)
-    {
-      if(line[0]=='p') 
-      {
-               addBack(&categoryN,getCategoryName(line,"_",3));
-      }
-    }
-   }
-   else
-   {
-      if(indice==1)
-       {
-         if(line[0]=='c' && line[1]=='o') break;
-         else
-         { 
-           fprintf(fOut,"%s",line);
-            if(line[0]=='p') 
-            {
-               addBack(&categoryN,getCategoryName(line,"_",3));
-            }
-          } 
-   
-       }
-       else
-       {
-        str_sub(line,0,5,strcats);
-        strcats[strlen(strcats)]=0;
-        if((strcmp(strcats,"#endif"))==0) break;
-        else fprintf(fOut,"%s",line);
-       }
-   }
+     line[strlen(line)]=0;
+     if(searchWord(categoryNames,line)==1)
+     {
+         a=1;
+         fprintf(fOut,"%s",line);
+     }
+     else
+     {
+         str_sub(line,0,5,strcats);
+         strcats[strlen(strcats)]=0;
+         if(!(strcmp(strcats,"#endif"))) break;
+         else fprintf(fOut,"%s",line);
+     }
    
   }  
-  if(a==0)
-  {
-   fprintf(fOut,"%s\n",categoryName);
-   if(indice==1) addBack(&categoryN,getCategoryName(categoryName,"_",3));
-  }
-  if(indice==1)
-  {
-   fprintf(fOut,"const static struct {\n");
-   fprintf(fOut,"\tconst char *name;\n");
-   fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
-   if (flag==0) fprintf(fOut,"} occiCategoryBuilder_map2[]={\n");
-   else  fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
 
-
-   elem *pelem = categoryN.first;
-   while(pelem)
-   {          
-     fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
-     pelem = pelem->next;
-   }
-   
-   free(pelem);
-   fprintf(fOut,"};\n");
+  if(!a)
+  {
+      fprintf(fOut,"%s\n",categoryName);
   }
   
   fprintf(fOut,"#endif\n\n\n");
   fprintf(fOut,"\n");
   fclose(fIn);
   fclose(fOut);
-  rename("text.tmp",pathf);
-  return 1;
+  if( rename(pathtmp,pathf) < 0 )
+     return 0;
+  else 
+     return 1;
 }
 
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to insert a line in a struct file                                                                */
+/* pathf: char *  the path file name                                                                         */
+/* categoryName: char * the name of the category                                                             */
+/* retutn 1 if successfully done                                                                             */
+/*-----------------------------------------------------------------------------------------------------------*/
+int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[])
+{
+  int a=0;
+  FILE *fIn;
+  FILE *fOut;
+  char line[DIM];
+  char pathtmp[DIM];
+  listc categoryN;
+  char * ctemp;
+  
+  sprintf(pathtmp,"%s/pyaccords/pysrc/occibuilder.tmp",PYPATH);
 
-/**************************************************************************************************/
+  resetList(&categoryN);
+
+  if((fIn=fopen(pathf,"r"))==NULL)
+  {
+     printf("Error inserInFile: No such file or directory\n");
+     return 0;
+  }
+
+  if((fOut=fopen(pathtmp,"w"))==NULL)
+  {
+    fclose(fIn);
+    printf("Error inserInFile :No such file or directory\n");
+    return 0;
+  }
+ 
+  while(fgets(line,DIM, fIn) != NULL)
+  {
+     line[strlen(line)]=0;
+     if(searchWord(categoryNames,line)==1)
+     {
+          a=1;
+          fprintf(fOut,"%s",line);
+          if(line[0]=='p') 
+          {
+               addBack(&categoryN,getCategoryName(line,"_",3));
+          } 
+     }
+     else
+     {
+          if(line[0]=='c' && line[1]=='o') break;
+          else
+          { 
+              fprintf(fOut,"%s",line);
+              if(line[0]=='p') 
+              {
+                addBack(&categoryN,getCategoryName(line,"_",3));
+              }
+          }
+      } 
+   } 
+ 
+  if(!a)
+  {
+     fprintf(fOut,"%s\n",categoryName);
+     ctemp = allocate_string(getCategoryName(categoryName,"_",3));
+     if (ctemp)
+      addBack(&categoryN,ctemp);
+  }
+  
+  fprintf(fOut,"const static struct {\n");
+  fprintf(fOut,"\tconst char *name;\n");
+  fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
+  fprintf(fOut,"} occiCategoryBuilder_map2[]={\n");
+  elem *pelem = categoryN.first;
+  while(pelem)
+  {          
+     fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
+     pelem = pelem->next;
+  }
+
+  fprintf(fOut,"};\n\n");
+  fprintf(fOut,"#endif\n");
+  fclose(fIn);
+  fclose(fOut);
+  if( rename(pathtmp,pathf) < 0)
+     return 0;
+  else
+     return 1;
+}
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Function to insert a line in a pystruct file                                                              */
+/* pathf: char *  the path file name                                                                         */
+/* categoryName: char * the name of the category                                                             */
+/* retutn 1 if successfully done                                                                             */
+/*-----------------------------------------------------------------------------------------------------------*/
+int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
+{
+  int a=0;
+  FILE *fIn;
+  FILE *fOut;
+  char line[DIM];
+  char strcats[10];
+  char pathtmp[DIM];
+  listc categoryN;
+  char * ctemp;
+  
+  sprintf(pathtmp,"%s/pyaccords/pysrc/listoccibuilder.tmp",PYPATH);
+
+  resetList(&categoryN);
+
+  if((fIn=fopen(pathf,"r"))==NULL)
+  {
+     printf("Error inserInFile: No such file or directory\n");
+     return 0;
+  }
+
+  if((fOut=fopen(pathtmp,"w"))==NULL)
+  {
+     fclose(fIn);
+     printf("Error inserInFile :No such file or directory\n");
+     return 0;
+  }
+ 
+  while(fgets(line,sizeof(line), fIn) != NULL)
+  {
+     line[strlen(line)]=0;
+     if(searchWord(categoryNames,line)==1)
+     {
+         a=1;
+         fprintf(fOut,"%s",line);
+         if(line[0]=='p') 
+         {
+               addBack(&categoryN,getCategoryName(line,"_",3));
+         }
+     }
+     else
+     {
+         if(line[0]=='c' && line[1]=='o') break;
+         else
+         { 
+            fprintf(fOut,"%s",line);
+            if(line[0]=='p') 
+            {
+               addBack(&categoryN,getCategoryName(line,"_",3));
+            }
+          }
+     } 
+  }
+  
+  if(!a)
+  {
+     fprintf(fOut,"%s\n",categoryName);
+      ctemp = allocate_string(getCategoryName(categoryName,"_",3));
+     if (ctemp)
+      addBack(&categoryN,ctemp);
+  }
+
+  fprintf(fOut,"const static struct {\n");
+  fprintf(fOut,"\tconst char *name;\n");
+  fprintf(fOut,"\tpublic struct occi_category * (*func)(char *a,char * b);\n");
+  fprintf(fOut,"} occiCategoryBuilder_map[]={\n");
+
+  elem *pelem = categoryN.first;
+  while(pelem)
+  {          
+     fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
+     pelem = pelem->next;
+  }
+   
+  fprintf(fOut,"};\n\n");
+  fprintf(fOut,"#endif\n");
+  fclose(fIn);
+  fclose(fOut);
+  if( rename(pathtmp,pathf) < 0)
+     return 0;
+  else
+     return 1;
+}
+
+/*------------------------------------------------------------------------------------------------*/
 /* Function to delete a line in a file                                                            */
 /* pathf: char* file name                                                                         */
 /* categoryName: char * name of the category                                                      */
 /* return 1 if succeeded                                                                          */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int deleteInFile(char pathf[],char categoryName[])
 {
   FILE *fIn;
   FILE *fOut;
-  char line[TAILLE];
-
+  char line[DIM];
+  char pathtmp[DIM];
+  
+  sprintf(pathtmp,"%s/pyaccords/pysrc/delfile.tmp",PYPATH);
   if((fIn=fopen(pathf,"r"))==NULL)
   {
    printf("Error deleteInFile: No such file or directory\n");
    return 0;
   }
-  if((fOut=fopen("text.tmp","w"))==NULL)
+  if((fOut=fopen(pathtmp,"w"))==NULL)
   {
    fclose(fIn);
    printf("Error delteInFile :No such file or directory\n");
@@ -227,7 +370,6 @@ int deleteInFile(char pathf[],char categoryName[])
  
   while(fgets(line,sizeof line, fIn))
   {
-   //line[strlen(line)]=0;
    if(searchWord(categoryName,line)!=1)
    {
     fprintf(fOut,"%s",line);
@@ -235,19 +377,21 @@ int deleteInFile(char pathf[],char categoryName[])
   }
   fclose(fIn);
   fclose(fOut);
-  rename("text.tmp",pathf);
-  return 1;
+  if( rename(pathtmp,pathf) < 0)
+     return 0;
+  else
+     return 1;
 }
 
 
 
-/*****************************************************************************************************************/
-/* Function to parse a string to get the category name                                                           */
-/* strCat: (char*) string to be parsed                                                                           */
-/* tok: (char*) delimeter for parssing                                                                           */
-/* p:(int) position of the name                                                                                  */
-/* return a string the categoryName                                                                              */
-/*****************************************************************************************************************/
+/*--------------------------------------------------------------------------------------------------*/
+/* Function to parse a string to get the category name                                              */
+/* strCat: (char*) string to be parsed                                                              */
+/* tok: (char*) delimeter for parssing                                                              */
+/* p:(int) position of the name                                                                     */
+/* return a string the categoryName                                                                 */
+/*--------------------------------------------------------------------------------------------------*/
 char *getCategoryName(char strCt[],char * tok,int p)
 {
  char *token=NULL;
@@ -265,14 +409,12 @@ char *getCategoryName(char strCt[],char * tok,int p)
 
 }
 
-
-
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 /* Function to search a word in a string                                                          */
 /* mot: char * word name                                                                          */
 /* line: char * the string                                                                        */
 /* return 1 if the word exist otherwise 0                                                         */
-/**************************************************************************************************/
+/*------------------------------------------------------------------------------------------------*/
 int searchWord(char *mot,char *line)
 {
     char car = 0;
@@ -287,7 +429,7 @@ int searchWord(char *mot,char *line)
               i++;
 	      if(mot[i] == 0 || line[j]=='\n') 
 	      {
-		 return 1; // on a trouvé, le mot on retourne 1
+		 return 1; // if found , return 1 
 	      }		
         }
         else
@@ -297,14 +439,14 @@ int searchWord(char *mot,char *line)
       j++;
      }
 
-    return 0;	// si on a rien trouvé, on retourne 0
+    return 0;	// if not found , return 0
 }
 
-/******************************************************************************************************************/
-/* Function to get the number of line in a file                                                                   */
-/* pathf: (char*) path name of the file                                                                           */
-/* return int the nubmer of line                                                                                  */
-/******************************************************************************************************************/
+/*-------------------------------------------------------------------------------------------------------*/
+/* Function to get the number of line in a file                                                          */
+/* pathf: (char*) path name of the file                                                                  */
+/* return int the nubmer of line                                                                         */
+/*-------------------------------------------------------------------------------------------------------*/
 int getLineNumber(char pathf[])  
 { 
    FILE* fp = fopen (pathf, "r" );
@@ -328,13 +470,13 @@ int getLineNumber(char pathf[])
 
 
 
-/******************************************************************************************************************************/
-/* Function to extract a substring from a string                                                                              */
-/* s: (char*) string sourcs                                                                                                   */
-/* start: (int) the extracted string start                                                                                    */
-/* end: (int) the extracted string end                                                                                        */
-/* new_s: (char*) the extracted string                                                                                        */
-/******************************************************************************************************************************/
+/*------------------------------------------------------------------------------------------------------------------*/
+/* Function to extract a substring from a string                                                                    */
+/* s: (char*) string sourcs                                                                                         */
+/* start: (int) the extracted string start                                                                          */
+/* end: (int) the extracted string end                                                                              */
+/* new_s: (char*) the extracted string                                                                              */
+/*------------------------------------------------------------------------------------------------------------------*/
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
 {
  if (s && (start < end))
@@ -350,9 +492,43 @@ void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
  }
  new_s[end-start+1]=0;
 }
-/*******************************************************************************************************************************/
-/* Function to concatenate two string str1, str2 with  a dilimeter d                                                           */
-/*******************************************************************************************************************************/
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+/* Function to extract a substring from a string                                                                     */
+/* s: (char*) string sourcs                                                                                          */
+/* start: (int) the extracted string start                                                                           */
+/* end: (int) the extracted string end                                                                               */
+/*-------------------------------------------------------------------------------------------------------------------*/
+char *sub_str(const char *s, unsigned int start, unsigned int end)
+{
+ char *new_s=NULL;
+ int i;
+ if (s != NULL && (start < end))
+ {
+        /* (1)*/
+    new_s = malloc (sizeof(*new_s) * (end-start + 2));
+    if(new_s != NULL)
+    {
+         /* (2)*/
+       for (i = start; i <= end; i++)
+       {
+         /* (3)*/   new_s[i-start] = s[i];
+       }
+       new_s[i-start] = '\0';
+    }
+    else
+    {
+     printf("Error: memory on");
+     exit(EXIT_FAILURE);
+    }
+   
+ }
+ return new_s;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* Function to concatenate two string str1, str2 with  a dilimeter d                                                  */
+/*--------------------------------------------------------------------------------------------------------------------*/
 void strConcat(char str1[],char str2[], char d)
 {
     int i=0,j=0;

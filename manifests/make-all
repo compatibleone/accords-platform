@@ -1,26 +1,82 @@
+#!/bin/bash
+#----------
+clear
 echo "--------------------------------------------------------------"
 echo "   production of the compatible one demonstrator packages     "
-echo "    this should really only be run on a debian platform       "
+echo "    this should really only be run on a linux  platform       "
 echo "   and must provide the NAME of the provisioning ACCOUNT      "
+echo "   and an eventual security parameter for security mode       "
 echo "--------------------------------------------------------------"
 echo "validate to proceed only if you really know what you are doing"
 read var
+echo "-------------------------------------------------------------------------------"
+echo "please specify the host operating system: (debian, ubuntu, ubuntu64, useit etc)"
+echo "-------------------------------------------------------------------------------"
+read var
+export makesystem=$var
+echo "-----------------------------------------------------------------------------"
+echo "indicate the provisioning platform:(openstack, opennebula, windowsazure  etc)"
+echo "-----------------------------------------------------------------------------"
+read var
+export makeplatform=$var
+export makeuser=$1
+export makesecurity=$2
+echo "--------------------------------------------------------------"
+echo "building accords platform demonstrator for : "
+echo "-------------------------------------------- "
+echo "System Type  : "$makesystem
+echo "Platform Type: "$makeplatform
+echo "Account Name : "$makeuser
+echo "Security Info: "$makesecurity
+echo "-------------------------------------------- "
 echo "cleaning packages"
-bash make-clean 
+echo "-------------------------------------------- "
+bash make-clean
+if [ -z "$makesecurity" ]; then
+	echo "security not required"
+	cp build-config-unsafe build-config
+	cp build-config-cosacs-unsafe build-config-cosacs
+	cp build-config-cool-unsafe build-config-cool
+else
+	bash make-security
+	cp build-config-secure build-config
+	cp build-config-cosacs-secure build-config-cosacs
+	cp build-config-cool-secure build-config-cool
+fi
+echo "-------------------------------------------- "
 echo "building accords platform manifests"
+echo "-------------------------------------------- "
 bash make-manifest
-echo "building accords platform service level agreements"
-bash make-sla $1
+if [ -z "$makeuser" ]; then
+	echo "not building SLA files"
+else
+	echo "building accords platform service level agreements"
+	bash make-sla $1
+fi
+echo "-------------------------------------------- "
 echo "building installation scripts"
+echo "-------------------------------------------- "
 bash make-install 
 echo "building run scripts"
+echo "-------------------------------------------- "
 bash make-run
-echo "building packages"
+echo "building packages" 
+echo "-------------------------------------------- "
 bash make-package 
 echo "building update"
+echo "-------------------------------------------- "
 bash make-update 
-echo "transfering to www.compatibleone.fr"
-scp -P 22100 accords-*.xml accords-*.sh sla*.xml update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform
+if [ -z "$makeuser" ]; then
+	echo "not transfering files"
+else
+	echo "transfering to www.compatibleone.fr"
+	tar -czvf accords-manifests.tgz accords-*.xml accords-*.sh sla-accords-*.xml
+	scp -P 22100 accords-*.xml accords-*.sh sla*.xml accords-manifests.tgz update-*.tgz run-* root@www.compatibleone.fr:/home/accords-platform/$makesystem
+	rm accords-manifests.tgz
+fi
+echo "-------------------------------------------- "
+echo "demonstrator production is ready for "$makesystem
+echo "-------------------------------------------- "
 bash make-clean
-echo "demonstrator production is up to date on www.compatibleone.fr"
+
 

@@ -7,8 +7,6 @@ struct	windowsazure
 	char *	id;
 
 	char *	name;
-	char *	flavor;
-	char *	image;
 	char *	profile;
 
 	char *	number;
@@ -21,6 +19,25 @@ struct	windowsazure
 	char *	firewall;
 	char *	hostname;
 	char *	workload;
+
+	char *	node;
+	char *	architecture;
+	char *	driver;
+	char *	price;
+	char *	original;
+	char *	account;
+
+	char *	location;
+	char *	group;
+	char *	hostedservice;
+	char *	storageaccount;
+
+	char *	image;
+	char *	media;
+	char *	flavor;
+	char *	publicnetwork;
+
+	char *	agent;
 
 	int	when;
 

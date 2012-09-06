@@ -5,4 +5,10 @@
 
 #include "amazonEc2Interface.c"
 #include "ec2configInterface.c"
+#include "gwInterface.c"
+#include "linkgwInterface.c"
+#include "intercloudGWInterface.c"
 #endif
+
+
+

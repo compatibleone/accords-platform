@@ -116,6 +116,20 @@ public	struct	occi_category * occi_add_action(struct occi_category * cptr,char *
 }
 
 /*	---------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ a c t i o n		*/
+/*	---------------------------------------------------	*/
+public	struct	occi_action *	occi_resolve_action( struct occi_category * optr, char * name )
+{
+	struct	occi_action * aptr;
+	for ( aptr=optr->firstact;
+		aptr != (struct occi_action *) 0;
+		aptr = aptr->next )
+		if (!( strcmp( aptr->name, name ) ))
+			break;
+	return( aptr );
+}
+
+/*	---------------------------------------------------	*/
 /*		o c c i _ a d d _ a t t r i b u t e     	*/
 /*	---------------------------------------------------	*/
 public	struct	occi_category * occi_add_attribute(struct occi_category * cptr,char * name,int m,int i )
@@ -127,6 +141,8 @@ public	struct	occi_category * occi_add_attribute(struct occi_category * cptr,cha
 		return( occi_remove_category( cptr ) );
 	else
 	{
+		if ( *(aptr->name+strlen(aptr->name)-1) == '.' )
+			*(aptr->name+strlen(aptr->name)-1) = 0;
 		aptr->mandatory = m;
 		aptr->immutable = i;
 		return( cptr );
@@ -147,17 +163,23 @@ public	struct	occi_category *	occi_parse_attributes( struct occi_category * optr
 	{
 		while (( *sptr == ' ' ) || ( *sptr == '"')) sptr++;
 		nptr = sptr;
-		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '{')) sptr++;
+		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '"' ) && ( *sptr != '{')) sptr++;
 		if ((c = *sptr) != 0) *(sptr++) = 0;
 		if ( c == '{' )
 		{
 			vptr = sptr;
 			while (( *sptr ) && ( *sptr != '}')) sptr++;
 			if ( *sptr ) *(sptr++) = 0;
-			if (!( strncmp(vptr,"mandatory",strlen("mandatory")) ))
+			if (!( strncmp(vptr,"required",strlen("required")) ))
 				m = 1;
+			else if (!( strncmp(vptr,"mandatory",strlen("mandatory")) ))
+				m = 1;
+			else if (!( strncmp(vptr,"optional",strlen("optional")) ))
+				m = 0;
 			else if (!( strncmp(vptr,"immutable",strlen("immutable")) ))
 				i = 1;
+			else if (!( strncmp(vptr,"mutable",strlen("mutable")) ))
+				i = 0;
 		}
 		else	m=i=0;
 		if (!( optr = occi_add_attribute( optr, nptr, m, i ) ))
@@ -171,6 +193,27 @@ public	struct	occi_category *	occi_parse_attributes( struct occi_category * optr
 /*	---------------------------------------------------	*/
 public	struct	occi_category *	occi_parse_actions( struct occi_category * optr, char * sptr )
 {
+	char *	vptr;
+	char *	nptr;
+	int	c;
+	while ( *sptr )
+	{
+		while (( *sptr == ' ' ) || ( *sptr == '"')) sptr++;
+		nptr = sptr;
+		while (( *sptr ) && ( *sptr != ' ') && ( *sptr != ',' ) && ( *sptr != '"' ) && ( *sptr != '{')) sptr++;
+		if ((c = *sptr) != 0) *(sptr++) = 0;
+		for ( 	vptr=nptr;
+			*vptr != 0;
+			vptr++ )
+		{
+			if ( *vptr == '#' )
+				break;
+		}
+		if ( *vptr == '#' )
+			nptr = (vptr+1);
+		if (!( optr = occi_add_action( optr, nptr, (char *) 0, (void *) 0 ) ))
+			break;
+	}
 	return( optr );
 }
 

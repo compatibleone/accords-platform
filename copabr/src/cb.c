@@ -85,6 +85,59 @@ public	int	get_provisioning_status()
 	return( provisioning_status );
 }
 
+/*	--------------------------------------------------------	*/
+/*	l i b e r a t e _ p l a c e m e n t _ c o n d i t i o n		*/
+/*	--------------------------------------------------------	*/
+private	void	liberate_placement_conditions(
+		struct cords_placement_criteria * placement )
+{
+	if ( placement )
+	{
+		if ( placement->algorithm )
+			placement->algorithm = liberate( placement->algorithm );
+		if ( placement->operator )
+			placement->operator = liberate( placement->operator );
+		if ( placement->zone )
+			placement->zone = liberate( placement->zone );
+		if ( placement->opinion )
+			placement->opinion = liberate( placement->opinion );
+		if ( placement->energy )
+			placement->energy = liberate( placement->energy );
+		if ( placement->security )
+			placement->security = liberate( placement->security );
+		if ( placement->price )
+			placement->price = liberate( placement->price );
+	}
+	return;
+}
+
+/*	----------------------------------------------------------	*/
+/*	   l i b e r t e _ g u a r a n t e e _ e l e m e n t 		*/
+/*	----------------------------------------------------------	*/
+private	struct cords_guarantee_element * liberate_guarantee_element( struct cords_guarantee_element * eptr )
+{
+	if ( eptr )
+	{
+		if ( eptr->reference )
+			eptr->reference = liberate( eptr->reference );
+		if ( eptr->obligated )
+			eptr->obligated = liberate( eptr->obligated );
+		if ( eptr->condition )
+			eptr->condition = liberate( eptr->condition );
+		if ( eptr->property )
+			eptr->property = liberate( eptr->property );
+		if ( eptr->objective )
+			eptr->objective = liberate( eptr->objective );
+		if ( eptr->scope )
+			eptr->scope = liberate( eptr->scope );
+		if ( eptr->importance )
+			eptr->importance = liberate( eptr->importance );
+		eptr = liberate( eptr );
+	}
+	return((struct cords_guarantee_element *) 0);
+}
+
+
 /*	-------------------------------------------------------		*/
 /*	t e r m i n a t e _ c o r d s _ p r o v i s i o n i n g		*/
 /*	-------------------------------------------------------		*/
@@ -95,6 +148,7 @@ private	char * 	cords_terminate_provisioning(
 		struct cords_provisioning * pptr )
 {
 	char * service=(char *) 0;
+	struct cords_guarantee_element * gptr;
 
 	if ( pptr->confID )
 		pptr->confID = liberate( pptr->confID );
@@ -104,6 +158,10 @@ private	char * 	cords_terminate_provisioning(
 		pptr->interID = liberate( pptr->interID );
 	if ( pptr->interface )
 		pptr->interface = occi_remove_response( pptr->interface );
+	if ( pptr->releaseID )
+		pptr->releaseID = liberate( pptr->releaseID );
+	if ( pptr->release )
+		pptr->release = occi_remove_response( pptr->release );
 	if ( pptr->secID )
 		pptr->secID = liberate( pptr->secID );
 	if ( pptr->security )
@@ -138,6 +196,19 @@ private	char * 	cords_terminate_provisioning(
 	else if ( pptr->instID )
 		pptr->instID = liberate( pptr->instID );
 	
+	if ( pptr->placement )
+		liberate_placement_conditions( pptr->placement );
+
+	if ( pptr->warranty )
+	{
+		while ((gptr = pptr->warranty->first) != (struct cords_guarantee_element *) 0)
+		{
+			pptr->warranty->first = gptr->next;
+			liberate_guarantee_element( gptr );
+		}
+		pptr->warranty->last = pptr->warranty->first;
+	}
+
 	return( service );
 }
 
@@ -305,6 +376,12 @@ private	char * cords_resolve_contract_id( struct xml_element * document, char * 
 	struct	xml_atribut * bptr;
 	int	l;
 
+	/* -------------------------- */
+	/* ensure valid core app name */
+	/* -------------------------- */
+	if (!( coreappname ))
+		return( coreappname );
+
 	/* --------------------------------------------------- */ 
 	/* resolve the contract id of the target of the action */
 	/* --------------------------------------------------- */ 
@@ -460,7 +537,7 @@ private	int	cords_affectation_instruction(
 			liberate_cordscript_action( action );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -590,7 +667,7 @@ private	int	cords_invocation_instruction(
 			liberate_cordscript_action( action );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			qptr = occi_remove_request( qptr );
@@ -714,7 +791,7 @@ private	int	cords_interface_instruction(
 		liberate_cordscript_action( action );
 		return(53);
 	}
-	else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+	else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 	{
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -762,6 +839,27 @@ private	char *	cords_contract_property_value( char * contract, char * propname, 
 }
 
 /*	-------------------------------------------------------		*/
+/*		c o r d s _ a c t i o n _ t e r m			*/
+/*	-------------------------------------------------------		*/
+private	char *	cords_action_term( struct cordscript_element * term )
+{
+	char	*	result;
+	switch ( term->type )
+	{
+	case	0 :
+		if (!( term->value ))
+			return( allocate_string("") );
+		else if (!( result = allocate_string( term->value ) ))
+			return( allocate_string("") );
+		else if (!( result = occi_unquoted_value( result ) ))
+			return( allocate_string("") );
+		else	return( result );
+	default	:
+		return( allocate_string("") );
+	}
+}
+
+/*	-------------------------------------------------------		*/
 /*	  c o r d s _ a c t i o n _ i n s t r u c t i o n		*/
 /*	-------------------------------------------------------		*/
 /*	here postscript configuration actions are transformed		*/
@@ -795,6 +893,7 @@ private	int	cords_action_instruction(
 	char *	mname;
 	char *	ivalue="";
 	char *	pvalue;
+	char *	property="";
 	char	buffer[2048];
 
 	if (!( lptr = action->lvalue ))
@@ -808,6 +907,7 @@ private	int	cords_action_instruction(
 
 	else if (!( strcasecmp( mname, "none" ) ))
 		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
+
 	else if (!( strcasecmp( mname, "set" ) ))
 		return( cords_affectation_instruction( host, document, action, nature,agent, tls ) );
 
@@ -815,6 +915,9 @@ private	int	cords_action_instruction(
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( strcasecmp( mname, "fork" ) ))
+		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
+
+	else if (!( strcasecmp( mname, "kill" ) ))
 		return( cords_invocation_instruction( host, document, action, mname,nature, agent, tls ) );
 
 	else if (!( strcasecmp( mname, "invoke" ) ))
@@ -837,6 +940,8 @@ private	int	cords_action_instruction(
 		rvalue != (struct cordscript_element *) 0;
 		rvalue = rvalue->next )
 	{
+		property = rvalue->value;
+
 		if (!( strcasecmp( mname, "monitor" ) ))
 		{
 			if (!( target = aptr ))
@@ -845,7 +950,13 @@ private	int	cords_action_instruction(
 				continue;
 			else if (!(symbol = cords_resolve_consumer_id( rvalue->prefix, agent, tls ) ))
 				continue;
-			else	ivalue = allocate_string("");
+			else if (!( rvalue->next ))
+				ivalue = allocate_string("");
+			else
+			{
+				rvalue  = rvalue->next;
+				ivalue = cords_action_term( rvalue );
+			}
 		}
 		else
 		{
@@ -858,7 +969,13 @@ private	int	cords_action_instruction(
 			else if (!( symbol = allocate_string( rvalue->prefix ) ))
 				continue;
 			else if (!( pvalue = cords_contract_property_value( source, rvalue->value, agent, tls ) ))
-				ivalue = allocate_string("");
+			{
+				if (!( property ))
+					ivalue = allocate_string("");
+				else if (!( strcmp( property, "contract" ) ))
+					ivalue = allocate_string( bptr ) ;
+				else	ivalue = allocate_string("");
+			}
 			else	ivalue = pvalue;
 		}
 
@@ -883,7 +1000,7 @@ private	int	cords_action_instruction(
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.value"  	, ivalue	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.symbol" 	, symbol 	) ))
 		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.source" 	, source 	) ))
-		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, rvalue->value	) )))
+		     ||  (!(dptr=occi_request_element(qptr,"occi.instruction.property"	, property	) )))
 		{
 			liberate( ivalue );
 			qptr = occi_remove_request( qptr );
@@ -911,7 +1028,7 @@ private	int	cords_action_instruction(
 			symbol = liberate( symbol );
 			return(53);
 		}
-		else if (!( zptr =  cords_create_link( aptr,  ihost, agent, tls ) ))
+		else if (!( zptr =  occi_create_link( aptr,  ihost, agent, tls ) ))
 		{
 			liberate( ivalue );
 			yptr = occi_remove_response( yptr );
@@ -964,7 +1081,7 @@ private	int	cords_configuration_action(
 	{
 		if (!( strcmp( type, "cordscript" )))
 			if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
-				cords_action_instruction( host, document, aptr,"configuration", agent, tls );
+				cords_action_instruction( host, document, aptr,_CORDS_CONFIGURATION, agent, tls );
 
 		type = liberate( type );
 	}
@@ -993,12 +1110,45 @@ private	int	cords_interface_action(
 		return( 78 );
 	if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
+
 	if (!( name = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_NAME ) ))
 		name = allocate_string("method");
 
 	if (!( strcmp( type, "cordscript" )))
 		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
 			cords_action_instruction( host, document, aptr,name, agent, tls );
+
+	type = liberate( type );
+	name = liberate( name );
+	statement = liberate( statement );	 
+
+	return(0);
+}
+
+/*	-------------------------------------------------------		*/
+/*	  	c o r d s _ r e l e a s _ a c t i o n			*/
+/*	-------------------------------------------------------		*/
+private	int	cords_release_action( 
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent,
+		char * tls )
+{
+	char *	type=(char *) 0;
+	char *	name=(char *) 0;
+	char *	statement=(char *) 0;
+	struct	cordscript_action * aptr=(struct cordscript_action*) 0;
+
+	if (!( statement = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_EXPRESSION ) ))
+		return( 78 );
+
+	if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
+		type = allocate_string("cordscript");
+
+	if (!( strcmp( type, "cordscript" )))
+		if ((aptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+			cords_action_instruction( host, document, aptr,_CORDS_RELEASE, agent, tls );
 
 	type = liberate( type );
 	name = liberate( name );
@@ -1088,6 +1238,61 @@ private	int	cords_broker_configuration(
 		struct occi_response * zptr,
 		char * agent, char * tls )
 {
+	struct	xml_atribut * xptr;
+	struct	occi_element *	eptr;
+	struct	occi_response * aptr;
+	char	*	id;
+	int		status;
+	int		instructions=0;
+	char		buffer[64];
+	if (!( zptr )) return(0);
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+		{
+			return( 908 );
+		}
+		else
+		{
+			cords_configuration_action( host, document, aptr, agent, tls );
+			aptr = occi_remove_response( aptr );
+			instructions++;
+			id = liberate( id );
+			continue;
+		}
+	}
+	sprintf(buffer,"%u",instructions);
+	if (( xptr = document_atribut( document, "instructions" ) ) != (struct xml_atribut *) 0)
+	{
+		if ( xptr->value ) xptr->value = liberate( xptr->value );
+		if (!( xptr->value = allocate_string( buffer ) ))
+			return( 927 );
+		else	return( 0 );
+	}
+	else if (!( xptr = document_add_atribut( document, "instructions", buffer ) ))
+		return( 927 );
+	else	return( 0 );
+}
+
+/*	-------------------------------------------------------		*/
+/*		c o r d s _ b r o k e r _ r e l e a s e 		*/
+/*	-------------------------------------------------------		*/
+/*	the counterpart to configuration is release and will be		*/
+/*	invoked through the COSACS interface just prior to the		*/
+/*	release of provisioning.					*/
+/*	-------------------------------------------------------		*/
+private	int	cords_broker_release(
+		char * host,
+		struct xml_element * document,
+		struct occi_response * zptr,
+		char * agent, char * tls )
+{
 	struct	occi_element *	eptr;
 	struct	occi_response * aptr;
 	char	*	id;
@@ -1107,7 +1312,7 @@ private	int	cords_broker_configuration(
 		}
 		else
 		{
-			cords_configuration_action( host, document, aptr, agent, tls );
+			cords_release_action( host, document, aptr, agent, tls );
 			aptr = occi_remove_response( aptr );
 			id = liberate( id );
 			continue;
@@ -1312,7 +1517,6 @@ private	struct	occi_request  * cords_add_provider_attribute(
 	else	return( qptr );		
 }
 
-
 /*	---------------------------------------------------------	*/
 /*		c o r d s _ c o e s _ o p e r a t i o n			*/
 /*	---------------------------------------------------------	*/
@@ -1321,8 +1525,9 @@ private	struct	occi_request  * cords_add_provider_attribute(
 /*	---------------------------------------------------------	*/
 private	char *	cords_coes_operation( 
 	struct cords_placement_criteria * selector, 
-	/* char * provider ,  char * node, */ char * agent, char * tls )
+	char * agent, char * tls )
 {
+	struct	occi_action	* aptr;
 	struct	occi_client 	* kptr;
 	struct	occi_request	* qptr;
 	struct	occi_response 	* zptr;
@@ -1350,6 +1555,7 @@ private	char *	cords_coes_operation(
 			else if (!( eptr->value ))
 				continue;
 			else	sprintf(buffer,"%s/%s/",eptr->value,_CORDS_PLACEMENT);
+
 			if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 				continue;
 			else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
@@ -1358,6 +1564,8 @@ private	char *	cords_coes_operation(
 				continue;
 			}
 			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , selector->provider ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.name"     , "" 		  ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.solution" , "" 		  ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , selector->node     ) )))
 			{
 				qptr = occi_remove_request( qptr );
@@ -1372,6 +1580,13 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", "default" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (( selector->zone )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.zone", selector->zone ) )))
 			{
@@ -1379,6 +1594,13 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.zone", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (( selector->energy )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.energy", selector->energy ) )))
 			{
@@ -1386,6 +1608,14 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.energy", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
+
 			if (( selector->opinion )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.opinion", selector->opinion ) )))
 			{
@@ -1393,6 +1623,13 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.opinion", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (( selector->security )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.security", selector->security ) )))
 			{
@@ -1400,6 +1637,13 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.security", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (( selector->operator )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.operator", selector->operator ) )))
 			{
@@ -1407,6 +1651,14 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.operator", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (( selector->price )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.price", selector->price ) )))
 			{
@@ -1414,13 +1666,28 @@ private	char *	cords_coes_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+			else if (!(dptr=occi_request_element(qptr,"occi.placement.price", "" ) ))
+			{
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+
 			if (!( yptr = occi_client_post( kptr, qptr ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
+
 			else if (!( id = occi_extract_location( yptr ) ))
+			{
+				yptr = occi_remove_response( yptr );
+				qptr = occi_remove_request( qptr );
+				kptr = occi_remove_client( kptr );
+				continue;
+			}
+			else if (!( selector->solution = allocate_string( id )))
 			{
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
@@ -1429,23 +1696,37 @@ private	char *	cords_coes_operation(
 			}
 			else
 			{
+
 				/* ------------------------------ */
 				/* build the placement identifier */
 				/* ------------------------------ */
 				rest_add_http_prefix( buffer, 1024, id );
 				yptr = occi_remove_response( yptr );
 				qptr = occi_remove_request( qptr );
+
+				/* ------------------------------------ */
+				/* check for existance of choose method */
+				/* ------------------------------------ */
+				if ( cords_validate_action( 
+					kptr, _CORDS_PLACEMENT, 
+					_CORDS_CHOOSE, buffer ) )
+				{
+					/* --------------------------- */
+					/* invoke the placement choice */
+					/* --------------------------- */
+					if (!( yptr = cords_invoke_action( 
+							buffer, 
+							_CORDS_CHOOSE, agent, tls ) ))
+						continue;
+					else	yptr = occi_remove_response( yptr );
+				}
+
 				kptr = occi_remove_client( kptr );
 
-				/* --------------------------- */
-				/* invoke the placement choice */
-				/* --------------------------- */
-				if (!( yptr = cords_invoke_action( buffer, _CORDS_CHOOSE, agent, tls ) ))
-					continue;
 				/* --------------------- */
 				/* retrieve the solution */
 				/* --------------------- */
-				else if (!( yptr = occi_simple_get( buffer, agent, tls ) ))
+				if (!( yptr = occi_simple_get( buffer, agent, tls ) ))
 					continue;
 				/* ------------------------- */
 				/* detect solution available */
@@ -1519,6 +1800,7 @@ private	void	reset_placement_criteria( struct cords_placement_criteria * selecto
 	selector->operator	=
 	selector->zone		=
 	selector->security	=
+	selector->solution	= 
 	selector->algorithm	= (char *) 0;	
 	return;
 }
@@ -1620,6 +1902,16 @@ private	char * 	cords_contract_provider(
 		return( host );
 	else
 	{
+		/* ---------------------------------------------------- */
+		/* store the placement attribute in the parent contract */
+		/* ---------------------------------------------------- */
+		if (( App->selector.solution  )
+		&&  ( dptr->parent )
+		&&  ( dptr->parent->name )
+		&&  (!( strcmp( dptr->parent->name, _CORDS_CONTRACT) )))
+		{
+			(void) document_add_atribut( dptr->parent, _CORDS_PLACEMENT, App->selector.solution );
+		}
 		sprintf(buffer,"%s/%s/%s",zptr,cptr->value,host);
 		return(allocate_string(buffer) );
 	}
@@ -1701,7 +1993,9 @@ private	char * cords_accept_provider( char * category, struct occi_response * zp
 /*	The resolver will be used to localise agencys which 		*/
 /*	will be tried in turn to localise provider descriptions		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_research_provider( char * defaut, char * agent, char * tls )
+private	char *	cords_research_provider( 
+			char * defaut,
+			char * agent, char * tls )
 {
 	struct	occi_response * zptr;
 	struct	occi_response * yptr;
@@ -1799,7 +2093,11 @@ private	char *	cords_research_provider( char * defaut, char * agent, char * tls 
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ r e s o l v e _ p r o v i d e r		*/
 /*	-------------------------------------------------------		*/
-private	char *	cords_resolve_provider( struct occi_response * node, char * defaut, char * agent,char * tls )
+private	char *	cords_resolve_provider( 
+			struct occi_response * node, 
+			char * defaut,
+			struct cords_placement_criteria * selector,
+			char * agent,char * tls )
 {
 	char	*	value;
 	/* ----------------------------------------- */
@@ -1809,8 +2107,12 @@ private	char *	cords_resolve_provider( struct occi_response * node, char * defau
 		return( cords_research_provider(defaut,agent, tls) );
 	else if (!( strcmp(value,_CORDS_NULL) ))
 		return( cords_research_provider(defaut,agent, tls) );
-	else if (!( strcmp(value,_CORDS_ANY) ))
-		return( cords_research_provider(defaut,agent, tls) );
+	else if (!( strcasecmp(value,_CORDS_ANY) ))
+	{
+		if ( selector->provider )
+			return( selector->provider );
+		else	return( cords_research_provider(defaut,agent, tls) );
+	}
 	else
 	{
 		if ( check_verbose() )
@@ -1843,12 +2145,17 @@ private	char *	cords_resolve_profile( struct occi_response * node, char * defaut
 /*	cords request/plan.						*/
 /*	-------------------------------------------------------		*/
 public	struct	xml_element * 	cords_build_contract( 
-		char * node, 	char * name, 
-		char * provider )
+		char * node, 	
+		char * name, 
+		char * agreement,
+		char * parentservice,
+		char * provider,
+		int	flags )
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
-
+	char	fbuffer[356];
+	sprintf(fbuffer,"%u",flags);
 	if (!( eptr = allocate_element()))
 		return((struct xml_element *) 0);
 	else if (!( eptr->name = allocate_string( _CORDS_CONTRACT ) ))
@@ -1856,6 +2163,10 @@ public	struct	xml_element * 	cords_build_contract(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NAME, name ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NODE, node ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_AGREEMENT, ( agreement ? agreement : "") ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_PARENTSERVICE, (parentservice ? parentservice : "") ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_SERVICE, "" ) ))
 		return(document_drop( eptr ));
@@ -1866,6 +2177,8 @@ public	struct	xml_element * 	cords_build_contract(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_ROOTPASS, "" ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_PROFILE, provider ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_FLAGS, fbuffer ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_TARIFICATION, "" ) ))
 		return(document_drop( eptr ));
@@ -1946,7 +2259,7 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	else if (!( document = cords_build_contract( id, App->nameApp, _CORDS_ANY ) ))
+	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->flags) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2006,7 +2319,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2125,13 +2438,14 @@ private	struct	xml_element * cords_terminate_private_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	char * common )
 {
 	struct	occi_response * yptr;
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2263,6 +2577,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	char *	id,
 	char *	agent,
 	char *	tls,
+	char *	sla,
 	int	location,
 	char *	common )
 {
@@ -2270,7 +2585,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, App->provider )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
 	{
 		liberate( common );
 		cords_terminate_instance_node( App );
@@ -2373,7 +2688,7 @@ private	struct	xml_element * 	cords_simple_private_common_contract(
 		if (!( common = cords_build_simple_common( App, host, id, agent, tls, sla, namePlan ) ))
 			return( (struct xml_element *) 0 );
 
-	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
+	return( cords_terminate_private_common_contract( App, id, agent, tls, sla, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2457,7 +2772,7 @@ private	struct	xml_element * 	cords_complex_private_common_contract(
 	if ( document )
 		document = document_drop( document );
 
-	return( cords_terminate_private_common_contract( App, id, agent, tls, common ) );
+	return( cords_terminate_private_common_contract( App, id, agent, tls,sla, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2486,7 +2801,7 @@ private	struct	xml_element * 	cords_complex_public_common_contract(
 	if ( document )
 		document = document_drop( document );
 
-	return( cords_terminate_public_common_contract( App, id, agent, tls, location, common ) );
+	return( cords_terminate_public_common_contract( App, id, agent, tls, sla, location, common ) );
 }
 
 /*	----------------------------------------------------------------------------	*/
@@ -2510,7 +2825,7 @@ private	struct	xml_element * 	cords_simple_public_common_contract(
 		else if (!( common = allocate_string( common ) ))
 			return( (struct xml_element *) 0 );
 	}
-	return( cords_terminate_public_common_contract( App, id, agent, tls, location, common ) );
+	return( cords_terminate_public_common_contract( App, id, agent, tls, sla, location, common ) );
 }
 
 /*	------------------------------------------------------------	*/
@@ -2610,6 +2925,7 @@ private	struct	xml_element * 	cords_instance_contract(
 /*	-------------------------------------------------------		*/
 public	struct	xml_element * cords_instance_node( 
 		struct cords_placement_criteria * selector,
+		struct cords_guarantee_criteria * warranty,
 		char * host,
 		char * id,
 		char * agent,
@@ -2629,7 +2945,12 @@ public	struct	xml_element * cords_instance_node(
 
 	memset( &App, 0, sizeof( struct cords_node_descriptor ));
 	memcpy( &App.selector, selector, sizeof( struct cords_placement_criteria ) );
+	memcpy( &App.warranty, warranty, sizeof( struct cords_guarantee_criteria ) );
 	App.scope = _SCOPE_NORMAL | _ACCESS_PRIVATE;
+	App.flags = selector->flags;
+
+	if ( warranty )
+		App.service = warranty->service;
 
 	if ( check_verbose() )	printf("   CORDS Node \n");
 
@@ -2679,7 +3000,7 @@ public	struct	xml_element * cords_instance_node(
 	/* -------------------------------- */
 	/* recover provider information now */
 	/* -------------------------------- */
-	if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, agent, tls )))
+	if (!( App.provider = cords_resolve_provider( App.node, Operator.provider, &App.selector, agent, tls )))
 	{
 		cords_terminate_instance_node( &App );
 		return((struct xml_element *) 0);
@@ -2774,11 +3095,16 @@ private	int	cords_instance_plan(
 {
 	struct	xml_atribut *	aptr;
 	struct	occi_response * zptr;
-	if (!( zptr =  cords_create_link( plan, instance, agent, tls ) ))
+
+	if (!( zptr =  occi_create_link( plan, instance, agent, tls ) ))
 		return(914);
-	else if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent, tls ) ))
+	else	zptr = occi_remove_response( zptr );
+
+	if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent, tls ) ))
 		return(915);
-	else if (!( aptr = document_add_atribut( document, "instance", instance )))
+	else	zptr = occi_remove_response( zptr );
+
+	if (!( aptr = document_add_atribut( document, "instance", instance )))
 		return(916);
 	else	return(0);
 }
@@ -2842,6 +3168,27 @@ private	int	cords_recover_results(struct xml_element * document, char * agent, c
 	return( 0 );
 }
 
+/*	----------------------------------------------------------	*/
+/*	   a l l o c a t e _ g u a r a n t e e _ e l e m e n t 		*/
+/*	----------------------------------------------------------	*/
+private	struct cords_guarantee_element * allocate_guarantee_element( struct cords_guarantee_criteria * gptr )
+{
+	struct	cords_guarantee_element * eptr;
+	if (!( eptr = allocate( sizeof( struct cords_guarantee_element ) ) ))
+		return( eptr );
+	else
+	{
+		memset( eptr, 0, sizeof( struct cords_guarantee_element ) );
+		if (!( eptr->parent = gptr ))
+			return( eptr );
+		else if (!( eptr->previous = gptr->last ))
+			gptr->first = eptr;
+		else	gptr->last->next = eptr;
+		gptr->last = eptr;
+		return( eptr );
+	}
+}
+
 /*	-------------------------------------------------	*/
 /*	c o r d s _ p l a c e m e n t _ c o n d i t i o n	*/
 /*	-------------------------------------------------	*/
@@ -2851,6 +3198,8 @@ private	int	cords_placement_condition(
 {
 	if (!( strcmp( nptr, "occi.placement.algorithm" ) ))
 		placement->algorithm = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.provider" ) ))
+		placement->provider = allocate_string( vptr );
 	else if (!( strcmp( nptr, "occi.placement.operator" ) ))
 		placement->operator = allocate_string( vptr );
 	else if (!( strcmp( nptr, "occi.placement.zone" ) ))
@@ -2863,6 +3212,152 @@ private	int	cords_placement_condition(
 		placement->security = allocate_string( vptr );
 	else if (!( strcmp( nptr, "occi.placement.price" ) ))
 		placement->price = allocate_string( vptr );
+	return( 0 );
+}
+
+/*	-------------------------------------------------	*/
+/*	 c o r d s _ w a r r a n t y _ c o n d i t i o n	*/
+/*	-------------------------------------------------	*/
+private	int	cords_warranty_condition(
+		struct cords_guarantee_element * gptr,
+		char * nptr, char * eptr, char * vptr )
+{
+	if (!( gptr ))
+		return( 0 );
+	/* --------------------------- */
+	/* this is a metric identifier */
+	/* --------------------------- */
+	else if (!( gptr->property = allocate_string( nptr ) ))
+		return( 27 );
+	else if (!( gptr->objective = allocate_string( vptr ) ))
+		return( 27 );
+	else if (!( gptr->condition = allocate_string( eptr ) ))
+		return( 27 );
+	else	return( 0 );
+}
+
+/*	-------------------------------------------------	*/
+/*	 c o r d s _ a n a l y s e _ c o n d i t i o n s	*/
+/*	-------------------------------------------------	*/
+/* 	this function retrieves placement conditions from	*/
+/*	the sla terms defined conditions block.			*/
+/*	-------------------------------------------------	*/
+private	int	cords_analyse_warranty( 
+		char * host,
+		char * termsid,
+		struct occi_response * zptr,
+		struct cords_guarantee_criteria * warranty,
+		char * agent, char * tls )
+{
+	struct	occi_element * eptr;
+	struct	occi_element * fptr;
+	char *	id;
+	char *	vid;
+	char *	vptr;
+	char *	nptr;
+	char *	cptr;
+	struct	occi_response * aptr;
+	struct	occi_response * bptr;
+	struct	occi_response * xptr;
+	int	status=0;
+	struct	cords_guarantee_element * wptr;
+
+	if (!( zptr )) 	
+		return(0);
+
+	/* ------------------------------------------------------- */
+	/* for all "term" elements attached to the "terms" section */
+	/* ------------------------------------------------------- */
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
+			return( 908 );
+		else
+		{
+			/* ----------------------------------------------------------- */
+			/* for all "guarantee" elements attached to the "term" section */
+			/* ----------------------------------------------------------- */
+			for (	fptr=cords_first_link( aptr );
+				fptr != (struct occi_element *) 0;
+				fptr = fptr->next )
+			{
+				if (!( fptr->value ))
+					continue;
+				else if (!( vid =  occi_unquoted_link( fptr->value ) ))
+					continue;
+				else if (!( bptr = cords_retrieve_instance( host, vid, agent, tls ) ))
+					return( 908 );
+				/* -------------------------------------------------- */
+				/* allocate a warranty element and append to criteria */
+				/* -------------------------------------------------- */
+				else if (!( wptr = allocate_guarantee_element( warranty ) ))
+					return( 927 );
+				else if (!( wptr->reference = allocate_string( vid ) ))
+					return( 927 );
+				else
+				{
+					/* ------------------------------ */
+					/* retrieve the scope  identifier */
+					/* ------------------------------ */
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_SCOPE )) != (char *) 0)
+						if (!( wptr->scope = allocate_string( nptr ) ))
+							return( 927 );
+
+					/* ------------------------------ */
+					/* retrieve the obligated value   */
+					/* ------------------------------ */
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_OBLIGATED )) != (char *) 0)
+						if (!( wptr->obligated = allocate_string( nptr ) ))
+							return( 927 );
+
+					/* ------------------------------- */
+					/* retrieve the importance value   */
+					/* ------------------------------- */
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_IMPORTANCE )) != (char *) 0)
+						if (!( wptr->importance = allocate_string( nptr ) ))
+							return( 927 );
+
+					/* ---------------------------------------------------- */
+					/* retrieve the condition identifier and resolve fields */
+					/* ---------------------------------------------------- */
+					if (( nptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_GUARANTEE, _CORDS_VARIABLE )) != (char *) 0)
+					{
+						if (!( xptr = occi_simple_get( nptr, agent, tls ) ))
+							return( 908 );
+						else
+						{
+							/* --------------------------------------------------- */
+							/* extract name and values and set the criteria fields */
+							/* --------------------------------------------------- */
+							if (( nptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_PROPERTY )) != (char *) 0)
+							{
+								if (( vptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
+								{
+									if (( cptr = occi_extract_atribut( xptr, Operator.domain, _CORDS_VARIABLE, _CORDS_CONDITION )) != (char *) 0)
+									{
+										cords_warranty_condition(wptr, nptr, cptr, vptr );
+									}
+								}
+							}
+							xptr = occi_remove_response( xptr );
+						}
+					}
+
+					bptr = occi_remove_response( bptr );
+					vid = liberate( vid );
+					continue;
+				}
+			}
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+		}
+	}
 	return( 0 );
 }
 
@@ -2954,6 +3449,7 @@ private	int	cords_retrieve_conditions(
 		char * slaid, 
 		struct occi_response * zptr,
 		struct cords_placement_criteria * placement,
+		struct cords_guarantee_criteria * warranty,
 		char * agent, char * tls )
 {
 	struct	occi_element * eptr;
@@ -2981,16 +3477,16 @@ private	int	cords_retrieve_conditions(
 		/* ------------------------- */
 		else if (!( aptr = cords_retrieve_instance( host, id, agent, tls ) ))
 			return( 908 );
-		else if (!( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )))
-			continue;
-		else if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
+		else if (( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )) != (char *) 0)
 		{
-			status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
+			if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
+				status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
+			else if (!( strcmp( vptr, _CORDS_GUARANTEES ) ))
+				status = cords_analyse_warranty( host, id, aptr, warranty, agent, tls );
 			aptr = occi_remove_response( aptr );
 			id = liberate( id );
-			return( status );
+			continue;
 		}
-		else	continue;
 	}
 	return( 0 );
 }
@@ -3001,6 +3497,7 @@ private	int	cords_retrieve_conditions(
 private	char *	cords_brokering_account(
 	struct  cords_provisioning * CbC,
 	struct	cords_placement_criteria * CpC,
+	struct	cords_guarantee_criteria * CgC,
 	char *	host, 
 	char * 	sla, 
 	char * 	agent, 
@@ -3031,7 +3528,7 @@ private	char *	cords_brokering_account(
 			return( cords_terminate_provisioning( 920, CbC ) );
 		else if (!( CbC->sla = cords_retrieve_instance( host, CbC->slaID, agent, tls )))
 			return( cords_terminate_provisioning( 930, CbC ) );
-		else if ((status = cords_retrieve_conditions( host, CbC->slaID, CbC->sla, CpC, agent, tls )) != 0)
+		else if ((status = cords_retrieve_conditions( host, CbC->slaID, CbC->sla, CpC, CgC, agent, tls )) != 0)
 			return( cords_terminate_provisioning( 907, CbC ) );
 	
 		/* -------------------------------------------------- */
@@ -3061,6 +3558,254 @@ private	char *	cords_valid_identifier( char * id )
 	else 	return( id );
 }
 
+/*	---------------------------------------------------	*/
+/*		c o r d s _ b u i l d _ c o n t r o l		*/
+/*	---------------------------------------------------	*/
+/*	builds a control element for sla guarantee monitors	*/
+/*	that will perform probe data surveillance and issue	*/
+/*	penalty or reward business values.			*/
+/*	---------------------------------------------------	*/ 
+private	char *	cords_build_control( char * contract, char * sla, struct cords_guarantee_element * gptr, char * agent, char * tls )
+{
+	struct	occi_client 	* kptr;
+	struct	occi_request	* qptr;
+	struct	occi_response 	* yptr;
+	struct	occi_element 	* dptr;
+	char	buffer[2048];
+	char *	ihost;
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_CONTROL, agent, tls ) ))
+		return((char *) 0);
+	else	
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_CONTROL);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.control.contract"  , contract 	 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.name" 	    , contract	 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.agreement" , sla	 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.property"  , gptr->property 	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.condition" , gptr->condition	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.objective" , gptr->objective	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.reference" , gptr->reference	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.importance", gptr->importance	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.obligated" , gptr->obligated	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.scope"	    , gptr->scope	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.monitor"   , ""	       	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.connection", ""	       	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.metric"    , ""	       	) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.control.probe"     , ""	       	) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = allocate_string( ihost ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( ihost );
+	}
+}
+
+/*	-------------------------------------------------------		*/
+/*		c o r d s _ c h e c k _ s c o p e			*/
+/*	-------------------------------------------------------		*/
+private	int	cords_check_scope( char * test, char * scope )
+{
+	if (!( strcasecmp( scope, "default") ))
+		return(1);
+	else if (!( strcasecmp( scope, "any") ))
+		return(1);
+	else if (!( strcasecmp( scope, "all") ))
+		return(1);
+	else if (!( strcmp( test, scope ) ))
+		return(1);
+	else	return(0);
+}
+
+/*	-------------------------------------------------------		*/
+/*	    c o r d s _ v a l i d a t e _ s c o p e 			*/
+/*	-------------------------------------------------------		*/
+/*	we arrive here with a node name and a scope description		*/
+/*	if the scope is null, default, any and all then OK		*/
+/*	if the scope is an exact match with node name then OK		*/
+/*	otherwise the complex scope string may specify a mix of		*/
+/*	equations or negations where an exact match will respond	*/
+/*	as required by its prefix or absence. The list of scope		*/
+/*	elements may be comma, semicolon or space separated:		*/
+/*									*/
+/*		"=one,!two;!three =four"				*/
+/*									*/
+/*	-------------------------------------------------------		*/
+ 
+private	int	cords_validate_scope( char * test, char * scope )
+{
+	int	result=0;
+	int	negation=0;
+	char *	root;
+	char *	sptr;
+	char *	wptr;
+	/* --------------------------- */
+	/* ensure scope : remove space */
+	/* --------------------------- */
+	if (!( scope ))
+		return(1);
+	else 
+	{
+		while ( *scope == ' ' ) scope++;
+	}
+
+	/* --------------------------- */
+	/* handle the easy stuff first */
+	/* --------------------------- */
+	if ( cords_check_scope( test, scope ) )
+		return( 1 );
+	/* -------------------------- */
+	/* handle the hard stuff next */		
+	/* -------------------------- */
+	else if (!( sptr = allocate_string( scope ) ))
+		return(1);
+	else	root = sptr;
+
+	while ( *sptr )
+	{
+		switch ( *sptr )
+		{
+		case	'!'	:
+			negation = 1;
+			sptr++;
+			while ( *sptr == ' ' ) sptr++;
+			break;
+		case	'='	:
+			negation = 0;
+			sptr++;
+			while ( *sptr == ' ' ) sptr++;
+			break;
+		default		:
+			negation=0;
+			break;
+		}
+
+		for ( wptr=sptr; *wptr != 0; wptr++ )
+			if (( *wptr == ',' )
+			||  ( *wptr == ' ' )
+			||  ( *wptr == ';' ))
+				break;
+
+		if ( *wptr )
+			*(wptr++) = 0;
+		if ((result = cords_check_scope( test, sptr )) != 0)
+			break;
+		else
+		{
+			result = negation = 0;
+			sptr = wptr;
+			continue;
+		}
+	}
+	liberate( root );
+	return( ( negation ? !result : result ) );
+}
+
+/*	-------------------------------------------------------		*/
+/*	    c o r d s _ s e r v i c e _ g u a r a n t e e s		*/
+/*	-------------------------------------------------------		*/
+private	int	cords_service_guarantees( 
+	char * host, 
+	char *	sla,
+	struct xml_element * document, 
+	struct cords_guarantee_criteria * warranty, 
+	char * agent, char * tls )
+{
+	char *	control;
+	struct	xml_element * xptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	struct	cordscript_action * csptr=(struct cordscript_action*) 0;
+	struct	cords_guarantee_element * gptr;
+	char	statement[4096];
+	/* ------------- */
+	/* for all nodes */
+	/* ------------- */
+	for (	xptr = document->first;
+		xptr != (struct xml_element *) 0;
+		xptr = xptr->next )
+	{
+		/* detect a guarantee */
+		/* ------------------ */
+		for (	gptr=warranty->first;
+			gptr != (struct cords_guarantee_element *) 0;
+			gptr = gptr->next )
+		{
+			if (!( gptr->scope ))
+				continue;
+
+			else if (!( aptr = document_atribut( xptr, _CORDS_NAME ) ))
+				continue;
+			else if (!( cords_validate_scope( aptr->value, gptr->scope ) ))
+				continue;
+			else if (!( gptr->property ))
+				continue;
+			else if (!( bptr = document_atribut( xptr, _CORDS_ID ) ))
+				continue;
+			else if (!( rest_valid_string( bptr->value ) ))
+				continue;
+			else
+			{
+				 if (!( control = cords_build_control( bptr->value, sla, gptr, agent, tls )))
+				{
+					/* monitor without control */
+					sprintf(statement,"%s.monitor(slam.%s);",
+						aptr->value, gptr->property );
+				}
+				else
+				{
+					/* monitor with control */
+					sprintf(statement,"%s.monitor(slam.%s,%c%s%c);",
+						aptr->value, gptr->property,
+						0x0022,control,0x0022 );
+					control = liberate( control );
+				}
+				if ((csptr = cordscript_parse_statement( statement )) != (struct cordscript_action *) 0)
+					cords_action_instruction( host, document, csptr,_CORDS_CONFIGURATION, agent, tls );
+			}
+		}  
+
+	}
+	return( 0 );
+}
+
 /*	-------------------------------------------------------		*/
 /*		c o r d s _ s e r v i c e _ b r o k e r			*/
 /*	-------------------------------------------------------		*/
@@ -3079,19 +3824,25 @@ public	char *	cords_service_broker(
 	char * 	tls, 
 	struct xml_element ** root )
 {
+	char *	resultid=(char *) 0;
 	int	status;
 	char *	id;
-	struct	cords_placement_criteria CpC;
 	struct	occi_response * zptr;
 	struct	occi_element * eptr;
 	struct	xml_atribut * aptr;
 	struct	xml_element  * mptr;
 	struct	xml_atribut  * nptr;
 	struct  cords_provisioning CbC; 
+	struct	cords_placement_criteria CpC;
+	struct cords_guarantee_criteria CgC;
 
 	memset(&CbC,0, sizeof( struct cords_provisioning ) );
 	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
-
+	memset(&CgC,0, sizeof( struct cords_guarantee_criteria ) );
+	CbC.placement = &CpC;
+	CbC.warranty  = &CgC;
+	CgC.service   = service;
+	
 	if ( check_verbose() )
 		printf("   CORDS Service Broker ( %s ) Phase 1 : Preparation \n", agent);
 
@@ -3110,7 +3861,7 @@ public	char *	cords_service_broker(
 	/* ----------------------------------------------- */
 	/* handle the account from the sla or the manifest */
 	/* ----------------------------------------------- */
-	if (!( id = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
+	if (!( resultid = cords_brokering_account( &CbC, &CpC, &CgC, host, sla, agent, tls ) ))
 		return( id );
 
 	/* ----------------------------------- */
@@ -3122,6 +3873,17 @@ public	char *	cords_service_broker(
 		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
+
+	/* ----------------------------- */
+	/* retrieve the release instance */
+	/* ----------------------------- */
+	if ((( CbC.releaseID = occi_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_RELEASE)) != (char *) 0)
+	&& (( CbC.releaseID = cords_valid_identifier( CbC.releaseID )) != (char *) 0))
+	{
+		if (!( CbC.release = cords_retrieve_instance( host, CbC.releaseID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
 
 	/* ------------------------------- */
 	/* retrieve the interface instance */
@@ -3157,11 +3919,11 @@ public	char *	cords_service_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
+		else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else if (!( nptr = document_atribut( mptr, _CORDS_ID ) ))
 			return( cords_terminate_provisioning( 914, &CbC ) );
-		else if (!( zptr =  cords_create_link( service, nptr->value,  agent, tls ) ))
+		else if (!( zptr =  occi_create_link( service, nptr->value,  agent, tls ) ))
 			return( cords_terminate_provisioning( 915, &CbC ) );
 		{
 			zptr = occi_remove_response( zptr );
@@ -3184,6 +3946,22 @@ public	char *	cords_service_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
+
+	/* -------------------------------------------- */
+	/* perform SLA guarantee instruction processing */
+	/* -------------------------------------------- */
+	if ((( sla ) && ( CgC.first ))
+	&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+
+	/* -------------------------------------- */
+	/* perform release instruction processing */
+	/* -------------------------------------- */
+	if (( CbC.release )
+	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+	
+
 	/* -------------------------------------------- */
 	/* perform interface methods action  processing */
 	/* -------------------------------------------- */
@@ -3191,7 +3969,11 @@ public	char *	cords_service_broker(
 	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
 
-	return( service );
+	else
+	{
+		cords_terminate_provisioning( 0, &CbC );
+		return( resultid );
+	}
 }
 
 /*	-------------------------------------------------------		*/
@@ -3208,9 +3990,12 @@ public	char *	cords_manifest_broker(
 	struct	xml_atribut * aptr;
 	struct	xml_element  * mptr;
 	struct cords_provisioning CbC; 
+	struct cords_guarantee_criteria CgC;
 
 	memset(&CbC,0, sizeof( struct cords_provisioning ) );
 	memset(&CpC,0, sizeof( struct cords_placement_criteria ) );
+	memset(&CgC,0, sizeof( struct cords_guarantee_criteria ) );
+	CbC.warranty = &CgC;
 
 	if ( check_verbose() )
 		printf("   CORDS Request Broker ( %s ) Phase 1 : Preparation \n", agent);
@@ -3227,7 +4012,7 @@ public	char *	cords_manifest_broker(
 	/* ----------------------------------------------- */
 	/* handle the account from the sla or the manifest */
 	/* ----------------------------------------------- */
-	if (!( id = cords_brokering_account( &CbC, &CpC, host, sla, agent, tls ) ))
+	if (!( id = cords_brokering_account( &CbC, &CpC, &CgC, host, sla, agent, tls ) ))
 		return( id );
 
 	/* ---------------------------------------- */
@@ -3249,6 +4034,17 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( 907, &CbC ) );
 	else if (!( CbC.configuration = cords_retrieve_instance( host, CbC.confID, agent, tls)))
 		return( cords_terminate_provisioning( 908, &CbC ) );
+
+	/* ----------------------------- */
+	/* retrieve the release instance */
+	/* ----------------------------- */
+	if ((( CbC.releaseID = occi_extract_atribut( CbC.manifest,Operator.domain,
+		_CORDS_MANIFEST,_CORDS_RELEASE)) != (char *) 0)
+	&& (( CbC.releaseID = cords_valid_identifier( CbC.releaseID )) != (char *) 0))
+	{
+		if (!( CbC.release = cords_retrieve_instance( host, CbC.releaseID, agent, tls)))
+			return( cords_terminate_provisioning( 908, &CbC ) );
+	}
 
 	/* ------------------------------- */
 	/* retrieve the interface instance */
@@ -3279,6 +4075,7 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( 911, &CbC ) );
 	else if (!( CbC.instID = occi_unquoted_value( aptr->value ) ))
 		return( cords_terminate_provisioning( 912, &CbC ) );
+	else	CgC.service = CbC.instID;
 
 	for (	eptr=cords_first_link( CbC.manifest );
 		eptr != (struct occi_element *) 0;
@@ -3288,7 +4085,7 @@ public	char *	cords_manifest_broker(
 			continue;
 		if (!( id =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( mptr = cords_instance_node( &CpC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
+		else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
 			return( cords_terminate_provisioning( 913, &CbC ) );
 		else	
 		{
@@ -3320,6 +4117,20 @@ public	char *	cords_manifest_broker(
 	/* perform configuration instruction processing */
 	/* -------------------------------------------- */
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
+		return( cords_terminate_provisioning( status, &CbC ) );
+	
+	/* -------------------------------------------- */
+	/* perform SLA guarantee instruction processing */
+	/* -------------------------------------------- */
+	if ((( sla ) && ( CgC.first ))
+	&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
+		return( cords_terminate_provisioning( status, &CbC ) );
+
+	/* -------------------------------------- */
+	/* perform release instruction processing */
+	/* -------------------------------------- */
+	if (( CbC.release )
+	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
 	/* -------------------------------------------- */

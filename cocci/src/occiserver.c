@@ -41,12 +41,48 @@
 #include "occiclient.h"
 #include "occiresolver.h"
 #include "occibody.h"
+#include "occilogin.h"
 #include "json.h"
+
+struct	accords_authorization
+{
+	struct	accords_authorization * previous;
+	struct	accords_authorization * next;
+	char *	user;
+	char *	pass;
+	char *	authorization;
+};
 
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
+private	struct	accords_authorization * AccordsAuthorization=(struct accords_authorization *) 0;
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
+
+private	struct rest_response * occi_get( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_put( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_post( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_delete( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
+
+private	struct rest_response * occi_head( 
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_request * rptr );
 
 /*	---------------------------------------------------------	*/
 /*			o c c i _ f a i l u r e				*/
@@ -57,8 +93,38 @@ private	char *	occi_authorization=(char *) 0;
 private	struct rest_response * occi_failure(struct rest_client * cptr,  int status, char * message )
 {
 	struct	rest_response * aptr;
+	struct	rest_header * hptr;
 	if (!( aptr = rest_allocate_response(cptr)))
 		return( aptr );
+	else 
+	{
+		switch ( status )
+		{
+		case	401	:
+			hptr = rest_response_header( aptr, _HTTP_WWW_AUTHENTICATE, _HTTP_BASIC );
+			break;
+		case	407	:
+			hptr = rest_response_header( aptr, _HTTP_PROXY_AUTHENTICATE, _HTTP_BASIC );
+			break;
+		}
+		return( rest_html_response( aptr, status, message ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*			o c c i _ r e d i r e c t			*/
+/*	---------------------------------------------------------	*/
+/*	this local function redirects to the resource specified		*/
+/*	in the fourth parameter.						*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_redirect(struct rest_client * cptr,  int status, char * message, char * target )
+{
+	struct	rest_response * aptr;
+	struct	rest_header * hptr;
+	if (!( aptr = rest_allocate_response(cptr)))
+		return( aptr );
+	else if (!( hptr = rest_response_header( aptr, _HTTP_LOCATION, target ) ))
+		return( rest_html_response( aptr, 500, message ) );
 	else	return( rest_html_response( aptr, status, message ) );
 }
 
@@ -70,10 +136,10 @@ public	int	occi_success( struct rest_response * aptr )
 	char			* nptr;
 	struct	rest_header 	* hptr;
 
-	if (!( hptr = rest_response_header( aptr, "Content-Type", "text/occi" ) ))
+	if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
 		return( 0 );
 
-	else if (!( hptr = rest_response_header( aptr, "Content-Length", "4" ) ))
+	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "4" ) ))
 		return( 0 );
 
 	else if (!( nptr = allocate_string( "OK\r\n" ) ))
@@ -393,6 +459,18 @@ private	struct rest_response * occi_get_capacities(
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else	return( rest_response_status( aptr, 200, "OK" ) );
 	}
+	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
+	{
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else if (!( mptr = occi_html_capacities( optr, aptr ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else
+		{
+			rest_response_body( aptr, mptr, _FILE_BODY );
+			return( rest_response_status( aptr, 200, "OK" ) );
+		}
+	}
 	else
 	{
 		for (	;
@@ -510,6 +588,93 @@ private	struct	rest_request *	occi_php_request_body(
 	struct rest_request * rptr)
 {
 	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ f o r m _ r e q u e s t _ t o k e n 		*/
+/*	---------------------------------------------------------	*/
+private	char *	occi_form_request_token( FILE * h, int t )
+{
+	char 	buffer[8192];
+	int	i=0;
+	int	c;
+	while ((c = fgetc( h )) > 0 )
+	{
+		if ( c == t )
+			break;
+		else if ( i < 8190 )
+			buffer[i++] = c;
+		else	break;
+	}
+	if (!( i ))
+		return((char *) 0);
+	else
+	{
+		buffer[i++] = 0;
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ f o r m _ r e q u e s t _ b o d y 		*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_request *	occi_form_request_body(
+	struct occi_category * optr, 
+	struct rest_request * rptr)
+{
+	FILE * h;
+	char *	domain=(char *) 0;
+	char *	category=(char *) 0;
+	char *	name=(char *) 0;
+	char *	value=(char *) 0;
+
+	struct rest_header * hptr=(struct rest_header *) 0;
+
+	char 	buffer[4048];
+
+	if (!( rptr->body ))
+		return( rptr );
+	else if (!( h = fopen( rptr->body,"r" ) ))
+		return( rptr );
+	else
+	{
+		while ((name = occi_form_request_token( h,'=' )) != (char *) 0)
+		{
+			if (!(value = occi_form_request_token( h, '&' ) ))
+			{
+				liberate( name );
+				continue;
+			}
+			else if (!( strcmp( name, "domain" ) ))
+			{
+				liberate( name );
+				domain=value;
+				continue;
+			}
+			else if (!( strcmp( name, "category" ) ))
+			{
+				liberate( name );
+				category=value;
+				continue;
+			}
+			else
+			{
+				sprintf(buffer,"%s.%s.%s=%s",
+					(domain ? domain : "occi" ),
+					(category ? category : "category" ),
+					name,
+					(value ? value : "" ));
+				if (!( hptr = rest_request_header( rptr, _OCCI_ATTRIBUTE, buffer ) ))
+					break;
+				else	liberate( value );
+			}
+		}
+		fclose(h);
+		if ( domain ) liberate( domain );
+		if ( category ) liberate( category );
+		return( rptr );
+	}
+
 }
 
 /*	---------------------------------------------------------	*/
@@ -719,6 +884,8 @@ private	struct	rest_request *	occi_request_body(
 		return( occi_json_request_body( optr, rptr ) );
 	else if (!( strcasecmp( hptr->value, _OCCI_OLD_JSON ) ))
 		return( occi_old_json_request_body( optr, rptr ) );
+	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_FORM ) ))
+		return( occi_form_request_body( optr, rptr ) );
 	else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
 	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
@@ -751,6 +918,244 @@ private	struct rest_response * occi_invoke_get(
 }
 
 /*	---------------------------------------------------------	*/
+/*	    	o c c i _ i n v o k e _ p s e u d o 			*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_invoke_pseudo(
+	char *	action,
+	struct rest_header   * hptr,
+	struct occi_category * optr,
+	struct rest_client   * cptr, 
+	struct rest_request  * rptr )
+{
+	struct rest_header   * xptr;
+	int	l;
+	int	i;
+	char *	sptr;
+	char *	wptr;
+	char *	tptr;
+
+	/* ------------------------------------- */
+	/* substitute the method with the action */
+	/* ------------------------------------- */
+	if ( rptr->method )	rptr->method = liberate( rptr->method );
+	rptr->method = action;
+
+	/* ---------------------------------------- */
+	/* if it is a POST : remove the instance id */
+	/* ---------------------------------------- */
+	if (!( strcmp( action, "POST" ) ))
+	{
+		for ( 	sptr=rptr->object, l=0, i=0; 
+			*(sptr+i) != 0;
+			i++ )
+			if ( *(sptr+i) == '/' )
+				l = (i+1);
+		*(sptr+l) = 0;
+	}
+
+	/* ----------------------------- */
+	/* rebuild the parameters string */
+	/* ----------------------------- */
+	if ( rptr->parameters )
+	{
+		rptr->parameters = liberate( rptr->parameters );
+		for (	wptr=(char *) 0, xptr=hptr;
+			xptr != (struct rest_header *) 0;
+			xptr = xptr->next )
+		{
+			if (!( sptr = allocate(
+				strlen( ( xptr->name  ? xptr->name  : "\0" ) ) + 
+				strlen( ( xptr->value ? xptr->value : "\0" ) ) + 2 ) ))
+			{
+				break;
+			}
+			else
+			{
+				sprintf(sptr,"%s=%s",
+					( xptr->name  ? xptr->name  : "\0" ),
+					( xptr->value ? xptr->value : "\0" ));
+				if (!( wptr ))
+					wptr = sptr;
+				else if (!( tptr = allocate( strlen( wptr ) + strlen( sptr ) + 2 ) ))
+					break;
+				else
+				{
+					sprintf(tptr,"%s&%s",wptr,sptr);
+					sptr = liberate( sptr );
+					wptr = liberate( wptr );
+					wptr = tptr;
+				}
+			}
+		}
+		rptr->parameters = wptr;
+	}
+	if ( hptr )	hptr = liberate_rest_headers( hptr );
+
+	/* ------------------------------------ */
+	/* dispatch the adjusted action request */
+	/* ------------------------------------ */
+	if (!( strcmp( action,"POST" ) ))
+		return( occi_post( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"GET" ) ))
+		return( occi_get( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"DELETE" ) ))
+		return( occi_delete( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"PUT" ) ))
+		return( occi_put( optr, cptr, rptr ) );
+	else if (!( strcmp( action,"HEAD" ) ))
+		return( occi_head( optr, cptr, rptr ) );
+	else	return( occi_failure(cptr,  500, "Server Failure" ) );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ e x t r a c t _ p a r a m e t e r s		*/
+/*	---------------------------------------------------------	*/
+/*	converts a "name=value&name=value" type url string to a		*/
+/*	list of name value header pairs.				*/
+/*	---------------------------------------------------------	*/
+private	struct	rest_header * occi_extract_parameters( char * sptr )
+{
+	char *	wptr;
+	char *	nptr;
+	char *	vptr;
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+
+	if (!( sptr ))
+		return( root );
+	else if (!( wptr = allocate_string( sptr ) ))
+		return( root );
+	else	sptr = wptr;
+
+	while (*wptr)
+	{
+		/* ----------------------- */
+		/* step over name to value */
+		/* ----------------------- */
+		for (	nptr=wptr; *wptr != 0; wptr++ )	
+			if (( *wptr == '=' ) || ( *wptr == '&' ))
+				break;
+
+		if ( *wptr == '=' )
+		{
+			*(wptr++) = 0;
+			/* ----------------------- */
+			/* step over value to name */
+			/* ----------------------- */
+			for (	vptr=wptr; *wptr != 0; wptr++ )
+				if ( *wptr == '&' )
+					break;
+			if ( *wptr == '&' )
+				*(wptr++) = 0;
+		}		
+		/* ---------- */
+		/* null value */
+		/* ---------- */
+		else
+		{
+			vptr = wptr;
+			 if ( *wptr == '&' )						
+				*(wptr++) = 0;
+		}
+
+		/* ----------------- */
+		/* allocate a header */
+		/* ----------------- */
+		if (!( hptr = rest_create_header( nptr, vptr ) ))
+			break;
+		else if (!( hptr->previous = foot ))
+			root = hptr;
+		else	hptr->previous->next = hptr;
+		foot = hptr;
+	}
+	liberate( sptr );
+	return( root );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ e x t r a c t _ a c t i o n			*/
+/*	---------------------------------------------------------	*/
+private	char *	occi_extract_action( struct rest_header ** hhptr )
+{
+	struct	rest_header * hptr;
+	char *	result=(char *) 0;
+	if (!( hptr = *hhptr ))
+		return( (char *) 0);
+
+	while ( hptr )
+	{
+		if (( hptr->name )
+		&&  (!( strcmp( hptr->name, "action" ) )))
+		{
+			/* -------------------------- */
+			/* duplicate the header value */
+			/* -------------------------- */
+			if (!( result = allocate_string( hptr->value ) ))
+				break;
+
+			/* -------------------------------------- */
+			/* remove the action value from the chain */
+			/* -------------------------------------- */
+			else if (!( hptr->previous ))
+			{
+				*hhptr = hptr->next;
+				hptr->next->previous = (struct rest_header * )0;
+				break;
+			}
+			else
+			{
+			 	hptr->previous->next = hptr->next;
+				if ( hptr->next )
+					hptr->next->previous = hptr->previous;
+				hptr->next = hptr->previous = (struct rest_header * ) 0;
+				liberate_rest_header( hptr );
+				break;
+			}
+		}
+		else	hptr = hptr->next;
+	}
+	return( result );
+}
+
+/*	---------------------------------------------------------	*/
+/*		   o c c i _ p s e u d o _ a c t i o n			*/
+/*	---------------------------------------------------------	*/
+/*	this function performs invocation of POST for a category	*/
+/*	---------------------------------------------------------	*/
+private	struct rest_response * occi_pseudo_action(
+	struct occi_category * optr,
+	struct rest_client   * cptr, 
+	struct rest_request  * rptr )
+{
+	struct	rest_header * hptr;
+	char *	action=(char *) 0;
+	if (!( action ))
+		return((struct rest_response *) 0);
+	else if (!( rptr ))
+		return((struct rest_response *) 0);
+	else if (!( rptr->parameters ))
+		return((struct rest_response *) 0);
+	else if (!( hptr = occi_extract_parameters( rptr->parameters ) ))
+		return((struct rest_response *) 0);
+	else if (!(action = occi_extract_action( &hptr ) ))
+	{
+		hptr = liberate_rest_headers( hptr );
+		return((struct rest_response *) 0);
+	}
+	else if ((!( strcmp( action, "POST"   ) ))
+	     ||  (!( strcmp( action, "GET"    ) ))
+	     ||  (!( strcmp( action, "DELETE" ) ))
+	     ||  (!( strcmp( action, "PUT"    ) )))
+		return( occi_invoke_pseudo( action, hptr, optr, cptr, rptr ) );
+	else
+	{
+		hptr = liberate_rest_headers( hptr );
+		return((struct rest_response *) 0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
 /*			o c c i _ i n v o k e _ p o s t 		*/
 /*	---------------------------------------------------------	*/
 /*	this function performs invocation of POST for a category	*/
@@ -762,7 +1167,9 @@ private	struct rest_response * occi_invoke_post(
 {
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_interface * iptr;
-	if (!( iptr = optr->interface ))
+	if (( aptr = occi_pseudo_action( optr, cptr, rptr )) != (struct rest_response *) 0)
+		return( aptr );
+	else if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
 	else if (!( rptr = occi_request_body(optr, rptr) ))
 		return( occi_failure(cptr,  400, "Bad Request : Incorrect Body" ) );
@@ -876,6 +1283,119 @@ private	struct	rest_response *	occi_invoke_transaction(
 }
 
 /*	----------------------------------------------------------------	*/
+/*		o c c i _ a u t h o r i z a t i o n _ f a i l u r e		*/
+/*	----------------------------------------------------------------	*/
+private	struct rest_response * occi_authorization_failure( 
+		struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_ACCEPT ) ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( hptr->value ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( accept_string_includes( hptr->value, _OCCI_TEXT_HTML ) ))
+		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else	return( occi_failure(cptr,  401, "Authorization required" ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ l o c a t e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_locate_authorization( char * username, char * password )
+{
+	struct	accords_authorization * aptr;
+	for (	aptr=AccordsAuthorization;
+		aptr != (struct accords_authorization *) 0;
+		aptr = aptr->next )
+	{
+		if ( strcmp( aptr->user, username ) != 0)
+			continue;
+		else if ( strcmp( aptr->pass, password ) != 0)
+			continue;
+		else	break;
+	}
+	return( aptr );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ r e m o v e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_remove_authorization( struct accords_authorization * aptr )
+{
+	if ( aptr )
+	{
+		if ( aptr->user )
+			aptr->user = liberate( aptr->user );
+		if ( aptr->pass )
+			aptr->pass = liberate( aptr->pass );
+		if ( aptr->authorization )
+			aptr->authorization = liberate( aptr->authorization );
+		aptr = liberate( aptr );
+	}
+	return((struct accords_authorization *) 0);
+}
+
+/*	----------------------------------------------------------------	*/
+/*		a c c o r d s _ d r o p _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_drop_authorization( struct accords_authorization * aptr )
+{
+	if (!( aptr->previous ))
+	{
+		if ((AccordsAuthorization = aptr->next) != (struct accords_authorization *) 0)
+			AccordsAuthorization->previous = (struct accords_authorization *) 0;
+	}
+	else if (( aptr->previous->next = aptr->next ) != (struct accords_authorization *) 0)
+		aptr->next->previous = aptr->previous;
+
+	return( accords_remove_authorization( aptr ) );
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ c r e a t e _ a u t h o r i z a t i o n 		*/
+/*	----------------------------------------------------------------	*/
+private	struct accords_authorization * accords_create_authorization( char * username, char * password, char * authorization )
+{
+	struct	accords_authorization * aptr;
+	if (!( aptr = (struct accords_authorization *) allocate( sizeof( struct accords_authorization ) ) ))
+		return( aptr );
+	else	memset( aptr, 0, sizeof( struct accords_authorization ) );
+	if (!( aptr->user = allocate_string( username ) ))
+		return( accords_remove_authorization( aptr ) );
+	else if (!( aptr->pass = allocate_string( password ) ))
+		return( accords_remove_authorization( aptr ) );
+	else if (!( aptr->authorization = allocate_string( authorization ) ))
+		return( accords_remove_authorization( aptr ) );
+	else
+	{
+		if ((aptr->next = AccordsAuthorization) != (struct accords_authorization *) 0)
+			aptr->next->previous = aptr;
+		return ((AccordsAuthorization = aptr));
+	}
+}
+
+/*	----------------------------------------------------------------	*/
+/*	   a c c o r d s _ r e s o l v e _ a u t h o r i z a t i o n		*/
+/*	----------------------------------------------------------------	*/
+private	int	accords_resolve_authorization( char * sptr, char * agent, char * tls )
+{
+	struct	accords_authorization * aptr;
+	char 	username[1024];
+	char 	password[1024];
+	char *	authorization;
+	if (!( rest_decode_credentials( sptr, username, password ) ))
+		return( 0 );
+	else if ((aptr = accords_locate_authorization( username, password )) != (struct accords_authorization *) 0)
+		return( 1 );
+	else if (!( authorization = login_occi_user( username, password, agent, tls )))
+		return( 0 );
+	else if (!(aptr = accords_create_authorization( username, password, authorization ) ))
+		return( 0 );
+	else	return( 1 );
+}
+
+/*	----------------------------------------------------------------	*/
 /*	o c c i _ c h e c k _ r e q u e s t _ a u t h o r i z a t i o n		*/
 /*	----------------------------------------------------------------	*/
 /*	Here we check the request authorization header value in respect		*/
@@ -894,12 +1414,26 @@ private	int	occi_check_request_authorization(
 		struct occi_category * optr )
 {
 	struct	rest_header * hptr;
-	if (!( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )))
+
+	/* ----------------------------------------------- */
+	/* test first for OCCI Authorization token present */
+	/* ----------------------------------------------- */
+	if (( hptr = rest_resolve_header( rptr->first, _OCCI_AUTHORIZE )) != (struct rest_header *) 0)
+	{
+		if (!( hptr->value ))
+			return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
+		else 	return( occi_resolve_authorization( hptr->value ) );
+	}
+	/* ------------------------------------- */
+	/* test for an HTTP AUTHORIZATION header */
+	/* ------------------------------------- */
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_AUTHORIZATION ) ))
 		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
 	else if (!( hptr->value ))
 		return(( occi_authorization ? ( optr->access & _OCCI_NO_AUTHORIZE ? 1 : 0) : 1 ));
-	else 	return( occi_resolve_authorization( hptr->value ) );
+	else 	return( accords_resolve_authorization( hptr->value, _CORDS_CONTRACT_AGENT, default_tls()  ) );
 }
+
 
 /*	---------------------------------------------------------	*/
 /*				o c c i _ g e t				*/
@@ -918,10 +1452,12 @@ private	struct rest_response * occi_get(
 	occi_show_request( rptr );
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
-	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+	else if (!( occi_check_request_authorization( rptr, optr ) ))
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_get_capacities( optr, cptr, rptr ) );
+	else if (!( strcmp( rptr->object, "/" ) ))
+		return( occi_redirect(cptr,  301, "Redirected to Capacities", "/-/" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_get( optr, cptr, rptr ) );
@@ -961,7 +1497,7 @@ private	struct rest_response * occi_post(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Creation" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -1015,7 +1551,7 @@ private	struct rest_response * occi_put(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if ((hptr = rest_resolve_header( rptr->first, "Link" )))
 		return( occi_failure(cptr,  400, "Bad Request : MUST not PUT Link" ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
@@ -1053,7 +1589,7 @@ private	struct rest_response * occi_delete(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Removal" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
@@ -1090,7 +1626,7 @@ private	struct rest_response * occi_head(
 	if (!( optr = vptr ))
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
-		return( occi_failure(cptr,  403, "Bad Request : Forbidden" ) );
+		return( occi_authorization_failure( cptr, rptr ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_head( optr, cptr, rptr ) );
@@ -1123,11 +1659,11 @@ public	int	occi_process_atributs(
 	char 	*	vptr;
 	struct	rest_header * hptr;
 
-	for ( 	hptr = rest_resolve_header( rptr->first, "X-OCCI-Attribute");
+	for ( 	hptr = rest_resolve_header( rptr->first, _OCCI_ATTRIBUTE );
 		hptr != (struct rest_header *) 0;
 		hptr = hptr->next )
 	{
-		if ( strcasecmp(hptr->name,"X-OCCI-Attribute") != 0)
+		if ( strcasecmp(hptr->name, _OCCI_ATTRIBUTE) != 0)
 			continue;
 		else if (!( hptr->value ))
 			continue;
@@ -1251,6 +1787,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		(void *) 0,
 		occi_alert
 	};
+
+	set_default_agent( nptr );
 
 	if ( tls )
 		if (!( strlen(tls) ))

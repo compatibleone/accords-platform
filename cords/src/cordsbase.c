@@ -50,6 +50,7 @@
 #include "consumer.c"
 #include "connection.c"
 #include "stream.c"
+#include "packet.c"
 #include "probe.c"
 #include "metric.c"
 #include "alert.c"
@@ -61,6 +62,7 @@
 #include "action.c"
 #include "user.c"
 #include "configuration.c"
+#include "release.c"
 #include "application.c"
 #include "parameter.c"
 #include "instruction.c"
@@ -81,6 +83,7 @@
 #include "publication.c"
 
 #include "monitor.c"
+#include "control.c"
 #include "event.c"
 #include "report.c"
 #include "optimise.c"
@@ -101,4 +104,10 @@
 
 #include "amazonEc2.c"
 #include "ec2config.c"
+#include "gw.c"
+#include "linkgw.c"
+#include "intercloudGW.c"
 #endif
+
+
+

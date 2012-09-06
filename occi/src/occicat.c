@@ -22,6 +22,8 @@
 
 #include "occicat.h"
 
+public	char *	occi_html_body(struct occi_category * cptr,struct rest_header  * hptr );
+
 /*	--------------------------------------------	*/
 /*	l i b e r a t e _ o c c i _ c a t e g o r y 	*/
 /*	--------------------------------------------	*/
@@ -91,6 +93,7 @@ public struct occi_category * reset_occi_category(struct occi_category * sptr)
 		sptr->interface = (void*) 0;
 		sptr->callback = (void*) 0;
 		sptr->payload = (void*) 0;
+		sptr->html_rendering = occi_html_body;
 	}
 	return(sptr);
 

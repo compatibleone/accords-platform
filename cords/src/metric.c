@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _metric_c_
@@ -39,6 +37,12 @@ public struct cords_metric * liberate_cords_metric(struct cords_metric * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->units )
 			 sptr->units = liberate(sptr->units);
+		if ( sptr->period )
+			 sptr->period = liberate(sptr->period);
+		if ( sptr->samples )
+			 sptr->samples = liberate(sptr->samples);
+		if ( sptr->expression )
+			 sptr->expression = liberate(sptr->expression);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_metric *) 0);
@@ -55,6 +59,9 @@ public struct cords_metric * reset_cords_metric(struct cords_metric * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->units = (char*) 0;
+		sptr->period = (char*) 0;
+		sptr->samples = (char*) 0;
+		sptr->expression = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -94,6 +101,18 @@ public int xmlin_cords_metric(struct cords_metric * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->units = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"period") ))
+		{
+			if ( wptr->value ) { sptr->period = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"samples") ))
+		{
+			if ( wptr->value ) { sptr->samples = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"expression") ))
+		{
+			if ( wptr->value ) { sptr->expression = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -115,9 +134,12 @@ public int rest_occi_cords_metric(FILE * fh,struct cords_metric * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.units='%s'\r\n",prefix,nptr,(sptr->units?sptr->units:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.period='%s'\r\n",prefix,nptr,(sptr->period?sptr->period:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.samples='%s'\r\n",prefix,nptr,(sptr->samples?sptr->samples:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expression='%s'\r\n",prefix,nptr,(sptr->expression?sptr->expression:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _metric_c_ */
+#endif	/* _metric_cmetric_c_ */

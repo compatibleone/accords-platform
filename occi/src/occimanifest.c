@@ -1,26 +1,24 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _manifest_c_
-#define _manifest_c_
+#ifndef _occimanifest_c_
+#define _occimanifest_c_
 
 #include "manifest.h"
 
@@ -37,6 +35,7 @@ private pthread_mutex_t list_cords_manifest_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_manifest_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_manifest_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_manifest_node() { return( cords_manifest_first ); }
+public struct  occi_kind_node * occi_last_cords_manifest_node() { return( cords_manifest_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -144,6 +143,8 @@ private void autoload_cords_manifest_nodes() {
 				pptr->nodes = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "release" )) != (struct xml_atribut *) 0)
+				pptr->release = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "interface" )) != (struct xml_atribut *) 0)
 				pptr->interface = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
@@ -195,6 +196,9 @@ public  void autosave_cords_manifest_nodes() {
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," release=%c",0x0022);
+		fprintf(h,"%s",(pptr->release?pptr->release:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," interface=%c",0x0022);
 		fprintf(h,"%s",(pptr->interface?pptr->interface:""));
 		fprintf(h,"%c",0x0022);
@@ -242,6 +246,8 @@ private void set_cords_manifest_field(
 			pptr->nodes = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
+		if (!( strcmp( nptr, "release" ) ))
+			pptr->release = allocate_string(vptr);
 		if (!( strcmp( nptr, "interface" ) ))
 			pptr->interface = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
@@ -313,6 +319,13 @@ private int pass_cords_manifest_filter(
 		else if ( strcmp(pptr->configuration,fptr->configuration) != 0)
 			return(0);
 		}
+	if (( fptr->release )
+	&&  (strlen( fptr->release ) != 0)) {
+		if (!( pptr->release ))
+			return(0);
+		else if ( strcmp(pptr->release,fptr->release) != 0)
+			return(0);
+		}
 	if (( fptr->interface )
 	&&  (strlen( fptr->interface ) != 0)) {
 		if (!( pptr->interface ))
@@ -374,6 +387,9 @@ private struct rest_response * cords_manifest_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%s",optr->domain,optr->id,pptr->configuration);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.release=%s",optr->domain,optr->id,pptr->release);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.interface=%s",optr->domain,optr->id,pptr->interface);
@@ -785,6 +801,19 @@ private void	redirect_occi_cords_manifest_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_manifest(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_manifest_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -806,6 +835,8 @@ public struct occi_category * occi_cords_manifest_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "release",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "interface",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
@@ -818,6 +849,8 @@ public struct occi_category * occi_cords_manifest_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_manifest)))
+			return( optr );
 		autoload_cords_manifest_nodes();
 		return(optr);
 	}
@@ -897,6 +930,17 @@ public struct rest_header *  cords_manifest_occi_headers(struct cords_manifest *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_manifest.release='%s'\r\n",(sptr->release?sptr->release:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_manifest.interface='%s'\r\n",(sptr->interface?sptr->interface:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -959,4 +1003,4 @@ public struct rest_header *  cords_manifest_occi_headers(struct cords_manifest *
 
 }
 
-#endif	/* _manifest_c_ */
+#endif	/* _occimanifest_c_ */

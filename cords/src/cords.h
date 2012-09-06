@@ -28,11 +28,13 @@
 #include "storage.h"
 #include "infrastructure.h"
 #include "package.h"
+#include "packet.h"
 #include "system.h"
 #include "image.h"
 #include "node.h"
 #include "action.h"
 #include "configuration.h"
+#include "release.h"
 #include "instruction.h"
 #include "value.h"
 #include "parameter.h"
@@ -54,6 +56,7 @@
 #include "script.h"
 
 #include "monitor.h"
+#include "control.h"
 #include "event.h"
 #include "report.h"
 

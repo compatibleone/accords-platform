@@ -211,6 +211,38 @@ public	struct	xml_element * document_element( struct xml_element * document, cha
 }
 
 /*	---------------------------------------------------	*/
+/*	   n e s t e d _ d o c u m e n t _ e l e m e n t 	*/
+/*	---------------------------------------------------	*/
+public	struct	xml_element * nested_document_element( struct xml_element * document, char * token )
+{
+	struct	xml_element * eptr;
+	struct	xml_element * fptr;
+	if (!( document ))
+		return( document );
+	else if (( document->name )
+	     &&  (!( strcmp( document->name, token ) )))
+		return( document );
+	for (	eptr = document->first;
+		eptr != (struct xml_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( strcmp( eptr->name, token ) ))
+			return( eptr );
+	}
+	for (	eptr = document->first;
+		eptr != (struct xml_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( fptr = nested_document_element( eptr, token ) ))
+			continue;
+		else	return( fptr );
+	}
+	return((struct xml_element *) 0);
+}
+
+/*	---------------------------------------------------	*/
 /*		d o c u m e n t _ a t r i b u t 		*/
 /*	---------------------------------------------------	*/
 public	struct	xml_atribut * document_atribut( struct xml_element * element, char * token )

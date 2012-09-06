@@ -26,6 +26,9 @@
 
 private	int	echo=0;
 private	int	ungotc=0;
+private	int	json_line=0;
+private	int	json_column=0;
+
 
 /*	------------------------------------------------	*/
 /*	  j s o n   p a r s e r   p r o t o t y p e s 		*/
@@ -40,6 +43,36 @@ private	char *	json_get_token( FILE * h );
 private	struct	data_element * json_get_matrix( FILE * h, struct data_element * parent  );
 private	struct	data_element * json_get_complex( FILE * h, struct data_element * parent  );
 private	struct	data_element * json_get_element( FILE * h, struct data_element * parent  );
+
+
+private	int 	json_failure( int status, char * message , char * other )
+{
+	printf("\njson parser json_failure(%u,%s %s) at line %u column %u \n",
+		status,message,other,json_line,json_column);
+	return( status );
+}
+
+
+/*	------------------------------------------------	*/
+/*		j s o n _ i n i t i a l i s e			*/ 
+/*	------------------------------------------------	*/
+private	FILE * json_initialise(char * filename)
+{
+	ungotc = 0;
+	json_line=0;
+	json_column=0;
+	return( fopen( filename, "r" ) );
+}
+
+/*	------------------------------------------------	*/
+/*		j s o n _ t er m in a t e			*/
+/*	------------------------------------------------	*/
+private	void	json_terminate(FILE * h)
+{
+	fclose( h );
+	ungotc = 0;
+	return;
+}
 
 /*	------------------------------------------------	*/
 /*		j s o n _ u n g e t c h				*/
@@ -72,6 +105,12 @@ private	int	json_getch( FILE * h )
 		c = 0;
 	else if ( echo )
 		printf("%c",c);
+	if ( c == '\n' )
+	{
+		json_line++; json_column=0;
+	}
+	else if (( c != 0 ) && ( c != '\r'))
+		json_column++;	
 	return( c );
 }
 
@@ -199,7 +238,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 	int	c;
 	if (( c = json_get_punctuation( h )) == -1)
 	{
-		failure(33,"expected","punctuation");
+		json_failure(33,"expected","punctuation");
 		return( drop_data_element( dptr ) );
 	}
 	else if (c == ']' )
@@ -211,7 +250,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 	{
 		if (!( dptr = json_get_matrix( h, dptr ) ))
 		{
-			failure(33,"expected","matrix");
+			json_failure(33,"expected","matrix");
 			return( drop_data_element( dptr ) );
 		}
 	}
@@ -219,13 +258,13 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 	{
 		if (!( dptr = json_get_complex( h, dptr ) ))
 		{
-			failure(33,"expected","complex");
+			json_failure(33,"expected","complex");
 			return( drop_data_element( dptr ) );
 		}
 	}
 	else if (!( dptr->value = json_get_token( h )))
 	{
-		failure(33,"expected","value");
+		json_failure(33,"expected","value");
 		return( drop_data_element( dptr ) );
 	}
 	else	return( dptr );
@@ -240,17 +279,17 @@ private	struct	data_element * json_get_element( FILE * h, struct data_element * 
 	int	c;
 	if (!( dptr = add_data_element( parent )))
 	{
-		failure(33,"cannot allocate", "element");
+		json_failure(33,"cannot allocate", "element");
 		return( dptr );
 	}
 	else if (!( dptr->name = json_get_token( h )))
 	{
-		failure(33,"expected","naming token");
+		json_failure(33,"expected","naming token");
 		return( drop_data_element( dptr ) );
 	}
 	else if (( c = json_get_punctuation( h )) == -1)
 	{
-		failure(33,"expected","punctuation");
+		json_failure(33,"expected","punctuation");
 		return( drop_data_element( dptr ) );
 	}
 	else if ( c == '}' )
@@ -260,7 +299,7 @@ private	struct	data_element * json_get_element( FILE * h, struct data_element * 
 	}
 	else if ( c != ':' )
 	{
-		failure(33,"incorrect","punctuation");
+		json_failure(33,"incorrect","punctuation");
 		return( drop_data_element( dptr ) );
 	}
 	return( json_get_value( h, dptr ) );
@@ -312,7 +351,6 @@ private	struct	data_element * json_get_matrix( FILE * h, struct data_element * p
 	}	
 }
 
-
 /*	------------------------------------------------	*/
 /*		j s o n _ p a r s e _ f i l e 			*/
 /*	------------------------------------------------	*/
@@ -323,7 +361,7 @@ public	struct	data_element *	json_parse_file( char * filename )
 	struct	data_element * dptr=(struct data_element *) 0;
 	if (( dptr = allocate_data_element( dptr )) != (struct data_element *) 0)
 	{
-		if (!( h = fopen( filename, "r" )))
+		if (!( h = json_initialise( filename )))
 			dptr = liberate_data_element( dptr );
 		else
 		{
@@ -332,8 +370,8 @@ public	struct	data_element *	json_parse_file( char * filename )
 			else if ((c = json_get_punctuation(h)) != '{' )
 				dptr = liberate_data_element( dptr );
 			else if (!( dptr = json_get_complex(h,dptr) ))
-				failure(33,"incorrect file",filename);
-			fclose(h);
+				json_failure(33,"incorrect file",filename);
+			json_terminate( h );
 		}
 	}
 	return( dptr );

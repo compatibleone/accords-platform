@@ -57,6 +57,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->access = liberate(sptr->access);
 		if ( sptr->common )
 			 sptr->common = liberate(sptr->common);
+		if ( sptr->session )
+			 sptr->session = liberate(sptr->session);
 		if ( sptr->scope )
 			 sptr->scope = liberate(sptr->scope);
 		if ( sptr->type )
@@ -65,6 +67,12 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->service = liberate(sptr->service);
 		if ( sptr->firewall )
 			 sptr->firewall = liberate(sptr->firewall);
+		if ( sptr->placement )
+			 sptr->placement = liberate(sptr->placement);
+		if ( sptr->parentservice )
+			 sptr->parentservice = liberate(sptr->parentservice);
+		if ( sptr->agreement )
+			 sptr->agreement = liberate(sptr->agreement);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_contract *) 0);
@@ -90,10 +98,19 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->price = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->common = (char*) 0;
+		sptr->session = (char*) 0;
 		sptr->scope = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->service = (char*) 0;
 		sptr->firewall = (char*) 0;
+		sptr->placement = (char*) 0;
+		sptr->parentservice = (char*) 0;
+		sptr->agreement = (char*) 0;
+		sptr->flags =  0;
+		sptr->startduration =  0;
+		sptr->stopduration =  0;
+		sptr->saveduration =  0;
+		sptr->instructions =  0;
 		sptr->commons =  0;
 		sptr->when =  0;
 		sptr->state =  0;
@@ -171,6 +188,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->common = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"session") ))
+		{
+			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"scope") ))
 		{
 			if ( wptr->value ) { sptr->scope = allocate_string(wptr->value); }
@@ -186,6 +207,38 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		else if (!( strcmp(wptr->name,"firewall") ))
 		{
 			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"placement") ))
+		{
+			if ( wptr->value ) { sptr->placement = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"parentservice") ))
+		{
+			if ( wptr->value ) { sptr->parentservice = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"agreement") ))
+		{
+			if ( wptr->value ) { sptr->agreement = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"flags") ))
+		{
+			if ( wptr->value ) { sptr->flags = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"startduration") ))
+		{
+			if ( wptr->value ) { sptr->startduration = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"stopduration") ))
+		{
+			if ( wptr->value ) { sptr->stopduration = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"saveduration") ))
+		{
+			if ( wptr->value ) { sptr->saveduration = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"instructions") ))
+		{
+			if ( wptr->value ) { sptr->instructions = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"commons") ))
 		{
@@ -225,10 +278,19 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.common='%s'\r\n",prefix,nptr,(sptr->common?sptr->common:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.placement='%s'\r\n",prefix,nptr,(sptr->placement?sptr->placement:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.parentservice='%s'\r\n",prefix,nptr,(sptr->parentservice?sptr->parentservice:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.flags='%u'\r\n",prefix,nptr,sptr->flags);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.startduration='%u'\r\n",prefix,nptr,sptr->startduration);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.stopduration='%u'\r\n",prefix,nptr,sptr->stopduration);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.saveduration='%u'\r\n",prefix,nptr,sptr->saveduration);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.commons='%u'\r\n",prefix,nptr,sptr->commons);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
@@ -236,4 +298,4 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 
 }
 
-#endif	/* _contract_c_ */
+#endif	/* _contract_ccontract_c_ */

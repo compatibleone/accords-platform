@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiazconfig_c_
@@ -37,6 +35,7 @@ private pthread_mutex_t list_az_config_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * az_config_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * az_config_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_az_config_node() { return( az_config_first ); }
+public struct  occi_kind_node * occi_last_az_config_node() { return( az_config_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -162,6 +161,16 @@ private void autoload_az_config_nodes() {
 				pptr->certificate = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
 				pptr->tls = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "hostedservice" )) != (struct xml_atribut *) 0)
+				pptr->hostedservice = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
+				pptr->storageaccount = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
+				pptr->location = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "services" )) != (struct xml_atribut *) 0)
+				pptr->services = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "current" )) != (struct xml_atribut *) 0)
 				pptr->current = document_atribut_value(aptr);
 			}
@@ -230,6 +239,21 @@ public  void autosave_az_config_nodes() {
 		fprintf(h," tls=%c",0x0022);
 		fprintf(h,"%s",(pptr->tls?pptr->tls:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," hostedservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->hostedservice?pptr->hostedservice:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," storageaccount=%c",0x0022);
+		fprintf(h,"%s",(pptr->storageaccount?pptr->storageaccount:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," location=%c",0x0022);
+		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," services=%c",0x0022);
+		fprintf(h,"%u",pptr->services);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," current=%c",0x0022);
 		fprintf(h,"%u",pptr->current);
 		fprintf(h,"%c",0x0022);
@@ -280,6 +304,16 @@ private void set_az_config_field(
 			pptr->certificate = allocate_string(vptr);
 		if (!( strcmp( nptr, "tls" ) ))
 			pptr->tls = allocate_string(vptr);
+		if (!( strcmp( nptr, "hostedservice" ) ))
+			pptr->hostedservice = allocate_string(vptr);
+		if (!( strcmp( nptr, "storageaccount" ) ))
+			pptr->storageaccount = allocate_string(vptr);
+		if (!( strcmp( nptr, "location" ) ))
+			pptr->location = allocate_string(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
+		if (!( strcmp( nptr, "services" ) ))
+			pptr->services = atoi(vptr);
 		if (!( strcmp( nptr, "current" ) ))
 			pptr->current = atoi(vptr);
 		}
@@ -404,6 +438,35 @@ private int pass_az_config_filter(
 		else if ( strcmp(pptr->tls,fptr->tls) != 0)
 			return(0);
 		}
+	if (( fptr->hostedservice )
+	&&  (strlen( fptr->hostedservice ) != 0)) {
+		if (!( pptr->hostedservice ))
+			return(0);
+		else if ( strcmp(pptr->hostedservice,fptr->hostedservice) != 0)
+			return(0);
+		}
+	if (( fptr->storageaccount )
+	&&  (strlen( fptr->storageaccount ) != 0)) {
+		if (!( pptr->storageaccount ))
+			return(0);
+		else if ( strcmp(pptr->storageaccount,fptr->storageaccount) != 0)
+			return(0);
+		}
+	if (( fptr->location )
+	&&  (strlen( fptr->location ) != 0)) {
+		if (!( pptr->location ))
+			return(0);
+		else if ( strcmp(pptr->location,fptr->location) != 0)
+			return(0);
+		}
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
+	if (( fptr->services ) && ( pptr->services != fptr->services )) return(0);
 	if (( fptr->current ) && ( pptr->current != fptr->current )) return(0);
 	return(1);
 }
@@ -457,6 +520,21 @@ private struct rest_response * az_config_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.tls=%s",optr->domain,optr->id,pptr->tls);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.hostedservice=%s",optr->domain,optr->id,pptr->hostedservice);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.storageaccount=%s",optr->domain,optr->id,pptr->storageaccount);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.services=%u",optr->domain,optr->id,pptr->services);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.current=%u",optr->domain,optr->id,pptr->current);
@@ -853,6 +931,19 @@ private void	redirect_occi_az_config_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_az_config(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_az_config_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -892,8 +983,20 @@ public struct occi_category * occi_az_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "tls",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "hostedservice",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "storageaccount",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "services",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_az_config)))
+			return( optr );
 		autoload_az_config_nodes();
 		return(optr);
 	}
@@ -1062,6 +1165,61 @@ public struct rest_header *  az_config_occi_headers(struct az_config * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.az_config.tls='%s'\r\n",(sptr->tls?sptr->tls:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.az_config.hostedservice='%s'\r\n",(sptr->hostedservice?sptr->hostedservice:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.az_config.storageaccount='%s'\r\n",(sptr->storageaccount?sptr->storageaccount:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.az_config.location='%s'\r\n",(sptr->location?sptr->location:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.az_config.group='%s'\r\n",(sptr->group?sptr->group:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.az_config.services='%u'\r\n",sptr->services);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

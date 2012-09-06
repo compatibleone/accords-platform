@@ -6,9 +6,11 @@ struct	cords_session
 {
 	char *	id;
 	char *	name;
-	char *	service;
-	char *	date;
-	int	streams;
+	char *	contract;
+	char *	account;
+	char *	start;
+	char *	finish;
+	int	connections;
 	int	state;
 };
 

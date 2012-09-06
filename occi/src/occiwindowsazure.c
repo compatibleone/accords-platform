@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occiwindowsazure_c_
@@ -37,6 +35,7 @@ private pthread_mutex_t list_windowsazure_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * windowsazure_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * windowsazure_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_windowsazure_node() { return( windowsazure_first ); }
+public struct  occi_kind_node * occi_last_windowsazure_node() { return( windowsazure_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -138,10 +137,6 @@ private void autoload_windowsazure_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
-				pptr->flavor = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
-				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
@@ -162,6 +157,36 @@ private void autoload_windowsazure_nodes() {
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
 				pptr->workload = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "architecture" )) != (struct xml_atribut *) 0)
+				pptr->architecture = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "driver" )) != (struct xml_atribut *) 0)
+				pptr->driver = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "original" )) != (struct xml_atribut *) 0)
+				pptr->original = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
+				pptr->location = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "group" )) != (struct xml_atribut *) 0)
+				pptr->group = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "hostedservice" )) != (struct xml_atribut *) 0)
+				pptr->hostedservice = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
+				pptr->storageaccount = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
+				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "media" )) != (struct xml_atribut *) 0)
+				pptr->media = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
+				pptr->flavor = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "publicnetwork" )) != (struct xml_atribut *) 0)
+				pptr->publicnetwork = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
 				pptr->when = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -196,12 +221,6 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," flavor=%c",0x0022);
-		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," image=%c",0x0022);
-		fprintf(h,"%s",(pptr->image?pptr->image:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
 		fprintf(h,"%c",0x0022);
@@ -232,6 +251,51 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," workload=%c",0x0022);
 		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," architecture=%c",0x0022);
+		fprintf(h,"%s",(pptr->architecture?pptr->architecture:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," driver=%c",0x0022);
+		fprintf(h,"%s",(pptr->driver?pptr->driver:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," original=%c",0x0022);
+		fprintf(h,"%s",(pptr->original?pptr->original:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," location=%c",0x0022);
+		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," group=%c",0x0022);
+		fprintf(h,"%s",(pptr->group?pptr->group:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," hostedservice=%c",0x0022);
+		fprintf(h,"%s",(pptr->hostedservice?pptr->hostedservice:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," storageaccount=%c",0x0022);
+		fprintf(h,"%s",(pptr->storageaccount?pptr->storageaccount:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," image=%c",0x0022);
+		fprintf(h,"%s",(pptr->image?pptr->image:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," media=%c",0x0022);
+		fprintf(h,"%s",(pptr->media?pptr->media:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," flavor=%c",0x0022);
+		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," publicnetwork=%c",0x0022);
+		fprintf(h,"%s",(pptr->publicnetwork?pptr->publicnetwork:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," when=%c",0x0022);
 		fprintf(h,"%u",pptr->when);
 		fprintf(h,"%c",0x0022);
@@ -261,10 +325,6 @@ private void set_windowsazure_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "flavor" ) ))
-			pptr->flavor = allocate_string(vptr);
-		if (!( strcmp( nptr, "image" ) ))
-			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
@@ -285,6 +345,36 @@ private void set_windowsazure_field(
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
 			pptr->workload = allocate_string(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
+		if (!( strcmp( nptr, "architecture" ) ))
+			pptr->architecture = allocate_string(vptr);
+		if (!( strcmp( nptr, "driver" ) ))
+			pptr->driver = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "original" ) ))
+			pptr->original = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "location" ) ))
+			pptr->location = allocate_string(vptr);
+		if (!( strcmp( nptr, "group" ) ))
+			pptr->group = allocate_string(vptr);
+		if (!( strcmp( nptr, "hostedservice" ) ))
+			pptr->hostedservice = allocate_string(vptr);
+		if (!( strcmp( nptr, "storageaccount" ) ))
+			pptr->storageaccount = allocate_string(vptr);
+		if (!( strcmp( nptr, "image" ) ))
+			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "media" ) ))
+			pptr->media = allocate_string(vptr);
+		if (!( strcmp( nptr, "flavor" ) ))
+			pptr->flavor = allocate_string(vptr);
+		if (!( strcmp( nptr, "publicnetwork" ) ))
+			pptr->publicnetwork = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
 			pptr->when = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -325,20 +415,6 @@ private int pass_windowsazure_filter(
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
-			return(0);
-		}
-	if (( fptr->flavor )
-	&&  (strlen( fptr->flavor ) != 0)) {
-		if (!( pptr->flavor ))
-			return(0);
-		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
-			return(0);
-		}
-	if (( fptr->image )
-	&&  (strlen( fptr->image ) != 0)) {
-		if (!( pptr->image ))
-			return(0);
-		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
 	if (( fptr->profile )
@@ -411,6 +487,111 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->workload,fptr->workload) != 0)
 			return(0);
 		}
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
+			return(0);
+		else if ( strcmp(pptr->node,fptr->node) != 0)
+			return(0);
+		}
+	if (( fptr->architecture )
+	&&  (strlen( fptr->architecture ) != 0)) {
+		if (!( pptr->architecture ))
+			return(0);
+		else if ( strcmp(pptr->architecture,fptr->architecture) != 0)
+			return(0);
+		}
+	if (( fptr->driver )
+	&&  (strlen( fptr->driver ) != 0)) {
+		if (!( pptr->driver ))
+			return(0);
+		else if ( strcmp(pptr->driver,fptr->driver) != 0)
+			return(0);
+		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
+	if (( fptr->original )
+	&&  (strlen( fptr->original ) != 0)) {
+		if (!( pptr->original ))
+			return(0);
+		else if ( strcmp(pptr->original,fptr->original) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
+	if (( fptr->location )
+	&&  (strlen( fptr->location ) != 0)) {
+		if (!( pptr->location ))
+			return(0);
+		else if ( strcmp(pptr->location,fptr->location) != 0)
+			return(0);
+		}
+	if (( fptr->group )
+	&&  (strlen( fptr->group ) != 0)) {
+		if (!( pptr->group ))
+			return(0);
+		else if ( strcmp(pptr->group,fptr->group) != 0)
+			return(0);
+		}
+	if (( fptr->hostedservice )
+	&&  (strlen( fptr->hostedservice ) != 0)) {
+		if (!( pptr->hostedservice ))
+			return(0);
+		else if ( strcmp(pptr->hostedservice,fptr->hostedservice) != 0)
+			return(0);
+		}
+	if (( fptr->storageaccount )
+	&&  (strlen( fptr->storageaccount ) != 0)) {
+		if (!( pptr->storageaccount ))
+			return(0);
+		else if ( strcmp(pptr->storageaccount,fptr->storageaccount) != 0)
+			return(0);
+		}
+	if (( fptr->image )
+	&&  (strlen( fptr->image ) != 0)) {
+		if (!( pptr->image ))
+			return(0);
+		else if ( strcmp(pptr->image,fptr->image) != 0)
+			return(0);
+		}
+	if (( fptr->media )
+	&&  (strlen( fptr->media ) != 0)) {
+		if (!( pptr->media ))
+			return(0);
+		else if ( strcmp(pptr->media,fptr->media) != 0)
+			return(0);
+		}
+	if (( fptr->flavor )
+	&&  (strlen( fptr->flavor ) != 0)) {
+		if (!( pptr->flavor ))
+			return(0);
+		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
+			return(0);
+		}
+	if (( fptr->publicnetwork )
+	&&  (strlen( fptr->publicnetwork ) != 0)) {
+		if (!( pptr->publicnetwork ))
+			return(0);
+		else if ( strcmp(pptr->publicnetwork,fptr->publicnetwork) != 0)
+			return(0);
+		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
 	if (( fptr->when ) && ( pptr->when != fptr->when )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -429,12 +610,6 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
@@ -465,6 +640,51 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.architecture=%s",optr->domain,optr->id,pptr->architecture);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.driver=%s",optr->domain,optr->id,pptr->driver);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.hostedservice=%s",optr->domain,optr->id,pptr->hostedservice);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.storageaccount=%s",optr->domain,optr->id,pptr->storageaccount);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.media=%s",optr->domain,optr->id,pptr->media);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.publicnetwork=%s",optr->domain,optr->id,pptr->publicnetwork);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
@@ -864,6 +1084,19 @@ private void	redirect_occi_windowsazure_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_windowsazure(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_windowsazure_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -878,10 +1111,6 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 	else {
 		redirect_occi_windowsazure_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
@@ -903,10 +1132,42 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "architecture",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "driver",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "original",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "group",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "hostedservice",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "storageaccount",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "media",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "publicnetwork",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_windowsazure)))
+			return( optr );
 		autoload_windowsazure_nodes();
 		return(optr);
 	}
@@ -943,28 +1204,6 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.name='%s'\r\n",(sptr->name?sptr->name:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.windowsazure.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.windowsazure.image='%s'\r\n",(sptr->image?sptr->image:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1075,6 +1314,171 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.node='%s'\r\n",(sptr->node?sptr->node:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.architecture='%s'\r\n",(sptr->architecture?sptr->architecture:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.driver='%s'\r\n",(sptr->driver?sptr->driver:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.price='%s'\r\n",(sptr->price?sptr->price:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.original='%s'\r\n",(sptr->original?sptr->original:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.location='%s'\r\n",(sptr->location?sptr->location:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.group='%s'\r\n",(sptr->group?sptr->group:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.hostedservice='%s'\r\n",(sptr->hostedservice?sptr->hostedservice:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.storageaccount='%s'\r\n",(sptr->storageaccount?sptr->storageaccount:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.image='%s'\r\n",(sptr->image?sptr->image:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.media='%s'\r\n",(sptr->media?sptr->media:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.publicnetwork='%s'\r\n",(sptr->publicnetwork?sptr->publicnetwork:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
