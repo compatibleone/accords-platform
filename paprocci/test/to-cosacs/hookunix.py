@@ -21,6 +21,15 @@ logger.info('The current directory is ' + currdir)
 logger.info('The current hostname is ' + hostname)
 logger.info('The lockfile is in ' + lockfile)
 logger.info('The current platform is ' + curros)
+logger.info('The arguments are ')
+command = []
+first = 0
+for arg in sys.argv:
+    if first==0:
+        first = 1
+    else:
+        logger.info('  ' + arg)
+        command.append(arg)
 
 def signal_handler(signal, frame):
     logger.info('Signal: something tryied to kill me... I am not dying...')
@@ -28,9 +37,13 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 logger.info('Running process...')
-process = subprocess.Popen(['sleep','100'])
+process = subprocess.Popen(command)
 
-logger.info('Process is running with PID ' + str(process.pid))
+logger.info('Process is running with PID ' + str(process.pid) + ' ... Let it be for a while... ')
+
+time.sleep(20) # In a perfect world, NFS would synchronize all the files in all the nodes of a grid in 0 seconds. 
+
+logger.info('Watching lockfile...')
 miscco.block_while_file_exists(lockfile)
 
 logger.info('File deleted. Process will be killed...')
