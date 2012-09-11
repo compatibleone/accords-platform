@@ -39,7 +39,6 @@ struct	cords_pa_contract
 	struct	cords_vector	image;
 	struct	cords_vector	system;
 	struct	cords_vector	package;
-	struct	pa_response *	flavors;
 	struct	pa_response *	images;
 };
 
@@ -83,8 +82,6 @@ private	int	terminate_proactive_contract( int status, struct cords_pa_contract *
 		cptr->system.message = occi_remove_response( cptr->system.message );
 	if ( cptr->package.message )
 		cptr->package.message = occi_remove_response( cptr->package.message );
-	if ( cptr->flavors )
-		cptr->flavors = liberate_pa_response( cptr->flavors );
 	if ( cptr->images  )
 		cptr->images  = liberate_pa_response( cptr->images  );
 	return( status );
@@ -131,107 +128,6 @@ private	int	pa_normalise_value( char * sptr, int normal )
 	return( value * factor );
 }
 
-
-/*	-----------------------------------------------------------------	*/
-/*		r e s o l v e _ c o n t r a c t _ f l a v o r 			*/
-/*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_flavor( struct cords_pa_contract * cptr )
-{
-	struct	pa_compute_infos	request;
-	struct	pa_compute_infos	flavor;
-	struct	pa_compute_infos	best;
-	char *			vptr;
-
-	struct	data_element * eptr=(struct data_element *) 0;
-	struct	data_element * dptr=(struct data_element *) 0;
-
-	if (!( eptr = json_element( cptr->flavors->jsonroot, "flavors" )))
-		return((char *) 0);
-
-	/* -------------------------------------------------------------- */
-	/* retrieve appropriate parameters from infrastructure components */
-	/* -------------------------------------------------------------- */
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
-		request.memory = 0;
-	else	request.memory = pa_normalise_value( vptr,'G' );
-
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_CORES ) ))
-		request.cores = 0;
-	else	request.cores = pa_normalise_value( vptr,'U' );
-
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_SPEED ) ))
-		request.speed = 0;
-	else	request.speed = pa_normalise_value(vptr,'G');
-	
-	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
-		_CORDS_STORAGE, _CORDS_SIZE ) ))
-		request.storage = 0;
-	else	request.storage = pa_normalise_value(vptr,'G');
-	
-	/* ----------------------------------------- */
-	/* for structures in flavor message response */
-	/* ----------------------------------------- */
-	memset( &best, 0, sizeof( struct pa_compute_infos ));
-	for ( 	dptr=eptr->first;
-		dptr != (struct data_element *) 0;
-		dptr = dptr->next )
-	{
-		/* ----------------------------------------------- */
-		/* collect the information from the flavor element */
-		/* ----------------------------------------------- */
-		if (!( vptr = json_atribut( dptr, "id" ) ))
-			continue;
-		else	flavor.id = vptr;
-		if (!( vptr = json_atribut( dptr, "disk" ) ))
-			flavor.storage = 0;
-		else	flavor.storage = pa_normalise_value(vptr,'G');
-		if (!( vptr = json_atribut( dptr, "ram" ) ))
-			flavor.memory = 0;
-		else	flavor.memory = pa_normalise_value(vptr,'M');
-		if (!( vptr = json_atribut( dptr, "vcpus" ) ))
-			flavor.cores = 0;
-		else	flavor.cores = pa_normalise_value(vptr,'U');
-		if (!( vptr = json_atribut( dptr, "speed" ) ))
-			flavor.speed = 0;
-		else	flavor.speed = pa_normalise_value(vptr,'G');
-		/* ------------------------------------ */
-		/* compare the request and the response */
-		/* ------------------------------------ */
-		if (( request.storage ) && ( flavor.storage < request.storage ))
-			continue;
-		else if (( request.memory  ) && ( flavor.memory < request.memory ))
-			continue;
-		else if (( request.cores ) && ( flavor.cores ) && ( flavor.cores < request.cores ))
-			continue;
-		else if (( request.speed ) && ( flavor.speed ) && ( flavor.speed < request.speed ))
-			continue;
-		/* --------------------- */
-		/* ok so its good enough */
-		/* --------------------- */
-		if (( best.cores ) && ( flavor.cores ) && ( best.cores < flavor.cores ))
-			continue;
-		if (( best.speed ) && ( flavor.speed ) && ( best.speed < flavor.speed ))
-			continue;
-		if (( best.memory ) && ( best.memory < flavor.memory ))
-			continue;
-		if (( best.storage ) && ( best.storage < flavor.storage ))
-			continue;
-		/* -------------------- */
-		/* in fact it is better */
-		/* -------------------- */
-		best.cores = flavor.cores;
-		best.speed = flavor.speed;
-		best.memory = flavor.memory;
-		best.storage = flavor.storage;
-		best.id = flavor.id;
-	}
-	if (!( best.id ))
-		return( best.id );
-	else	return(allocate_string( best.id ) );
-}
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
@@ -335,7 +231,6 @@ public	int	create_proactive_contract(
 		char * tls )
 {
 	struct	cords_pa_contract contract;
-	struct	pa_response * flavors=(struct pa_response *) 0;
 	struct	pa_response * images =(struct pa_response *) 0;
 	int	status;
 	char *	vptr;
@@ -403,15 +298,6 @@ public	int	create_proactive_contract(
 		return( terminate_proactive_contract( 1178, &contract ) );
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
 		return( terminate_proactive_contract( 1179, &contract ) );
-
-	/* --------------------------------------------------------- */
-	/* recover detailled list of pa Flavors and resolve contract */
-	/* --------------------------------------------------------- */
-	//else if (!( contract.flavors = pa_list_flavor_details() ))
-	//	return( terminate_proactive_contract( 1180, &contract ) );
-	//else if (!( pptr->flavor = resolve_contract_flavor( &contract ) ))
-	//	return( terminate_proactive_contract( 1181, &contract ) );
-		
 
 	/* ---------------------------------- */
 	/* recover the node image description */

@@ -36,6 +36,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -43,6 +49,7 @@ import org.ow2.proactive.compatibleone.exchangeobjects.NodeInfo;
 import org.ow2.proactive.compatibleone.exchangeobjects.NodePublicInfo;
 import org.ow2.proactive.compatibleone.misc.CONodeState;
 import org.ow2.proactive.compatibleone.misc.Misc;
+import org.ow2.proactive.compatibleone.misc.Signal;
 import org.ow2.proactive.compatibleone.rm.NodeId;
 import org.ow2.proactive.compatibleone.rm.ResourceManagerClient;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -56,17 +63,22 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
 public class SchedulerClient {
 	public static final String JOBNAME = "COApplication";
-	private static SchedulerClient instance;
+	
+	private static String schedulerurl_backup;
+	private static String username_backup;
+	private static String password_backup;
 	
 	protected static Logger logger  =						// Logger. 
 			Logger.getLogger(SchedulerClient.class.getName()); 
@@ -76,29 +88,18 @@ public class SchedulerClient {
 
 	private Scheduler scheduler;
 	
-	public static SchedulerClient initializeInstance(
+	public static void setUpInitiParameters(
 			String schedulerurl, 
 			String username,
-			String password) throws Exception{
-		if (instance != null){
-	        logger.error("Trying to re-initialize the SchedulerClient.");
-		}
-		instance = new SchedulerClient(schedulerurl, username, password);
-		return instance;
+			String password){
+		schedulerurl_backup = schedulerurl;
+		username_backup = username;
+		password_backup = password;
 	}
 	
-	public static SchedulerClient getInstance(){
-		if (instance == null){
-	        logger.error("Trying to access the SchedulerClient without initializing.");
-		}
-		localCheck(instance);
-		return instance;
-	}
-	
-	private static void localCheck(SchedulerClient client){
-        logger.info("About to use the SchedulerClient...");
-        boolean bool = client.scheduler.isConnected();
-        logger.info("SchedulerClient.isConnected()=" + bool);
+	public static SchedulerClient getInstance() throws Exception{
+        logger.info("Initializing instance of Scheduler...");
+		return new SchedulerClient(schedulerurl_backup, username_backup, password_backup);
 	}
 	
 	/**
@@ -133,17 +134,21 @@ public class SchedulerClient {
 	/**
 	 * Method to create a job with one task, which runs a specific application (i.e. COSACS of 
 	 * CompatibleOne) and later returns the information of that node.
-	 * @param nodeselectioncriteria criteria to select the node (it must be a Selection Script of ProActive)
+	 * @param stopsignal signal to listen to to know if the job submission attempt is no longer needed.
+	 * @param nodeselectioncriteria criteria to select the node (it must be a Selection Script of ProActive).
 	 * @param applicationpath path of the application to be run in the node. 
 	 * @param applicationargs arguments to pass to the application. 
 	 * @param nodetoken special token that allow the usage of some privileged nodes. 
+	 * @param nonodes number of nodes needed by this application. 
 	 * @return information about the node in which the application runs. 
 	 * @throws Exception if something goes wrong. */
 	public String acquireApplicationInNode(
+			Signal stopsignal,
 			SelectionScript nodeselectioncriteria, 
 			String applicationpath,
 			String applicationargs, 
-			String nodetoken) throws Exception {
+			String nodetoken,
+			Integer nonodes) throws Exception {
 		
 		logger.info("Creating job and tasks...");
 		NativeTask primaryTask = new NativeTask();
@@ -154,8 +159,18 @@ public class SchedulerClient {
 		primaryTask.setWorkingDir(workingdir);
 		primaryTask.setCommandLine(Misc.getStringArray(applicationpath, applicationargs));
 		primaryTask.setName(applicationpath);
-		logger.info("Using selection script: '"+nodeselectioncriteria.getScript()+"'...");
+		logger.debug("Using selection script: '"+nodeselectioncriteria.getScript()+"'...");
 		primaryTask.addSelectionScript(nodeselectioncriteria);
+		
+		if (nonodes != null && nonodes > 1){
+			logger.info("Using topology made of " + nonodes + " nodes...");
+			TopologyDescriptor topologyDescriptor = TopologyDescriptor.SINGLE_HOST;
+			ParallelEnvironment parallelEnvironment = new ParallelEnvironment(nonodes, topologyDescriptor);
+			primaryTask.setParallelEnvironment(parallelEnvironment);
+		}else{
+			logger.info("Only one node required, no topology needed.");
+		}
+		
 		if (nodetoken != null){
 			logger.info("Using node token: '"+nodetoken+"'...");
 			primaryTask.addGenericInformation("NS_AUTH", nodetoken);
@@ -170,13 +185,19 @@ public class SchedulerClient {
 		JobId jobId = scheduler.submit(taskFlowJob);
 		pendingJobId = jobId.toString();
 		logger.info("Submitted the job (JobId " + jobId + ")");
-		
+	
 		JobState jobstate = null;
 		while(true){
 			jobstate = scheduler.getJobState(jobId);
 			if (jobstate.getStatus().equals(JobStatus.PENDING)){ // It is still pending... We need to wait...
 				logger.info("Waiting for the pending job...");
-				Thread.sleep(2000);
+				if (stopsignal.getValue()==true){
+					logger.info("Waited too much for the job to execute, trying to remove it...");
+					removeJobAlone(jobId);
+					logger.info("Removed the job " + jobId);
+					throw new Exception("Obliged to stop, removed the job " + jobId + ". ");
+				}
+				Thread.sleep(3000);
 			}else{ 	// Not pending anymore, so it went through execution but it's not sure that it's running, so
 					// the correct execution must be checked. 
 				if (!jobstate.getStatus().equals(JobStatus.RUNNING)){ // Not running? There is a problem then...
@@ -236,9 +257,41 @@ public class SchedulerClient {
 				address, 
 				nodePublicInfo.getNodeURL(), 
 				nodePublicInfo.getOwner());
+				
+		
+		if (stopsignal.getValue()==true){
+			logger.info("Job executed but too late...");
+			removeJobAlone(jobId);
+			logger.info("Removed the job " + jobId);
+			throw new Exception("Job " + jobId + " executed but too late...");
+		}
 		return ret.toString();
 	}
 
+	
+	public void removeJobAlone(final JobId jobId) throws Exception{
+		logger.info("Trying to FINAL release node whose related id is: " + jobId);
+		Callable<String> callable = new Callable<String>(){
+			@Override
+			public String call() throws Exception {
+				SchedulerClient scheduler = SchedulerClient.getInstance();
+				String result = scheduler.releaseNode(jobId.toString());
+				logger.info("Released the node: " + jobId + ", result: " + result);
+				scheduler.disconnect();
+				return result;
+			}
+		};
+		
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		Future<String> future = executor.submit(callable); // We ask to execute the callable.
+		String res = null;
+		try{
+			res = future.get(Integer.MAX_VALUE, TimeUnit.SECONDS);
+		}catch(Exception e){
+			logger.error("Error: ", e);
+		}
+	}
+	
 	/**
 	 * Maps a given node with a running job. 
 	 * @return a hashtable containing the mapping.
@@ -356,4 +409,12 @@ public class SchedulerClient {
             return false;
         }
     }
+	
+	public void disconnect(){
+		try{
+			scheduler.disconnect();
+		}catch(Exception e){
+			logger.warn("Error while trying to disconnect...", e);
+		}
+	}
 }

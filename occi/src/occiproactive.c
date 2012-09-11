@@ -137,8 +137,6 @@ private void autoload_proactive_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
-				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
@@ -153,14 +151,14 @@ private void autoload_proactive_nodes() {
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
 				pptr->access = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "rootpass" )) != (struct xml_atribut *) 0)
-				pptr->rootpass = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "reference" )) != (struct xml_atribut *) 0)
 				pptr->reference = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "publicaddr" )) != (struct xml_atribut *) 0)
 				pptr->publicaddr = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "privateaddr" )) != (struct xml_atribut *) 0)
 				pptr->privateaddr = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "nopanodes" )) != (struct xml_atribut *) 0)
+				pptr->nopanodes = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
@@ -203,9 +201,6 @@ public  void autosave_proactive_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," flavor=%c",0x0022);
-		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
@@ -227,9 +222,6 @@ public  void autosave_proactive_nodes() {
 		fprintf(h," access=%c",0x0022);
 		fprintf(h,"%s",(pptr->access?pptr->access:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," rootpass=%c",0x0022);
-		fprintf(h,"%s",(pptr->rootpass?pptr->rootpass:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," reference=%c",0x0022);
 		fprintf(h,"%s",(pptr->reference?pptr->reference:""));
 		fprintf(h,"%c",0x0022);
@@ -238,6 +230,9 @@ public  void autosave_proactive_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," privateaddr=%c",0x0022);
 		fprintf(h,"%s",(pptr->privateaddr?pptr->privateaddr:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," nopanodes=%c",0x0022);
+		fprintf(h,"%s",(pptr->nopanodes?pptr->nopanodes:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
@@ -280,8 +275,6 @@ private void set_proactive_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "flavor" ) ))
-			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
@@ -296,14 +289,14 @@ private void set_proactive_field(
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
 			pptr->access = allocate_string(vptr);
-		if (!( strcmp( nptr, "rootpass" ) ))
-			pptr->rootpass = allocate_string(vptr);
 		if (!( strcmp( nptr, "reference" ) ))
 			pptr->reference = allocate_string(vptr);
 		if (!( strcmp( nptr, "publicaddr" ) ))
 			pptr->publicaddr = allocate_string(vptr);
 		if (!( strcmp( nptr, "privateaddr" ) ))
 			pptr->privateaddr = allocate_string(vptr);
+		if (!( strcmp( nptr, "nopanodes" ) ))
+			pptr->nopanodes = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
@@ -352,13 +345,6 @@ private int pass_proactive_filter(
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
-			return(0);
-		}
-	if (( fptr->flavor )
-	&&  (strlen( fptr->flavor ) != 0)) {
-		if (!( pptr->flavor ))
-			return(0);
-		else if ( strcmp(pptr->flavor,fptr->flavor) != 0)
 			return(0);
 		}
 	if (( fptr->image )
@@ -410,13 +396,6 @@ private int pass_proactive_filter(
 		else if ( strcmp(pptr->access,fptr->access) != 0)
 			return(0);
 		}
-	if (( fptr->rootpass )
-	&&  (strlen( fptr->rootpass ) != 0)) {
-		if (!( pptr->rootpass ))
-			return(0);
-		else if ( strcmp(pptr->rootpass,fptr->rootpass) != 0)
-			return(0);
-		}
 	if (( fptr->reference )
 	&&  (strlen( fptr->reference ) != 0)) {
 		if (!( pptr->reference ))
@@ -436,6 +415,13 @@ private int pass_proactive_filter(
 		if (!( pptr->privateaddr ))
 			return(0);
 		else if ( strcmp(pptr->privateaddr,fptr->privateaddr) != 0)
+			return(0);
+		}
+	if (( fptr->nopanodes )
+	&&  (strlen( fptr->nopanodes ) != 0)) {
+		if (!( pptr->nopanodes ))
+			return(0);
+		else if ( strcmp(pptr->nopanodes,fptr->nopanodes) != 0)
 			return(0);
 		}
 	if (( fptr->hostname )
@@ -486,9 +472,6 @@ private struct rest_response * proactive_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -510,9 +493,6 @@ private struct rest_response * proactive_occi_response(
 	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.rootpass=%s",optr->domain,optr->id,pptr->rootpass);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.reference=%s",optr->domain,optr->id,pptr->reference);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -520,6 +500,9 @@ private struct rest_response * proactive_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.nopanodes=%s",optr->domain,optr->id,pptr->nopanodes);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
@@ -959,8 +942,6 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 		redirect_occi_proactive_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
@@ -975,13 +956,13 @@ public struct occi_category * occi_proactive_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "rootpass",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "reference",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "publicaddr",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "privateaddr",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "nopanodes",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
@@ -1033,17 +1014,6 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.proactive.name='%s'\r\n",(sptr->name?sptr->name:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.proactive.flavor='%s'\r\n",(sptr->flavor?sptr->flavor:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1131,17 +1101,6 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.proactive.rootpass='%s'\r\n",(sptr->rootpass?sptr->rootpass:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.proactive.reference='%s'\r\n",(sptr->reference?sptr->reference:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1165,6 +1124,17 @@ public struct rest_header *  proactive_occi_headers(struct proactive * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.proactive.privateaddr='%s'\r\n",(sptr->privateaddr?sptr->privateaddr:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.proactive.nopanodes='%s'\r\n",(sptr->nopanodes?sptr->nopanodes:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

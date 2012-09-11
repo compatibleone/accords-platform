@@ -53,7 +53,7 @@ public class Starter {
 	 * The procci is started through command line, not through JNI.
 	 * @param args
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 		Arguments options = new Arguments(args);
 		ProcciParametersHandler prob = new ProcciParametersHandler(options); 
 		try{
@@ -72,7 +72,7 @@ public class Starter {
 	 * @param args
 	 * @return the initialized procci.
 	 */
-	public static Procci start(Object[] args){
+	public static Procci start(Object[] args) throws Exception{
 		// For this implementation: user=args[0] and pass=args[1]
 		String user = args[0].toString();
 		String pass = args[1].toString();

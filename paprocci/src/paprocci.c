@@ -194,6 +194,13 @@ private	int	paprocci(int argc, char * argv[] )
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
+
+	/** TEST  **/
+
+	test_invoke();
+
+	/** TEST  **/
+
 	paprocci_load();
 	while ( argi < argc )
 	{

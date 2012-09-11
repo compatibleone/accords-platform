@@ -108,7 +108,7 @@ public class SelectionScriptCreator {
 					cond.getCondition().replace("OPERATOR", operator) + 
 					printCurrentDecision();
 		}
-		logger.info("Selection script created: " + script);
+		//logger.info("Selection script created: " + script);
 		return new SelectionScript(script, "JavaScript", true);
 	}
 	

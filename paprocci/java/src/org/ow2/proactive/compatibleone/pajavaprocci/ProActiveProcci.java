@@ -56,39 +56,22 @@ import org.ow2.proactive.scripting.*;
 public class ProActiveProcci extends Procci{
 	private static Logger logger =						// Logger. 
 			Logger.getLogger(ProActiveProcci.class.getName()); 
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
-	
 	private ProcciProperties props;
 	
 	public ProActiveProcci(ProcciProperties props){
+		//executor =  Executors.newFixedThreadPool(1);
 		this.props = props;
 	}
 	
 	/**
-	 * Here command-line parameters are interpreted and an action takes place accordingly. */
-	public void initialize(final String user, final String pass){
+	 * Here command-line parameters are interpreted and an action takes place accordingly. 
+	 * @throws Exception 
+	 * @throws ElementNotFoundException */
+	public void initialize(final String user, final String pass) throws ElementNotFoundException{
 		logger.info("Trying to initialize all (user="+user+" pass="+pass+")...");
-		Callable<String> callable = new Callable<String>(){
-			@Override
-			public String call() throws Exception {
-				ResourceManagerClient.initializeInstance(
-					props.getProperty("rm.url"), 
-					user, 
-					pass);
-				SchedulerClient.initializeInstance(
-					props.getProperty("scheduler.url"),
-					user, 
-					pass);
-				return "";
-			}
-		};
+		ResourceManagerClient.setUpInitParameters(props.getProperty("rm.url"), user, pass);
+		SchedulerClient.setUpInitiParameters( props.getProperty("scheduler.url"), user, pass);
 		
-		Future<String> future = executor.submit(callable); // We ask to execute the callable.
-		try{
-			future.get(new Integer(props.getProperty("scheduler.timeout")), TimeUnit.SECONDS);
-		}catch(Exception e){
-			logger.warn("Error: ", e);
-		}
 	}
 	/**
 	 * Here command-line parameters are interpreted and an action takes place accordingly. */
@@ -102,7 +85,8 @@ public class ProActiveProcci extends Procci{
 				String os = args.getStr("select-by-os");
 				String hostname = args.getStr("select-by-hostname");
 				String file = args.getStr("select-by-file-existent");
-				Object[] params = {os, hostname, file};
+				String nonodes = args.getStr("number-of-nodes");
+				Object[] params = {os, hostname, file, nonodes};
 				String nodeid = start_server(params);
 				Misc.print(nodeid);
 			}else if (args.getBool("get-node-info")){
@@ -127,6 +111,8 @@ public class ProActiveProcci extends Procci{
 				Misc.print("No command given");  
 			}
 			Misc.exit();  
+			//Thread.sleep(18000);
+			//command(args);
 		}catch(Throwable e){
 			logger.warn("Execution error detected: " + e.getMessage());
 			e.printStackTrace();
@@ -139,16 +125,34 @@ public class ProActiveProcci extends Procci{
 			throw new Exception("The amount of parameters passed is " + args.length + " but " + amount + " are required.");
 		}
 	}
+	
+	private ExecutorService createExecutor(){
+		return Executors.newSingleThreadExecutor();
+	}
+	
+	public String listOperativeSystems() throws Exception{
+		ResourceManagerClient rm = ResourceManagerClient.getInstance(); 
+		Set<String> nodeurls = rm.getNodesUrl(false);
+		GenerationScript datascript = DataScriptCreator.createScript(DataScriptAddition.getOS());
+		//GenerationScript datascript = DataScriptCreator.createScript(DataScriptAddition.getCPUUser());
+		rm.runScript(
+				nodeurls, 
+				datascript);
+		rm.disconnect();
+		return "{}";
+	}
+	
 	/**
 	 * Execute in a ProActive node an instance of COSACS module. 
 	 * @return a json object telling the result of the operation and some extra data. 
 	 * @throws Exception if anything goes wrong. 
 	 */
 	public String start_server(Object[] args) throws Exception{
-		checkparameters(args, 3);
+		checkparameters(args, 4);
 		String os = (args[0]==null?null:args[0].toString());
 		String hostname = (args[1]==null?null:args[1].toString());
 		String file = (args[2]==null?null:args[2].toString());
+		String nonodesstr = (args[3]==null?null:args[3].toString());
 		
 		if (os==null){
 			os = "linux";
@@ -189,46 +193,49 @@ public class ProActiveProcci extends Procci{
 					);
 		}
 		
-		final SelectionScript selectionscript = selection;
-		final SchedulerClient scheduler = SchedulerClient.getInstance();
+		Integer nonodes;
+		try{
+			nonodes = Integer.parseInt(nonodesstr);
+		}catch(Exception e){
+			nonodes = null;
+			logger.warn("Error parsing number of nodes: '" + nonodesstr + "'... Skipping parameter.");
+		}
 		
+		final Integer nonodesf = nonodes;
+		final SelectionScript selectionscript = selection;
+		final Signal stopsignal = new Signal(false);
 		Callable<String> callable = new Callable<String>(){
 			@Override
 			public String call() throws Exception {
 		
+				SchedulerClient scheduler = SchedulerClient.getInstance();
 				String node = scheduler.acquireApplicationInNode(
+						stopsignal,
 						selectionscript, 
 						app_path, 
 						app_args, 
-						nodetoken); // Get a json formatted object with all the information.
+						nodetoken, 
+						nonodesf); // Get a json formatted object with all the information.
 				logger.info("Obtained the remote with info: " + node);
+				scheduler.disconnect();
 				return node;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{
 			res = future.get(new Integer(props.getProperty("scheduler.timeout")), TimeUnit.SECONDS);
 			return res;
 		}catch(Exception e){
+			stopsignal.setValue(true);
 			logger.warn("Error: ", e);
-			scheduler.releasePotentialNode(); // Release the node that was maybe taken. 
 			return (new ErrorObject(e).toString());
 		}
 	}
 	
 	
-	public String listOperativeSystems() throws Exception{
-		ResourceManagerClient rm = ResourceManagerClient.getInstance(); 
-		Set<String> nodeurls = rm.getNodesUrl(false);
-		GenerationScript datascript = DataScriptCreator.createScript(DataScriptAddition.getOS());
-		//GenerationScript datascript = DataScriptCreator.createScript(DataScriptAddition.getCPUUser());
-		rm.runScript(
-				nodeurls, 
-				datascript);
-		return "{}";
-	}
 	
 	/**
 	 * Monitors a node.
@@ -246,16 +253,20 @@ public class ProActiveProcci extends Procci{
 			@Override
 			public String call() throws Exception {
 				ResourceManagerClient rm = ResourceManagerClient.getInstance(); 
+				String result = null;
 				if (mbean == null){
 					logger.info("Interpreting attribute parameter as a monitoring property...");
-					return rm.monitorNode(nodeurl, attribute).toString();
+					result = rm.monitorNode(nodeurl, attribute).toString();
 				}else{
 					logger.info("Using explicitly told mbean and attribute...");
-					return rm.monitorNode(nodeurl, mbean, attribute).toString();
+					result = rm.monitorNode(nodeurl, mbean, attribute).toString();
 				}
+				rm.disconnect();
+				return result;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{
@@ -282,10 +293,14 @@ public class ProActiveProcci extends Procci{
 				Hashtable<NodeId, String> job2node = scheduler.mapNodesWithJobs();
 				ResourceManagerClient rm = ResourceManagerClient.getInstance();
 				NodePublicInfoList nodes = rm.getAllTheNodesInfo(job2node);
-				return nodes.toString();
+				String result = nodes.toString();
+				scheduler.disconnect();
+				rm.disconnect();
+				return result;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{
@@ -297,6 +312,7 @@ public class ProActiveProcci extends Procci{
 		}
 	}
 
+	
 	/**
 	 * Get the output of a task running at a particular node.
 	 */
@@ -306,10 +322,13 @@ public class ProActiveProcci extends Procci{
 			@Override
 			public String call() throws Exception {
 				SchedulerClient scheduler = SchedulerClient.getInstance();
-				return scheduler.acquireOutput(jobid);
+				String result = scheduler.acquireOutput(jobid);
+				scheduler.disconnect();
+				return result;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{
@@ -321,6 +340,7 @@ public class ProActiveProcci extends Procci{
 		}
 	}
 
+	
 	/**
 	 * Get public information regarding a node. 
 	 *  
@@ -337,10 +357,14 @@ public class ProActiveProcci extends Procci{
 				Hashtable<NodeId, String> job2node = scheduler.mapNodesWithJobs();
 				ResourceManagerClient rm = ResourceManagerClient.getInstance();
 				NodePublicInfo node = rm.getNodePublicInfo(nodeid, job2node);
-				return node.toString();
+				String result = node.toString();
+				scheduler.disconnect();
+				rm.disconnect();
+				return result;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{
@@ -368,10 +392,12 @@ public class ProActiveProcci extends Procci{
 				SchedulerClient scheduler = SchedulerClient.getInstance();
 				String result = scheduler.releaseNode(uuid);
 				logger.info("Released the node: " + uuid + ", result: " + result);
+				scheduler.disconnect();
 				return result;
 			}
 		};
 		
+		ExecutorService executor = createExecutor();//Executors.newSingleThreadExecutor();
 		Future<String> future = executor.submit(callable); // We ask to execute the callable.
 		String res = null;
 		try{

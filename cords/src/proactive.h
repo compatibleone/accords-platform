@@ -7,20 +7,21 @@ struct	proactive
 	char *	id;    
 
 	char *	name;       
-	char *	flavor;
+	//char *	flavor;
 	char *	image;
 	char *	profile;
 
 	char *	node;
 	char *	price;
-	char *	account;
+	//char *	account;
 
 	char *	number;     // uuid of the ProActive node request? 
 	char *	access;
-	char *	rootpass;   
+	//char *	rootpass;   
 	char *	reference;  
 	char *	publicaddr;
 	char *	privateaddr;
+	char *  nopanodes;
 
 	char *	hostname;
 	char *	workload;

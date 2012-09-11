@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.compatibleone.exchangeobjects.NodePublicInfo;
@@ -68,32 +67,23 @@ import org.ow2.proactive.scripting.ScriptResult;
 public class ResourceManagerClient {
 	public static Logger logger = Logger.getLogger(ResourceManagerClient.class.getName()); 	// Logger.
 	
-	private static ResourceManagerClient instance; // Singleton attribute. 
+	private static String url_backup;
+	private static String username_backup;
+	private static String password_backup;
 	
 	private ResourceManager rm;
 	private RMAuthentication auth;
 	private Credentials cred;
 	
-	public static ResourceManagerClient initializeInstance(String url, String user, String pass) throws Exception{
-		if (instance != null){
-	        logger.error("Trying to re-initialize the RMClient.");
-		}
-		instance = new ResourceManagerClient(url, user, pass);
-		return instance;
+	public static void setUpInitParameters(String url, String user, String pass){
+		url_backup = url;
+		username_backup = user;
+		password_backup = pass;
 	}
 	
-	public static ResourceManagerClient getInstance(){
-		if (instance == null){
-	        logger.error("Trying to access the RMClient without initializing.");
-		}
-		localCheck(instance);
-		return instance;
-	}
-	
-	private static void localCheck(ResourceManagerClient client){
-        logger.info("About to use the ResourceManagerClient...");
-        BooleanWrapper bool = client.rm.isActive();
-        logger.info("RM.isActive()=" + bool.toString());
+	public static ResourceManagerClient getInstance() throws Exception{
+        logger.info("Initializing instance of RM...");
+		return new ResourceManagerClient(url_backup, username_backup, password_backup);
 	}
 	
 	/**
@@ -258,5 +248,9 @@ public class ResourceManagerClient {
 	        
 		}
         return null;
+	}
+	
+	public void disconnect(){
+		rm.disconnect();
 	}
 }

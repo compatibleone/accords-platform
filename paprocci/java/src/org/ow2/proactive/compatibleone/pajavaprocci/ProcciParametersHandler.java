@@ -97,6 +97,7 @@ public final class ProcciParametersHandler {
 		args.addNewOption("c", "select-by-hostname", true);
 		args.addNewOption("f", "select-by-file-existent", true);
 		args.addNewOption("g", "select-by-os", true);
+		args.addNewOption("n", "number-of-nodes", true);
 		args.addNewOption("i", "list-os", false);
 	}
 	

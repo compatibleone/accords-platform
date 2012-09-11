@@ -1,12 +1,114 @@
 #include <invoke.h>
 #include <proactive.h>
 #include <paconfig.h>
+#include <restrequest.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
 #define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
+#define CLASS_REST_REQUEST "org/ow2/compatibleone/exchangeobjects/RestRequest"
+#define CLASS_REST_HEADER "org/ow2/compatibleone/exchangeobjects/RestHeader"
 
+struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp);
+jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr);
+jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr);
+
+void test_invoke(){}
+void test_invoke1(){
+	struct jvm_struct * jvmp = NULL;
+	jvmp = initialize_jvm_if_needed(&jvmp);
+	struct rest_request a;
+	a.first = NULL;
+	a.last = NULL;
+	a.method = "methoddd";
+	a.object = "objecttt";
+	a.parameters = "parameterssss";
+	a.version = "versionnnn";
+	a.type = 333;
+	a.body = "bodyyyy";
+	a.host = "hostttt";
+
+	create_java_rest_request_object(jvmp, &a);
+}
+
+jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr){
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	if (rptr == NULL){
+		fprintf(stderr, "Can't accept NULL parameters...\n");
+		exit(-1);
+	}
+
+	jclass sclass = (*env)->FindClass(env, CLASS_REST_REQUEST);
+	if (sclass == 0){
+		fprintf(stderr, "Can't find class...\n");
+		exit(-1);
+	}
+
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V");
+
+	if (initmeth == 0){
+		fprintf(stderr, "Can't find method...\n");
+		exit(-1);
+	}
+
+	jobject first = create_java_rest_header_object(jvmp, NULL);
+	jobject last = create_java_rest_header_object(jvmp, NULL);
+	jstring method = (*env)->NewStringUTF(env, (rptr->method?rptr->method:""));	
+	jstring object = (*env)->NewStringUTF(env, (rptr->object?rptr->object:""));	
+	jstring parameters = (*env)->NewStringUTF(env, (rptr->parameters?rptr->parameters:""));	
+	jstring version = (*env)->NewStringUTF(env, (rptr->version?rptr->version:""));	
+	jint type = (jint) rptr->type;
+	jstring body = (*env)->NewStringUTF(env, (rptr->body?rptr->body:""));	
+	jstring host = (*env)->NewStringUTF(env, (rptr->host?rptr->host:""));	
+	
+	jobject restrequ = (*env)->NewObject(env, sclass, initmeth, first, last, method, object, parameters, version, type, body, host);
+
+	if (restrequ == 0){
+		fprintf(stderr, "Can't instantiate class...\n");
+		exit(-1);
+	}
+
+	fprintf(stderr, "All right!\n");
+	exit(0);
+
+	return restrequ;
+
+}
+
+jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr){
+	jmethodID initmeth;
+	jobject resthead;
+	
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	jclass sclass = (*env)->FindClass(env, CLASS_REST_HEADER);
+	if (sclass == 0){
+		fprintf(stderr, "Can't find class...\n");
+		exit(-1);
+	}
+
+	initmeth = (*env)->GetMethodID(env, sclass, "<init>","()V");
+
+	if (initmeth == 0){
+		fprintf(stderr, "Can't find method...\n");
+		exit(-1);
+	}
+
+	resthead = (*env)->NewObject(env, sclass, initmeth);
+
+	if (resthead == 0){
+		fprintf(stderr, "Can't instantiate class...\n");
+		exit(-1);
+	}
+
+	return resthead;
+}
 
 
 /**
@@ -297,6 +399,21 @@ struct jvm_struct * initialize_provider_if_needed(struct pa_config * config, str
 }
 
 /**
+ * Initialize the procci and connects it to the provider if needed. 
+ * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
+ */
+struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp){
+	if (*jvmpp==NULL){
+		fprintf(stderr, "Initializing JVM (NOT provider)...\n");
+		// start the JVM
+		*jvmpp = start_jvm();
+		fprintf(stderr, "JVM and was initialized successfully.\n");
+	}else{
+		fprintf(stderr, "Provider initialized, skipping...\n");
+	}
+	return *jvmpp;
+}
+/**
  * Start a VM.
  * @param config procci configuration structure.
  * @param jvmpp procci JVM structure.
@@ -319,7 +436,7 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	// The Java method to call is 'String start_server(Object[] args)'.
 	// We prepare the arguments to invoke it. 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 3, sclass, NULL);
+	jobjectArray margs = (*env)->NewObjectArray(env, 4, sclass, NULL);
 
 	jstr1 = (*env)->NewStringUTF(env, constr->image);	// Set argument. 
 	//jstr2 = (*env)->NewStringUTF(env, "demo");

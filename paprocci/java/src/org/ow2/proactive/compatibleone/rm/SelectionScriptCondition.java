@@ -63,7 +63,7 @@ public class SelectionScriptCondition {
 	 */
 	public static SelectionScriptCondition anyNode(){
 		String condition = "var selected; selected = true;";
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
@@ -79,7 +79,7 @@ public class SelectionScriptCondition {
 				"else "+ NEWLINE + 
 				"{selected = selected OPERATOR false; println(\"hostname /= HOSTNAME ==> NOT selected\");}" + NEWLINE ; 
 		condition = condition.replace("HOSTNAME", hostname);
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 		                     
 	}
@@ -96,7 +96,7 @@ public class SelectionScriptCondition {
 	    "else"+NEWLINE +
 	    "{selected = selected OPERATOR false;println(\"FILENAME does not exist ==> NOT selected\");}" + NEWLINE;
 		condition = condition.replace("FILENAME", filename);
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
@@ -112,7 +112,7 @@ public class SelectionScriptCondition {
 	    "else"+NEWLINE +
 	    "{selected = selected OPERATOR true; println(\"FILENAME does not exist ==> SELECTED\");}" + NEWLINE;
 		condition = condition.replace("FILENAME", filename);
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 
@@ -134,7 +134,7 @@ public class SelectionScriptCondition {
 	    "else"+NEWLINE +
 	    "{selected = selected OPERATOR true; println(filet + \" does not exist ==> SELECTED\");}" + NEWLINE;
 		condition = condition.replace("FILENAME", speciallockprefix);
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
@@ -154,7 +154,7 @@ public class SelectionScriptCondition {
 	    "else"+NEWLINE +
 	    "{selected = selected OPERATOR false; println(filet + \" does not exist ==> NOT selected\");}" + NEWLINE;
 		condition = condition.replace("FILENAME", prefix);
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
@@ -172,7 +172,7 @@ public class SelectionScriptCondition {
 	    "else"+NEWLINE +
 	    "{selected = selected OPERATOR false; println(os + \" does not match OSTARGET ==> NOT selected\");}" + NEWLINE;
 		condition = condition.replace("OSTARGET", ostarget.toLowerCase());
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
@@ -193,8 +193,28 @@ public class SelectionScriptCondition {
 	    condition += "else"+NEWLINE ;
 	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
-		logger.info("Condition for selection script created: " + condition);
+		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
-	
+	/**
+	 * In order to be selected by this condition, a node must have an X greater than
+	 * the given minimum value. 
+	 * @param minimum value of X. 
+	 * @return the SelectionScriptCondition associated. 
+	 */
+	public static SelectionScriptCondition nodeWithXGreaterThan(String X, double minimum){
+		//X = "getCpuPerc().getUser()"
+		String condition = "";
+		condition += "importClass(org.hyperic.sigar.Sigar);" + NEWLINE;
+		condition += "var sigar = new Sigar();" + NEWLINE;
+		condition += "var usercpu = sigar.XXX;" + NEWLINE;
+	    condition += "if (usercpu < MINIMUM)"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(usercpu \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
+	    condition += "else"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
+	    condition = condition.replace("XXX", X);
+		//logger.info("Condition for selection script created: " + condition);
+		return new SelectionScriptCondition(condition);
+	}
 }

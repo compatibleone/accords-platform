@@ -76,14 +76,12 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 		if ( pptr->number ) pptr->number = liberate( pptr->number );
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
 		pptr->number = allocate_string("");
 		pptr->hostname = allocate_string("");
-		pptr->rootpass  = allocate_string("");
 		pptr->publicaddr = allocate_string("");
-		pptr->privateaddr = allocate_string("");
+		pptr->nopanodes = allocate_string("");
 		pptr->status = _OCCI_IDLE;
 	}
 	return(0);
@@ -132,13 +130,10 @@ private	int	parse_create_server_response( struct pa_response * server_created,st
 		if ( server_data->number ) 
 			server_data->number = liberate( server_data->number );
 
-		if ( server_data->rootpass ) 
-			server_data->rootpass = liberate( server_data->rootpass );
-
         // Checking that the field error is not there. 
 		if (vptr = json_atribut( server_created->jsonroot, "error")) // Obtaining the error of the operation (if present, there was an error). 
 		{
-            fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
+			fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
 			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
@@ -155,16 +150,6 @@ private	int	parse_create_server_response( struct pa_response * server_created,st
 			return( 27 );
 		}
 
-		else if (!( vptr = json_atribut( server_created->jsonroot, "adminPass") )) // Obtaining the adminPass to access the ProActive node. 
-		{
-			reset_structure_proactive_server( server_data );
-			return( 27 );
-		}
-		else if (!( server_data->rootpass  = allocate_string(vptr))) // Putting the adminPass of the ProActive node in proactive*->rootpass.
-		{
-			reset_structure_proactive_server( server_data );
-			return( 27 );
-		}
 		autosave_proactive_nodes();
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
@@ -258,6 +243,13 @@ private	struct	rest_response * start_proactive(
 	struct	proactive * pptr;
 	int	status;
 	char	reference[512];
+
+	// Create jobject complex type to pass it to Java. 
+	//   rest_request
+	//   rest_response
+	// Fill it in. 
+	
+	//create_java_rest_request_object(rptr);
 
 	printf("start_proactive\n");
 	if (!( pptr = vptr ))							// Can't provide null.
