@@ -3054,6 +3054,8 @@ public	struct	xml_element * 	cords_build_service(
 	char * manifest, char * sla,
 	char * account,	char * tarif)
 {
+	struct	occi_response * zptr;
+	char *	vptr;
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
 
@@ -3071,9 +3073,12 @@ public	struct	xml_element * 	cords_build_service(
 		return(document_drop( eptr ));
 	else if ((tarif) && (!( aptr = document_add_atribut( eptr, _CORDS_TARIFICATION , tarif ) )))
 		return(document_drop( eptr ));
-	else if (( sla ) && (!( aptr = document_add_atribut( eptr, _CORDS_SLA, sla ) )))
+	else if (!( sla ))
+		return( eptr );
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_SLA, sla ) ))
 		return( eptr );
 	else	return( eptr );
+
 }
 
 /*	-------------------------------------------------------		*/

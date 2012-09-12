@@ -10,6 +10,7 @@ struct	cords_agreement
 	char * 	initiator;	
 	char * 	responder;	
 	char * 	serviceprovider; 
+	char *	initiation;
 	char * 	expiration;	
 	char * 	templateid;	
 	char * 	templatename;	

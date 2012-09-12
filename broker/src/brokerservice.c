@@ -455,6 +455,32 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	return(0);
 }
 
+/*	-------------------------------------------	*/
+/*		s e r v i c e _ p e r i o d 		*/
+/*	-------------------------------------------	*/
+private	int	service_period( struct cords_service * pptr )
+{
+	int	status=0;
+	if ( rest_valid_string( pptr->initiation ) )
+	{
+		if ((!( strcasecmp( pptr->initiation, "any" ) ))
+		||  (!( strcasecmp( pptr->initiation, "now" ) )))
+			status = 0;
+		else if ( atoi( pptr->initiation ) > time((long *) 0) )
+			return(1);
+	}
+
+	if ( rest_valid_string( pptr->expiration ) )
+	{
+		if (!( strcasecmp( pptr->expiration, "never" ) ))
+			status = 0;
+		else if ( atoi( pptr->expiration ) < time((long *) 0) )
+			return(2);
+	}
+	return( status );
+}
+
+
 
 /*	-------------------------------------------	*/
 /* 	        s t a r t _ s e r v i c e
@@ -473,10 +499,19 @@ private	struct	rest_response * start_service(
 	{
 		if ( pptr->state == _OCCI_IDLE )
 		{
-			service_action( pptr, pptr->id, _CORDS_START );
-			pptr->when  = time((long*) 0);
-			pptr->state = _OCCI_RUNNING;
-			autosave_cords_service_nodes();
+			switch ( service_period( pptr ) )
+			{
+			case	1	:
+				return( rest_html_response( aptr, 409, "Before Service Initiation" ) );
+			case	2	:
+				return( rest_html_response( aptr, 410, "After Service Expiration" ) );
+			case	0	:
+				service_action( pptr, pptr->id, _CORDS_START );
+				pptr->when  = time((long*) 0);
+				pptr->state = _OCCI_RUNNING;
+				autosave_cords_service_nodes();
+			}
+
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -685,6 +720,152 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	return(0);
 }
 
+/*	------------------------------------------------	*/
+/*		s e r v i c e _ d u r a t i o n			*/
+/*	------------------------------------------------	*/
+/*	[+] 		increment				*/
+/*	[ <integer>D ]	day count				*/
+/*	[ <integer>H ]	hour count				*/
+/*	[ <integer>M ]	minute count				*/
+/*	[ <integer>S ]	second count				*/
+/*	------------------------------------------------	*/
+private	int	service_duration( char * sptr )
+{
+	int	result=0;
+	int	value=0;
+	if ( sptr )
+	{
+		while ( *sptr )
+		{
+			while (( *sptr == ' ' ) || ( *sptr == '+' ))
+				sptr++;
+			if (!( *sptr ))
+				break;
+			else	value = atoi(sptr);
+			while ((*sptr >= '0') && ( *sptr <= '9'))
+				sptr++;
+			if (( *sptr == 'd' )
+			||  ( *sptr == 'D' ))
+			{
+				sptr++;
+				result += (value * (24 * 60 * 60 ));
+			}
+			else if (( *sptr == 'h' )
+			     ||  ( *sptr == 'H' ))
+			{
+				sptr++;
+				result += (value * (60 * 60 ));
+			}
+			else if (( *sptr == 'm' )
+			     ||  ( *sptr == 'M' ))
+			{
+				sptr++;
+				result += (value * 60 );
+			}
+			else if (( *sptr == 's' )
+			     ||  ( *sptr == 'S' ))
+			{
+				sptr++;
+				result += value;
+			}
+			else	break;
+		}
+	}
+	return( result );
+}
+
+/*	------------------------------------------------	*/
+/*	e s t a b l i s h _ s e r v i c e _ p e r i o d		*/
+/*	------------------------------------------------	*/
+private	void	establish_service_period( struct cords_service * pptr )
+{
+	int	seconds=0;
+	char	buffer[256];
+	char *	sptr;
+	struct	occi_element * dptr;
+	struct	occi_response * zptr;
+
+	if ( rest_valid_string( pptr->sla ) )
+	{
+		/* ---------------------- */
+		/* retrieve the agreement */
+		/* ---------------------- */
+		if (!( zptr = occi_simple_get( pptr->sla, _CORDS_CONTRACT_AGENT, default_tls() )))
+			return;
+		else
+		{
+			/* ------------------------------------------------ */
+			/* locate the SLA contract initiation date and time */
+			/* ------------------------------------------------ */
+			if ((dptr = occi_locate_element( zptr->first, "occi.agreement.initiation" )) != (struct occi_element *) 0)
+			{
+				if ( pptr->initiation )
+					liberate( pptr->initiation );
+				if (!( pptr->initiation = allocate_string( dptr->value ) ))
+					return;
+			}
+
+			/* ------------------------------------------------ */
+			/* locate the SLA contract expiration date and time */
+			/* ------------------------------------------------ */
+			if ((dptr = occi_locate_element( zptr->first, "occi.agreement.expiration" )) != (struct occi_element *) 0)
+			{
+				if ( pptr->expiration )
+					liberate( pptr->expiration );
+				if (!( pptr->expiration = allocate_string( dptr->value ) ))
+					return;
+			}
+			zptr = occi_remove_response( zptr );
+		}
+	}
+
+	if (!( rest_valid_string( pptr->initiation ) ))
+		if (!( pptr->initiation = allocate_string( "now" ) ))
+			return;
+
+	if (!( rest_valid_string( pptr->expiration ) ))
+		if (!( pptr->expiration = allocate_string( "never" ) ))
+			return;
+
+	/* ------------------------ */
+	/* detect and establish now */
+	/* ------------------------ */
+	if (!( strcasecmp(( sptr = pptr->initiation ), "now" ) ))
+	{
+		liberate( pptr->initiation );
+		sprintf(buffer,"%u",time((long*)0));
+		if (!( pptr->initiation = allocate_string( buffer ) ))
+			return;
+
+	}
+	else if ( *sptr == '+' )
+	{
+		seconds = service_duration( (sptr+1) );
+		liberate( pptr->initiation );
+		sprintf(buffer,"%u",time((long*)0)+seconds);
+		if (!( pptr->initiation = allocate_string( buffer ) ))
+			return;
+	}
+
+	/* ----------------------------------- */
+	/* detect and establish expiration now */
+	/* ----------------------------------- */
+	if ((sptr = pptr->expiration) != (char *) 0)
+	{
+		if (!( strcasecmp( sptr,"never" ) ))
+			return;
+		else if ( *pptr->expiration == '+' )
+		{
+			seconds = service_duration( (sptr+1) );
+			liberate( pptr->expiration );
+			sprintf(buffer,"%u",time((long*)0)+seconds);
+			if (!( pptr->expiration = allocate_string( buffer ) ))
+				return;
+		}
+	}
+	return;
+}
+
 /*	-------------------------------------------	*/
 /* 	  c r e a t e _ s e r v i c e _ g r a p h 	*/
 /*	-------------------------------------------	*/
@@ -704,6 +885,8 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 	else if (!( host = default_identity()))
 		return(118);
 	else	sprintf(buffer,"%s/%s/%s",host,_CORDS_SERVICE,pptr->id);
+
+	establish_service_period( pptr );
 
 	/* --------------------------------------------- */
 	/* attempt to build a new service instance graph */

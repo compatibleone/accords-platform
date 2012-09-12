@@ -47,6 +47,10 @@ public struct cords_service * liberate_cords_service(struct cords_service * sptr
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->session )
 			 sptr->session = liberate(sptr->session);
+		if ( sptr->initiation )
+			 sptr->initiation = liberate(sptr->initiation);
+		if ( sptr->expiration )
+			 sptr->expiration = liberate(sptr->expiration);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_service *) 0);
@@ -68,6 +72,8 @@ public struct cords_service * reset_cords_service(struct cords_service * sptr)
 		sptr->sla = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->session = (char*) 0;
+		sptr->initiation = (char*) 0;
+		sptr->expiration = (char*) 0;
 		sptr->when =  0;
 		sptr->instructions =  0;
 		sptr->contracts =  0;
@@ -130,6 +136,14 @@ public int xmlin_cords_service(struct cords_service * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->session = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"initiation") ))
+		{
+			if ( wptr->value ) { sptr->initiation = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"expiration") ))
+		{
+			if ( wptr->value ) { sptr->expiration = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"when") ))
 		{
 			if ( wptr->value ) { sptr->when = atoi(wptr->value); }
@@ -168,6 +182,8 @@ public int rest_occi_cords_service(FILE * fh,struct cords_service * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.sla='%s'\r\n",prefix,nptr,(sptr->sla?sptr->sla:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.initiation='%s'\r\n",prefix,nptr,(sptr->initiation?sptr->initiation:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expiration='%s'\r\n",prefix,nptr,(sptr->expiration?sptr->expiration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%u'\r\n",prefix,nptr,sptr->when);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.instructions='%u'\r\n",prefix,nptr,sptr->instructions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contracts='%u'\r\n",prefix,nptr,sptr->contracts);

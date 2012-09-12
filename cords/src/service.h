@@ -12,6 +12,8 @@ struct	cords_service
 	char *	sla;
 	char *	price;
 	char *	session;
+	char *	initiation;
+	char *	expiration;
 	int	when;
 	int	instructions;
 	int	contracts;

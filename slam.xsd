@@ -22,6 +22,7 @@
 		<xsd:attribute name="initiator" type="xsd:string"/>
 		<xsd:attribute name="responder" type="xsd:string"/>
 		<xsd:attribute name="serviceprovider" type="xsd:string"/>
+		<xsd:attribute name="initiation" type="xsd:string"/>
 		<xsd:attribute name="expiration" type="xsd:string"/>
 		<xsd:attribute name="template" type="xsd:string"/>
 		<xsd:attribute name="templatename" type="xsd:string"/>
