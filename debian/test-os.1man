@@ -1,0 +1,42 @@
+    testos –host {host] –user {username] –password {password} {command}
+
+    The term {command} may be one of the following:
+        LIST FLAVORS: Returns the list of flavors currently defined for the particular OpenStack platform. 
+        LIST IMAGES: Returns the list of images current available on the OpenStack platform
+        LIST SERVERS:Returns the server instances provisioned on the OpenStack platform.
+        RETRIEVE FLAVOR {flavorId}: Returns the details associated with the specified flavor identifier.
+        RETRIEVE IMAGE {imageId}: Returns the details associated with the specified image identifier.
+        RETRIEVE SERVER {ServerId}: Returns the precise details and Meta data collection associated with the specified server instance identifier.
+        REMOVE SERVER {ServerId}: Deletes the server instance and releases all provisioned resources.
+
+   CRUD Operations 
+
+   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | METADATA <id> ]  
+   CREATE   <name> <image> <flavor> <ip> 
+   FLAVOR   <name> <ram> <cpus> <disk> 
+   GROUP    <name> 
+   RULE     <group> <protocol> <from> <to> 
+   PUBLICVM <name> <server> 
+   GLANCE PUBLIC <id> 
+   GLANCE PRIVATE <id> 
+   SNAPSHOT <name> <server> 
+   ADDRESS 
+   METADATA  <id>  <names=values>   
+   ASSOCIATE <address> <serverid>   
+   HEAD   [ GLANCE ] <id> 
+   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] 
+   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] 
+   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] 
+
+   Options
+     --user <username>     set account user name 
+     --password <value>    set account password  
+     --tenant <value>      set account tenant    
+     --host <hostname>     set host name         
+     --version <value>     set host version      
+     --agent   <name>      set test agent name   
+     --tls <config>        set tls config        
+     --detail              display detailed lists 
+     --verbose             activate verbose messages 
+     --debug               activate debug messages 
+

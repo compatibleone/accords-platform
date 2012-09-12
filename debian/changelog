@@ -1,0 +1,5 @@
+compatibleone-accords (0.20120901-1) unstable; urgency=low
+
+  * Initial Debian packaging of CompatibleOne Accords plateform.
+
+ -- Vincent <vincent@renardias.com>  Sat, 01 Sep 2012 20:33:43 +0200
