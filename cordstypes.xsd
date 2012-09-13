@@ -48,6 +48,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="number" type="xsd:string"/>
 		<xsd:attribute name="security" type="xsd:string"/>
+		<xsd:attribute name="date" type="xsd:string"/>
 		<xsd:attribute name="legal" type="xsd:string"/>
 		<xsd:attribute name="users" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
@@ -123,6 +124,11 @@
 			name="access" 
 			type="xsd:string"
 			default="private" 
+			/>
+		<xsd:attribute 	
+			name="category" 
+			type="xsd:string"
+			default="manifest" 
 			/>
 		<xsd:attribute
 		 	name="scope" 
