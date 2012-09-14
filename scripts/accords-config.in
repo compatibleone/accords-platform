@@ -328,7 +328,7 @@ _run-paasprocci() {
     @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
-_run-paasprocci() {
+_run-jpaasprocci() {
     @bindir@/jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
