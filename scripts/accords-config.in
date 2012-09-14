@@ -6,10 +6,12 @@
 #   Prologue 2011
 #   Mandriva 2011
 #   Bull 2012
-# Author: 
+#   CityPassenger 2012
+# Authors: 
 #   Jean Parpaillon
 #   Jamie Marshall
 #   Liliana Cabalantti
+#   Vincent Renardias
 
 set -e
 
@@ -195,20 +197,7 @@ _co-status() {
     echo "-----------------------------"
     echo " Accords Platform Components "
     echo "-----------------------------"
-    netstat -a -p | grep LISTEN | grep publisher
-    netstat -a -p | grep LISTEN | grep fileserver
-    netstat -a -p | grep LISTEN | grep coss
-    netstat -a -p | grep LISTEN | grep comons
-    netstat -a -p | grep LISTEN | grep conets
-    netstat -a -p | grep LISTEN | grep coobas
-    netstat -a -p | grep LISTEN | grep coes
-    netstat -a -p | grep LISTEN | grep coees
-    netstat -a -p | grep LISTEN | grep parser
-    netstat -a -p | grep LISTEN | grep broker
-    netstat -a -p | grep LISTEN | grep procci
-    netstat -a -p | grep LISTEN | grep cosched
-    netstat -a -p | grep LISTEN | grep ezvm
-    netstat -a -p | grep LISTEN | grep coips
+    netstat -a -p | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|coes|coees|parser|broker|procci|cosched|ezvm|coips)'
 }
 
 co-stop() {
@@ -264,59 +253,59 @@ co-stop() {
 }
 
 _run-azprocci() {
-    /usr/local/bin/azprocci --config $target CO-AZPROCCI/1.0
+    @bindir@/azprocci --config $target CO-AZPROCCI/1.0
 } 
 
 _run-broker() {
-    /usr/local/bin/broker --config $target CO-BROKER/1.0
+    @bindir@/broker --config $target CO-BROKER/1.0
 } 
 
 _run-coes() {
-    /usr/local/bin/coes --config $target CO-ES/1.0
+    @bindir@/coes --config $target CO-ES/1.0
 } 
 
 _run-coees() {
-    /usr/local/bin/coees --config $target CO-EES/1.0
+    @bindir@/coees --config $target CO-EES/1.0
 } 
 
 _run-comons() {
-    /usr/local/bin/comons --config $target CO-MONS/1.0
+    @bindir@/comons --config $target CO-MONS/1.0
 }
 
 _run-conets() {
-    /usr/local/bin/conets --config $target CO-NETS/1.0
+    @bindir@/conets --config $target CO-NETS/1.0
 }
 
 _run-coobas() {
-    /usr/local/bin/coobas --config $target CO-BAS/1.0
+    @bindir@/coobas --config $target CO-BAS/1.0
 }
 
 _run-coss() {
-    /usr/local/bin/coss --config $target CO-SS/1.0
+    @bindir@/coss --config $target CO-SS/1.0
 }
 
 _run-ezvm() {
-    /usr/local/bin/ezvm --config $target CO-EZVM/1.0
+    @bindir@/ezvm --config $target CO-EZVM/1.0
 }
 
 _run-coips() {
-    /usr/local/bin/coips --config $target CO-IPS/1.0
+    @bindir@/coips --config $target CO-IPS/1.0
 }
 
 _run-fileserver() {
-    /usr/local/bin/fileserver --config $target CO-FS/1.0
+    @bindir@/fileserver --config $target CO-FS/1.0
 }
 
 _run-onprocci() {
-    /usr/local/bin/onprocci --config $target CO-ONPROCCI/1.0
+    @bindir@/onprocci --config $target CO-ONPROCCI/1.0
 }
 
 _run-osprocci() {
-    /usr/local/bin/osprocci --config $target CO-OSPROCCI/1.0
+    @bindir@/osprocci --config $target CO-OSPROCCI/1.0
 }
 
 _run-dcprocci() {
-    /usr/local/bin/dcprocci --config $target CO-DCPROCCI/1.0
+    @bindir@/dcprocci --config $target CO-DCPROCCI/1.0
 }
 
 _run-paprocci() {
@@ -324,43 +313,43 @@ _run-paprocci() {
 }
 
 _run-osocciprocci() {
-    /usr/local/bin/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+    @bindir@/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
 _run-testosocci() {
-    /usr/local/bin/testosocci --config $target CO-TESTOSOCCI/1.0
+    @bindir@/testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
 _run-slam() {
-    /usr/local/bin/slam --config $target CO-SLAM/1.0
+    @bindir@/slam --config $target CO-SLAM/1.0
 }
 
 _run-paasprocci() {
-    /usr/local/bin/paasprocci --config $target CO-PAASPROCCI/1.0
+    @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
 _run-paasprocci() {
-    /usr/local/bin/jpaasprocci --config $target CO-JPAASPROCCI/1.0
+    @bindir@/jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
 _run-example() {
-    /usr/local/bin/example --config $target CO-EXAMPLE/1.0
+    @bindir@/example --config $target CO-EXAMPLE/1.0
 }
 
 _run-parser() {
-    /usr/local/bin/parser --config $target CO-PARSER/1.0
+    @bindir@/parser --config $target CO-PARSER/1.0
 }
 
 _run-procci() {
-    /usr/local/bin/procci --config $target CO-PROCCI/1.0
+    @bindir@/procci --config $target CO-PROCCI/1.0
 }
  
 _run-cosched() {
-    /usr/local/bin/cosched --config $target CO-SCHED/1.0
+    @bindir@/cosched --config $target CO-SCHED/1.0
 }
  
 _run-publisher() {
-   /usr/local/bin/publisher --config $target CO-PUB/1.0
+   @bindir@/publisher --config $target CO-PUB/1.0
 }
 
 _run-fileserver() {
