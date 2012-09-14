@@ -18,11 +18,11 @@ else
 LDFLAGS="-Wl,-z,defs"
 endif
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+#ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
+#else
+#	CFLAGS += -O2
+#endif
 
 configure:
 	./autogen.sh
@@ -99,3 +99,4 @@ binary-arch: build install
 binary: binary-arch binary-indep
 
 .PHONY: install build clean binary-indep binary-arch binary
+
