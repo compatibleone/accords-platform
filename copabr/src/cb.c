@@ -52,6 +52,13 @@ private	struct	xml_element * 	cords_complete_contract(
 	char *	agent,
 	char *	tls );
 
+private	char *	cords_negotiate_provider( 
+		struct cords_node_descriptor * App,
+		char * id,
+		struct xml_element * xptr,
+		char * agent,
+		char * tls );
+
 private	int	provisioning_status=0;
 
 
@@ -2298,7 +2305,31 @@ private	struct	xml_element * 	cords_instance_abstract_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->flags) ))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	/* --------------------------------------- */
+	/* attempt to add the provider information */
+	/* --------------------------------------- */
+	else if (!( xptr = cords_add_provider( document, App->provider, App->nameApp, App->profile ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	/* ------------------------------------------ */
+	/* negotiation of the provider must now occur */
+	/* ------------------------------------------ */
+	else if (!( App->providerid = cords_negotiate_provider( App, id, xptr, agent, tls ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	/* --------------------------------------------------- */
+	/* then complete the provider description for contract */
+	/* --------------------------------------------------- */
+	else if (!( aptr = document_add_atribut( xptr, _CORDS_ID, App->providerid ) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
