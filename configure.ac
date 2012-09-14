@@ -312,6 +312,15 @@ AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
 AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
 AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
 
+AC_ARG_ENABLE([jpaasprocci],
+      [AS_HELP_STRING([--disable-jpaasprocci],
+		      [Disable jpaasprocci @<:@default=enable@:>@])],
+      [],
+      [enable_jpaasprocci=yes])
+AM_CONDITIONAL([ENABLE_JPAASPROCCI], [test "$enable_jpaasprocci" = "yes"])
+AC_SUBST([CFLAGS_JPAASPROCCI], [-I\${abs_top_srcdir}/jpaasprocci/src])
+AC_SUBST([PATH_JPAASPROCCI], [${abs_top_srcdir}/jpaasprocci/src])
+
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
 		      [Disable cool @<:@default=enable@:>@])],
@@ -470,6 +479,7 @@ AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
+AC_CONFIG_FILES([jpaasprocci/Makefile jpaasprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
@@ -526,6 +536,7 @@ echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - paasprocci               : $enable_paasprocci"
+echo "    - jpaasprocci              : $enable_jpaasprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - testosocci               : $enable_testosocci"
@@ -543,3 +554,4 @@ echo "    - testpa                   : $enable_testpa"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
 echo ""
+

@@ -1949,6 +1949,7 @@ private	void 	cords_terminate_instance_node( struct cords_node_descriptor * dptr
 	if ( dptr->typeApp )	dptr->typeApp = liberate( dptr->typeApp );
 	if ( dptr->accessApp )	dptr->accessApp = liberate( dptr->accessApp );
 	if ( dptr->scopeApp )	dptr->scopeApp = liberate( dptr->scopeApp );
+	if ( dptr->category )	dptr->category = liberate( dptr->category );
 	if ( dptr->hid )	dptr->hid = liberate( dptr->hid );
 	if ( dptr->sid )	dptr->sid = liberate( dptr->sid );
 	if ( dptr->provider )	dptr->provider = liberate( dptr->provider );
@@ -2274,6 +2275,92 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 
 	return( document );
 
+}
+
+/*	----------------------------------------------------------------	*/
+/*	c o r d s _ i n s t a n c e _ a b s t r a c t _ c o n t r a c t	 	*/
+/*	----------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_instance_abstract_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char *	sla,
+	char * 	namePlan )
+{
+	int	status;
+	struct	xml_element 	*	xroot=(struct xml_element *) 0;
+	struct	xml_element 	*	xptr;
+	struct	xml_element 	* 	document=(struct xml_element *) 0;
+	struct	xml_atribut	*	aptr;
+
+	/* --------------------------------------------------- */
+	/* then create the contract document for the node here */
+	/* --------------------------------------------------- */
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->flags) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+	else	return( document );
+
+}
+
+/*	----------------------------------------------------------------------------	*/
+/*		      c o r d s _ b u i l d _ a b s t r a c t _ c o m m o n		*/
+/*	----------------------------------------------------------------------------	*/
+private	char *	cords_build_abstract_common(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char *	sla,
+	char * namePlan,
+	struct xml_element ** xroot )
+{
+	struct	xml_element * document;
+	struct	xml_atribut * aptr;
+	char *	common;
+
+	/* ----------------------------------- */
+	/* build a new simple service contract */
+	/* ----------------------------------- */
+	if (!( document = cords_instance_abstract_contract( App, host, id, agent, tls,sla, namePlan ) ))
+		return((char *) 0);
+
+	else if (!( document = cords_complete_contract( App, document, agent, tls ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((char *) 0);
+	}
+
+	/* ------------------ */
+	/* recover identifier */
+	/* ------------------ */
+	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
+	{
+		cords_terminate_instance_node( App );
+		document = document_drop( document );
+		return((char *) 0);
+	}
+	else if (!( common = allocate_string( aptr->value ) ))
+	{
+		cords_terminate_instance_node( App );
+		document = document_drop( document );
+		return((char *) 0);
+	}
+	else if (!( xroot ))
+	{
+		document = document_drop( document );
+		return( common );
+	}
+	else
+	{
+		*xroot = document;
+		return( common );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2616,6 +2703,63 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 }
 
 /*	----------------------------------------------------------------------------	*/
+/*	c o r d s _ a b s t r a c t _ p r i v a t e _ c o m m o n  _ c o n t r a c t	*/
+/*	----------------------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_abstract_private_common_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char *	sla,
+	char * 	namePlan )
+{
+	struct	xml_element * document=(struct xml_element *) 0;
+	struct	xml_atribut * aptr;
+	char *	common;
+	/* ------------------------------------------ */
+	/* retrieve the common instance from the node */
+	/* ------------------------------------------ */
+	if (!( common = occi_extract_atribut(App->node,Operator.domain,_CORDS_NODE,_CORDS_COMMON)))
+		if (!( common = cords_build_abstract_common( App, host, id, agent, tls, sla, namePlan, &document ) ))
+			return( (struct xml_element *) 0 );
+
+	if ( document )
+		document = document_drop( document );
+
+	return( cords_terminate_private_common_contract( App, id, agent, tls,sla, common ) );
+}
+
+/*	----------------------------------------------------------------------------	*/
+/*	  c o r d s _ a b s t r a c t _ p u b l i c _ c o m m o n  _ c o n t r a c t	*/
+/*	----------------------------------------------------------------------------	*/
+private	struct	xml_element * 	cords_abstract_public_common_contract(
+	struct cords_node_descriptor * App,
+	char *	host,
+	char *	id,
+	char *	agent,
+	char *	tls,
+	char *	sla,
+	char * 	namePlan )
+{
+	struct	xml_element * document=(struct xml_element *) 0;
+	char * 	common=(char *) 0;
+	int	location=0;
+	if (!( common = cords_resolve_public_common(App,host,id,agent, tls,&location) ))
+	{
+		if (!( common = cords_build_abstract_common( App, host, id, agent, tls, sla, namePlan, &document ) ))
+			return( (struct xml_element *) 0 );
+		else if (!( common = allocate_string( common ) ))
+			return( (struct xml_element *) 0 );
+	}
+
+	if ( document )
+		document = document_drop( document );
+
+	return( cords_terminate_public_common_contract( App, id, agent, tls, sla, location, common ) );
+}
+
+/*	----------------------------------------------------------------------------	*/
 /*		      c o r d s _ b u i l d _ c o m p l e x _ c o m m o n		*/
 /*	----------------------------------------------------------------------------	*/
 private	char * 	cords_build_simple_common(
@@ -2905,13 +3049,24 @@ private	struct	xml_element * 	cords_instance_contract(
 			return( cords_simple_private_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 		else	return( cords_simple_public_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 	}
-	else
+	/* --------------------------------- */
+	/* detect an IAAS Complex types node */
+	/* --------------------------------- */
+	else if (!( strcmp( App->category, _CORDS_MANIFEST ) ))
 	{
 		if (!( App->scope & _SCOPE_COMMON ))
 			return( cords_instance_complex_contract( App, host, id, agent, tls, sla, namePlan ) );
 		else if ( App->scope & _ACCESS_PRIVATE )
 			return( cords_complex_private_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 		else	return( cords_complex_public_common_contract( App, host, id, agent, tls, sla, namePlan ) );
+	}
+	else 
+	{
+		if (!( App->scope & _SCOPE_COMMON ))
+			return( cords_instance_abstract_contract( App, host, id, agent, tls, sla, namePlan ) );
+		else if ( App->scope & _ACCESS_PRIVATE )
+			return( cords_abstract_private_common_contract( App, host, id, agent, tls, sla, namePlan ) );
+		else	return( cords_abstract_public_common_contract( App, host, id, agent, tls, sla, namePlan ) );
 	}
 }
 
@@ -3028,6 +3183,12 @@ public	struct	xml_element * cords_instance_node(
 		}
 		else	App.scope |= _ACCESS_PRIVATE;
 	}
+
+	/* ------------------------------ */
+	/* collect the node type category */
+	/* ------------------------------ */
+	if (!(App.category = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_CATEGORY)))
+		App.category = allocate_string( _CORDS_MANIFEST );
 
 	/* ---------------------------------------------------- */
 	/* instance or share the service contract for this node */

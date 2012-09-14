@@ -83,7 +83,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-paasprocci run-procci run-cosched run-publisher accords-config"
+# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-paasprocci run-jpaasprocci run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
 _co_start() {
@@ -181,6 +181,10 @@ _co_start() {
     @bindir@/run-paasprocci &
     sleep $tempo
 
+    echo "Starting accords jpaas procci services"
+    @bindir@/run-jpaasprocci &
+    sleep $tempo
+
     echo "Starting accords procci example"
     @bindir@/run-example &
     sleep $tempo
@@ -271,6 +275,7 @@ _co_stop() {
     _stop_service cosacs
     _stop_service example
     _stop_service slam
+    _stop_service jpaasprocci
     _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
@@ -371,6 +376,10 @@ _run_paasprocci() {
     @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
+_run_jpaasprocci() {
+    @bindir@/jpaasprocci --config $target CO-JPAASPROCCI/1.0
+}
+
 _run_example() {
     @bindir@/example --config $target CO-EXAMPLE/1.0
 }
@@ -423,6 +432,7 @@ _make_security_files() {
 	_mksecs dcprocci 1
 	_mksecs slam 1
 	_mksecs paasprocci 1
+	_mksecs jpaasprocci 1
 	_mksecs example 1
 	_mksecs command
     
@@ -494,6 +504,7 @@ _accords_config() {
 		_mkcert dcprocci
 		_mkcert slam
 		_mkcert paasprocci
+		_mkcert jpaasprocci
 		_mkcert example
 		_mkcert cosacs
 	
@@ -540,6 +551,7 @@ _accords_config() {
     _mkcfg cosched
     _mkcfg slam
     _mkcfg paasprocci
+    _mkcfg jpaasprocci
     _mkcfg example
     _mkcosacs cosacs
 
@@ -794,6 +806,9 @@ case `basename $0` in
 	;;
     run-paasprocci)
 	_run_paasprocci $*
+	;;
+    run-jpaasprocci)
+	_run_jpaasprocci $*
 	;;
     run-example)
 	_run_example $*

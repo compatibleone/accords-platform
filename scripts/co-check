@@ -130,6 +130,19 @@ function verification()
 	check	opennebula	onprocci
 	check	windowsazure	azprocci
 
+	check	jpaas				jpaasprocci
+	check	paas_application		paasprocci
+	check	paas_deployable			paasprocci
+	check	paas_link			paasprocci
+	check	paas_environment		paasprocci
+	check	paas_manifest			paasprocci
+	check	paas_node			paasprocci
+	check	paas_version			paasprocci
+	check	paas_relation			paasprocci
+	check	paas_version_instance		paasprocci
+	check	paas_configuration_option	paasprocci
+	check	paas_configuration_template	paasprocci
+
 }
 
 if [ -z "$verbose" ]; then

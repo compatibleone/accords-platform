@@ -101,10 +101,11 @@ struct	cords_node_descriptor
 	int			flags;		/* contract special flags				*/
 	char 			* account;	/* account for which service is engaged			*/
 	char 			* accountName;	/* name of account for which service is engaged		*/
-	char			* nameApp;
-	char 			* typeApp;
+	char			* nameApp;	/* the name of the node					*/
+	char 			* typeApp;	/* the name of the specific type instance		*/
 	char			* service;	/* the parent service identifier for the contract	*/
 	char			* scopeApp;	/* the node scope : normal/common 			*/
+	char			* category;	/* the node category : manifest/other			*/
 	char			* accessApp;	/* the node access: public/private 			*/
 	char			* hid;
 	char			* sid;

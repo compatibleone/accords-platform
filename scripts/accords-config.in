@@ -75,7 +75,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-paasprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-paasprocci run-jpaasprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -214,6 +214,8 @@ _co-status() {
 co-stop() {
     killall example
     sleep $tempo
+    killall jpaasprocci
+    sleep $tempo
     killall paasprocci
     sleep $tempo
     killall slam
@@ -335,6 +337,10 @@ _run-slam() {
 
 _run-paasprocci() {
     /usr/local/bin/paasprocci --config $target CO-PAASPROCCI/1.0
+}
+
+_run-paasprocci() {
+    /usr/local/bin/jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
 _run-example() {
