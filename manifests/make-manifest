@@ -47,8 +47,8 @@ bash build-manifest onprocci 8087
 echo "<node name=\"accords:onprocci\" scope=normal access=public type=\"accords:onprocci\"/>" >> accords-provisioning.xml
 bash build-manifest paprocci 8087
 echo "<node name=\"accords:paprocci\" scope=normal access=public type=\"accords:paprocci\"/>" >> accords-provisioning.xml
-bash build-manifest paasprocci 8087
-echo "<node name=\"accords:paasprocci\" scope=normal access=public type=\"accords:paasprocci\"/>" >> accords-provisioning.xml
+bash build-manifest copaas 8087
+echo "<node name=\"accords:copaas\" scope=normal access=public type=\"accords:copaas\"/>" >> accords-provisioning.xml
 bash build-manifest jpaasprocci 8087
 echo "<node name=\"accords:jpaasprocci\" scope=normal access=public type=\"accords:jpaasprocci\"/>" >> accords-provisioning.xml
 bash build-manifest dcprocci 8087

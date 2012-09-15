@@ -1,5 +1,5 @@
-#ifndef	_paasprocci_c	
-#define	_paasprocci_c
+#ifndef	_copaas_c	
+#define	_copaas_c
 
 #include "standard.h"
 #include "broker.h"
@@ -13,7 +13,7 @@
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
 
-struct	accords_configuration PaasProcci = {
+struct	accords_configuration CoPaas = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -26,17 +26,17 @@ struct	accords_configuration PaasProcci = {
 	"xmpp",  8000,
 	"domain",
 	"europe",
-	"paasprocci.xml",
+	"copaas.xml",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(PaasProcci.debug);		}
-public	int	check_verbose()		{	return(PaasProcci.verbose);		}
-public	char *	default_publisher()	{	return(PaasProcci.publisher);	}
-public	char *	default_operator()	{	return(PaasProcci.operator);		}
-public	char *	default_tls()		{	return(PaasProcci.tls);		}
-public	char *	default_zone()		{	return(PaasProcci.zone);		}
+public	int	check_debug()		{	return(CoPaas.debug);		}
+public	int	check_verbose()		{	return(CoPaas.verbose);		}
+public	char *	default_publisher()	{	return(CoPaas.publisher);	}
+public	char *	default_operator()	{	return(CoPaas.operator);		}
+public	char *	default_tls()		{	return(CoPaas.tls);		}
+public	char *	default_zone()		{	return(CoPaas.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -52,7 +52,7 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
-#include "paasprocci.h"
+#include "copaas.h"
 #include "paas_application.c"
 #include "paas_configuration_option.c"
 #include "paas_configuration_template.c"
@@ -77,26 +77,26 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "occipaas_version_instance.c"
 
 /*	---------------------------------------------------------------	*/  
-/*	p a a s p r o c c i _ c o n f i g u r a t i o n			*/
+/*	c o p a a s _ c o n f i g u r a t i o n				*/
 /*	---------------------------------------------------------------	*/  
-/*	this function loads paasprocci configuration			*/
+/*	this function loads copaas configuration			*/
 /*	from the xml configuration file.				*/
 /*	---------------------------------------------------------------	*/  
-private	void	paasprocci_configuration()
+private	void	copaas_configuration()
 {
-	load_accords_configuration( &PaasProcci, "paasprocci" );
+	load_accords_configuration( &CoPaas, "copaas" );
 	return;
 }
 
-/*	---------------------------------------------------------------	*/  
-/*	p a a s p r o c c i _ b a n n e r				*/
+/*	-----------------------------------------------------	----------	*/  
+/*	c o p a a s _ b a n n e r				*/
 /*	---------------------------------------------------------------	*/  
 /*	this function will be called to display module identification 	*/
 /*	when launched from the command line without any parameters.	*/
 /*	---------------------------------------------------------------	*/  
-private	int	paasprocci_banner()
+private	int	copaas_banner()
 {
-	printf("\n   CompatibleOne Generic PaasProcci Service : Version 1.0a.0.01");
+	printf("\n   CompatibleOne Generic CoPaas Service : Version 1.0a.0.01");
 	printf("\n   Beta Version : 26/07/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Mohamed Mohamed, Sami Yangui");
 	printf("\n");
@@ -107,10 +107,10 @@ private	int	paasprocci_banner()
 }
 
 /*	------------------------------------------- */
-/*	p a a s p r o c c i _ i n i t i a l i s e		*/
+/*	c o p a a s _ i n i t i a l i s e	    */
 /*	------------------------------------------- */
 
-private	struct rest_server * paasprocci_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * copaas_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -123,13 +123,13 @@ private	struct rest_server * paasprocci_initialise(  void * v,struct rest_server
 }
 
 /*	-------------------------------------------	*/
-/*	p a a s p r o c c i _ a u t h o r i s e 		*/
+/*	c o p a a s _ a u t h o r i s e 		*/
 /*	------------------------------------------- 	*/
-private	int	paasprocci_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	copaas_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, PaasProcci.user ) )
+	if ( strcmp( username, CoPaas.user ) )
 		return(0);
-	else if ( strcmp( password, PaasProcci.password ) )
+	else if ( strcmp( password, CoPaas.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -138,98 +138,90 @@ private	int	paasprocci_authorise(  void * v,struct rest_client * cptr, char * us
 	else	return(1);
 }
 
-/*	------------------------------------------- */
-/*	p a a s p r o c c i _ e x t e n s i o n 		*/
 /*	-------------------------------------------	*/
-private	struct rest_extension * paasprocci_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+/*	c o p a a s _ e x t e n s i o n 		*/
+/*	-------------------------------------------	*/
+private	struct rest_extension * copaas_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
 
 /*	--------------------------------------------	*/
-/*	p a a s p r o c c i _ o p e r a t i o n 		*/
+/*	c o p a a s _ o p e r a t i o n 		*/
 /*	--------------------------------------------	*/
 /*	environment and category preparation		*/
 /*	--------------------------------------------	*/
-private	int	paasprocci_operation( char * nptr )
+private	int	copaas_operation( char * nptr )
 {
 
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_paasprocci.xml");
+	set_autosave_cords_xlink_name("links_copaas.xml");
 
-	rest_initialise_log( PaasProcci.monitor );
+	rest_initialise_log( CoPaas.monitor );
 
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
-	if (!( optr = occi_paas_application_builder( PaasProcci.domain, "paas_application" ) ))
+	if (!( optr = occi_paas_application_builder( CoPaas.domain, "paas_application" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_deployable_builder( PaasProcci.domain, "paas_deployable" ) ))
+	if (!( optr = occi_paas_deployable_builder( CoPaas.domain, "paas_deployable" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_link_builder( PaasProcci.domain, "paas_link" ) ))
+	if (!( optr = occi_paas_link_builder( CoPaas.domain, "paas_link" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_environment_builder( PaasProcci.domain, "paas_environment" ) ))
+	if (!( optr = occi_paas_environment_builder( CoPaas.domain, "paas_environment" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_manifest_builder( PaasProcci.domain, "paas_manifest" ) ))
+	if (!( optr = occi_paas_manifest_builder( CoPaas.domain, "paas_manifest" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_node_builder( PaasProcci.domain, "paas_node" ) ))
+	if (!( optr = occi_paas_node_builder( CoPaas.domain, "paas_node" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_version_builder( PaasProcci.domain, "paas_version" ) ))
+	if (!( optr = occi_paas_version_builder( CoPaas.domain, "paas_version" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_relation_builder( PaasProcci.domain, "paas_relation" ) ))
+	if (!( optr = occi_paas_relation_builder( CoPaas.domain, "paas_relation" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_version_instance_builder( PaasProcci.domain, "paas_version_instance" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
-
-	if (!( optr = occi_paas_configuration_option_builder( PaasProcci.domain, "paas_configuration_option" ) ))
+	if (!( optr = occi_paas_version_instance_builder( CoPaas.domain, "paas_version_instance" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -237,7 +229,7 @@ private	int	paasprocci_operation( char * nptr )
 	last = optr;
 
 
-	if (!( optr = occi_paas_configuration_template_builder( PaasProcci.domain, "paas_configuration_template" ) ))
+	if (!( optr = occi_paas_configuration_option_builder( CoPaas.domain, "paas_configuration_option" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -245,15 +237,23 @@ private	int	paasprocci_operation( char * nptr )
 	last = optr;
 
 
-	if (!( PaasProcci.identity ))
+	if (!( optr = occi_paas_configuration_template_builder( CoPaas.domain, "paas_configuration_template" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+
+	if (!( CoPaas.identity ))
 	{
 		/* --------------------------	*/
 		/* launch simple occi server 	*/
 		/* --------------------------	*/
 		return( occi_server(  
 			nptr, 
-			PaasProcci.restport, PaasProcci.tls, 
-			PaasProcci.threads, first, (char *) 0 ) );
+			CoPaas.restport, CoPaas.tls, 
+			CoPaas.threads, first, (char *) 0 ) );
 	}
 	else
 	{
@@ -261,27 +261,27 @@ private	int	paasprocci_operation( char * nptr )
 		/* publication and pricing of categories before occi server launch */
 		/* --------------------------------------------------------------- */
 		initialise_occi_publisher( 
-			PaasProcci.publisher, (char*) 0, (char *) 0, (char *) 0);
+			CoPaas.publisher, (char*) 0, (char *) 0, (char *) 0);
 
 		return( publishing_occi_server(
-				PaasProcci.user, PaasProcci.password,
-				PaasProcci.identity,  nptr, 
-				PaasProcci.restport, PaasProcci.tls, 
-				PaasProcci.threads, first ) );
+				CoPaas.user, CoPaas.password,
+				CoPaas.identity,  nptr, 
+				CoPaas.restport, CoPaas.tls, 
+				CoPaas.threads, first ) );
 	}
 }
 
 /*	------------------------------------------- */
-/*	p a a s p r o c c i _ o p t i o n s			*/
+/*	c o p a a s _ o p t i o n s		    */
 /*	------------------------------------------- */
-/*	Command line option analysis			*/
+/*	Command line option analysis		    */
 /*	------------------------------------------- */
-private	int	paasprocci_options(int argc, char * argv[] )
+private	int	copaas_options(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	paasprocci_configuration();
+	copaas_configuration();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -292,10 +292,10 @@ private	int	paasprocci_options(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				PaasProcci.verbose=1;
+				CoPaas.verbose=1;
 				continue;
 			case	'd'	:
-				PaasProcci.debug = 0xFFFF;
+				CoPaas.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -305,7 +305,7 @@ private	int	paasprocci_options(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = paasprocci_operation(aptr) ))
+		else if (!( status = copaas_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -320,12 +320,12 @@ private	int	paasprocci_options(int argc, char * argv[] )
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
-		return( paasprocci_banner() );
-	else	return( paasprocci_options( argc, argv ) );
+		return( copaas_banner() );
+	else	return( copaas_options( argc, argv ) );
 }
 
 	/* ---------- */
-#endif 	/* _paasprocci_c */
+#endif 	/* _copaas_c */
 	/* ---------- */
 
 

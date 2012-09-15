@@ -53,8 +53,8 @@ endif
 if ENABLE_SLAM
 SUBDIRS += slam
 endif
-if ENABLE_PAASPROCCI
-SUBDIRS += paasprocci
+if ENABLE_COPAAS
+SUBDIRS += copaas
 endif
 if ENABLE_JPAASPROCCI
 SUBDIRS += jpaasprocci

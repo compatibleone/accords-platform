@@ -8,7 +8,7 @@ bash build-update coees
 bash build-update conets
 bash build-update cosched
 bash build-update slam
-bash build-update paasprocci
+bash build-update copaas
 bash build-update ezvm
 bash build-update coips
 bash build-update-cool

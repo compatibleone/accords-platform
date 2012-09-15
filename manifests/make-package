@@ -8,7 +8,7 @@ bash build-package coees
 bash build-package conets
 bash build-package cosched
 bash build-package slam
-bash build-package paasprocci
+bash build-package copaas
 bash build-package ezvm
 bash build-package coips
 bash build-package-cool

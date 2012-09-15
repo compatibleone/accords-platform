@@ -1,6 +1,6 @@
 
-#ifndef	_paasprocci_h
-#define	_paasprocci_h
+#ifndef	_copaas_h
+#define	_copaas_h
 
 #include "paas_application.h"
 #include "paas_configuration_option.h"
@@ -14,6 +14,6 @@
 #include "paas_version.h"
 #include "paas_version_instance.h"
 
-#endif	/* _paasprocci_h */
-	/* ------------- */
+#endif	/* _copaas_h */
+	/* --------- */
 

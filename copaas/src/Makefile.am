@@ -1,5 +1,5 @@
 #
-# OSOCCI Makefile.am
+# COPAAS Makefile.am
 #
 # Copyright 2012, Prologue, All rights reserved
 #
@@ -7,7 +7,7 @@
 #   Iain James Marshall <ijm667@hotmail.com>
 #
 
-bin_PROGRAMS = paasprocci
+bin_PROGRAMS = copaas
 EXTRA_DIST = occipaas_application.c \
 occipaas_config_option.c \
 occipaas_config_template.c \
@@ -39,8 +39,8 @@ paas_version.h \
 paas_version_instance.c \
 paas_version_instance.h
 
-paasprocci_SOURCES = paasprocci.c 
+copaas_SOURCES = copaas.c 
 
-paasprocci_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) 
-paasprocci_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
+copaas_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) 
+copaas_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
 

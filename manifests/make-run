@@ -19,7 +19,7 @@ bash build-run paprocci
 bash build-run parser
 bash build-run procci
 bash build-run slam
-bash build-run paasprocci
+bash build-run copaas
 bash build-run jpaasprocci
 bash build-run-cool
 bash build-run-tools
