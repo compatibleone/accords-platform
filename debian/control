@@ -140,6 +140,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
+Package: compatibleone-jpaasprocci
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - JPaaS Procci subsystem
+ CompatibleOne Accords Platform - JPaaS Procci subsystem
 
 Package: compatibleone-ezvm
 Section: net

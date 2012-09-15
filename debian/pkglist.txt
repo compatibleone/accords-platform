@@ -14,7 +14,7 @@ compatibleone-coss
 compatibleone-dcprocci
 compatibleone-ezvm
 compatibleone-fileserver
-compatibleone-onprocci
+compatibleone-jpaasprocci
 compatibleone-osocciprocci
 compatibleone-osprocci
 compatibleone-paprocci
