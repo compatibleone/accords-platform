@@ -8,6 +8,7 @@ compatibleone-coips
 compatibleone-comons
 compatibleone-conets
 compatibleone-coobas
+compatibleone-cool
 compatibleone-cosacs
 compatibleone-cosched
 compatibleone-coss
