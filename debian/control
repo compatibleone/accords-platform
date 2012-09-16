@@ -43,12 +43,12 @@ Description: CompatibleOne Accords Platform - COEES subsystem
  server executable program and must have been started before any provisioning plan
  energy efficiency processing may be performed for the provisioning of resources.
 
-Package: compatibleone-coes
+Package: compatibleone-cops
 Section: net
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform - COES subsystem
- The CompatibleOne Elasticity Services module is a standalone OCCI REST server
+Description: CompatibleOne Accords Platform - COPS subsystem
+ The CompatibleOne Placement Services module is a standalone OCCI REST server
  executable program and must have been started before any provisioning plan smart
  placement processing may be performed for the provisioning of resources.
  This component is of particular importance as a target or consumer of monitoring
@@ -156,6 +156,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform - JPaaS Procci subsystem
  CompatibleOne Accords Platform - JPaaS Procci subsystem
 
+Package: compatibleone-copaas
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - PaaS Services subsystem
+ CompatibleOne Accords Platform - PaaS Services subsystem
+
 Package: compatibleone-ezvm
 Section: net
 Architecture: any
@@ -256,7 +263,7 @@ Description: CompatibleOne Accords Platform - Open Stack inspection tool
 
 Package: compatibleone-accords
 Architecture: any
-Depends: libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-coes, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
+Depends: libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Description: CompatibleOne Accords Platform - All packages
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
