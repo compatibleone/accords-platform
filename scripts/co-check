@@ -131,17 +131,17 @@ function verification()
 	check	windowsazure	azprocci
 
 	check	jpaas				jpaasprocci
-	check	paas_application		paasprocci
-	check	paas_deployable			paasprocci
-	check	paas_link			paasprocci
-	check	paas_environment		paasprocci
-	check	paas_manifest			paasprocci
-	check	paas_node			paasprocci
-	check	paas_version			paasprocci
-	check	paas_relation			paasprocci
-	check	paas_version_instance		paasprocci
-	check	paas_configuration_option	paasprocci
-	check	paas_configuration_template	paasprocci
+	check	paas_application		copass
+	check	paas_deployable			copass
+	check	paas_link			copass
+	check	paas_environment		copass
+	check	paas_manifest			copass
+	check	paas_node			copass
+	check	paas_version			copass
+	check	paas_relation			copass
+	check	paas_version_instance		copass
+	check	paas_configuration_option	copass
+	check	paas_configuration_template	copass
 
 }
 
