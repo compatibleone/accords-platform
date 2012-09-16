@@ -15,8 +15,8 @@
 /* See the License for the specific language governing permissions and 	*/
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
-#ifndef	_coes_c
-#define	_coes_c
+#ifndef	_cops_c
+#define	_cops_c
 
 #include "standard.h"
 #include "broker.h"
@@ -28,7 +28,7 @@
 #include "occiresolver.h"
 #include "occibuilder.h"
 
-struct	accords_configuration Coes = {
+struct	accords_configuration Cops = {
 	0,0,
 	0,0,0,0,
 	(char *) 0,
@@ -40,18 +40,18 @@ struct	accords_configuration Coes = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"coes.xml",
+	"cops.xml",
 	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
 
-public	int	check_debug()		{	return(Coes.debug);		}
-public	int	check_verbose()		{	return(Coes.verbose);		}
-public	char *	default_publisher()	{	return(Coes.publisher);		}
-public	char *	default_operator()	{	return(Coes.operator);		}
-public	char *	default_tls()		{	return(Coes.tls);		}
-public	char *	default_zone()		{	return(Coes.zone);		}
+public	int	check_debug()		{	return(Cops.debug);		}
+public	int	check_verbose()		{	return(Cops.verbose);		}
+public	char *	default_publisher()	{	return(Cops.publisher);		}
+public	char *	default_operator()	{	return(Cops.operator);		}
+public	char *	default_tls()		{	return(Cops.tls);		}
+public	char *	default_zone()		{	return(Cops.zone);		}
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -68,14 +68,14 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		c o e s _ l o a d 		*/
+/*		c o p s _ l o a d 		*/
 /*	---------------------------------------------	*/
-/*	this function loads coes  configuration	*/
+/*	this function loads cops  configuration	*/
 /*	from the xml configuration file.		*/
 /*	---------------------------------------------	*/  
-private	void	coes_load()
+private	void	cops_load()
 {
-	load_accords_configuration( &Coes, "coes" );
+	load_accords_configuration( &Cops, "cops" );
 	return;
 }
 
@@ -83,7 +83,7 @@ private	void	coes_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.08");
+	printf("\n   CompatibleOne Placement Services COPS : Version 1.0a.0.08");
 	printf("\n   Beta Version : 25/05/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
@@ -94,9 +94,9 @@ private	int	banner()
 }
 
 /*	------------------------------------------------------------------	*/
-/*			c o e s _ i n i t i a l i s e			*/
+/*			c o p s _ i n i t i a l i s e			*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_server * coes_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * cops_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -109,13 +109,13 @@ private	struct rest_server * coes_initialise(  void * v,struct rest_server * spt
 }
 
 /*	------------------------------------------------------------------	*/
-/*			c o e s _ a u t h o r i s e 			*/
+/*			c o p s _ a u t h o r i s e 			*/
 /*	------------------------------------------------------------------	*/
-private	int	coes_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	cops_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
-	if ( strcmp( username, Coes.user ) )
+	if ( strcmp( username, Cops.user ) )
 		return(0);
-	else if ( strcmp( password, Coes.password ) )
+	else if ( strcmp( password, Cops.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -125,9 +125,9 @@ private	int	coes_authorise(  void * v,struct rest_client * cptr, char * username
 }
 
 /*	------------------------------------------------------------------	*/
-/*			c o e s _ e x t e n s i o n 				*/
+/*			c o p s _ e x t e n s i o n 				*/
 /*	------------------------------------------------------------------	*/
-private	struct rest_extension * coes_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * cops_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
@@ -516,17 +516,17 @@ private	struct	occi_interface	placement_interface = {
 
 
 /*	------------------------------------------------------------------	*/
-/*			c o e s _ o p e r a t i o n				*/
+/*			c o p s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
-private	int	coes_operation( char * nptr )
+private	int	cops_operation( char * nptr )
 {
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_coes.xml");
+	set_autosave_cords_xlink_name("links_cops.xml");
 
-	if (!( optr = occi_cords_placement_builder( Coes.domain, "placement" ) ))
+	if (!( optr = occi_cords_placement_builder( Cops.domain, "placement" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -543,29 +543,21 @@ private	int	coes_operation( char * nptr )
 	else if (!( optr = occi_add_action( optr,"release","",release_placement)))
 		return( 28 );
 
-	if (!( optr = comons_connection_builder( Coes.domain ) ))
+	if (!( optr = comons_connection_builder( Cops.domain ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = comons_packet_builder( Coes.domain, "packet_coes.xml" ) ))
+	if (!( optr = comons_packet_builder( Cops.domain, "packet_cops.xml" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_algorithm_builder( Coes.domain, "algorithm" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-	optr->callback  = (void *) 0;
-
-	if (!( optr = occi_cords_quota_builder( Coes.domain, "quota" ) ))
+	if (!( optr = occi_cords_algorithm_builder( Cops.domain, "algorithm" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -573,30 +565,38 @@ private	int	coes_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	rest_initialise_log( Coes.monitor );
+	if (!( optr = occi_cords_quota_builder( Cops.domain, "quota" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
 
-	if (!( Coes.identity ))
-		return( occi_server(  nptr, Coes.restport, Coes.tls, Coes.threads, first, (char *) 0 ) );
+	rest_initialise_log( Cops.monitor );
+
+	if (!( Cops.identity ))
+		return( occi_server(  nptr, Cops.restport, Cops.tls, Cops.threads, first, (char *) 0 ) );
 	else
 	{
-		initialise_occi_publisher( Coes.publisher, (char*) 0, (char *) 0, (char *) 0);
+		initialise_occi_publisher( Cops.publisher, (char*) 0, (char *) 0, (char *) 0);
 		return( publishing_occi_server(
-			Coes.user, Coes.password,
-			Coes.identity,  nptr, 
-			Coes.restport, Coes.tls, 
-			Coes.threads, first ) );
+			Cops.user, Cops.password,
+			Cops.identity,  nptr, 
+			Cops.restport, Cops.tls, 
+			Cops.threads, first ) );
 	}
 }
 
 /*	------------------------------------------------------------------	*/
-/*				c o e s 					*/
+/*				c o p s 					*/
 /*	------------------------------------------------------------------	*/
-private	int	coes(int argc, char * argv[] )
+private	int	cops(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	coes_load();
+	cops_load();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -607,10 +607,10 @@ private	int	coes(int argc, char * argv[] )
 			switch( *(aptr++) )
 			{
 			case	'v'	:
-				Coes.verbose=1;
+				Cops.verbose=1;
 				continue;
 			case	'd'	:
-				Coes.debug = 0xFFFF;
+				Cops.debug = 0xFFFF;
 				continue;
 			case	'-'	:
 				if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -620,7 +620,7 @@ private	int	coes(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = coes_operation(aptr) ))
+		else if (!( status = cops_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -634,11 +634,11 @@ public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
 		return( banner() );
-	else	return( coes( argc, argv ) );
+	else	return( cops( argc, argv ) );
 }
 
 
 	/* --------- */
-#endif	/* _coes_c */
+#endif	/* _cops_c */
 	/* --------- */
 

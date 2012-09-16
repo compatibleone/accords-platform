@@ -3,7 +3,7 @@ bash build-run publisher
 bash build-run azprocci
 bash build-run broker
 bash build-run coees
-bash build-run coes
+bash build-run cops
 bash build-run comons
 bash build-run conets
 bash build-run coobas

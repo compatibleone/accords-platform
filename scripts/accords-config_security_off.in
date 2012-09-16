@@ -67,7 +67,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-publisher"
+aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"
@@ -103,8 +103,8 @@ _co-start() {
     ./run-conets &
     sleep 1
 
-    echo "Starting accords elasticity services"
-    ./run-coes &
+    echo "Starting accords placement services"
+    ./run-cops &
     sleep 1
     
     echo "Starting accords energy efficiency services"
@@ -193,7 +193,7 @@ _co-status() {
     netstat -a -p | grep LISTEN | grep comons
     netstat -a -p | grep LISTEN | grep conets
     netstat -a -p | grep LISTEN | grep coobas
-    netstat -a -p | grep LISTEN | grep coes
+    netstat -a -p | grep LISTEN | grep cops
     netstat -a -p | grep LISTEN | grep coees
     netstat -a -p | grep LISTEN | grep parser
     netstat -a -p | grep LISTEN | grep broker
@@ -236,7 +236,7 @@ co-stop() {
     sleep 1
     killall coees
     sleep 1
-    killall coes
+    killall cops
     sleep 1
     killall conets
     sleep 1
@@ -259,8 +259,8 @@ _run-broker() {
     /usr/local/bin/broker --config $target CO-BROKER/1.0
 } 
 
-_run-coes() {
-    /usr/local/bin/coes --config $target CO-ES/1.0
+_run-cops() {
+    /usr/local/bin/cops --config $target CO-ES/1.0
 } 
 
 _run-coees() {

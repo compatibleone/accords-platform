@@ -75,7 +75,7 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-cosched run-publisher accords-config"
+# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
 _co_start() {
@@ -106,7 +106,7 @@ _co_start() {
     sleep 1
 
     echo "Starting accords elasticity services"
-    @bindir@/run-coes &
+    @bindir@/run-cops &
     sleep 1
     
     echo "Starting accords energy efficiency services"
@@ -224,7 +224,7 @@ _co_status() {
 	netstat -a -p | grep LISTEN | grep comons
 	netstat -a -p | grep LISTEN | grep conets
 	netstat -a -p | grep LISTEN | grep coobas
-	netstat -a -p | grep LISTEN | grep coes
+	netstat -a -p | grep LISTEN | grep cops
 	netstat -a -p | grep LISTEN | grep coees
 	netstat -a -p | grep LISTEN | grep parser
 	netstat -a -p | grep LISTEN | grep broker
@@ -240,7 +240,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep comons || true
 	lsof -i | grep LISTEN | grep conets || true
 	lsof -i | grep LISTEN | grep coobas || true
-	lsof -i | grep LISTEN | grep coes || true
+	lsof -i | grep LISTEN | grep cops || true
 	lsof -i | grep LISTEN | grep coees || true
 	lsof -i | grep LISTEN | grep parser || true
 	lsof -i | grep LISTEN | grep broker || true
@@ -273,7 +273,7 @@ _co_stop() {
     _stop_service ezvm
     _stop_service coips
     _stop_service coees
-    _stop_service coes
+    _stop_service cops
     _stop_service conets
     _stop_service coobas
     _stop_service comons
@@ -290,8 +290,8 @@ _run_broker() {
     @bindir@/broker --config $target CO-BROKER/1.0
 } 
 
-_run_coes() {
-    @bindir@/coes --config $target CO-ES/1.0
+_run_cops() {
+    @bindir@/cops --config $target CO-ES/1.0
 } 
 
 _run_coees() {
@@ -386,7 +386,7 @@ _make_security_files() {
 	_mksecs fileserver 0
 	_mksecs coss 0
 	_mksecs comons 1
-	_mksecs coes 1
+	_mksecs cops 1
 	_mksecs coees 1
 	_mksecs coobas 1
 	_mksecs conets 1
@@ -459,7 +459,7 @@ _accords_config() {
 		export sslconfig=./openssl.cnf
 
 		_mkcert coss
-		_mkcert coes
+		_mkcert cops
 		_mkcert coees
 		_mkcert coobas
 		_mkcert comons
@@ -506,7 +506,7 @@ _accords_config() {
     _mkpub publisher
     _mkmon coss 
     _mkmon comons 
-    _mkcfg coes 
+    _mkcfg cops 
     _mkcfg conets 
     _mkcfg coobas 
     _mkcfg parser 
@@ -735,8 +735,8 @@ case `basename $0` in
     run-broker)
 	_run_broker $*
 	;;
-    run-coes)
-	_run_coes $*
+    run-cops)
+	_run_cops $*
 	;;
     run-coees)
 	_run_coees $*

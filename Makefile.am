@@ -65,8 +65,8 @@ endif
 if ENABLE_EXAMPLE
 SUBDIRS += example
 endif
-if ENABLE_COES
-SUBDIRS += coes
+if ENABLE_COPS
+SUBDIRS += cops
 endif
 if ENABLE_COEES
 SUBDIRS += coees
