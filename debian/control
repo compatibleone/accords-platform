@@ -99,6 +99,15 @@ Description: CompatibleOne Accords Platform - COOBAS subsystem
  party software vendors but can also be configured by hand by editing the corresponding
  category configuration file, “cords_price.xml”,  prior to launching the COOBAS module.
 
+Package: compatibleone-cool
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - COOL subsystem
+ The CompatibleOne Elasticity Manager subsystem is a standalone OCCI REST server
+ executable program and must have been started before any provisioning of application
+ images may be performed through the broker.
+
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
@@ -140,6 +149,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
+Package: compatibleone-jpaasprocci
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - JPaaS Procci subsystem
+ CompatibleOne Accords Platform - JPaaS Procci subsystem
 
 Package: compatibleone-ezvm
 Section: net

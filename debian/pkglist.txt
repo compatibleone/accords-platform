@@ -8,13 +8,14 @@ compatibleone-coips
 compatibleone-comons
 compatibleone-conets
 compatibleone-coobas
+compatibleone-cool
 compatibleone-cosacs
 compatibleone-cosched
 compatibleone-coss
 compatibleone-dcprocci
 compatibleone-ezvm
 compatibleone-fileserver
-compatibleone-onprocci
+compatibleone-jpaasprocci
 compatibleone-osocciprocci
 compatibleone-osprocci
 compatibleone-paprocci
