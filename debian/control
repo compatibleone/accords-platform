@@ -108,6 +108,13 @@ Description: CompatibleOne Accords Platform - COOL subsystem
  executable program and must have been started before any provisioning of application
  images may be performed through the broker.
 
+Package: compatibleone-copaas
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - COPAAS subsystem
+ The CompatibleOne COPaaS subsystem is a standalone OCCI REST server
+
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
@@ -255,8 +262,8 @@ Description: CompatibleOne Accords Platform - Open Stack inspection tool
  resources that are available or have been provisioned using the following command line syntax
 
 Package: compatibleone-accords
-Architecture: any
-Depends: libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-coes, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
+Architecture: all
+Depends: libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-coes, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cool, compatibleone-copaas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-jpaasprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Description: CompatibleOne Accords Platform - All packages
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
