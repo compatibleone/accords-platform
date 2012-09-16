@@ -1523,12 +1523,12 @@ private	struct	occi_request  * cords_add_provider_attribute(
 }
 
 /*	---------------------------------------------------------	*/
-/*		c o r d s _ c o e s _ o p e r a t i o n			*/
+/*		c o r d s _ c o p s _ o p e r a t i o n			*/
 /*	---------------------------------------------------------	*/
-/*	this function provides linkage to COES placement engine		*/
+/*	this function provides linkage to COPS placement engine		*/
 /*	for the selection of the provider to be used by broker		*/		
 /*	---------------------------------------------------------	*/
-private	char *	cords_coes_operation( 
+private	char *	cords_cops_operation( 
 	struct cords_placement_criteria * selector, 
 	char * agent, char * tls )
 {
@@ -1766,9 +1766,9 @@ private	char *	cords_select_provider( struct cords_placement_criteria * selector
 	char			* solution;
 
 	/* ------------------------------------------------------ */
-	/* allow the COES elastic placement engine to do its work */
+	/* allow the COPS elastic placement engine to do its work */
 	/* ------------------------------------------------------ */
-	if (( solution = cords_coes_operation( selector, agent, tls )) != (char *) 0)
+	if (( solution = cords_cops_operation( selector, agent, tls )) != (char *) 0)
 		return( solution );
 	
 	/* ------------------------------------------------------ */

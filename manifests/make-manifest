@@ -16,8 +16,8 @@ bash build-manifest conets 8087
 echo "<node name=\"accords:conets\" scope=normal access=public type=\"accords:conets\"/>" >> accords-platform.xml
 bash build-manifest cosched 8087
 echo "<node name=\"accords:cosched\" scope=normal access=public type=\"accords:cosched\"/>" >> accords-platform.xml
-bash build-manifest coes 8087
-echo "<node name=\"accords:coes\" scope=normal access=public type=\"accords:coes\"/>" >> accords-platform.xml
+bash build-manifest cops 8087
+echo "<node name=\"accords:cops\" scope=normal access=public type=\"accords:cops\"/>" >> accords-platform.xml
 bash build-manifest coees 8087
 echo "<node name=\"accords:coees\" scope=normal access=public type=\"accords:coees\"/>" >> accords-platform.xml
 bash build-manifest slam 8087

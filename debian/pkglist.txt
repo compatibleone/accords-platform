@@ -3,7 +3,7 @@ libcompatibleone-accords0
 compatibleone-azprocci
 compatibleone-broker
 compatibleone-coees
-compatibleone-coes
+compatibleone-cops
 compatibleone-coips
 compatibleone-comons
 compatibleone-conets
@@ -16,6 +16,7 @@ compatibleone-dcprocci
 compatibleone-ezvm
 compatibleone-fileserver
 compatibleone-jpaasprocci
+compatibleone-copaas
 compatibleone-osocciprocci
 compatibleone-osprocci
 compatibleone-paprocci

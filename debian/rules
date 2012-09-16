@@ -51,13 +51,13 @@ clean:
 	rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
 	-$(MAKE) distclean
 	rm -f config.{sub,guess,status,log}
-	dh_clean -k
+	dh_prep
 	./clean
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
 # Build architecture independant packages.
 
