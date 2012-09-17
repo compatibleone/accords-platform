@@ -108,13 +108,6 @@ Description: CompatibleOne Accords Platform - COOL subsystem
  executable program and must have been started before any provisioning of application
  images may be performed through the broker.
 
-Package: compatibleone-copaas
-Section: net
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform - COPAAS subsystem
- The CompatibleOne COPaaS subsystem is a standalone OCCI REST server
-
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
