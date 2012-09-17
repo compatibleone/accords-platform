@@ -6,7 +6,7 @@ struct paas_manifest
 	char* id;
 	char* name;
 	char* xmlns;
-	int status;
+	int state;
 };
 
 #endif	

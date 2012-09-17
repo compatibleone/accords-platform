@@ -10,7 +10,7 @@ struct paas_environment{
 	char* date_updated;
 	char* description;
 	char* provider;
-	int status;
+	int state;
 	};
 
 #endif	

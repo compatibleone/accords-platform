@@ -7,7 +7,7 @@ struct paas_version
 	char* label;
 	char* date_updated;
 	char* description;
-	int status;
+	int state;
 };
 
 #endif	

@@ -8,7 +8,7 @@ struct paas_application
 	char* date_created;
 	char* description;
 	char* environment;
-	int status;
+	int state;
 };
 
 #endif	

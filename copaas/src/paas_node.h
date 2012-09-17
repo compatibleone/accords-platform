@@ -8,7 +8,7 @@ struct paas_node
 	char* name;
 	char* version;
 	char* provider;
-	int status;
+	int state;
 };
 
 #endif	

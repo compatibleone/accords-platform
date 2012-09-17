@@ -7,10 +7,10 @@ struct paas_version_instance
 	char* name;
 	char* date_instantiated;
 	char* description;
-	char* state;
 	char* default_instance;
-	int status;
+	int state;
 };
 
 #endif	
+
 

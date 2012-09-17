@@ -7,7 +7,7 @@ struct	paas_link
 	char *	name;
 	char *	type;
 	char *	expression;
-	int	status;
+	int	state;
 };
 
 #endif	

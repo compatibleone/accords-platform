@@ -6,7 +6,7 @@ struct 	paas_relation
 {
 	char * 	id;
 	char *	name;
-	int	status;
+	int	state;
 };
 
 #endif	

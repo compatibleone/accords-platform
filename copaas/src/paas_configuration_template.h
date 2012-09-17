@@ -9,7 +9,7 @@ struct paas_configuration_template
 	char* date_created;
 	char* date_updated;
 	char* description;
-	int status;
+	int state;
 };
 
 #endif	

@@ -14,7 +14,7 @@ struct paas_configuration_option
 	char* namespace; 
 	char* option_name;
 	char* value;
-	int status;
+	int state;
 };
 
 #endif	

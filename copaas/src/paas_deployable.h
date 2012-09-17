@@ -8,7 +8,7 @@ struct paas_deployable
 	char* content_type;
 	char* location;
 	char* multitenancy_level;
-	int status;
+	int state;
 };
 
 #endif	
