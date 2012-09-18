@@ -134,7 +134,9 @@ public	int	occi_success( struct rest_response * aptr )
 	char			* nptr;
 	struct	rest_header 	* hptr;
 
-	if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
+	if ((hptr = rest_resolve_header( aptr->first, _HTTP_CONTENT_TYPE )) != (struct rest_header *) 0)
+		return( 0 );	
+	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
 		return( 0 );
 
 	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "4" ) ))
