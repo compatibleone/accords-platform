@@ -376,7 +376,9 @@ public	char *	occi_text_capacities(
 			}
 		}
 		fclose(h);
-		if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
+		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain" ) ))
+			return( filename );
+		else if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
 			return( filename );
 		else	return( occi_content_length(contentlength, filename ));
 	}
