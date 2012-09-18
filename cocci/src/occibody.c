@@ -843,10 +843,10 @@ public	int	accept_string_includes( char * sptr, char * tptr )
 /*	---------------------------------------------------	*/
 public	char * occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr )
 {
-	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
+	if (!( strcasecmp( accepts, _OCCI_TEXT_PLAIN ) ))
 		return( occi_text_body( cptr, hptr ) );
 
-	if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
+	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
 		return( occi_html_body( cptr, hptr ) );
 
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
