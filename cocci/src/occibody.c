@@ -690,7 +690,7 @@ private	char *	occi_text_body(
 				hptr = hptr->next;
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
-				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				rest_replace_header( hptr, _OCCI_TEXT_PLAIN );
 				hptr = hptr->next;
 			}
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
