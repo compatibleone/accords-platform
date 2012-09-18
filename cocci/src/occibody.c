@@ -635,6 +635,7 @@ private	char *	occi_text_body(
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
+	char *	mptr;
 	int	attributs=0;
 	int	mode=0;
 
@@ -660,11 +661,6 @@ private	char *	occi_text_body(
 				mode=2;
 				break;
 			}
-			else if (!( strcasecmp( hhptr->name, _OCCI_CATEGORY ) ))
-			{
-				mode=2;
-				break;
-			}
 		}
 
 		if ( mode == 1 )
@@ -681,14 +677,17 @@ private	char *	occi_text_body(
 		}
 		else
 		{
+			if (( mptr = occi_http_category( cptr )) != (char *) 0)
+			{
+				fprintf(h,"Category: %s\n",mptr);
+				liberate( mptr );
+			}
 			for (	;
 				hhptr != (struct rest_header *) 0;
 				hhptr = hhptr->next )
 			{
 
-				if (!( strcasecmp( hhptr->name, _OCCI_CATEGORY ) ))
-					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
-				else if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+				if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
 					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
 			}			
 		}
