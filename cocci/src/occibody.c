@@ -642,17 +642,17 @@ private	char *	occi_text_body(
 			hhptr != (struct rest_header *) 0;
 			hhptr = hhptr->next )
 		{
-			if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
 			{
 				mode=1;
 				break;
 			}
-			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			else if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
 			{
 				mode=2;
 				break;
 			}
-			else if (!( strcasecmp( hptr->name, _OCCI_CATEGORY ) ))
+			else if (!( strcasecmp( hhptr->name, _OCCI_CATEGORY ) ))
 			{
 				mode=2;
 				break;
