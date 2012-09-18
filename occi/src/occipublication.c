@@ -675,9 +675,7 @@ private struct rest_response * cords_publication_get_list(
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
-	if (!( aptr = occi_content_type( cptr, rptr, aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
-	else if (!( occi_success( aptr ) ))
+	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }

@@ -623,10 +623,12 @@ private	char *	occi_text_body(
 {
 	FILE *	h;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * hhptr;
 	char *	filename;
-	char		buffer[2048];
+	char	buffer[2048];
 	char *	vptr;
-	int		attributs=0;
+	int	attributs=0;
+	int	mode=0;
 
 	if (!( filename = rest_temporary_filename( "txt" ) ))
 		return((char *) 0);
@@ -636,7 +638,52 @@ private	char *	occi_text_body(
 
 	else
 	{
-		fprintf(h,"{ Category: %c%s%c; ",0x0022,cptr->id,0x0022 );
+		for (	hhptr=hptr;
+			hhptr != (struct rest_header *) 0;
+			hhptr = hhptr->next )
+		{
+			if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			{
+				mode=1;
+				break;
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			{
+				mode=2;
+				break;
+			}
+			else if (!( strcasecmp( hptr->name, _OCCI_CATEGORY ) ))
+			{
+				mode=2;
+				break;
+			}
+		}
+
+		if ( mode = 1 )
+		{
+			for (	;
+				hhptr != (struct rest_header *) 0;
+				hhptr = hhptr->next )
+			{
+
+				if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
+			}			
+
+		}
+		else
+		{
+			for (	;
+				hhptr != (struct rest_header *) 0;
+				hhptr = hhptr->next )
+			{
+
+				if (!( strcasecmp( hhptr->name, _OCCI_CATEGORY ) ))
+					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
+				else if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
+			}			
+		}
 		while ( hptr )
 		{
 			if (!( hptr->name ))
@@ -651,18 +698,14 @@ private	char *	occi_text_body(
 				contentlength = hptr;
 				hptr = hptr->next;
 			}
-			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			else if ((!( strcasecmp( hptr->name, _OCCI_LOCATION  ) ))
+			     ||  (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			     ||  (!( strcasecmp( hptr->name, _OCCI_CATEGORY  ) )))
 			{
-				fprintf(h,"%s: %s\n",hptr->name,hptr->value);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
 		}
-		if ( attributs )
-			fprintf(h,"\t}\n");
-		else	fprintf(h,"%c%c\n",0x0022,0x0022);
-		fprintf(h,"}\n");
-
 		fclose(h);
 		return( occi_content_length(contentlength, filename ));
 	}
