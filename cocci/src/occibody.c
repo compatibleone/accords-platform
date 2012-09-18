@@ -659,7 +659,7 @@ private	char *	occi_text_body(
 			}
 		}
 
-		if ( mode = 1 )
+		if ( mode == 1 )
 		{
 			for (	;
 				hhptr != (struct rest_header *) 0;
