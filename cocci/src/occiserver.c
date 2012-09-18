@@ -57,6 +57,11 @@ private	struct	accords_authorization * AccordsAuthorization=(struct accords_auth
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
 
+private	struct rest_response *	occi_content_type( 
+	struct occi_category * cptr,
+	struct rest_request * qptr, 
+	struct rest_response * rptr );
+
 private	struct rest_response * occi_get( 
 		void * vptr,
 		struct rest_client * cptr, 
@@ -495,9 +500,11 @@ private	struct rest_response * occi_get_capacities(
 			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
 				hptr = rest_response_header( aptr, "Category", mptr );
 
-	if (!( occi_success( aptr ) ))
+	if (!( aptr = occi_content_type( optr, rptr, aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
-	else	return( rest_response_status( aptr, 200, "OK" ) );
+	else	if (!( occi_success( aptr ) ))
+		return( rest_response_status( aptr, 500, "Server Failure" ) );
+	else	return( aptr );
 
 }
 
@@ -1759,6 +1766,81 @@ private	struct rest_response * occi_alert(
 	}
 }
 
+
+private	struct occi_category * append_category_list( struct occi_category * lptr, struct occi_category * cptr )
+{
+	struct	occi_category * root;
+	if (!( root = lptr ))
+		return( cptr );
+	else
+	{
+		while ( lptr->next )
+			lptr = lptr->next;
+
+		lptr->next = cptr;
+		cptr->previous = lptr;
+		return( root );
+	}
+}
+
+private	struct occi_category * check_occi_conformity( struct occi_category * category )
+{
+	struct	occi_category * cptr;
+	struct	occi_category * optr;
+	int	core=0;
+	for ( cptr=category;
+		cptr != (struct occi_category *) 0;
+		cptr = cptr->next )
+	{
+		if (!( strcmp( cptr->id, "entity" ) ))
+			core |= 1;
+		else if (!( strcmp( cptr->id, "resource" ) ))
+			core |= 2;
+		else if (!( strcmp( cptr->id, "link" ) ))
+			core |= 4;
+	}
+	if (!( core & 1 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"entity",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/entity#",
+			"standard OCCI entity" ) )) 
+			return( category );
+		optr->access = _OCCI_PRIVATE;
+		category = append_category_list( category, optr );
+	}
+	if (!( core & 2 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"resource",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/resource#",
+			"standard OCCI resource" ) )) 
+			return( category );
+		optr->access = _OCCI_PRIVATE;
+		category = append_category_list( category, optr );
+	}
+	if (!( core & 4 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"link",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/link#",
+			"standard OCCI link" ) )) 
+			return( category );
+		optr->access = _OCCI_PRIVATE;
+		category = append_category_list( category, optr );
+	}
+	return( category );
+}
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ s e r v e r				*/
 /*	---------------------------------------------------------	*/
@@ -1793,6 +1875,12 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 	if ( tls )
 		if (!( strlen(tls) ))
 			tls = (char *) 0;
+
+	/* -------------------------------------------------- */
+	/* ensure that the basic core information is provided */
+	/* -------------------------------------------------- */
+	if (!( category = check_occi_conformity( category ) ))
+ 		return( 55 );
 
 	occi_authorization = authorization;
 	Osi.authorise = (void *) 0;

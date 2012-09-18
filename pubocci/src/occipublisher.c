@@ -819,79 +819,6 @@ public	int	occi_release_AAA( char * user, char * password, char * agent, char * 
 	return( 0 );
 }
 
-private	struct occi_category * append_category_list( struct occi_category * lptr, struct occi_category * cptr )
-{
-	if (!( lptr ))
-		return( cptr );
-	else
-	{
-		while ( lptr->next )
-			lptr = lptr->next;
-
-		lptr->next = cptr;
-		cptr->previous = lptr;
-		return( lptr );
-	}
-}
-
-private	struct occi_category * check_occi_conformity( struct occi_category * category )
-{
-	struct	occi_category * cptr;
-	struct	occi_category * optr;
-	int	core=0;
-	for ( cptr=category;
-		cptr != (struct occi_category *) 0;
-		cptr = cptr->next )
-	{
-		if (!( strcmp( cptr->id, "entity" ) ))
-			core |= 1;
-		else if (!( strcmp( cptr->id, "resource" ) ))
-			core |= 2;
-		else if (!( strcmp( cptr->id, "link" ) ))
-			core |= 4;
-	}
-	if (!( core & 1 ))
-	{
-		if (!( optr = occi_create_category(
-			"occi",
-			"entity",
-			"http://schemas.ogf.org/core#",
-			"kind",
-			"http://scheme.ogf.org/occi/entity#",
-			"standard OCCI entity" ) )) 
-			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
-	}
-	if (!( core & 2 ))
-	{
-		if (!( optr = occi_create_category(
-			"occi",
-			"resource",
-			"http://schemas.ogf.org/core#",
-			"kind",
-			"http://scheme.ogf.org/occi/resource#",
-			"standard OCCI resource" ) )) 
-			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
-	}
-	if (!( core & 4 ))
-	{
-		if (!( optr = occi_create_category(
-			"occi",
-			"link",
-			"http://schemas.ogf.org/core#",
-			"kind",
-			"http://scheme.ogf.org/occi/link#",
-			"standard OCCI link" ) )) 
-			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
-	}
-	return( category );
-}
-
 /*	---------------------------------------------------------	*/
 /*		p u b l i s h i n g _ o c c i _ s e r v e r		*/
 /*	---------------------------------------------------------	*/
@@ -919,11 +846,6 @@ public	int	publishing_occi_server(
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
-	/* -------------------------------------------------- */
-	/* ensure that the basic core information is provided */
-	/* -------------------------------------------------- */
-	if (!( category = check_occi_conformity( category ) ))
- 		return( 55 );
 
 	/* -------------------------------------------- */
 	/* handle transport layer security, if required */
