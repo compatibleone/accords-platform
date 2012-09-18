@@ -495,11 +495,12 @@ private	struct rest_response * occi_get_capacities(
 		}
 	}
 
+#ifdef	_need_to_add_link_manager
 	if ((optr = OcciServerLinkManager) != (struct occi_category*) 0)
 		if (!( optr->access & _OCCI_SECRET ))
 			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
 				hptr = rest_response_header( aptr, "Category", mptr );
-
+#endif
 	if (!( aptr = occi_content_type( optr, rptr, aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	if (!( occi_success( aptr ) ))
