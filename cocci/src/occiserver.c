@@ -57,11 +57,6 @@ private	struct	accords_authorization * AccordsAuthorization=(struct accords_auth
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
 
-private	struct rest_response *	occi_content_type( 
-	struct occi_category * cptr,
-	struct rest_request * qptr, 
-	struct rest_response * rptr );
-
 private	struct rest_response * occi_get( 
 		void * vptr,
 		struct rest_client * cptr, 
@@ -557,7 +552,7 @@ private	void	occi_show_request( struct rest_request * rptr )
 /*	---------------------------------------------------------	*/
 /*			o c c i _ c o n t e n t _ t y p e		*/
 /*	---------------------------------------------------------	*/
-private	struct rest_response *	occi_content_type( 
+public 	struct rest_response *	occi_content_type( 
 	struct occi_category * cptr,
 	struct rest_request * qptr, 
 	struct rest_response * rptr )
