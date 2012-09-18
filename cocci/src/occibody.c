@@ -336,6 +336,55 @@ public	char *	occi_html_capacities(
 }
 
 /*	------------------------------------------------------------	*/
+/*	  		o c c i _ t e x t _ c a p a c i t i e s		*/
+/*	------------------------------------------------------------	*/
+public	char *	occi_text_capacities( 
+		struct occi_category * cptr,
+		struct rest_response * aptr )
+{
+	FILE *	h;
+	char *	mptr;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	nptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * contenttype=(struct rest_header *) 0;
+	struct	rest_header * hptr;
+
+	if (!( filename = rest_temporary_filename( "txt" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+		for (	;
+			cptr != (struct occi_category *) 0;
+			cptr = cptr->next )
+		{
+			if ( cptr->access & _OCCI_SECRET )
+				continue;
+			else if (!( mptr = occi_http_capacity( cptr ) ))
+				continue;
+			else
+			{
+				fprintf(h,"Category: %s\n",mptr);
+				liberate( mptr );
+			}
+		}
+		fclose(h);
+		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain" ) ))
+			return( filename );
+		else if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
+			return( filename );
+		else	return( occi_content_length(contentlength, filename ));
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*	  		o c c i _ h t m l _ b o d y 			*/
 /*	------------------------------------------------------------	*/
 public	char *	occi_html_body( 
@@ -843,10 +892,11 @@ public	int	accept_string_includes( char * sptr, char * tptr )
 /*	---------------------------------------------------	*/
 public	char * occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr )
 {
-	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
+	if ((!( strcasecmp( accepts, _OCCI_TEXT_PLAIN ) ))
+	||  (!( strcasecmp( accepts, "*/*" ) )))
 		return( occi_text_body( cptr, hptr ) );
 
-	if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
+	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
 		return( occi_html_body( cptr, hptr ) );
 
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
