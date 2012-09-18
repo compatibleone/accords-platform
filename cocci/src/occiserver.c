@@ -135,7 +135,7 @@ public	int	occi_success( struct rest_response * aptr )
 	struct	rest_header 	* hptr;
 
 	if (!( hptr = rest_resolve_header( aptr->first, _HTTP_ACCEPT ) ))
-		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain" ) ))
+		if (!( hptr = occi_accept_header( aptr ) ))
 			return( 0 );
 	if ((hptr = rest_resolve_header( aptr->first, _HTTP_CONTENT_TYPE )) != (struct rest_header *) 0)
 		return( 0 );	
@@ -456,7 +456,7 @@ private	struct rest_response * occi_get_capacities(
 
 		sprintf(clbuff,"%u",strlen(mptr));
 
-		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi, text/plain, text/html" ) ))
+		if (!( hptr = occi_accept_header( aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
@@ -493,7 +493,7 @@ private	struct rest_response * occi_get_capacities(
 			}
 			else	liberate( mptr );
 		}
-		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi, text/plain" ) ))
+		if (!( hptr = occi_accept_header( aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 
 	}

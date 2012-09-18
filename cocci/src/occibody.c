@@ -336,6 +336,14 @@ public	char *	occi_html_capacities(
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ a c c e p t _ h e a d e r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header * occi_accept_header( struct rest_response * aptr )
+{
+	return( rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain,text/html" ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*	  		o c c i _ t e x t _ c a p a c i t i e s		*/
 /*	------------------------------------------------------------	*/
 public	char *	occi_text_capacities( 
@@ -376,7 +384,7 @@ public	char *	occi_text_capacities(
 			}
 		}
 		fclose(h);
-		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain" ) ))
+		if (!( hptr = occi_accept_header( aptr )))
 			return( filename );
 		else if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
 			return( filename );
