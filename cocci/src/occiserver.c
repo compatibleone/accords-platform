@@ -511,12 +511,11 @@ private	struct rest_response * occi_get_capacities(
 		}
 	}
 
-#ifdef	_need_to_add_link_manager
 	if ((optr = OcciServerLinkManager) != (struct occi_category*) 0)
 		if (!( optr->access & _OCCI_SECRET ))
 			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
 				hptr = rest_response_header( aptr, "Category", mptr );
-#endif
+
 	if (!( aptr = occi_content_type( optr, rptr, aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	if (!( occi_success( aptr ) ))
@@ -1813,8 +1812,6 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 			core |= 1;
 		else if (!( strcmp( cptr->id, "resource" ) ))
 			core |= 2;
-		else if (!( strcmp( cptr->id, "link" ) ))
-			core |= 4;
 	}
 	if (!( core & 1 ))
 	{
@@ -1838,19 +1835,6 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 			"kind",
 			"http://scheme.ogf.org/occi/resource#",
 			"standard OCCI resource" ) )) 
-			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
-	}
-	if (!( core & 4 ))
-	{
-		if (!( optr = occi_create_category(
-			"occi",
-			"link",
-			"http://schemas.ogf.org/core#",
-			"kind",
-			"http://scheme.ogf.org/occi/link#",
-			"standard OCCI link" ) )) 
 			return( category );
 		optr->access = _OCCI_PRIVATE;
 		category = append_category_list( category, optr );
