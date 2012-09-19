@@ -71,6 +71,7 @@ coes/src/coes
 comons/src/comons
 conets/src/conets
 coobas/src/coobas
+copaas/src/copaas
 coss/src/coss
 fileserver/src/fileserver
 onprocci/src/onprocci
@@ -112,3 +113,5 @@ scripts/run-publisher
 dcprocci/src/dcprocci
 scripts/run-cosched
 scripts/run-ezvm
+debian/files
+debian/*.log
