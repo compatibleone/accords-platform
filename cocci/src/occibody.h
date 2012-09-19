@@ -26,6 +26,7 @@
 #include "url.h"
 #include "urlpublic.h"
 
+public	struct rest_header * occi_accept_header( struct rest_response * response );
 public	char *	occi_html_capacities( struct occi_category * cptr, struct rest_response  * aptr );
 public	char *	occi_text_capacities( struct occi_category * cptr, struct rest_response  * aptr );
 public	char *	occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr );

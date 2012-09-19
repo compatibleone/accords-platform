@@ -336,6 +336,14 @@ public	char *	occi_html_capacities(
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ a c c e p t _ h e a d e r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header * occi_accept_header( struct rest_response * aptr )
+{
+	return( rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain,text/html" ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*	  		o c c i _ t e x t _ c a p a c i t i e s		*/
 /*	------------------------------------------------------------	*/
 public	char *	occi_text_capacities( 
@@ -376,7 +384,7 @@ public	char *	occi_text_capacities(
 			}
 		}
 		fclose(h);
-		if (!( hptr = rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain" ) ))
+		if (!( hptr = occi_accept_header( aptr )))
 			return( filename );
 		else if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
 			return( filename );
@@ -627,6 +635,7 @@ private	char *	occi_text_body(
 	char *	filename;
 	char	buffer[2048];
 	char *	vptr;
+	char *	mptr;
 	int	attributs=0;
 	int	mode=0;
 
@@ -642,24 +651,19 @@ private	char *	occi_text_body(
 			hhptr != (struct rest_header *) 0;
 			hhptr = hhptr->next )
 		{
-			if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
 			{
 				mode=1;
 				break;
 			}
-			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
-			{
-				mode=2;
-				break;
-			}
-			else if (!( strcasecmp( hptr->name, _OCCI_CATEGORY ) ))
+			else if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
 			{
 				mode=2;
 				break;
 			}
 		}
 
-		if ( mode = 1 )
+		if ( mode == 1 )
 		{
 			for (	;
 				hhptr != (struct rest_header *) 0;
@@ -673,14 +677,17 @@ private	char *	occi_text_body(
 		}
 		else
 		{
+			if (( mptr = occi_http_category( cptr )) != (char *) 0)
+			{
+				fprintf(h,"Category: %s\n",mptr);
+				liberate( mptr );
+			}
 			for (	;
 				hhptr != (struct rest_header *) 0;
 				hhptr = hhptr->next )
 			{
 
-				if (!( strcasecmp( hhptr->name, _OCCI_CATEGORY ) ))
-					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
-				else if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+				if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
 					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
 			}			
 		}
@@ -690,7 +697,7 @@ private	char *	occi_text_body(
 				hptr = hptr->next;
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
-				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				rest_replace_header( hptr, _OCCI_TEXT_PLAIN );
 				hptr = hptr->next;
 			}
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))

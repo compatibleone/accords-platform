@@ -125,6 +125,25 @@ private	char * 	cords_consumer_publication(
 /*	---------------------------------------------------------	*/
 /*	c o r d s _ p r o v i d e r _ p u b l i c a t i o n		*/
 /*	---------------------------------------------------------	*/
+private	char * 	cords_provider_agreement(
+		char * provider,
+		char * name,
+		char * category,
+		char * operator,
+		char * identity, 
+		char * agent, char * tls )
+{
+	struct	occi_result * zptr;
+	struct	occi_element * eptr;
+	return( provider );
+}
+
+/*	---------------------------------------------------------	*/
+/*	c o r d s _ p r o v i d e r _ p u b l i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+/*	Their might exist an SLA controlling the publication of		*/
+/*	resource quota by the provider.					*/
+/*	---------------------------------------------------------	*/
 private	char * 	cords_provider_publication( 
 		char * name,
 		char * category,
@@ -142,6 +161,7 @@ private	char * 	cords_provider_publication(
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
+	char  *	result=(char *) 0;
 	char	buffer[2048];
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_PROVIDER, agent, tls ) ))
@@ -188,7 +208,9 @@ private	char * 	cords_provider_publication(
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
-		return( allocate_string( buffer ) );
+		if (!( result = allocate_string( buffer ) ))
+			return( result );
+		else	return( cords_provider_agreement( result, name, category, operator, identity, agent, tls ) );
 	}
 
 }
