@@ -123,7 +123,135 @@ private	char * 	cords_consumer_publication(
 }
 
 /*	---------------------------------------------------------	*/
-/*	c o r d s _ p r o v i d e r _ p u b l i c a t i o n		*/
+/*		o c c i _ r e s o l v e _ a c c o u n t			*/
+/*	---------------------------------------------------------	*/
+/*	resolve the account identifier using provided accountname	*/
+/*	---------------------------------------------------------	*/
+private	char *	occi_resolve_account( char * name, char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_ACCOUNT, agent, tls ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_ACCOUNT);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!(dptr=occi_request_element(qptr,"occi.account.name", ( name ? name : name ) ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		rest_add_http_prefix(buffer,2048,ihost);
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ r e s o l v e _ a g r e e m e n t		*/
+/*	---------------------------------------------------------	*/
+/*	resolve the first agreement for the indicated initiator		*/
+/*	---------------------------------------------------------	*/
+private	char * occi_resolve_agreement( char * accid, char * agent, char * tls )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
+	char	buffer[2048];
+
+	if (!( ihost = occi_resolve_category_provider( _CORDS_AGREEMENT, agent, tls ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_AGREEMENT);
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!(dptr=occi_request_element(qptr,"occi.agreement.initiator" , ( accid ? accid : accid ) ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		rest_add_http_prefix(buffer,2048,ihost);
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*	     c o r d s _ p r o v i d e r _ a g r e e m e n t		*/
+/*	---------------------------------------------------------	*/
+/*	resolve the provider account, if any, and the sla, if any	*/
+/*	and process the quota information that it describes.		*/
 /*	---------------------------------------------------------	*/
 private	char * 	cords_provider_agreement(
 		char * provider,
@@ -133,9 +261,45 @@ private	char * 	cords_provider_agreement(
 		char * identity, 
 		char * agent, char * tls )
 {
-	struct	occi_result * zptr;
-	struct	occi_element * eptr;
-	return( provider );
+	char *	accountid;
+	struct	occi_response * account;
+	char *	agreementid;
+	struct	occi_response * agreement;
+
+	/* ----------------------------------------------------- */
+	/* resolve the account id from the operator account name */
+	/* ----------------------------------------------------- */
+	if (!( accountid = occi_resolve_account( operator, agent, tls ) ))
+		return( provider );
+
+	/* ----------------------------------------------------- */
+	/* resolve the agreement id from the account identifier  */
+	/* ----------------------------------------------------- */
+	else if (!( agreementid = occi_resolve_agreement( accountid, agent, tls ) ))
+	{
+		liberate( accountid );
+		return( provider );
+	}
+
+	/* ----------------------------------------------------- */
+	/* retrieve the agreement description record information */
+	/* ----------------------------------------------------- */
+	else if (!( agreement = occi_simple_get( agreementid, agent, tls ) ))
+	{
+		liberate( accountid );
+		liberate( agreementid );
+		return( provider );
+	}
+	/* ----------------------------------------------------- */
+	/* clean it all up now before return to the publication  */
+	/* ----------------------------------------------------- */
+	else
+	{
+		agreement = occi_remove_response( agreement );
+		liberate( accountid );
+		liberate( agreementid );
+		return( provider );
+	}
 }
 
 /*	---------------------------------------------------------	*/

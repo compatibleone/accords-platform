@@ -521,7 +521,7 @@ private	struct rest_response * occi_get_capacities(
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
-	else	return( aptr );
+	else	return( rest_response_status( aptr, 200, "OK" ) );
 
 }
 
@@ -1826,8 +1826,15 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 			"http://scheme.ogf.org/occi/entity#",
 			"standard OCCI entity" ) )) 
 			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
+		if (!( optr = occi_add_attribute( optr, "id", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "title", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
 	}
 	if (!( core & 2 ))
 	{
@@ -1839,8 +1846,13 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 			"http://scheme.ogf.org/occi/resource#",
 			"standard OCCI resource" ) )) 
 			return( category );
-		optr->access = _OCCI_PRIVATE;
-		category = append_category_list( category, optr );
+		if (!( optr = occi_add_attribute( optr, "summary", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
 	}
 	if (!( core & 4 ))
 	{
