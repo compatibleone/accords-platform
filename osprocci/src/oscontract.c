@@ -137,13 +137,16 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 	/* --------------------------------------------- */
 	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
-		strcpy(request.architecture,"x86" );
-	else if ((!(strcasecmp( vptr, "x86"    ) ))
-	     ||  (!(strcasecmp( vptr, "x86_32" ) ))
-	     ||  (!(strcasecmp( vptr, "x86_64" ) ))
-	     ||  (!(strcasecmp( vptr, "txt86"  ) )))
-		strcpy(request.architecture,vptr  );
-	else	strcpy(request.architecture,"x86" );
+		strcpy(request.architecture,"blank" );
+	else if ((!(strcasecmp( vptr, "x86"    		) ))
+	     ||  (!(strcasecmp( vptr, "x86_32" 		) ))
+	     ||  (!(strcasecmp( vptr, "x86_64" 		) )))
+		strcpy(request.architecture,"untrusted" );
+	else if ((!(strcasecmp( vptr, "txt86"  		) ))
+	     ||  (!(strcasecmp( vptr, "txt86_32" 	) ))
+	     ||  (!(strcasecmp( vptr, "txt86_64"  	) )))
+		strcpy(request.architecture,"trusted" );
+	else	strcpy(request.architecture,"blank" );
 	
 	/* ----------------------------------------- */
 	/* for structures in flavor message response */
@@ -173,16 +176,27 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 			flavor.speed = 0;
 		else	flavor.speed = rest_normalise_value(vptr,'G');
 
-		if (!( vptr = json_atribut( dptr, "architecture" ) ))
-			strcpy(flavor.architecture,"x86" );
+		if (!( vptr = json_atribut( dptr, "trustlevel" ) ))
+			strcpy(flavor.architecture,"blank" );
 		else	strcpy(flavor.architecture,vptr  );
 
 		/* ------------------------------------ */
+		/* handle flavour architecture types    */
+		/* ------------------------------------ */
+		if (!( strncasecmp( request.architecture, "trusted", strlen("trusted") ) ))
+		{
+			if (!( strncasecmp( flavor.architecture, "untrusted", strlen("trusted") ) ))
+				continue;
+			else if (!( strncasecmp( flavor.architecture, "blank",strlen("trusted") ) ))
+				continue;
+		}
+		else if (!( strncasecmp( flavor.architecture, "trusted",strlen("trusted") ) ))
+			continue; 
+	
+		/* ------------------------------------ */
 		/* compare the request and the response */
 		/* ------------------------------------ */
-		if ( strncasecmp( flavor.architecture, request.architecture, strlen(request.architecture) ) != 0 ) 
-			continue;
-		else if (( request.storage ) && ( flavor.storage < request.storage ))
+		if (( request.storage ) && ( flavor.storage < request.storage ))
 			continue;
 		else if (( request.memory  ) && ( flavor.memory < request.memory ))
 			continue;
