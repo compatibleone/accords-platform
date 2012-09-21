@@ -2289,9 +2289,16 @@ private	int	cords_terminate_xsd(
 		aptr = aptr->next )
 	{
 		/* -------------------------------------------- */
+		/* filter out any implicite namespace attribute	*/
+		/* -------------------------------------------- */
+		if (!( aptr->name ))
+			continue;
+		else if (!( strcmp( aptr->name, "xmlns" )))
+			continue;
+		/* -------------------------------------------- */
 		/* ensure the attribute is specified in the XSD */
 		/* -------------------------------------------- */
-		if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
+		else if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
 		{
 			sprintf(buffer,"xsd:incorrect attribute:%s",aptr->name);
 			return(cords_append_error(dptr,799,buffer));

@@ -17,7 +17,6 @@
 		<xsd:element name="terms" type="cordsTerms" minOccurs="1" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="xmlns" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="initiator" type="xsd:string"/>
 		<xsd:attribute name="responder" type="xsd:string"/>

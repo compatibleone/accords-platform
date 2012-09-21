@@ -15,7 +15,6 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="xmlns" type="xsd:string"/>
 		<xsd:attribute name="configuration" type="xsd:string"/>
 		<xsd:attribute name="release" type="xsd:string"/>
 		<xsd:attribute name="interface" type="xsd:string"/>
