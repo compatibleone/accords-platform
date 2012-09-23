@@ -10,7 +10,7 @@
 
 	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/quotatypes.xsd"/>
 
-	<xsd:element name="provider" type="cords_provider"/>
+	<xsd:element name="provider" type="cordsProvider"/>
 
 </xsd:schema>
 
