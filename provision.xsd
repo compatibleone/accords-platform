@@ -1,0 +1,20 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Compatible One Resource and Request Description Schema Version 2.12
+			Provisionary Version 24th September
+			Provider Quota Description Schema for SLA manager
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/quotatypes.xsd"/>
+
+	<xsd:element name="provider" type="cords_provider"/>
+
+</xsd:schema>
+
+
+
+
+

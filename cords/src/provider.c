@@ -74,6 +74,7 @@ public struct cords_provider * reset_cords_provider(struct cords_provider * sptr
 		sptr->zone = (char*) 0;
 		sptr->opinion = (char*) 0;
 		sptr->security = (char*) 0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -140,6 +141,10 @@ public int xmlin_cords_provider(struct cords_provider * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->security = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"state") ))
+		{
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
+		}
 	}
 	return(0);
 
@@ -164,6 +169,7 @@ public int rest_occi_cords_provider(FILE * fh,struct cords_provider * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.opinion='%s'\r\n",prefix,nptr,(sptr->opinion?sptr->opinion:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

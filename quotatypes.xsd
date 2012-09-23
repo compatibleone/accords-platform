@@ -1,0 +1,65 @@
+
+<xsd:schema xmlns:xsd="http://www.w3c.org/2001/XMLSchema">
+
+<xsd:complexType name="cords_operator">
+	<xsd:attribute name="id" type="xsd:string"/>
+	<xsd:attribute name="name" type="xsd:string"/>
+	<xsd:attribute name="description" type="xsd:string"/>
+	<xsd:attribute name="account" type="xsd:string"/>
+	<xsd:attribute name="security" type="xsd:string"/>
+	<xsd:attribute name="pricelist" type="xsd:string"/>
+	<xsd:attribute name="state" type="xsd:integer"/>
+</xsd:complexType>
+
+<xsd:complexType name="cords_price">
+	<xsd:attribute name="id" type="xsd:string"/>
+	<xsd:attribute name="name" type="xsd:string"/>
+	<xsd:attribute name="operator" type="xsd:string"/>
+	<xsd:attribute name="description" type="xsd:string"/>
+	<xsd:attribute name="currency" type="xsd:string"/>
+	<xsd:attribute name="fixed" type="xsd:string"/>
+	<xsd:attribute name="rate" type="xsd:string"/>
+	<xsd:attribute name="units" type="xsd:string"/>
+	<xsd:attribute name="period" type="xsd:string"/>
+	<xsd:attribute name="state" type="xsd:integer"/>
+</xsd:complexType>
+
+<xsd:complexType name="cords_quota">
+	<xsd:sequence>
+		<xsd:element name="price" type="cords_price" minOccurs='1' maxOccurs='1'/>
+	</xsd:sequence>
+	<xsd:attribute name="id" type="xsd:string"/>
+	<xsd:attribute name="name" type="xsd:string"/>
+	<xsd:attribute name="description" type="xsd:string"/>
+	<xsd:attribute name="operator" type="xsd:string"/>
+	<xsd:attribute name="price" type="xsd:string"/>
+	<xsd:attribute name="zone" type="xsd:string"/>
+	<xsd:attribute name="opinion" type="xsd:string"/>
+	<xsd:attribute name="ceiling" type="xsd:integer"/>
+	<xsd:attribute name="offered" type="xsd:integer"/>
+	<xsd:attribute name="reserved" type="xsd:integer"/>
+	<xsd:attribute name="consumed" type="xsd:integer"/>
+	<xsd:attribute name="state" type="xsd:integer"/>
+</xsd:complexType>
+
+<xsd:complexType name="cords_provider">
+	<xsd:sequence>
+		<xsd:element name="quota" type="cords_quota" minOccurs='1' maxOccurs='unbounded'/>
+	</xsd:sequence>
+	<xsd:attribute name="id" type="xsd:string"/>
+	<xsd:attribute name="name" type="xsd:string"/>
+	<xsd:attribute name="identity" type="xsd:string"/>
+	<xsd:attribute name="category" type="xsd:string"/>
+	<xsd:attribute name="profile" type="xsd:string"/>
+	<xsd:attribute name="operator" type="xsd:string"/>
+	<xsd:attribute name="price" type="xsd:string"/>
+	<xsd:attribute name="zone" type="xsd:string"/>
+	<xsd:attribute name="opinion" type="xsd:string"/>
+	<xsd:attribute name="security" type="xsd:string"/>
+	<xsd:attribute name="quotas" type="xsd:integer"/>
+	<xsd:attribute name="state" type="xsd:integer"/>
+</xsd:complexType>
+
+</xsd:schema>
+
+

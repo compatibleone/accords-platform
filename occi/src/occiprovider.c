@@ -153,6 +153,8 @@ private void autoload_cords_provider_nodes() {
 				pptr->opinion = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "security" )) != (struct xml_atribut *) 0)
 				pptr->security = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
+				pptr->state = document_atribut_value(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -207,6 +209,9 @@ public  void autosave_cords_provider_nodes() {
 		fprintf(h," security=%c",0x0022);
 		fprintf(h,"%s",(pptr->security?pptr->security:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," state=%c",0x0022);
+		fprintf(h,"%u",pptr->state);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
 	fprintf(h,"</cords_providers>\n");
@@ -246,6 +251,8 @@ private void set_cords_provider_field(
 			pptr->opinion = allocate_string(vptr);
 		if (!( strcmp( nptr, "security" ) ))
 			pptr->security = allocate_string(vptr);
+		if (!( strcmp( nptr, "state" ) ))
+			pptr->state = atoi(vptr);
 		}
 	return;
 }
@@ -340,6 +347,7 @@ private int pass_cords_provider_filter(
 		else if ( strcmp(pptr->security,fptr->security) != 0)
 			return(0);
 		}
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
 
@@ -380,6 +388,9 @@ private struct rest_response * cords_provider_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.security=%s",optr->domain,optr->id,pptr->security);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -817,6 +828,8 @@ public struct occi_category * occi_cords_provider_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "security",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_provider)))
 			return( optr );
 		autoload_cords_provider_nodes();
@@ -943,6 +956,17 @@ public struct rest_header *  cords_provider_occi_headers(struct cords_provider *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_provider.security='%s'\r\n",(sptr->security?sptr->security:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_provider.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
