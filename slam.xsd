@@ -57,7 +57,10 @@
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="identity" type="xsd:string"/>
-		<xsd:attribute name="payload" type="xsd:string"/>
+		<xsd:attribute name="manifest" type="xsd:string"/>
+		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="variables" type="xsd:integer"/>
+		<xsd:attribute name="guarantees" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 

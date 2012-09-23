@@ -41,8 +41,10 @@ public struct cords_term * liberate_cords_term(struct cords_term * sptr)
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->identity )
 			 sptr->identity = liberate(sptr->identity);
-		if ( sptr->payload )
-			 sptr->payload = liberate(sptr->payload);
+		if ( sptr->manifest )
+			 sptr->manifest = liberate(sptr->manifest);
+		if ( sptr->provider )
+			 sptr->provider = liberate(sptr->provider);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_term *) 0);
@@ -61,7 +63,10 @@ public struct cords_term * reset_cords_term(struct cords_term * sptr)
 		sptr->description = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->identity = (char*) 0;
-		sptr->payload = (char*) 0;
+		sptr->manifest = (char*) 0;
+		sptr->provider = (char*) 0;
+		sptr->variables =  0;
+		sptr->guarantees =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -109,9 +114,21 @@ public int xmlin_cords_term(struct cords_term * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->identity = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"payload") ))
+		else if (!( strcmp(wptr->name,"manifest") ))
 		{
-			if ( wptr->value ) { sptr->payload = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->manifest = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"provider") ))
+		{
+			if ( wptr->value ) { sptr->provider = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"variables") ))
+		{
+			if ( wptr->value ) { sptr->variables = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"guarantees") ))
+		{
+			if ( wptr->value ) { sptr->guarantees = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -136,7 +153,10 @@ public int rest_occi_cords_term(FILE * fh,struct cords_term * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.payload='%s'\r\n",prefix,nptr,(sptr->payload?sptr->payload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.manifest='%s'\r\n",prefix,nptr,(sptr->manifest?sptr->manifest:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.variables='%u'\r\n",prefix,nptr,sptr->variables);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.guarantees='%u'\r\n",prefix,nptr,sptr->guarantees);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

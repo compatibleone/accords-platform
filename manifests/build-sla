@@ -7,7 +7,7 @@
 # --------------------------------------------------
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > sla-$1.xml
 echo "<agreement name=\"$1\" xmlns=\"http://www.compatibleone.fr/schemes/slam.xsd\" initiator=\"$2\" responder=\"accords\" serviceprovider=\"responder\" description=\"generated SLA\" initiation=\"now\" expiration=\"never\" template=\"none\">" >> sla-$1.xml 
-echo "<terms name=\"$1:services\" type=\"$1:services\">" >> sla-$1.xml 
+echo "<terms name=\"$1:services\" type=\"services\">" >> sla-$1.xml 
 echo "<term name=\"$1:service1\">" >> sla-$1.xml 
 echo "<manifest name=\"$3\">" >> sla-$1.xml 
 echo "</manifest>" >> sla-$1.xml

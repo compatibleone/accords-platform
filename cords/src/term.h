@@ -9,7 +9,10 @@ struct	cords_term
 	char * 	description;
 	char * 	type;	
 	char *	identity;
-	char *	payload;
+	char *	manifest;
+	char *	provider;
+	int	variables;
+	int	guarantees;
 	int	state;	
 };
 
