@@ -88,11 +88,7 @@ public	char *	default_zone()		{	return(Publisher.zone);			}
 /*	-------------------------------------------------	*/  
 public	char *	retrieve_master_publisher()		
 {
-	if (!( Publisher.publisher ))
-		return((char *) 0 );
-	else if (!( strlen( Publisher.publisher ) ))
-		return((char *) 0 );
-	else if (!( strcmp( Publisher.publisher, _CORDS_NULL ) ))
+	if (!( rest_valid_string( Publisher.publisher ) ))
 		return((char *) 0 );
 	else	return( Publisher.publisher );
 }
@@ -102,11 +98,7 @@ public	char *	retrieve_master_publisher()
 /*	-----------------------------------------------------	*/  
 public	char *	retrieve_remote_publication(struct cords_publication * pptr)		
 {
-	if (!( pptr->remote ))
-		return((char *) 0 );
-	else if (!( strlen( pptr->remote ) ))
-		return((char *) 0 );
-	else if (!( strcmp( pptr->remote, _CORDS_NULL ) ))
+	if (!( rest_valid_string( pptr->remote ) ))
 		return((char *) 0 );
 	else	return( pptr->remote );
 }

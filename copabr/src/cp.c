@@ -2493,7 +2493,7 @@ private	struct occi_response * cords_integrate_fields(
 		/* -------------------------- */
 		if (!( eptr->value ))
 			continue;
-		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+		else if (!( rest_valid_string( eptr->value ) ))
 			continue;
 		else if (( aptr = document_atribut( document, nptr )) != (struct xml_atribut *) 0)
 			continue;

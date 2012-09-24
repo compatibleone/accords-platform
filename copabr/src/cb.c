@@ -1077,9 +1077,7 @@ private	int	cords_configuration_action(
 	}
 	else if (!( type = occi_extract_atribut( zptr, Operator.domain,_CORDS_ACTION,_CORDS_TYPE ) ))
 		type = allocate_string("cordscript");
-	else if (!( strlen( type ) ))
-		type = allocate_string("cordscript");
-	else if (!( strcmp( type, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( type ) ))
 		type = allocate_string("cordscript");
 
 	if ( type != (char *) 0 )
@@ -2111,7 +2109,7 @@ private	char *	cords_resolve_provider(
 	/* ----------------------------------------- */
 	if (!( value = occi_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROVIDER ))) 
 		return( cords_research_provider(defaut,agent, tls) );
-	else if (!( strcmp(value,_CORDS_NULL) ))
+	else if (!( rest_valid_string( value ) ))
 		return( cords_research_provider(defaut,agent, tls) );
 	else if (!( strcasecmp(value,_CORDS_ANY) ))
 	{
@@ -2138,7 +2136,7 @@ private	char *	cords_resolve_profile( struct occi_response * node, char * defaut
 	/* ----------------------------------------- */
 	if (!( value = occi_extract_atribut( node, Operator.domain, _CORDS_NODE, _CORDS_PROFILE ))) 
 		return( allocate_string( defaut ) );
-	else if (!( strcmp(value,_CORDS_NULL) ))
+	else if (!( rest_valid_string( value ) ))
 		return( allocate_string( defaut ) );
 	else	return( value );
 }
@@ -3173,7 +3171,7 @@ public	struct	xml_element * cords_instance_node(
 	/* --------------------------------------------- */
 	/* ensure default simple type if no type present */
 	/* --------------------------------------------- */
-	else if (!( strcmp(App.typeApp, _CORDS_NULL )))
+	else if (!( rest_valid_string( App.typeApp ) ))
 	{
 		if (!(App.typeApp = allocate_string(_CORDS_SIMPLE)))
 		{

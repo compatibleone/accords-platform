@@ -22,20 +22,6 @@
 #include "stdnode.h"
 
 /*	------------------------------------------	*/
-/*		o s _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	occi_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
-/*	------------------------------------------	*/
 /*	    o c c i _ o s _ l o c a t i o n		*/
 /*	------------------------------------------	*/
 private	char *	occi_os_location( struct rest_response * zptr )
@@ -506,7 +492,7 @@ private	struct	rest_response * start_occi_openstack(
 		if (!( status ))
 		{
 			sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-			if (!( occi_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
@@ -541,7 +527,7 @@ private	struct	rest_response * save_occi_openstack(
 		/* TODO : add OCCI save code */
 		/* ------------------------- */
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -574,7 +560,7 @@ private	struct	rest_response * snapshot_occi_openstack(
 		/* TODO : add OCCI snapshot code */
 		/* ----------------------------- */
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=snapshot", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -629,7 +615,7 @@ private	struct	rest_response * stop_occi_openstack(
 		pptr->when = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );

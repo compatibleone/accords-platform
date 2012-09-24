@@ -472,7 +472,7 @@ public	char *	occi_extract_atribut(
 			continue;
 		else if (!( eptr->value ))
 			break;
-		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+		else if (!( rest_valid_string( eptr->value ) ))
 			break;
 		else	return( occi_unquoted_value( eptr->value ) );
 	}

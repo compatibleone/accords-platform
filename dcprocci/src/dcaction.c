@@ -18,34 +18,6 @@
 #ifndef	_dcaction_c
 #define	_dcaction_c
 
-/*	------------------------------------------	*/
-/*		d c _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	dc_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
-/*	------------------------------------------	*/
-/*		d c _ v a l i d _ a d d r e s s		*/
-/*	------------------------------------------	*/
-private	int	dc_valid_address( char * address )
-{
-	if (!( address ))
-		return(0);
-	else if (!( strlen( address )))
-		return( 0 );
-	else if (!( strcmp( address, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
 private	int	build_deltacloud_firewall( struct deltacloud * pptr )
 {
 	return(0);
@@ -91,7 +63,7 @@ private	struct	rest_response * start_deltacloud(
 		zptr = liberate_rest_response( zptr );
 		if (!( status ))
 		{
-			if (!( dc_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_DELTACLOUD, pptr->price, "action=start", pptr->account, pptr->id ) )
 				return( rest_html_response( aptr, 200, "OK" ) );

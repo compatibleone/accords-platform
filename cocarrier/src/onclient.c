@@ -21,7 +21,6 @@
 #include "onclient.h"
 #include "restpublic.h"
 
-#define	_CORDS_NULL "(null)"
 #define	_CORDS_NONE "none"
 
 private	struct	on_config On = {

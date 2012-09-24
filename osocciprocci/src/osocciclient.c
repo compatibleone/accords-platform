@@ -348,9 +348,7 @@ public	int	set_occi_os_configuration( char * host, int port, char * user, char *
 	if ( agent )
 		if (!( OcciConfig.agent = allocate_string( agent ) ))
 			return( liberate_occi_os_configuration(27) );
-	if (( tls )
-	&&  ( strlen( tls ) > 0 )
-	&&  ( strcmp( tls, _CORDS_NULL ) ))
+	if ( rest_valid_string( tls ) )
 	{
 		if (!( OcciConfig.tls = allocate_string( tls ) ))
 			return( liberate_occi_os_configuration(27) );

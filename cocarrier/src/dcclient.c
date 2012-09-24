@@ -24,7 +24,6 @@
 #include "dcclient.h"
 #include "restclient.h"
 
-#define	_CORDS_NULL "(null)"
 #define	_CORDS_NONE "none"
 
 struct	dc_api_configuration
@@ -48,22 +47,6 @@ private struct dc_api_configuration DeltaCloudConfig =
 	(char *) 0,
 	(char *) 0
 };
-
-/*	------------------------------------------------	*/
-/*		d c _ v a l i d _ s t r i n g			*/
-/*	------------------------------------------------	*/
-private	int	dc_valid_string( char * vptr )
-{
-	if (!( vptr ))
-		return( 0 );
-	else if (!( strlen( vptr ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NULL ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NONE ) ))
-		return( 0 );
-	else	return( 1 );
-}
 
 /*	------------------------------------------------------------	*/
 /*	 l i b e r a t e _ d c _ a p i _ c o n f i g u r a t i o n	*/
@@ -320,10 +303,10 @@ public char * dc_create_image_message( char * instance, char * name, char * desc
 
 		fprintf(h,"instance_id=%s",instance);
 
-		if ( dc_valid_string(name) )
+		if ( rest_valid_string(name) )
 			fprintf(h,"&name=%s",name);
 
-		if ( dc_valid_string(description) )
+		if ( rest_valid_string(description) )
 			fprintf(h,"&description=%s",description);
 
 		fclose(h);
@@ -424,16 +407,16 @@ public char * dc_create_instance_message( char * name, char * profile, char * im
 
 		fprintf(h,"image_id=%s",image);
 
-		if ( dc_valid_string(name) )
+		if ( rest_valid_string(name) )
 			fprintf(h,"&name=%s",name);
 
-		if ( dc_valid_string(profile) )
+		if ( rest_valid_string(profile) )
 			fprintf(h,"&hwp_id=%s",profile);
 
-		if ( dc_valid_string(firewall) )
+		if ( rest_valid_string(firewall) )
 			fprintf(h,"&firewalls1=%s",firewall);
 
-		if ( dc_valid_string(zone) )
+		if ( rest_valid_string(zone) )
 			fprintf(h,"&realm_id=%s",zone);
 
 		fclose(h);
@@ -555,7 +538,7 @@ public char * dc_create_firewall_message( char * name, char * description )
 	{
 		fprintf(h,"name=%s",name);
 
-		if ( dc_valid_string(description) )
+		if ( rest_valid_string(description) )
 			fprintf(h,"&description=%s",description);
 
 		fclose(h);

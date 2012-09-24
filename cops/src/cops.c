@@ -319,7 +319,7 @@ private	int	create_placement_solution(
 	if (!( pptr->algorithm ))
 		pptr->algorithm = allocate_string( "default" );
 
-	else if (!( strcmp( pptr->algorithm, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( pptr->algorithm ) ))
 	{
 		pptr->algorithm = liberate( pptr->algorithm );
 		if (!( pptr->algorithm = allocate_string( "default" ) ))

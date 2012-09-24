@@ -929,7 +929,7 @@ private	int	create_service(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( strlen( pptr->sla ) ))
 		return(0);
-	else if (!( strcmp( pptr->sla, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( pptr->sla ) ))
 		return(0);
 	else	return( create_service_graph( optr, pptr ) ); 
 }

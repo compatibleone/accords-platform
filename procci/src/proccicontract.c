@@ -204,11 +204,7 @@ private	int	is_common_contract( struct cords_contract * pptr )
 {
 	if (!( pptr ))
 		return( 0 );
-	else if (!( pptr->common ))
-		return( 0 );
-	else if (!( strlen( pptr->common ) ))
-		return( 0 );
-	else if (!( strcmp( pptr->common, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( pptr->common ) ))
 		return( 0 );
 	else	return( 1 );
 }
@@ -220,11 +216,7 @@ private	int	is_valid_provider( struct cords_contract * pptr )
 {
 	if (!( pptr ))
 		return( 0 );
-	else if (!( pptr->provider ))
-		return( 0 );
-	else if (!( strlen( pptr->provider ) ))
-		return( 0 );
-	else if (!( strcmp( pptr->provider, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( pptr->provider ) ))
 		return( 0 );
 	else	return( 1 );
 }
@@ -236,11 +228,7 @@ private	int	is_common_scope( struct cords_contract * pptr )
 {
 	if (!( pptr ))
 		return( 0 );
-	else if (!( pptr->scope ))
-		return( 0 );
-	else if (!( strlen( pptr->scope ) ))
-		return( 0 );
-	else if (!( strcmp( pptr->scope, _CORDS_NULL ) ))
+	else if (!( rest_valid_string( pptr->scope ) ))
 		return( 0 );
 	else if (!( strcmp( pptr->scope, _CORDS_COMMON ) ))
 		return( 1 );
