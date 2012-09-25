@@ -19,6 +19,16 @@
 #define	_copsoperation_c
 
 #include "cb.h"
+#include "stdnode.h"
+
+struct	cops_quota
+{
+	struct	cops_quota * previous;
+	struct	cops_quota * next;
+	char *	uuid;
+	char *	property;
+	int	quantity;
+};
 
 struct	cops_solution
 {
@@ -33,15 +43,65 @@ struct	cops_solution
 	char *	opinion;
 	char *	energy;
 	char *	price;
+	struct	cops_quota * first;
+	struct	cops_quota * last;
 	int	match;
 	int	chosen;
 };
 
+struct	cops_options
+{
+	char *	algorithm;	/* default algorithm		*/
+	int	preference;	/* 0: round robin, 1: oldest	*/
+	int	overbooking;	/* overbooking allowed 		*/
+}	Coptions = 
+{
+	"zone",
+	0,
+	0
+};
+
+/*	----------------------------------------------------------	*/
+/*		l i b e r a t e _ c o p s _ q u o t a 			*/
+/*	----------------------------------------------------------	*/
+private	struct	cops_quota * liberate_cops_quota(struct	cops_quota * qptr)
+{
+	if ( qptr )
+	{
+		if ( qptr->uuid )
+			qptr->uuid = liberate( qptr->uuid );
+		if ( qptr->property )
+			qptr->property = liberate( qptr->property );
+		qptr = liberate( qptr );
+	}
+	return((struct cops_quota *) 0);
+}
+
+/*	----------------------------------------------------------	*/
+/*		a l l o c a t e _ c o p s _ q u o t a 			*/
+/*	----------------------------------------------------------	*/
+private	struct	cops_quota * allocate_cops_quota()
+{
+	struct	cops_quota * qptr;
+	if (!( qptr = allocate( sizeof( struct cops_quota ) ) ))
+		return( qptr );
+	else 
+	{
+		qptr->previous 	= 
+		qptr->next 	= (struct cops_quota *) 0;
+		qptr->uuid 	= 
+		qptr->property	= (char *) 0;
+		qptr->quantity  = 0;
+		return( qptr );
+	}
+}
+	
 /*	----------------------------------------------------------	*/
 /*		l i b e r a t e _ c o p s _ s o l u t i o n		*/
 /*	----------------------------------------------------------	*/
 private struct	cops_solution * liberate_cops_solution(struct cops_solution * sptr)
 {
+	struct	cops_quota * qptr;
 	if ( sptr )
 	{
 		if ( sptr->uuid )
@@ -60,6 +120,12 @@ private struct	cops_solution * liberate_cops_solution(struct cops_solution * spt
 			sptr->energy = liberate( sptr->energy );
 		if ( sptr->message )
 			sptr->message = occi_remove_response( sptr->message );
+		while ((qptr = sptr->first) != (struct cops_quota *) 0)
+		{
+			sptr->first = qptr->next;
+			qptr = liberate_cops_quota( qptr );
+		}
+		sptr->first = sptr->last = (struct cops_quota *) 0;
 		sptr = liberate( sptr );
 	}
 	return((struct cops_solution *) 0);
@@ -212,10 +278,9 @@ private	struct	cops_solution *	select_cops_reputation( struct cops_solution * fi
 /*	----------------------------------------------------------	*/
 /*		s e l e c t _ c o p s _ r e s u l t 			*/
 /*	----------------------------------------------------------	*/
-private	int	preference=0; 	/* round robin preference */
 private	struct	cops_solution *	select_cops_result( struct cops_solution * first )
 {
-	if ( preference )
+	if ( Coptions.preference & 1 )
 		return( select_cops_reputation( first ) );
 	else 	return( select_cops_oldest( first ) );
 }
@@ -392,7 +457,7 @@ private	struct	cops_solution *	select_cops_solution( struct cords_placement * pp
 {
 	char *	aptr;
 	if (!( rest_valid_string(( aptr = pptr->algorithm )) ))
-		aptr = "zone";
+		aptr = Coptions.algorithm;
 
 	if (!( strcasecmp( aptr, "zone" ) ))
 		return( select_cops_zone( pptr, first ) );
@@ -407,7 +472,6 @@ private	struct	cops_solution *	select_cops_solution( struct cords_placement * pp
 	else 	return( select_cops_complex( pptr, first ) );
 }
 
-
 /*	----------------------------------------------------------	*/
 /*		v a l i d a t e _ c o p s _ q u o t a			*/
 /*	----------------------------------------------------------	*/
@@ -417,12 +481,148 @@ private	struct	cops_solution *	select_cops_solution( struct cords_placement * pp
 /*	----------------------------------------------------------	*/
 /*	  NB: the zptr memory must be released when not accepted	*/
 /*	----------------------------------------------------------	*/
-private	int	validate_cops_quota( struct occi_response * zptr, struct cords_placement * pptr )
+private	struct cops_solution * validate_cops_quota( 
+				struct cops_solution * sptr,
+				struct occi_response * zptr, 
+				struct cords_placement * pptr, 
+				struct rest_header * hptr )
 {
-	/* ---- */
-	/* TODO */
-	/* ---- */
-	return( 1 );
+	struct	rest_header  * iptr;
+	struct	occi_element * eptr;
+	struct	occi_element * dptr;
+	struct	occi_response * yptr;
+	struct	cops_quota * qptr;
+	int	offered;
+	int	reserved;
+	int	consumed;
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = cords_next_link( eptr ) )
+	{
+		offered=reserved=consumed=0;
+		if (!( eptr->value ))
+			continue;
+		else if (!( yptr = occi_simple_get( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			continue;
+		else if (!( dptr = occi_locate_element( yptr->first, "occi.quota.property" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( qptr = allocate_cops_quota()))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( qptr->previous = sptr->last ))
+			sptr->first = qptr;
+		else	sptr->last->next = qptr;
+		sptr->last = qptr;
+		if (!( qptr->property = allocate_string( dptr->value )))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( qptr->uuid = allocate_string( eptr->value )))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( dptr = occi_locate_element( yptr->first, "occi.quota.offered" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else	offered = atoi( dptr->value );
+		if (!( dptr = occi_locate_element( yptr->first, "occi.quota.reserved" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else	reserved = atoi( dptr->value );
+		if (!( dptr = occi_locate_element( yptr->first, "occi.quota.consumed" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else	consumed = atoi( dptr->value );
+
+		yptr = occi_remove_response( yptr );
+
+		/* ------------------------------------- */
+		/* locate consumption of this quota item */
+		/* ------------------------------------- */
+		for (	iptr=hptr;
+			iptr != (struct rest_header *) 0;
+			iptr = iptr->next )
+		{
+			if (!( iptr->name ))
+				continue;
+			else if (!( iptr->value ))
+				continue;
+			else if (!( strcmp( iptr->name, qptr->property ) ))
+			{
+				if ((offered - reserved) >= atoi(iptr->value))
+					qptr->quantity = atoi(iptr->value);
+				else if (!( Coptions.overbooking ))
+					return( liberate_cops_solution( sptr ) );
+				else	qptr->quantity = atoi(iptr->value);
+				break;
+			}
+		}
+	}
+	return( sptr );
+}
+
+/*	----------------------------------------------------------	*/
+/*		e v a l u a t e _ c o p s _ n e e d s			*/
+/*	----------------------------------------------------------	*/
+/*	calculation of placement quota needs in terms of		*/
+/*		accords.machine.count : 1				*/
+/*		accords.address.count : 1				*/
+/*		occi.compute.cores					*/
+/*		occi.compute.memory					*/
+/*		occi.storage.size 					*/
+/*	----------------------------------------------------------	*/
+private	struct	rest_header *	evaluate_cops_needs( struct standard_node * nptr )
+{
+	struct	rest_header * first=(struct rest_header *) 0;
+	struct	rest_header * last=(struct rest_header *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	occi_element* eptr;
+
+	if (!( nptr ))
+		return( first );
+
+	if (!( first = rest_create_header( "accords.machine.count", "1" )))
+		return( first );
+	else 	last = first;
+
+	if (!( nptr->compute.message ))
+		return( first );
+
+	if (( eptr = occi_locate_element( nptr->compute.message->first, "occi.compute.cores" )) != (struct occi_element *) 0)
+		if (!( last = rest_postfix_header( last, "occi.compute.cores", eptr->value )))
+			return( first );
+
+	if (( eptr = occi_locate_element( nptr->compute.message->first, "occi.compute.memory" )) != (struct occi_element *) 0)
+		if (!( last = rest_postfix_header( last, "occi.compute.memory", eptr->value )))
+			return( first );
+
+	if (!( nptr->storage.message ))
+		return( first );
+
+	if (( eptr = occi_locate_element( nptr->storage.message->first, "occi.storage.size" )) != (struct occi_element *) 0)
+		if (!( last = rest_postfix_header( last, "occi.storage.size", eptr->value )))
+			return( first );
+
+	if (!( nptr->network.message ))
+		return( first );
+
+	if (!( last = rest_postfix_header( last, "accords.address.count", "1" )))
+		return( first );
+	else	return( first );
+
 }
 
 /*	----------------------------------------------------------	*/
@@ -436,9 +636,12 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 	struct	occi_response	* zptr;
 	struct	occi_response	* yptr;
 	struct	cops_solution 	* sptr;
+	struct	standard_node 	* nptr;
+	struct	rest_header 	* qptr;
 	struct	cops_solution   * first=(struct cops_solution *) 0;
 	struct	cops_solution   * last=(struct cops_solution *) 0;
 	int			  solutions=0;
+	int			  status=0;
 
 	/* ----------------------------------------------- */
 	/* retrieve the OCCI resource instances that match */
@@ -446,6 +649,12 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 	if (!( pptr ))
 		return((char *) 0);
 	else if (!( rest_valid_string( pptr->provider ) ))
+		return((char *) 0);
+	else if (!( rest_valid_string( pptr->node ) ))
+		return((char *) 0);
+	else if (!( nptr = get_standard_node( pptr->node, _CORDS_CONTRACT_AGENT, default_tls(), &status ) ))
+		return((char *) 0);
+	else if (!( qptr = evaluate_cops_needs( nptr ) ))
 		return((char *) 0);
 	else if (!( eptr = occi_create_element( "occi.provider.category", pptr->provider ) ))
 		return((char *) 0);
@@ -461,9 +670,12 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 				continue;
 			else if (!( yptr = occi_simple_get( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 				continue;
-			else if (!( validate_cops_quota( yptr, pptr ) ))
-				continue;
 			else if (!( sptr = allocate_cops_solution( eptr->value, yptr ) ))
+			{
+				yptr = occi_remove_response( yptr );
+				continue;
+			}
+			else if (!( sptr = validate_cops_quota( sptr, yptr, pptr, qptr ) ))
 			{
 				yptr = occi_remove_response( yptr );
 				continue;
@@ -479,27 +691,10 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 			return( (char *) 0 );
 		else 
 		{
-			/* ---------------------------------- */
-			/* only one solution is the easy case */
-			/* ---------------------------------- */
-			if ( solutions == 1 )
-			{
-				if (( first ) && ( first->identity ))
-				{
-					result = allocate_string( first->identity );
-					sptr = liberate_cops_solution( first );
-					return( result );
-				}
-				else
-				{
-					sptr = liberate_cops_solution( first );
-					return( (char *) 0);
-				}
-			}
 			/* --------------------------------------- */
 			/* multiple solutions need better handling */
 			/* --------------------------------------- */
-			else if (!( sptr = select_cops_solution( pptr, first ) ))
+			if (!( sptr = select_cops_solution( pptr, first ) ))
 			{
 				while ((sptr = first) != (struct cops_solution *) 0)
 				{
