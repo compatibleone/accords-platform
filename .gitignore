@@ -124,6 +124,7 @@ debian/compatibleone-coees/
 debian/compatibleone-coips/
 debian/compatibleone-comons/
 debian/compatibleone-conets/
+debian/compatibleone-coobas/
 debian/compatibleone-cool/
 debian/compatibleone-copaas/
 debian/compatibleone-cops/
@@ -142,6 +143,7 @@ debian/compatibleone-parser/
 debian/compatibleone-procci/
 debian/compatibleone-publisher/
 debian/compatibleone-slam/
+debian/compatibleone-testosocci/
 debian/libcompatibleone-accords-dev/
 debian/libcompatibleone-accords0/
 debian/tmp/
