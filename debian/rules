@@ -52,7 +52,7 @@ clean:
 	-$(MAKE) distclean
 	rm -f config.{sub,guess,status,log}
 	dh_prep
-	rm debian/*.log debian/files
+	rm -f debian/*.log debian/files
 	./clean
 
 install: build
