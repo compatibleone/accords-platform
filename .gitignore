@@ -113,6 +113,8 @@ product/
 publisher/Makefile.in
 publisher/src/Makefile.in
 publisher/src/publisher
+pyaccords/pysrc/pypacksrc/pypacksrc.py
+pyaccords/pysrc/pypath.h
 *.scan
 scripts/accords
 scripts/accords-config
