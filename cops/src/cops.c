@@ -83,8 +83,8 @@ private	void	cops_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Placement Services COPS : Version 1.0a.0.08");
-	printf("\n   Beta Version : 25/05/2012");
+	printf("\n   CompatibleOne Placement Services COPS : Version 1.0b.0.01");
+	printf("\n   Beta Version : 25/07/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -133,6 +133,7 @@ private	struct rest_extension * cops_extension( void * v,struct rest_server * sp
 }
 
 #include "comonsconnection.c"
+#include "copsoperation.c"
 
 /*	-----------------------------------------------------------	*/
 /*			s e l e c t _ p l a c e m e n t			*/

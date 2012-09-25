@@ -1699,6 +1699,40 @@ public	struct	occi_response *	occi_simple_put(
 }
 
 /*	------------------------------------------------------------	*/
+/*		     o c c i _ s i m p l e _ l i s t 			*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_simple_list( 
+	char * reference, struct occi_element * eptr, char * agent, char * tls )
+{	
+	struct	occi_element 	* fptr;
+	struct	occi_client  	* cptr;
+	struct 	occi_request  	* qptr;
+	struct 	occi_response 	* zptr=(struct occi_response *) 0;
+
+	if (!( cptr = occi_create_client( reference, agent, tls ) ))
+	 	return((struct occi_response *) 0);
+	else if (!( qptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+	 	return((struct occi_response *) 0);
+
+	for (	;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+		if (!( fptr = occi_request_element( qptr, eptr->name, eptr->value ) ))
+			break;
+
+	if (!( zptr = occi_client_get( cptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		return( zptr );
+	}
+	else
+	{
+		qptr = occi_remove_request( qptr );
+		return( zptr );
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*		     o c c i _ s i m p l e _ p o s t 			*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_simple_post( 
