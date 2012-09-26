@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_dcclient_c
 #define	_dcclient_c
 
@@ -26,7 +24,6 @@
 #include "dcclient.h"
 #include "restclient.h"
 
-#define	_CORDS_NULL "(null)"
 #define	_CORDS_NONE "none"
 
 struct	dc_api_configuration
@@ -50,22 +47,6 @@ private struct dc_api_configuration DeltaCloudConfig =
 	(char *) 0,
 	(char *) 0
 };
-
-/*	------------------------------------------------	*/
-/*		d c _ v a l i d _ s t r i n g			*/
-/*	------------------------------------------------	*/
-private	int	dc_valid_string( char * vptr )
-{
-	if (!( vptr ))
-		return( 0 );
-	else if (!( strlen( vptr ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NULL ) ))
-		return( 0 );
-	else if (!( strcmp( vptr, _CORDS_NONE ) ))
-		return( 0 );
-	else	return( 1 );
-}
 
 /*	------------------------------------------------------------	*/
 /*	 l i b e r a t e _ d c _ a p i _ c o n f i g u r a t i o n	*/
@@ -322,10 +303,10 @@ public char * dc_create_image_message( char * instance, char * name, char * desc
 
 		fprintf(h,"instance_id=%s",instance);
 
-		if ( dc_valid_string(name) )
+		if ( rest_valid_string(name) )
 			fprintf(h,"&name=%s",name);
 
-		if ( dc_valid_string(description) )
+		if ( rest_valid_string(description) )
 			fprintf(h,"&description=%s",description);
 
 		fclose(h);
@@ -426,16 +407,16 @@ public char * dc_create_instance_message( char * name, char * profile, char * im
 
 		fprintf(h,"image_id=%s",image);
 
-		if ( dc_valid_string(name) )
+		if ( rest_valid_string(name) )
 			fprintf(h,"&name=%s",name);
 
-		if ( dc_valid_string(profile) )
+		if ( rest_valid_string(profile) )
 			fprintf(h,"&hwp_id=%s",profile);
 
-		if ( dc_valid_string(firewall) )
+		if ( rest_valid_string(firewall) )
 			fprintf(h,"&firewalls1=%s",firewall);
 
-		if ( dc_valid_string(zone) )
+		if ( rest_valid_string(zone) )
 			fprintf(h,"&realm_id=%s",zone);
 
 		fclose(h);
@@ -557,7 +538,7 @@ public char * dc_create_firewall_message( char * name, char * description )
 	{
 		fprintf(h,"name=%s",name);
 
-		if ( dc_valid_string(description) )
+		if ( rest_valid_string(description) )
 			fprintf(h,"&description=%s",description);
 
 		fclose(h);

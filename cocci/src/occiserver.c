@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_occiserver_c
 #define _occiserver_c
 
@@ -136,7 +134,12 @@ public	int	occi_success( struct rest_response * aptr )
 	char			* nptr;
 	struct	rest_header 	* hptr;
 
-	if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
+	if (!( hptr = rest_resolve_header( aptr->first, _HTTP_ACCEPT ) ))
+		if (!( hptr = occi_accept_header( aptr ) ))
+			return( 0 );
+	if ((hptr = rest_resolve_header( aptr->first, _HTTP_CONTENT_TYPE )) != (struct rest_header *) 0)
+		return( 0 );	
+	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, "text/occi" ) ))
 		return( 0 );
 
 	else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "4" ) ))
@@ -453,7 +456,9 @@ private	struct rest_response * occi_get_capacities(
 
 		sprintf(clbuff,"%u",strlen(mptr));
 
-		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
+		if (!( hptr = occi_accept_header( aptr ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, clbuff )))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
@@ -471,7 +476,7 @@ private	struct rest_response * occi_get_capacities(
 			return( rest_response_status( aptr, 200, "OK" ) );
 		}
 	}
-	else
+	else if ( accept_string_includes( ctptr, _OCCI_TEXT_OCCI ) )
 	{
 		for (	;
 			optr != (struct occi_category *) 0;
@@ -488,14 +493,33 @@ private	struct rest_response * occi_get_capacities(
 			}
 			else	liberate( mptr );
 		}
+		if (!( hptr = occi_accept_header( aptr ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+
+	}
+	else if (( accept_string_includes( ctptr, _OCCI_TEXT_PLAIN ) )
+	     ||  ( accept_string_includes( ctptr, "*/*" ) ))
+	{
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_PLAIN ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else if (!( mptr = occi_text_capacities( optr, aptr ) ))
+			return( rest_response_status( aptr, 500, "Server Failure" ) );
+		else
+		{
+			rest_response_body( aptr, mptr, _FILE_BODY );
+			return( rest_response_status( aptr, 200, "OK" ) );
+		}
 	}
 
+#ifdef	_need_to_add_link_manager
 	if ((optr = OcciServerLinkManager) != (struct occi_category*) 0)
 		if (!( optr->access & _OCCI_SECRET ))
 			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
 				hptr = rest_response_header( aptr, "Category", mptr );
-
-	if (!( occi_success( aptr ) ))
+#endif
+	if (!( aptr = occi_content_type( optr, rptr, aptr ) ))
+		return( rest_response_status( aptr, 500, "Server Failure" ) );
+	else	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 
@@ -528,7 +552,7 @@ private	void	occi_show_request( struct rest_request * rptr )
 /*	---------------------------------------------------------	*/
 /*			o c c i _ c o n t e n t _ t y p e		*/
 /*	---------------------------------------------------------	*/
-private	struct rest_response *	occi_content_type( 
+public 	struct rest_response *	occi_content_type( 
 	struct occi_category * cptr,
 	struct rest_request * qptr, 
 	struct rest_response * rptr )
@@ -1759,6 +1783,100 @@ private	struct rest_response * occi_alert(
 	}
 }
 
+
+private	struct occi_category * append_category_list( struct occi_category * lptr, struct occi_category * cptr )
+{
+	struct	occi_category * root;
+	if (!( root = lptr ))
+		return( cptr );
+	else
+	{
+		while ( lptr->next )
+			lptr = lptr->next;
+
+		lptr->next = cptr;
+		cptr->previous = lptr;
+		return( root );
+	}
+}
+
+private	struct occi_category * check_occi_conformity( struct occi_category * category )
+{
+	struct	occi_category * cptr;
+	struct	occi_category * optr;
+	int	core=0;
+	for ( cptr=category;
+		cptr != (struct occi_category *) 0;
+		cptr = cptr->next )
+	{
+		if (!( strcmp( cptr->id, "entity" ) ))
+			core |= 1;
+		else if (!( strcmp( cptr->id, "resource" ) ))
+			core |= 2;
+		else if (!( strcmp( cptr->id, "link" ) ))
+			core |= 4;
+	}
+	if (!( core & 1 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"entity",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/entity#",
+			"standard OCCI entity" ) )) 
+			return( category );
+		if (!( optr = occi_add_attribute( optr, "id", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "title", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
+	}
+	if (!( core & 2 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"resource",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/resource#",
+			"standard OCCI resource" ) )) 
+			return( category );
+		if (!( optr = occi_add_attribute( optr, "summary", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
+	}
+	if (!( core & 4 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"link",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/link#",
+			"standard OCCI link" ) )) 
+			return( category );
+		if (!( optr = occi_add_attribute( optr, "source", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "target", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
+	}
+	return( category );
+}
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ s e r v e r				*/
 /*	---------------------------------------------------------	*/
@@ -1793,6 +1911,12 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 	if ( tls )
 		if (!( strlen(tls) ))
 			tls = (char *) 0;
+
+	/* -------------------------------------------------- */
+	/* ensure that the basic core information is provided */
+	/* -------------------------------------------------- */
+	if (!( category = check_occi_conformity( category ) ))
+ 		return( 55 );
 
 	occi_authorization = authorization;
 	Osi.authorise = (void *) 0;

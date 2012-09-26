@@ -3,7 +3,7 @@ bash build-install publisher $1
 bash build-install azprocci $1
 bash build-install broker $1
 bash build-install coees $1
-bash build-install coes $1
+bash build-install cops $1
 bash build-install comons $1
 bash build-install conets $1
 bash build-install coobas $1
@@ -20,5 +20,6 @@ bash build-install paprocci $1
 bash build-install parser $1
 bash build-install procci $1
 bash build-install slam $1
-bash build-install paasprocci $1
+bash build-install copaas $1
+bash build-install jpaasprocci $1
 

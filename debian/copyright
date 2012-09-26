@@ -1,0 +1,43 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: accords-platform
+Source: <http://www.compatibleone.org>
+
+Files: *
+Copyright: 2011-2012 CompatibleOne development team <compatible-general@ow2.org>
+License: Apache-2.0
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    .
+        http://www.apache.org/licenses/LICENSE-2.0
+    .
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+    Copyright (C) 2002-2010 The Apache Software Foundation
+    .
+    On Debian systems, the complete text of the Apache version 2.0 license
+    can be found in "/usr/share/common-licenses/Apache-2.0".
+    .
+    In this source package a copy is kept in the file LICENSE-2.0.txt
+
+Files: debian/*
+Copyright: 2012 CityPassenger <vrenardias@citypassenger.com>
+License: Apache-2.0
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    .
+        http://www.apache.org/licenses/LICENSE-2.0
+    .
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+     Copyright (C) 2002-2010 The Apache Software Foundation
+     .
+    On Debian systems, the complete text of the Apache version 2.0 license
+    can be found in "/usr/share/common-licenses/Apache-2.0".

@@ -10,6 +10,7 @@ struct	cords_node
 	char *				profile;
 	char *				infrastructure;
 	char *				image;
+	char *				category;
 	char *				access;
 	char *				common;
 	char *				scope;

@@ -17,6 +17,7 @@ struct	occi_publisher;
 
 struct	occi_publisher
 {
+	int	sla;
 	char *	tls;
 	char *	host;
 	char *	room;

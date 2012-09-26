@@ -9,7 +9,7 @@ else
 	bash build-security azprocci
 	bash build-security broker
 	bash build-security coees
-	bash build-security coes
+	bash build-security cops
 	bash build-security comons
 	bash build-security conets
 	bash build-security coobas
@@ -26,7 +26,8 @@ else
 	bash build-security parser
 	bash build-security procci
 	bash build-security slam
-	bash build-security paasprocci
+	bash build-security copaas
+	bash build-security jpaasprocci
 fi
 
 

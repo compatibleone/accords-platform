@@ -30,12 +30,12 @@ fi
 # then specify the security directory.
 # -------------------------------------
 # nethsm=1
-# tls=security
+tls=security
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-tls=
+# tls=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls
@@ -47,6 +47,7 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
+#logdir=/var/log/accords
 
 if [ -z "$tls" ]; then
     tempo=1
@@ -78,12 +79,26 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
+if [ -z "$logdir" ]; then
+        logdir="."
+fi
+
+if [ ! -d "$logdir" ]; then
+        echo "$logdir: no such directory"
+        exit 1
+fi
+
+if [ ! -d "$logdir/rest" ]; then
+        echo "$logdir/rest: no such directory"
+        exit 1
+fi
+
 ###
 ### Aliases
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-coes run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-paasprocci run-procci run-cosched run-publisher accords-config"
+# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-copaas run-jpaasprocci run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
 _co_start() {
@@ -113,8 +128,8 @@ _co_start() {
     @bindir@/run-conets &
     sleep $tempo
 
-    echo "Starting accords elasticity services"
-    @bindir@/run-coes &
+    echo "Starting accords placement services"
+    @bindir@/run-cops &
     sleep $tempo
     
     echo "Starting accords energy efficiency services"
@@ -177,8 +192,12 @@ _co_start() {
     @bindir@/run-slam &
     sleep $tempo
 
-    echo "Starting accords paas procci services"
-    @bindir@/run-paasprocci &
+    echo "Starting accords paas services"
+    @bindir@/run-copaas &
+    sleep $tempo
+
+    echo "Starting accords jpaas procci services"
+    @bindir@/run-jpaasprocci &
     sleep $tempo
 
     echo "Starting accords procci example"
@@ -230,21 +249,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p | grep LISTEN | grep publisher
-	netstat -a -p | grep LISTEN | grep fileserver
-	netstat -a -p | grep LISTEN | grep coss
-	netstat -a -p | grep LISTEN | grep comons
-	netstat -a -p | grep LISTEN | grep conets
-	netstat -a -p | grep LISTEN | grep coobas
-	netstat -a -p | grep LISTEN | grep coes
-	netstat -a -p | grep LISTEN | grep coees
-	netstat -a -p | grep LISTEN | grep parser
-	netstat -a -p | grep LISTEN | grep broker
-	netstat -a -p | grep LISTEN | grep procci
-	netstat -a -p | grep LISTEN | grep cosched
-	netstat -a -p | grep LISTEN | grep ezvm
-	netstat -a -p | grep LISTEN | grep coips
-	netstat -a -p | grep LISTEN | grep cosacs
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -252,7 +257,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep comons || true
 	lsof -i | grep LISTEN | grep conets || true
 	lsof -i | grep LISTEN | grep coobas || true
-	lsof -i | grep LISTEN | grep coes || true
+	lsof -i | grep LISTEN | grep cops || true
 	lsof -i | grep LISTEN | grep coees || true
 	lsof -i | grep LISTEN | grep parser || true
 	lsof -i | grep LISTEN | grep broker || true
@@ -271,7 +276,8 @@ _co_stop() {
     _stop_service cosacs
     _stop_service example
     _stop_service slam
-    _stop_service paasprocci
+    _stop_service jpaasprocci
+    _stop_service copaas
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -286,7 +292,7 @@ _co_stop() {
     _stop_service ezvm
     _stop_service coips
     _stop_service coees
-    _stop_service coes
+    _stop_service cops
     _stop_service conets
     _stop_service coobas
     _stop_service comons
@@ -303,8 +309,8 @@ _run_broker() {
     @bindir@/broker --config $target CO-BROKER/1.0
 } 
 
-_run_coes() {
-    @bindir@/coes --config $target CO-ES/1.0
+_run_cops() {
+    @bindir@/cops --config $target CO-ES/1.0
 } 
 
 _run_coees() {
@@ -367,8 +373,12 @@ _run_slam() {
     @bindir@/slam --config $target CO-SLAM/1.0
 }
 
-_run_paasprocci() {
-    @bindir@/paasprocci --config $target CO-PAASPROCCI/1.0
+_run_copaas() {
+    @bindir@/copaas --config $target CO-PAAS/1.0
+}
+
+_run_jpaasprocci() {
+    @bindir@/jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
 _run_example() {
@@ -403,7 +413,7 @@ _make_security_files() {
 	_mksecs fileserver 0
 	_mksecs coss 0
 	_mksecs comons 1
-	_mksecs coes 1
+	_mksecs cops 1
 	_mksecs coees 1
 	_mksecs coobas 1
 	_mksecs conets 1
@@ -422,7 +432,8 @@ _make_security_files() {
 	_mksecs azprocci 1
 	_mksecs dcprocci 1
 	_mksecs slam 1
-	_mksecs paasprocci 1
+	_mksecs copaas 1
+	_mksecs jpaasprocci 1
 	_mksecs example 1
 	_mksecs command
     
@@ -472,7 +483,7 @@ _accords_config() {
 		export sslconfig=./openssl.cnf
 
 		_mkcert coss
-		_mkcert coes
+		_mkcert cops
 		_mkcert coees
 		_mkcert coobas
 		_mkcert comons
@@ -493,7 +504,8 @@ _accords_config() {
 		_mkcert azprocci
 		_mkcert dcprocci
 		_mkcert slam
-		_mkcert paasprocci
+		_mkcert copaas
+		_mkcert jpaasprocci
 		_mkcert example
 		_mkcert cosacs
 	
@@ -520,7 +532,7 @@ _accords_config() {
     _mkpub publisher
     _mkmon coss 
     _mkmon comons 
-    _mkcfg coes 
+    _mkcfg cops 
     _mkcfg conets 
     _mkcfg coobas 
     _mkcfg parser 
@@ -539,7 +551,8 @@ _accords_config() {
     _mkcfg coees 
     _mkcfg cosched
     _mkcfg slam
-    _mkcfg paasprocci
+    _mkcfg copaas
+    _mkcfg jpaasprocci
     _mkcfg example
     _mkcosacs cosacs
 
@@ -750,8 +763,8 @@ case `basename $0` in
     run-broker)
 	_run_broker $*
 	;;
-    run-coes)
-	_run_coes $*
+    run-cops)
+	_run_cops $*
 	;;
     run-coees)
 	_run_coees $*
@@ -792,8 +805,11 @@ case `basename $0` in
     run-slam)
 	_run_slam $*
 	;;
-    run-paasprocci)
-	_run_paasprocci $*
+    run-copaas)
+	_run_copaas $*
+	;;
+    run-jpaasprocci)
+	_run_jpaasprocci $*
 	;;
     run-example)
 	_run_example $*

@@ -8,9 +8,10 @@
         <xsd:element name="paas_application" type="paas_application"/>
       </xsd:sequence>
       <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="xmlns" use="required" type="xsd:NCName"/>
+      <xsd:attribute name="access" default="public" type="xsd:string"/>
+      <xsd:attribute name="scope" default="normal" type="xsd:string"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_application">
@@ -24,7 +25,7 @@
       <xsd:attribute name="environement" use="required" type="xsd:NCName"/>
       <xsd:attribute name="name" use="required" type="xsd:NCName"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_version">
@@ -35,7 +36,7 @@
       <xsd:attribute name="description" use="required" type="xsd:NCName"/>
       <xsd:attribute name="label" use="required" type="xsd:decimal"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_version_instance">
@@ -49,7 +50,7 @@
       <xsd:attribute name="state" use="required" type="xsd:NCName"/>
       <xsd:attribute name="uri" use="required"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_deployable">
@@ -58,7 +59,7 @@
       <xsd:attribute name="multitenancy_level" use="required" type="xsd:NCName"/>
       <xsd:attribute name="name" use="required" type="xsd:NCName"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_environment">
@@ -70,7 +71,7 @@
       <xsd:attribute name="provider" use="required" type="xsd:NCName"/>
       <xsd:attribute name="uri" use="required"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_configuration_template">
@@ -85,7 +86,7 @@
       <xsd:attribute name="name" use="required" type="xsd:NCName"/>
       <xsd:attribute name="uri" use="required"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_configuration_option">
@@ -102,7 +103,7 @@
       <xsd:attribute name="value_options" use="required"/>
       <xsd:attribute name="value_type" use="required"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_node">
@@ -111,7 +112,7 @@
       <xsd:attribute name="provider" use="required" type="xsd:NCName"/>
       <xsd:attribute name="version" use="required" type="xsd:decimal"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
   
     <xsd:complexType name="paas_relation">
@@ -119,7 +120,7 @@
         <xsd:element name="paas_link" type="paas_link"/>
       </xsd:choice>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="paas_link">
@@ -127,7 +128,7 @@
       <xsd:attribute name="name" use="required" type="xsd:NCName"/>
       <xsd:attribute name="type" use="required" type="xsd:NCName"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="status" type="xsd:integer"/>
+      <xsd:attribute name="state" type="xsd:integer"/>
     </xsd:complexType>
 
 </xsd:schema>

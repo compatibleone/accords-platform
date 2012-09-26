@@ -1,0 +1,14 @@
+#ifndef	_paas_link_h
+#define	_paas_link_h
+
+struct	paas_link
+{
+	char *	id;
+	char *	name;
+	char *	type;
+	char *	expression;
+	int	state;
+};
+
+#endif	
+

@@ -145,6 +145,8 @@ private void autoload_cords_agreement_nodes() {
 				pptr->responder = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "serviceprovider" )) != (struct xml_atribut *) 0)
 				pptr->serviceprovider = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "initiation" )) != (struct xml_atribut *) 0)
+				pptr->initiation = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "expiration" )) != (struct xml_atribut *) 0)
 				pptr->expiration = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "templateid" )) != (struct xml_atribut *) 0)
@@ -197,6 +199,9 @@ public  void autosave_cords_agreement_nodes() {
 		fprintf(h," serviceprovider=%c",0x0022);
 		fprintf(h,"%s",(pptr->serviceprovider?pptr->serviceprovider:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," initiation=%c",0x0022);
+		fprintf(h,"%s",(pptr->initiation?pptr->initiation:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," expiration=%c",0x0022);
 		fprintf(h,"%s",(pptr->expiration?pptr->expiration:""));
 		fprintf(h,"%c",0x0022);
@@ -243,6 +248,8 @@ private void set_cords_agreement_field(
 			pptr->responder = allocate_string(vptr);
 		if (!( strcmp( nptr, "serviceprovider" ) ))
 			pptr->serviceprovider = allocate_string(vptr);
+		if (!( strcmp( nptr, "initiation" ) ))
+			pptr->initiation = allocate_string(vptr);
 		if (!( strcmp( nptr, "expiration" ) ))
 			pptr->expiration = allocate_string(vptr);
 		if (!( strcmp( nptr, "templateid" ) ))
@@ -319,6 +326,13 @@ private int pass_cords_agreement_filter(
 		else if ( strcmp(pptr->serviceprovider,fptr->serviceprovider) != 0)
 			return(0);
 		}
+	if (( fptr->initiation )
+	&&  (strlen( fptr->initiation ) != 0)) {
+		if (!( pptr->initiation ))
+			return(0);
+		else if ( strcmp(pptr->initiation,fptr->initiation) != 0)
+			return(0);
+		}
 	if (( fptr->expiration )
 	&&  (strlen( fptr->expiration ) != 0)) {
 		if (!( pptr->expiration ))
@@ -370,6 +384,9 @@ private struct rest_response * cords_agreement_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.serviceprovider=%s",optr->domain,optr->id,pptr->serviceprovider);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.initiation=%s",optr->domain,optr->id,pptr->initiation);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.expiration=%s",optr->domain,optr->id,pptr->expiration);
@@ -814,6 +831,8 @@ public struct occi_category * occi_cords_agreement_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "serviceprovider",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "initiation",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "expiration",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "templateid",0,0) ))
@@ -906,6 +925,17 @@ public struct rest_header *  cords_agreement_occi_headers(struct cords_agreement
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_agreement.serviceprovider='%s'\r\n",(sptr->serviceprovider?sptr->serviceprovider:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_agreement.initiation='%s'\r\n",(sptr->initiation?sptr->initiation:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

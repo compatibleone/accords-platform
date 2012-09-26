@@ -3,7 +3,7 @@ bash build-run publisher
 bash build-run azprocci
 bash build-run broker
 bash build-run coees
-bash build-run coes
+bash build-run cops
 bash build-run comons
 bash build-run conets
 bash build-run coobas
@@ -19,7 +19,8 @@ bash build-run paprocci
 bash build-run parser
 bash build-run procci
 bash build-run slam
-bash build-run paasprocci
+bash build-run copaas
+bash build-run jpaasprocci
 bash build-run-cool
 bash build-run-tools
 

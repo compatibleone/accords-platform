@@ -145,6 +145,8 @@ private void autoload_cords_node_nodes() {
 				pptr->infrastructure = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "category" )) != (struct xml_atribut *) 0)
+				pptr->category = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
 				pptr->access = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "common" )) != (struct xml_atribut *) 0)
@@ -199,6 +201,9 @@ public  void autosave_cords_node_nodes() {
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," category=%c",0x0022);
+		fprintf(h,"%s",(pptr->category?pptr->category:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," access=%c",0x0022);
 		fprintf(h,"%s",(pptr->access?pptr->access:""));
 		fprintf(h,"%c",0x0022);
@@ -248,6 +253,8 @@ private void set_cords_node_field(
 			pptr->infrastructure = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
+		if (!( strcmp( nptr, "category" ) ))
+			pptr->category = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
 			pptr->access = allocate_string(vptr);
 		if (!( strcmp( nptr, "common" ) ))
@@ -326,6 +333,13 @@ private int pass_cords_node_filter(
 		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
+	if (( fptr->category )
+	&&  (strlen( fptr->category ) != 0)) {
+		if (!( pptr->category ))
+			return(0);
+		else if ( strcmp(pptr->category,fptr->category) != 0)
+			return(0);
+		}
 	if (( fptr->access )
 	&&  (strlen( fptr->access ) != 0)) {
 		if (!( pptr->access ))
@@ -390,6 +404,9 @@ private struct rest_response * cords_node_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.category=%s",optr->domain,optr->id,pptr->category);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
@@ -837,6 +854,8 @@ public struct occi_category * occi_cords_node_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "category",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "common",0,0) ))
@@ -931,6 +950,17 @@ public struct rest_header *  cords_node_occi_headers(struct cords_node * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_node.image='%s'\r\n",(sptr->image?sptr->image:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_node.category='%s'\r\n",(sptr->category?sptr->category:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

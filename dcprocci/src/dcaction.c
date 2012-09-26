@@ -1,52 +1,22 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_dcaction_c
 #define	_dcaction_c
-
-/*	------------------------------------------	*/
-/*		d c _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	dc_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
-
-/*	------------------------------------------	*/
-/*		d c _ v a l i d _ a d d r e s s		*/
-/*	------------------------------------------	*/
-private	int	dc_valid_address( char * address )
-{
-	if (!( address ))
-		return(0);
-	else if (!( strlen( address )))
-		return( 0 );
-	else if (!( strcmp( address, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
 
 private	int	build_deltacloud_firewall( struct deltacloud * pptr )
 {
@@ -93,7 +63,7 @@ private	struct	rest_response * start_deltacloud(
 		zptr = liberate_rest_response( zptr );
 		if (!( status ))
 		{
-			if (!( dc_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_DELTACLOUD, pptr->price, "action=start", pptr->account, pptr->id ) )
 				return( rest_html_response( aptr, 200, "OK" ) );

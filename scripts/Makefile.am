@@ -13,17 +13,17 @@ scripts=accords
 
 aliases = \
 	co-start co-broker co-command co-parser co-resolver co-status co-stop \
-	run-azprocci run-broker run-coes run-coees run-coips run-comons run-conets run-coobas \
+	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
-	run-cosacs accords-config
+	run-cosacs run-copaas run-jpaasprocci accords-config
 
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in accords.init
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
-localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COOL):$(PATH_COES):$(PATH_COMONS):$(PATH_CONETS):$(PATH_COOBAS):$(PATH_COSS):$(PATH_EZVM):$(PATH_FILESERVER):$(PATH_ONPROCCI):$(PATH_OSPROCCI):$(PATH_PARSER):$(PATH_PROCCI):$(PATH_COSCHED):$(PATH_PUBLISHER):$(builddir)
+localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COOL):$(PATH_COPS):$(PATH_COMONS):$(PATH_CONETS):$(PATH_COOBAS):$(PATH_COSS):$(PATH_EZVM):$(PATH_FILESERVER):$(PATH_ONPROCCI):$(PATH_OSPROCCI):$(PATH_PARSER):$(PATH_PROCCI):$(PATH_COSCHED):$(PATH_PUBLISHER):$(builddir)
 localedit = sed \
         -e 's|@sitepath[@]|$(localpath)|g' \
 	-e 's|@bindir[@]|$(bindir)|g' \

@@ -1,0 +1,11 @@
+compatibleone-accords (0.20120918-1) unstable; urgency=low
+
+  * Various fixes/updates, WIP.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Tue, 18 Sep 2012 11:03:43 +0200
+
+compatibleone-accords (0.20120901-1) unstable; urgency=low
+
+  * Initial Debian packaging of CompatibleOne Accords plateform.
+
+ -- Vincent Renardias <vincent@renardias.com>  Sat, 01 Sep 2012 20:33:43 +0200

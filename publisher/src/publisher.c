@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_publisher_c
 #define	_publisher_c
 
@@ -90,11 +88,7 @@ public	char *	default_zone()		{	return(Publisher.zone);			}
 /*	-------------------------------------------------	*/  
 public	char *	retrieve_master_publisher()		
 {
-	if (!( Publisher.publisher ))
-		return((char *) 0 );
-	else if (!( strlen( Publisher.publisher ) ))
-		return((char *) 0 );
-	else if (!( strcmp( Publisher.publisher, _CORDS_NULL ) ))
+	if (!( rest_valid_string( Publisher.publisher ) ))
 		return((char *) 0 );
 	else	return( Publisher.publisher );
 }
@@ -104,11 +98,7 @@ public	char *	retrieve_master_publisher()
 /*	-----------------------------------------------------	*/  
 public	char *	retrieve_remote_publication(struct cords_publication * pptr)		
 {
-	if (!( pptr->remote ))
-		return((char *) 0 );
-	else if (!( strlen( pptr->remote ) ))
-		return((char *) 0 );
-	else if (!( strcmp( pptr->remote, _CORDS_NULL ) ))
+	if (!( rest_valid_string( pptr->remote ) ))
 		return((char *) 0 );
 	else	return( pptr->remote );
 }

@@ -1,22 +1,3 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
 #ifndef	_cords_parser_c
 #define	_cords_parser_c
 
@@ -2308,9 +2289,16 @@ private	int	cords_terminate_xsd(
 		aptr = aptr->next )
 	{
 		/* -------------------------------------------- */
+		/* filter out any implicite namespace attribute	*/
+		/* -------------------------------------------- */
+		if (!( aptr->name ))
+			continue;
+		else if (!( strcmp( aptr->name, "xmlns" )))
+			continue;
+		/* -------------------------------------------- */
 		/* ensure the attribute is specified in the XSD */
 		/* -------------------------------------------- */
-		if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
+		else if (!( bptr = xsd_atribut( wptr, aptr->name ) ))
 		{
 			sprintf(buffer,"xsd:incorrect attribute:%s",aptr->name);
 			return(cords_append_error(dptr,799,buffer));
@@ -2505,7 +2493,7 @@ private	struct occi_response * cords_integrate_fields(
 		/* -------------------------- */
 		if (!( eptr->value ))
 			continue;
-		else if (!( strcmp( eptr->value, _CORDS_NULL ) ))
+		else if (!( rest_valid_string( eptr->value ) ))
 			continue;
 		else if (( aptr = document_atribut( document, nptr )) != (struct xml_atribut *) 0)
 			continue;

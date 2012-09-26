@@ -1,41 +1,25 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_occi_os_c
 #define	_occi_os_c
 
 #include "occiclient.h"
 #include "stdnode.h"
-
-/*	------------------------------------------	*/
-/*		o s _ v a l i d _ p r i c e		*/
-/*	------------------------------------------	*/
-private	int	occi_valid_price( char * price )
-{
-	if (!( price ))
-		return(0);
-	else if (!( strlen( price )))
-		return( 0 );
-	else if (!( strcmp( price, _CORDS_NULL ) ))
-		return( 0 );
-	else	return( 1 );
-}	
 
 /*	------------------------------------------	*/
 /*	    o c c i _ o s _ l o c a t i o n		*/
@@ -508,7 +492,7 @@ private	struct	rest_response * start_occi_openstack(
 		if (!( status ))
 		{
 			sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-			if (!( occi_valid_price( pptr->price ) ))
+			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=start", pptr->account, reference ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
@@ -543,7 +527,7 @@ private	struct	rest_response * save_occi_openstack(
 		/* TODO : add OCCI save code */
 		/* ------------------------- */
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -576,7 +560,7 @@ private	struct	rest_response * snapshot_occi_openstack(
 		/* TODO : add OCCI snapshot code */
 		/* ----------------------------- */
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=snapshot", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -631,7 +615,7 @@ private	struct	rest_response * stop_occi_openstack(
 		pptr->when = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-		if (!( occi_valid_price( pptr->price ) ))
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
 			return( rest_html_response( aptr, 200, "OK" ) );

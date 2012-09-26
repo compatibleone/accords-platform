@@ -1,0 +1,26 @@
+# --------------------------------------------------
+# build an sla document file for provisioner
+# --------------------------------------------------
+# parameter 1 : target sla xml filename
+# parameter 2 : accords account name of sla initator
+# parameter 3 : the provider service description
+# --------------------------------------------------
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > sla-$1.xml
+echo "<agreement name=\"$1\" xmlns=\"http://www.compatibleone.fr/schemes/slam.xsd\" initiator=\"$2\" responder=\"accords\" serviceprovider=\"responder\" description=\"generated SLA\" initiation=\"now\" expiration=\"never\" template=\"none\">" >> sla-$1.xml 
+echo "<terms name=\"$1:services\" type=\"services\">" >> sla-$1.xml 
+echo "<term name=\"$1:service1\">" >> sla-$1.xml 
+echo "<provider name=\"$3\">" >> sla-$1.xml 
+echo "</manifest>" >> sla-$1.xml
+echo "</term>" >> sla-$1.xml
+echo "</terms>" >> sla-$1.xml
+echo "<terms name=\"$1:conditions\" type=\"conditions\">" >> sla-$1.xml 
+echo "<term name=\"$1:condition1\">" >> sla-$1.xml 
+echo "<variable name=\"$1:v1\" property=\"occi.placement.algorithm\" condition=\"eq\" value=\"zone\"/>" >> sla-$1.xml 
+echo "<variable name=\"$1:v2\" property=\"occi.placement.zone\" condition=\"eq\" value=\"europe\"/>" >> sla-$1.xml 
+echo "</term>" >> sla-$1.xml
+echo "</terms>" >> sla-$1.xml
+echo "<terms name=\"accords:guarantees\" type=\"guarantees\"/>" >> sla-$1.xml 
+echo "</agreement>" >> sla-$1.xml
+
+
+

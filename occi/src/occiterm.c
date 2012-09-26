@@ -143,8 +143,14 @@ private void autoload_cords_term_nodes() {
 				pptr->type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "identity" )) != (struct xml_atribut *) 0)
 				pptr->identity = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "payload" )) != (struct xml_atribut *) 0)
-				pptr->payload = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "manifest" )) != (struct xml_atribut *) 0)
+				pptr->manifest = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
+				pptr->provider = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "variables" )) != (struct xml_atribut *) 0)
+				pptr->variables = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "guarantees" )) != (struct xml_atribut *) 0)
+				pptr->guarantees = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -186,8 +192,17 @@ public  void autosave_cords_term_nodes() {
 		fprintf(h," identity=%c",0x0022);
 		fprintf(h,"%s",(pptr->identity?pptr->identity:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," payload=%c",0x0022);
-		fprintf(h,"%s",(pptr->payload?pptr->payload:""));
+		fprintf(h," manifest=%c",0x0022);
+		fprintf(h,"%s",(pptr->manifest?pptr->manifest:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," provider=%c",0x0022);
+		fprintf(h,"%s",(pptr->provider?pptr->provider:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," variables=%c",0x0022);
+		fprintf(h,"%u",pptr->variables);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," guarantees=%c",0x0022);
+		fprintf(h,"%u",pptr->guarantees);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -221,8 +236,14 @@ private void set_cords_term_field(
 			pptr->type = allocate_string(vptr);
 		if (!( strcmp( nptr, "identity" ) ))
 			pptr->identity = allocate_string(vptr);
-		if (!( strcmp( nptr, "payload" ) ))
-			pptr->payload = allocate_string(vptr);
+		if (!( strcmp( nptr, "manifest" ) ))
+			pptr->manifest = allocate_string(vptr);
+		if (!( strcmp( nptr, "provider" ) ))
+			pptr->provider = allocate_string(vptr);
+		if (!( strcmp( nptr, "variables" ) ))
+			pptr->variables = atoi(vptr);
+		if (!( strcmp( nptr, "guarantees" ) ))
+			pptr->guarantees = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -284,13 +305,22 @@ private int pass_cords_term_filter(
 		else if ( strcmp(pptr->identity,fptr->identity) != 0)
 			return(0);
 		}
-	if (( fptr->payload )
-	&&  (strlen( fptr->payload ) != 0)) {
-		if (!( pptr->payload ))
+	if (( fptr->manifest )
+	&&  (strlen( fptr->manifest ) != 0)) {
+		if (!( pptr->manifest ))
 			return(0);
-		else if ( strcmp(pptr->payload,fptr->payload) != 0)
+		else if ( strcmp(pptr->manifest,fptr->manifest) != 0)
 			return(0);
 		}
+	if (( fptr->provider )
+	&&  (strlen( fptr->provider ) != 0)) {
+		if (!( pptr->provider ))
+			return(0);
+		else if ( strcmp(pptr->provider,fptr->provider) != 0)
+			return(0);
+		}
+	if (( fptr->variables ) && ( pptr->variables != fptr->variables )) return(0);
+	if (( fptr->guarantees ) && ( pptr->guarantees != fptr->guarantees )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -319,7 +349,16 @@ private struct rest_response * cords_term_occi_response(
 	sprintf(cptr->buffer,"%s.%s.identity=%s",optr->domain,optr->id,pptr->identity);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.payload=%s",optr->domain,optr->id,pptr->payload);
+	sprintf(cptr->buffer,"%s.%s.manifest=%s",optr->domain,optr->id,pptr->manifest);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.provider=%s",optr->domain,optr->id,pptr->provider);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.variables=%u",optr->domain,optr->id,pptr->variables);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.guarantees=%u",optr->domain,optr->id,pptr->guarantees);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -750,7 +789,13 @@ public struct occi_category * occi_cords_term_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "identity",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "payload",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "manifest",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "variables",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "guarantees",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -835,7 +880,40 @@ public struct rest_header *  cords_term_occi_headers(struct cords_term * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_term.payload='%s'\r\n",(sptr->payload?sptr->payload:""));
+	sprintf(buffer,"occi.cords_term.manifest='%s'\r\n",(sptr->manifest?sptr->manifest:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_term.provider='%s'\r\n",(sptr->provider?sptr->provider:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_term.variables='%u'\r\n",sptr->variables);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_term.guarantees='%u'\r\n",sptr->guarantees);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

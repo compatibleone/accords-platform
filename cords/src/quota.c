@@ -35,6 +35,8 @@ public struct cords_quota * liberate_cords_quota(struct cords_quota * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->property )
+			 sptr->property = liberate(sptr->property);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->operator )
@@ -60,6 +62,7 @@ public struct cords_quota * reset_cords_quota(struct cords_quota * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->property = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->operator = (char*) 0;
 		sptr->price = (char*) 0;
@@ -103,6 +106,10 @@ public int xmlin_cords_quota(struct cords_quota * sptr,struct xml_element * eptr
 		else if (!( strcmp(wptr->name,"name") ))
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"property") ))
+		{
+			if ( wptr->value ) { sptr->property = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"description") ))
 		{
@@ -160,6 +167,7 @@ public int rest_occi_cords_quota(FILE * fh,struct cords_quota * sptr,char * pref
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.property='%s'\r\n",prefix,nptr,(sptr->property?sptr->property:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));

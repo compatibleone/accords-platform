@@ -1,23 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
-
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_occi_body_c
 #define	_occi_body_c
 
@@ -339,6 +336,63 @@ public	char *	occi_html_capacities(
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ a c c e p t _ h e a d e r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header * occi_accept_header( struct rest_response * aptr )
+{
+	return( rest_response_header( aptr, _HTTP_ACCEPT, "text/occi,text/plain,text/html" ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*	  		o c c i _ t e x t _ c a p a c i t i e s		*/
+/*	------------------------------------------------------------	*/
+public	char *	occi_text_capacities( 
+		struct occi_category * cptr,
+		struct rest_response * aptr )
+{
+	FILE *	h;
+	char *	mptr;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	nptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * contenttype=(struct rest_header *) 0;
+	struct	rest_header * hptr;
+
+	if (!( filename = rest_temporary_filename( "txt" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+		for (	;
+			cptr != (struct occi_category *) 0;
+			cptr = cptr->next )
+		{
+			if ( cptr->access & _OCCI_SECRET )
+				continue;
+			else if (!( mptr = occi_http_capacity( cptr ) ))
+				continue;
+			else
+			{
+				fprintf(h,"Category: %s\n",mptr);
+				liberate( mptr );
+			}
+		}
+		fclose(h);
+		if (!( hptr = occi_accept_header( aptr )))
+			return( filename );
+		else if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
+			return( filename );
+		else	return( occi_content_length(contentlength, filename ));
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*	  		o c c i _ h t m l _ b o d y 			*/
 /*	------------------------------------------------------------	*/
 public	char *	occi_html_body( 
@@ -577,10 +631,13 @@ private	char *	occi_text_body(
 {
 	FILE *	h;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * hhptr;
 	char *	filename;
-	char		buffer[2048];
+	char	buffer[2048];
 	char *	vptr;
-	int		attributs=0;
+	char *	mptr;
+	int	attributs=0;
+	int	mode=0;
 
 	if (!( filename = rest_temporary_filename( "txt" ) ))
 		return((char *) 0);
@@ -590,14 +647,57 @@ private	char *	occi_text_body(
 
 	else
 	{
-		fprintf(h,"{ Category: %c%s%c; ",0x0022,cptr->id,0x0022 );
+		for (	hhptr=hptr;
+			hhptr != (struct rest_header *) 0;
+			hhptr = hhptr->next )
+		{
+			if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+			{
+				mode=1;
+				break;
+			}
+			else if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
+			{
+				mode=2;
+				break;
+			}
+		}
+
+		if ( mode == 1 )
+		{
+			for (	;
+				hhptr != (struct rest_header *) 0;
+				hhptr = hhptr->next )
+			{
+
+				if (!( strcasecmp( hhptr->name, _OCCI_LOCATION ) ))
+					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
+			}			
+
+		}
+		else
+		{
+			if (( mptr = occi_http_category( cptr )) != (char *) 0)
+			{
+				fprintf(h,"Category: %s\n",mptr);
+				liberate( mptr );
+			}
+			for (	;
+				hhptr != (struct rest_header *) 0;
+				hhptr = hhptr->next )
+			{
+
+				if (!( strcasecmp( hhptr->name, _OCCI_ATTRIBUTE ) ))
+					fprintf(h,"%s: %s\n",hhptr->name, hhptr->value);
+			}			
+		}
 		while ( hptr )
 		{
 			if (!( hptr->name ))
 				hptr = hptr->next;
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
 			{
-				rest_replace_header( hptr, _OCCI_MIME_JSON );
+				rest_replace_header( hptr, _OCCI_TEXT_PLAIN );
 				hptr = hptr->next;
 			}
 			else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
@@ -605,18 +705,14 @@ private	char *	occi_text_body(
 				contentlength = hptr;
 				hptr = hptr->next;
 			}
-			else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			else if ((!( strcasecmp( hptr->name, _OCCI_LOCATION  ) ))
+			     ||  (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+			     ||  (!( strcasecmp( hptr->name, _OCCI_CATEGORY  ) )))
 			{
-				fprintf(h,"%s: %s\n",hptr->name,hptr->value);
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
 		}
-		if ( attributs )
-			fprintf(h,"\t}\n");
-		else	fprintf(h,"%c%c\n",0x0022,0x0022);
-		fprintf(h,"}\n");
-
 		fclose(h);
 		return( occi_content_length(contentlength, filename ));
 	}
@@ -846,10 +942,11 @@ public	int	accept_string_includes( char * sptr, char * tptr )
 /*	---------------------------------------------------	*/
 public	char * occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr )
 {
-	if (!( strcasecmp( accepts, _OCCI_TEXT_OCCI ) ))
+	if ((!( strcasecmp( accepts, _OCCI_TEXT_PLAIN ) ))
+	||  (!( strcasecmp( accepts, "*/*" ) )))
 		return( occi_text_body( cptr, hptr ) );
 
-	if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
+	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
 		return( occi_html_body( cptr, hptr ) );
 
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))

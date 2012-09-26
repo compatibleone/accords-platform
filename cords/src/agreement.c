@@ -43,6 +43,8 @@ public struct cords_agreement * liberate_cords_agreement(struct cords_agreement 
 			 sptr->responder = liberate(sptr->responder);
 		if ( sptr->serviceprovider )
 			 sptr->serviceprovider = liberate(sptr->serviceprovider);
+		if ( sptr->initiation )
+			 sptr->initiation = liberate(sptr->initiation);
 		if ( sptr->expiration )
 			 sptr->expiration = liberate(sptr->expiration);
 		if ( sptr->templateid )
@@ -68,6 +70,7 @@ public struct cords_agreement * reset_cords_agreement(struct cords_agreement * s
 		sptr->initiator = (char*) 0;
 		sptr->responder = (char*) 0;
 		sptr->serviceprovider = (char*) 0;
+		sptr->initiation = (char*) 0;
 		sptr->expiration = (char*) 0;
 		sptr->templateid = (char*) 0;
 		sptr->templatename = (char*) 0;
@@ -123,6 +126,10 @@ public int xmlin_cords_agreement(struct cords_agreement * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->serviceprovider = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"initiation") ))
+		{
+			if ( wptr->value ) { sptr->initiation = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"expiration") ))
 		{
 			if ( wptr->value ) { sptr->expiration = allocate_string(wptr->value); }
@@ -163,6 +170,7 @@ public int rest_occi_cords_agreement(FILE * fh,struct cords_agreement * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.initiator='%s'\r\n",prefix,nptr,(sptr->initiator?sptr->initiator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.responder='%s'\r\n",prefix,nptr,(sptr->responder?sptr->responder:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.serviceprovider='%s'\r\n",prefix,nptr,(sptr->serviceprovider?sptr->serviceprovider:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.initiation='%s'\r\n",prefix,nptr,(sptr->initiation?sptr->initiation:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.expiration='%s'\r\n",prefix,nptr,(sptr->expiration?sptr->expiration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.templateid='%s'\r\n",prefix,nptr,(sptr->templateid?sptr->templateid:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.templatename='%s'\r\n",prefix,nptr,(sptr->templatename?sptr->templatename:""));

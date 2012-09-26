@@ -3,13 +3,14 @@
 
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
-			Compatible One Service Level Agreement Description Schema Version 2.08
-			Provisionary Version 24th May 2012
+			Compatible One Service Level Agreement Description Schema Version 2.12
+			Provisionary Version 21st Sept 2012
 			Enforced by the ACCORDS Parser
 		</xsd:documentation>
 	</xsd:annotation>
 
 	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/cordstypes.xsd"/>
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/quotatypes.xsd"/>
 
 	<xsd:element name="agreement" type="cordsAgreement"/>
 
@@ -17,11 +18,11 @@
 		<xsd:element name="terms" type="cordsTerms" minOccurs="1" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
-		<xsd:attribute name="xmlns" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="initiator" type="xsd:string"/>
 		<xsd:attribute name="responder" type="xsd:string"/>
 		<xsd:attribute name="serviceprovider" type="xsd:string"/>
+		<xsd:attribute name="initiation" type="xsd:string"/>
 		<xsd:attribute name="expiration" type="xsd:string"/>
 		<xsd:attribute name="template" type="xsd:string"/>
 		<xsd:attribute name="templatename" type="xsd:string"/>
@@ -47,6 +48,7 @@
 	<xsd:complexType name="cordsTerm">
 		<xsd:choice>
 			<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="provider" type="cordsProvider" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="guarantee" type="cordsGuarantee" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:choice>
@@ -55,7 +57,10 @@
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="identity" type="xsd:string"/>
-		<xsd:attribute name="payload" type="xsd:string"/>
+		<xsd:attribute name="manifest" type="xsd:string"/>
+		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="variables" type="xsd:integer"/>
+		<xsd:attribute name="guarantees" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 

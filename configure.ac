@@ -187,14 +187,14 @@ AM_CONDITIONAL([ENABLE_COSCHED], [test "$enable_cosched" = "yes"])
 AC_SUBST([CFLAGS_COSCHED], [-I\${abs_top_srcdir}/cosched/src])
 AC_SUBST([PATH_COSCHED], [${abs_top_srcdir}/cosched/src])
 
-AC_ARG_ENABLE([coes],
-      [AS_HELP_STRING([--disable-coes],
-		      [Disable coes @<:@default=enable@:>@])],
+AC_ARG_ENABLE([cops],
+      [AS_HELP_STRING([--disable-cops],
+		      [Disable cops @<:@default=enable@:>@])],
       [],
-      [enable_coes=yes])
-AM_CONDITIONAL([ENABLE_COES], [test "$enable_coes" = "yes"])
-AC_SUBST([CFLAGS_COES], [-I\${abs_top_srcdir}/coes/src])
-AC_SUBST([PATH_COES], [${abs_top_srcdir}/coes/src])
+      [enable_cops=yes])
+AM_CONDITIONAL([ENABLE_COPS], [test "$enable_cops" = "yes"])
+AC_SUBST([CFLAGS_COPS], [-I\${abs_top_srcdir}/cops/src])
+AC_SUBST([PATH_COPS], [${abs_top_srcdir}/cops/src])
 
 AC_ARG_ENABLE([coees],
       [AS_HELP_STRING([--disable-coees],
@@ -303,14 +303,23 @@ AM_CONDITIONAL([ENABLE_SLAM], [test "$enable_slam" = "yes"])
 AC_SUBST([CFLAGS_SLAM], [-I\${abs_top_srcdir}/slam/src])
 AC_SUBST([PATH_SLAM], [${abs_top_srcdir}/slam/src])
 
-AC_ARG_ENABLE([paasprocci],
-      [AS_HELP_STRING([--disable-paasprocci],
-		      [Disable paasprocci @<:@default=enable@:>@])],
+AC_ARG_ENABLE([copaas],
+      [AS_HELP_STRING([--disable-copaas],
+		      [Disable copaas @<:@default=enable@:>@])],
       [],
-      [enable_paasprocci=yes])
-AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
-AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
-AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
+      [enable_copaas=yes])
+AM_CONDITIONAL([ENABLE_COPAAS], [test "$enable_copaas" = "yes"])
+AC_SUBST([CFLAGS_COPAAS], [-I\${abs_top_srcdir}/copaas/src])
+AC_SUBST([PATH_COPAAS], [${abs_top_srcdir}/copaas/src])
+
+AC_ARG_ENABLE([jpaasprocci],
+      [AS_HELP_STRING([--disable-jpaasprocci],
+		      [Disable jpaasprocci @<:@default=enable@:>@])],
+      [],
+      [enable_jpaasprocci=yes])
+AM_CONDITIONAL([ENABLE_JPAASPROCCI], [test "$enable_jpaasprocci" = "yes"])
+AC_SUBST([CFLAGS_JPAASPROCCI], [-I\${abs_top_srcdir}/jpaasprocci/src])
+AC_SUBST([PATH_JPAASPROCCI], [${abs_top_srcdir}/jpaasprocci/src])
 
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
@@ -449,7 +458,7 @@ AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
 AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
 AC_CONFIG_FILES([ezvm/Makefile ezvm/src/Makefile])
-AC_CONFIG_FILES([coes/Makefile coes/src/Makefile])
+AC_CONFIG_FILES([cops/Makefile cops/src/Makefile])
 AC_CONFIG_FILES([coees/Makefile coees/src/Makefile])
 AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])
 AC_CONFIG_FILES([comons/Makefile comons/src/Makefile])
@@ -464,7 +473,8 @@ AC_CONFIG_FILES([cosched/Makefile cosched/src/Makefile])
 AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
-AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
+AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
+AC_CONFIG_FILES([jpaasprocci/Makefile jpaasprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
@@ -503,7 +513,7 @@ echo "    - pubocci                  : $enable_pubocci"
 echo "    - copabr                   : $enable_copabr"
 echo "    - coss                     : $enable_coss"
 echo "    - ezvm                     : $enable_ezvm"
-echo "    - coes                     : $enable_coes"
+echo "    - cops                     : $enable_cops"
 echo "    - coees                    : $enable_coees"
 echo "    - coobas                   : $enable_coobas"
 echo "    - comons                   : $enable_comons"
@@ -519,7 +529,8 @@ echo "    - osprocci                 : $enable_osprocci"
 echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
-echo "    - paasprocci               : $enable_paasprocci"
+echo "    - copaas                   : $enable_copaas"
+echo "    - jpaasprocci              : $enable_jpaasprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - testosocci               : $enable_testosocci"
@@ -537,3 +548,4 @@ echo "    - testaz                   : $enable_testaz"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
 echo ""
+

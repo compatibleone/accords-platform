@@ -14,6 +14,7 @@ struct	cords_provider
 	char *	zone;
 	char *	opinion;
 	char * 	security;
+	int	state;
 };
 
 #endif
