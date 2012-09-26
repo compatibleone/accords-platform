@@ -2,22 +2,35 @@
 #include <proactive.h>
 #include <paconfig.h>
 #include <restrequest.h>
+#include <restresponse.h>
+#include <restheader.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
 #define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
 #define CLASS_REST_REQUEST "org/ow2/compatibleone/exchangeobjects/RestRequest"
+#define CLASS_REST_RESPONSE "org/ow2/compatibleone/exchangeobjects/RestResponse"
 #define CLASS_REST_HEADER "org/ow2/compatibleone/exchangeobjects/RestHeader"
+#define CLASS_BLOCK_REST_HEADER "org/ow2/compatibleone/exchangeobjects/RestHeaderBlock"
+#define CLASS_PROCCI_CATEGORY "org/ow2/compatibleone/exchangeobjects/ProcciCategory"
 
 struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp);
 jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr);
+jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_response * rptr);
 jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr);
+jobject create_java_rest_header_full_block_object(struct jvm_struct * jvmp, struct rest_header * first);
+jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proactive * category);
 
 void test_invoke(){}
 void test_invoke1(){
 	struct jvm_struct * jvmp = NULL;
 	jvmp = initialize_jvm_if_needed(&jvmp);
+
+
+	fprintf(stderr, "If you see this, is because Mauricio is testing... :)\n");
+
+	fprintf(stderr, "Creating rest_request...\n");
 	struct rest_request a;
 	a.first = NULL;
 	a.last = NULL;
@@ -30,9 +43,144 @@ void test_invoke1(){
 	a.host = "hostttt";
 
 	create_java_rest_request_object(jvmp, &a);
+
+	fprintf(stderr, "Creating rest_response...\n");
+	struct rest_response b;
+	b.first = NULL;
+	b.last = NULL;
+	b.status = 333;
+	b.version = "versionnnn";
+	b.message = "messageeee";
+	b.type = 333;
+	b.body = "bodyyyy";
+
+	create_java_rest_response_object(jvmp, &b);
+
+	fprintf(stderr, "Creating rest_header...\n");
+	struct rest_header c1;
+	c1.next = NULL;
+	c1.previous = NULL;
+	c1.parent = NULL;
+	c1.name = "name1";
+	c1.value = "value1";
+
+	struct rest_header c2;
+	c2.next = NULL;
+	c2.previous = NULL;
+	c2.parent = NULL;
+	c2.name = "name2";
+	c2.value = "value2";
+
+	c1.next = &c2;
+	c2.previous = &c1;
+
+	create_java_rest_header_full_block_object(jvmp, &c1);
+
+
+	fprintf(stderr, "Creating procci category...\n");
+	struct proactive d;
+	d.id = "idddd";
+
+	create_java_procci_category_object(jvmp, &d);
+
+
+	fprintf(stderr, "All right!\n");
+	exit(0);
+
+
 }
 
-jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr){
+jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proactive * category){
+	// Initializing JVM parameters...
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	if (category == NULL){
+		fprintf(stderr, "Can't accept NULL parameters...\n");
+		exit(-1);
+	}
+
+	jclass sclass = (*env)->FindClass(env, CLASS_PROCCI_CATEGORY); 
+	if (sclass == 0){
+		fprintf(stderr, "Can't find class " CLASS_PROCCI_CATEGORY "...\n");
+		exit(-1);
+	}
+
+	// Looking for instantiation method.
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Ljava/lang/String;)V");
+
+	if (initmeth == 0){
+		fprintf(stderr, "Can't find " CLASS_PROCCI_CATEGORY " constructor method...\n");
+		exit(-1);
+	}
+
+	// Preparing parameters to instantiate the class...
+	jstring id = (*env)->NewStringUTF(env, (category->id?category->id:""));	
+	
+	// Instantiating the class... 
+	jobject restobj = (*env)->NewObject(env, sclass, initmeth, id);
+
+	if (restobj == 0){
+		fprintf(stderr, "Can't instantiate class " CLASS_PROCCI_CATEGORY "...\n");
+		exit(-1);
+	}
+
+	return restobj;
+
+}
+
+jobject create_java_rest_header_full_block_object(struct jvm_struct * jvmp, struct rest_header * first){
+	jmethodID initmeth;
+	jmethodID addmeth;
+	jobject resthead;
+	
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	jclass sclass = (*env)->FindClass(env, CLASS_BLOCK_REST_HEADER);
+	if (sclass == 0){
+		fprintf(stderr, "Can't find class" CLASS_BLOCK_REST_HEADER "...\n");
+		exit(-1);
+	}
+
+	initmeth = (*env)->GetMethodID(env, sclass, "<init>","()V");
+
+	if (initmeth == 0){
+		fprintf(stderr, "Can't find " CLASS_BLOCK_REST_HEADER " constructor method...\n");
+		exit(-1);
+	}
+
+	resthead = (*env)->NewObject(env, sclass, initmeth);
+
+	if (resthead == 0){
+		fprintf(stderr, "Can't instantiate class " CLASS_BLOCK_REST_HEADER "...\n");
+		exit(-1);
+	}
+
+	addmeth = (*env)->GetMethodID(env, sclass, "add","(Ljava/lang/String;Ljava/lang/String;)V");
+
+	if (addmeth == 0){
+		fprintf(stderr, "Can't find method to add...\n");
+		exit(-1);
+	}
+
+	while(first != NULL){
+		fprintf(stderr, "Going through elements to add them %s...\n", first->name);
+		jstring namestr = (*env)->NewStringUTF(env, first->name);
+		jstring valuestr = (*env)->NewStringUTF(env, first->value);
+		(*env)->CallVoidMethod(env, resthead, addmeth, namestr, valuestr);
+
+		first = first->next;
+	}
+
+	return resthead;
+}
+
+
+jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_response * rptr){
+	// Initializing JVM parameters...
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
 	jobject procci = jvmp->procci;
@@ -42,21 +190,69 @@ jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_re
 		exit(-1);
 	}
 
-	jclass sclass = (*env)->FindClass(env, CLASS_REST_REQUEST);
+	jclass sclass = (*env)->FindClass(env, CLASS_REST_RESPONSE); 
 	if (sclass == 0){
-		fprintf(stderr, "Can't find class...\n");
+		fprintf(stderr, "Can't find class " CLASS_REST_RESPONSE "...\n");
 		exit(-1);
 	}
 
+	// Looking for instantiation method.
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Lorg/ow2/compatibleone/exchangeobjects/RestHeader;ILjava/lang/String;Ljava/lang/String;ILjava/lang/String;)V");
+
+	if (initmeth == 0){
+		fprintf(stderr, "Can't find " CLASS_REST_RESPONSE " constructor method...\n");
+		exit(-1);
+	}
+
+	// Preparing parameters to instantiate the class...
+	jobject first = create_java_rest_header_object(jvmp, NULL);
+	jobject last = create_java_rest_header_object(jvmp, NULL);
+	jint status = (jint) rptr->status;
+	jstring version = (*env)->NewStringUTF(env, (rptr->version?rptr->version:""));	
+	jstring message = (*env)->NewStringUTF(env, (rptr->message?rptr->message:""));	
+	jint type = (jint) rptr->type;
+	jstring body = (*env)->NewStringUTF(env, (rptr->body?rptr->body:""));	
+	
+	// Instantiating the class... 
+	jobject restobj = (*env)->NewObject(env, sclass, initmeth, first, last, status, version, message, type, body);
+
+	if (restobj == 0){
+		fprintf(stderr, "Can't instantiate class " CLASS_REST_RESPONSE "...\n");
+		exit(-1);
+	}
+
+	return restobj;
+
+}
+jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr){
+	// Initializing JVM parameters...
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	if (rptr == NULL){
+		fprintf(stderr, "Can't accept NULL parameters...\n");
+		exit(-1);
+	}
+
+	jclass sclass = (*env)->FindClass(env, CLASS_REST_REQUEST); 
+	if (sclass == 0){
+		fprintf(stderr, "Can't find class " CLASS_REST_REQUEST "...\n");
+		exit(-1);
+	}
+
+	// Looking for instantiation method.
 	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V");
 
 	if (initmeth == 0){
-		fprintf(stderr, "Can't find method...\n");
+		fprintf(stderr, "Can't find " CLASS_REST_REQUEST " constructor method...\n");
 		exit(-1);
 	}
 
+	// Preparing parameters to instantiate the class...
 	jobject first = create_java_rest_header_object(jvmp, NULL);
 	jobject last = create_java_rest_header_object(jvmp, NULL);
+	//jobject first = create_java_rest_header_full_block_object(jvmp, NULL);
 	jstring method = (*env)->NewStringUTF(env, (rptr->method?rptr->method:""));	
 	jstring object = (*env)->NewStringUTF(env, (rptr->object?rptr->object:""));	
 	jstring parameters = (*env)->NewStringUTF(env, (rptr->parameters?rptr->parameters:""));	
@@ -65,19 +261,18 @@ jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_re
 	jstring body = (*env)->NewStringUTF(env, (rptr->body?rptr->body:""));	
 	jstring host = (*env)->NewStringUTF(env, (rptr->host?rptr->host:""));	
 	
-	jobject restrequ = (*env)->NewObject(env, sclass, initmeth, first, last, method, object, parameters, version, type, body, host);
+	// Instantiating the class... 
+	jobject restobj = (*env)->NewObject(env, sclass, initmeth, first, last, method, object, parameters, version, type, body, host);
 
-	if (restrequ == 0){
-		fprintf(stderr, "Can't instantiate class...\n");
+	if (restobj == 0){
+		fprintf(stderr, "Can't instantiate class " CLASS_REST_REQUEST "...\n");
 		exit(-1);
 	}
 
-	fprintf(stderr, "All right!\n");
-	exit(0);
-
-	return restrequ;
+	return restobj;
 
 }
+
 
 jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr){
 	jmethodID initmeth;
@@ -89,21 +284,21 @@ jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_hea
 
 	jclass sclass = (*env)->FindClass(env, CLASS_REST_HEADER);
 	if (sclass == 0){
-		fprintf(stderr, "Can't find class...\n");
+		fprintf(stderr, "Can't find class " CLASS_REST_HEADER "...\n");
 		exit(-1);
 	}
 
 	initmeth = (*env)->GetMethodID(env, sclass, "<init>","()V");
 
 	if (initmeth == 0){
-		fprintf(stderr, "Can't find method...\n");
+		fprintf(stderr, "Can't find " CLASS_REST_HEADER " constructor method...\n");
 		exit(-1);
 	}
 
 	resthead = (*env)->NewObject(env, sclass, initmeth);
 
 	if (resthead == 0){
-		fprintf(stderr, "Can't instantiate class...\n");
+		fprintf(stderr, "Can't instantiate class " CLASS_REST_HEADER "...\n");
 		exit(-1);
 	}
 

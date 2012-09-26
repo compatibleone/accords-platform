@@ -361,13 +361,14 @@ AC_ARG_ENABLE([paprocci],
       [AS_HELP_STRING([--enable-paprocci],
 		      [Enable paprocci and get as argument the Sun JDK path (preferred jdk1.6.0_25) @<:@default=disable@:>@])],
       [enable_paprocci=yes;paprocci_jdk=$enableval],
-      [])
+      [enable_paprocci=no;paprocci_jdk=jdk_not_used])
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
-AC_SUBST([CFLAGS_PAPROCCI], [-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux])
-AC_SUBST([LDFLAGS_PAPROCCI], [-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverif])
-AC_SUBST([PATH_PAPROCCI], [${abs_top_srcdir}/paprocci/src])
 
-paprocci_LDFLAGS =  
+AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
+AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
+#AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
+#AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
 
 AC_ARG_ENABLE([command],
       [AS_HELP_STRING([--disable-command],
@@ -525,6 +526,7 @@ echo "    - testosocci               : $enable_testosocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"
 echo "    - paprocci                 : $enable_paprocci"
+echo "       - JDK used              : $paprocci_jdk"
 echo "    - command                  : $enable_command"
 echo "    - testos                   : $enable_testos"
 echo "    - testdc                   : $enable_testdc"

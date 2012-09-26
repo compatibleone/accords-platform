@@ -7,7 +7,7 @@
 			<network name="panetwork" label="ethernet" vlan="100M"/>
 		</infrastructure>
 		<image name="paimage">
-			<system name="ubuntu"/>
+			<system name="linux"/>
                 </image>
 	</node>
         <configuration name="paconfig">
