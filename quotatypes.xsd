@@ -37,6 +37,7 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="property" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="operator" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
