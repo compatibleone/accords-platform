@@ -150,7 +150,7 @@ _co-start() {
     sleep $tempo
 
     echo "Starting accords proactive services"
-    run-paprocci &
+    ./run-paprocci &
     sleep $tempo
 
     echo "Starting accords test occi open stack server"
@@ -309,7 +309,7 @@ _run-dcprocci() {
 }
 
 _run-paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    @bindir@/paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run-osocciprocci() {
