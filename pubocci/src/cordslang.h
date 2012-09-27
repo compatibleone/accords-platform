@@ -92,6 +92,8 @@
 #define	_CORDS_FLAGS		"flags"
 #define	_CORDS_INITIATION	"initiaiton"
 #define	_CORDS_EXPIRATION	"expiration"
+#define	_CORDS_QUOTA		"quota"
+#define	_CORDS_QUANTITY		"quantity"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

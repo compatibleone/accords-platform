@@ -1,0 +1,61 @@
+# --------------------------------------------------
+# build an provider quota document file
+# --------------------------------------------------
+# parameter 1 : target quota xml filename
+# parameter 2 : total number of virtual cpus
+# parameter 3 : total ammount of ram in gigabytes
+# parameter 4 : total ammount of disk in gigabytes
+# parameter 5 : total count of virtual machines
+# parameter 6 : total number of IP addresses
+# --------------------------------------------------
+echo "build-provider [name] [cpu] [ram] [disk] [vm] [ip] "
+name=$1
+cpu=$2
+ram=$3
+disk=$4
+vm=$5
+adr=$6
+
+if [ -z "$name" ]; then
+	echo "Specify the provider name (no spaces)"
+	read name
+fi
+
+if [ -z "$cpu" ]; then
+	echo "Specify the total number of virtual cpus"
+	read cpu
+fi
+
+if [ -z "$ram" ]; then
+	echo "Specify the total ammount of virtual rams in Gb"
+	read ram
+fi
+
+if [ -z "$disk" ]; then
+	echo "Specify the total ammount of virtual diskspace in Gb"
+	read disk
+fi
+
+if [ -z "$vm" ]; then
+	echo "Specify the total number of virtual machines"
+	read vm
+fi
+
+if [ -z "$adr" ]; then
+	echo "Specify the total number of IP addresses"
+	read adr
+fi
+
+echo "build-provider " $name $cpu $ram $disk $vm $adr
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > quota-$name.xml
+echo "<provider name=\"$name\" xmlns=\"http://www.compatibleone.fr/schemes/provision.xsd\">" >> quota-$name.xml 
+echo "<quota name=\":cpu\" property=\"occi.compute.cores\" value=\"$cpu\"/>" >> quota-$name.xml 
+echo "<quota name=\":ram\" property=\"occi.compute.memory\" value=\"$ram\"/>" >> quota-$name.xml 
+echo "<quota name=\":disk\" property=\"occi.storage.size\" value=\"$disk\"/>" >> quota-$name.xml 
+echo "<quota name=\":vm\" property=\"accords.vm.count\" value=\"$vm\"/>" >> quota-$name.xml 
+echo "<quota name=\":adr\" property=\"accords.address.count\" value=\"$adr\"/>" >> quota-$name.xml 
+echo "</provider>" >> quota-$name.xml
+
+
+

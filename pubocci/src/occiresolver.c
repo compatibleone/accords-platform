@@ -22,6 +22,9 @@
 #include "cp.h"
 
 private	struct	occi_publisher Resolver = {
+	0,
+	(char *) 0,
+	(char *) 0,
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
