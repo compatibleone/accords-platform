@@ -58,7 +58,7 @@ struct	cops_options
 	int	overbooking;	/* overbooking allowed 		*/
 }	Coptions = 
 {
-	"zone",
+	"quota:zone",
 	0,
 	0
 };
@@ -477,15 +477,15 @@ private	struct	cops_solution *	select_cops_solution( struct cords_placement * pp
 	if (!( rest_valid_string(( aptr = pptr->algorithm )) ))
 		aptr = Coptions.algorithm;
 
-	if (!( strcasecmp( aptr, "zone" ) ))
+	if (!( strcasecmp( aptr, "quota:zone" ) ))
 		return( select_cops_zone( pptr, first ) );
-	else if (!( strcasecmp( aptr,"security" ) ))
+	else if (!( strcasecmp( aptr,"quota:security" ) ))
 		return( select_cops_security( pptr, first ) );
-	else if (!( strcasecmp( aptr, "opinion" ) ))
+	else if (!( strcasecmp( aptr, "quota:opinion" ) ))
 		return( select_cops_opinion( pptr, first ) );
-	else if (!( strcasecmp( aptr, "energy" ) ))
+	else if (!( strcasecmp( aptr, "quota:energy" ) ))
 		return( select_cops_energy( pptr, first ) );
-	else if (!( strcasecmp( aptr, "price" ) ))
+	else if (!( strcasecmp( aptr, "quota:price" ) ))
 		return( select_cops_price( pptr, first ) );
 	else 	return( select_cops_complex( pptr, first ) );
 }

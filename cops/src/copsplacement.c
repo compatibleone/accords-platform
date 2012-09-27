@@ -161,6 +161,22 @@ private	int	score_based_placement(
 	else	return( 0  );
 }
 
+/*	------------------------------------------------------------	*/
+/*		q u o t a _ b a s e d _ p l a c e m e n t		*/
+/*	------------------------------------------------------------	*/
+/*	this placement makes use of the new provider quota algorithm
+/*	------------------------------------------------------------	*/
+private	int	quota_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	if (!( pptr->solution = resolve_cops_solution( pptr ) ))
+		return( 30 );
+	else	return( 0  );
+}
+
 /*	--------------------------------------------------	*/
 /*	c r e a t e _ p l a c e m e n t _ s o l u t i o n	*/
 /*	--------------------------------------------------	*/
@@ -196,7 +212,9 @@ private	int	create_placement_solution(
 	/* -------------------------------------------------- */
 	/* select by  indicated placement algorithm operation */
 	/* -------------------------------------------------- */
-	if (!( strcmp( pptr->algorithm, "default" ) ))
+	if (!( strncmp( pptr->algorithm, "quota", strlen( "quota" ) ) ))
+		return( quota_based_placement( optr, pptr, agent, tls ) );
+	else if (!( strcmp( pptr->algorithm, "default" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( strcmp( pptr->algorithm, "price" ) ))
 		return( price_based_placement( optr, pptr, agent, tls ) );
