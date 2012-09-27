@@ -128,9 +128,6 @@ endif
 if ENABLE_TESTCB
 SUBDIRS += testcb
 endif
-if ENABLE_TESTPA
-SUBDIRS += testpa
-endif
 if ENABLE_FILESERVER
 SUBDIRS += fileserver
 endif

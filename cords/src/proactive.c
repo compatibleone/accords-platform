@@ -35,24 +35,28 @@ public struct proactive * liberate_proactive(struct proactive * sptr)
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->flavor )
-			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
 		if ( sptr->access )
 			 sptr->access = liberate(sptr->access);
-		if ( sptr->rootpass )
-			 sptr->rootpass = liberate(sptr->rootpass);
 		if ( sptr->reference )
 			 sptr->reference = liberate(sptr->reference);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
 			 sptr->privateaddr = liberate(sptr->privateaddr);
+		if ( sptr->nopanodes )
+			 sptr->nopanodes = liberate(sptr->nopanodes);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->workload )
@@ -76,15 +80,17 @@ public struct proactive * reset_proactive(struct proactive * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->flavor = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->profile = (char*) 0;
+		sptr->node = (char*) 0;
+		sptr->price = (char*) 0;
+		sptr->account = (char*) 0;
 		sptr->number = (char*) 0;
 		sptr->access = (char*) 0;
-		sptr->rootpass = (char*) 0;
 		sptr->reference = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
+		sptr->nopanodes = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
 		sptr->account = (char*) 0;
@@ -125,10 +131,6 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"flavor") ))
-		{
-			if ( wptr->value ) { sptr->flavor = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"image") ))
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
@@ -137,6 +139,18 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"node") ))
+		{
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"price") ))
+		{
+			if ( wptr->value ) { sptr->price = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"number") ))
 		{
 			if ( wptr->value ) { sptr->number = allocate_string(wptr->value); }
@@ -144,10 +158,6 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"access") ))
 		{
 			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"rootpass") ))
-		{
-			if ( wptr->value ) { sptr->rootpass = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"reference") ))
 		{
@@ -160,6 +170,10 @@ public int xmlin_proactive(struct proactive * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"privateaddr") ))
 		{
 			if ( wptr->value ) { sptr->privateaddr = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"nopanodes") ))
+		{
+			if ( wptr->value ) { sptr->nopanodes = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"hostname") ))
 		{
@@ -201,15 +215,17 @@ public int rest_occi_proactive(FILE * fh,struct proactive * sptr,char * prefix, 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.nopanodes='%s'\r\n",prefix,nptr,(sptr->nopanodes?sptr->nopanodes:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));

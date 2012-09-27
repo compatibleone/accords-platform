@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="pademo" xmlns="file:///tmp/manifest.xsd">
+	<node name="webnode" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="painfrastructure">
+			<compute name="pacompute" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="pastorage" size="20G"/>
+			<network name="panetwork" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="paimage">
+			<system name="linux"/>
+                </image>
+	</node>
+        <configuration name="paconfig">
+          <action name="runweb" expression="webnode.fork('/bin/bash /home/cperUser/compatibleone/cosacs/startweb.sh');"/>
+        </configuration>
+	<account name="paaccount"/>
+	<security name="pasecurity"/>
+</manifest>
+

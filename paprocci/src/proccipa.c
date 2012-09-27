@@ -74,17 +74,31 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 		if ( pptr->number ) pptr->number = liberate( pptr->number );
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
 		if ( pptr->reference ) pptr->reference = liberate( pptr->reference );
-		if ( pptr->rootpass ) pptr->rootpass = liberate( pptr->rootpass );
 		if ( pptr->publicaddr ) pptr->publicaddr = liberate( pptr->publicaddr );
 		if ( pptr->privateaddr ) pptr->privateaddr = liberate( pptr->privateaddr );
 		pptr->number = allocate_string("");
 		pptr->hostname = allocate_string("");
-		pptr->rootpass  = allocate_string("");
 		pptr->publicaddr = allocate_string("");
-		pptr->privateaddr = allocate_string("");
+		pptr->nopanodes = allocate_string("");
 		pptr->status = _OCCI_IDLE;
 	}
 	return(0);
+}
+
+/*! Check if the output of the pa_delete_server function was correct. */
+private	int	parse_delete_server_response( struct pa_response * server_created)
+{
+	char *	vptr; // Auxiliar variable. 
+
+    // Checking that the field error is not there. 
+    if (vptr = json_atribut( server_created->jsonroot, "error")) // Obtaining the error of the operation (if present, there was an error). 
+    {
+        fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
+        return( 27 );
+    }
+
+    return (0); 
+
 }
 
 /*	--------------------------------------------------------	*/
@@ -93,7 +107,7 @@ private	int	reset_structure_proactive_server( struct proactive * pptr )
 /*! This function fills in the struct proactive* given by usign the information that lies into 
  * the pa_response structure + calling the server to get info about the ProActive node. 
  * It also frees some proactive* structure fields. */
-private	int	connect_proactive_server( struct pa_response * server_created,struct proactive * server_data )
+private	int	parse_create_server_response( struct pa_response * server_created,struct proactive * server_data )
 {
 	struct	pa_response * zptr;
 	struct	pa_response * yptr;
@@ -114,8 +128,13 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 		if ( server_data->number ) 
 			server_data->number = liberate( server_data->number );
 
-		if ( server_data->rootpass ) 
-			server_data->rootpass = liberate( server_data->rootpass );
+        // Checking that the field error is not there. 
+		if (vptr = json_atribut( server_created->jsonroot, "error")) // Obtaining the error of the operation (if present, there was an error). 
+		{
+			fprintf(stderr, "An error occured while contacting ProActive: '%s'...\n", vptr);
+			reset_structure_proactive_server( server_data );
+			return( 27 );
+		}
 
         // Filling in the server_data structure given. 
 		if (!( vptr = json_atribut( server_created->jsonroot, "id") )) // Obtaining the ID of the operation. 
@@ -129,16 +148,6 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 			return( 27 );
 		}
 
-		else if (!( vptr = json_atribut( server_created->jsonroot, "adminPass") )) // Obtaining the adminPass to access the ProActive node. 
-		{
-			reset_structure_proactive_server( server_data );
-			return( 27 );
-		}
-		else if (!( server_data->rootpass  = allocate_string(vptr))) // Putting the adminPass of the ProActive node in proactive*->rootpass.
-		{
-			reset_structure_proactive_server( server_data );
-			return( 27 );
-		}
 		autosave_proactive_nodes();
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
@@ -154,31 +163,19 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 				reset_structure_proactive_server( server_data );
 				return( 27 );
 			}
-			else if (!( strcmp( vptr, "PREPARING" )))                   // Check if the node is in Pending status, if so wait and re-ask. 
-			{
-				sleep(1);
-				if ( zptr )
-					zptr = liberate_pa_response( zptr );
-				if (!( zptr = pa_get_server( server_data->number ))) // Here re-connect to the server and get UP-TO-DATE info about the ProActive node to check status. 
-				{
-					reset_structure_proactive_server( server_data );
-					return( 555 );
-				}
-				else	yptr = zptr;
-			}
-			else if (!( strcmp( vptr, "RUNNING" )))                  // Check if the node is in Running (correct) status, if so, exit the loop. 
+			else if (!( strcmp( vptr, "RUNNING" )))         // Check if the node is in Running (correct) status, if so, exit the loop. 
 				break;
-			else if (!( strcmp( vptr, "IDLE" )))                  // Check if the node is in Finished status (which is not correct). 
-            {
-                reset_structure_proactive_server( server_data );
-                return( 555 );
-            }
+			else                  				// Else... 
+			{
+				reset_structure_proactive_server( server_data );
+				return( 555 );
+			}
 		}
 		if ( server_data->hostname ) server_data->hostname = liberate( server_data->hostname );
 		if ( server_data->reference ) server_data->reference = liberate( server_data->reference );
 		if ( server_data->publicaddr ) server_data->publicaddr = liberate( server_data->publicaddr );
 		if ( server_data->privateaddr ) server_data->privateaddr = liberate( server_data->privateaddr );
-		if (!( vptr = json_atribut( yptr->jsonroot, "hostId") ))    // Get the hostId. 
+		if (!( vptr = json_atribut( yptr->jsonroot, "hostname") ))    // Get the hostname. 
 		{
 			reset_structure_proactive_server( server_data );
 			return( 27 );
@@ -188,7 +185,7 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 			reset_structure_proactive_server( server_data );
 			return( 27 );
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "private")) != (char *) 0) // Get the "private" json field. 
+		if (( vptr = json_atribut( yptr->jsonroot, "privateip")) != (char *) 0) // Get the "private" json field. 
 		{
 			if (!( server_data->privateaddr  = allocate_string(vptr)))               // Put in privateaddr the private ip address. 
 			{
@@ -196,7 +193,7 @@ private	int	connect_proactive_server( struct pa_response * server_created,struct
 				return( 27 );
 			}
 		}
-		if (( vptr = json_atribut( yptr->jsonroot, "public")) != (char *) 0) // Get the "public" json field. 
+		if (( vptr = json_atribut( yptr->jsonroot, "publicip")) != (char *) 0) // Get the "public" json field. 
 		{
 			if (!( server_data->publicaddr  = allocate_string(vptr)))               // Put in proactive*->publicaddr the public ip address of the ProActive node. 
 			{
@@ -237,116 +234,58 @@ private	struct	rest_response * start_proactive(
 		struct rest_client * cptr, 
 		struct rest_request * rptr, 
 		struct rest_response * aptr, 
-		void * vptr )               // It is void* , but is casted to a struct proactive* since the request comes
+		void * vptr )       // It is void* , but is casted to a struct proactive* since the request comes
                                     // from the occiserver, which receives something generic (related maybe to OpenStack, or OpenNebula, or any other).
 {
 	struct	pa_response * paptr;
 	struct	proactive * pptr;
-	int		status;
-    //char    *   idptr;
-    char        reference[512];
-	char	*	filename;
-	char 	*	personality="";
-	char 	*	resource=_CORDS_LAUNCH_CFG;
-    int physical_memory_constraint = 10;                                        // A contraint to apply to the node requested (>10MiB of RAM).
-	if (!( pptr = vptr ))                                                       // Can't provide null.
+	int	status;
+	char	reference[512];
+
+	// Create jobject complex type to pass it to Java. 
+	//   rest_request
+	//   rest_response
+	// Fill it in. 
+	
+	//create_java_rest_request_object(rptr);
+
+	printf("start_proactive\n");
+	if (!( pptr = vptr ))							// Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )                                      // If server is not idle, reply OK (?)
+	else if ( pptr->status != _OCCI_IDLE )     
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)      // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)	// Set up configuration according to profile (where the user and pass are).
 		return( rest_html_response( aptr, status, "Not Found" ) );
-    // could be used 
-		//pptr->id, here there is a file with details about the kind of required node. 
-        //pptr->image, image for the node, not valid now. 
-        //pptr->flavor, flavor of the node, not valid now. 
-        //personality, personality of the node, not considered now. 
-        //resource ) )) kind of resource of the node. 
-        //    char * name,
-        //    char * label,
-        //    char * description,
-        //    char * location,
-        //    char * group )
-        //
-	else if (!( paptr = pa_create_server(
-                    physical_memory_constraint)))                           // Request of a node using constraints. 
+	else if (!( paptr = pa_create_server(pptr)))				// Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_proactive_server( paptr, pptr );
+		/* ------------------------------- */
+		/* parse data obtained from server */
+		/* ------------------------------- */
+		status = parse_create_server_response( paptr, pptr ); // Returns 0 if everything okay.
 		paptr = liberate_pa_response( paptr );
-		//if (!( status ))
-		//	return( rest_html_response( aptr, 200, "OK" ) );
-		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
+		if (status) // If something went wrong (status != 0)
+		{
+			fprintf(stderr, "Something went wrong connecting to proactive %d...\n", status);
+			return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+		}
+		sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
+		/* ---------------------------- */
+		/* launch the COSACS operations */
+		/* ---------------------------- */
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_CONFIGURATION,
+			reference, WpaProcci.publisher );
 
-        /*****COSACS*******/ 
-
-        sprintf(reference,"%s/%s/%s",WpaProcci.identity,_CORDS_PROACTIVE,pptr->id);
-        /* --------------------------------- */
-        /* retrieve crucial data from server */
-        /* --------------------------------- */
-        //if (!( status = connect_openstack_server( osptr, pptr ) ))
-        //{
-            /* -------------------------------------------- */
-            /* attempt to associate the floating IP address */
-            /* -------------------------------------------- */
-            //if ( pptr->floating )
-            //   if ((status = associate_server_address( pptr )) != 0 )
-            //        return( rest_html_response( aptr, status, "Bad Request : Create Server Request" ) );
-
-            /* ---------------------------- */
-            /* launch the COSACS operations */
-            /* ---------------------------- */
-            cosacs_metadata_instructions( 
-                    pptr->hostname, _CORDS_CONFIGURATION,
-                    reference, WpaProcci.publisher, pptr->account );
-
-            /* ------------------------------------- */
-            /* release the public IP if not required */
-            /* ------------------------------------- */
-            //if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
-            //{
-            //    release_floating_address( pptr );
-            //    if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
-            //    if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
-            //    {
-            //        reset_openstack_server( pptr );
-            //        return( rest_html_response( aptr, 4016, "Server Failure : Allocation Failure" ) );
-            //    }
-            //}
-            /* ----------------------- */
-            /* create server meta data */
-            /* ----------------------- */
-            //if (!( idptr = json_atribut( osptr->jsonroot, "id") ))
-            //    return( rest_html_response( aptr, 4032, "Server Failure : Missing Meta Data Server ID" ) );
-
-            //else if (!( metafilename = os_create_metadata_request( personality ) ))
-            //    return( rest_html_response( aptr, 4064, "Server Failure : Create MetaData Message" ) );
-            //else if (!( metaptr = os_create_metadata( idptr, metafilename )))
-            //    return( rest_html_response( aptr, 4128, "Server Failure : Create MetaData Request" ) );
-            //else
-            //{
-            //    metaptr = liberate_os_response( metaptr );
-            //    liberate( metafilename );
-        //    }
-        //}
-        //osptr = liberate_os_response( osptr );
-        if (!( status ))
-        {
-
-            return( rest_html_response( aptr, 200, "OK" ) );
-        //    if (!( os_valid_price( pptr->price ) ))
-        //        return( rest_html_response( aptr, 200, "OK" ) );
-        //    else if ( occi_send_transaction( _CORDS_PROACTIVE, pptr->price, "action=start", pptr->account, reference ) )
-        //        return( rest_html_response( aptr, 200, "OK" ) );
-        //    else    return( rest_html_response( aptr, 200, "OK" ) );
-        }
-        else
-        {    
-            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
-        }
+		if (!( status ))  
+		{
+			return( rest_html_response( aptr, 200, "OK" ) );
+		}
+		else
+		{    
+			return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+		}
     }
 
 
@@ -362,34 +301,51 @@ private	struct	rest_response * save_proactive(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	pa_response * osptr;
-	int		status;
-	struct	proactive * pptr;
-	char	*	filename;
-
     return( rest_html_response( aptr, 404, "Invalid Action" ) ); 
-    
-	//if (!( pptr = vptr ))
-	 	//return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	//else if ( pptr->status == _OCCI_IDLE )
-		//return( rest_html_response( aptr, 400, "Contract Not Active" ) );
-	//else if ((status = use_proactive_configuration( pptr->profile )) != 0)
-		//return( rest_html_response( aptr, status, "Not Found" ) );
-	//else if (!( filename = pa_create_image_request( pptr->name, pptr->number ) ))
-	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//else if (!( osptr = pa_create_image( filename ) ))
-	 	//return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//else
-	//{
-		///* --------------------------------- */
-		///* retrieve crucial data from server */
-		///* --------------------------------- */
-		//status = connect_proactive_image( osptr, pptr );
-		//osptr = liberate_pa_response( osptr );
-		//if (!( status ))
-			//return( rest_html_response( aptr, 200, "OK" ) );
-		//else  	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	//}
+}
+
+/*	--------------------------------------------------------	*/
+/* 	 s t o p  _ p r o a c t i v e _ p r o v i s i o n i n g  	*/
+/*	--------------------------------------------------------	*/
+private	struct pa_response *	stop_proactive_provisioning( struct proactive * pptr )
+{
+	int	status;
+	struct	pa_response * osptr;
+
+	if ((status = use_proactive_configuration( pptr->profile )) != 0)
+		return((struct pa_response *) 0);
+	else
+	{
+		/* ------------------------------------------ */
+		/* launch the deletion of the server instance */
+		/* ------------------------------------------ */
+		if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
+		{
+			/* ----------------------------- */
+			/* await server instance removal */
+			/* ----------------------------- */
+			//do
+			//{
+			//	if (!( osptr ))
+			//		break;
+			//	else if (!( osptr->response ))
+			//		break;
+			//	else if ( osptr->response->status > 299 )
+			//		break;
+			//	else
+			//	{
+			//		sleep(1);
+			//		osptr = liberate_pa_response( osptr );
+			//	}
+			//}
+			//while ((osptr=pa_get_server( pptr->number )) != (struct os_response *) 0);
+		}
+		/* ------------------------------------------- */
+		/* ensure release of the allocated floating IP */
+		/* ------------------------------------------- */
+		//remove_floating_address( pptr );
+		return( osptr );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -409,12 +365,15 @@ private	struct	rest_response * stop_proactive(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status == _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where the user:pass is)
+	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where user and pass are)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = pa_delete_server( pptr->number )))
+	else if (!( osptr = pa_delete_server(pptr)))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{
+        if (parse_delete_server_response(osptr) != 0){ // If something went wrong...
+            return( rest_html_response( aptr, 4256, "Server Failure : Connect ProActive" ) );
+        }
 		if ( pptr->status != _OCCI_IDLE )
 		{
 			reset_structure_proactive_server( pptr );
@@ -574,6 +533,7 @@ private	struct	rest_response * revert_proactive(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+#include "pacontract.c"
 
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ p r o a c t i v e  		*/
@@ -586,7 +546,9 @@ private	int	create_proactive(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else if (!( pptr->node )) 
+		return( 0 ); 
+	else	return(create_proactive_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WpaProcci.tls));
 }
 
 /*	-------------------------------------------	*/
@@ -715,7 +677,7 @@ private	int	set_default_proactive(struct occi_category * optr, void * vptr)
 /* 	b u i l d _ p r o a c t i v e _ c o n f i g u r a t i o n	*/
 /*	---------------------------------------------------------	*/
 /*	this category handles the configuration of the interface	*/
-/*	to the oepn stack server for the preceeding category of		*/
+/*	to the proactive  server for the preceeding category of		*/
 /*	provisioning instance requests.					*/
 /*	---------------------------------------------------------	*/
 public	struct	occi_category * build_proactive_configuration( char * domain )

@@ -1,0 +1,42 @@
+USAGE OF THIS MODULE
+
+   -h, --help 
+      Print this message. 
+      
+   -v, --debug LEVELOFVERBOSITY
+      Verbose debugging mode level. The default value is 0 (silent). Value 2: verbose. Value 3: the module will try to load the log4j configuration file to know what and where to put the log messages.
+       
+   -O --logconf LOG-CONFIG 
+      Path of the log4j configuration file (if not specified or does not exist, the default log4j.properties file will be used if it exists).  
+      
+   Parameters regarding basic information needed:
+   
+   -u, --user
+      User name.
+		
+   -p, --pass
+      Password.
+		
+   -a, --properties-file
+      Properties file.
+		
+   Parameters regarding functionalities. 
+   
+   -l, --list-nodes
+      List the nodes available.
+   -g, --get-node
+      Get a node. 
+   -d, --release-node
+      Release a node. 
+   -j, --get-node-info
+      Get information of a node.  	
+   -r, --monitor-node
+      Get monitoring information of a node.  
+   -e, --mbean
+      Name of the mbean to query. 
+   -i, --attribute
+      Name of the MBean attribute to query.
+   -c, --launch-task
+      Launch a task to the given node.
+   -n, --node-url
+      Node url. 

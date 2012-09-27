@@ -1,0 +1,47 @@
+#!/bin/bash
+
+function addalljars()
+{
+  #echo Adding jars in folder $1
+  find $1 -name '*.jar' > alljars.txt
+  exec < alljars.txt
+  while read line
+  do
+    #echo --- Adding $line
+    CPATH=$CPATH:$line
+  done
+  rm alljars.txt
+}
+
+
+# Set up directories. 
+FIRSTDIR=`pwd`
+THISDIR=`dirname $0`          # This will always point to ./bin
+BASEDIR=$THISDIR/../          # This will always point to .
+
+# NOTE: remember to set up the environment given by the env.sh file (must set up PAUSER and PAPASS environment variables)
+
+THISDIR=`cd $THISDIR; pwd`
+BASEDIR=`cd $BASEDIR; pwd`
+
+cd $BASEDIR
+
+# Preparing classpath
+CPATH=.
+
+addalljars $BASEDIR/lib/
+
+addalljars $BASEDIR/dist/
+
+export CLASSPATH=$CPATH
+#echo CLASSPATH $CPATH
+
+# Uncomment if local ProActive scheduler connection wanted (default). 
+# $JAVA_HOME/bin/java -Xmx1024m org.ow2.proactive.compatibleone.pajavaprocci.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-local.properties $@  -v 3
+
+# Uncomment if demo ProActive scheduler connection wanted . 
+#$JAVA_HOME/bin/java -Xmx1024m org.ow2.proactive.compatibleone.pajavaprocci.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-demo.properties $@ -v 3
+
+# Uncomment if PACA Grid connection wanted (needs a PACA Grid account). 
+$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-pacagrid.properties $@  -v 3
+

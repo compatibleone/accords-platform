@@ -149,10 +149,6 @@ _co-start() {
     ./run-osprocci &
     sleep $tempo
 
-    echo "Starting accords proactive services"
-    run-paprocci &
-    sleep $tempo
-
     echo "Starting accords test occi open stack server"
     ./run-testosocci &
     sleep $tempo
@@ -172,6 +168,10 @@ _co-start() {
     echo "Starting accords windows azure services"
     ./run-azprocci &
     sleep $tempo
+
+    echo "ProActive services can be started manually"
+    #./run-paprocci &
+    #sleep $tempo
 
     echo "ACCORDS ready"
     ./co-status
@@ -309,7 +309,7 @@ _run-dcprocci() {
 }
 
 _run-paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    @bindir@/paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run-osocciprocci() {

@@ -47,7 +47,7 @@ struct	accords_configuration WpaProcci = {
 	"xmpp",  8000,
 	"domain",
 	"paprocci.xml",
-    "europe",
+	"europe",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -57,7 +57,7 @@ public	int	check_verbose()		{	return(WpaProcci.verbose);	}
 public	char *	default_publisher()	{	return(WpaProcci.publisher);	}
 public	char *	default_tls()		{	return(WpaProcci.tls);		}
 public	char *	default_operator()	{	return(WpaProcci.operator);	}
-public	char *	default_zone()	    {	return(WpaProcci.zone);	}
+public	char *	default_zone()	   	{	return(WpaProcci.zone);		}
 
 /*!
  * Called in any case of failure in this procci. */
@@ -160,7 +160,6 @@ private	int	paprocci_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-
 	if (!( optr = build_proactive_configuration( WpaProcci.domain ) ))
 		return( 27 );
 
@@ -193,6 +192,13 @@ private	int	paprocci(int argc, char * argv[] )
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
+
+	/** TEST  **/
+
+	test_invoke();
+
+	/** TEST  **/
+
 	paprocci_load();
 	while ( argi < argc )
 	{
@@ -229,6 +235,7 @@ private	int	paprocci(int argc, char * argv[] )
 /*	------------------------------------------------------------------	*/
 public	int	main(int argc, char * argv[] )
 {
+	printf("Starting procci...\n");
 	if ( argc == 1 )
 		return( banner() );
 	else	return( paprocci( argc, argv ) );

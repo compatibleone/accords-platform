@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project name="co-proactive-procci" basedir="." default="main">
+
+    <property file="${user.home}/.proactive/build.properties" />
+    <property file="${basedir}/build.properties" />
+
+    <property environment="env"/>
+    <property name="src.dir"           value="src"/>
+    <property name="build.dir"         value="build"/>
+    <property name="classes.dir"       value="${build.dir}/classes"/>
+    <property name="dist.dir"           value="dist"/>
+    <property name="palib.dir"         value="${scheduling.project.dir}/dist/lib"/>
+    <property name="lib.dir"           value="lib"/>
+    <property name="ourpalib.dir"      value="${lib.dir}/scheduling"/>
+    <property name="main-class"        value="org.ow2.proactive.compatibleone.pajavaprocci.Starter"/>
+
+
+    <target name="copyDependencies">
+	<echo>Copying dependencies...</echo>
+	<copy todir="${ourpalib.dir}">
+            <fileset dir="${palib.dir}" includes="**/*.jar"/>
+	</copy>
+    </target>	  
+
+    <path id="classpath">
+        <fileset dir="${ourpalib.dir}"   includes="**/*.jar"/>
+        <fileset dir="${lib.dir}"        includes="**/*.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="compile" depends="copyDependencies">
+        <mkdir dir="${classes.dir}"/>
+	<copy todir="${classes.dir}">
+            <fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.txt,**/*.ico" />
+	</copy>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+	<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="dist">
+        <java fork="true" classname="${main-class}">
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="clean-build" depends="clean,dist"/>
+    <target name="jar" depends="dist"/>
+    <target name="main" depends="clean,run"/>
+
+</project>

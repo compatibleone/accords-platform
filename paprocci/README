@@ -1,0 +1,20 @@
+README TEST
+****** ****
+
+To simply launch paprocci execute the script provided.
+
+STARTING EVERYTHING 
+******** **********
+This example will guide you towards a quick running example of Accords (the CompatibleOne platform) using as a service provider the ProActive Parallel Suite. 
+
+1. Run:
+
+	$ ./test/pademo_place_files.sh
+
+2. Make sure you have a running instance of ProActive Resource Manager and Scheduler (PACAGrid can be used to avoid this step).
+
+3. Start up ACCORDS: 
+
+	$ ./test/pademo_init.sh 
+
+Now you can do co-parser and co-broker of any manifest.xml file you have in there. 
