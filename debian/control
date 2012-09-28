@@ -2,7 +2,7 @@ Source: compatibleone-accords
 Section: net
 Priority: extra
 Maintainer: Vincent Renardias <vrenardias@citypassenger.com>
-Build-Depends: debhelper (>= 8.0.0), lsb-release
+Build-Depends: debhelper (>= 8.0.0), lsb-release, openjdk-7-jdk
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
@@ -205,13 +205,13 @@ Recommends: compatibleone-testosocci
 Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
  CompatibleOne Accords Platform - Open Stack Procci subsystem
 
-Package: compatibleone-paprocci
-Section: net
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform - ProActive Procci subsystem
- CompatibleOne Accords Platform - ProActive Procci subsystem
-
+#Package: compatibleone-paprocci
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}
+#Description: CompatibleOne Accords Platform - ProActive Procci subsystem
+# CompatibleOne Accords Platform - ProActive Procci subsystem
+#
 Package: compatibleone-parser
 Section: net
 Architecture: any
