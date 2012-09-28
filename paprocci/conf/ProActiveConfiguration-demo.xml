@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+  <properties>
+    <prop key="proactive.net.nolocal" value="true"/>
+    <!--<prop key="proactive.rmi.port" value="1234"/>-->
+    <prop key="proactive.communication.protocol" value="pamr"/>
+    <prop key="proactive.net.router.address" value="vizcacha.cloud.sophia.inria.fr"/>
+    <prop key="proactive.net.router.port" value="8090"/>
+  </properties>
+  <javaProperties>
+  </javaProperties>
+</ProActiveUserProperties>
+
+
