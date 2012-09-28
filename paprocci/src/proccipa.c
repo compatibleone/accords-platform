@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
 /* -------------------------------------------------------------------- */
 /* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
 /* you may not use this file except in compliance with the License. 	*/
@@ -15,6 +15,7 @@
 /* See the License for the specific language governing permissions and 	*/
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
+
 #ifndef	_proccipa_c
 #define	_proccipa_c
 
