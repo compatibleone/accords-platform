@@ -206,7 +206,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else if (!( strcasecmp( p2, "PRIVATE" ) ))
 			os_result( os_glance_access( subscription,p3, 0 ) );
 		else if (!( strcasecmp( p2, "CREATE" ) ))
-			os_result( os_post_glance( subscription,p3, p4 ) );
+			os_result( os_post_glance( subscription,p3, p4, p5 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -378,7 +378,7 @@ private	int	os_banner()
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   PUBLICVM <name> <server> ");
-	printf("\n   GLANCE CREATE <name> <filename> ");
+	printf("\n   GLANCE CREATE <name> <format> <filename> ");
 	printf("\n   GLANCE PUBLIC <id> ");
 	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");

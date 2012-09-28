@@ -125,6 +125,7 @@ public	struct	os_response *	os_get_server	(struct os_subscription *  sptr, char 
 public	struct	os_response *	os_get_flavor  (struct os_subscription *  sptr, char * id );
 public	struct	os_response *	os_get_image    (struct os_subscription *  sptr, char * id );
 
+public	struct	os_response *	os_post_glance	(struct os_subscription * sptr,  char * name, char * format, char * filename );
 public	struct	os_response *	os_get_glance	(struct os_subscription *  sptr,  char * id );
 public	struct	os_response *	os_glance_access(struct os_subscription *  sptr,  char * id, int ispublic );
 public	struct	os_response *	os_head_glance	(struct os_subscription *  sptr,  char * id );

@@ -2174,7 +2174,7 @@ public	struct	os_response *	os_get_glance	(struct os_subscription * sptr,  char 
 /*	------------------------------------------------------------	*/
 /*			o s _ p o s t _ g l an c e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_post_glance	(struct os_subscription * sptr,  char * name, char * filename )
+public	struct	os_response *	os_post_glance	(struct os_subscription * sptr,  char * name, char * format, char * filename )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
@@ -2184,9 +2184,14 @@ public	struct	os_response *	os_post_glance	(struct os_subscription * sptr,  char
 	struct	rest_header 	*	mptr=(struct rest_header * ) 0;
 	struct	rest_header 	*	lptr=(struct rest_header * ) 0;
 	strcat(buffer,"/images/");
+
 	if (!( mptr = rest_create_header( "x-image-meta-name", name )))
 		return( rptr );
-	else if (!( hptr = os_authenticate(sptr) ))
+	else if (!( mptr->next = rest_create_header( "x-image-meta-disk-format", format )))
+		return( rptr );
+	else	mptr->next->previous = mptr;
+
+	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
 	for (	lptr=hptr;
 		lptr->next;
