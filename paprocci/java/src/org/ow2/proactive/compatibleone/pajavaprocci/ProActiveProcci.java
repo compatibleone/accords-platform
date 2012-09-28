@@ -43,6 +43,9 @@ import java.util.Set;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.ow2.compatibleone.Procci;
+import org.ow2.compatibleone.exchangeobjects.ProcciCategory;
+import org.ow2.compatibleone.exchangeobjects.RestRequest;
+import org.ow2.compatibleone.exchangeobjects.RestResponse;
 import org.ow2.proactive.compatibleone.exceptions.ElementNotFoundException;
 import org.ow2.proactive.compatibleone.exchangeobjects.*;
 import org.ow2.proactive.compatibleone.misc.*;
@@ -95,8 +98,8 @@ public class ProActiveProcci extends Procci{
 				Misc.print(nodeinfo);
 			}else if (args.getBool("release-node")){
 				Object[] params = {args.getStr("release-node")};
-				String output = stop_server(params);
-				Misc.print(output);
+				//String output = stop_server(params);
+				//Misc.print(output);
 			}else if (args.getBool("monitor-node")){
 				Object[] params = {args.getStr("monitor-node"), args.getStr("mbean"), args.getStr("attribute")};
 				String output = monitor_server(params);
@@ -379,19 +382,34 @@ public class ProActiveProcci extends Procci{
 	
 	/**
 	 * This method releases a locked node. 
-	 * @param uuid uuid of the node locked. 
+	 * @param uuid id of the node locked. 
 	 * @return a json object telling the result of the operation. 
 	 */
-	public String stop_server(Object[] args) throws Exception{
+	/*          start_proactive ( 
+	                                   struct occi_category * optr,
+                                       struct rest_client * cptr,
+                    struct rest_request * rptr,
+                    struct rest_response * aptr,
+                    void * vptr 
+                )  
+                
+                despues de recibir la llamada esta funcion llama a C para actualizar la category o no
+                 */
+	public String stop_server(
+			RestRequest restrequest, 
+			RestResponse restresponse, 
+			ProcciCategory category, 
+			Object[] args) throws Exception{
 		checkparameters(args, 1);
-		final String uuid = args[0].toString();
-		logger.info("Trying to release node whose related id is: " + uuid);
+		final String id = args[0].toString();
+		logger.info("Trying to release node whose related id is: " + id);
+		logger.info("Rest request: " + restrequest.toString());
 		Callable<String> callable = new Callable<String>(){
 			@Override
 			public String call() throws Exception {
 				SchedulerClient scheduler = SchedulerClient.getInstance();
-				String result = scheduler.releaseNode(uuid);
-				logger.info("Released the node: " + uuid + ", result: " + result);
+				String result = scheduler.releaseNode(id);
+				logger.info("Released the node: " + id + ", result: " + result);
 				scheduler.disconnect();
 				return result;
 			}

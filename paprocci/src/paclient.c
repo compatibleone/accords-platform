@@ -516,7 +516,7 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 /*			p a _ d e l e t e _ s e r v e r                         */
 /*	------------------------------------------------------------	*/
 /*! Unlock one ProActive node from the Scheduler/RM. */
-public	struct	pa_response *	pa_delete_server(struct proactive * constr)
+public	struct	pa_response *	pa_delete_server(struct rest_request * request,  struct rest_response * response, struct proactive * constr)
 {
 	char * filename = NULL;
 	char * raw_list = NULL;
@@ -532,7 +532,7 @@ public	struct	pa_response *	pa_delete_server(struct proactive * constr)
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	}else if (!(raw_list = stop_server(&Wpa, &jvmp, constr))){
+	}else if (!(raw_list = stop_server(&Wpa, &jvmp, request, response, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;

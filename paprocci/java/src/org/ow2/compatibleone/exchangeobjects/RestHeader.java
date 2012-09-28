@@ -76,4 +76,7 @@ struct  rest_request {
     public String getValue() {
 		return value;
 	}
+    public String toString(){
+    	return "[" + "name " +  name + ", " + "value " +  value + "]"  ;
+    }
 }

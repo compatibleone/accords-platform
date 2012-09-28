@@ -17,4 +17,13 @@ public class RestHeaderBlock {
     public void add(String name, String value) {
     	list.add(new RestHeader(name, value));
 	}
+    
+    public String toString(){
+    	String ret = "[";
+    	for (RestHeader i: list){
+    		ret = ret + i.toString() + ", ";
+    	}
+    	ret = ret + "]";
+    	return ret;
+    }
 }

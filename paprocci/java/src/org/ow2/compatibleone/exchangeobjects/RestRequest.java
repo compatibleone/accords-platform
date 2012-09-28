@@ -15,8 +15,7 @@ struct  rest_request {
 };	 
  */
 
-	private RestHeader first;
-	private RestHeader last;
+	private RestHeaderBlock all;
     private String method;
     private String object;
     private String parameters;
@@ -26,8 +25,7 @@ struct  rest_request {
     private String host;
     
     public RestRequest(
-    		RestHeader first, 
-    		RestHeader last, 
+    		RestHeaderBlock all,
     		String method, 
     		String object, 
     		String parameters, 
@@ -36,8 +34,7 @@ struct  rest_request {
     		String body,
     		String host){
     	
-    		this.first = first;
-    		this.last = last;
+    		this.all = all;
     		this.method = method;
     		this.object = object;
     		this.parameters = parameters;
@@ -46,11 +43,8 @@ struct  rest_request {
     		this.body = body;
     		this.host = host;
     }
-    public RestHeader getFirst() {
-		return first;
-	}
-    public RestHeader getLast() {
-		return last;
+    public RestHeaderBlock getBlock() {
+		return all;
 	}
     public String getMethod() {
 		return method;
@@ -73,4 +67,17 @@ struct  rest_request {
     public String getHost() {
 		return host;
 	}
+    public String toString(){
+    	return 
+    		"[" + 
+    		"block " +  all + ", \n" + 
+    		"method " +  method + ", \n" + 
+    		"object " +  object + ", \n" + 
+    		"parameters " +  parameters + ", \n" + 
+    		"version " +  version + ", \n" + 
+    		"type " +  type + ", \n" + 
+    		"body " +  body + ", \n" + 
+    		"host " +  host + ", \n" + 
+    		"]"  ;
+    }
 }

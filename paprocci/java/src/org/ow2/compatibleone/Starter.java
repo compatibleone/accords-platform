@@ -68,7 +68,7 @@ public class Starter {
 	}
 	
 	/**
-	 * The procci is started through JNI.
+	 * The procci is started through JNI (not through command line).
 	 * @param args
 	 * @return the initialized procci.
 	 */

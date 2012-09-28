@@ -309,7 +309,7 @@ private	struct	rest_response * save_proactive(
 /*	--------------------------------------------------------	*/
 /* 	 s t o p  _ p r o a c t i v e _ p r o v i s i o n i n g  	*/
 /*	--------------------------------------------------------	*/
-private	struct pa_response *	stop_proactive_provisioning( struct proactive * pptr )
+private	struct pa_response *	stop_proactive_provisioning2( struct proactive * pptr )
 {
 	int	status;
 	struct	pa_response * osptr;
@@ -321,8 +321,8 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
-		if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
-		{
+		//if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
+		//{
 			/* ----------------------------- */
 			/* await server instance removal */
 			/* ----------------------------- */
@@ -341,7 +341,7 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 			//	}
 			//}
 			//while ((osptr=pa_get_server( pptr->number )) != (struct os_response *) 0);
-		}
+		//}
 		/* ------------------------------------------- */
 		/* ensure release of the allocated floating IP */
 		/* ------------------------------------------- */
@@ -369,7 +369,7 @@ private	struct	rest_response * stop_proactive(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where user and pass are)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = pa_delete_server(pptr)))
+	else if (!( osptr = pa_delete_server(rptr, aptr, pptr)))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{

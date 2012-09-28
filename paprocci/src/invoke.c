@@ -185,7 +185,7 @@ jobject create_java_rest_header_full_block_object(struct jvm_struct * jvmp, stru
 	}
 
 	while(first != NULL){
-		fprintf(stderr, "Going through elements to add them %s...\n", first->name);
+		//fprintf(stderr, "Going through elements to add them %s...\n", first->name);
 		jstring namestr = (*env)->NewStringUTF(env, first->name);
 		jstring valuestr = (*env)->NewStringUTF(env, first->value);
 		(*env)->CallVoidMethod(env, resthead, addmeth, namestr, valuestr);
@@ -242,6 +242,7 @@ jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_r
 	return restobj;
 
 }
+
 jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr){
 	// Initializing JVM parameters...
 	JNIEnv *env = jvmp->env;
@@ -260,7 +261,7 @@ jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_re
 	}
 
 	// Looking for instantiation method.
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V");
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeaderBlock;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V");
 
 	if (initmeth == 0){
 		fprintf(stderr, "Can't find " CLASS_REST_REQUEST " constructor method...\n");
@@ -268,9 +269,9 @@ jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_re
 	}
 
 	// Preparing parameters to instantiate the class...
-	jobject first = create_java_rest_header_object(jvmp, NULL);
-	jobject last = create_java_rest_header_object(jvmp, NULL);
-	//jobject first = create_java_rest_header_full_block_object(jvmp, NULL);
+	//jobject first = create_java_rest_header_object(jvmp, NULL);
+	//jobject last = create_java_rest_header_object(jvmp, NULL);
+	jobject all = create_java_rest_header_full_block_object(jvmp, (rptr->first?rptr->first:NULL));
 	jstring method = (*env)->NewStringUTF(env, (rptr->method?rptr->method:""));	
 	jstring object = (*env)->NewStringUTF(env, (rptr->object?rptr->object:""));	
 	jstring parameters = (*env)->NewStringUTF(env, (rptr->parameters?rptr->parameters:""));	
@@ -280,7 +281,7 @@ jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_re
 	jstring host = (*env)->NewStringUTF(env, (rptr->host?rptr->host:""));	
 	
 	// Instantiating the class... 
-	jobject restobj = (*env)->NewObject(env, sclass, initmeth, first, last, method, object, parameters, version, type, body, host);
+	jobject restobj = (*env)->NewObject(env, sclass, initmeth, all, method, object, parameters, version, type, body, host);
 
 	if (restobj == 0){
 		fprintf(stderr, "Can't instantiate class " CLASS_REST_REQUEST "...\n");
@@ -480,6 +481,54 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
 	exit(0);
 }
 
+/** 
+ * Make a call to the java layer.  
+ * @param mname defines the name of the method to invoke
+ * @param msign defines signature of the method to invoke
+ * @param margs defines the concrete arguments to invoke the method
+ * @return the json String of the result of the call.
+ * DO NOT MODIFY THIS FUNCTION.
+ */
+char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, jobject request,  jobject response, jobject constr, jobjectArray margs){
+	jstring jstr1;
+	jstring jstr2;
+	JNIEnv *env = jvmp->env;
+	JavaVM *jvm = jvmp->jvm;
+	jobject procci = jvmp->procci;
+
+	fprintf(stderr, "Executing %s...\n", mname);
+	
+	jclass cls = (*env)->FindClass(env, "org/ow2/compatibleone/Procci");
+	if (cls == NULL) {
+		fprintf(stderr, "Problem while finding the interface Procci...\n");
+		destroy_jvm(env, jvm);
+	}else{
+		fprintf(stderr, "Class found.\n");
+	}
+
+	jmethodID methodid = (*env)->GetMethodID(env, cls, mname, msign);
+	if (methodid == NULL) {
+		fprintf(stderr, "Could not find the method %s.\n", mname);
+		destroy_jvm(env, jvm);
+	}else{
+		fprintf(stderr, "Method '%s' found.\n", mname);
+	}
+
+	jobject result = (*env)->CallObjectMethod(env, procci, methodid, request, response, constr, margs);
+	fprintf(stderr, "Looking for exceptions...\n");
+	if ((*env)->ExceptionOccurred(env)) {
+		(*env)->ExceptionDescribe(env);
+		return NULL;
+	}else{
+		fprintf(stderr, "Method '%s' executed.\n", mname);
+		const char *str = (*env)->GetStringUTFChars(env,result,0);
+		char * ret = (char*)malloc(strlen(str)+1);
+		strcpy(ret, str);
+		(*env)->ReleaseStringUTFChars(env, result, str);
+		return ret;
+	}
+}
+
 
 /** 
  * Make a call to the java layer.  
@@ -666,7 +715,7 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
  * Stop a VM.
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
-char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct proactive * constr) {
+char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct rest_request * request,  struct rest_response * response, struct proactive * constr) {
 
 	jstring jstr1;
 
@@ -679,11 +728,18 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);
 
+	printf("1");
 	jstr1 = (*env)->NewStringUTF(env, constr->number);
 
+	printf("2");
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
 
-	return call_java_procci(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
+	printf("3");
+	jobject requesto =  create_java_rest_request_object(jvmp, request);
+	printf("4");
+	return call_java_procci2(jvmp, "stop_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, NULL, NULL,  margs);
+ 
+
 }
 
 

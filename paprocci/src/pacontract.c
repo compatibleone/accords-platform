@@ -342,19 +342,20 @@ public	int	delete_proactive_contract(
 		char * tls )
 {
 	struct	pa_response * paptr;
-	if ((paptr = stop_proactive_provisioning( pptr )) != (struct pa_response *) 0)
-		paptr = liberate_pa_response( paptr );
+	printf("Should not be called...");
+	//if ((paptr = stop_proactive_provisioning( pptr )) != (struct pa_response *) 0)
+		//paptr = liberate_pa_response( paptr );
 	//if (!( pptr->image ))
 	//	return( 0 );
 	//else if (!( pptr->original ))
 	//	return( 0 );
 	//else if (!( strcmp( pptr->original, pptr->image ) ))
 	//	return( 0 );
-	else
-	{
+	//else
+	//{
 		//pa_delete_image( pptr->image );
-		return(0);
-	}
+		//return(0);
+	//}
 }
 
 	/* ------------- */
