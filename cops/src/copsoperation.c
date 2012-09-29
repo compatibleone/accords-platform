@@ -93,6 +93,7 @@ private	struct	cops_quota * allocate_cops_quota()
 	{
 		qptr->previous 	= 
 		qptr->next 	= (struct cops_quota *) 0;
+		qptr->reference =
 		qptr->uuid 	= 
 		qptr->property	= (char *) 0;
 		qptr->quantity  = 0;
@@ -147,6 +148,8 @@ private struct	cops_solution * allocate_cops_solution(char * uuid, struct occi_r
 	else if (!( sptr = allocate( sizeof( struct cops_solution ) ) ))
 		return( sptr );
 	else 	memset( sptr, 0, sizeof( struct cops_solution ));
+
+	sptr->first = sptr->last = (struct cops_quota *) 0;
 	
 	/* ----------------------------------------- */
 	/* store the unique and universal identifier */
@@ -325,7 +328,7 @@ private	struct	cops_solution *	select_cops_zone( struct cords_placement * pptr, 
 
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -350,7 +353,7 @@ private	struct	cops_solution *	select_cops_security( struct cords_placement * pp
 	}
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -375,7 +378,7 @@ private	struct	cops_solution *	select_cops_energy( struct cords_placement * pptr
 	}
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -400,7 +403,7 @@ private	struct	cops_solution *	select_cops_opinion( struct cords_placement * ppt
 	}
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -425,7 +428,7 @@ private	struct	cops_solution *	select_cops_price( struct cords_placement * pptr,
 	}
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -465,7 +468,7 @@ private	struct	cops_solution *	select_cops_complex( struct cords_placement * ppt
 
 	if (!( items ))
 		return((struct cops_solution *) 0);
-	else	return( select_cops_result( sptr ) );
+	else	return( select_cops_result( first ) );
 }
 
 /*	----------------------------------------------------------	*/
@@ -685,6 +688,7 @@ private	struct cops_solution * validate_cops_quota(
 	int	offered;
 	int	reserved;
 	int	consumed;
+	char *	vptr;
 	for (	eptr=cords_first_link( zptr );
 		eptr != (struct occi_element *) 0;
 		eptr = cords_next_link( eptr ) )
@@ -692,9 +696,15 @@ private	struct cops_solution * validate_cops_quota(
 		offered=reserved=consumed=0;
 		if (!( eptr->value ))
 			continue;
-		else if (!( yptr = occi_simple_get( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		else if (!( vptr =  occi_unquoted_link( eptr->value ) ))
 			continue;
-		else if (!( dptr = occi_locate_element( yptr->first, "occi.quota.property" ) ))
+		else if (!( yptr = occi_simple_get( vptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			liberate( vptr );
+			continue;
+		}
+		else	liberate( vptr );
+		if (!( dptr = occi_locate_element( yptr->first, "occi.quota.property" ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			continue;
@@ -713,7 +723,7 @@ private	struct cops_solution * validate_cops_quota(
 			yptr = occi_remove_response( yptr );
 			continue;
 		}
-		else if (!( qptr->uuid = allocate_string( eptr->value )))
+		else if (!( qptr->uuid =  occi_unquoted_link( eptr->value ) ))
 		{
 			yptr = occi_remove_response( yptr );
 			continue;
@@ -768,7 +778,7 @@ private	struct cops_solution * validate_cops_quota(
 /*		e v a l u a t e _ c o p s _ n e e d s			*/
 /*	----------------------------------------------------------	*/
 /*	calculation of placement quota needs in terms of		*/
-/*		accords.machine.count : 1				*/
+/*		accords.vm.count : 1					*/
 /*		accords.address.count : 1				*/
 /*		occi.compute.cores					*/
 /*		occi.compute.memory					*/
@@ -784,7 +794,7 @@ private	struct	rest_header *	evaluate_cops_needs( struct standard_node * nptr )
 	if (!( nptr ))
 		return( first );
 
-	if (!( first = rest_create_header( "accords.machine.count", "1" )))
+	if (!( first = rest_create_header( "accords.vm.count", "1" )))
 		return( first );
 	else 	last = first;
 
@@ -821,6 +831,8 @@ private	struct	rest_header *	evaluate_cops_needs( struct standard_node * nptr )
 private	char *	resolve_cops_solution( struct cords_placement * pptr )
 {
 	char	buffer[4096];
+	char	prefix[1024];
+	char *	ihost;
 	char *	result=(char *) 0;
 	struct	occi_element 	* eptr;
 	struct	occi_response	* zptr;
@@ -832,6 +844,18 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 	struct	cops_solution   * last=(struct cops_solution *) 0;
 	int			  solutions=0;
 	int			  status=0;
+
+	/* ---------------------------------------------------- */
+	/* -resolve the provider category manager		*/
+	/* ---------------------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_PROVIDER, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( ihost );
+	else
+	{
+		sprintf(prefix,"/%s/",_CORDS_PROVIDER);
+		sprintf(buffer,"%s%s",ihost,prefix);
+		liberate( ihost );
+	}
 
 	/* ----------------------------------------------- */
 	/* retrieve the OCCI resource instances that match */
@@ -852,11 +876,15 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 		return((char *) 0);
 	else 
 	{
-		for (	eptr=cords_first_link( zptr );
+		for (	eptr = zptr->first;
 			eptr != (struct occi_element *) 0;
-			eptr = cords_next_link( eptr ) )
+			eptr = eptr->next )
 		{
-			if (!( eptr->value ))
+			if (!( rest_valid_string( eptr->name ) ))
+				continue;
+			else if ( strcmp( eptr->name, prefix ) != 0 )
+				continue;
+			else if (!( rest_valid_string( eptr->value ) ))
 				continue;
 			else if (!( yptr = occi_simple_get( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 				continue;

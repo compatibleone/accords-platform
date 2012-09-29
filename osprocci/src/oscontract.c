@@ -146,7 +146,7 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 	     ||  (!(strcasecmp( vptr, "txt86_32" 	) ))
 	     ||  (!(strcasecmp( vptr, "txt86_64"  	) )))
 		strcpy(request.architecture,"trusted" );
-	else	strcpy(request.architecture,"blank" );
+	else	strcpy(request.architecture,"untrusted" );
 	
 	/* ----------------------------------------- */
 	/* for structures in flavor message response */
@@ -176,8 +176,9 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 			flavor.speed = 0;
 		else	flavor.speed = rest_normalise_value(vptr,'G');
 
-		if (!( vptr = json_atribut( dptr, "trustlevel" ) ))
-			strcpy(flavor.architecture,"blank" );
+		if (!( vptr = json_atribut( dptr, "trust_lvl" ) ))
+			strcpy(flavor.architecture,"untrusted" );
+
 		else	strcpy(flavor.architecture,vptr  );
 
 		/* ------------------------------------ */
@@ -185,10 +186,8 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 		/* ------------------------------------ */
 		if (!( strncasecmp( request.architecture, "trusted", strlen("trusted") ) ))
 		{
-			if (!( strncasecmp( flavor.architecture, "untrusted", strlen("trusted") ) ))
-				continue;
-			else if (!( strncasecmp( flavor.architecture, "blank",strlen("trusted") ) ))
-				continue;
+			if ( strncasecmp( flavor.architecture, "trusted",strlen("trusted") ) != 0 )
+				continue; 
 		}
 		else if (!( strncasecmp( flavor.architecture, "trusted",strlen("trusted") ) ))
 			continue; 

@@ -157,6 +157,8 @@ private void autoload_cords_quota_nodes() {
 				pptr->reserved = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "consumed" )) != (struct xml_atribut *) 0)
 				pptr->consumed = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "granularity" )) != (struct xml_atribut *) 0)
+				pptr->granularity = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -219,6 +221,9 @@ public  void autosave_cords_quota_nodes() {
 		fprintf(h," consumed=%c",0x0022);
 		fprintf(h,"%u",pptr->consumed);
 		fprintf(h,"%c",0x0022);
+		fprintf(h," granularity=%c",0x0022);
+		fprintf(h,"%u",pptr->granularity);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -265,6 +270,8 @@ private void set_cords_quota_field(
 			pptr->reserved = atoi(vptr);
 		if (!( strcmp( nptr, "consumed" ) ))
 			pptr->consumed = atoi(vptr);
+		if (!( strcmp( nptr, "granularity" ) ))
+			pptr->granularity = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -351,6 +358,7 @@ private int pass_cords_quota_filter(
 	if (( fptr->offered ) && ( pptr->offered != fptr->offered )) return(0);
 	if (( fptr->reserved ) && ( pptr->reserved != fptr->reserved )) return(0);
 	if (( fptr->consumed ) && ( pptr->consumed != fptr->consumed )) return(0);
+	if (( fptr->granularity ) && ( pptr->granularity != fptr->granularity )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -398,6 +406,9 @@ private struct rest_response * cords_quota_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.consumed=%u",optr->domain,optr->id,pptr->consumed);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.granularity=%u",optr->domain,optr->id,pptr->granularity);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -842,6 +853,8 @@ public struct occi_category * occi_cords_quota_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "consumed",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "granularity",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_quota)))
@@ -992,6 +1005,17 @@ public struct rest_header *  cords_quota_occi_headers(struct cords_quota * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_quota.consumed='%u'\r\n",sptr->consumed);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_quota.granularity='%u'\r\n",sptr->granularity);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

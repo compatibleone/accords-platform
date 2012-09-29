@@ -1583,12 +1583,6 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", "default" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->zone )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.zone", selector->zone ) )))
@@ -1597,21 +1591,9 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.zone", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->energy )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.energy", selector->energy ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.energy", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1626,21 +1608,9 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.opinion", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->security )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.security", selector->security ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.security", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1655,21 +1625,8 @@ private	char *	cords_cops_operation(
 				continue;
 			}
 
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.operator", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-
 			if (( selector->price )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.price", selector->price ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.price", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );

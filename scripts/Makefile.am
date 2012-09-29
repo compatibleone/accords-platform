@@ -12,7 +12,7 @@ dist_pkgsysconf_DATA=cords_user.xml accords.ini
 scripts=accords
 
 aliases = \
-	co-start co-broker co-command co-parser co-resolver co-status co-stop \
+	co-start co-broker co-command co-parser co-provider co-resolver co-status co-stop \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
