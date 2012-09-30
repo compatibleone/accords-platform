@@ -547,6 +547,8 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 	char 	buffer[2048];
 	char 	value[256];
 	char 	self[2048];
+	char 	qname[64];
+	int	items=0;
 	char *	ihost;
 
 	/* ---------------------------------------------------- */
@@ -584,6 +586,8 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 		qptr != (struct cops_quota *) 0;
 		qptr = qptr->next )
 	{
+		sprintf(qname,"q%u",++items);
+
 		/* ----------------------------- */
 		/* the provider quota identifier */
 		/* ----------------------------- */
@@ -596,6 +600,44 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 		/* ----------------------------- */
 		sprintf(value,"%u", qptr->quantity);
 		if (!( eptr = occi_create_element( "occi.quantity.value", value ) ))
+			return( build_cops_failure( pptr,sptr ) );
+		else
+		{
+			eptr->previous = last;
+			last->next = eptr;
+			last = eptr;
+		}
+
+		/* ----------------------------- */
+		/* the timestamp when occured    */
+		/* ----------------------------- */
+		sprintf(value,"%u",time((long *) 0));
+		if (!( eptr = occi_create_element( "occi.quantity.when", value ) ))
+			return( build_cops_failure( pptr,sptr ) );
+		else
+		{
+			eptr->previous = last;
+			last->next = eptr;
+			last = eptr;
+		}
+
+		/* ----------------------------- */
+		/* the quantity name token       */
+		/* ----------------------------- */
+		sprintf(value,"%u",time((long *) 0));
+		if (!( eptr = occi_create_element( "occi.quantity.name", qname ) ))
+			return( build_cops_failure( pptr,sptr ) );
+		else
+		{
+			eptr->previous = last;
+			last->next = eptr;
+			last = eptr;
+		}
+
+		/* ----------------------------- */
+		/* add the placement parent uuid */
+		/* ----------------------------- */
+		if (!( eptr = occi_create_element( "occi.quantity.placement", self ) ))
 			return( build_cops_failure( pptr,sptr ) );
 		else
 		{

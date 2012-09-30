@@ -378,6 +378,57 @@ private	int	update_placement(struct occi_category * optr, void * vptr)
 	else	return(0);
 }
 
+/*	-----------------------------------------------------------	*/
+/* 	      d e l e t e _ p l a c e m e n t _ q u a n t i t i e s	*/
+/*	-----------------------------------------------------------	*/
+private	int	delete_placement_quantities( struct cords_placement * pptr )
+{
+	struct	occi_response 	* zptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char 			  buffer[2048];
+	char 			* wptr;
+	/* ----------------------------------------------------- */
+	/* for all defined contract nodes of the current service */
+	/* ----------------------------------------------------- */
+	buffer[0] = 0;
+	for (	nptr=occi_first_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else
+		{
+			liberate( wptr );
+			if (!( buffer[0] ))
+				strcpy( buffer, lptr->source );
+			if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
+		}
+	}
+
+	/* ----------------------------- */
+	/* delete links from this object */
+	/* ----------------------------- */
+	if ( strlen( buffer ) )
+		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response ( zptr );
+
+	return(0);
+}
+
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ p l a c e m e n t  		*/
 /*	-------------------------------------------	*/
@@ -389,7 +440,7 @@ private	int	delete_placement(struct occi_category * optr, void * vptr)
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else	return(0);
+	else	return(delete_placement_quantities(pptr));
 }
 
 private	struct	occi_interface	placement_interface = 
