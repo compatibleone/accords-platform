@@ -567,7 +567,7 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 	/* ---------------------------------------------------- */
 	if (!( rest_valid_string( Cops.identity ) ))
 		return( build_cops_failure( pptr,sptr ) );
-	else	sprintf(self,"%s/%s/%s",Cops.identity,_CORDS_QUANTITY,pptr->id);
+	else	sprintf(self,"%s/%s/%s",Cops.identity,_CORDS_PLACEMENT,pptr->id);
 
 	/* ---------------------------------------------------- */
 	/* -delete quantity links from this placement		*/
