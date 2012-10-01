@@ -10,7 +10,6 @@ lib_LTLIBRARIES = libcocci.la
 EXTRA_DIST = occic.c occic.h \
 	stdnode.c stdnode.h \
 	occim.c occim.h \
-	occipublisher.h \
 	occirescat.h occiresolver.h \
 	occirespro.h \
 	urlpublic.h \
