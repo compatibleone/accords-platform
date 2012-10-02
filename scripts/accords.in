@@ -6,11 +6,13 @@
 #   Prologue 2011
 #   Mandriva 2011
 #   Bull 2012
+#   CityPassenger 2012
 #
 # Author: 
 #   Jean Parpaillon
 #   Jamie Marshall
 #   Liliana Cabalantti
+#   Vincent Renardias
 #
 
 set -e
@@ -47,7 +49,22 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
-#logdir=/var/log/accords
+
+if [ -z "$accords_workdir"]; then
+	accords_workdir = "."
+fi
+
+if [ ! -d "$accords_workdir" ]; then
+        echo "$accords_workdir: no such directory"
+        exit 1
+fi
+
+if [ ! -d "$accords_workdir/rest" ]; then
+        echo "$accords_workdir/rest: no such directory"
+        exit 1
+fi
+
+cd $accords_workdir
 
 if [ -z "$tls" ]; then
     tempo=1
@@ -77,20 +94,6 @@ fi
 
 if [ -z "$monitor" ]; then
     monitor=$trace
-fi
-
-if [ -z "$logdir" ]; then
-        logdir="."
-fi
-
-if [ ! -d "$logdir" ]; then
-        echo "$logdir: no such directory"
-        exit 1
-fi
-
-if [ ! -d "$logdir/rest" ]; then
-        echo "$logdir/rest: no such directory"
-        exit 1
 fi
 
 ###
