@@ -100,8 +100,8 @@ private	int	invoke_quantity_action( struct cords_quantity * pptr, int action )
 			/* --------------------- */
 			/* update the instance	 */
 			/* --------------------- */
-			zzptr = occi_simple_put( buffer, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() );
-			zzptr = occi_remove_response ( zzptr );
+			if ((zzptr = occi_simple_put( pptr->quota, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zzptr = occi_remove_response ( zzptr );
 		}							
 		zptr = occi_remove_response( zptr );
 		return(0);
