@@ -51,7 +51,7 @@ operator=accords
 password=co-system
 
 if [ -z "$accords_workdir"]; then
-	accords_workdir = "."
+	accords_workdir="."
 fi
 
 if [ ! -d "$accords_workdir" ]; then
