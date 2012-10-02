@@ -47,7 +47,22 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
-#logdir=/var/log/accords
+
+if [ -z "$workdir"]; then
+	workdir = "."
+fi
+
+if [ ! -d "$workdir" ]; then
+        echo "$workdir: no such directory"
+        exit 1
+fi
+
+if [ ! -d "$workdir/rest" ]; then
+        echo "$workdir/rest: no such directory"
+        exit 1
+fi
+
+cd $workdir
 
 if [ -z "$tls" ]; then
     tempo=1
@@ -77,20 +92,6 @@ fi
 
 if [ -z "$monitor" ]; then
     monitor=$trace
-fi
-
-if [ -z "$logdir" ]; then
-        logdir="."
-fi
-
-if [ ! -d "$logdir" ]; then
-        echo "$logdir: no such directory"
-        exit 1
-fi
-
-if [ ! -d "$logdir/rest" ]; then
-        echo "$logdir/rest: no such directory"
-        exit 1
 fi
 
 ###
