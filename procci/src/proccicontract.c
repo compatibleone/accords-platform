@@ -751,9 +751,11 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	{
 		if ((!( pptr->type ))
 		||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
-			occi_simple_delete( pptr->provider, _CORDS_SERVICE_AGENT, default_tls() );
+			zptr = occi_simple_delete( pptr->provider, _CORDS_SERVICE_AGENT, default_tls() );
 		else if ( pptr->service )
-			occi_simple_delete( pptr->service, _CORDS_SERVICE_AGENT, default_tls() );
+			zptr = occi_simple_delete( pptr->service, _CORDS_SERVICE_AGENT, default_tls() );
+		if ( zptr )
+			zptr = occi_remove_response( zptr );
 	}
 
 	/* ----------------------------------------------------- */
@@ -811,6 +813,8 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 				_CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				zptr = occi_remove_response ( zptr );
 		}
+		if ((zptr = occi_simple_delete( pptr->placement, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 	}
 
 	/* -------------------------------------- */
