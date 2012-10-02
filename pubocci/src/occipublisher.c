@@ -505,7 +505,14 @@ private	char * 	cords_provider_publication(
 		Publisher.sla = 1;
 		return ( cords_update_provider( result, identity, category, agent, tls ) );
 	}
-
+	/* ---------------------------------------------------- */
+	/* enforce the service level agreement in security mode */
+	/* ---------------------------------------------------- */
+	else if ( rest_valid_string( default_tls() ) != 0 )
+	{
+		rest_log_message("An Account and SLA is required for provider",agent);
+		return((char *) 0);
+	}
 	/* ---------------------------------- */
 	/* didnt find one so create a new one */
 	/* ---------------------------------- */

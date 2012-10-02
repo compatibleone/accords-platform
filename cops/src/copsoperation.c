@@ -646,6 +646,18 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 			last = eptr;
 		}
 
+		/* ------------------------------ */
+		/* add the placement account uuid */
+		/* ------------------------------ */
+		if (!( eptr = occi_create_element( "occi.quantity.account", pptr->account ) ))
+			return( build_cops_failure( pptr,sptr ) );
+		else
+		{
+			eptr->previous = last;
+			last->next = eptr;
+			last = eptr;
+		}
+
 		/* ----------------------------- */
 		/* the quota property concerned  */
 		/* ----------------------------- */

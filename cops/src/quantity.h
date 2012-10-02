@@ -6,6 +6,7 @@ struct	cords_quantity
 {
 	char *	id;
 	char *	name;
+	char *	account;
 	char *	placement;
 	char *	quota;
 	char *	property;

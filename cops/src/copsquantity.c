@@ -103,8 +103,27 @@ private	int	invoke_quantity_action( struct cords_quantity * pptr, int action )
 			if ((zzptr = occi_simple_put( pptr->quota, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				zzptr = occi_remove_response ( zzptr );
 		}							
+
 		zptr = occi_remove_response( zptr );
-		return(0);
+
+		/* ------------------------------ */
+		/* handle an eventual transaction */
+		/* ------------------------------ */
+		if (!( action & 2 ))
+			return( 0 );
+		else if (!( eptr = occi_locate_element( zptr->first, "occi.quota.price" ) ))
+			return(0);
+		else if (!( rest_valid_string( eptr->value ) ))
+			return(0);
+		else
+		{
+			occi_send_transaction( 
+				_CORDS_QUANTITY, eptr->value, 
+				( action & 1 ? "action=start" : "action=stop" ),
+				pptr->account, pptr->id );
+			return( 0 );
+
+		}
 	}
 }
 

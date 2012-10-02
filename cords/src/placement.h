@@ -4,6 +4,7 @@ struct	cords_placement
 {
 	char	*	id;
 	char	*	name;
+	char 	*	account;
 	char	*	algorithm;
 	char 	*	node;
 	char 	*	provider;
