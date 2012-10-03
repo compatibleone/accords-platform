@@ -416,6 +416,80 @@ private	int	cosacs_service_operation( char * service, char * syntax )
 }
 
 /*	-----------------------------------------------------	*/
+/*	      l l _ i n v o i c e _ o p e r a t i o n		*/
+/*	-----------------------------------------------------	*/
+private	int	ll_invoice_operation( char * account, char * other )
+{
+	char *	ihost;
+	char * 	accountid;
+	struct	occi_element * eptr;
+	struct	occi_response * zptr;
+	struct	occi_response * yptr;
+	char *	sptr;
+	char	buffer[2048];
+	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
+		return(failure(40,"unknown account",account));
+	else if (!( eptr = occi_create_element( "occi.invoice.account", accountid ) ))
+		return(55);
+
+	if (!( sptr = occi_resolve_category_provider( _CORDS_INVOICE, agent, default_tls() ) ))
+		return( 500 );
+	else	sprintf(buffer,"%s/%s/",sptr,_CORDS_INVOICE );
+
+	if (!( zptr = occi_simple_post( buffer, eptr, agent, default_tls() )))
+		return(56);
+	else if (!( ihost = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 118 );
+	}
+	else
+	{
+		if (!( yptr = occi_simple_get( ihost, agent, default_tls() ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return( 119 );
+		}
+		else if (!( eptr = occi_locate_element( yptr->first, "occi.invoice.document" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			zptr = occi_remove_response( zptr );
+			return(120);
+		}
+		else
+		{
+			printf("invoice: %s\n",eptr->value);
+			yptr = occi_remove_response( yptr );
+			zptr = occi_remove_response( zptr );
+			return(0);
+		}
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*		c o r d s _ i n v o i c e _ a c t i o n		*/
+/*	-----------------------------------------------------	*/
+private	int	cords_invoice_action( char * account, char * other )
+{
+	int	status;
+	char *	auth;
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	status = ll_invoice_operation( account, other );
+
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+
+	return( status );
+}
+
+/*	-----------------------------------------------------	*/
 /*		  s e r v i c e _ o p e r a t i o n		*/
 /*	-----------------------------------------------------	*/
 private	int	service_operation( char * command, char * service, char * syntax )
@@ -425,6 +499,8 @@ private	int	service_operation( char * command, char * service, char * syntax )
 	FILE *	h;
 	if (!( command ))
 		return( 31 );
+	else if (!( strcasecmp( command, "INVOICE"  ) ))
+		return( cords_invoice_action( filename, syntax ) );
 	else if (!( service ))
 		return( 32 );
 	else if (!( h = fopen( service, "r" ) ))
@@ -523,8 +599,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0a.0.05");
-	printf("\n   Beta Version : 03/07/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.01");
+	printf("\n   Beta Version : 03/10/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START    <service_file> ");
@@ -533,7 +609,8 @@ private	int	banner()
 	printf("\n         command <options> SNAPSHOT <service_file> ");
 	printf("\n         command <options> DELETE   <service_file> ");
 	printf("\n         command <options> COSACS   <service_file> <instruction> ");
-	printf("\n         command <options> OCCI   [body] <request> ");
+	printf("\n         command <options> OCCI     [body] <request> ");
+	printf("\n         command <options> INVOICE  <account>      ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");

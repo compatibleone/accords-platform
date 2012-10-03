@@ -33,7 +33,7 @@ private	int	invoke_quantity_action( struct cords_quantity * pptr, int action )
 	int			result;
 	int			value;
 	char			buffer[128];
-
+	char 			self[1024];
 	if (!( pptr ))
 		return(0);
 	else if (!( rest_valid_string( pptr->quota )))
