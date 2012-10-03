@@ -45,8 +45,9 @@ struct	accords_configuration Configuration = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"europe",
 	"jpaasprocci.xml",
+	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

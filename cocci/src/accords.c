@@ -97,6 +97,8 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		identity = configuration->identity = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "zone" ) ))
 		configuration->zone = allocate_string( argv[++argi] );
+	else if (!( strcmp( aptr, "storage" ) ))
+		configuration->storage = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "user" ) ))
 		configuration->user = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "password" ) ))
@@ -138,6 +140,7 @@ public	void	accords_configuration_options()
 	printf("\n   --operator   <name>        specify name of operator");
 	printf("\n   --identity   <url>         specify url for publication ");
 	printf("\n   --zone       <name>        specify location zone   ");
+	printf("\n   --storage    <name>        specify data storage name");
 	printf("\n   --user       <name>        specify user log name   ");
 	printf("\n   --password   <value>       specify user password   ");
 	return;
@@ -202,6 +205,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 					configuration->resthost = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
 					configuration->restport = document_atribut_value( aptr );
+				if ((aptr = document_atribut( vptr, "storage" )) != (struct xml_atribut *) 0)
+					configuration->storage = document_atribut_string( aptr );
 			}
 
 			if (( vptr = document_element( eptr, "security" )) != (struct xml_element *) 0)

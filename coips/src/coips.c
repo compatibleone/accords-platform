@@ -47,6 +47,7 @@ struct	accords_configuration Coips = {
 	"domain",
 	"coips.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

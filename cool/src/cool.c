@@ -43,8 +43,9 @@ struct	accords_configuration Cool = {
 	"http",  80,
 	"xmpp",  8000,
 	"domain",
-	"europe",
 	"cool.xml",
+	"europe",
+	"storage",	
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

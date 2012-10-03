@@ -44,6 +44,7 @@ struct	accords_configuration CooBas = {
 	"domain",
 	"coobas.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -498,6 +499,68 @@ private	struct	occi_interface	transaction_interface = {
 	};
 
 /*	------------------------------------------------------------------	*/
+/*		h t m l _ i n v o i c e _ r e n d e r i n g			*/
+/*	------------------------------------------------------------------	*/
+private	char *	html_invoice_rendering(
+		struct occi_category * cptr,
+		struct rest_header  * hptr )
+{
+	char *	vptr;
+	char *	filename=(char *) 0;
+	struct	rest_header * root=hptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * contentype=(struct rest_header *) 0;
+	while ( hptr )
+	{
+		if (!( hptr->name ))
+			hptr = hptr->next;
+		else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+		{
+			contentype = hptr;
+			hptr = hptr->next;
+		}
+		else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
+		{
+			contentlength = hptr;
+			hptr = hptr->next;
+		}
+		else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			return( occi_html_body( cptr, root ) );
+		else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+		{
+			if (!( rest_valid_string( hptr->value ) ))
+			{
+				hptr = hptr->next;
+				continue;
+			}
+			else if (!( strncasecmp( (vptr = hptr->value), "occi.invoice.document", strlen("occi.invoice.document") ) ))
+			{
+				vptr += strlen("occi.invoice.document");
+				if ( *vptr == '=' )
+					vptr++;
+				if (!( filename = allocate_string( vptr ) ))
+					return( occi_html_body( cptr, root ) );
+
+			}
+			hptr = hptr->next;
+			continue;
+		}
+		else	hptr = hptr->next;
+	}
+	if (!( filename ))
+		return( occi_html_body( cptr, root ) );
+	else if (!( contentype ))
+		return( occi_html_body( cptr, root ) );
+	else if (!( contentlength ))
+		return( occi_html_body( cptr, root ) );
+	else
+	{
+		rest_replace_header( contentype, _OCCI_TEXT_HTML );
+		return( occi_content_length( contentlength, filename) );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
 /*			c o o b a s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
 private	int	coobas_operation( char * nptr )
@@ -543,6 +606,7 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &invoice_interface;
+	optr->html_rendering = html_invoice_rendering;
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = comons_connection_builder( CooBas.domain ) ))
