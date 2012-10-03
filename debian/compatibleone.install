@@ -1,0 +1,5 @@
+etc/accords/accords.ini
+etc/accords/cords_user.xml
+etc/default/accords
+usr/bin/accords
+usr/bin/accords-config

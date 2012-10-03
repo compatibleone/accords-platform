@@ -6,6 +6,13 @@ Build-Depends: debhelper (>= 8.0.0), lsb-release, openjdk-7-jdk
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
+Package: compatibleone
+Section: net
+Architecture: all
+Depends: lsb-base (>= 3.0-6)
+Description: CompatibleOne Accords Platform Base Files
+ CompatibleOne Accords platform base files
+
 Package: libcompatibleone-accords-dev
 Section: libdevel
 Architecture: any
@@ -16,7 +23,7 @@ Description: compatibleOne Accords development files
 Package: libcompatibleone-accords0
 Section: libs
 Architecture: any
-Depends: lsb-base (>= 3.0-6), ${shlibs:Depends}, ${misc:Depends}
+Depends: lsb-base (>= 3.0-6), compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform Base Libraries and Files
  CompatibleOne Accords platform base dynamic libraries and Files
 
@@ -263,7 +270,7 @@ Description: CompatibleOne Accords Platform - Open Stack inspection tool
 
 Package: compatibleone-accords
 Architecture: all
-Depends: libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-paprocci, compatibleone-parser, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Description: CompatibleOne Accords Platform - All packages
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,

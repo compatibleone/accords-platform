@@ -1,8 +1,3 @@
 usr/lib/lib*.so
 usr/lib/lib*.so.0
 usr/lib/lib*.so.0.0.0
-etc/accords/accords.ini
-etc/accords/cords_user.xml
-etc/default/accords
-usr/bin/accords
-usr/bin/accords-config
