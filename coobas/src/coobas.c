@@ -29,6 +29,7 @@
 #include "cordslang.h"
 #include "cp.h"
 #include "cb.h"
+#include "occibody.h"
 
 struct	accords_configuration CooBas = {
 	0,0,
@@ -175,7 +176,7 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 	fprintf(h,"<tr class=evenrow><th>Date    </th><th>%s</th></tr>\n",pptr->date);
 	fprintf(h,"<tr class=oddrow> <th>Invoice </th><th>%s</th></tr>\n",pptr->id);
 	fprintf(h,"<tr class=evenrow><th>Number  </th><th>%s</th></tr>\n",pptr->id);
-	fprintf(h,"<tr class=oddrow> <th>Account </th><th>%s</th></tr>\n",pptr->account);
+	fprintf(h,"<tr class=oddrow> <th>Account </th><th><a href='%s'>%s</a></th></tr>\n",pptr->account,pptr->account);
 	fprintf(h,"</table><p>\n");
 	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
 	fprintf(h,"<tr class=headrow><th width='20%c'>Transaction<th>Date<th>Description<th width='20%c'>Price</tr>\n",0x0025,0x0025);
@@ -560,6 +561,53 @@ private	char *	html_invoice_rendering(
 	}
 }
 
+
+/*	------------------------------------------------------------------	*/
+/*			p r o c e s s _ i n v o i c e				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * process_invoice(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_invoice * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		process_invoice_transactions( pptr );
+		autosave_cords_invoice_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			    c l o s e _ i n v o i c e				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * close_invoice(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_invoice * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state = 1;
+		autosave_cords_invoice_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
 /*	------------------------------------------------------------------	*/
 /*			c o o b a s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -608,6 +656,11 @@ private	int	coobas_operation( char * nptr )
 	optr->callback  = &invoice_interface;
 	optr->html_rendering = html_invoice_rendering;
 	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_add_action( optr,"process","",process_invoice)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"close","",close_invoice)))
+		return( 28 );
 
 	if (!( optr = comons_connection_builder( CooBas.domain ) ))
 		return( 27 );
