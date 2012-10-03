@@ -2,7 +2,7 @@ Source: compatibleone-accords
 Section: net
 Priority: extra
 Maintainer: Vincent Renardias <vrenardias@citypassenger.com>
-Build-Depends: debhelper (>= 8.0.0), lsb-release, openjdk-7-jdk
+Build-Depends: debhelper (>= 8.0.0), lsb-release
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
@@ -23,7 +23,7 @@ Description: compatibleOne Accords development files
 Package: libcompatibleone-accords0
 Section: libs
 Architecture: any
-Depends: lsb-base (>= 3.0-6), compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform Base Libraries and Files
  CompatibleOne Accords platform base dynamic libraries and Files
 
