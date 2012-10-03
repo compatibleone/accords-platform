@@ -1,0 +1,94 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          accords-platform
+# Required-Start:    $network $local_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: CompatibleOne Publisher component init script
+# Description:       The publisher is responsible for the management of service publications performed
+#		by the components comprising the platform. Each of the different service provider
+#		components comprising the platform will publish its collection of categories for
+#		use by other components. The publisher is provided as a standalone OCCI REST
+#		server executable program and must have been started before any of the other
+#		components may be used.
+### END INIT INFO
+
+# Author: Vincent <vincent@renardias.com>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC='CompatibleOne publisher service'	# Introduce a short description here
+NAME=compatibleone-publisher		# Introduce the short server's name here
+DAEMON=/usr/bin/run-publisher		# Introduce the server's location here
+DAEMON_ARGS=""				# Arguments to run the daemon with
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+[ -x $DAEMON ] || exit 0
+
+# Read configuration variable file if it is present
+[ -r /etc/default/accords ] && . /etc/default/accords
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+
+if [ "$enabled" = 0 ]; then
+	exit 0
+fi
+
+if [ -z "$accords_workdir"]; then
+        accords_workdir="."
+fi
+
+if [ ! -d "$accords_workdir" ]; then
+        echo "$accords_workdir: no such directory"
+        exit 1
+fi
+
+cd $accords_workdir
+
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
+	$DAEMON &
+  ;;
+  stop)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        killall -q publisher || true
+        killall -q lt-publisher || true
+	sleep $tempo
+	;;
+  status)
+       netstat -a -p -n | grep LISTEN | grep publisher
+       ;;
+  #reload|force-reload)
+	#
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
+	#
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
+  restart|force-reload)
+	#
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
+	#
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	/etc/init.d/$NAME stop
+	/etc/init.d/$NAME start
+	;;
+  *)
+	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
+
+:

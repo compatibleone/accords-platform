@@ -70,6 +70,8 @@ binary-indep: build install
 	dh_installchangelogs -i
 	dh_installdocs -i
 	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
+	dh_installdirs -i
+	dh_installinit -i
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
@@ -86,6 +88,8 @@ binary-arch: build install
 	dh_installdocs -a
 	dh_installexamples -a
 	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
+	dh_installdirs -a
+	dh_installinit -a
 	dh_installmenu -a
 	#dh_installmime -a
 	dh_installman -a
