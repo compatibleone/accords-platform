@@ -5,3 +5,4 @@ etc/init.d
 etc/init.d/accords
 etc/accords/accords.ini
 etc/accords/cords_user.xml
+etc/default/accords
