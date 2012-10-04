@@ -60,8 +60,9 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
-	mkdir -p `pwd`/debian/tmp/etc/default
+	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/
 	cp debian/accords.default `pwd`/debian/tmp/etc/default/accords
+	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 # Build architecture independant packages.
 
 binary-indep: build install

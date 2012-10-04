@@ -41,7 +41,7 @@ if [ "$enabled" = 0 ]; then
 	exit 0
 fi
 
-if [ -z "$accords_workdir"]; then
+if [ -z "$accords_workdir" ]; then
         accords_workdir="."
 fi
 

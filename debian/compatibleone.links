@@ -1,1 +1,2 @@
 /var/log/accords/rest /var/lib/accords/rest
+/etc/accords/openssl.cnf /var/lib/accords/openssl.cnf

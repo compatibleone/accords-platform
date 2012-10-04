@@ -1,3 +1,9 @@
+compatibleone-accords (0.20121004-1) unstable; urgency=low
+
+  * More fixes/updates, Initial init script for publisher, WIP.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Thu, 4 Oct 2012 11:55:16 +0200
+
 compatibleone-accords (0.20120918-1) unstable; urgency=low
 
   * Various fixes/updates, WIP.
