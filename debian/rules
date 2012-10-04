@@ -43,6 +43,7 @@ build: build-stamp
 build-stamp: config.status
 	dh_testdir
 	$(MAKE)
+	# cd ./manifests && ./make-all
 	touch $@
 
 clean:
@@ -51,6 +52,7 @@ clean:
 	rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
 	-$(MAKE) distclean
 	rm -f config.{sub,guess,status,log}
+	# cd manifests && ./make-clean
 	dh_prep
 	rm -f debian/*.log debian/files debian/*.init
 	./clean
@@ -99,7 +101,6 @@ binary-arch: build install
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
-	#LD_LIBRARY_PATH=`pwd`/debian/tmp/usr/lib dh_shlibdeps -a
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a

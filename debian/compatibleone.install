@@ -4,3 +4,6 @@ etc/default/accords
 etc/accords/openssl.cnf
 usr/bin/accords
 usr/bin/accords-config
+usr/bin/testcp
+usr/bin/testcb
+usr/bin/command
