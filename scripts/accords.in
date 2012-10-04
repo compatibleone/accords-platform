@@ -110,69 +110,133 @@ _co_start() {
 # ---------------------------------------------------
 #       The basic accords platform components
 # ---------------------------------------------------
-    echo "Starting accords publication services"
-    @bindir@/run-publisher &
-    sleep $tempo
+    if [ -x @bindir@/run-publisher ]; then
+        echo "Starting accords publication services"
+        @bindir@/run-publisher &
+        sleep $tempo
+    else
+        echo "NOT Starting accords publication services"
+    fi
 
-    echo "Starting accords file services"
-    @bindir@/run-fileserver &
-    sleep $tempo
+    if [ -x @bindir@/run-fileserver ]; then
+        echo "Starting accords file services"
+        @bindir@/run-fileserver &
+        sleep $tempo
+    else
+        echo "NOT Starting accords file services"
+    fi
     
-    echo "Starting accords security services"
-    @bindir@/run-coss &
-    sleep $tempo
+    if [ -x @bindir@/run-coss ]; then
+        echo "Starting accords security services"
+        @bindir@/run-coss &
+        sleep $tempo
+    else
+        echo "NOT accords security services"
+    fi
 
-    echo "Starting accords monitoring services"
-    @bindir@/run-comons &
-    sleep $tempo
+    if [ -x @bindir@/run-comons ]; then
+        echo "Starting accords monitoring services"
+        @bindir@/run-comons &
+        sleep $tempo
+    else
+        echo "NOT Starting accords monitoring services"
+    fi
     
-    echo "Starting accords accounting services"
-    @bindir@/run-coobas &
-    sleep $tempo
+    if [ -x @bindir@/run-coobas ]; then
+        echo "Starting accords accounting services"
+        @bindir@/run-coobas &
+        sleep $tempo
+    else
+        echo "NOT Starting accords accounting services"
+    fi
     
-    echo "Starting accords scheduling services"
-    @bindir@/run-cosched &
-    sleep $tempo
+    if [ -x @bindir@/run-cosched ]; then
+        echo "Starting accords scheduling services"
+        @bindir@/run-cosched &
+        sleep $tempo
+    else
+        echo "NOT Starting accords scheduling services"
+    fi
 
-    echo "Starting accords networking services"
-    @bindir@/run-conets &
-    sleep $tempo
+    if [ -x @bindir@/run-conets ]; then
+        echo "Starting accords networking services"
+        @bindir@/run-conets &
+        sleep $tempo
+    else
+        echo "NOT Starting accords networking services"
+    fi
 
-    echo "Starting accords placement services"
-    @bindir@/run-cops &
-    sleep $tempo
+    if [ -x @bindir@/run-cops ]; then
+        echo "Starting accords placement services"
+        @bindir@/run-cops &
+        sleep $tempo
+    else
+        echo "NOT Starting accords placement services"
+    fi
     
-    echo "Starting accords energy efficiency services"
-    @bindir@/run-coees &
-    sleep $tempo
+    if [ -x @bindir@/run-coees ]; then
+        echo "Starting accords energy efficiency services"
+        @bindir@/run-coees &
+        sleep $tempo
+    else
+        echo "NOT Starting accords energy efficiency services"
+    fi
     
-    echo "Starting accords image storage services"
-    @bindir@/run-ezvm &
-    sleep $tempo
+    if [ -x @bindir@/run-ezvm ]; then
+        echo "Starting accords image storage services"
+        @bindir@/run-ezvm &
+        sleep $tempo
+    else
+        echo "NOT Starting accords image storage services"
+    fi
 
-    echo "Starting accords image production services"
-    @bindir@/run-coips &
-    sleep $tempo
+    if [ -x @bindir@/run-coips ]; then
+        echo "Starting accords image production services"
+        @bindir@/run-coips
+        sleep $tempo
+    else
+        echo "NOT Starting accords image production services"
+    fi
 
-    echo "Starting accords sla services"
-    @bindir@/run-slam &
-    sleep $tempo
+    if [ -x @bindir@/run-slam ]; then
+        echo "Starting accords sla services"
+        @bindir@/run-slam &
+        sleep $tempo
+    else
+        echo "NOT Starting accords sla services"
+    fi
 
-    echo "Starting accords paas services"
-    @bindir@/run-copaas &
-    sleep $tempo
+    if [ -x @bindir@/run-copaas ]; then
+        echo "Starting accords paas services"
+        @bindir@/run-copaas &
+        sleep $tempo
+    else
+        echo "NOT Starting accords paas services"
+    fi
 
-    echo "Starting accords parser services"
-    @bindir@/run-parser &
-    sleep $tempo
+    if [ -x @bindir@/run-parser ]; then
+        echo "Starting accords parser services"
+        @bindir@/run-parser &
+        sleep $tempo
+    else
+        echo "NOT Starting accords parser services"
+    fi
 
-    echo "Starting accords broker services"
-    @bindir@/run-broker &
-    sleep $tempo
+    if [ -x @bindir@/run-broker ]; then
+        echo "Starting accords broker services"
+        @bindir@/run-broker &
+        sleep $tempo
+    else
+        echo "NOT Starting accords broker services"
+    fi
 
-    echo "Starting accords procci services"
-    @bindir@/run-procci &
-    sleep $tempo
+    if [ -x @bindir@/run-procci ]; then
+        echo "Starting accords procci services"
+        @bindir@/run-procci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords procci services"
+    fi
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
@@ -243,9 +307,13 @@ _co_start() {
 #    sleep $tempo
 # ---------------------------------------------------
 
-    echo "Starting accords software configuration services"
-    @bindir@/run-cosacs &
-    sleep $tempo
+    if [ -x @bindir@/run-cosacs ]; then
+        echo "Starting accords software configuration services"
+        @bindir@/run-cosacs &
+        sleep $tempo
+    else
+        echo "NOT Starting accords software configuration services"
+    fi
 
     echo "ACCORDS ready"
     @bindir@/co-status
