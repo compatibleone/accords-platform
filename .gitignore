@@ -35,6 +35,7 @@ cosacs/src/cosacs
 cosched/src/cosched
 coss/src/coss
 dcprocci/src/dcprocci
+debian/compatibleone/
 debian/compatibleone-accords/
 debian/compatibleone-accords-doc/
 debian/compatibleone-azprocci/
