@@ -52,7 +52,7 @@ clean:
 	-$(MAKE) distclean
 	rm -f config.{sub,guess,status,log}
 	dh_prep
-	rm -f debian/*.log debian/files
+	rm -f debian/*.log debian/files debian/*.init
 	./clean
 
 install: build
@@ -63,6 +63,7 @@ install: build
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/
 	cp debian/accords.default `pwd`/debian/tmp/etc/default/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
+	./debian/mkinitfiles.sh
 # Build architecture independant packages.
 
 binary-indep: build install

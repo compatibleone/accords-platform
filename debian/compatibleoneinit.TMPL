@@ -17,9 +17,9 @@
 # Author: Vincent <vincent@renardias.com>
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC='CompatibleOne publisher service'	# Introduce a short description here
-NAME=compatibleone-publisher		# Introduce the short server's name here
-DAEMON=/usr/bin/run-publisher		# Introduce the server's location here
+DESC='CompatibleOne @@service@@ service'	# Introduce a short description here
+NAME=compatibleone-@@service@@		# Introduce the short server's name here
+DAEMON=/usr/bin/run-@@service@@		# Introduce the server's location here
 DAEMON_ARGS=""				# Arguments to run the daemon with
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
@@ -59,12 +59,12 @@ case "$1" in
   ;;
   stop)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-        killall -q publisher || true
-        killall -q lt-publisher || true
+        killall -q @@service@@ || true
+        killall -q lt-@@service@@ || true
 	sleep $tempo
 	;;
   status)
-       netstat -a -p -n | grep LISTEN | grep publisher
+       netstat -a -p -n | grep LISTEN | grep @@service@@
        ;;
   #reload|force-reload)
 	#
