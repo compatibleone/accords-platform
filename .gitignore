@@ -69,6 +69,7 @@ debian/libcompatibleone-accords0/
 debian/libcompatibleone-accords-dev/
 debian/*.log
 debian/*.substvars
+debian/*.debhelper
 debian/tmp/
 depcomp
 .deps
