@@ -1,231 +1,101 @@
 #!/bin/bash
 #
-# accords	This shell script takes care of starting and stopping
-#		accords (CompatibleOne).
+# compatibleone	This shell script takes care of starting and stopping
+#		CompatibleOne components.
 #
 # chkconfig: - 58 74
-# description: accords is CompatibleOne.
+# description: CompatibleOne components init script.
 
 ### BEGIN INIT INFO
-# Provides: accords
-# Required-Start: $network $local_fs $remote_fs
-# Required-Stop: $network $local_fs $remote_fs
-# Should-Start: $syslog $named ntpdate
-# Should-Stop: $syslog $named
-# Short-Description: start and stop accords
-# Description: accords is CompatibleOne
+# Provides:          compatibleone
+# Required-Start:    $network $local_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: CompatibleOne components init script
+# Description:       This script is responsible for the management of service publications performed
+#		by the components comprising the platform. Each of the different service provider
+#		components comprising the platform will publish its collection of categories for
+#		use by other components. The publisher is provided as a standalone OCCI REST
+#		server executable program and must have been started before any of the other
+#		components may be used.
 ### END INIT INFO
 
-# Source function library.
-. /etc/init.d/functions
+# Author: Vincent <vincent@renardias.com>
+# Modified for RPM: Alexandre Lissy <alissy@mandriva.com>
 
-# Check accords.xml
-target=/etc/accords/accords.xml
-[ ! -f $target ] && echo "No $target, please run accords-config" && exit 1
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC='CompatibleOne services'		# Introduce a short description here
+NAME=compatibleone			# Introduce the short server's name here
+DAEMON_ARGS=""				# Arguments to run the daemon with
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
 
-# Source accords config
-[ -f /etc/accords/accords.ini ] && . /etc/accords/accords.ini
+# Read configuration variable file if it is present
+[ -r /etc/default/accords ] && . /etc/default/accords
 
-prog=accords
-lockfile=/var/lock/subsys/$prog
-pidbase=/var/run/$prog
+# Load the VERBOSE setting and other rcS variables
+# . /lib/init/vars.sh
 
-daemons="publisher fileserver coss comons coobas conets coes coees ezvm coips parser broker procci cosched osprocci testosocci osocciprocci onprocci azprocci dcprocci slam cosacs"
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
 
-start_daemon() {
-	name=$1
-	server=$2
-	pidfile=$pidbase.$name.pid
-	[ -x /usr/bin/$name ] || return 1
-	daemon --pidfile $pidfile "/usr/bin/$name --config $target $server &"
-	RETVAL=$?
-	sleep 1
-	pid="$(__pids_pidof "$name")"
-	echo $pid >$pidfile
-	return $RETVAL
-}
+# Define log_daemon_msg, which is not in CentOS
+log_daemon_msg() { logger "$@"; }
 
-status_daemon() {
-	name=$1
-	pidfile=$pidbase.$name.pid
-	status -p $pidfile $name
-}
+if [ "$enabled" = 0 ]; then
+	exit 0
+fi
 
-stop_daemon() {
-	name=$1
-	pidfile=$pidbase.$name.pid
-	killproc -p $pidfile $name
-	RETVAL=$?
-	[ $RETVAL -eq 0 ] && rm -f $pidfile
-	return $RETVAL
-}
+if [ -z "$accords_workdir" ]; then
+        accords_workdir="."
+fi
 
-_run_azprocci() {
-    start_daemon azprocci CO-AZPROCCI/1.0
-} 
+if [ ! -d "$accords_workdir" ]; then
+        echo "$accords_workdir: no such directory"
+        exit 1
+fi
 
-_run_broker() {
-    start_daemon broker CO-BROKER/1.0
-} 
+cd $accords_workdir
 
-_run_coes() {
-    start_daemon coes CO-ES/1.0
-} 
-
-_run_coees() {
-    start_daemon coees CO-EES/1.0
-} 
-
-_run_comons() {
-    start_daemon comons CO-MONS/1.0
-}
-
-_run_conets() {
-    start_daemon conets CO-NETS/1.0
-}
-
-_run_coobas() {
-    start_daemon coobas CO-BAS/1.0
-}
-
-_run_cosacs() {
-    start_daemon cosacs CO-SACS/1.0
-}
-
-_run_coss() {
-    start_daemon coss CO-SS/1.0
-}
-
-_run_ezvm() {
-    start_daemon ezvm CO-EZVM/1.0
-}
-
-_run_coips() {
-    start_daemon coips CO-IPS/1.0
-}
-
-_run_fileserver() {
-    start_daemon fileserver CO-FS/1.0
-}
-
-_run_onprocci() {
-    start_daemon onprocci CO-ONPROCCI/1.0
-}
-
-_run_osprocci() {
-    start_daemon osprocci CO-OSPROCCI/1.0
-}
-
-_run_osocciprocci() {
-    start_daemon osocciprocci CO-OSOCCIPROCCI/1.0
-}
-
-_run_testosocci() {
-    start_daemon testosocci CO-TESTOSOCCI/1.0
-}
-
-_run_slam() {
-    start_daemon slam CO-SLAM/1.0
-}
-
-_run_dcprocci() {
-    start_daemon dcprocci CO-DCPROCCI/1.0
-}
-
-_run_parser() {
-    start_daemon parser CO-PARSER/1.0
-}
-
-_run_paprocci() {
-    start_daemon paprocci CO-PAPROCCI/1.0
-}
-
-_run_procci() {
-    start_daemon procci CO-PROCCI/1.0
-}
-
-_run_cosched() {
-    start_daemon cosched CO-SCHED/1.0
-}
- 
-_run_publisher() {
-    start_daemon publisher CO-PUB/1.0
-}
-
-_run_fileserver() {
-    start_daemon fileserver CO-FS/1.0
-}
-
-start() {
-	[ "$EUID" != "0" ] && exit 4
-	[ "$NETWORKING" = "no" ] && exit 1
-	RETVAL=0
-
-        # Start daemons.
-        echo -n $"Starting $prog: "
-	echo
-	for d in $daemons; do
-		echo -n "	$d "
-		_run_$d
-		RETVAL=$?
-		echo 
-		[ $RETVAL -ne 0 ] && echo "Error while starting $d" && exit 1
-	done;
-
-	[ $RETVAL -eq 0 ] && touch $lockfile
-	return $RETVAL
-}
-
-stop() {
-	[ "$EUID" != "0" ] && exit 4
-	RETVAL=0
-
-        echo -n $"Shutting down $prog: "
-	echo
-	for d in $daemons; do
-		echo -n "	$d "
-		stop_daemon $d
-		echo 
-	done;
-
-	[ $RETVAL -eq 0 ] && rm -f $lockfile
-	return $RETVAL
-}
-
-status_daemons() {
-	[ "$EUID" != "0" ] && exit 4
-
-	for d in $daemons; do
-		status_daemon $d
-		echo 
-	done;
-}
-
-# See how we were called.
 case "$1" in
   start)
-	start
-	;;
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
+	/usr/bin/co-start
+  ;;
   stop)
-	stop
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	/usr/bin/co-stop
+	sleep $tempo
 	;;
   status)
-	status_daemons
-	;;
+       /usr/bin/co-status
+       ;;
+  #reload|force-reload)
+	#
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
+	#
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
   restart|force-reload)
-	stop
-	start
-	;;
-  try-restart|condrestart)
-	if status $prog > /dev/null; then
-	    stop
-	    start
-	fi
-	;;
-  reload)
-	exit 3
+	#
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
+	#
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	/etc/init.d/$NAME stop
+	sleep 5
+	/etc/init.d/$NAME start
 	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|try-restart|force-reload}"
-	exit 2
+	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+	exit 3
+	;;
 esac
+
+:
