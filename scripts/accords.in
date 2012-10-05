@@ -192,7 +192,7 @@ _co_start() {
 
     if [ -x @bindir@/run-coips ]; then
         echo "Starting accords image production services"
-        @bindir@/run-coips
+        @bindir@/run-coips &
         sleep $tempo
     else
         echo "NOT Starting accords image production services"
