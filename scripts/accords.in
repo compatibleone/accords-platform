@@ -259,7 +259,7 @@ _co_start() {
         echo "NOT Starting accords open stack services"
     fi
 
-    fi [ -x @bindir@/run-onprocci ]; then
+    if [ -x @bindir@/run-onprocci ]; then
         echo "Starting accords open nebula services"
         @bindir@/co-provider onprocci accords 20 20 1000 20 20   
         @bindir@/co-parser quota-onprocci
