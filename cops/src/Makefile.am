@@ -9,7 +9,7 @@
 
 bin_PROGRAMS = cops
 
-EXTRA_DIST   = copsoperation.c copsplacement.c copsquantity.c occiquantity.c quantity.c
+EXTRA_DIST   = copsoperation.c copsplacement.c copsquantity.c occiquantity.c quantity.c quantity.h
 
 cops_SOURCES = cops.c
 

@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = jpaasprocci
-EXTRA_DIST =  jpaas.c jpaas.h occijpaas.c jpaascontract.h jpaascontract.c
+EXTRA_DIST =  jpaas.c jpaas.h occijpaas.c jpaascontract.h jpaascontract.c jpaasclient.h
 
 jpaasprocci_SOURCES = jpaasprocci.c jpaasclient.c
 
