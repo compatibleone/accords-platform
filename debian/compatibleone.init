@@ -1,12 +1,12 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          accords-platform
+# Provides:          compatibleone
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: CompatibleOne Publisher component init script
-# Description:       The publisher is responsible for the management of service publications performed
+# Short-Description: CompatibleOne components init script
+# Description:       This script is responsible for the management of service publications performed
 #		by the components comprising the platform. Each of the different service provider
 #		components comprising the platform will publish its collection of categories for
 #		use by other components. The publisher is provided as a standalone OCCI REST

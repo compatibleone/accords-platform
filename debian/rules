@@ -54,7 +54,7 @@ clean:
 	rm -f config.{sub,guess,status,log}
 	# cd manifests && ./make-clean
 	dh_prep
-	rm -f debian/*.log debian/files debian/*.init
+	rm -f debian/*.log debian/files
 	./clean
 
 install: build
