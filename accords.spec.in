@@ -16,7 +16,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		accords
 Version:	_VERSION
-Release:	10.0
+Release:	11.0
 License:	GPL
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -68,7 +68,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/broker
-%attr(0755,root,root) %{_bindir}/coes
+#attr(0755,root,root) %{_bindir}/coes
+%attr(0755,root,root) %{_bindir}/co-provider
 %attr(0755,root,root) %{_bindir}/command
 %attr(0755,root,root) %{_bindir}/comons
 %attr(0755,root,root) %{_bindir}/conets
@@ -76,17 +77,21 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/coss
 %attr(0755,root,root) %{_bindir}/coees
 %attr(0755,root,root) %{_bindir}/coips
+%attr(0755,root,root) %{_bindir}/cool
+%attr(0755,root,root) %{_bindir}/copaas
+%attr(0755,root,root) %{_bindir}/cops
 %attr(0755,root,root) %{_bindir}/cosacs
 %attr(0755,root,root) %{_bindir}/cosched
 %attr(0755,root,root) %{_bindir}/dcprocci
 %attr(0755,root,root) %{_bindir}/example
 %attr(0755,root,root) %{_bindir}/ezvm
 %attr(0755,root,root) %{_bindir}/fileserver
+%attr(0755,root,root) %{_bindir}/jpaasprocci
 %attr(0755,root,root) %{_bindir}/onprocci
 %attr(0755,root,root) %{_bindir}/osprocci
 %attr(0755,root,root) %{_bindir}/osocciprocci
 %attr(0755,root,root) %{_bindir}/parser
-%attr(0755,root,root) %{_bindir}/paprocci
+#attr(0755,root,root) %{_bindir}/paprocci
 %attr(0755,root,root) %{_bindir}/procci
 %attr(0755,root,root) %{_bindir}/publisher
 %attr(0755,root,root) %{_bindir}/slam
@@ -97,7 +102,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/testosocci
 %attr(0755,root,root) %{_bindir}/teston
 %attr(0755,root,root) %{_bindir}/testos
-%attr(0755,root,root) %{_bindir}/testpa
+#attr(0755,root,root) %{_bindir}/testpa
 %attr(0755,root,root) %{_bindir}/testresolver
 ## links against accords
 %attr(0755,root,root) %{_bindir}/accords-config
@@ -110,14 +115,17 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/co-stop
 %attr(0755,root,root) %{_bindir}/run-azprocci
 %attr(0755,root,root) %{_bindir}/run-broker
-%attr(0755,root,root) %{_bindir}/run-coes
+#attr(0755,root,root) %{_bindir}/run-coes
 %attr(0755,root,root) %{_bindir}/run-comons
 %attr(0755,root,root) %{_bindir}/run-conets
+%attr(0755,root,root) %{_bindir}/run-copaas
+%attr(0755,root,root) %{_bindir}/run-cops
 %attr(0755,root,root) %{_bindir}/run-coobas
 %attr(0755,root,root) %{_bindir}/run-cosched
 %attr(0755,root,root) %{_bindir}/run-coss
 %attr(0755,root,root) %{_bindir}/run-ezvm
 %attr(0755,root,root) %{_bindir}/run-fileserver
+%attr(0755,root,root) %{_bindir}/run-jpaasprocci
 %attr(0755,root,root) %{_bindir}/run-onprocci
 %attr(0755,root,root) %{_bindir}/run-osprocci
 %attr(0755,root,root) %{_bindir}/run-parser
