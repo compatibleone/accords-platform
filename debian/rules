@@ -54,7 +54,7 @@ clean:
 	rm -f config.{sub,guess,status,log}
 	# cd manifests && ./make-clean
 	dh_prep
-	rm -f debian/*.log debian/files debian/*.init
+	rm -f debian/*.log debian/files
 	./clean
 
 install: build
@@ -62,10 +62,10 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
-	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/
+	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
+	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp debian/accords.default `pwd`/debian/tmp/etc/default/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
-	./debian/mkinitfiles.sh
 # Build architecture independant packages.
 
 binary-indep: build install

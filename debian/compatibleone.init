@@ -1,12 +1,12 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          accords-platform
+# Provides:          compatibleone
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: CompatibleOne Publisher component init script
-# Description:       The publisher is responsible for the management of service publications performed
+# Short-Description: CompatibleOne components init script
+# Description:       This script is responsible for the management of service publications performed
 #		by the components comprising the platform. Each of the different service provider
 #		components comprising the platform will publish its collection of categories for
 #		use by other components. The publisher is provided as a standalone OCCI REST
@@ -17,15 +17,11 @@
 # Author: Vincent <vincent@renardias.com>
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC='CompatibleOne @@service@@ service'	# Introduce a short description here
-NAME=compatibleone-@@service@@		# Introduce the short server's name here
-DAEMON=/usr/bin/run-@@service@@		# Introduce the server's location here
+DESC='CompatibleOne services'		# Introduce a short description here
+NAME=compatibleone			# Introduce the short server's name here
 DAEMON_ARGS=""				# Arguments to run the daemon with
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-
-# Exit if the package is not installed
-[ -x $DAEMON ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/accords ] && . /etc/default/accords
@@ -55,16 +51,15 @@ cd $accords_workdir
 case "$1" in
   start)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
-	$DAEMON &
+	/usr/bin/co-start
   ;;
   stop)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-        killall -q @@service@@ || true
-        killall -q lt-@@service@@ || true
+	/usr/bin/co-stop
 	sleep $tempo
 	;;
   status)
-       netstat -a -p -n | grep LISTEN | grep @@service@@
+       /usr/bin/co-status
        ;;
   #reload|force-reload)
 	#
@@ -82,6 +77,7 @@ case "$1" in
 	#
 	log_daemon_msg "Restarting $DESC" "$NAME"
 	/etc/init.d/$NAME stop
+	sleep 5
 	/etc/init.d/$NAME start
 	;;
   *)
