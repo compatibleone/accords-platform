@@ -9,7 +9,7 @@ Homepage: http://www.compatibleone.org/
 Package: compatibleone
 Section: net
 Architecture: any
-Depends: lsb-base (>= 3.0-6), ${shlibs:Depends}, ${misc:Depends}
+Depends: openssl (>= 1.0.1), lsb-base (>= 3.0-6), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform Base Files
  CompatibleOne Accords platform base files
 

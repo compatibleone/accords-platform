@@ -3,6 +3,9 @@ etc/accords/cords_user.xml
 etc/default/accords
 etc/accords/openssl.cnf
 usr/bin/accords
+usr/bin/co-parser
+usr/bin/co-provider
 usr/bin/accords-config
 usr/bin/test??
+usr/bin/testresolver
 usr/bin/command

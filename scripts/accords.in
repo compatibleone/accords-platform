@@ -12,7 +12,7 @@
 #   Jean Parpaillon
 #   Jamie Marshall
 #   Liliana Cabalantti
-#   Vincent Renardias
+#   Vincent Renardias <vincent@renardias.com>
 #
 
 set -e
@@ -248,47 +248,71 @@ _co_start() {
 # ---------------------------------------------------
 #    The accords platform provisioning components
 # ---------------------------------------------------
-    echo "Starting accords open stack services"
-    @bindir@/co-provider osprocci accords 30 10 1000 30 30
-    @bindir@/co-parser quota-osprocci
-    @bindir@/co-parser sla-osprocci
-    @bindir@/run-osprocci &
-    sleep $tempo
+    if [ -x @bindir@/run-osprocci ]; then
+        echo "Starting accords open stack services"
+        @bindir@/co-provider osprocci accords 30 10 1000 30 30
+        @bindir@/co-parser quota-osprocci
+        @bindir@/co-parser sla-osprocci
+        @bindir@/run-osprocci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords open stack services"
+    fi
 
-    echo "Starting accords open nebula services"
-    @bindir@/co-provider onprocci accords 20 20 1000 20 20   
-    @bindir@/co-parser quota-onprocci
-    @bindir@/co-parser sla-onprocci
-    @bindir@/run-onprocci &
-    sleep $tempo
+    fi [ -x @bindir@/run-onprocci ]; then
+        echo "Starting accords open nebula services"
+        @bindir@/co-provider onprocci accords 20 20 1000 20 20   
+        @bindir@/co-parser quota-onprocci
+        @bindir@/co-parser sla-onprocci
+        @bindir@/run-onprocci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords open nebula services"
+    fi
     
-    echo "Starting accords proactive services"
-    @bindir@/co-provider paprocci accords 5 5 500 5 5
-    @bindir@/co-parser quota-paprocci
-    @bindir@/co-parser sla-paprocci
-    @bindir@/run-paprocci &
-    sleep $tempo
+    if [ -x @bindir@/run-paprocci ]; then
+        echo "Starting accords proactive services"
+        @bindir@/co-provider paprocci accords 5 5 500 5 5
+        @bindir@/co-parser quota-paprocci
+        @bindir@/co-parser sla-paprocci
+        @bindir@/run-paprocci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords proactive services"
+    fi
 
-    echo "Starting accords windows azure services"
-    @bindir@/co-provider azprocci accords 10 10 1000 10 10
-    @bindir@/co-parser quota-azprocci
-    @bindir@/co-parser sla-azprocci
-    @bindir@/run-azprocci &
-    sleep $tempo
+    if [ -x @bindir@/run-azprocci ]; then
+        echo "Starting accords windows azure services"
+        @bindir@/co-provider azprocci accords 10 10 1000 10 10
+        @bindir@/co-parser quota-azprocci
+        @bindir@/co-parser sla-azprocci
+        @bindir@/run-azprocci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords windows azure services"
+    fi
 
-    echo "Starting accords delta cloud services"
-    @bindir@/co-provider dcprocci accords 1 1 1000 1 1
-    @bindir@/co-parser quota-dcprocci
-    @bindir@/co-parser sla-dcprocci
-    @bindir@/run-dcprocci &
-    sleep $tempo
+    if [ -x @bindir@/run-dcprocci ]; then
+        echo "Starting accords delta cloud services"
+        @bindir@/co-provider dcprocci accords 1 1 1000 1 1
+        @bindir@/co-parser quota-dcprocci
+        @bindir@/co-parser sla-dcprocci
+        @bindir@/run-dcprocci &
+        sleep $tempo
+    else
+        echo "NOT Starting accords delta cloud services"
+    fi
 
-    echo "Starting accords jpaas procci services"
-    @bindir@/co-provider jpaasprocci accords 10 10 1000 10 10
-    @bindir@/co-parser quota-jpaasprocci
-    @bindir@/co-parser sla-jpaasprocci
-    @bindir@/run-jpaasprocci &
-    sleep $tempo
+    if [ -x @bindir@/run-jpaasprocci ]; then
+        echo "Starting accords jpaas procci services"
+        @bindir@/co-provider jpaasprocci accords 10 10 1000 10 10
+        @bindir@/co-parser quota-jpaasprocci
+        @bindir@/co-parser sla-jpaasprocci
+        @bindir@/run-jpaasprocci &
+        sleep $tempo
+     else
+        echo "NOT Starting accords jpaas procci services"
+     fi
 
 # ---------------------------------------------------
 #    These have been commented out since they are 
