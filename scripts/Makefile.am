@@ -9,7 +9,7 @@
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 dist_pkgsysconf_DATA=cords_user.xml accords.ini
 
-scripts=accords
+scripts=accords co-check
 
 aliases = \
 	co-start co-broker co-command co-parser co-provider co-resolver co-status co-stop \
@@ -19,7 +19,7 @@ aliases = \
 	run-cosacs run-copaas run-jpaasprocci accords-config
 
 
-EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in accords.init
+EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
@@ -40,13 +40,16 @@ setaliases = sed \
 	-e 's|@aliases[@]|$(aliases)|g'
 
 all-local: $(scripts)
-	chmod 755 accords
+	chmod 755 accords co-check
 	for alias in $(aliases); do \
 	  ln -fs accords $$alias; \
 	done
 
-install-exec-local: accords.in Makefile accords.init
+install-exec-local: accords.in Makefile accords.init co-check.in
 	mkdir -p $(DESTDIR)$(bindir)
+	srcdir=''; \
+	  test -f ./co-check.in || srcdir=$(srcdir)/; \
+	  $(installedit) $${srcdir}co-check.in >$(DESTDIR)$(bindir)/co-check
 	srcdir=''; \
 	  test -f ./accords.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}accords.in >$(DESTDIR)$(bindir)/accords
@@ -61,10 +64,19 @@ uninstall-local:
 	  rm -f $(DESTDIR)$(bindir)/$$alias; \
 	done
 	rm -f $(DESTDIR)$(bindir)/accords
+	rm -f $(DESTDIR)$(bindir)/co-check
 	rm -f $(DESTDIR)$(sysconfdir)/init.d/accords
 
 accords: accords.in
 accords: Makefile
+	rm -f $@ $@.tmp
+	srcdir=''; \
+	  test -f ./$@.in || srcdir=$(srcdir)/; \
+	  $(installedit) $${srcdir}$@.in | $(setaliases) >$@.tmp
+	mv $@.tmp $@
+
+co-check: co-check.in
+co-check: Makefile
 	rm -f $@ $@.tmp
 	srcdir=''; \
 	  test -f ./$@.in || srcdir=$(srcdir)/; \

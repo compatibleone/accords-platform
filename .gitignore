@@ -122,6 +122,7 @@ scripts/accords
 scripts/accords-config
 scripts/accords.xml
 scripts/co-broker
+scripts/co-check
 scripts/co-command
 scripts/co-parser
 scripts/co-resolver
