@@ -50,18 +50,22 @@ domain=occi
 operator=accords
 password=co-system
 
-if [ -z "$accords_workdir"]; then
-	accords_workdir="."
-fi
+if [ `basename $0` != "co-status" ]; then
 
-if [ ! -d "$accords_workdir" ]; then
-        echo "$accords_workdir: no such directory"
-        exit 1
-fi
+    if [ -z "$accords_workdir"]; then
+         accords_workdir="."
+    fi
 
-if [ ! -d "$accords_workdir/rest" ]; then
-        echo "$accords_workdir/rest: no such directory"
-        exit 1
+    if [ ! -d "$accords_workdir" ]; then
+         echo "$accords_workdir: no such directory"
+         exit 1
+    fi
+
+    if [ ! -d "$accords_workdir/rest" ]; then
+         echo "$accords_workdir/rest: no such directory"
+         exit 1
+    fi
+
 fi
 
 cd $accords_workdir
