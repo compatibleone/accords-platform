@@ -105,8 +105,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.02");
-	printf("\n   Beta Version : 29/08/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.03");
+	printf("\n   Beta Version : 08/10/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -161,6 +161,7 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
+	(char *) 0,	/* elastic security	*/
 	1,	/* elastic floor 		*/
 	2, 	/* elastic ceiling		*/
 	0,	/* elastic strategy		*/
@@ -1322,6 +1323,12 @@ private	int	load_balancer( char * nptr )
 		Cool.tls = (char *) 0;
 
 	/* -------------------------------------------- */
+	/* ensure TLS is correct either NULL or Valid   */
+	/* -------------------------------------------- */
+	if (!( rest_valid_string( Elastic.security ) ))
+		Elastic.security = (char *) 0;
+
+	/* -------------------------------------------- */
 	/* the ceiling must be higher or equal to floor */
 	/* -------------------------------------------- */
 	if ( Elastic.floor > Elastic.ceiling )
@@ -1353,7 +1360,7 @@ private	int	load_balancer( char * nptr )
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
 	cool_log_message( "rest server starting", 0 );
-	status = rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi );
+	status = rest_server(  nptr, Cool.restport, Elastic.security, 0, &Osi );
 	cool_log_message( "rest server shutdown", 0 );
 	return( status );
 }
@@ -1386,6 +1393,11 @@ private	int	cool_operation( char * nptr )
 	/* ------------------------------ */
 	/* analyse the elasticity options */
 	/* ------------------------------ */
+	if (!( eptr = getenv( "elastic_security" ) ))
+		Elastic.security = (char *) 0;
+	else if (!( Elastic.security = allocate_string( eptr ) ))
+		return( 27 );
+
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
