@@ -219,14 +219,6 @@ Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
 #Description: CompatibleOne Accords Platform - ProActive Procci subsystem
 # CompatibleOne Accords Platform - ProActive Procci subsystem
 #
-Package: compatibleone-parser
-Section: net
-Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform - Parser
- Parser subsystem of the CompatibleOne Accords Platform
- The parser is provided as a standalone OCCI REST server executable program and must
- have been started before any manifest processing may be performed. 
 
 Package: compatibleone-procci
 Section: net
