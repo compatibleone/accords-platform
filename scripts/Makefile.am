@@ -19,7 +19,7 @@ aliases = \
 	run-cosacs run-copaas run-jpaasprocci accords-config
 
 
-EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init
+EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
@@ -57,7 +57,8 @@ install-exec-local: accords.in Makefile accords.init co-check.in
 	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
-	install -p -m 0755 -D $(srcdir)/accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
+	install -p -m 0755 -D $(srcdir)/accords.init $(DESTDIR)$(sysconfdir)/init.d/compatibleone
+	install -p -m 0644 -D $(srcdir)/accords.default $(DESTDIR)$(sysconfdir)/default/accords
 
 uninstall-local:
 	for alias in $(aliases); do \

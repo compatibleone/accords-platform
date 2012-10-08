@@ -64,7 +64,6 @@ install: build
 	make DESTDIR=`pwd`/debian/tmp install
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
-	cp debian/accords.default `pwd`/debian/tmp/etc/default/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 # Build architecture independant packages.
 
