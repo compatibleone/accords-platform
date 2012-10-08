@@ -80,6 +80,14 @@ if [ -z "$target" ]; then
     target=accords.xml
 fi
 
+if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" ]; then
+    if test ! -e $accords_workdir/$target; then
+	echo "Can not find target file: $accords_workdir/$target."
+	echo "Please run accords-config first !"
+	exit 1
+    fi
+fi
+
 if [ -z "$resthost" ]; then
     resthost=127.0.0.1
 fi
@@ -659,6 +667,9 @@ _accords_config() {
 	echo "Creating Accords Security Files"
     
 	export calist=Certificates.crt
+	if [ -f /etc/accords/Certificates.crt ]; then
+		export calist=/etc/accords/Certificates.crt
+	fi
 	export pass=Accords
 
 	if [ -z "$nethsm" ]; then 
@@ -949,14 +960,6 @@ _mkpro() {
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
 }
-
-if test "`basename $0`" != "accords-config"; then
-    if test ! -e $target; then
-	echo "Can not find target file: $target."
-	echo "Please run accords-config first !"
-	exit 1
-    fi
-fi
 
 case `basename $0` in
     co-start) 
