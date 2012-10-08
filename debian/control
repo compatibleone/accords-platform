@@ -2,7 +2,7 @@ Source: compatibleone-accords
 Section: net
 Priority: extra
 Maintainer: Vincent Renardias <vrenardias@citypassenger.com>
-Build-Depends: debhelper (>= 8.0.0)
+Build-Depends: debhelper (>= 8.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
