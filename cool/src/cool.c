@@ -105,8 +105,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.03");
-	printf("\n   Beta Version : 08/10/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.04");
+	printf("\n   Beta Version : 09/10/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -284,7 +284,7 @@ private	struct elastic_contract * allocate_elastic_contract()
 		return( eptr );
 	else	memset( (char *) eptr, 0, sizeof( struct elastic_contract ) );
 
-	if (!( eptr->service = allocate_string( (default_tls()? "https" : "http" ) )))
+	if (!( eptr->service = allocate_string( ( rest_valid_string( Elastic.security ) ? "https" : "http" ) )))
 		return( liberate_elastic_contract( eptr ) );
 	else	eptr->port = Cool.restport;
 	return( eptr );
