@@ -1376,6 +1376,8 @@ private	int	cool_operation( char * nptr )
 	struct	elastic_contract * ecptr;
 	char *	eptr;
 	int	status;
+	char *	tls;
+	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
 
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
@@ -1387,6 +1389,23 @@ private	int	cool_operation( char * nptr )
 
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
+
+	/* -------------------------------------------- */
+	/* handle transport layer security, if required */
+	/* -------------------------------------------- */
+	if (!( rest_valid_string(Cool.tls) ))
+		Cool.tls = (char *) 0;
+	else if (!( tlsconf = tls_configuration_load( Cool.tls ) ))
+		return( 40 );
+	else if ( tlsconf->authenticate )
+	{
+		if ((Cool.user) && (Cool.password))
+		{
+			cool_log_message( "authentication", 0 );
+			if ((status = occi_secure_AAA( Cool.user, Cool.password, nptr, Cool.tls )) != 0)
+				return( status );
+		}
+	}
 
 	cool_log_message( "operation", 0 );
 
@@ -1451,6 +1470,16 @@ private	int	cool_operation( char * nptr )
 	{
 		Elastic.first = ecptr->next;
 		ecptr = liberate_elastic_contract( ecptr );
+	}
+
+	/* -------------------------------------------- */
+	/* terminate security session, if one is active */
+	/* -------------------------------------------- */
+	if (( Cool.tls ) && ( tlsconf ))
+	{
+		occi_release_AAA( Cool.user, Cool.password, nptr, Cool.tls );
+		if ( tlsconf )
+			tlsconf = release_tls_configuration(tlsconf );
 	}
 
 	return( status );

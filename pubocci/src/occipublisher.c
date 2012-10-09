@@ -1219,9 +1219,6 @@ public	int	publishing_occi_server(
 	if (( tls ) && ( tlsconf ))
 	{
 		occi_release_AAA( user, password, agent, tls );
-		if ( Publisher.authorization )
-			Publisher.authorization = logout_occi_user( 
-				user, password, agent, Publisher.authorization, tls );
 		if ( tlsconf )
 			tlsconf = release_tls_configuration(tlsconf );
 	}
