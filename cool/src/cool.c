@@ -897,6 +897,32 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 }
 
 /*	---------------------------------------------	*/
+/*	o c c i _ e l a s t i c _ c o n d i t i o n s	*/
+/*	---------------------------------------------	*/
+private	struct elastic_contract * occi_elastic_conditions(
+	struct elastic_contract * eptr,
+	char * sla,
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty )
+{
+	struct	occi_response * zptr;
+	if (!( rest_valid_string( sla ) ))
+		return( eptr );
+	else if (!( zptr = occi_simple_get( sla, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( cords_retrieve_conditions( sla, sla, zptr, selector, warranty, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( liberate_elastic_contract( eptr ) );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( eptr );
+	}
+}
+
+/*	---------------------------------------------	*/
 /*	  n e w _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
 /*	creates a new elastic contract by duplicating	*/
@@ -1006,6 +1032,9 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->name = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	else if (!( eptr = occi_elastic_conditions( eptr, eptr->agreement, &selector, &warranty ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 

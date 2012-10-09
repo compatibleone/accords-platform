@@ -171,6 +171,14 @@ public	struct	xml_element * cords_instance_node(
 		char * account,
 		char * accountName );
 
+public	int	cords_retrieve_conditions( 
+		char * host,
+		char * slaid, 
+		struct occi_response * zptr,
+		struct cords_placement_criteria * placement,
+		struct cords_guarantee_criteria * warranty,
+		char * agent, char * tls );
+
 
 	/* ----- */
 #endif	/* _cb_h */

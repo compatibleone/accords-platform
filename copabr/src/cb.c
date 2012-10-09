@@ -3595,7 +3595,7 @@ private	int	cords_analyse_conditions(
 /* 	this function retrieves placement conditions from	*/
 /*	the sla terms defined conditions block.			*/
 /*	-------------------------------------------------	*/
-private	int	cords_retrieve_conditions( 
+public	int	cords_retrieve_conditions( 
 		char * host,
 		char * slaid, 
 		struct occi_response * zptr,
