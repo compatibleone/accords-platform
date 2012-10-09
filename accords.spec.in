@@ -436,34 +436,34 @@ rm -rf ${RPM_BUILD_ROOT}
 make DESTDIR="${RPM_BUILD_ROOT}" install
 
 # create some directories
-for dir in etc/defaults etc/accords usr/share/accords usr/share/doc/accords var/lib/accords/rest var/log/accords/rest; do
-	mkdir -p ${RPM_BUILD_ROOT}/$dir
+for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords/rest %{_localstatedir}/log/accords/rest; do
+	mkdir -p ${RPM_BUILD_ROOT}$dir
 done;
 
 # install some extra files
-cp *.xsd ${RPM_BUILD_ROOT}/usr/share/doc/accords
-cp manifests/openssl.cnf ${RPM_BUILD_ROOT}/etc/accords/
-ln -s /etc/accords/openssl.cnf ${RPM_BUILD_ROOT}/var/lib/accords/openssl.cnf
+cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
+cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
 
 # add a fake file to produce a useless package
-cat <<EOF >${RPM_BUILD_ROOT}/usr/share/accords/README
+cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
 This package contains nothing, and only exists to pull dependencies.
 EOF
 
 # remove unpackaged files
-rm ${RPM_BUILD_ROOT}/usr/bin/example
+rm ${RPM_BUILD_ROOT}%{_bindir}/example
 #TODO: remove this line once paprocci is packaged again
-rm ${RPM_BUILD_ROOT}/usr/bin/run-paprocci
+rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
 %post
 /sbin/ldconfig
 
-if [ -e /var/lib/accords/accords.xml ] ; then
+if [ -e %{_localstatedir}/lib/accords/accords.xml ] ; then
 	exit 0
 fi
 
-cd /var/lib/accords/ && accords-config
-# /etc/init.d/compatibleone start
+cd %{_localstatedir}/lib/accords/ && accords-config
+# %{_sysconfdir}/init.d/compatibleone start
 
 %postun
 /sbin/ldconfig

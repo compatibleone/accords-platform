@@ -65,6 +65,7 @@ install: build
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
+	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 # Build architecture independant packages.
 
 binary-indep: build install
