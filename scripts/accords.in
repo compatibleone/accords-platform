@@ -253,7 +253,7 @@ _co_start() {
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
-    sleep 5
+    sleep 10
     @bindir@/co-parser accounts
     @bindir@/co-parser metrics
     @bindir@/co-parser coips
