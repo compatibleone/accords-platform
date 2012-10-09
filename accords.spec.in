@@ -490,6 +490,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %dir %{_localstatedir}/lib/accords/rest
+%dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
 
 #--------------------------------------------
@@ -607,10 +608,12 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files accords-doc
 %defattr(-,root,root,0755)
+%dir %{_docdir}/accords
 %attr(0644,root,root) %{_docdir}/accords/*.xsd
 
 %files accords
 %defattr(-,root,root,0755)
+%dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
 
 %changelog
