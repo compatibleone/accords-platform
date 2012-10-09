@@ -4,30 +4,30 @@ else
 	echo "building security options"
 	mkdir $makesecurity
 	cp ../Certificates.crt $makesecurity
-	bash build-security cosacs
-	bash build-security publisher
-	bash build-security azprocci
-	bash build-security broker
-	bash build-security coees
-	bash build-security cops
-	bash build-security comons
-	bash build-security conets
-	bash build-security coobas
-	bash build-security cosched
-	bash build-security coss
-	bash build-security dcprocci
-	bash build-security ezvm
-	bash build-security coips
-	bash build-security cool
-	bash build-security onprocci
-	bash build-security osocciprocci
-	bash build-security osprocci
-	bash build-security paprocci
-	bash build-security parser
-	bash build-security procci
-	bash build-security slam
-	bash build-security copaas
-	bash build-security jpaasprocci
+	bash build-security cosacs 1
+	bash build-security publisher 0
+	bash build-security azprocci 1
+	bash build-security broker 1
+	bash build-security coees 1
+	bash build-security cops 1
+	bash build-security comons 1 
+	bash build-security conets 1
+	bash build-security coobas 1 
+	bash build-security cosched 1
+	bash build-security coss 0
+	bash build-security dcprocci 1
+	bash build-security ezvm 1 
+	bash build-security coips 1 
+	bash build-security cool 1
+	bash build-security onprocci 1
+	bash build-security osocciprocci 1
+	bash build-security osprocci 1
+	bash build-security paprocci 1
+	bash build-security parser 1
+	bash build-security procci 1
+	bash build-security slam 1
+	bash build-security copaas 1
+	bash build-security jpaasprocci 1
 fi
 
 
