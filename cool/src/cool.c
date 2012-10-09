@@ -913,12 +913,12 @@ private	struct elastic_contract * occi_elastic_conditions(
 	else if (!( cords_retrieve_conditions( sla, sla, zptr, selector, warranty, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		zptr = occi_remove_response( zptr );
-		return( liberate_elastic_contract( eptr ) );
+		return( eptr );
 	}
 	else
 	{
 		zptr = occi_remove_response( zptr );
-		return( eptr );
+		return( liberate_elastic_contract( eptr ) );
 	}
 }
 
