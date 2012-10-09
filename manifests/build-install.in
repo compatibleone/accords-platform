@@ -6,7 +6,7 @@ echo "tar -xzvf package-$1.tgz" >> $target
 echo "install -d rest" >> $target
 echo "install -d service" >> $target
 echo "install -d security" >> $target
-echo "mv $1 /usr/local/bin" >> $target
+echo "mv $1 @bindir@" >> $target
 echo "rm package-$1.tgz" >> $target
 chmod +x $target
 

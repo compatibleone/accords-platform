@@ -456,7 +456,6 @@ rm ${RPM_BUILD_ROOT}%{_bindir}/example
 rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
 %post
-/sbin/ldconfig
 
 if [ -e %{_localstatedir}/lib/accords/accords.xml ] ; then
 	exit 0
@@ -465,7 +464,27 @@ fi
 cd %{_localstatedir}/lib/accords/ && accords-config
 # %{_sysconfdir}/init.d/compatibleone start
 
+%preun
+%if 0%{?suse_version}
+%stop_on_removal compatibleone
+%endif
+
 %postun
+%if 0%{?suse_version}
+%restart_on_update compatibleone
+%insserv_cleanup
+%endif
+
+%post -n %{libname}
+/sbin/ldconfig
+
+%post -n %{libnamedev}
+/sbin/ldconfig
+
+%postun -n %{libname}
+/sbin/ldconfig
+
+%postun -n %{libnamedev}
 /sbin/ldconfig
 
 %clean
@@ -490,6 +509,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %dir %{_localstatedir}/lib/accords/rest
+%dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
 
 #--------------------------------------------
@@ -607,10 +627,12 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files accords-doc
 %defattr(-,root,root,0755)
+%dir %{_docdir}/accords
 %attr(0644,root,root) %{_docdir}/accords/*.xsd
 
 %files accords
 %defattr(-,root,root,0755)
+%dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
 
 %changelog
