@@ -1401,9 +1401,9 @@ private	int	cool_operation( char * nptr )
 	{
 		if ((Cool.user) && (Cool.password))
 		{
-			cool_log_message( "authentication", 0 );
 			if ((status = occi_secure_AAA( Cool.user, Cool.password, nptr, Cool.tls )) != 0)
 				return( status );
+			else	cool_log_message( "authentication", 0 );
 		}
 	}
 
