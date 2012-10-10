@@ -428,7 +428,7 @@ by heterogeneous cloud service providers.
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure CFLAGS="-Wl,--no-as-needed"
+%configure CFLAGS="-Wl,--no-as-needed" LDFLAGS="-Wl,--no-as-needed"
 make
 
 %install
