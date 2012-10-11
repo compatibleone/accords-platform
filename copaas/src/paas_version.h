@@ -4,6 +4,7 @@
 struct paas_version
 {
 	char* id;
+	char* name;
 	char* label;
 	char* date_updated;
 	char* description;

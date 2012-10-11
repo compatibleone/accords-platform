@@ -41,6 +41,8 @@ public struct paas_version_instance * liberate_paas_version_instance(struct paas
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->default_instance )
 			 sptr->default_instance = liberate(sptr->default_instance);
+		if ( sptr->uri )
+			 sptr->uri = liberate(sptr->uri);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_version_instance *) 0);
@@ -59,6 +61,7 @@ public struct paas_version_instance * reset_paas_version_instance(struct paas_ve
 		sptr->date_instantiated = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->default_instance = (char*) 0;
+		sptr->uri = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -106,6 +109,10 @@ public int xmlin_paas_version_instance(struct paas_version_instance * sptr,struc
 		{
 			if ( wptr->value ) { sptr->default_instance = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"uri") ))
+		{
+			if ( wptr->value ) { sptr->uri = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -129,6 +136,7 @@ public int rest_occi_paas_version_instance(FILE * fh,struct paas_version_instanc
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_instantiated='%s'\r\n",prefix,nptr,(sptr->date_instantiated?sptr->date_instantiated:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.default_instance='%s'\r\n",prefix,nptr,(sptr->default_instance?sptr->default_instance:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.uri='%s'\r\n",prefix,nptr,(sptr->uri?sptr->uri:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

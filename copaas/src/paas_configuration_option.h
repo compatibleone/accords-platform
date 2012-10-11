@@ -4,16 +4,19 @@
 struct paas_configuration_option
 {
 	char* id;
+	char* name;
 	char* change_severity;
+	char* default_value;
 	char* max_length;
 	char* max_value;
 	char* min_value;
-	char* regex;
-	char* user_defined;
-	char* value_options;
 	char* namespace; 
 	char* option_name;
+	char* regex;
+	char* user_defined;
 	char* value;
+	char* value_options;
+	char* value_type;
 	int state;
 };
 

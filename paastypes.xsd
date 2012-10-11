@@ -1,136 +1,140 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
-    <xsd:complexType name="paas_manifest">
-      <xsd:sequence>
-        <xsd:element name="paas_description" type="xsd:string"/>
-        <xsd:element name="paas_application" type="paas_application"/>
-      </xsd:sequence>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="access" default="public" type="xsd:string"/>
-      <xsd:attribute name="scope" default="normal" type="xsd:string"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_manifest">
+		<xsd:sequence>
+			<xsd:element name="paas_description" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="paas_application" type="paas_application" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="paas_description" default="none" type="xsd:string"/>
+		<xsd:attribute name="paas_application" default="none" type="xsd:string"/>
+		<xsd:attribute name="access" default="public" type="xsd:string"/>
+		<xsd:attribute name="scope" default="normal" type="xsd:string"/>
+		<xsd:attribute name="state" default="0" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_application">
-      <xsd:sequence>
-        <xsd:element name="paas_version" type="paas_version"/>
-        <xsd:element name="paas_environment" type="paas_environment"/>
-        <xsd:element name="paas_configuration_template" type="paas_configuration_template"/>
-      </xsd:sequence>
-      <xsd:attribute name="date_created" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="description" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="environement" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_application">
+		<xsd:sequence>
+			<xsd:element name="paas_version" type="paas_version" minOccurs="0" maxOccurs="1" />	
+			<xsd:element name="paas_environment" type="paas_environment" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="paas_configuration_template" type="paas_configuration_template" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="paas_version" type="xsd:string"/>
+		<xsd:attribute name="paas_environment" type="xsd:string"/>
+		<xsd:attribute name="paas_configuration_template" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+		<xsd:attribute name="date_created" use="required" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_version">
-      <xsd:sequence>
-        <xsd:element name="paas_version_instance" type="paas_version_instance"/>
-      </xsd:sequence>
-      <xsd:attribute name="date_updated" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="description" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="label" use="required" type="xsd:decimal"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_version">
+		<xsd:sequence>
+			<xsd:element name="paas_version_instance" type="paas_version_instance" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="date_updated" use="required" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="label" use="required" type="xsd:decimal"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_version_instance">
-      <xsd:sequence>
-        <xsd:element name="paas_deployable" type="paas_deployable"/>
-      </xsd:sequence>
-      <xsd:attribute name="date_instantiated" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="default_instance" use="required" type="xsd:boolean"/>
-      <xsd:attribute name="description" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="state" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="uri" use="required"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_version_instance">
+		<xsd:sequence>
+			<xsd:element name="paas_deployable" type="paas_deployable"  minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="date_instantiated" use="required" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="default_instance" use="required" type="xsd:boolean"/>
+		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="uri" use="required"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_deployable">
-      <xsd:attribute name="content_type" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="location" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="multitenancy_level" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_deployable">
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="content_type" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="location" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="multitenancy_level" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_environment">
-      <xsd:attribute name="config_template" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="date_created" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="date_updated" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="description" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="provider" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="uri" use="required"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_environment">
+		<xsd:sequence>
+			<xsd:element name="paas_configuration_template" type="paas_configuration_template" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="paas_configuration_template" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="date_created" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="date_updated" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="provider" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="uri" use="required"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_configuration_template">
-      <xsd:sequence>
-        <xsd:element name="paas_configuration_option" type="paas_configuration_option"/>
-        <xsd:element name="paas_node" maxoccurs="unbounded" type="paas_node"/>
-        <xsd:element name="paas_relation" maxOccurs="unbounded" type="paas_relation"/>
-      </xsd:sequence>
-      <xsd:attribute name="date_created" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="date_updated" use="required" type="xsd:NMTOKEN"/>
-      <xsd:attribute name="description" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="uri" use="required"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_configuration_template">
+		<xsd:sequence>
+			<xsd:element name="paas_configuration_option" type="paas_configuration_option" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="paas_node" maxoccurs="unbounded" type="paas_node" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="paas_relation" maxOccurs="unbounded" type="paas_relation" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="date_created" use="required" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="date_updated" use="required" type="xsd:NMTOKEN"/>
+		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="uri" use="required"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_configuration_option">
-      <xsd:attribute name="change_severity" use="required"/>
-      <xsd:attribute name="default_value" use="required"/>
-      <xsd:attribute name="max_length" use="required"/>
-      <xsd:attribute name="max_value" use="required"/>
-      <xsd:attribute name="min_value" use="required"/>
-      <xsd:attribute name="namespace" use="required"/>
-      <xsd:attribute name="option_name" use="required"/>
-      <xsd:attribute name="regex" use="required"/>
-      <xsd:attribute name="user_defined" use="required"/>
-      <xsd:attribute name="value" use="required"/>
-      <xsd:attribute name="value_options" use="required"/>
-      <xsd:attribute name="value_type" use="required"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_configuration_option">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="change_severity" use="required"/>
+		<xsd:attribute name="default_value" use="required"/>
+		<xsd:attribute name="max_length" use="required"/>
+		<xsd:attribute name="max_value" use="required"/>
+		<xsd:attribute name="min_value" use="required"/>
+		<xsd:attribute name="namespace" use="required"/>
+		<xsd:attribute name="option_name" use="required"/>
+		<xsd:attribute name="regex" use="required"/>
+		<xsd:attribute name="user_defined" use="required"/>
+		<xsd:attribute name="value" use="required"/>
+		<xsd:attribute name="value_options" use="required"/>
+		<xsd:attribute name="value_type" use="required"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_node">
-      <xsd:attribute name="content_type" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="provider" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="version" use="required" type="xsd:decimal"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
-  
-    <xsd:complexType name="paas_relation">
-      <xsd:choice>
-        <xsd:element name="paas_link" type="paas_link"/>
-      </xsd:choice>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_node">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="content_type" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="provider" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="version" use="required" type="xsd:decimal"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
-    <xsd:complexType name="paas_link">
-      <xsd:attribute name="expression" use="required"/>
-      <xsd:attribute name="name" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="type" use="required" type="xsd:NCName"/>
-      <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="state" type="xsd:integer"/>
-    </xsd:complexType>
+	<xsd:complexType name="paas_relation">
+		<xsd:element name="paas_link" type="paas_link" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string" />
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="paas_link">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="expression" use="required"/>
+		<xsd:attribute name="type" use="required" type="xsd:NCName"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
 
 </xsd:schema>
-
 

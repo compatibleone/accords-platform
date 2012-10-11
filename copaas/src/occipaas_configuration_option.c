@@ -135,26 +135,32 @@ private void autoload_paas_configuration_option_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "change_severity" )) != (struct xml_atribut *) 0)
 				pptr->change_severity = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "default_value" )) != (struct xml_atribut *) 0)
+				pptr->default_value = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "max_length" )) != (struct xml_atribut *) 0)
 				pptr->max_length = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "max_value" )) != (struct xml_atribut *) 0)
 				pptr->max_value = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "min_value" )) != (struct xml_atribut *) 0)
 				pptr->min_value = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "regex" )) != (struct xml_atribut *) 0)
-				pptr->regex = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "user_defined" )) != (struct xml_atribut *) 0)
-				pptr->user_defined = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "value_options" )) != (struct xml_atribut *) 0)
-				pptr->value_options = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "namespace" )) != (struct xml_atribut *) 0)
 				pptr->namespace = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "option_name" )) != (struct xml_atribut *) 0)
 				pptr->option_name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "regex" )) != (struct xml_atribut *) 0)
+				pptr->regex = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "user_defined" )) != (struct xml_atribut *) 0)
+				pptr->user_defined = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "value" )) != (struct xml_atribut *) 0)
 				pptr->value = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "value_options" )) != (struct xml_atribut *) 0)
+				pptr->value_options = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "value_type" )) != (struct xml_atribut *) 0)
+				pptr->value_type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -184,8 +190,14 @@ public  void autosave_paas_configuration_option_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," change_severity=%c",0x0022);
 		fprintf(h,"%s",(pptr->change_severity?pptr->change_severity:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," default_value=%c",0x0022);
+		fprintf(h,"%s",(pptr->default_value?pptr->default_value:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," max_length=%c",0x0022);
 		fprintf(h,"%s",(pptr->max_length?pptr->max_length:""));
@@ -196,23 +208,26 @@ public  void autosave_paas_configuration_option_nodes() {
 		fprintf(h," min_value=%c",0x0022);
 		fprintf(h,"%s",(pptr->min_value?pptr->min_value:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," regex=%c",0x0022);
-		fprintf(h,"%s",(pptr->regex?pptr->regex:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," user_defined=%c",0x0022);
-		fprintf(h,"%s",(pptr->user_defined?pptr->user_defined:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," value_options=%c",0x0022);
-		fprintf(h,"%s",(pptr->value_options?pptr->value_options:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," namespace=%c",0x0022);
 		fprintf(h,"%s",(pptr->namespace?pptr->namespace:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," option_name=%c",0x0022);
 		fprintf(h,"%s",(pptr->option_name?pptr->option_name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," regex=%c",0x0022);
+		fprintf(h,"%s",(pptr->regex?pptr->regex:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," user_defined=%c",0x0022);
+		fprintf(h,"%s",(pptr->user_defined?pptr->user_defined:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," value=%c",0x0022);
 		fprintf(h,"%s",(pptr->value?pptr->value:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," value_options=%c",0x0022);
+		fprintf(h,"%s",(pptr->value_options?pptr->value_options:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," value_type=%c",0x0022);
+		fprintf(h,"%s",(pptr->value_type?pptr->value_type:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -238,26 +253,32 @@ private void set_paas_configuration_option_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "change_severity" ) ))
 			pptr->change_severity = allocate_string(vptr);
+		if (!( strcmp( nptr, "default_value" ) ))
+			pptr->default_value = allocate_string(vptr);
 		if (!( strcmp( nptr, "max_length" ) ))
 			pptr->max_length = allocate_string(vptr);
 		if (!( strcmp( nptr, "max_value" ) ))
 			pptr->max_value = allocate_string(vptr);
 		if (!( strcmp( nptr, "min_value" ) ))
 			pptr->min_value = allocate_string(vptr);
-		if (!( strcmp( nptr, "regex" ) ))
-			pptr->regex = allocate_string(vptr);
-		if (!( strcmp( nptr, "user_defined" ) ))
-			pptr->user_defined = allocate_string(vptr);
-		if (!( strcmp( nptr, "value_options" ) ))
-			pptr->value_options = allocate_string(vptr);
 		if (!( strcmp( nptr, "namespace" ) ))
 			pptr->namespace = allocate_string(vptr);
 		if (!( strcmp( nptr, "option_name" ) ))
 			pptr->option_name = allocate_string(vptr);
+		if (!( strcmp( nptr, "regex" ) ))
+			pptr->regex = allocate_string(vptr);
+		if (!( strcmp( nptr, "user_defined" ) ))
+			pptr->user_defined = allocate_string(vptr);
 		if (!( strcmp( nptr, "value" ) ))
 			pptr->value = allocate_string(vptr);
+		if (!( strcmp( nptr, "value_options" ) ))
+			pptr->value_options = allocate_string(vptr);
+		if (!( strcmp( nptr, "value_type" ) ))
+			pptr->value_type = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -291,11 +312,25 @@ private int pass_paas_configuration_option_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
 	if (( fptr->change_severity )
 	&&  (strlen( fptr->change_severity ) != 0)) {
 		if (!( pptr->change_severity ))
 			return(0);
 		else if ( strcmp(pptr->change_severity,fptr->change_severity) != 0)
+			return(0);
+		}
+	if (( fptr->default_value )
+	&&  (strlen( fptr->default_value ) != 0)) {
+		if (!( pptr->default_value ))
+			return(0);
+		else if ( strcmp(pptr->default_value,fptr->default_value) != 0)
 			return(0);
 		}
 	if (( fptr->max_length )
@@ -319,27 +354,6 @@ private int pass_paas_configuration_option_filter(
 		else if ( strcmp(pptr->min_value,fptr->min_value) != 0)
 			return(0);
 		}
-	if (( fptr->regex )
-	&&  (strlen( fptr->regex ) != 0)) {
-		if (!( pptr->regex ))
-			return(0);
-		else if ( strcmp(pptr->regex,fptr->regex) != 0)
-			return(0);
-		}
-	if (( fptr->user_defined )
-	&&  (strlen( fptr->user_defined ) != 0)) {
-		if (!( pptr->user_defined ))
-			return(0);
-		else if ( strcmp(pptr->user_defined,fptr->user_defined) != 0)
-			return(0);
-		}
-	if (( fptr->value_options )
-	&&  (strlen( fptr->value_options ) != 0)) {
-		if (!( pptr->value_options ))
-			return(0);
-		else if ( strcmp(pptr->value_options,fptr->value_options) != 0)
-			return(0);
-		}
 	if (( fptr->namespace )
 	&&  (strlen( fptr->namespace ) != 0)) {
 		if (!( pptr->namespace ))
@@ -354,11 +368,39 @@ private int pass_paas_configuration_option_filter(
 		else if ( strcmp(pptr->option_name,fptr->option_name) != 0)
 			return(0);
 		}
+	if (( fptr->regex )
+	&&  (strlen( fptr->regex ) != 0)) {
+		if (!( pptr->regex ))
+			return(0);
+		else if ( strcmp(pptr->regex,fptr->regex) != 0)
+			return(0);
+		}
+	if (( fptr->user_defined )
+	&&  (strlen( fptr->user_defined ) != 0)) {
+		if (!( pptr->user_defined ))
+			return(0);
+		else if ( strcmp(pptr->user_defined,fptr->user_defined) != 0)
+			return(0);
+		}
 	if (( fptr->value )
 	&&  (strlen( fptr->value ) != 0)) {
 		if (!( pptr->value ))
 			return(0);
 		else if ( strcmp(pptr->value,fptr->value) != 0)
+			return(0);
+		}
+	if (( fptr->value_options )
+	&&  (strlen( fptr->value_options ) != 0)) {
+		if (!( pptr->value_options ))
+			return(0);
+		else if ( strcmp(pptr->value_options,fptr->value_options) != 0)
+			return(0);
+		}
+	if (( fptr->value_type )
+	&&  (strlen( fptr->value_type ) != 0)) {
+		if (!( pptr->value_type ))
+			return(0);
+		else if ( strcmp(pptr->value_type,fptr->value_type) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -377,7 +419,13 @@ private struct rest_response * paas_configuration_option_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.change_severity=%s",optr->domain,optr->id,pptr->change_severity);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.default_value=%s",optr->domain,optr->id,pptr->default_value);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.max_length=%s",optr->domain,optr->id,pptr->max_length);
@@ -389,22 +437,25 @@ private struct rest_response * paas_configuration_option_occi_response(
 	sprintf(cptr->buffer,"%s.%s.min_value=%s",optr->domain,optr->id,pptr->min_value);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.regex=%s",optr->domain,optr->id,pptr->regex);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.user_defined=%s",optr->domain,optr->id,pptr->user_defined);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.value_options=%s",optr->domain,optr->id,pptr->value_options);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.namespace=%s",optr->domain,optr->id,pptr->namespace);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.option_name=%s",optr->domain,optr->id,pptr->option_name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.regex=%s",optr->domain,optr->id,pptr->regex);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.user_defined=%s",optr->domain,optr->id,pptr->user_defined);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.value=%s",optr->domain,optr->id,pptr->value);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.value_options=%s",optr->domain,optr->id,pptr->value_options);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.value_type=%s",optr->domain,optr->id,pptr->value_type);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -801,6 +852,19 @@ private void	redirect_occi_paas_configuration_option_mt( struct rest_interface *
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas_configuration_option(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_configuration_option_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -814,7 +878,11 @@ public struct occi_category * occi_paas_configuration_option_builder(char * a,ch
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_paas_configuration_option_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "change_severity",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "default_value",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "max_length",0,0) ))
 			return(optr);
@@ -822,20 +890,24 @@ public struct occi_category * occi_paas_configuration_option_builder(char * a,ch
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "min_value",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "regex",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "user_defined",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "value_options",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "namespace",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "option_name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "regex",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "user_defined",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "value",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "value_options",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "value_type",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_configuration_option)))
+			return( optr );
 		autoload_paas_configuration_option_nodes();
 		return(optr);
 	}
@@ -871,7 +943,29 @@ public struct rest_header *  paas_configuration_option_occi_headers(struct paas_
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.paas_configuration_option.change_severity='%s'\r\n",(sptr->change_severity?sptr->change_severity:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.default_value='%s'\r\n",(sptr->default_value?sptr->default_value:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -915,39 +1009,6 @@ public struct rest_header *  paas_configuration_option_occi_headers(struct paas_
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_configuration_option.regex='%s'\r\n",(sptr->regex?sptr->regex:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas_configuration_option.user_defined='%s'\r\n",(sptr->user_defined?sptr->user_defined:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas_configuration_option.value_options='%s'\r\n",(sptr->value_options?sptr->value_options:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.paas_configuration_option.namespace='%s'\r\n",(sptr->namespace?sptr->namespace:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -970,7 +1031,51 @@ public struct rest_header *  paas_configuration_option_occi_headers(struct paas_
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.regex='%s'\r\n",(sptr->regex?sptr->regex:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.user_defined='%s'\r\n",(sptr->user_defined?sptr->user_defined:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.paas_configuration_option.value='%s'\r\n",(sptr->value?sptr->value:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.value_options='%s'\r\n",(sptr->value_options?sptr->value_options:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_configuration_option.value_type='%s'\r\n",(sptr->value_type?sptr->value_type:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
