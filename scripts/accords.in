@@ -52,7 +52,7 @@ password=co-system
 
 if [ `basename $0` != "co-status" ]; then
 
-    if [ -z "$accords_workdir"]; then
+    if [ -z "$accords_workdir" ]; then
          accords_workdir="."
     fi
 

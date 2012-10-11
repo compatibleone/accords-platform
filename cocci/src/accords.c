@@ -128,7 +128,7 @@ public	void	accords_configuration_options()
 	printf("\n   --debug                    activates debug messages");
 	printf("\n   --verbose                  activates info  messages");
 	printf("\n   --threads                  activate thread handlers");
-	printf("\n   __config     <filename>    specify configuration filename ");
+	printf("\n   --config     <filename>    specify configuration filename ");
 	printf("\n   --tls        <filename>    specify tls configuration filename ");
 	printf("\n   --ipv4                     activate use of IP V4 ( default ) ");
 	printf("\n   --ipv6                     activate use of IP V6 ( default ) ");

@@ -1,7 +1,10 @@
 #!/bin/sh
-# (c) 2011 Mandriva, http://www.mandriva.com
+# (c) 2011,2012 Prologue, CityPassenger, Mandriva
 #
 # Authors:
+#   Hamid MEDJAHED <hmedjahed@prologue.fr>
+#   Elyes ZEKRI <ezekri@prologue.fr>
+#   Vincent Renardias <vrenardias@citypassenger.com>
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 set -e
@@ -14,10 +17,7 @@ autoreconf --install
 
 #For PyaccordsSDK configuration
 PWD=$(pwd)
-sed -i '/#define PYPATH/d' pyaccords/pysrc/pypath.h
-sed -i "4i\#define PYPATH \"$PWD\"" pyaccords/pysrc/pypath.h
-
-sed -i '/srcpydir/d' pyaccords/pysrc/pypacksrc/pypacksrc.py
-sed -i "4i\srcpydir=\"$PWD\"" pyaccords/pysrc/pypacksrc/pypacksrc.py
+sed -e "s#@@PWD@@#${PWD}#" < pyaccords/pysrc/pypath.h.in > pyaccords/pysrc/pypath.h
+sed -e "s#@@PWD@@#${PWD}#" < pyaccords/pysrc/pypacksrc/pypacksrc.py.in > pyaccords/pysrc/pypacksrc/pypacksrc.py
 
 exit 0
