@@ -38,7 +38,7 @@ fi
 if [ $p = "memory" ]; then
 	echo "<term name=\":guarantee2\">" >> sla-$1.xml
 	echo "<guarantee name=\":g2\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
-	echo "<variable  name=\":gv2\" property=\"memory:free\" condition=\"less\" value=\"50\"/>" >> sla-$1.xml
+	echo "<variable  name=\":gv2\" property=\"memory:used\" condition=\"less\" value=\"50\"/>" >> sla-$1.xml
 	echo "<business  name=\":bv2\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
 	echo "<business  name=\":bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
 	echo "</guarantee>" >> sla-$1.xml
@@ -48,7 +48,7 @@ fi
 if [ $p = "users" ]; then
 	echo "<term name=\":guarantee3\">" >> sla-$1.xml
 	echo "<guarantee name=\":g3\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
-	echo "<variable  name=\":gv3\" property=\"user:count\" condition=\"gr\" value=\"3\"/>" >> sla-$1.xml
+	echo "<variable  name=\":gv3\" property=\"user:count\" condition=\"less\" value=\"3\"/>" >> sla-$1.xml
 	echo "<business  name=\":bv3\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
 	echo "<business  name=\":bv3\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
 	echo "</guarantee>" >> sla-$1.xml
