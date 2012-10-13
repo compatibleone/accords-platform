@@ -20,13 +20,43 @@ echo "<variable name=\"$1:v2\" property=\"occi.placement.zone\" condition=\"eq\"
 echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
 echo "<terms name=\"accords:guarantees\" type=\"guarantees\">" >> sla-$1.xml 
-echo "<term name=\"$1:guarantee1\">" >> sla-$1.xml
-echo "<guarantee name=\"$1:g1\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
-echo "<variable  name=\"$1:gv1\" property=\"cpu\" condition="less" value="50"/>" >> sla-$1.xml
-echo "<business  name=\"$1:bv1\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
-echo "<business  name=\"$1:bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
-echo "</guarantee>" >> sla-$1.xml
-echo "</term>" >> sla-$1.xml
+
+var=$4 $5 $6
+
+for p in $var; do
+
+if [ $p = "cpu" ]; then
+	echo "<term name=\"$1:guarantee1\">" >> sla-$1.xml
+	echo "<guarantee name=\"$1:g1\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
+	echo "<variable  name=\"$1:gv1\" property=\"cpu:idle\" condition=\"less\" value=\"50\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv1\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
+	echo "</guarantee>" >> sla-$1.xml
+	echo "</term>" >> sla-$1.xml
+fi
+
+if [ $p = "memory" ]; then
+	echo "<term name=\"$1:guarantee2\">" >> sla-$1.xml
+	echo "<guarantee name=\"$1:g2\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
+	echo "<variable  name=\"$1:gv2\" property=\"memory:free\" condition=\"less\" value=\"50\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv2\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
+	echo "</guarantee>" >> sla-$1.xml
+	echo "</term>" >> sla-$1.xml
+fi
+
+if [ $p = "users" ]; then
+	echo "<term name=\"$1:guarantee1\">" >> sla-$1.xml
+	echo "<guarantee name=\"$1:g1\" obligated=\"provider\" importance=\"normal\" scope=\"default\">" >> sla-$1.xml
+	echo "<variable  name=\"$1:gv1\" property=\"user:count\" condition=\"gr\" value=\"3\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv1\" nature=\"reward\" expression=\"cordscript:packet.consume();\"/>" >> sla-$1.xml
+	echo "<business  name=\"$1:bv2\" nature=\"penalty\" expression=\"cordscript:alert.new();\"/>" >> sla-$1.xml
+	echo "</guarantee>" >> sla-$1.xml
+	echo "</term>" >> sla-$1.xml
+fi
+
+done
+
 echo "</terms>" >> sla-$1.xml
 echo "</agreement>" >> sla-$1.xml
 
