@@ -42,10 +42,19 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.compatibleone.exceptions.NodeInfoException;
 import org.ow2.proactive.compatibleone.exchangeobjects.NodePublicInfo;
 import org.ow2.proactive.compatibleone.exchangeobjects.NodePublicInfoList;
 import org.ow2.proactive.compatibleone.misc.CONodeState;
@@ -110,6 +119,7 @@ public class ResourceManagerClient {
         logger.info("Done.");
         logger.info("Logging in...");
         ResourceManager rmStub = auth.login(cred);								// Login against the RM.
+        
         logger.info("Done.");
         this.auth = auth;
         this.cred = cred;
@@ -134,7 +144,7 @@ public class ResourceManagerClient {
 	 * @param node a string containing information (ideally the url) of a particular node. 
 	 * @param node2job list containing a mapping between lock-jobs and nodes. 
 	 * @return Information about the node. */
-	public NodePublicInfo getNodePublicInfo(String node, Hashtable<NodeId, String> node2job) throws Exception{
+	public NodePublicInfo getCompleteNodePublicInfo(String node, Hashtable<NodeId, String> node2job) throws Exception{
         List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
         if (listne.size() == 0) {
             logger.info("No nodes handled by Resource Manager");
@@ -144,7 +154,7 @@ public class ResourceManagerClient {
 	            logger.debug(" - Comparing '" + evt.getNodeUrl() + "' with target '" + node + "'...");
             	if(new NodeId(evt.getNodeUrl()).equals(new NodeId(node))){
 		            logger.info("   - Found!");
-                	NodePublicInfo h = generateNodePublicInfo(evt);
+                	NodePublicInfo h = getBasicNodePublicInfo(evt);
                 	if(node2job!=null){
 	                	String jobid = node2job.get(new NodeId(evt.getNodeUrl()));
 	                	h.setId(jobid);
@@ -159,13 +169,26 @@ public class ResourceManagerClient {
 	/**
 	 * Generate node public information from a RMNodeEvent.
 	 * @param evt source of information.
-	 * @return the NodePublicInfo object. */
-	private NodePublicInfo generateNodePublicInfo(RMNodeEvent evt){
+	 * @return the NodePublicInfo object. 
+	 * @throws Exception */
+	private NodePublicInfo getBasicNodePublicInfo(RMNodeEvent evt) throws NodeInfoException{
 		CONodeState state = new CONodeState(evt.getNodeState()); 
-    	NodePublicInfo h = new NodePublicInfo(evt.getNodeUrl(), evt.getNodeUrl(), state, evt.getHostName(), evt.getNodeOwner());
+		String ipaddress = null;
+		try{
+			 ipaddress = NodeFactory.getNode(evt.getNodeUrl()).getVMInformation().getInetAddress().getHostAddress();
+		}catch(NodeException e){
+			logger.warn("Error getting IP of node " + evt.getNodeUrl() + " ", e);
+			throw new NodeInfoException("Error getting IP of node '" + evt.getNodeUrl() + "'.");
+		}
+    	NodePublicInfo h = new NodePublicInfo(
+    			evt.getNodeUrl(), 
+    			evt.getNodeUrl(), 
+    			state, 
+    			evt.getHostName(), 
+    			evt.getNodeOwner(),
+    			ipaddress);
     	return h;
 	}
-	
 	
 	/**
 	 * Get a list containing information about all the nodes. 
@@ -180,7 +203,7 @@ public class ResourceManagerClient {
                 logger.info("No nodes handled by Resource Manager");
             } else { 
                 for (RMNodeEvent evt : listne) {
-                	NodePublicInfo h = generateNodePublicInfo(evt);
+                	NodePublicInfo h = getBasicNodePublicInfo(evt);
 	                //logger.info("- Checking id for node: " + evt.getNodeUrl());
                 	if(node2job!=null){
 	                	String jobid = node2job.get(new NodeId(evt.getNodeUrl()));

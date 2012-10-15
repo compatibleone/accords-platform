@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.compatibleone.scheduler;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -41,7 +40,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -114,6 +112,10 @@ public class SchedulerClient {
 			String username,
 			String password) throws Exception{
 		this.pendingJobId = null;
+		
+		//logger.info("HARDCODED FOR TEST");
+		//int a = 3; if (a>2){return;}
+		
 		scheduler = initializeSchedulerProxy(schedulerurl, username, password);
 	}
 	
@@ -138,6 +140,7 @@ public class SchedulerClient {
 	 * @param nodeselectioncriteria criteria to select the node (it must be a Selection Script of ProActive).
 	 * @param applicationpath path of the application to be run in the node. 
 	 * @param applicationargs arguments to pass to the application. 
+	 * @param appworkingdir working directory for the application. 
 	 * @param nodetoken special token that allow the usage of some privileged nodes. 
 	 * @param nonodes number of nodes needed by this application. 
 	 * @return information about the node in which the application runs. 
@@ -146,20 +149,30 @@ public class SchedulerClient {
 			Signal stopsignal,
 			SelectionScript nodeselectioncriteria, 
 			String applicationpath,
-			String applicationargs, 
+			String applicationargs[], 
+			String appworkingdir, 
 			String nodetoken,
 			Integer nonodes) throws Exception {
+		
+		//logger.info("HARDCODED FOR TEST");
+		//int a = 3; if (a>2){ return "{\"id\":\"12385\",\"adminPass\":\"passWord\",\"status\":\"RUNNING\",\"hostname\":\"cper-PC\",\"privateip\":\"138.96.126.112\",\"publicip\":\"138.96.126.112\",\"nodeurl\":\"pamr://6131/xps1\",\"owner\":\"mjost\"}"; }
+		
 		
 		logger.info("Creating job and tasks...");
 		NativeTask primaryTask = new NativeTask();
 		logger.info("Using application path:  '"+applicationpath+"'...");
 		logger.info("Using application args:  '"+applicationargs+"'...");
-		String workingdir = (new File(applicationpath)).getParent();
-		logger.info("Using working directory: '"+workingdir+"'...");
-		primaryTask.setWorkingDir(workingdir);
+		for (String arg:applicationargs){
+			logger.info(" - '"+arg+"'");
+		}
+		
+		logger.info("Using app. working dir:  '"+appworkingdir+"'...");
+		
+		primaryTask.setWorkingDir(appworkingdir);
 		primaryTask.setCommandLine(Misc.getStringArray(applicationpath, applicationargs));
 		primaryTask.setName(applicationpath);
-		logger.debug("Using selection script: '"+nodeselectioncriteria.getScript()+"'...");
+		
+		logger.info("Using selection script: '"+nodeselectioncriteria.getScript()+"'...");
 		primaryTask.addSelectionScript(nodeselectioncriteria);
 		
 		if (nonodes != null && nonodes > 1){
@@ -231,34 +244,22 @@ public class SchedulerClient {
 		logger.info("Execution status: " + status);
 
 		ResourceManagerClient rm = ResourceManagerClient.getInstance();
-		NodePublicInfo nodePublicInfo = rm.getNodePublicInfo(runningnode, null);
+		NodePublicInfo nodePublicInfo = rm.getCompleteNodePublicInfo(runningnode, null);
+		rm.disconnect();
 		
-		String hostname = nodePublicInfo.getHostname(); 
-		String address = null;
-		try{
-			address = InetAddress.getByName(hostname).getHostAddress();
-		}catch(Exception e){
-			try{
-				address = InetAddress.getByName(runningnode).getHostAddress();
-			}catch(Exception ee){
-				
-				logger.warn("Could not find out the IP address of host with hostname: '" + hostname + "' or '" + runningnode + "'.");
-				throw new Exception("Cannot resolve IP address for: '" + hostname + "' or '" + runningnode + "'");
-			}
-		}
+		logger.info("IP address detected: " + nodePublicInfo.getIpAddress());
 		
 		// Return a json formatted object with all information needed. 
 		NodeInfo ret = new NodeInfo(
 				jobId.toString(), 
 				"passWord", 
 				new CONodeState(status), 
-				hostname, 
-				address, 
-				address, 
+				nodePublicInfo.getHostname(), 
+				nodePublicInfo.getIpAddress(), 
+				nodePublicInfo.getIpAddress(), 
 				nodePublicInfo.getNodeURL(), 
 				nodePublicInfo.getOwner());
 				
-		
 		if (stopsignal.getValue()==true){
 			logger.info("Job executed but too late...");
 			removeJobAlone(jobId);
@@ -269,6 +270,11 @@ public class SchedulerClient {
 	}
 
 	
+	/**
+	 * Best effort to remove a job.
+	 * @param jobId of the job to remove.
+	 * @throws Exception if something goes wrong.
+	 */
 	public void removeJobAlone(final JobId jobId) throws Exception{
 		logger.info("Trying to FINAL release node whose related id is: " + jobId);
 		Callable<String> callable = new Callable<String>(){
@@ -352,6 +358,23 @@ public class SchedulerClient {
 		return "{}";
 	}
 	
+	public class AppenderTester extends AppenderSkeleton {
+		protected Logger logger  =						// Logger. 
+			Logger.getLogger(AppenderTester.class.getName()); 
+        @Override
+        protected void append(LoggingEvent loggingevent) {
+            logger.info(">> " + loggingevent.getMessage());
+        }
+        @Override
+        public void close() {
+            super.closed = true;
+        }
+        @Override
+        public boolean requiresLayout() {
+            return false;
+        }
+    }
+	
 	/**
 	 * Release the node (by killing the application/task that it runs).
 	 * @param uuid of the node/task/application/job.
@@ -385,7 +408,7 @@ public class SchedulerClient {
 		if (this.pendingJobId != null){
 			logger.warn("There is a pending job (" + pendingJobId + "). Trying to kill it...");
 			try{
-				releaseNode(pendingJobId);
+				this.releaseNode(pendingJobId);
 			}catch(Exception r){
 				logger.warn("Error while killing the job " + pendingJobId + ": " + r.getMessage());
 			}
@@ -393,23 +416,9 @@ public class SchedulerClient {
 		}
 	}
 	
-	public class AppenderTester extends AppenderSkeleton {
-		protected Logger logger  =						// Logger. 
-			Logger.getLogger(AppenderTester.class.getName()); 
-        @Override
-        protected void append(LoggingEvent loggingevent) {
-            logger.info(">> " + loggingevent.getMessage());
-        }
-        @Override
-        public void close() {
-            super.closed = true;
-        }
-        @Override
-        public boolean requiresLayout() {
-            return false;
-        }
-    }
-	
+	/** 
+	 * Disconnect this scheduler stub.
+	 **/
 	public void disconnect(){
 		try{
 			scheduler.disconnect();

@@ -43,5 +43,5 @@ export CLASSPATH=$CPATH
 #$JAVA_HOME/bin/java -Xmx1024m org.ow2.proactive.compatibleone.pajavaprocci.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-demo.properties $@ -v 3
 
 # Uncomment if PACA Grid connection wanted (needs a PACA Grid account). 
-$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-pacagrid.properties $@  -v 3
+$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci.properties $@  -v 3
 

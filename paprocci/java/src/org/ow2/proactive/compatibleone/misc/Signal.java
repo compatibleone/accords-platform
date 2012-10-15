@@ -5,11 +5,11 @@ public class Signal {
 	
 	public Signal(boolean value){}
 	
-	public boolean getValue(){
+	public synchronized boolean getValue(){
 		return value;
 	};
 	
-	public void setValue(boolean k){
+	public synchronized void setValue(boolean k){
 		value = k;
 	};
 	

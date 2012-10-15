@@ -23,14 +23,15 @@ public class NodePublicInfo {
 	private String hostname;
 	private String owner;
 	private String id;
-				
+	private String ipaddress;
 	
-	public NodePublicInfo(String nodeid, String nodeurl, CONodeState status, String hostname, String owner){
+	public NodePublicInfo(String nodeid, String nodeurl, CONodeState status, String hostname, String owner, String ipaddress){
 		this.nodeid = nodeid;
 		this.nodeurl = nodeurl;
 		this.status = status.toString();
 		this.hostname = hostname;
 		this.owner = owner;
+		this.ipaddress = ipaddress;
 	}
 	
 	public String getId() {
@@ -59,6 +60,10 @@ public class NodePublicInfo {
 	
 	public String getOwner() {
 		return owner;
+	}
+	
+	public String getIpAddress() {
+		return ipaddress;
 	}
 	
 	public String toString(){

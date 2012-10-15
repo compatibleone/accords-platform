@@ -94,6 +94,8 @@ public class NodeMonitor {
     public Object monitor(String jmxnodeurl, String mbean, String attribute) throws Exception {
         
         RMCachingProxyUserInterface rm = new RMCachingProxyUserInterface();
+        
+        logger.info("Getting connected to RMJMX...");
         boolean connected = rm.init(auth.getHostURL(), credentials);
         
     	if (connected){

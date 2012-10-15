@@ -90,12 +90,6 @@ public final class ProcciParametersHandler {
 		args.addNewOption("j", "get-node-info", true);											// Get information of a node.  
 		args.addNewOption("k", "get-node-output", true);										// Get stdout and stderr of a task (running in a node).  
 		
-		args.addNewOption("r", "monitor-node", true);											// Get monitoring information of a node.  
-		args.addNewOption("e", "mbean", true);
-		args.addNewOption("i", "attribute", true);
-		
-		args.addNewOption("c", "select-by-hostname", true);
-		args.addNewOption("f", "select-by-file-existent", true);
 		args.addNewOption("g", "select-by-os", true);
 		args.addNewOption("n", "number-of-nodes", true);
 		args.addNewOption("i", "list-os", false);

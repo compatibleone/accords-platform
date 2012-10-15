@@ -109,6 +109,8 @@ public class SelectionScriptCreator {
 					printCurrentDecision();
 		}
 		//logger.info("Selection script created: " + script);
+		// Hack for \ characters that JavaScript interpret as escape characters.   
+		script = script.replace("\\", "\\\\");
 		return new SelectionScript(script, "JavaScript", true);
 	}
 	

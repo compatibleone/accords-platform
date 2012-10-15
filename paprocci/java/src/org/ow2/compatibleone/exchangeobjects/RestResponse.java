@@ -13,8 +13,7 @@ struct  rest_response {
 };	 
  */
 
-	private RestHeader first;
-	private RestHeader last;
+	private RestHeaderBlock all;
     private int status;
     private String version;
     private String message;
@@ -22,27 +21,22 @@ struct  rest_response {
     private String body;
     
     public RestResponse(
-    		RestHeader first, 
-    		RestHeader last, 
+    		RestHeaderBlock all,
     		int status, 
     		String version, 
     		String message, 
     		int type, 
     		String body){
     	
-    		this.first = first;
-    		this.last = last;
+    		this.all = all;
     		this.status = status;
     		this.version = version;
     		this.message = message;
     		this.type = type;
     		this.body = body;
     }
-    public RestHeader getFirst() {
-		return first;
-	}
-    public RestHeader getLast() {
-		return last;
+    public RestHeaderBlock getAll() {
+		return all;
 	}
     public int getStatus() {
 		return status;
@@ -59,4 +53,15 @@ struct  rest_response {
     public String getBody() {
 		return body;
 	}
+    public String toString(){
+    	return 
+    		"[" + 
+    		"block " +  all + ", \n" + 
+    		"status " +  status + ", \n" + 
+    		"version " +  version + ", \n" + 
+    		"message " +  message + ", \n" + 
+    		"type " +  type + ", \n" + 
+    		"body " +  body + ", \n" + 
+    		"]"  ;
+    }
 }

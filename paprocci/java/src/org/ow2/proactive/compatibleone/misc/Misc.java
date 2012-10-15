@@ -186,12 +186,11 @@ public class Misc {
 		exit();
 	}
 	
-	public static String[] getStringArray(String command, String arguments){
-		String[] splitargs = arguments.split(" ");
-		String[] all = new String[splitargs.length+1];
+	public static String[] getStringArray(String command, String ... arguments){
+		String[] all = new String[arguments.length+1];
 		all[0] = command;
-		for (int i=0; i<splitargs.length; i++){
-			all[i+1] = splitargs[i];
+		for (int i=0; i<arguments.length; i++){
+			all[i+1] = arguments[i];
 		}
 		return all;
 	}
