@@ -571,7 +571,7 @@ _run_osprocci() {
 }
 
 _run_paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    JDK=$(readlink -f /usr/bin/java| sed "s:/jre/bin/java::") LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386 @bindir@/paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run_osocciprocci() {
