@@ -50,7 +50,7 @@ domain=occi
 operator=accords
 password=co-system
 
-if [ `basename $0` != "co-status" ]; then
+if [ `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
 
     if [ -z "$accords_workdir" ]; then
          accords_workdir="."
@@ -80,7 +80,7 @@ if [ -z "$target" ]; then
     target=accords.xml
 fi
 
-if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" ]; then
+if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
     if test ! -e $accords_workdir/$target; then
 	echo "Can not find target file: $accords_workdir/$target."
 	echo "Please run accords-config first !"
@@ -571,7 +571,7 @@ _run_osprocci() {
 }
 
 _run_paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    JDK=$(readlink -f /usr/bin/java| sed "s:/jre/bin/java::") LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386 @bindir@/paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run_osocciprocci() {
@@ -791,8 +791,8 @@ _stop_service() {
     service=$1
     echo "Stopping service: $service"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	killall -q $service || true
-	killall -q lt-$service || true
+	killall -u $(whoami) -q $service || true
+	killall -u $(whoami) -q lt-$service || true
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	killall $service >/dev/null 2>&1 || true
 	killall lt-$service >/dev/null 2>&1 || true
