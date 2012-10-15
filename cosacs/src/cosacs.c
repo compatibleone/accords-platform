@@ -46,6 +46,7 @@ private	struct	accords_configuration Cosacs = {
 	"domain",
 	"cosacs.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

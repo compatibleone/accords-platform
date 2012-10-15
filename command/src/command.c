@@ -538,6 +538,70 @@ private	int	service_operation( char * command, char * service, char * syntax )
 	}	
 }
 
+/*	---------------------------------------------------	*/
+/*	    l l _ c o m m a n d _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------	*/
+private	int	ll_command_transaction( char * account, char * price, char * reference, char * action, char * description )
+{
+	int	status=0;
+	char *	accountid=(char *) 0;
+	char *	priceid=(char *) 0;
+
+	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
+		return(failure(78,"unknown account",account));
+	else if (!( priceid = occi_resolve_price( price, agent, default_tls() ) ))
+	{
+		accountid = liberate( accountid );
+		return(failure(78,"unknown price",price));
+	}
+	else if (!( occi_send_transaction( reference, priceid, action, accountid, description )))
+	{
+		accountid = liberate( accountid );
+		priceid = liberate( priceid );
+		return(failure(55,"transaction failure",reference));
+	}
+	else
+	{
+		accountid = liberate( accountid );
+		priceid = liberate( priceid );
+		return( 0 );
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*		c o m m a n d _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------	*/
+private	int	command_transaction( char * account, char * price, char * reference, char * action, char * description )
+{
+	int		status=0;
+	char 	*	auth=(char *) 0;
+	if (!( account ))
+		return( 30 );
+	else if (!( price ))
+		return( 31 );
+	else if (!( reference ))
+		return( 32 );
+	else if (!( description ))
+		return( 33 );
+	else
+	{
+		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+
+		status = ll_command_transaction( account ,price, reference, action, description );
+
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+
+		return( status );
+
+	}
+}
+
 /*	-----------------------------------	*/
 /*		o p e r a t i o n		*/
 /*	-----------------------------------	*/
@@ -559,6 +623,9 @@ private	int	operation( int argc, char * argv[] )
 				command = aptr;
 				continue;
 			}
+			else if (!( strcasecmp( command, "TRANSACTION" ) )) 
+				return( command_transaction( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3] ) );
+
 			else if ((!( strcasecmp( command, "COSACS" ))) && (!( syntax )))
 			{
 				syntax = aptr;
@@ -599,18 +666,19 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.01");
-	printf("\n   Beta Version : 03/10/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.02");
+	printf("\n   Beta Version : 15/10/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
-	printf("\n         command <options> START    <service_file> ");
-	printf("\n         command <options> STOP     <service_file> ");
-	printf("\n         command <options> SAVE     <service_file> ");
-	printf("\n         command <options> SNAPSHOT <service_file> ");
-	printf("\n         command <options> DELETE   <service_file> ");
-	printf("\n         command <options> COSACS   <service_file> <instruction> ");
-	printf("\n         command <options> OCCI     [body] <request> ");
-	printf("\n         command <options> INVOICE  <account>      ");
+	printf("\n         command <options> START       <service_file> ");
+	printf("\n         command <options> STOP        <service_file> ");
+	printf("\n         command <options> SAVE        <service_file> ");
+	printf("\n         command <options> SNAPSHOT    <service_file> ");
+	printf("\n         command <options> DELETE      <service_file> ");
+	printf("\n         command <options> COSACS      <service_file> <instruction> ");
+	printf("\n         command <options> OCCI        [body] <request> ");
+	printf("\n         command <options> INVOICE     <account>      ");
+	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");
