@@ -50,7 +50,7 @@ domain=occi
 operator=accords
 password=co-system
 
-if [ `basename $0` != "co-status" ]; then
+if [ `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
 
     if [ -z "$accords_workdir" ]; then
          accords_workdir="."
@@ -80,7 +80,7 @@ if [ -z "$target" ]; then
     target=accords.xml
 fi
 
-if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" ]; then
+if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
     if test ! -e $accords_workdir/$target; then
 	echo "Can not find target file: $accords_workdir/$target."
 	echo "Please run accords-config first !"

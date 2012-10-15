@@ -6,6 +6,8 @@ compatibleone-accords (0.20121015-1) unstable; urgency=low
   * Change debhelper dep so the package builds on Ubuntu 9.04.
   * Commit work with Mauricio to build compatibleone-paprocci and run it with
     the appropriate autodetected java environment.
+  * co-stop: can now be run from any directory.
+  * Add package compatibleone-example.
 
  -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 15 Oct 2012 11:08:00 +0200
 

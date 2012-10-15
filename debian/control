@@ -170,6 +170,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
 Description: CompatibleOne Accords Platform - PaaS Services subsystem
  CompatibleOne Accords Platform - PaaS Services subsystem
 
+Package: compatibleone-example
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Description: CompatibleOne Accords Platform - Example OCCI subsystem
+ CompatibleOne Accords Platform - Example OCCI subsystem
+
 Package: compatibleone-ezvm
 Section: net
 Architecture: any
@@ -263,6 +270,7 @@ Package: compatibleone-accords
 Architecture: all
 Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Recommends: compatibleone-paprocci
+Suggests: compatibleone-example
 Description: CompatibleOne Accords Platform - All packages
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
