@@ -791,8 +791,8 @@ _stop_service() {
     service=$1
     echo "Stopping service: $service"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	killall -q $service || true
-	killall -q lt-$service || true
+	killall -u $(whoami) -q $service || true
+	killall -u $(whoami) -q lt-$service || true
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	killall $service >/dev/null 2>&1 || true
 	killall lt-$service >/dev/null 2>&1 || true
