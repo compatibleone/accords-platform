@@ -11,6 +11,9 @@ export DH_OPTIONS
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+# WARNING: MAKE SURE /usr/bin/javac POINTS TO SUN'S JDK (NOT OPENJDK)
+JAVA_HOME ?= $(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+
 #CFLAGS = -Wall -g
 #ifeq (Debian,$(shell lsb_release -s -i))
 #LDFLAGS=
@@ -36,6 +39,7 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+		--enable-paprocci=$(JAVA_HOME) \
 		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
