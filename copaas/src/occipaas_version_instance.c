@@ -143,6 +143,8 @@ private void autoload_paas_version_instance_nodes() {
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "default_instance" )) != (struct xml_atribut *) 0)
 				pptr->default_instance = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "uri" )) != (struct xml_atribut *) 0)
+				pptr->uri = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -184,6 +186,9 @@ public  void autosave_paas_version_instance_nodes() {
 		fprintf(h," default_instance=%c",0x0022);
 		fprintf(h,"%s",(pptr->default_instance?pptr->default_instance:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," uri=%c",0x0022);
+		fprintf(h,"%s",(pptr->uri?pptr->uri:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -216,6 +221,8 @@ private void set_paas_version_instance_field(
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "default_instance" ) ))
 			pptr->default_instance = allocate_string(vptr);
+		if (!( strcmp( nptr, "uri" ) ))
+			pptr->uri = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -277,6 +284,13 @@ private int pass_paas_version_instance_filter(
 		else if ( strcmp(pptr->default_instance,fptr->default_instance) != 0)
 			return(0);
 		}
+	if (( fptr->uri )
+	&&  (strlen( fptr->uri ) != 0)) {
+		if (!( pptr->uri ))
+			return(0);
+		else if ( strcmp(pptr->uri,fptr->uri) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -303,6 +317,9 @@ private struct rest_response * paas_version_instance_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.default_instance=%s",optr->domain,optr->id,pptr->default_instance);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.uri=%s",optr->domain,optr->id,pptr->uri);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -699,6 +716,19 @@ private void	redirect_occi_paas_version_instance_mt( struct rest_interface * ipt
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas_version_instance(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_version_instance_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -720,8 +750,12 @@ public struct occi_category * occi_paas_version_instance_builder(char * a,char *
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "default_instance",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "uri",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_version_instance)))
+			return( optr );
 		autoload_paas_version_instance_nodes();
 		return(optr);
 	}
@@ -791,6 +825,17 @@ public struct rest_header *  paas_version_instance_occi_headers(struct paas_vers
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas_version_instance.default_instance='%s'\r\n",(sptr->default_instance?sptr->default_instance:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_version_instance.uri='%s'\r\n",(sptr->uri?sptr->uri:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

@@ -50,18 +50,22 @@ domain=occi
 operator=accords
 password=co-system
 
-if [ -z "$accords_workdir"]; then
-	accords_workdir="."
-fi
+if [ `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
 
-if [ ! -d "$accords_workdir" ]; then
-        echo "$accords_workdir: no such directory"
-        exit 1
-fi
+    if [ -z "$accords_workdir" ]; then
+         accords_workdir="."
+    fi
 
-if [ ! -d "$accords_workdir/rest" ]; then
-        echo "$accords_workdir/rest: no such directory"
-        exit 1
+    if [ ! -d "$accords_workdir" ]; then
+         echo "$accords_workdir: no such directory"
+         exit 1
+    fi
+
+    if [ ! -d "$accords_workdir/rest" ]; then
+         echo "$accords_workdir/rest: no such directory"
+         exit 1
+    fi
+
 fi
 
 cd $accords_workdir
@@ -74,6 +78,14 @@ fi
 
 if [ -z "$target" ]; then
     target=accords.xml
+fi
+
+if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
+    if test ! -e $accords_workdir/$target; then
+	echo "Can not find target file: $accords_workdir/$target."
+	echo "Please run accords-config first !"
+	exit 1
+    fi
 fi
 
 if [ -z "$resthost" ]; then
@@ -241,7 +253,7 @@ _co_start() {
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
-    sleep 5
+    sleep 10
     @bindir@/co-parser accounts
     @bindir@/co-parser metrics
     @bindir@/co-parser coips
@@ -559,7 +571,7 @@ _run_osprocci() {
 }
 
 _run_paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    JDK=$(readlink -f /usr/bin/java| sed "s:/jre/bin/java::") LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386 @bindir@/paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run_osocciprocci() {
@@ -655,6 +667,9 @@ _accords_config() {
 	echo "Creating Accords Security Files"
     
 	export calist=Certificates.crt
+	if [ -f /etc/accords/Certificates.crt ]; then
+		export calist=/etc/accords/Certificates.crt
+	fi
 	export pass=Accords
 
 	if [ -z "$nethsm" ]; then 
@@ -776,8 +791,8 @@ _stop_service() {
     service=$1
     echo "Stopping service: $service"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	killall -q $service || true
-	killall -q lt-$service || true
+	killall -u $(whoami) -q $service || true
+	killall -u $(whoami) -q lt-$service || true
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	killall $service >/dev/null 2>&1 || true
 	killall lt-$service >/dev/null 2>&1 || true
@@ -945,14 +960,6 @@ _mkpro() {
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
 }
-
-if test "`basename $0`" != "accords-config"; then
-    if test ! -e $target; then
-	echo "Can not find target file: $target."
-	echo "Please run accords-config first !"
-	exit 1
-    fi
-fi
 
 case `basename $0` in
     co-start) 

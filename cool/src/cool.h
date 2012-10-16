@@ -61,6 +61,7 @@ struct	elastic_control
 	/* ------------------------------------ */
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
+	char 	*	security;
 	int		floor;
 	int		ceiling;
 	int		strategy;
@@ -103,6 +104,7 @@ struct	elastic_control
 	struct	elastic_contract * current;
 
 	int	*	unitdata;
+
 
 };
 

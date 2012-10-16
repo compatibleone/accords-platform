@@ -43,6 +43,7 @@ public	char *	occi_resolve_consumer( char * consumer, char * agent, char * tls )
 public	char *	occi_resolve_consumer_identity( char * consumer, char * agent, char * tls );
 public	char *	occi_resolve_metric( char * metric, char * agent, char * tls );
 public	char *	occi_resolve_account( char * name, char * agent, char * tls );
+public	char *	occi_resolve_price( char * name, char * agent, char * tls );
 
 
 	/* ---------------- */

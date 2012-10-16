@@ -3,7 +3,7 @@ target=config-$1.xml
 zone=$2
 thishost=$3
 pubhost=$4
-tls=
+tls=security
 if test -z "$tls"; then
 	prefix="http://"
 else
@@ -34,7 +34,7 @@ echo "    <security" >> $target
 echo "         user='service-"${module}"'" >> $target
 echo "         password='"$password"'" >> $target
 echo "         monitor='"$monitor"'" >> $target
-echo "         tls=''/>" >> $target
+echo "         tls='"${tls}"/"${module}"Tls.xml'/>" >> $target
 echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
 echo "</"${module}">" >> $target
 echo "</accords>" >> $target

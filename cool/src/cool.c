@@ -105,8 +105,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.02");
-	printf("\n   Beta Version : 29/08/2012 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.04");
+	printf("\n   Beta Version : 09/10/2012 ");
 	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -161,6 +161,7 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
+	(char *) 0,	/* elastic security	*/
 	1,	/* elastic floor 		*/
 	2, 	/* elastic ceiling		*/
 	0,	/* elastic strategy		*/
@@ -283,7 +284,7 @@ private	struct elastic_contract * allocate_elastic_contract()
 		return( eptr );
 	else	memset( (char *) eptr, 0, sizeof( struct elastic_contract ) );
 
-	if (!( eptr->service = allocate_string( (default_tls()? "https" : "http" ) )))
+	if (!( eptr->service = allocate_string( ( rest_valid_string( Elastic.security ) ? "https" : "http" ) )))
 		return( liberate_elastic_contract( eptr ) );
 	else	eptr->port = Cool.restport;
 	return( eptr );
@@ -896,6 +897,32 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 }
 
 /*	---------------------------------------------	*/
+/*	o c c i _ e l a s t i c _ c o n d i t i o n s	*/
+/*	---------------------------------------------	*/
+private	struct elastic_contract * occi_elastic_conditions(
+	struct elastic_contract * eptr,
+	char * sla,
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty )
+{
+	struct	occi_response * zptr;
+	if (!( rest_valid_string( sla ) ))
+		return( eptr );
+	else if (!( zptr = occi_simple_get( sla, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( liberate_elastic_contract( eptr ) );
+	else if (!( cords_retrieve_conditions( sla, sla, zptr, selector, warranty, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( eptr );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( liberate_elastic_contract( eptr ) );
+	}
+}
+
+/*	---------------------------------------------	*/
 /*	  n e w _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
 /*	creates a new elastic contract by duplicating	*/
@@ -1005,6 +1032,9 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->name = allocate_string( result ) ))
+		return( liberate_elastic_contract( eptr ) );
+
+	else if (!( eptr = occi_elastic_conditions( eptr, eptr->agreement, &selector, &warranty ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
@@ -1322,6 +1352,12 @@ private	int	load_balancer( char * nptr )
 		Cool.tls = (char *) 0;
 
 	/* -------------------------------------------- */
+	/* ensure TLS is correct either NULL or Valid   */
+	/* -------------------------------------------- */
+	if (!( rest_valid_string( Elastic.security ) ))
+		Elastic.security = (char *) 0;
+
+	/* -------------------------------------------- */
 	/* the ceiling must be higher or equal to floor */
 	/* -------------------------------------------- */
 	if ( Elastic.floor > Elastic.ceiling )
@@ -1353,7 +1389,7 @@ private	int	load_balancer( char * nptr )
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
 	cool_log_message( "rest server starting", 0 );
-	status = rest_server(  nptr, Cool.restport, Cool.tls, 0, &Osi );
+	status = rest_server(  nptr, Cool.restport, Elastic.security, 0, &Osi );
 	cool_log_message( "rest server shutdown", 0 );
 	return( status );
 }
@@ -1369,6 +1405,8 @@ private	int	cool_operation( char * nptr )
 	struct	elastic_contract * ecptr;
 	char *	eptr;
 	int	status;
+	char *	tls;
+	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
 
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
@@ -1381,11 +1419,33 @@ private	int	cool_operation( char * nptr )
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
+	/* -------------------------------------------- */
+	/* handle transport layer security, if required */
+	/* -------------------------------------------- */
+	if (!( rest_valid_string(Cool.tls) ))
+		Cool.tls = (char *) 0;
+	else if (!( tlsconf = tls_configuration_load( Cool.tls ) ))
+		return( 40 );
+	else if ( tlsconf->authenticate )
+	{
+		if ((Cool.user) && (Cool.password))
+		{
+			if ((status = occi_secure_AAA( Cool.user, Cool.password, nptr, Cool.tls )) != 0)
+				return( status );
+			else	cool_log_message( "authentication", 0 );
+		}
+	}
+
 	cool_log_message( "operation", 0 );
 
 	/* ------------------------------ */
 	/* analyse the elasticity options */
 	/* ------------------------------ */
+	if (!( eptr = getenv( "elastic_security" ) ))
+		Elastic.security = (char *) 0;
+	else if (!( Elastic.security = allocate_string( eptr ) ))
+		return( 27 );
+
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
@@ -1439,6 +1499,16 @@ private	int	cool_operation( char * nptr )
 	{
 		Elastic.first = ecptr->next;
 		ecptr = liberate_elastic_contract( ecptr );
+	}
+
+	/* -------------------------------------------- */
+	/* terminate security session, if one is active */
+	/* -------------------------------------------- */
+	if (( Cool.tls ) && ( tlsconf ))
+	{
+		occi_release_AAA( Cool.user, Cool.password, nptr, Cool.tls );
+		if ( tlsconf )
+			tlsconf = release_tls_configuration(tlsconf );
 	}
 
 	return( status );

@@ -11,6 +11,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = scripts
+SUBDIRS += manifests
+
 if ENABLE_COXML
 SUBDIRS += coxml
 endif
@@ -141,9 +143,9 @@ if ENABLE_TESTDC
 SUBDIRS += testdc
 endif
 
-EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd accords.spec.in
+EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in
 
-SPEC=$(PACKAGE).spec
+SPEC=compatibleone.spec
 SPEC_DIR:=$(shell rpm -E '%{_specdir}')
 SOURCE_DIR:=$(shell rpm -E '%{_sourcedir}')
 

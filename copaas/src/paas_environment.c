@@ -37,8 +37,8 @@ public struct paas_environment * liberate_paas_environment(struct paas_environme
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->uri )
 			 sptr->uri = liberate(sptr->uri);
-		if ( sptr->config_template )
-			 sptr->config_template = liberate(sptr->config_template);
+		if ( sptr->paas_configuration_template )
+			 sptr->paas_configuration_template = liberate(sptr->paas_configuration_template);
 		if ( sptr->date_created )
 			 sptr->date_created = liberate(sptr->date_created);
 		if ( sptr->date_updated )
@@ -63,7 +63,7 @@ public struct paas_environment * reset_paas_environment(struct paas_environment 
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->uri = (char*) 0;
-		sptr->config_template = (char*) 0;
+		sptr->paas_configuration_template = (char*) 0;
 		sptr->date_created = (char*) 0;
 		sptr->date_updated = (char*) 0;
 		sptr->description = (char*) 0;
@@ -107,9 +107,9 @@ public int xmlin_paas_environment(struct paas_environment * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->uri = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"config_template") ))
+		else if (!( strcmp(wptr->name,"paas_configuration_template") ))
 		{
-			if ( wptr->value ) { sptr->config_template = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->paas_configuration_template = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"date_created") ))
 		{
@@ -148,7 +148,7 @@ public int rest_occi_paas_environment(FILE * fh,struct paas_environment * sptr,c
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.uri='%s'\r\n",prefix,nptr,(sptr->uri?sptr->uri:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.config_template='%s'\r\n",prefix,nptr,(sptr->config_template?sptr->config_template:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_configuration_template='%s'\r\n",prefix,nptr,(sptr->paas_configuration_template?sptr->paas_configuration_template:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_created='%s'\r\n",prefix,nptr,(sptr->date_created?sptr->date_created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_updated='%s'\r\n",prefix,nptr,(sptr->date_updated?sptr->date_updated:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));

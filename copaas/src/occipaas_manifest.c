@@ -137,8 +137,14 @@ private void autoload_paas_manifest_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "xmlns" )) != (struct xml_atribut *) 0)
-				pptr->xmlns = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
+				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "scope" )) != (struct xml_atribut *) 0)
+				pptr->scope = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_description" )) != (struct xml_atribut *) 0)
+				pptr->paas_description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application" )) != (struct xml_atribut *) 0)
+				pptr->paas_application = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -171,8 +177,17 @@ public  void autosave_paas_manifest_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," xmlns=%c",0x0022);
-		fprintf(h,"%s",(pptr->xmlns?pptr->xmlns:""));
+		fprintf(h," access=%c",0x0022);
+		fprintf(h,"%s",(pptr->access?pptr->access:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," scope=%c",0x0022);
+		fprintf(h,"%s",(pptr->scope?pptr->scope:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," paas_description=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_description?pptr->paas_description:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," paas_application=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application?pptr->paas_application:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -200,8 +215,14 @@ private void set_paas_manifest_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "xmlns" ) ))
-			pptr->xmlns = allocate_string(vptr);
+		if (!( strcmp( nptr, "access" ) ))
+			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "scope" ) ))
+			pptr->scope = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_description" ) ))
+			pptr->paas_description = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application" ) ))
+			pptr->paas_application = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -242,11 +263,32 @@ private int pass_paas_manifest_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->xmlns )
-	&&  (strlen( fptr->xmlns ) != 0)) {
-		if (!( pptr->xmlns ))
+	if (( fptr->access )
+	&&  (strlen( fptr->access ) != 0)) {
+		if (!( pptr->access ))
 			return(0);
-		else if ( strcmp(pptr->xmlns,fptr->xmlns) != 0)
+		else if ( strcmp(pptr->access,fptr->access) != 0)
+			return(0);
+		}
+	if (( fptr->scope )
+	&&  (strlen( fptr->scope ) != 0)) {
+		if (!( pptr->scope ))
+			return(0);
+		else if ( strcmp(pptr->scope,fptr->scope) != 0)
+			return(0);
+		}
+	if (( fptr->paas_description )
+	&&  (strlen( fptr->paas_description ) != 0)) {
+		if (!( pptr->paas_description ))
+			return(0);
+		else if ( strcmp(pptr->paas_description,fptr->paas_description) != 0)
+			return(0);
+		}
+	if (( fptr->paas_application )
+	&&  (strlen( fptr->paas_application ) != 0)) {
+		if (!( pptr->paas_application ))
+			return(0);
+		else if ( strcmp(pptr->paas_application,fptr->paas_application) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -268,7 +310,16 @@ private struct rest_response * paas_manifest_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.xmlns=%s",optr->domain,optr->id,pptr->xmlns);
+	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.paas_description=%s",optr->domain,optr->id,pptr->paas_description);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.paas_application=%s",optr->domain,optr->id,pptr->paas_application);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -665,6 +716,19 @@ private void	redirect_occi_paas_manifest_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas_manifest(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_manifest_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -680,10 +744,18 @@ public struct occi_category * occi_paas_manifest_builder(char * a,char * b) {
 		redirect_occi_paas_manifest_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "xmlns",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "scope",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "paas_description",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "paas_application",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_manifest)))
+			return( optr );
 		autoload_paas_manifest_nodes();
 		return(optr);
 	}
@@ -730,7 +802,40 @@ public struct rest_header *  paas_manifest_occi_headers(struct paas_manifest * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_manifest.xmlns='%s'\r\n",(sptr->xmlns?sptr->xmlns:""));
+	sprintf(buffer,"occi.paas_manifest.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_manifest.scope='%s'\r\n",(sptr->scope?sptr->scope:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_manifest.paas_description='%s'\r\n",(sptr->paas_description?sptr->paas_description:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_manifest.paas_application='%s'\r\n",(sptr->paas_application?sptr->paas_application:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

@@ -1,0 +1,641 @@
+%define _enable_debug_packages %{nil}
+%define debug_package          %{nil}
+%define distname accords
+
+%define major 0
+%define libname lib%{name}-accords%{major}
+%define libnamedev lib%{name}-accords-devel
+
+%define ssldev openssl-devel
+%define uuiddev libuuid-devel
+%define group System/Management
+
+%if 0%{?mandriva_version}
+%define group  System/Servers
+%define libname %mklibname %{name}-accords %major
+%define libnamedev %mklibname %{name}-accords %major -d
+%endif
+
+%if 0%{?suse_version}
+%define ssldev libopenssl-devel
+%endif
+
+Summary:	CompatibleOne cloud brokering platform
+Name:		compatibleone
+Version:	_VERSION
+Release:	12.0
+License:	GPL
+Group:		%{group}
+URL:		http://www.compatibleone.org
+Source0:	%{distname}-%{version}.tar.gz
+BuildRequires:  %{uuiddev}
+BuildRequires:  %{ssldev}
+Requires:       lsb
+Prereq:		/sbin/ldconfig
+
+%description
+CompatibleOne Accords platform base files
+
+#-------------------------------------------
+
+%package -n %{libname}
+Group:      Libraries
+Summary:    CompatibleOne Accords Platform Base Libraries and Files
+Requires:   %{name} = %{version}-%{release}
+
+%description -n %{libname}
+CompatibleOne Accords platform base dynamic libraries and Files
+
+#-------------------------------------------
+
+%package -n %{libnamedev}
+Group:      Development/Libraries/C and C++
+Summary:    compatibleOne Accords development files
+Requires:   %{libname} = %{version}-%{release}
+
+%description -n %{libnamedev}
+CompatibleOne Accords development files; For developpers only.
+
+#-------------------------------------------
+%package azprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Azur Procci subsystem
+
+%description azprocci
+CompatibleOne Accords Platform - Azur Procci subsystem
+
+#-------------------------------------------
+
+%package broker
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Broker subsystem
+
+%description broker
+Broker subsystem of the CompatibleOne Accords Platform
+
+#-------------------------------------------
+
+%package coees
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COEES subsystem
+
+%description coees
+The CompatibleOne Energy Efficiency Service component is a standalone OCCI REST
+server executable program and must have been started before any provisioning plan
+energy efficiency processing may be performed for the provisioning of resources.
+
+#-------------------------------------------
+
+%package cops
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COPS subsystem
+
+%description cops
+The CompatibleOne Placement Services module is a standalone OCCI REST server
+executable program and must have been started before any provisioning plan smart
+placement processing may be performed for the provisioning of resources.
+This component is of particular importance as a target or consumer of monitoring
+information in the form of provisioning alerts which will be used in the elaboration
+of the scoring information that will be used to influence the selection of particular
+provider platforms during subsequent placement operations.
+
+#-------------------------------------------
+
+%package coips
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COIPS subsystem
+
+%description coips
+COIPS subsystem of the CompatibleOne Accords Platform
+The CompatibleOne Image Production Services module is a standalone OCCI REST
+server executable program and must have been started before any manifest parser
+image production processing may be performed for the provisioning of application
+images for computational resources.
+
+#-------------------------------------------
+
+%package comons
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COMONS subsystem
+
+%description comons
+The CompatibleOne Monitoring Services component is a standalone OCCI REST server
+executable program and must have been started after the security services and
+before all other components of the platform.
+
+#-------------------------------------------
+
+%package conets
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - CONETS subsystem
+
+%description conets
+The CompatibleOne Network Services component is a standalone OCCI REST server
+executable program and must have been started before any provisioning of application
+images may be performed through the broker.
+
+#-------------------------------------------
+
+%package coobas
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COOBAS subsystem
+
+%description coobas
+The CompatibleOne Ordering, Billing and Accountancy Services component is a standalone
+OCCI REST server executable program and must have been started after the monitoring
+services and before all other components of the platform.
+This component is responsible for the management of the platform price list comprising
+the prices of the different categories and provisioning operations. This information
+is intended to be configured using external user interfaced tools provided by third
+party software vendors but can also be configured by hand by editing the corresponding
+category configuration file, “cords_price.xml”,  prior to launching the COOBAS module.
+
+#-------------------------------------------
+
+%package cool
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COOL subsystem
+
+%description cool
+The CompatibleOne Elasticity Manager subsystem is a standalone OCCI REST server
+executable program and must have been started before any provisioning of application
+images may be performed through the broker.
+
+#-------------------------------------------
+
+%package cosacs
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COSACS subsystem
+
+%description cosacs
+The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
+server executable program that will have been embedded in the application image produced by
+the preceding Application Image Production tool. The component will be used through the
+provisioning procci components for the personalization of the application image during
+resource deployment startup.
+The module also provides the monitoring control channels for the activation of monitoring
+agents and their data collection probes.
+
+#-------------------------------------------
+
+%package cosched
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COSCHED subsystem
+
+%description cosched
+Scheduling subsystem for the CompatibleOne Accords Platform
+
+#-------------------------------------------
+
+%package coss
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - COSS subsystem
+
+%description coss
+The CompatibleOne Security Services component is a standalone OCCI REST server
+executable program and must have been started after the publisher and before all other
+components of the platform.
+The principles, on which the security of the platform depends, require the use of
+Transport Layer Security (TLS 1.0) to be announced and accepted by all server and client
+endpoints. The exchange of Certificates between communicating endpoints is strongly encouraged.
+Authentication of processes and users must be performed through an identity management
+system and will result in authorization being accorded for access to the platform and its components.
+
+#-------------------------------------------
+
+%package dcprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
+
+%description dcprocci
+CompatibleOne Accords Platform - Delta Cloud Procci subsystem
+
+#-------------------------------------------
+
+%package jpaasprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - JPaaS Procci subsystem
+
+%description jpaasprocci
+CompatibleOne Accords Platform - JPaaS Procci subsystem
+
+#-------------------------------------------
+
+%package copaas
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - PaaS Services subsystem
+
+%description copaas
+CompatibleOne Accords Platform - PaaS Services subsystem
+
+#-------------------------------------------
+
+%package ezvm
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - EZVM subsystem
+
+%description ezvm
+This standalone OCCI REST server executable program enables the instantiations of
+VM on various cloud service providers while providing a complete abstraction of the
+portability problems for the consumer. It also enables to move from one cloud to
+another by running VM images on various providers. EZVM must have been started
+before any manifest parser image production processing may be performed for the
+provisioning of application images for computational resources.
+
+#-------------------------------------------
+
+%package fileserver
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Fileserver subsystem
+
+%description fileserver
+CompatibleOne Accords Platform - Fileserver subsystem
+
+#-------------------------------------------
+
+%package onprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Open Nebula Procci subsystem
+
+%description onprocci
+CompatibleOne Accords Platform - Open Nebula Procci subsystem
+
+#-------------------------------------------
+
+%package osocciprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+#Suggests: %{name}-testosocci
+Summary: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
+
+%description osocciprocci
+CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
+
+#-------------------------------------------
+
+%package osprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+#Suggests: %{name}-testosocci
+Summary: CompatibleOne Accords Platform - Open Stack Procci subsystem
+
+%description osprocci
+CompatibleOne Accords Platform - Open Stack Procci subsystem
+
+#-------------------------------------------
+
+#%package paprocci
+#Group: %{group}
+#Requires: %{name} = %{version}-%{release}
+#Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
+#
+#%description paprocci
+#CompatibleOne Accords Platform - ProActive Procci subsystem
+#
+
+#-------------------------------------------
+
+%package procci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Procci
+
+%description procci
+This component of the ACCORDS platform is responsible for the management of generic
+provisioning contracts as requested by the service broker during the creation of the
+service instance control graph.  Provider specific contracts will be negotiated here
+using the provider specific procci components as required by the description of the
+node to be provisioned. This standalone OCCI REST server executable program and must
+have been started before any provisioning plan processing may be performed for the
+provisioning of resources.
+
+#-------------------------------------------
+
+%package publisher
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Publisher
+
+%description publisher
+The publisher is responsible for the management of service publications performed
+by the components comprising the platform. Each of the different service provider
+components comprising the platform will publish its collection of categories for
+use by other components. The publisher is provided as a standalone OCCI REST
+server executable program and must have been started before any of the other
+components may be used.
+
+#-------------------------------------------
+
+%package slam
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - SLA Manager
+
+%description slam
+Service Level Agreement for the CompatibleOne Accords Platform
+
+#-------------------------------------------
+
+%package testosocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Open Stack inspection tool
+
+%description testosocci
+This command line tool allows inspection of the Open Stack platform
+resources that are available or have been provisioned using the following command line syntax
+
+#-------------------------------------------
+
+%package accords
+BuildArch: noarch
+Requires: %{name} = %{version}-%{release}
+Requires: %{libnamedev}
+Requires: %{libname}
+Requires: %{name}-azprocci
+Requires: %{name}-broker
+Requires: %{name}-coees
+Requires: %{name}-cops
+Requires: %{name}-coips
+Requires: %{name}-comons
+Requires: %{name}-conets
+Requires: %{name}-coobas
+Requires: %{name}-cosacs
+Requires: %{name}-cosched
+Requires: %{name}-coss
+Requires: %{name}-dcprocci
+Requires: %{name}-ezvm
+Requires: %{name}-fileserver
+Requires: %{name}-onprocci
+Requires: %{name}-osocciprocci
+Requires: %{name}-osprocci
+Requires: %{name}-procci
+Requires: %{name}-publisher
+Requires: %{name}-slam
+Requires: %{name}-testosocci
+Requires: %{name}-accords-doc
+Conflicts: accords
+Obsoletes: accords
+Summary: CompatibleOne Accords Platform - All packages
+
+%description accords
+CompatibleOne is an open source project which provides a model, CORDS
+(CompatibleOne Resource Description Schema), and a platform,
+ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
+for the description and federation of different clouds comprising resources provisioned
+by heterogeneous cloud service providers. CompatibleOne's flexible service architecture
+makes it independent from any Cloud Service Provider (from OpenStack to OpenNebula,
+from Azure to Vcloud) and can address all types of cloud services (IaaS, PaaS, SaaS,
+XaaS, BpaaS, …) and any type of cloud service deployment (public, private, community and hybrid).
+The goals of CompatibleOne are to:
+- Provide entrepreneurs and organisations unimpeded access to cloud technologies
+- Provide innovative platform of services, that go beyond the standard services provided by existing cloud providers
+- Remove the constraints of vendor lock-in
+- Provide a platform that the community can evolve rapidly and adapt according to their needs
+
+#-------------------------------------------
+
+%package accords-doc
+BuildArch: noarch
+Summary: documentation for CompatibleOne Accord's platform
+
+%description accords-doc
+CompatibleOne is an open source project which provides a model
+and a platform for the description and federation of different clouds comprising resources
+by heterogeneous cloud service providers.
+
+#-------------------------------------------
+
+%prep
+%setup -q -n %{distname}-%{version}
+
+%build
+%configure CFLAGS="-Wl,--no-as-needed" LDFLAGS="-Wl,--no-as-needed"
+make
+
+%install
+rm -rf ${RPM_BUILD_ROOT}
+make DESTDIR="${RPM_BUILD_ROOT}" install
+
+# create some directories
+for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords/rest %{_localstatedir}/log/accords/rest; do
+	mkdir -p ${RPM_BUILD_ROOT}$dir
+done;
+
+# install some extra files
+cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
+cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
+
+# add a fake file to produce a useless package
+cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
+This package contains nothing, and only exists to pull dependencies.
+EOF
+
+# remove unpackaged files
+rm ${RPM_BUILD_ROOT}%{_bindir}/example
+#TODO: remove this line once paprocci is packaged again
+rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
+
+%post
+
+if [ -e %{_localstatedir}/lib/accords/accords.xml ] ; then
+	exit 0
+fi
+
+cd %{_localstatedir}/lib/accords/ && accords-config
+# %{_sysconfdir}/init.d/compatibleone start
+
+%preun
+%if 0%{?suse_version}
+%stop_on_removal compatibleone
+%endif
+
+%postun
+%if 0%{?suse_version}
+%restart_on_update compatibleone
+%insserv_cleanup
+%endif
+
+%post -n %{libname}
+/sbin/ldconfig
+
+%post -n %{libnamedev}
+/sbin/ldconfig
+
+%postun -n %{libname}
+/sbin/ldconfig
+
+%postun -n %{libnamedev}
+/sbin/ldconfig
+
+%clean
+rm -rf ${RPM_BUILD_ROOT}
+
+%files
+%defattr(-,root,root,0755)
+%attr(0755,root,root) %{_sysconfdir}/init.d/compatibleone
+%dir %{_sysconfdir}/accords
+%config %{_sysconfdir}/accords/accords.ini
+%config %{_sysconfdir}/accords/cords_user.xml
+%config %{_sysconfdir}/default/accords
+%config %{_sysconfdir}/accords/openssl.cnf
+%attr(0755,root,root) %{_bindir}/accords
+%attr(0755,root,root) %{_bindir}/co-*
+%attr(0755,root,root) %{_bindir}/accords-config
+%attr(0755,root,root) %{_bindir}/test??
+%attr(0755,root,root) %{_bindir}/testresolver
+%attr(0755,root,root) %{_bindir}/command
+%attr(0755,root,root) %{_bindir}/parser
+%attr(0755,root,root) %{_bindir}/run-parser
+%dir %{_localstatedir}/lib/accords
+%attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
+%dir %{_localstatedir}/lib/accords/rest
+%dir %{_localstatedir}/log/accords
+%dir %{_localstatedir}/log/accords/rest
+
+#--------------------------------------------
+
+%files azprocci
+%attr(0755,root,root) %{_bindir}/azprocci
+%attr(0755,root,root) %{_bindir}/run-azprocci
+
+%files broker
+%attr(0755,root,root) %{_bindir}/broker
+%attr(0755,root,root) %{_bindir}/run-broker
+
+%files coees
+%attr(0755,root,root) %{_bindir}/coees
+%attr(0755,root,root) %{_bindir}/run-coees
+
+%files cops
+%attr(0755,root,root) %{_bindir}/cops
+%attr(0755,root,root) %{_bindir}/run-cops
+
+%files coips
+%attr(0755,root,root) %{_bindir}/coips
+%attr(0755,root,root) %{_bindir}/run-coips
+
+%files comons
+%attr(0755,root,root) %{_bindir}/comons
+%attr(0755,root,root) %{_bindir}/run-comons
+
+%files conets
+%attr(0755,root,root) %{_bindir}/conets
+%attr(0755,root,root) %{_bindir}/run-conets
+
+%files coobas
+%attr(0755,root,root) %{_bindir}/coobas
+%attr(0755,root,root) %{_bindir}/run-coobas
+
+%files cool
+%attr(0755,root,root) %{_bindir}/cool
+#attr(0755,root,root) %{_bindir}/run-cool
+
+%files cosacs
+%attr(0755,root,root) %{_bindir}/cosacs
+%attr(0755,root,root) %{_bindir}/run-cosacs
+
+%files cosched
+%attr(0755,root,root) %{_bindir}/cosched
+%attr(0755,root,root) %{_bindir}/run-cosched
+
+%files coss
+%attr(0755,root,root) %{_bindir}/coss
+%attr(0755,root,root) %{_bindir}/run-coss
+
+%files dcprocci
+%attr(0755,root,root) %{_bindir}/dcprocci
+%attr(0755,root,root) %{_bindir}/run-dcprocci
+
+%files jpaasprocci
+%attr(0755,root,root) %{_bindir}/jpaasprocci
+%attr(0755,root,root) %{_bindir}/run-jpaasprocci
+
+%files copaas
+%attr(0755,root,root) %{_bindir}/copaas
+%attr(0755,root,root) %{_bindir}/run-copaas
+
+%files ezvm
+%attr(0755,root,root) %{_bindir}/ezvm
+%attr(0755,root,root) %{_bindir}/run-ezvm
+
+%files fileserver
+%attr(0755,root,root) %{_bindir}/fileserver
+%attr(0755,root,root) %{_bindir}/run-fileserver
+
+%files onprocci
+%attr(0755,root,root) %{_bindir}/onprocci
+%attr(0755,root,root) %{_bindir}/run-onprocci
+
+%files osocciprocci
+%attr(0755,root,root) %{_bindir}/osocciprocci
+%attr(0755,root,root) %{_bindir}/run-osocciprocci
+
+%files osprocci
+%attr(0755,root,root) %{_bindir}/osprocci
+%attr(0755,root,root) %{_bindir}/run-osprocci
+
+#files paprocci
+#attr(0755,root,root) %{_bindir}/paprocci
+#attr(0755,root,root) %{_bindir}/run-paprocci
+
+%files procci
+%attr(0755,root,root) %{_bindir}/procci
+%attr(0755,root,root) %{_bindir}/run-procci
+
+%files publisher
+%attr(0755,root,root) %{_bindir}/publisher
+%attr(0755,root,root) %{_bindir}/run-publisher
+
+%files slam
+%attr(0755,root,root) %{_bindir}/slam
+%attr(0755,root,root) %{_bindir}/run-slam
+
+%files testosocci
+%attr(0755,root,root) %{_bindir}/testosocci
+%attr(0755,root,root) %{_bindir}/run-testosocci
+
+%files -n %{libname}
+%defattr(-,root,root,0755)
+%{_libdir}/lib*.so
+%{_libdir}/lib*.so.0
+%{_libdir}/lib*.so.0.0.0
+
+%files -n %{libnamedev}
+%defattr(-,root,root,0755)
+%{_libdir}/lib*.a
+%{_libdir}/lib*.la
+
+%files accords-doc
+%defattr(-,root,root,0755)
+%dir %{_docdir}/accords
+%attr(0644,root,root) %{_docdir}/accords/*.xsd
+
+%files accords
+%defattr(-,root,root,0755)
+%dir %{_datadir}/accords
+%attr(0644,root,root) %{_datadir}/accords/README
+
+%changelog
+* Wed Jan 06 2012 Jean-Philippe Braun <jpbraun@mandriva.com> - 1.0
+- initial package
+

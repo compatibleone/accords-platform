@@ -14,12 +14,12 @@ scripts=accords co-check
 aliases = \
 	co-start co-broker co-command co-parser co-provider co-resolver co-status co-stop \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas \
-	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
+	run-coss run-example run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
 	run-cosacs run-copaas run-jpaasprocci accords-config
 
 
-EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init
+EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
@@ -57,7 +57,8 @@ install-exec-local: accords.in Makefile accords.init co-check.in
 	for alias in $(aliases); do \
 	  ln -fs accords $(DESTDIR)$(bindir)/$$alias; \
 	done
-	install -p -m 0755 -D $(srcdir)/accords.init $(DESTDIR)$(sysconfdir)/init.d/accords
+	install -p -m 0755 -D $(srcdir)/accords.init $(DESTDIR)$(sysconfdir)/init.d/compatibleone
+	install -p -m 0644 -D $(srcdir)/accords.default $(DESTDIR)$(sysconfdir)/default/accords
 
 uninstall-local:
 	for alias in $(aliases); do \

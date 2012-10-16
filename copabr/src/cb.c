@@ -3595,7 +3595,7 @@ private	int	cords_analyse_conditions(
 /* 	this function retrieves placement conditions from	*/
 /*	the sla terms defined conditions block.			*/
 /*	-------------------------------------------------	*/
-private	int	cords_retrieve_conditions( 
+public	int	cords_retrieve_conditions( 
 		char * host,
 		char * slaid, 
 		struct occi_response * zptr,
@@ -4097,7 +4097,6 @@ public	char *	cords_service_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
-
 	/* -------------------------------------------- */
 	/* perform SLA guarantee instruction processing */
 	/* -------------------------------------------- */
@@ -4111,7 +4110,6 @@ public	char *	cords_service_broker(
 	if (( CbC.release )
 	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
-	
 
 	/* -------------------------------------------- */
 	/* perform interface methods action  processing */
@@ -4224,80 +4222,85 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( status, &CbC ) );
 	else if (!( aptr = document_atribut( CbC.document, _CORDS_ID )))
 		return( cords_terminate_provisioning( 911, &CbC ) );
+
 	else if (!( CbC.instID = occi_unquoted_value( aptr->value ) ))
 		return( cords_terminate_provisioning( 912, &CbC ) );
 	else	CgC.service = CbC.instID;
 
-	for (	eptr=cords_first_link( CbC.manifest );
-		eptr != (struct occi_element *) 0;
-		eptr = eptr->next )
+	if (!( rest_valid_string( sla ) ))
 	{
-		if (!( eptr->value ))
-			continue;
-		if (!( id =  occi_unquoted_link( eptr->value ) ))
-			continue;
-		else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
-			return( cords_terminate_provisioning( 913, &CbC ) );
-		else	
+
+		for (	eptr=cords_first_link( CbC.manifest );
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
 		{
-			/* ----------------------- */
-			/* add to list of contracts */
-			/* ----------------------- */
-			if (!( mptr->previous = CbC.document->last ))
-				CbC.document->first = mptr;
-			else 	mptr->previous->next = mptr;
-			CbC.document->last = mptr;
-			id = liberate( id );
-			CbC.nodes++;
-			continue;
+			if (!( eptr->value ))
+				continue;
+			if (!( id =  occi_unquoted_link( eptr->value ) ))
+				continue;
+			else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
+				return( cords_terminate_provisioning( 913, &CbC ) );
+			else	
+			{
+				/* ----------------------- */
+				/* add to list of contracts */
+				/* ----------------------- */
+				if (!( mptr->previous = CbC.document->last ))
+					CbC.document->first = mptr;
+				else 	mptr->previous->next = mptr;
+				CbC.document->last = mptr;
+				id = liberate( id );
+				CbC.nodes++;
+				continue;
+			}
 		}
-	}
 
-	/* ----------------------------------- */
-	/* terminate the service element level */
-	/* ----------------------------------- */
-	(void) cords_terminate_level( CbC.document, agent, tls );
+		/* ----------------------------------- */
+		/* terminate the service element level */
+		/* ----------------------------------- */
+		(void) cords_terminate_level( CbC.document, agent, tls );
 
-	if ( check_verbose() )
-		printf("   CORDS Request Broker ( %s ) Provisioned %u Nodes \n",agent,CbC.nodes);
+		if ( check_verbose() )
+			printf("   CORDS Request Broker ( %s ) Provisioned %u Nodes \n",agent,CbC.nodes);
 
-	if ( check_verbose() )
-		printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);
+		if ( check_verbose() )
+			printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);
 
-	/* -------------------------------------------- */
-	/* perform configuration instruction processing */
-	/* -------------------------------------------- */
-	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform configuration instruction processing */
+		/* -------------------------------------------- */
+		if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
+			return( cords_terminate_provisioning( status, &CbC ) );
 	
-	/* -------------------------------------------- */
-	/* perform SLA guarantee instruction processing */
-	/* -------------------------------------------- */
-	if ((( sla ) && ( CgC.first ))
-	&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform SLA guarantee instruction processing */
+		/* -------------------------------------------- */
+		if ((( sla ) && ( CgC.first ))
+		&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 
-	/* -------------------------------------- */
-	/* perform release instruction processing */
-	/* -------------------------------------- */
-	if (( CbC.release )
-	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------- */
+		/* perform release instruction processing */
+		/* -------------------------------------- */
+		if (( CbC.release )
+		&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 	
-	/* -------------------------------------------- */
-	/* perform interface methods action  processing */
-	/* -------------------------------------------- */
-	if (( CbC.interface )
-	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform interface methods action  processing */
+		/* -------------------------------------------- */
+		if (( CbC.interface )
+		&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 
-	/* ------------------------------------ */
-	/* check if document return is required */
-	/* ------------------------------------ */
-	if ( root )
-	{
-		*root = CbC.document;
-		CbC.document = (struct xml_element *) 0;
+		/* ------------------------------------ */
+		/* check if document return is required */
+		/* ------------------------------------ */
+		if ( root )
+		{
+			*root = CbC.document;
+			CbC.document = (struct xml_element *) 0;
+		}
 	}
 
 	return( cords_terminate_provisioning( 0, &CbC ) );

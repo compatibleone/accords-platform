@@ -8,6 +8,7 @@ struct paas_version_instance
 	char* date_instantiated;
 	char* description;
 	char* default_instance;
+	char* uri;
 	int state;
 };
 

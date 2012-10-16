@@ -33,6 +33,8 @@ public struct paas_version * liberate_paas_version(struct paas_version * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
 		if ( sptr->label )
 			 sptr->label = liberate(sptr->label);
 		if ( sptr->date_updated )
@@ -53,6 +55,7 @@ public struct paas_version * reset_paas_version(struct paas_version * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
 		sptr->label = (char*) 0;
 		sptr->date_updated = (char*) 0;
 		sptr->description = (char*) 0;
@@ -87,6 +90,10 @@ public int xmlin_paas_version(struct paas_version * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"label") ))
 		{
 			if ( wptr->value ) { sptr->label = allocate_string(wptr->value); }
@@ -118,6 +125,7 @@ public int rest_occi_paas_version(FILE * fh,struct paas_version * sptr,char * pr
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.label='%s'\r\n",prefix,nptr,(sptr->label?sptr->label:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_updated='%s'\r\n",prefix,nptr,(sptr->date_updated?sptr->date_updated:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
