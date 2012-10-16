@@ -511,6 +511,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
+%doc %{_mandir}/man7/*
+%doc %{_mandir}/man1/*
 
 #--------------------------------------------
 
