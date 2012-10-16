@@ -449,6 +449,7 @@ dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
 AC_CONFIG_FILES([manifests/Makefile])
+AC_CONFIG_FILES([manpages/Makefile])
 AC_CONFIG_FILES([coxml/Makefile coxml/src/Makefile])
 AC_CONFIG_FILES([occi/Makefile occi/src/Makefile])
 AC_CONFIG_FILES([cords/Makefile cords/src/Makefile])
