@@ -260,6 +260,16 @@ provisioning of application images for computational resources.
 
 #-------------------------------------------
 
+%package example
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - Example OCCI subsystem
+
+%description example
+CompatibleOne Accords Platform - Example OCCI subsystem
+
+#-------------------------------------------
+
 %package fileserver
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
@@ -450,8 +460,6 @@ cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
 This package contains nothing, and only exists to pull dependencies.
 EOF
 
-# remove unpackaged files
-rm ${RPM_BUILD_ROOT}%{_bindir}/example
 #TODO: remove this line once paprocci is packaged again
 rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
@@ -577,6 +585,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %files ezvm
 %attr(0755,root,root) %{_bindir}/ezvm
 %attr(0755,root,root) %{_bindir}/run-ezvm
+
+%files example
+%attr(0755,root,root) %{_bindir}/example
+%attr(0755,root,root) %{_bindir}/run-example
 
 %files fileserver
 %attr(0755,root,root) %{_bindir}/fileserver
