@@ -12,6 +12,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = scripts
 SUBDIRS += manifests
+SUBDIRS += manpages
 
 if ENABLE_COXML
 SUBDIRS += coxml
