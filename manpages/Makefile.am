@@ -13,6 +13,8 @@ man7_COMPATIBLEONE = accords.7 compatibleone.7
 man1_COMPATIBLEONE =  accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-resolver.1 co-start.1 co-status.1 co-stop.1
 
+EXTRA_DIST = $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
+
 install_man = install -m0644 -D
 
 install-data-local: $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
