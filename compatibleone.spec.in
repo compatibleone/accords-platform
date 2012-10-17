@@ -453,7 +453,9 @@ done;
 # install some extra files
 cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
 cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
+ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
 
 # add a fake file to produce a useless package
 cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
@@ -504,8 +506,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/accords.ini
 %config %{_sysconfdir}/accords/cords_user.xml
-%config %{_sysconfdir}/default/accords
 %config %{_sysconfdir}/accords/openssl.cnf
+%config %{_sysconfdir}/accords/coips.xml
+%config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
 %attr(0755,root,root) %{_bindir}/accords-config
