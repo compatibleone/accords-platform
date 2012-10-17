@@ -519,6 +519,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/run-parser
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
+%attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
