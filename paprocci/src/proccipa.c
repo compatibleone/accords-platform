@@ -255,10 +255,10 @@ private	struct	rest_response * start_proactive(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->status != _OCCI_IDLE )     {
 		return( rest_html_response( aptr, 200, "OK" ) );
-	}else if ((status = use_proactive_configuration( pptr->profile )) != 0){	// Set up configuration according to profile (where the user and pass are).
+	}else if ((status = use_proactive_configuration( pptr->profile )) != 0){// Set up configuration according to profile (where the user and pass are).
 		printf("ERROR Profile '%s' not found. \n", pptr->profile);
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	}else if (!( paptr = pa_create_server(pptr))){				// Request of a node using constraints. 
+	}else if (!( paptr = pa_create_server(rptr, aptr, pptr))){		// Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	}else
 	{

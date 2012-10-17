@@ -480,7 +480,7 @@ void start_provider_if_needed(){
  * @param constr constraints for the node to provide.
  * @return the parsed information about the reservation process.
  */
-public	struct	pa_response * pa_create_server(struct proactive * constr)
+public	struct	pa_response * pa_create_server(struct rest_request * request,  struct rest_response * response, struct proactive * constr)
 {
 	char * filename = NULL;
 	char * raw_list = NULL;
@@ -494,7 +494,7 @@ public	struct	pa_response * pa_create_server(struct proactive * constr)
 
 	if (!(result = (struct pa_response*) malloc(sizeof(struct pa_response)))){
 		return NULL;
-	}else if (!(raw_list = start_server(&Wpa, &jvmp, constr))){
+	}else if (!(raw_list = start_server(&Wpa, &jvmp, request, response, constr))){
 		fprintf(stderr, "Problem making call to the java layer...\n");
 		free(result);
 		return NULL;

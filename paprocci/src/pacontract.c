@@ -127,6 +127,51 @@ private	int	pa_normalise_value( char * sptr, int normal )
 	return( value * factor );
 }
 
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ n o n o d e s 		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_nonodes(struct cords_pa_contract * cptr )
+{
+	//struct	pa_compute_infos	request;
+	//struct	os_compute_infos	flavor;
+	//struct	os_compute_infos	best;
+	char *			vptr;
+
+	//struct	data_element * eptr=(struct data_element *) 0;
+	//struct	data_element * dptr=(struct data_element *) 0;
+
+	//if (!( eptr = json_element( cptr->flavors->jsonroot, "flavors" )))
+		//return((char *) 0);
+
+	/* -------------------------------------------------------------- */
+	/* retrieve appropriate parameters from infrastructure components */
+	/* -------------------------------------------------------------- */
+	/*
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
+		request.memory = 0;
+	else	request.memory = rest_normalise_value( vptr,'G' );
+
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_CORES ) ))
+		request.cores = 0;
+	else	request.cores = rest_normalise_value( vptr,'U' );
+
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_SPEED ) ))
+		request.speed = 0;
+	else	request.speed = rest_normalise_value(vptr,'G');
+	
+	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
+		_CORDS_STORAGE, _CORDS_SIZE ) ))
+		request.storage = 0;
+	else	request.storage = rest_normalise_value(vptr,'G');
+	*/
+
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_CORES);
+
+	return(vptr);
+}
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
@@ -312,13 +357,14 @@ public	int	create_proactive_contract(
 		return( terminate_proactive_contract( 1184, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
 		return( terminate_proactive_contract( 1185, &contract ) );
-
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
 	//else if (!( contract.images = pa_list_image_details() ))
 	//	return( terminate_proactive_contract( 1186, &contract ) );
 	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+		return( terminate_proactive_contract( 1187, &contract ) );
+	else if (!( pptr->nopanodes = resolve_contract_nonodes( &contract ) ))
 		return( terminate_proactive_contract( 1187, &contract ) );
 	//else if (!( pptr->original = allocate_string( pptr->image ) ))
 	//	return( terminate_proactive_contract( 1188, &contract ) );

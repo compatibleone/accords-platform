@@ -88,11 +88,11 @@ public class ProActiveProcci implements Procci{
 				Misc.print(nodesinfo);
 			}else if (args.getBool("get-cosacs")){
 				String os = args.getStr("select-by-os");
-				String hostname = args.getStr("select-by-hostname");
-				String file = args.getStr("select-by-file-existent");
+				String hostname = null; //args.getStr("select-by-hostname");
+				String file = null; //args.getStr("select-by-file-existent");
 				String nonodes = args.getStr("number-of-nodes");
 				Object[] params = {os, hostname, file, nonodes};
-				String nodeid = start_server(params);
+				String nodeid = start_server(null, null, null, params);
 				Misc.print(nodeid);
 			}else if (args.getBool("get-node-info")){
 				Object[] params = {args.getStr("get-node-info")};
@@ -147,15 +147,24 @@ public class ProActiveProcci implements Procci{
 	 * @return a json object telling the result of the operation and some extra data. 
 	 * @throws Exception if anything goes wrong. 
 	 */
-	public String start_server(Object[] args) throws Exception{
-		checkparameters(args, 4);
-		String os = (args[0]==null?null:args[0].toString());
-		String nonodesstr = (args[3]==null?null:args[3].toString());
+	public String start_server(
+			RestRequest restrequest, 
+			RestResponse restresponse, 
+			ProcciCategory category, 
+			Object[] argss) throws Exception{
+		//checkparameters(args, 4);
+		//String os = (args[0]==null?null:args[0].toString());
+		//String nonodesstr = (args[3]==null?null:args[3].toString());
+		String os = category.getImage();
+		String nonodesstr = category.getNopanodes();
 		
 		if (os==null){
 			os = "linux";
 			logger.warn("No Operative System specified, using as default: " + os);
 		}
+		
+		logger.info("Nodes: " + category.getNopanodes());
+		logger.info("Image: " + category.getImage());
 		
 		final String path_sep;
 		final String app_path;
@@ -254,8 +263,9 @@ public class ProActiveProcci implements Procci{
 			RestResponse restresponse, 
 			ProcciCategory category, 
 			Object[] args) throws Exception{
-		checkparameters(args, 1);
-		final String id = args[0].toString();
+		//checkparameters(args, 1);
+		//final String id = args[0].toString();
+		final String id = category.getNumber();
 		logger.info("Trying to release node whose related id is: " + id);
 		Callable<String> callable = new Callable<String>(){
 			@Override

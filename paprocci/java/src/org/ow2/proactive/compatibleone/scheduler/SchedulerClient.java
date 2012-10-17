@@ -113,7 +113,7 @@ public class SchedulerClient {
 			String password) throws Exception{
 		this.pendingJobId = null;
 		
-		//logger.info("HARDCODED FOR TEST");
+		//logger.info("HARDCODED");
 		//int a = 3; if (a>2){return;}
 		
 		scheduler = initializeSchedulerProxy(schedulerurl, username, password);
@@ -154,7 +154,7 @@ public class SchedulerClient {
 			String nodetoken,
 			Integer nonodes) throws Exception {
 		
-		//logger.info("HARDCODED FOR TEST");
+		//logger.info("HARDCODED");
 		//int a = 3; if (a>2){ return "{\"id\":\"12385\",\"adminPass\":\"passWord\",\"status\":\"RUNNING\",\"hostname\":\"cper-PC\",\"privateip\":\"138.96.126.112\",\"publicip\":\"138.96.126.112\",\"nodeurl\":\"pamr://6131/xps1\",\"owner\":\"mjost\"}"; }
 		
 		

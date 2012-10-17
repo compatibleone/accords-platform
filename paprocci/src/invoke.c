@@ -126,7 +126,8 @@ jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proa
 	}
 
 	// Looking for instantiation method.
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Ljava/lang/String;)V");
+	printf("HEYYYYYYYYYYY FIND THE RIGHT METHIOD NAME\n");
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 
 	if (initmeth == 0){
 		fprintf(stderr, "Can't find " CLASS_PROCCI_CATEGORY " constructor method...\n");
@@ -135,9 +136,27 @@ jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proa
 
 	// Preparing parameters to instantiate the class...
 	jstring id = (*env)->NewStringUTF(env, (category->id?category->id:""));	
-	
+	jstring name = (*env)->NewStringUTF(env, (category->name?category->name:""));	
+	jstring image = (*env)->NewStringUTF(env, (category->image?category->image:""));	
+	jstring profile = (*env)->NewStringUTF(env, (category->profile?category->profile:""));	
+	jstring node = (*env)->NewStringUTF(env, (category->node?category->node:""));	
+	jstring price = (*env)->NewStringUTF(env, (category->price?category->price:""));	
+	jstring number = (*env)->NewStringUTF(env, (category->number?category->number:""));	
+	jstring access = (*env)->NewStringUTF(env, (category->access?category->access:""));	
+	jstring reference = (*env)->NewStringUTF(env, (category->reference?category->reference:""));	
+	jstring publicaddr = (*env)->NewStringUTF(env, (category->publicaddr?category->publicaddr:""));	
+	jstring privateaddr = (*env)->NewStringUTF(env, (category->privateaddr?category->privateaddr:""));	
+	jstring nopanodes = (*env)->NewStringUTF(env, (category->nopanodes?category->nopanodes:""));	
+	jstring hostname = (*env)->NewStringUTF(env, (category->hostname?category->hostname:""));	
+	jstring workload = (*env)->NewStringUTF(env, (category->workload?category->workload:""));	
+	jstring account = (*env)->NewStringUTF(env, (category->account?category->account:""));	
+	jstring agent = (*env)->NewStringUTF(env, (category->agent?category->agent:""));	
+	jstring when = (*env)->NewStringUTF(env, "");	
+	jstring status = (*env)->NewStringUTF(env,"");	
+
 	// Instantiating the class... 
-	jobject restobj = (*env)->NewObject(env, sclass, initmeth, id);
+	jobject restobj = (*env)->NewObject(env, sclass, initmeth, 
+			id, name, image, profile, node, price, number, access, reference, publicaddr, privateaddr, nopanodes, hostname, workload, account, agent, when, status);
 
 	if (restobj == 0){
 		fprintf(stderr, "Can't instantiate class " CLASS_PROCCI_CATEGORY "...\n");
@@ -215,7 +234,8 @@ jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_r
 	}
 
 	// Looking for instantiation method.
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeader;Lorg/ow2/compatibleone/exchangeobjects/RestHeader;ILjava/lang/String;Ljava/lang/String;ILjava/lang/String;)V");
+	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeaderBlock;ILjava/lang/String;Ljava/lang/String;ILjava/lang/String;)V");
+
 
 	if (initmeth == 0){
 		fprintf(stderr, "Can't find " CLASS_REST_RESPONSE " constructor method...\n");
@@ -334,7 +354,7 @@ char* getjars(const char* targetdir){
 	struct dirent *ent;
 	char* buffer;
 	item_jar * curr, * head;
-	fprintf(stderr, "Looking for .jars in '%s'...\n", targetdir);
+	//fprintf(stderr, "Looking for .jars in '%s'...\n", targetdir);
 	head = NULL;
 	dir = opendir (targetdir);
 	if (dir != NULL) { /* print all the files and directories within directory */
@@ -354,7 +374,7 @@ char* getjars(const char* targetdir){
 	curr = head;
 	int counter=0;
 	while(curr) {
-		fprintf(stderr, "Found: %s\n", curr->value);
+		//fprintf(stderr, "Found: %s\n", curr->value);
 		counter+=strlen(curr->value);
 		curr = curr->next;
 	}
@@ -364,7 +384,7 @@ char* getjars(const char* targetdir){
 
 	curr = head;
 	while(curr) {
-		fprintf(stderr, "Using: %s\n", curr->value);
+		//fprintf(stderr, "Using: %s\n", curr->value);
 		strcat (buffer,curr->value);
 		free(curr->value);
 		head = curr;
@@ -538,7 +558,7 @@ char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, j
  * @return the json String of the result of the call.
  * DO NOT MODIFY THIS FUNCTION.
  */
-char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
+char * call_java_procci_nobody_uses(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
 	jstring jstr1;
 	jstring jstr2;
 	JNIEnv *env = jvmp->env;
@@ -675,6 +695,7 @@ struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp){
 	}
 	return *jvmpp;
 }
+
 /**
  * Start a VM.
  * @param config procci configuration structure.
@@ -683,7 +704,7 @@ struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp){
  * @return the resulting json object of the java call.
  * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
-char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct proactive * constr) {
+char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct rest_request * request,  struct rest_response * response, struct proactive * constr) {
 
 	jstring jstr1;
 	jstring jstr2;
@@ -708,7 +729,11 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr2);
 	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr3);
 
-	return call_java_procci(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
+	jobject requesto = create_java_rest_request_object(jvmp, request);
+	jobject responseo= create_java_rest_response_object(jvmp, response);
+	jobject proccico = create_java_procci_category_object(jvmp, constr);
+
+	return call_java_procci2(jvmp, "start_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, responseo, proccico, margs);
 }
 
 /**
@@ -734,10 +759,11 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 	printf("2");
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
 
-	printf("3");
-	jobject requesto =  create_java_rest_request_object(jvmp, request);
-	printf("4");
-	return call_java_procci2(jvmp, "stop_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, NULL, NULL,  margs);
+	jobject requesto = create_java_rest_request_object(jvmp, request);
+	jobject responseo= create_java_rest_response_object(jvmp, response);
+	jobject proccico = create_java_procci_category_object(jvmp, constr);
+
+	return call_java_procci2(jvmp, "stop_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, responseo, proccico, margs);
  
 
 }
