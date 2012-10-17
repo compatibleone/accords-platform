@@ -167,7 +167,7 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 	/* --------------------------------------------- */
 	/* collect and control the architecture required */
 	/* --------------------------------------------- */
-	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
 		strcpy(request.architecture,"blank" );
 	else if ((!(strcasecmp( vptr, "x86"    		) ))
