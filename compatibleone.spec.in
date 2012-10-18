@@ -39,7 +39,7 @@ CompatibleOne Accords platform base files
 #-------------------------------------------
 
 %package -n %{libname}
-Group:      Libraries
+Group:      System/Libraries
 Summary:    CompatibleOne Accords Platform Base Libraries and Files
 Requires:   %{name} = %{version}-%{release}
 
@@ -50,7 +50,7 @@ CompatibleOne Accords platform base dynamic libraries and Files
 
 %package -n %{libnamedev}
 Group:      Development/Libraries/C and C++
-Summary:    compatibleOne Accords development files
+Summary:    CompatibleOne Accords development files
 Requires:   %{libname} = %{version}-%{release}
 
 %description -n %{libnamedev}
@@ -425,7 +425,7 @@ The goals of CompatibleOne are to:
 
 %package accords-doc
 BuildArch: noarch
-Summary: documentation for CompatibleOne Accord's platform
+Summary: Documentation for CompatibleOne Accord's platform
 
 %description accords-doc
 CompatibleOne is an open source project which provides a model
@@ -634,7 +634,6 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files -n %{libname}
 %defattr(-,root,root,0755)
-%{_libdir}/lib*.so
 %{_libdir}/lib*.so.0
 %{_libdir}/lib*.so.0.0.0
 
@@ -642,6 +641,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root,0755)
 %{_libdir}/lib*.a
 %{_libdir}/lib*.la
+%{_libdir}/lib*.so
 
 %files accords-doc
 %defattr(-,root,root,0755)
