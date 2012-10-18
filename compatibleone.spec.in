@@ -39,7 +39,7 @@ CompatibleOne Accords platform base files
 #-------------------------------------------
 
 %package -n %{libname}
-Group:      Libraries
+Group:      System/Libraries
 Summary:    CompatibleOne Accords Platform Base Libraries and Files
 Requires:   %{name} = %{version}-%{release}
 
