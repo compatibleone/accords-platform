@@ -32,14 +32,14 @@ fi
 # then specify the security directory.
 # -------------------------------------
 # nethsm=1
-tls=security
+# tls=security
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-# tls=
+tls=
 # -------------------------------------
-resthost=127.0.0.1
+resthost=157.159.249.204
 secdir=$tls
 zone="europe"
 trace=1
@@ -113,11 +113,11 @@ fi
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-copaas run-jpaasprocci run-procci run-cosched run-publisher accords-config"
+# aliases="co-start co-provider co-provision co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-copaas run-jpaasprocci run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
-_co_start() {
-    echo "Starting ACCORDS"
+_co_platform() {
+    echo "Starting ACCORDS Platform"
 
 # ---------------------------------------------------
 #       The basic accords platform components
@@ -257,9 +257,17 @@ _co_start() {
     @bindir@/co-parser accounts
     @bindir@/co-parser metrics
     @bindir@/co-parser coips
+
+    echo "ACCORDS Platform Started"
+}
+
+_co_provision()
+{
 # ---------------------------------------------------
 #    The accords platform provisioning components
 # ---------------------------------------------------
+    echo "Starting ACCORDS Provisioning"
+
     if [ -x @bindir@/run-osprocci ]; then
         echo "Starting accords open stack services"
         @bindir@/co-provider osprocci accords 30 10 1000 30 30
@@ -351,8 +359,13 @@ _co_start() {
         echo "NOT Starting accords software configuration services"
     fi
 
-    echo "ACCORDS ready"
-    @bindir@/co-status
+    echo "ACCORDS Provisioning Started"
+}
+
+_co_start()
+{
+	_co_platform
+	_co_provision
 }
 
 _co_broker() {
@@ -964,6 +977,12 @@ _mkpro() {
 case `basename $0` in
     co-start) 
 	_co_start $*
+	;;
+    co-provision) 
+	_co_provision $*
+	;;
+    co-platform) 
+	_co_platform $*
 	;;
     co-broker) 
 	_co_broker $*

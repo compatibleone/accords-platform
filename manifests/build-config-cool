@@ -8,16 +8,12 @@ zone=$2
 thishost=$3
 pubhost=$4
 pubport=8086
-tls=security
+tls=
 
 # -------------------------------
 # establish service prefix
 # -------------------------------
-if test -z "$tls"; then
-	prefix="http://"
-else
-	prefix="https://"
-fi
+prefix="http://"
 
 # -------------------------------
 # establish host for identity
@@ -66,7 +62,7 @@ echo "    <security" >> $target
 echo "         user='service-"${module}"'" >> $target
 echo "         password='"$password"'" >> $target
 echo "         monitor='"$monitor"'" >> $target
-echo "         tls='"$tls"/"${module}"Tls.xml'/>" >> $target
+echo "         tls=''/>" >> $target
 echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
 echo "</"${module}">" >> $target
 echo "</accords>" >> $target

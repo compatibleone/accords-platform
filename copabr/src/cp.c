@@ -2685,6 +2685,16 @@ private	int 	ll_cords_parse_element(
 					return(cords_append_error(document,706,"creating category"));
 				else if ((status = cords_resolve_location( zptr, document )) != 0)
 					return(cords_append_error(document,status,"resolving location"));
+				/* ------------------------------------------ */
+				/* retrieve the instance and integrate fields */
+				/* ------------------------------------------ */
+				else if (!( aptr = document_atribut( document, _CORDS_ID )))
+					return(cords_append_error(document,705,"resolving category id"));
+				else if (( yptr = cords_retrieve_category( document, aptr->value, agent,tls )) != (struct occi_response *) 0)
+				{
+					if (!( yptr = cords_integrate_fields( document, yptr, "occi", agent, tls ) ))
+						return(cords_append_error(document,705,"integrating category"));
+				}
 			}
 		}
 		else
