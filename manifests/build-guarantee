@@ -21,7 +21,7 @@ echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
 echo "<terms name=\":guarantees\" type=\"guarantees\">" >> sla-$1.xml 
 
-var=$4 $5 $6
+var="$4 $5 $6"
 
 for p in $var; do
 
