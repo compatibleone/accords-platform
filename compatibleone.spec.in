@@ -50,7 +50,7 @@ CompatibleOne Accords platform base dynamic libraries and Files
 
 %package -n %{libnamedev}
 Group:      Development/Libraries/C and C++
-Summary:    compatibleOne Accords development files
+Summary:    CompatibleOne Accords development files
 Requires:   %{libname} = %{version}-%{release}
 
 %description -n %{libnamedev}
@@ -425,7 +425,7 @@ The goals of CompatibleOne are to:
 
 %package accords-doc
 BuildArch: noarch
-Summary: documentation for CompatibleOne Accord's platform
+Summary: Documentation for CompatibleOne Accord's platform
 
 %description accords-doc
 CompatibleOne is an open source project which provides a model
