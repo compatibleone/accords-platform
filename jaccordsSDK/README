@@ -133,4 +133,4 @@ Class examples
 			}
 		}
 
-
+# After creating or removing a category compile all the accords-platform >>> make and make install
