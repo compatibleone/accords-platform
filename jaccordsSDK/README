@@ -17,11 +17,26 @@ limitations under the License.
 
 HOW to use jaccordsSDK
 
-# Make sure to have defined the environment variable JAVA_HOME pointing to a JDK 1.6 .
-# under jaccordsSDK/jcompmgr
-# generate libcompmgr.so with make and fallow instruction
+# Make sure to have defined the environment variable JAVA_HOME pointing to JDK 1.6 .
+# Now in jaccordsSDK/jcompmgr generate libcompmgr.so following the instructions 
+# given by the execution of
 
-# To generate a category use this example
+   $ cd jaccordsSDK/jcompmgr
+   $ make
+
+# Then create somewhere a class (for example Testjcompmgr.java) implementing 
+# the functionality needed. Use the examples below as reference.
+# Compile the java class (using javac).
+
+   $ export  LD_LIBRARY_PATH=/path/to/jaccordsSDK/jcompmgr/
+   $ export      CLASSPATH=.:/path/to/jaccordsSDK/jcompmgr/
+   $ javac Testjcompmgr.java
+   $ java  Testjcompmgr
+
+
+Class examples
+
+# A class that generates a category is shown in this example
 	- where generateCategory(String catName, String catAtr, String catAct, String occiFlag, int pFlag) takes five parameters	
 	- catName: Category Name
 	- catAtr: Attributes of the category (exp: "atr1 atr2 atr2")
@@ -44,7 +59,6 @@ HOW to use jaccordsSDK
     
 		public class Testjcompmgr{
         		static{
-                		try{
                         		System.loadLibrary("JcompMgr");
                 		}catch( UnsatisfiedLinkError e){
                         		System.out.println("Could not load library, add it to LD_LIBRARY_PATH?");
@@ -58,7 +72,7 @@ HOW to use jaccordsSDK
 		}
 
 
-# To remove a category use this example
+# To remove a category use this class example
 	- where removeCategory(String catName, int actFlag, int pFlag) takes three parameters
 	- catName: category name
 	- actFlag: takes 0 àr 1
@@ -81,7 +95,7 @@ HOW to use jaccordsSDK
 		}
 
 
- # To generate a new module use this example
+ # To generate a new module use this class example
 	- where generateComponent(String mName, String catName) takes two parameters
 	- mName: module name
 	- catName: List of category (exp "cat1 cat2 cat3")
@@ -100,7 +114,7 @@ HOW to use jaccordsSDK
 			}
 		}
 
-# To delete a module use this example
+# To delete a module use this class example
 	- where removeComponent(String mName) takes one parameter
 	- mName: moduleName
 
