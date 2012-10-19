@@ -19,5 +19,5 @@ autoreconf --install
 PWD=$(pwd)
 sed -e "s#@@PWD@@#${PWD}#" < pyaccords/pysrc/pypath.h.in > pyaccords/pysrc/pypath.h
 sed -e "s#@@PWD@@#${PWD}#" < pyaccords/pysrc/pypacksrc/pypacksrc.py.in > pyaccords/pysrc/pypacksrc/pypacksrc.py
-
+sed -e "s#@@PWD@@#${PWD}#" < jaccords/jsrc/jpath.h.in > jaccords/jsrc/jpath.h
 exit 0
