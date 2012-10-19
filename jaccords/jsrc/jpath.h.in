@@ -1,0 +1,6 @@
+#ifndef _jpath_h_
+#define _jpath_h_
+
+#define JPATH "@@PWD@@"
+
+#endif

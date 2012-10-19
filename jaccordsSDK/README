@@ -1,0 +1,122 @@
+----------------------------------------------------------------------------- 
+ACCORDS Platform                                                              
+Copyright 2012  Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue               
+----------------------------------------------------------------------------- 
+Licensed under the Apache License, Version 2.0 (the "License");               
+you may not use this file except in compliance with the License.              
+You may obtain a copy of the License at                                       
+                                                                               
+       http://www.apache.org/licenses/LICENSE-2.0                              
+                                                                               
+Unless required by applicable law or agreed to in writing, software           
+distributed under the License is distributed on an "AS IS" BASIS,             
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      
+See the License for the specific language governing permissions and           
+limitations under the License.                                                
+------------------------------------------------------------------------------
+
+HOW to use jaccordsSDK
+
+# Make sure to have defined the environment variable JAVA_HOME pointing to a JDK 1.6 .
+# under jaccordsSDK/jcompmgr
+# generate libcompmgr.so with make and fallow instruction
+
+# To generate a category use this example
+	- where generateCategory(String catName, String catAtr, String catAct, String occiFlag, int pFlag) takes five parameters	
+	- catName: Category Name
+	- catAtr: Attributes of the category (exp: "atr1 atr2 atr2")
+        - catAct: Actions of the category (exp: "act1 act2 act3")
+	- occiFlag : Takes one of the foolowing value
+                - "" nothing to specify
+		- "_OCCI_PRIORITY"  the service is to be offered first   
+		- "_OCCI_PRIVATE"   the service is not to be published   
+		- "_OCCI_SECRET"    the will not appear in categories   
+		- " _OCCI_AUTO_PUBLISH"    the service will be auto publish
+		- "_OCCI_SECURE"  each access must be secure         
+		- "_OCCI_NO_PRICING"    inhibit category pricing            
+		- "_OCCI_NO_AUTHORIZE"  inhibit category authorize failure   	
+		- "_OCCI_CONSUMER"  publish monitoring consumer         
+		- "_OCCI_PROVIDER"  publish resources provider           
+		- "_OCCI_CONTRACT"  publish resources under contract 
+	- pFlag: Takes 0 or 1
+		- 0 the category is related to Accords platform
+		- 1 the category is related to a cloud provider
+    
+		public class Testjcompmgr{
+        		static{
+                		try{
+                        		System.loadLibrary("JcompMgr");
+                		}catch( UnsatisfiedLinkError e){
+                        		System.out.println("Could not load library, add it to LD_LIBRARY_PATH?");
+                        		System.exit(1);
+                		}
+        		}
+        		public static void main(String[] argv){
+                		JcompMgr gen = new JcompMgr();
+                 		gen.generateCategory("cateroryName","atr1 atr2","start stop","_OCCI_PROVIDER",0); 
+			}
+		}
+
+
+# To remove a category use this example
+	- where removeCategory(String catName, int actFlag, int pFlag) takes three parameters
+	- catName: category name
+	- actFlag: takes 0 àr 1
+		-0 if the category does not have actions
+		- 1 if category have actions
+			
+		public class Testjcompmgr{
+        		static{
+                		try{
+                        		System.loadLibrary("JcompMgr");
+                		}catch( UnsatisfiedLinkError e){
+                        		System.out.println("Could not load library, add it to LD_LIBRARY_PATH?");
+                        		System.exit(1);
+                		}
+        		}
+        		public static void main(String[] argv){
+                		JcompMgr gen = new JcompMgr();
+                 		gen.removeCategory("categoryName",1,0);
+			}
+		}
+
+
+ # To generate a new module use this example
+	- where generateComponent(String mName, String catName) takes two parameters
+	- mName: module name
+	- catName: List of category (exp "cat1 cat2 cat3")
+        	public class Testjcompmgr{
+        		static{
+                		try{
+                        		System.loadLibrary("JcompMgr");
+                		}catch( UnsatisfiedLinkError e){
+                        		System.out.println("Could not load library, add it to LD_LIBRARY_PATH?");
+                        		System.exit(1);
+                		}
+        		}
+        		public static void main(String[] argv){
+                		JcompMgr gen = new JcompMgr();
+                 		 gen.generateComponent("expModule","categoryname1 categoryname2");
+			}
+		}
+
+# To delete a module use this example
+	- where removeComponent(String mName) takes one parameter
+	- mName: moduleName
+
+		public class Testjcompmgr{
+        		static{
+                		try{
+                        		System.loadLibrary("JcompMgr");
+                		}catch( UnsatisfiedLinkError e){
+                        		System.out.println("Could not load library, add it to LD_LIBRARY_PATH?");
+                        		System.exit(1);
+                		}
+        		}
+        		public static void main(String[] argv){
+                		JcompMgr gen = new JcompMgr();
+                 		 gen.removeComponent("expModule");
+			}
+		}
+
+
