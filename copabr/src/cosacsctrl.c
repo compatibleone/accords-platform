@@ -1014,7 +1014,7 @@ public	int	cosacs_metadata_instructions(
 				sprintf(duffer,"cosacs::metadata(%s,%s)","account",account);
 				rest_log_debug( duffer );
 			}
-			if (!( cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  ) ))
+			if (!( cosacs_create_metadata( cosacs, (char *) 0, "account",  account  ) ))
 			{
 				if ( check_debug() )
 				{
@@ -1025,9 +1025,9 @@ public	int	cosacs_metadata_instructions(
 					rest_log_debug("end::cosacs::metadata::static");
 				else	rest_log_debug("error::cosacs::metadata::cosacs");
 			}
-			else	rest_log_debug("error::cosacs::metadata::contract");
+			else	rest_log_debug("error::cosacs::metadata::account");
 		}
-		else	rest_log_debug("error::cosacs::metadata::account");
+		else	rest_log_debug("error::cosacs::metadata::contract");
 	}
 	else	rest_log_debug("error::cosacs::metadata::publisher");
 
