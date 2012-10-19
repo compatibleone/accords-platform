@@ -1011,14 +1011,23 @@ public	int	cosacs_metadata_instructions(
 		{
 			if ( check_debug() )
 			{
-				sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
+				sprintf(duffer,"cosacs::metadata(%s,%s)","account",account);
 				rest_log_debug( duffer );
 			}
-			if (!( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) ))
-				rest_log_debug("end::cosacs::metadata::static");
-			else	rest_log_debug("error::cosacs::metadata::cosacs");
+			if (!( cosacs_create_metadata( cosacs, (char *) 0, "contract",  contract  ) ))
+			{
+				if ( check_debug() )
+				{
+					sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
+					rest_log_debug( duffer );
+				}
+				if (!( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) ))
+					rest_log_debug("end::cosacs::metadata::static");
+				else	rest_log_debug("error::cosacs::metadata::cosacs");
+			}
+			else	rest_log_debug("error::cosacs::metadata::contract");
 		}
-		else	rest_log_debug("error::cosacs::metadata::contract");
+		else	rest_log_debug("error::cosacs::metadata::account");
 	}
 	else	rest_log_debug("error::cosacs::metadata::publisher");
 
