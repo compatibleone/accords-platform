@@ -506,8 +506,7 @@ int generateJCategoryActionStruct(char *categoryName, listc categoryAct, int n, 
 int generateJCategoryActionCfile(
 	char *categoryName,
 	listc categoryAtr,
-	listc categoryAct,
-        char *cosacsFlag, 
+	listc categoryAct, 
 	int flag, 
 	char pathf[])
 {
@@ -2566,7 +2565,7 @@ int generateJModuleFile(char * moduleName, char * categoryNameList)
 			fprintf(f,"\t\t\tSystem.out.println(\"Could not load library JcompDEV, add it to LD_LIBRARY_PATH?\");\n");
 			fprintf(f,"\t\t\tSystem.exit(1);\n");
 			fprintf(f,"\t\t}\n");
-			fprintf(f"\t}\n\n");	 
+			fprintf(f,"\t}\n\n");	 
                 	fprintf(f,"\tpublic static void main(String[] argv){\n");
 			fprintf(f,"\t\tJcompDev comp = new JcompDev();\n");
                 	fprintf(f,"\t\tcomp.launchModule(argv.length,argv,\"%s\",\"%s\");\n",moduleName,categoryNameList);
