@@ -143,6 +143,16 @@ images may be performed through the broker.
 
 #-------------------------------------------
 
+%package conagios
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - CONAGIOS subsystem
+
+%description conagios
+The CompatibleOne Nagios Description Management Service Component.
+
+#-------------------------------------------
+
 %package coobas
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
@@ -387,6 +397,7 @@ Requires: %{name}-cops
 Requires: %{name}-coips
 Requires: %{name}-comons
 Requires: %{name}-conets
+Requires: %{name}-conagios
 Requires: %{name}-coobas
 Requires: %{name}-cosacs
 Requires: %{name}-cosched
@@ -555,6 +566,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %files conets
 %attr(0755,root,root) %{_bindir}/conets
 %attr(0755,root,root) %{_bindir}/run-conets
+
+%files conagios
+%attr(0755,root,root) %{_bindir}/conagios
+%attr(0755,root,root) %{_bindir}/run-conagios
 
 %files coobas
 %attr(0755,root,root) %{_bindir}/coobas
