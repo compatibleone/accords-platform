@@ -121,6 +121,7 @@ publisher/src/Makefile.in
 publisher/src/publisher
 pyaccords/pysrc/pypacksrc/pypacksrc.py
 pyaccords/pysrc/pypath.h
+jaccords/jsrc/jpath.h
 *.scan
 scripts/accords
 scripts/accords-config
