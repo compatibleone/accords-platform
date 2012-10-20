@@ -19,6 +19,9 @@ command/src/Makefile.in
 comons/Makefile.in
 comons/src/comons
 comons/src/Makefile.in
+conagios/Makefile.in
+conagios/src/conagios
+conagios/src/Makefile.in
 conets/Makefile.in
 conets/src/conets
 conets/src/Makefile.in
