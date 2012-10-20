@@ -27,16 +27,15 @@ localpath = $(PATH_AZPROCCI):$(PATH_BROKER):$(PATH_COOL):$(PATH_COPS):$(PATH_COM
 localedit = sed \
         -e 's|@sitepath[@]|$(localpath)|g' \
 	-e 's|@bindir[@]|$(bindir)|g' \
-        -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g'
+        -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g' \
+	-e 's|@aliases[@]|$(aliases)|g'
 
 # Edit for normal run (installed)
 installpath = $(pkglibexecdir)
 installedit = sed \
         -e 's|@sitepath[@]|$(installpath)|g' \
 	-e 's|@bindir[@]|$(bindir)|g' \
-        -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g'
-
-setaliases = sed \
+        -e 's|@pkgsysconfdir[@]|$(pkgsysconfdir)|g' \
 	-e 's|@aliases[@]|$(aliases)|g'
 
 all-local: $(scripts)
@@ -73,7 +72,7 @@ accords: Makefile
 	rm -f $@ $@.tmp
 	srcdir=''; \
 	  test -f ./$@.in || srcdir=$(srcdir)/; \
-	  $(installedit) $${srcdir}$@.in | $(setaliases) >$@.tmp
+	  $(installedit) $${srcdir}$@.in >$@.tmp
 	mv $@.tmp $@
 
 co-check: co-check.in
@@ -81,5 +80,5 @@ co-check: Makefile
 	rm -f $@ $@.tmp
 	srcdir=''; \
 	  test -f ./$@.in || srcdir=$(srcdir)/; \
-	  $(installedit) $${srcdir}$@.in | $(setaliases) >$@.tmp
+	  $(installedit) $${srcdir}$@.in >$@.tmp
 	mv $@.tmp $@
