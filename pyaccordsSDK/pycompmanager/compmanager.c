@@ -1228,8 +1228,8 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
      i++;   
     }
     free(pelem);
-    fprintf(f,"#ifndef _%s_c_\n",categoryName);
-    fprintf(f,"#define _%s_c_\n\n",categoryName);
+    fprintf(f,"#ifndef _occi%s_c_\n",categoryName);
+    fprintf(f,"#define _occi%s_c_\n\n",categoryName);
     fprintf(f,"#include \"%s.h\"\n\n",categoryName);
     fprintf(f,"/*	--------------------------------	*/\n");
     if(!flag) fprintf(f,"/*	o c c i _ c o r d s _ %s 	        */\n",categoryName);
@@ -2111,6 +2111,21 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     fprintf(f,"\treturn;\n");
     fprintf(f,"}\n\n");
     
+    fprintf(f,"/*	------------------------------------	*/\n");
+    fprintf(f,"/*	c r u d   d e l e t e   a c t i o n 	*/\n");
+    fprintf(f,"/*	------------------------------------	*/\n");
+    if(!flag) fprintf(f,"private struct rest_response * delete_action_cords_%s(struct occi_category * optr,\n",categoryName); 
+    else fprintf(f,"private struct rest_response * delete_action_%s(struct occi_category * optr,\n",categoryName); 
+    fprintf(f,"struct rest_client * cptr,\n");  
+    fprintf(f,"struct rest_request * rptr,\n");  
+    fprintf(f,"struct rest_response * aptr,\n");  
+    fprintf(f,"void * vptr )\n");
+    fprintf(f,"{\n");
+    fprintf(f,"\taptr = liberate_rest_response( aptr );\n");
+    if(!flag) fprintf(f,"\treturn( occi_cords_%s_delete(optr,cptr,rptr));\n",categoryName);
+    else fprintf(f,"\treturn( occi_%s_delete(optr,cptr,rptr));\n",categoryName);
+    fprintf(f,"}\n");
+
     fprintf(f,"/*	------------------------------------------	*/\n");
     fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
     fprintf(f,"/*	------------------------------------------	*/\n");
