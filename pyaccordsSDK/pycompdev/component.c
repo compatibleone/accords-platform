@@ -31,7 +31,7 @@
 #include "../../pyaccords/pysrc/categactionname.h"
 #include "../../pyaccords/pysrc/categactionnumber.h"
 #include "../../pyaccords/pysrc/categaccess.h"
-#include "../../listoccibuilder.h"
+#include "../../pyaccords/pysrc/listoccibuilder.h"
 
 struct accords_configuration moduleConfig;
 
