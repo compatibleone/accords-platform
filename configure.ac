@@ -312,6 +312,15 @@ AM_CONDITIONAL([ENABLE_COPAAS], [test "$enable_copaas" = "yes"])
 AC_SUBST([CFLAGS_COPAAS], [-I\${abs_top_srcdir}/copaas/src])
 AC_SUBST([PATH_COPAAS], [${abs_top_srcdir}/copaas/src])
 
+AC_ARG_ENABLE([conagios],
+      [AS_HELP_STRING([--disable-conagios],
+		      [Disable conagios @<:@default=enable@:>@])],
+      [],
+      [enable_conagios=yes])
+AM_CONDITIONAL([ENABLE_CONAGIOS], [test "$enable_conagios" = "yes"])
+AC_SUBST([CFLAGS_CONAGIOS], [-I\${abs_top_srcdir}/conagios/src])
+AC_SUBST([PATH_CONAGIOS], [${abs_top_srcdir}/conagios/src])
+
 AC_ARG_ENABLE([jpaasprocci],
       [AS_HELP_STRING([--disable-jpaasprocci],
 		      [Disable jpaasprocci @<:@default=enable@:>@])],
@@ -478,6 +487,7 @@ AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
 AC_CONFIG_FILES([jpaasprocci/Makefile jpaasprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
+AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
@@ -532,6 +542,7 @@ echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - copaas                   : $enable_copaas"
+echo "    - conagios                 : $enable_conagios"
 echo "    - jpaasprocci              : $enable_jpaasprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"

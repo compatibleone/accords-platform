@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3c.org/2001/XMLSchema">
+
+<xsd:complexType name="nagios_command">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="syntax" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_contact_group">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="alias" type="xsd:string;/>
+	<xsd:attribute name="contacts" type="xsd:integer;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_contact">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="alias" type="xsd:string;/>
+	<xsd:attribute name="host_notification_period" type="xsd:string;/>
+	<xsd:attribute name="service_notification_period" type="xsd:string;/>
+	<xsd:attribute name="host_notification_options" type="xsd:string;/>
+	<xsd:attribute name="service_notification_options" type="xsd:string;/>
+	<xsd:attribute name="email" type="xsd:string;/>
+	<xsd:attribute name="pager" type="xsd:string;/>
+	<xsd:attribute name="addressx" type="xsd:string;/>
+	<xsd:attribute name="host_notifications_enabled" type="xsd:integer;/>
+	<xsd:attribute name="service_notifications_enabled" type="xsd:integer;/>
+	<xsd:attribute name="can_submit_commands" type="xsd:integer;/>
+	<xsd:attribute name="retain_status_information" type="xsd:integer;/>
+	<xsd:attribute name="retain_nonstatus_information" type="xsd:integer;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_host_dependency">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="dependent_host_name" type="xsd:string;/>
+	<xsd:attribute name="dependent_hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="inherits_parent" type="xsd:integer;/>
+	<xsd:attribute name="execution_failure_criteria" type="xsd:string;/>
+	<xsd:attribute name="notification_failure_criteria" type="xsd:string;/>
+	<xsd:attribute name="dependency_period" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_host_escalation">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="escalation_period" type="xsd:string;/>
+	<xsd:attribute name="escalation_options" type="xsd:string;/>
+	<xsd:attribute name="first_notification" type="xsd:integer;/>
+	<xsd:attribute name="last_notification" type="xsd:integer;/>
+	<xsd:attribute name="notification_interval" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_host_ext_info">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="notes" type="xsd:string;/>
+	<xsd:attribute name="notes_url" type="xsd:string;/>
+	<xsd:attribute name="action_url" type="xsd:string;/>
+	<xsd:attribute name="icon_image" type="xsd:string;/>
+	<xsd:attribute name="icon_image_alt" type="xsd:string;/>
+	<xsd:attribute name="vrml_image" type="xsd:string;/>
+	<xsd:attribute name="statusmap_image" type="xsd:string;/>
+	<xsd:attribute name="2d_coords" type="xsd:string;/>
+	<xsd:attribute name="3d_coords" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_hostgroup">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="alias" type="xsd:string;/>
+	<xsd:attribute name="notes" type="xsd:string;/>
+	<xsd:attribute name="notes_url" type="xsd:string;/>
+	<xsd:attribute name="action_url" type="xsd:string;/>
+	<xsd:attribute name="members" type="xsd:integer;/>
+	<xsd:attribute name="statis" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_service_dependency">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="dependent_host_name" type="xsd:string;/>
+	<xsd:attribute name="dependent_hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="dependent_service_description" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="service_description" type="xsd:string;/>
+	<xsd:attribute name="inherits_parent" type="xsd:integer;/>
+	<xsd:attribute name="execution_failure_criteria" type="xsd:string;/>
+	<xsd:attribute name="notification_failure_criteria" type="xsd:string;/>
+	<xsd:attribute name="dependency_period" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_servicegroup">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="alias" type="xsd:string;/>
+	<xsd:attribute name="members" type="xsd:integer;/>
+	<xsd:attribute name="servicegroup_members" type="xsd:integer;/>
+	<xsd:attribute name="notes" type="xsd:string;/>
+	<xsd:attribute name="notes_url" type="xsd:string;/>
+	<xsd:attribute name="action_url" type="xsd:string;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_service">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="hostgroup_name" type="xsd:string;/>
+	<xsd:attribute name="service_description" type="xsd:string;/>
+	<xsd:attribute name="display_name" type="xsd:string;/>
+	<xsd:attribute name="servicegroups" type="xsd:integer;/>
+	<xsd:attribute name="is_volatile" type="xsd:integer;/>
+	<xsd:attribute name="check_command" type="xsd:string;/>
+	<xsd:attribute name="initial_state" type="xsd:string;/>
+	<xsd:attribute name="max_check_attempts" type="xsd:integer;/>
+	<xsd:attribute name="check_interval" type="xsd:integer;/>
+	<xsd:attribute name="retry_interval" type="xsd:integer;/>
+	<xsd:attribute name="active_checks_enabled" type="xsd:integer;/>
+	<xsd:attribute name="passive_checks_enabled" type="xsd:integer;/>
+	<xsd:attribute name="check_period" type="xsd:string;/>
+	<xsd:attribute name="obsess_over_service" type="xsd:integer;/>
+	<xsd:attribute name="check_freshness" type="xsd:integer;/>
+	<xsd:attribute name="freshness_threshold" type="xsd:integer;/>
+	<xsd:attribute name="event_handler" type="xsd:string;/>
+	<xsd:attribute name="event_handler_enabled" type="xsd:integer;/>
+	<xsd:attribute name="low_flap_threshold" type="xsd:integer;/>
+	<xsd:attribute name="high_flap_threshold" type="xsd:integer;/>
+	<xsd:attribute name="flap_detection_enabled" type="xsd:integer;/>
+	<xsd:attribute name="flap_detection_options" type="xsd:string;/>
+	<xsd:attribute name="process_perf_data" type="xsd:integer;/>
+	<xsd:attribute name="retain_status_information" type="xsd:integer;/>
+	<xsd:attribute name="retain_nonstatus_information" type="xsd:integer;/>
+	<xsd:attribute name="notification_interval" type="xsd:integer;/>
+	<xsd:attribute name="first_notification_delay" type="xsd:integer;/>
+	<xsd:attribute name="notification_period" type="xsd:string;/>
+	<xsd:attribute name="notification_options" type="xsd:string;/>
+	<xsd:attribute name="notifications_enabled" type="xsd:integer;/>
+	<xsd:attribute name="contacts" type="xsd:integer;/>
+	<xsd:attribute name="contact_groups" type="xsd:integer;/>
+	<xsd:attribute name="stalking_options" type="xsd:string;/>
+	<xsd:attribute name="notes" type="xsd:string;/>
+	<xsd:attribute name="notes_url" type="xsd:string;/>
+	<xsd:attribute name="action_url" type="xsd:string;/>
+	<xsd:attribute name="icon_image" type="xsd:string;/>
+	<xsd:attribute name="icon_image_alt" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_serviceextinfo">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="host_name" type="xsd:string;/>
+	<xsd:attribute name="service_description" type="xsd:string;/>
+	<xsd:attribute name="notes" type="xsd:string;/>
+	<xsd:attribute name="notes_url" type="xsd:string;/>
+	<xsd:attribute name="action_url" type="xsd:string;/>
+	<xsd:attribute name="icon_image" type="xsd:string;/>
+	<xsd:attribute name="icon_image_alt" type="xsd:string;/>
+	<xsd:attribute name="status" type="xsd:integer;/>
+</xsd:complexType>
+
+<xsd:complexType name="nagios_timeperiod">
+	<xsd:attribute name="name" type="xsd:string;/>
+	<xsd:attribute name="alias" type="xsd:string;/>
+	<xsd:attribute name="weekday" type="xsd:string;/>
+	<xsd:attribute name="exception" type="xsd:string;/>
+	<xsd:attribute name="timeperiods" type="xsd:integer;/>
+</xsd:complexType>
+
+</xsd:schema>
+
+

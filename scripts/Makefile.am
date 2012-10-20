@@ -13,7 +13,7 @@ scripts=accords co-check
 
 aliases = \
 	co-start co-platform co-provision co-broker co-command co-parser co-provider co-resolver co-status co-stop \
-	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas \
+	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas run-conagios \
 	run-coss run-example run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
 	run-cosacs run-copaas run-jpaasprocci accords-config

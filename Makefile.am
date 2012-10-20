@@ -65,6 +65,9 @@ endif
 if ENABLE_COOL
 SUBDIRS += cool
 endif
+if ENABLE_CONAGIOS
+SUBDIRS += conagios
+endif
 if ENABLE_EXAMPLE
 SUBDIRS += example
 endif

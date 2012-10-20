@@ -6,6 +6,8 @@
 <cords_user
  id="3d960eb3-copa-4bdd-a7a7-20e9coms85f3" name="service-copaas" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-cona-4bdd-a7a7-20e9coms56e4" name="service-conagios" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-jpas-4bdd-a7a7-20e9coms85f4" name="service-jpaasprocci" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-como-4bdd-a7a7-20e9coms85f5" name="service-comons" password="co-system" role="user" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
