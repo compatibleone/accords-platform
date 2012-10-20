@@ -30,7 +30,8 @@
 #include "../../pyaccords/pysrc/categaction.h"
 #include "../../pyaccords/pysrc/categactionname.h"
 #include "../../pyaccords/pysrc/categactionnumber.h"
-#include "listoccibuilder.h"
+#include "../../pyaccords/pysrc/categaccess.h"
+#include "../../listoccibuilder.h"
 
 struct accords_configuration moduleConfig;
 
@@ -164,6 +165,24 @@ private	struct rest_extension * module_extension( void * v,struct rest_server * 
 {
 	return( xptr );
 }
+
+/*---------------------------------------------------------------------------------------------*/
+/* Function for category access type                                                           */
+/*---------------------------------------------------------------------------------------------*/
+int callocciCategoryAccess(const char *name)
+{
+	int i;
+	for (i=0; i< (sizeof(occiCategoryAccess_map)/ sizeof(occiCategoryAccess_map[0])); i++)
+	{
+		if(!strcmp(occiCategoryAccess_map[i].name, name))
+		{
+		  return occiCategoryAccess_map[i].access;
+		}
+	}
+        
+	return 0;
+}
+
 /*---------------------------------------------------------------------------------------------*/
 /*      Function to call occi category action for the category specified in name variable      */
 /*---------------------------------------------------------------------------------------------*/
@@ -178,7 +197,7 @@ struct rest_response * callocciCategoryAction(const char *name)
      }
   }
 
-  return (struct occi_category *) 0;
+  return (struct rest_response *) 0;
 }
 
 /*---------------------------------------------------------------------------------------------*/
