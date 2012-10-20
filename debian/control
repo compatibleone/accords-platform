@@ -196,6 +196,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
 Description: CompatibleOne Accords Platform - Fileserver subsystem
  CompatibleOne Accords Platform - Fileserver subsystem
 
+Package: compatibleone-nagios
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Description: CompatibleOne Accords Platform - Nagios subsystem
+ CompatibleOne Accords Platform - Nagios subsystem
+
 Package: compatibleone-onprocci
 Section: net
 Architecture: any

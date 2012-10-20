@@ -59,6 +59,7 @@ debian/compatibleone-example/
 debian/compatibleone-ezvm/
 debian/compatibleone-fileserver/
 debian/compatibleone-jpaasprocci/
+debian/compatibleone-nagios/
 debian/compatibleone-onprocci/
 debian/compatibleone-osocciprocci/
 debian/compatibleone-osprocci/

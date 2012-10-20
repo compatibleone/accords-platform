@@ -8,6 +8,7 @@ compatibleone-accords (0.20121015-1) unstable; urgency=low
     the appropriate autodetected java environment.
   * co-stop: can now be run from any directory.
   * Add package compatibleone-example.
+  * Add compatibleone-nagios package.
 
  -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 15 Oct 2012 11:08:00 +0200
 
