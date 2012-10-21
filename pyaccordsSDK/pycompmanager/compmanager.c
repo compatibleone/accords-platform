@@ -2433,7 +2433,7 @@ int  enTete(char pathf[])
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
 /*---------------------------------------------------------------------------------------------------------------*/
-int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglist)
+int generateModuleFile(char * moduleName, char * categoryNameList)
 {
    char pathfd[DIM];
    char pathff[DIM];
@@ -2477,7 +2477,7 @@ int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglis
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\", \"%s\")\n",LIB_PYCOMPDEV,moduleName,categoryNameList,flaglist);
+      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\")\n",moduleName,categoryNameList);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);

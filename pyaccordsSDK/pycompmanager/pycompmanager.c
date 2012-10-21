@@ -71,8 +71,8 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  char * categoryNameList;
  char * flaglist;
  
- if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&flaglist)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList,flaglist);
+ if (! PyArg_ParseTuple( args,"ss",&moduleName,&categoryNameList)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList);
  if(a)
  {
    printf(" %s component is created\n",moduleName);
