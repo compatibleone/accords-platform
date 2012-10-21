@@ -273,8 +273,7 @@ private	int	module_operation(
                  char * nptr, 
                  struct accords_configuration *componentModule, 
                  char *moduleName, 
-                 listc categoryName,
-                 listc flaglist)
+                 listc categoryName)
 {
         char xlinkModule[1024];
 	struct	occi_category * first=(struct occi_category *) 0;
@@ -285,16 +284,16 @@ private	int	module_operation(
         struct occi_interface categoryInterface;
         int numOfact; 
         char categoryAction[1024];
+        char packetfile[256];
         char *actionName;
-        int provider_access;
+        int categoryAccess = 0;
 
-
-        elem *pelem = categoryName.first;    
-        elem *pelem2 = flaglist.first;    
+        elem *pelem = categoryName.first;      
         sprintf(xlinkModule,"links_%s.xml",moduleName);
         xlinkModule[strlen(xlinkModule)]=0;
 	set_autosave_cords_xlink_name(xlinkModule);
-        
+        sprintf(packetfile,"packet_%s.xml",moduleName); 
+
         while(pelem)
         {       
           
@@ -306,19 +305,27 @@ private	int	module_operation(
 	  else	optr->previous->next = optr;
 	  last = optr;
 	  optr->callback = callocciCategoryInterface(pelem->value);
-          provider_access=atoi(pelem2->value);
-          if(provider_access) optr->access |= _OCCI_PROVIDER;
+          
+	  if(!(strcmp(pelem->value, "packet")))
+	  {
+		 set_autosave_cords_packet_name(packetfile);
+	  }
+          categoryAccess = callocciCategoryAccess(pelem->value);
+          if(categoryAccess)
+	  {
+		optr->access = categoryAccess;
+	  }
+
           numOfact = callocciCategoryActionNumber(pelem->value);
           for(i=0;i<numOfact;i++)
           {
                actionName = allocate_string(callocciCategoryActionName(pelem->value,i));
                sprintf(categoryAction,"%s_%s",pelem->value,actionName);
                if (!( optr = occi_add_action( optr,actionName,"",callocciCategoryAction(categoryAction))))
-		   return( optr );
+		   return( 27 );
           }  
            
            pelem=pelem->next;  
-           pelem2=pelem2->next;
         } 
 	
         rest_initialise_log( componentModule->monitor );
@@ -342,14 +349,14 @@ private	int	module_operation(
 /*	------------------------------------------------------------------	*/
 /*				Module 				        	*/
 /*	------------------------------------------------------------------	*/
-private	int	module(int argc, char * argv[],char *moduleName,char * categoryList, char * flaglist)
+private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
         char *  token;
         listc  categoryLst;
-        listc  l_flaglist;
+        
         if ( argc == 1 )
         {
 		return( banner() );
@@ -364,14 +371,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
               addBack(&categoryLst,token);
               token=strtok(NULL, " ");
            } 
-
-           resetList(&l_flaglist);
-           token= strtok(flaglist," ");
-           for(; token != NULL ;)
-           {
-              addBack(&l_flaglist,token);
-              token=strtok(NULL, " ");
-           } 
+ 
            //loud configuration module
            fillInAccordsConfiguration( &moduleConfig,moduleName);
            load_accords_configuration( &moduleConfig, moduleName );
@@ -399,12 +399,19 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList,
 			status = 30;
 			break;
 		}
-		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst, l_flaglist) ))
+		else if (!( status = module_operation(aptr,&moduleConfig,moduleName,categoryLst) ))
 			continue;
 		else	break;
 	  }
 	  return(status);
         }
+}
+
+int module_main(int argc, char * argv[], char moduleName[], char categoryNameList[])
+{
+	if(argc == 1)
+		return banner();
+	else return module(argc, argv, moduleName, categoryNameList);
 }
 
 	/* ------------- */

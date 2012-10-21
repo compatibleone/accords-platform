@@ -301,7 +301,6 @@ private	int	module_operation(
         char categoryAction[1024];
 	char packetfile[256];
         char *actionName;
-        int provider_access;
         int categoryAccess=0;
 
         elem *pelem = categoryName.first;        
