@@ -135,7 +135,7 @@ public final class ProcciParametersHandler {
 		if (initialization==INIT_CLI){
 			filename = this.getArgs().getStr("properties-file");
 		}else{
-			filename = "./conf/procci.properties";
+			filename = "/var/lib/accords/paprocci/paprocci.properties";
 		}
 		
 		File f = new File(filename);	// Load a set of properties for this procci.
