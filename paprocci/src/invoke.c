@@ -405,18 +405,19 @@ struct jvm_struct * start_jvm() {
 	jclass cls;
 	jmethodID methodid;
 
-	char* jarslist1 = getjars(JAVA_MODULE_PATH "lib/scheduling/");
-	char* jarslist2 = getjars(JAVA_MODULE_PATH "lib/");
-	char* jarslist3 = getjars(JAVA_MODULE_PATH "dist/");
-	char* jarslist = (char*) malloc (strlen(jarslist1) + strlen(jarslist2) + strlen(jarslist3) + 1);
-	jarslist[0] = '\0';
+	char * jarslist = getjars("/usr/share/java/accords/paprocci/");
+	//char* jarslist1 = getjars(JAVA_MODULE_PATH "lib/scheduling/");
+	//char* jarslist2 = getjars(JAVA_MODULE_PATH "lib/");
+	//char* jarslist3 = getjars(JAVA_MODULE_PATH "dist/");
+	//char* jarslist = (char*) malloc (strlen(jarslist1) + strlen(jarslist2) + strlen(jarslist3) + 1);
+	//jarslist[0] = '\0';
 	//strcat(classpt, KEY_CLASSPATH);
-	strcat(jarslist, jarslist1);
-	strcat(jarslist, jarslist2);
-	strcat(jarslist, jarslist3);
-	free(jarslist1);
-	free(jarslist2);
-	free(jarslist3);
+	//strcat(jarslist, jarslist1);
+	//strcat(jarslist, jarslist2);
+	//strcat(jarslist, jarslist3);
+	//free(jarslist1);
+	//free(jarslist2);
+	//free(jarslist3);
 	fprintf(stderr, "Jars' list: '%s'\n", jarslist);
 #ifdef JNI_VERSION_1_2
 	JavaVMInitArgs vm_args;

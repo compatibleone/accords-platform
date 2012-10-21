@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="pademo" xmlns="file:///tmp/manifest.xsd">
+	<node name="webnode" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="painfrastructure">
+			<compute name="pacompute" architecture="x86" cores="2" memory="2G" speed="2G"/>
+			<storage name="pastorage" size="20G"/>
+			<network name="panetwork" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="paimage">
+			<system name="windows"/>
+                </image>
+	</node>
+        <configuration name="paconfig">
+		<action name="runweb" expression="webnode.system('cd C:\Eureva\Deploy\Tremulous && start C:\Eureva\Deploy\Tremulous\tremulous.x86.exe -streamingProtocol=RTSP -user=fpi -address=127.0.0.1:23470 -netinput=8600 -lobbyport=8610');"/>
+        </configuration>
+	<account name="paaccount"/>
+	<security name="pasecurity"/>
+</manifest>
+
