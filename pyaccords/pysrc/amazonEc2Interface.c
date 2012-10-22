@@ -23,7 +23,7 @@
 private int amazonEc2_create(struct occi_category * optr, void * vptr)
 {
 	struct occi_kind_node * nptr;
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
         char srcdir[1024];
@@ -385,7 +385,7 @@ private int amazonEc2_create(struct occi_category * optr, void * vptr)
 private int amazonEc2_retrieve(struct occi_category * optr, void * vptr)
 {
 	struct occi_kind_node * nptr;
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
         char srcdir[1024];
@@ -747,7 +747,7 @@ private int amazonEc2_retrieve(struct occi_category * optr, void * vptr)
 private int amazonEc2_update(struct occi_category * optr, void * vptr)
 {
 	struct occi_kind_node * nptr;
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
         char srcdir[1024];
@@ -1109,7 +1109,7 @@ private int amazonEc2_update(struct occi_category * optr, void * vptr)
 private int amazonEc2_delete(struct occi_category * optr, void * vptr)
 {
 	struct occi_kind_node * nptr;
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
         char srcdir[1024];

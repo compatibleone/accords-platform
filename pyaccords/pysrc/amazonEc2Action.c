@@ -35,7 +35,7 @@ struct rest_response * start_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
@@ -310,7 +310,7 @@ struct rest_response * save_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
@@ -585,7 +585,7 @@ struct rest_response * snapshot_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
@@ -860,7 +860,7 @@ struct rest_response * stop_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
@@ -1135,7 +1135,7 @@ struct rest_response * suspend_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
@@ -1410,7 +1410,7 @@ struct rest_response * restart_amazonEc2(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_amazonEc2 * pptr;
+	struct amazonEc2 * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
