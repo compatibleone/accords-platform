@@ -400,7 +400,7 @@ int generatePyCategoryTypeStruct(char *categoryName, char * categoryAccess, char
   	char pathtmp[1024];
   	char strcats[20];
 
-  	sprintf(pathtmp,"%s/pyaccords/pysrc/categaccess.tmp",JPATH);
+  	sprintf(pathtmp,"%s/pyaccords/pysrc/categaccess.tmp",PYPATH);
   
   	if((fIn=fopen(pathf,"r"))==NULL)
   	{
