@@ -101,10 +101,14 @@ int deleteCategory(char categoryName[],int indice,int flag)
  char pathactbstructname[DIM];
  char pathactbstruct[DIM];
  char pathf[DIM];
+ char pathaccess[DIM];
+
 
  strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
+
+ sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
 
  sprintf(pathactstructname,"%s_",categoryName);
  sprintf(pathactstruct,"%s/%s",pathf,PY_ACT_STRUCT);
@@ -236,6 +240,8 @@ int deleteCategory(char categoryName[],int indice,int flag)
     return 0; 
  else if(!(deleteInFile(occibuilderb,occibuildername)))
     return 0;
+ else if(!(deleteInFile(pathaccess, categoryName)))
+    return 0;
  else
     return 1;
 }
@@ -248,7 +254,12 @@ int deleteCategory(char categoryName[],int indice,int flag)
 /* pathf: (char*) a path name for the directory project                                                  */
 /* return 1 if succeeded                                                                                 */
 /*-------------------------------------------------------------------------------------------------------*/
-int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag)
+int generateAccordsCategory(
+	char *categoryName,
+	char *categoryAttributes, 
+	char *categoryActions,
+	char * categoryAccess, 
+	int flag)
 {
  FILE *f;
  char *token=NULL;
@@ -257,12 +268,14 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  char pathact[DIM];
  char pathactname[DIM];
  char pathactnumber[DIM];
+ char pathcategaccess[DIM];
  listc categoryAtr;
  listc categoryAtrB;
  listc categoryAct;
  char occipath[DIM];
  char categoryAttributesB[1024]="id";
- int indice=0;
+ int indice = 0;
+ int indiceA = 0;
  char pathf[1024];
   
  strcpy(pathf,PYPATH);
@@ -270,6 +283,7 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);
 
  if(categoryActions[0]!='\0') indice=1;
+ if(categoryAccess[0] != '\0') indiceA = 1;
 
  /*---------------------------------*/
  /*create category.h file           */
@@ -350,6 +364,14 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
      else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
          return 0;
   }
+  
+  if(indiceA)
+  {
+         sprintf(pathcategaccess,"%s/%s",PYPATH, PY_CATEGACCESS_STRUCT);
+         if(!generatePyCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
+           return 0;          
+  }
+
 
   if(!(createCategoryCordsCfile(categoryName,categoryAtr,dim,flag,pathff)))         /* create category.c file */
       return 0;
@@ -367,6 +389,67 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
       return dim;
  
 }
+
+
+int generatePyCategoryTypeStruct(char *categoryName, char * categoryAccess, char pathf[])
+{
+	FILE *fIn;
+	FILE *fOut;
+  	int a=0;
+  	char line[256];
+  	char pathtmp[1024];
+  	char strcats[20];
+
+  	sprintf(pathtmp,"%s/pyaccords/pysrc/categaccess.tmp",JPATH);
+  
+  	if((fIn=fopen(pathf,"r"))==NULL)
+  	{
+   		printf("Error in generate category Action struct file: No such file or directory\n");
+   		return 0;
+  	}
+  	if((fOut=fopen(pathtmp,"w")) == NULL)
+  	{
+   		fclose(fIn);
+   		printf("Error in generate category Action struct file tmp: No such file or directory\n");
+   		return 0;
+  	}
+ 
+  	while( fgets(line,256, fIn) != NULL)
+  	{
+    		if(searchWord(categoryName,line))
+    		{
+       			a=1;
+       			fprintf(fOut,"%s",line);
+    		}
+    		else
+    		{
+       			str_sub(line,0,1,strcats);
+       			if(!(strcmp(strcats,"};"))) 
+       			{
+          			break;
+       			}
+       			else 
+       			{
+         			fprintf(fOut,"%s",line);
+       			}
+    		}
+  	}
+  
+  	if(!a)
+  	{
+		fprintf(fOut,"\t{\"%s\", %s},\n",categoryName,categoryAccess);
+ 	}
+  
+  	fprintf(fOut,"};\n");
+  	fprintf(fOut,"#endif\n");
+  	fclose(fIn);
+  	fclose(fOut);
+  	if(rename(pathtmp,pathf) < 0)
+     	return 0;
+  	else
+     	return 1;
+}
+
 
 int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, char pathf[])
 {
