@@ -29,6 +29,7 @@ DESC='CompatibleOne services'		# Introduce a short description here
 NAME=compatibleone			# Introduce the short server's name here
 DAEMON_ARGS=""				# Arguments to run the daemon with
 PIDFILE=/var/run/$NAME.pid
+LOCKFILE=/var/lock/subsys/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
@@ -63,11 +64,15 @@ case "$1" in
   start)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
 	/usr/bin/co-start
+	retval=$?
+	[ $retval -eq 0 ] && touch $LOCKFILE
   ;;
   stop)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
 	/usr/bin/co-stop
+	retval=$?
 	sleep $tempo
+	[ $retval -eq 0 ] && rm -f $LOCKFILE
 	;;
   status)
        /usr/bin/co-status
