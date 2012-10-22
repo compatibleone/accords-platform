@@ -900,7 +900,7 @@ int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int f
       			pelem=pelem->next;
       			while(pelem)
       			{
-        			fprintf(f,"\telse if(!(strValid(pptr->%s))){\n",pelem->value);
+        			fprintf(f,"\tif(!(strValid(pptr->%s))){\n",pelem->value);
         			fprintf(f,"\t\tstrcpy(strtmp,\" \");\n");
         			fprintf(f,"\t\tstrConcat(sendstr,strtmp,',');\n");
         			fprintf(f,"\t}\n");
