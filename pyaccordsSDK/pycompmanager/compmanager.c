@@ -2578,7 +2578,7 @@ int generateModuleFile(char * moduleName, char * categoryNameList)
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\")\n",moduleName,categoryNameList);
+      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\")\n",LIB_PYCOMPDEV,moduleName,categoryNameList);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);
