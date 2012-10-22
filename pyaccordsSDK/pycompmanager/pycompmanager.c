@@ -25,10 +25,11 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
  char * categoryAttributes;         
  char * categoryName;
  char * categoryActions;
+ char * categoryAccess;
  int flag;
 
- if (! PyArg_ParseTuple( args,"sssi",&categoryName, &categoryAttributes,&categoryActions,&flag)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag);
+ if (! PyArg_ParseTuple( args,"ssssi",&categoryName, &categoryAttributes,&categoryActions, &categoryAccess, &flag)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,categoryAccess,flag);
  if(dim <= 0) 
  {
    printf("Failure to create %s OCCI category\n",categoryName);
