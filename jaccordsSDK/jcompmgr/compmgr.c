@@ -342,7 +342,7 @@ int generateJAccordsCategory(
         if(indiceA)
         {
            sprintf(pathcategaccess,"%s/%s",JPATH, J_CATEGACCESS_STRUCT);
-           if(!generatePyCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
+           if(!generateJCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
            	return 0;          
         }
       
