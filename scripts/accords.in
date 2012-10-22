@@ -15,7 +15,7 @@
 #   Vincent Renardias <vincent@renardias.com>
 #
 
-set -e
+#set -e
 
 export PATH=@sitepath@:@bindir@:$PATH
 
@@ -124,9 +124,14 @@ _co_run_serv() {
     if [ -z "$name" ]; then
         name=$serv
     fi
-    echo "Starting accords $name"
-    run-$serv &
-    sleep $tempo
+    which run-$serv 2>/dev/null >/dev/null
+    if [ $? -eq 0 ]; then
+        echo "Starting $name"
+        run-$serv &
+        sleep $tempo
+    else
+        echo "NOT starting $name"
+    fi
 }
 
 _co_platform() {
@@ -157,7 +162,14 @@ _co_platform() {
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
-    sleep 20
+    secs=20
+    echo "Please wait $secs seconds while starting the provisioning services agreements"
+    for i in $(seq 1 $secs)
+    do 
+       sleep 1
+       echo -n "."
+    done
+    echo
     co-parser accounts
     co-parser metrics
     co-parser coips
@@ -327,7 +339,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -343,6 +355,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep cosched || true
 	lsof -i | grep LISTEN | grep ezvm || true
 	lsof -i | grep LISTEN | grep coips || true
+	lsof -i | grep LISTEN | grep conagios || true
 	lsof -i | grep LISTEN | grep cosacs || true
     else
 	echo "Unsupported OS ($(uname -s))"
