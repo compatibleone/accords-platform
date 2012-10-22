@@ -70,12 +70,12 @@ struct	ec2_image_infos
 
 
 
-struct	cords_ec2config * resolve_ec2_configuration( char * sptr )
+struct	ec2config * resolve_ec2_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
-	struct	cords_ec2config * pptr=(struct cords_ec2config *) 0;
-	struct	occi_kind_node  * occi_first_cords_ec2config_node();
-	for (	nptr = occi_first_cords_ec2config_node();
+	struct	ec2config * pptr=(struct ec2config *) 0;
+	struct	occi_kind_node  * occi_first_ec2config_node();
+	for (	nptr = occi_first_ec2config_node();
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next )
 	{
@@ -88,14 +88,14 @@ struct	cords_ec2config * resolve_ec2_configuration( char * sptr )
 			return( pptr );
                 }
 	}
-	return((struct cords_ec2config *) 0);
+	return((struct ec2config *) 0);
 }
 
 
 
 int use_ec2_configuration( char * sptr )
 {
-        struct	cords_ec2config * pptr;
+        struct	ec2config * pptr;
 	if (!( pptr = resolve_ec2_configuration(sptr)))
 	 	return( 404 );
         else
@@ -111,7 +111,7 @@ int use_ec2_configuration( char * sptr )
 
 int create_ec2_contract(
 		struct occi_category * optr,
-		struct cords_amazonEc2 * pptr,
+		struct amazonEc2 * pptr,
 		char * agent,
 		char * tls )
 {

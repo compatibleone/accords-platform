@@ -1,7 +1,7 @@
 #ifndef _cords_ec2config_h_
 #define _cords_ec2config_h_
 
-struct cords_ec2config
+struct ec2config
 {
 	char * id;
 	char * name;
