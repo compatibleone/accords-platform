@@ -19,7 +19,7 @@ compilejava:
 	@echo Creating Java binary...
 	javac $(PROJECTNAME).java
 compilec:
-	gcc -o lib$(PROJECTNAME).so $(PROJECTNAME).c compdev.c -C $(EXTRA_DIST) -shared -fpic -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux $(LD_INCLUDES) $(LD_FLAGS) $(LD_JFLAGS)
+	gcc -o lib$(PROJECTNAME).so $(PROJECTNAME).c compdev.c $(EXTRA_DIST) -shared -fpic -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux $(LD_INCLUDES) $(LD_FLAGS) $(LD_JFLAGS)
 clean:
 	rm *.class
 	rm *.so

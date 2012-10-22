@@ -17,7 +17,6 @@
 
 #ifndef _COMPDEV_H
 #define _COMPDEV_H
-#include "../../cocci/src/accords.h"
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName);
 struct rest_response * callocciCategoryAction(const char *name);
