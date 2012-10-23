@@ -1,3 +1,10 @@
+compatibleone-accords (0.20121022-1) unstable; urgency=low
+
+  * Upstream change: new accords bash script.
+  * All executables now have a manpage.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 22 Oct 2012 15:18:00 +0200
+
 compatibleone-accords (0.20121015-1) unstable; urgency=low
 
   * Only recommend compatibleone-paprocci so everybody isn't forced to install the Java runtime.
