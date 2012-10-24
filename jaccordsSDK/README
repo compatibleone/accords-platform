@@ -38,7 +38,7 @@ Class examples
 
 # A class that generates a category is shown in this example
 	- where generateCategory(String catName, String catAtr, String catAct, String occiFlag, int pFlag) takes five parameters	
-	- catName: Category Name
+	- catName: Category name
 	- catAtr: Attributes of the category (exp: "atr1 atr2 atr2")
         - catAct: Actions of the category (exp: "act1 act2 act3")
 	- occiFlag : Takes one of the foolowing value
@@ -67,14 +67,14 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		gen.generateCategory("cateroryName","atr1 atr2","start stop","_OCCI_PROVIDER",0); 
+                 		gen.generateCategory("mycategory","atr1 atr2","start stop","",0); 
 			}
 		}
 
 
 # To remove a category use this class example
 	- where removeCategory(String catName, int actFlag, int pFlag) takes three parameters
-	- catName: category name
+	- catName: Category name
 	- actFlag: takes 0 àr 1
 		-0 if the category does not have actions
 		- 1 if category have actions
@@ -90,7 +90,7 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		gen.removeCategory("categoryName",1,0);
+                 		gen.removeCategory("mycategory",1,0);
 			}
 		}
 
@@ -110,7 +110,7 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		 gen.generateComponent("expModule","categoryname1 categoryname2");
+                 		 gen.generateComponent("mymodule","mycategory");
 			}
 		}
 
@@ -129,8 +129,79 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		 gen.removeComponent("expModule");
+                 		 gen.removeComponent("mymodule");
 			}
 		}
 
-# After creating or removing a category compile all the accords-platform >>> make and make install
+# After creating or removing a category compile all the accords-platform 
+	$ cd accords-platform
+	$ make 
+	$ make install
+
+# After creating a category you find two files under accords-platform/jaccords/
+	- <categoryName>Interface.java: for implementing crud (create, retrieve, update, delete) interface for the new category.
+	- <categoryNameAction.java: for implementing actions for the new category.
+
+# Next when the new module has been created
+	- A new folder named <moduleName> is created under accords-platform.
+	- Inside this folder <JmoduleName>.java file is created. 
+
+# Add the new module configurations to accords.xml and cords_user.xml files.
+
+# Compile Jcompdev library
+ 	$ cd accords-platform/jaccordsSDK/jcompdev
+	$ make
+
+# Compile the generated module
+ 	-Compile the java class (using javac).
+   	$ export  LD_LIBRARY_PATH=/path/to/jaccordsSDK/jcompdev/
+   	$ export      CLASSPATH=.:/path/to/jaccordsSDK/jcompdev/
+   	$ javac J<moduleName<.java
+
+# Make sure that the platform has been already started
+
+# If the secure mode is selected you need to create key and certificate for this new module by using this script under accords-platform/scripts/  folder
+  
+   		module=<JmoduleName>
+		export bits=2048
+		export days=365
+		export sslconfig=./openssl.cnf
+       		echo "<tls key='security/"${module}"PrivateKey.pem'" > security/${module}Tls.xml
+    		echo "     certificate='security/"${module}"Certificate.pem'" >> security/${module}Tls.xml
+    		echo "     passphrase='"Accords"'" >> security/${module}Tls.xml
+    		echo "     authority='"Certificates.crt"'" >> security/${module}Tls.xml
+    		echo "     authenticate='"1"'" >> security/${module}Tls.xml
+    		echo "     option='"13"' />" >> security/${module}Tls.xml
+    		chmod 0640 security/${module}Tls.xml
+    		echo "Creating certificate for module $1"
+    		if test ! -e $sslconfig; then
+			echo "Can not find openSSL config file: $sslconfig"
+			exit 1
+    		fi
+    		if [ -z "$nethsm" ]; then
+			openssl req -config $sslconfig \
+	    			-newkey $bits -x509 -days $days -sha1 \
+	    			-keyout security/${module}PrivateKey.pem -out security/${module}Certificate.pem 2> /dev/null
+    		else
+			openssl req -engine pkcs11 -keyform e -config $sslconfig \
+	    			-newkey $bits -x509 -days $days -sha1 \
+	    			-keyout security/${module}PrivateKey.pem -out security/${module}Certificate.pem
+    		fi
+    		chmod 0400 security/${module}PrivateKey.pem
+    		chmod 0444 security/${module}Certificate.pem
+
+# To execute the new module file run-<moduleName>.sh 
+  	$ cd accords-platform/scrips
+	$ touch run-<moduleName>.sh
+        $ chmod +x run-<moduleName>.sh
+
+# Copy the folowing script in run-<moduleName>.sh file
+
+	CURRDIR=`dirname $0`       
+	export LD_LIBRARY_PATH=$CURRDIR/../jaccordsSDK/jcompdev/
+	java -cp $CURRDIR/../expModule/:$CURRDIR/../jaccordsSDK/jcompdev/ J<moduleName> J<moduleName> --config accords.xml  CO-EXPMODULE/1.0
+
+
+# run the module
+	$ ./run-<moduleName>.sh
+
