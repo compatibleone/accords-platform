@@ -956,7 +956,7 @@ int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int f
 			fprintf(f,"\t\t}\n");
 			fprintf(f,"\t\telse\n");
 			fprintf(f,"\t\t{\n");
-			fprintf(f,"\t\t\tprintf(\"Error in J%sint.class: FindClass function returned 0.\\n\");\n",categoryName);
+			fprintf(f,"\t\t\tprintf(\"Error in J%sInt.class: FindClass function returned 0.\\n\");\n",categoryName);
                         fprintf(f,"\t\t\treturn 0;\n");
 			fprintf(f,"\t\t}\n");
 			fprintf(f,"\t}\n");

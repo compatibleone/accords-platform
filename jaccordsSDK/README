@@ -198,8 +198,9 @@ Class examples
 # Copy the folowing script in run-<moduleName>.sh file
 
 	CURRDIR=`dirname $0`       
-	export LD_LIBRARY_PATH=$CURRDIR/../jaccordsSDK/jcompdev/
-	java -cp $CURRDIR/../expModule/:$CURRDIR/../jaccordsSDK/jcompdev/ J<moduleName> J<moduleName> --config accords.xml  CO-EXPMODULE/1.0
+	export LD_LIBRARY_PATH=$CURRDIR/../jaccordsSDK/jcompdev/;pwd :/usr/local/lib/
+	export CLASSPATH=$CURRDIR/../<moduleName>/:$CURRDIR/../jaccordsSDK/:$CURRDIR/../jaccordsSDK/jcompdev/:$CURRDIR/../jaccords/:$CURRDIR/../jaccords/jsrc/
+	java -Djava.library.path="$LD_LIBRARY_PATH" -cp $CLASSPATH J<moduleName> J<moduleName> --config accords.xml  CO-EXPMODULE/1.0
 
 
 # run the module
