@@ -32,4 +32,4 @@ EXTRA_DIST = occiatb.h occienquiry.c occimachine.c occiparameter.c \
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
-libocci_la_LDLAGS = $(LD_COPABR)
+libocci_la_LDFLAGS =
