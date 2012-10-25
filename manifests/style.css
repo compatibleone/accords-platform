@@ -1,3 +1,7 @@
+body	{
+	font-family: Futura, Tahoma;
+	}
+
 table 	{
 	width: 80%;
 	border-style: none;
@@ -9,25 +13,42 @@ th 	{
 	padding: 2mm;
 	border-style: solid;
 	border-color: #000033;
-	border-width: 1px;
+	border-color: #AAAABB;
+	border-width: 3px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
 	}
 
 .input 	{
 	border-width: 1px;
 	border-style: solid;
-	width: 14cm;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-color: #AAAABB;
+	padding: 1mm;
+	width: 16cm;
+	height: 3em;
 	}
 .button	{
 	border-width: 1px;
 	background-color: #DDDDFF;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
 	border-style: outset;
-	width: 30mm;
+	border-color: #AAAABB;
+	width: 40mm;
+	height: 3em;
 	}
 .action	{
 	border-width: 1px;
 	background-color: #DDDDFF;
 	border-style: outset;
-	width: 8cm;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-style: outset;
+	border-color: #AAAABB;
+	width: 40mm;
+	height: 3em;
 	}
 
 td 	{

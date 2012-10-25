@@ -1,3 +1,7 @@
+body	{
+	font-family: Futura, Tahoma;
+	}
+
 table 	{
 	width: 80%;
 	border-style: none;
@@ -12,13 +16,14 @@ th 	{
 	border-color: #AAAABB;
 	border-width: 3px;
 	border-radius: 8px;
-	-moz-border-radius: 15px;
+	-moz-border-radius: 8px;
 	}
 
 .input 	{
 	border-width: 1px;
 	border-style: solid;
 	border-radius: 8px;
+	-moz-border-radius: 8px;
 	border-color: #AAAABB;
 	padding: 1mm;
 	width: 16cm;
@@ -28,6 +33,7 @@ th 	{
 	border-width: 1px;
 	background-color: #DDDDFF;
 	border-radius: 8px;
+	-moz-border-radius: 8px;
 	border-style: outset;
 	border-color: #AAAABB;
 	width: 40mm;
@@ -38,6 +44,7 @@ th 	{
 	background-color: #DDDDFF;
 	border-style: outset;
 	border-radius: 8px;
+	-moz-border-radius: 8px;
 	border-style: outset;
 	border-color: #AAAABB;
 	width: 40mm;
