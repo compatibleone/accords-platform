@@ -1,0 +1,70 @@
+table 	{
+	width: 80%;
+	border-style: none;
+	}
+
+th 	{
+	background-color: #EEEEFF;
+	color: #000044;
+	padding: 2mm;
+	border-style: solid;
+	border-color: #000033;
+	border-color: #AAAABB;
+	border-width: 3px;
+	border-radius: 8px;
+	-moz-border-radius: 15px;
+	}
+
+.input 	{
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 8px;
+	border-color: #AAAABB;
+	padding: 1mm;
+	width: 16cm;
+	height: 3em;
+	}
+.button	{
+	border-width: 1px;
+	background-color: #DDDDFF;
+	border-radius: 8px;
+	border-style: outset;
+	border-color: #AAAABB;
+	width: 40mm;
+	height: 3em;
+	}
+.action	{
+	border-width: 1px;
+	background-color: #DDDDFF;
+	border-style: outset;
+	border-radius: 8px;
+	border-style: outset;
+	border-color: #AAAABB;
+	width: 40mm;
+	height: 3em;
+	}
+
+td 	{
+	padding: 2mm;
+	background-color: #F6F6FF;
+	border-style: none;
+	width: 70%;
+	}
+
+.title {
+	font-size: 18pt;
+	}
+
+.header {
+	font-size: 16pt;
+
+	}
+
+.description {
+	font-size: 12pt;
+	padding: 5mm;
+	border-style: dotted;
+	border-color: #000088;
+	}
+
+

@@ -1,0 +1,24 @@
+bash build-nagios cosacs 8286 
+bash build-nagios publisher $1 8086
+bash build-nagios coss $1 8087
+bash build-nagios comons $1 8087
+bash build-nagios coobas $1 8087 
+bash build-nagios cops $1 8087
+bash build-nagios coees $1 8087
+bash build-nagios conets $1 8087
+bash build-nagios cosched $1 8087
+bash build-nagios slam $1 8087
+bash build-nagios copaas $1 8087
+bash build-nagios ezvm $1 8087
+bash build-nagios coips $1 8087
+bash build-nagios broker $1 8087
+bash build-nagios parser $1 8087
+bash build-nagios procci $1 8087
+bash build-nagios osprocci $1 8087
+bash build-nagios onprocci $1 8087
+bash build-nagios azprocci $1 8087
+bash build-nagios dcprocci $1 8087
+bash build-nagios osocciprocci $1 8087
+bash build-nagios paprocci $1 8087
+bash build-nagios jpaasprocci $1 8087
+
