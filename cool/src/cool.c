@@ -1070,6 +1070,9 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		else	return( use_elastic_contract( eptr, econtract ) );	
 		
 	}
+
+	/* Should never be reached, added to comply with rpmlint */
+	return NULL;
 }
 
 /*	--------------------------------------------	*/

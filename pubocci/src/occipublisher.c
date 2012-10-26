@@ -398,6 +398,9 @@ private	char * 	cords_provider_agreement( char * operator, char * agent, char * 
 		liberate( agreementid );
 		return( result );
 	}
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( NULL );
 }
 
 /*	---------------------------------------------------------	*/

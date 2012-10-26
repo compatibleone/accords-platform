@@ -264,6 +264,8 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 		return( dc_result( dc_create_address() ) );
 	}
 
+	/* Should never be reached, added to comply with rpmlint */
+	return( -1 );
 }
 
 private int	dc_test_main( int argc, char * argv[] )

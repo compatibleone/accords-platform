@@ -432,6 +432,9 @@ public	int	json_serialise( struct data_element * dptr, char * filename )
 		fclose(h);
 		return(0);
 	}
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( -1 );
 }
 	
 /*	------------------------------------------------	*/

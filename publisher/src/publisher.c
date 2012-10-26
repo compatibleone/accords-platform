@@ -702,6 +702,9 @@ private	int	create_agency(struct occi_category * optr, void * vptr)
 		pptr->uptime = 0;
 		pptr->state  = 1;
 	}
+
+	/* Should never be reached, added to comply with rpmlint */
+	return(-1);
 }
 
 /*	-------------------------------------------	*/

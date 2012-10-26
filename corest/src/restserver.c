@@ -728,6 +728,9 @@ public	struct	rest_response *	rest_liberate_response( struct rest_response * apt
 		liberate_rest_response( aptr );
 		return((struct rest_response *) 0);
 	}
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( NULL );
 }		
 
 /*	------------------------------------------------	*/
