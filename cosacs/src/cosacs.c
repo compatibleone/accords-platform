@@ -28,6 +28,9 @@
 #include "occibuilder.h"
 #include "cordslang.h"
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #define	_COSACS_START 		"cosacs:start"
 #define	_COSACS_SHITDOWN	"cosacs:shutdown"
 #define	_COSACS_LOCAL		"127.0.0.1"
