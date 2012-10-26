@@ -891,8 +891,8 @@ _mknag() {
 	module=$1
 	echo "define service { " 			>> $nagios
 	echo "  use generic-service" 			>> $nagios
-	echo "  host_name $module " 			>> $nagios
-	echo "  service_description Accords Platform Component $module " >> $nagios
+	echo "  host_name accords " 			>> $nagios
+	echo "  service_description accords:$module "   >> $nagios
 	echo "  check_command check_occi -p $restport -t 10 "    >> $nagios
 	echo "  max_check_attempts " 6			>> $nagios
 	echo "  check_interval " 60			>> $nagios
