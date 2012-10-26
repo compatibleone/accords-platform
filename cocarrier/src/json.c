@@ -266,6 +266,9 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 		return( drop_data_element( dptr ) );
 	}
 	else	return( dptr );
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( NULL );
 }
 
 /*	------------------------------------------------	*/
