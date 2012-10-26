@@ -33,7 +33,7 @@ fi
 # and the nagios configuration file
 # -------------------------------------
 # nethsm=1
-# nagios=/usr/local/etc/accords/small-accords-nagios.cfg
+# nagios=/usr/local/etc/accords/accords-nagios.cfg
 tls=security
 # -------------------------------------
 # with neither security nor monitoring 
@@ -368,6 +368,7 @@ _co_status() {
 }
 
 _co_stop() {
+    _nagios_stop
     _stop_service cosacs
     _stop_service example
     _stop_service slam
@@ -819,6 +820,23 @@ _mkcosacs() {
 # -------------------------------------------
 # addition of accords configuration to nagios
 # -------------------------------------------
+_nagios_stop() {
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		if [ -f "/usr/local/nagios/etc/nagios.cfg" ]; then
+			echo "restarting nagios for the accords platform"	
+			echo "# accords platform shutdown" > $nagios.active
+			service nagios restart
+		else
+			echo "nogios is not installed"
+		fi
+	fi
+}
+
+# -------------------------------------------
+# addition of accords configuration to nagios
+# -------------------------------------------
 _nagios_start() {
 	if [ -z "$nagios" ]; then
 		echo "nagios is not required"
@@ -830,12 +848,13 @@ _nagios_start() {
 				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg	
 				echo "# CompatibleOne Small Accords Platform " >> /usr/local/nagios/etc/nagios.cfg
 				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg
-				echo "cfg_file=$nagios" >> /usr/local/nagios/etc/nagios.cfg
-				echo "restarting nagios for the accords platform"	
-				service nagios restart
+				echo "cfg_file=$nagios.active" >> /usr/local/nagios/etc/nagios.cfg
 			else
 				echo "nagios already configured for accords platform"
 			fi	
+			echo "restarting nagios for the accords platform"	
+			cp $nagios $nagios.active
+			service nagios restart
 		else
 			echo "nogios is not installed"
 		fi
