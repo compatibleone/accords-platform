@@ -39,6 +39,7 @@ tls=security
 nethsm=
 # tls=
 # -------------------------------------
+nagios=accords-nagios.cfg
 resthost=127.0.0.1
 secdir=$tls
 zone="europe"
@@ -621,6 +622,7 @@ _accords_config() {
     fi
 
     echo "Creating Accords Port Configuration : ports.xml"
+    echo "Creating Accords Nagios Configuration : " $nagios
 
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ports.xml
     echo "<import name=\"accords-ports\" xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> ports.xml
@@ -629,6 +631,8 @@ _accords_config() {
     echo "Creating Accords Global Configuration File: $target"
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $target
     echo "<accords>" >> $target
+
+    _initnag
 
     _mkpub publisher
     _mkmon coss 
@@ -657,6 +661,8 @@ _accords_config() {
     _mkpro jpaasprocci
     _mkcfg example
     _mkcosacs cosacs
+
+    _termnag
 
     echo "</accords>" >> $target
     echo "</network>" >> ports.xml
@@ -762,6 +768,7 @@ _mkpub() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\"${module}\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 _mkmon() {
@@ -783,6 +790,7 @@ _mkmon() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 _mkcosacs() {
@@ -805,6 +813,104 @@ _mkcosacs() {
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\"8286\" to=\"8286\"/>" >> ports.xml
 }
 
+# -------------------------
+# nagios configuration file
+# -------------------------
+_initnag() {
+	echo "# ---------------------- " 		>  $nagios
+	echo "# small accords platform " 		>> $nagios
+	echo "# ---------------------- " 		>> $nagios
+	echo "#  nagios configuration  " 		>> $nagios
+	echo "# ---------------------- " 		>> $nagios
+
+# ----------------------------------
+#	nagios period definition
+# ----------------------------------
+	echo "define timeperiod { " 	  		>> $nagios
+	echo "  period_name  whenever " 		>> $nagios
+	echo "  alias 'no specific time' " 		>> $nagios
+	echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios command definitions
+# ----------------------------------
+	echo "define command { " 	  		>> $nagios
+	echo "  command_name  check_occi " 		>> $nagios
+	if [ -z "$tls" ]; then
+		echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ -u /-/ -e OOPS " >> $nagios
+	else
+		echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -s 'Bad Request Expected Host' " >> $nagios
+	fi
+	echo "} " 			 		>> $nagios
+
+	echo "define command { " 	  		>> $nagios
+	echo "  command_name  nothing " 		>> $nagios
+	echo "  command_line  test    "			>> $nagios
+	echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios contact definition
+# ----------------------------------
+	echo "define contact { " 	  		>> $nagios
+	echo "  contact_name  supervisor " 		>> $nagios
+	echo "  host_notifications_enabled 1" 		>> $nagios
+	echo "  service_notifications_enabled 1" 	>> $nagios
+	echo "  host_notification_period whenever" 	>> $nagios
+	echo "  service_notification_period whenever" 	>> $nagios
+	echo "  host_notification_options	n " 	>> $nagios
+	echo "  service_notification_options	n" 	>> $nagios
+	echo "  host_notification_commands nothing" 	>> $nagios
+	echo "  service_notification_commands nothing" 	>> $nagios
+	echo "} " 			 		>> $nagios
+
+# --------------------------------------
+#	nagios contact group definition
+# --------------------------------------
+	echo "define contactgroup{ "			>> $nagios
+	echo " contactgroup_name accords "		>> $nagios
+	echo " alias 'Accords Platform Contact Group' "	>> $nagios
+	echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios host definition
+# ----------------------------------
+	echo "define host { " 		 		>> $nagios
+	echo "  host_name  accords" 			>> $nagios
+	echo "  alias      'Small Accords Platform' " 	>> $nagios
+	echo "  address " $resthost 			>> $nagios
+	echo "  max_check_attempts " 2			>> $nagios
+	echo "  check_period  whenever" 		>> $nagios
+	echo "  contacts supervisor "			>> $nagios
+	echo "  contact_groups	accords "		>> $nagios		
+	echo "  notification_interval 5 "		>> $nagios		
+	echo "  notification_period whenever "		>> $nagios	
+	echo "} " 			 		>> $nagios
+}
+
+_mknag() {
+	module=$1
+	echo "define service { " 			>> $nagios
+	echo "  use generic-service" 			>> $nagios
+	echo "  host_name $module " 			>> $nagios
+	echo "  service_description Accords Platform Component $module " >> $nagios
+	echo "  check_command check_occi -p $restport -t 10 "    >> $nagios
+	echo "  max_check_attempts " 6			>> $nagios
+	echo "  check_interval " 60			>> $nagios
+	echo "  retry_interval " 20			>> $nagios
+	echo "  check_period  whenever" 		>> $nagios
+	echo "  contacts supervisor "			>> $nagios
+	echo "  contact_groups	accords "		>> $nagios		
+	echo "  notification_interval 5 "		>> $nagios		
+	echo "  notification_period whenever "		>> $nagios	
+	echo "}" 					>> $nagios
+}
+
+_termnag() {
+	echo "#------------ " 				>> $nagios
+	echo "# end of file " 				>> $nagios
+	echo "#------------ " 				>> $nagios
+}
+
 _mkcfg() {
     module=$1
     export restport=$(($restport+1))
@@ -824,6 +930,7 @@ _mkcfg() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 _mkpro() {
@@ -845,6 +952,7 @@ _mkpro() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 case `basename $0` in
