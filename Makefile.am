@@ -71,6 +71,9 @@ endif
 if ENABLE_EXAMPLE
 SUBDIRS += example
 endif
+if ENABLE_COIDMS
+SUBDIRS += coidms
+endif
 if ENABLE_COPS
 SUBDIRS += cops
 endif
