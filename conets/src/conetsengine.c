@@ -1,6 +1,8 @@
 #ifndef	_conetsengine_c
 #define	_conetsengine_c
 
+#define _GNU_SOURCE
+#include <stdio.h>
 
 #include "standard.h"
 #include "broker.h"

@@ -356,6 +356,9 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return(0);
 	}
 	else	return( failure(32, "incorrect p1", p1 ) );
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( -1 );
 }
 
 private	int	az_command(int argc, char * argv[] )

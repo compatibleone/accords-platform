@@ -829,6 +829,9 @@ private	char *	cosacs_connection_monitor(
 	if (!( yptr = occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 
 	return( monitor );
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( NULL );
 }
 
 /*	-----------------------------------------------------------	*/
@@ -912,6 +915,9 @@ private	int	cosacs_monitoring_instruction(
 	else if (!( monitor = cosacs_connection_monitor( account, session, connection, probe, metric, control ) ))
 		return( 118 );
 	else	return( 0 );
+
+	/* Should never be reached, added to comply with rpmlint */
+	return( -1 );
 }
 
 
