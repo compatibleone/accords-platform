@@ -388,6 +388,18 @@ AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
 #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
 #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
 
+AC_ARG_ENABLE([coidms],
+      [AS_HELP_STRING([--enable-coidms],
+		      [Enable coidms @<:@default=disable@:>@])],
+      [enable_coidms=yes],
+      [enable_coidms=no] 
+      )
+AM_CONDITIONAL([ENABLE_COIDMS], [test "$enable_coidms" = "yes"])
+AC_SUBST([CFLAGS_COIDMS], [-I\${abs_top_srcdir}/coidms/src])
+AC_SUBST([PATH_COIDMS], [${abs_top_srcdir}/coidms/src])
+# XXX FIXME: Autodetect libcurl presence
+AC_SUBST([LDFLAGS_COIDMS], ["-L/usr/include/curl -lcurl"])
+
 AC_ARG_ENABLE([command],
       [AS_HELP_STRING([--disable-command],
 		      [Disable command @<:@default=enable@:>@])],
@@ -489,6 +501,7 @@ AC_CONFIG_FILES([jpaasprocci/Makefile jpaasprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
+AC_CONFIG_FILES([coidms/Makefile coidms/src/Makefile])
 AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
@@ -546,6 +559,7 @@ echo "    - conagios                 : $enable_conagios"
 echo "    - jpaasprocci              : $enable_jpaasprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
+echo "    - coidms                   : $enable_coidms"
 echo "    - testosocci               : $enable_testosocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"
