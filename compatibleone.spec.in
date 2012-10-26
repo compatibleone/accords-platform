@@ -17,7 +17,7 @@
 %define is_rh 0
 %define is_suse 0
 
-%if %{_vendor} == "Mageia"
+%if 0%{?mgaversion}
 %define is_mga 1
 %endif
 
