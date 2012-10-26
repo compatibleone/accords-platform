@@ -3,6 +3,8 @@
 
 #include "base64.h"
 
+#include <string.h>
+
 int DecodeBase64(
 	char * sInput, char * sOutput, int * piBytes)
 {
