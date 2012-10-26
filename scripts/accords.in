@@ -29,17 +29,19 @@ fi
 # -------------------------------------
 # to activate the security using nethsm
 # set nethsm to 1
-# then specify the security directory.
+# then specify the security directory,
+# and the nagios configuration file
 # -------------------------------------
 # nethsm=1
+# nagios=/usr/local/etc/accords/small-accords-nagios.cfg
 tls=security
 # -------------------------------------
-# sans security 
+# with neither security nor monitoring 
 # -------------------------------------
-nethsm=
 # tls=
+nethsm=
+nagios=
 # -------------------------------------
-nagios=accords-nagios.cfg
 resthost=127.0.0.1
 secdir=$tls
 zone="europe"
@@ -231,6 +233,7 @@ _co_start()
 {
 	_co_platform
 	_co_provision
+	_nagios_start
 }
 
 _co_broker() {
@@ -813,102 +816,140 @@ _mkcosacs() {
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\"8286\" to=\"8286\"/>" >> ports.xml
 }
 
+# -------------------------------------------
+# addition of accords configuration to nagios
+# -------------------------------------------
+_nagios_start() {
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		if [ -f "/usr/local/nagios/etc/nagios.cfg" ]; then
+			var=`grep accords /usr/local/nagios/etc/nagios.cfg`
+			if [ -z "$var" ]; then
+				echo "configuration of nagios for accords platform"
+				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg	
+				echo "# CompatibleOne Small Accords Platform " >> /usr/local/nagios/etc/nagios.cfg
+				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg
+				echo "cfg_file=$nagios" >> /usr/local/nagios/etc/nagios.cfg
+				echo "restarting nagios for the accords platform"	
+				service nagios restart
+			else
+				echo "nagios already configured for accords platform"
+			fi	
+		else
+			echo "nogios is not installed"
+		fi
+	fi
+}
+
 # -------------------------
 # nagios configuration file
 # -------------------------
 _initnag() {
-	echo "# ---------------------- " 		>  $nagios
-	echo "# small accords platform " 		>> $nagios
-	echo "# ---------------------- " 		>> $nagios
-	echo "#  nagios configuration  " 		>> $nagios
-	echo "# ---------------------- " 		>> $nagios
+	if [ -z "$nagios" ]; then
+		return;
+	else
+		echo "# ---------------------- " 		>  $nagios
+		echo "# small accords platform " 		>> $nagios
+		echo "# ---------------------- " 		>> $nagios
+		echo "#  nagios configuration  " 		>> $nagios
+		echo "# ---------------------- " 		>> $nagios
 
 # ----------------------------------
 #	nagios period definition
 # ----------------------------------
-	echo "define timeperiod { " 	  		>> $nagios
-	echo "  period_name  whenever " 		>> $nagios
-	echo "  alias 'no specific time' " 		>> $nagios
-	echo "} " 			 		>> $nagios
+		echo "define timeperiod { " 	  		>> $nagios
+		echo "  period_name  whenever " 		>> $nagios
+		echo "  alias 'no specific time' " 		>> $nagios
+		echo "} " 			 		>> $nagios
 
 # ----------------------------------
 #	nagios command definitions
 # ----------------------------------
-	echo "define command { " 	  		>> $nagios
-	echo "  command_name  check_occi " 		>> $nagios
-	if [ -z "$tls" ]; then
-		echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ -u /-/ -e OOPS " >> $nagios
-	else
-		echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -s 'Bad Request Expected Host' " >> $nagios
-	fi
-	echo "} " 			 		>> $nagios
+		echo "define command { " 	  		>> $nagios
+		echo "  command_name  check_occi " 		>> $nagios
+		if [ -z "$tls" ]; then
+			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ -u /-/ -e OOPS " >> $nagios
+		else
+			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -s 'Bad Request Expected Host' " >> $nagios
+		fi
+		echo "} " 			 		>> $nagios
 
-	echo "define command { " 	  		>> $nagios
-	echo "  command_name  nothing " 		>> $nagios
-	echo "  command_line  test    "			>> $nagios
-	echo "} " 			 		>> $nagios
+		echo "define command { " 	  		>> $nagios
+		echo "  command_name  nothing " 		>> $nagios
+		echo "  command_line  test    "			>> $nagios
+		echo "} " 			 		>> $nagios
 
 # ----------------------------------
 #	nagios contact definition
 # ----------------------------------
-	echo "define contact { " 	  		>> $nagios
-	echo "  contact_name  supervisor " 		>> $nagios
-	echo "  host_notifications_enabled 1" 		>> $nagios
-	echo "  service_notifications_enabled 1" 	>> $nagios
-	echo "  host_notification_period whenever" 	>> $nagios
-	echo "  service_notification_period whenever" 	>> $nagios
-	echo "  host_notification_options	n " 	>> $nagios
-	echo "  service_notification_options	n" 	>> $nagios
-	echo "  host_notification_commands nothing" 	>> $nagios
-	echo "  service_notification_commands nothing" 	>> $nagios
-	echo "} " 			 		>> $nagios
+		echo "define contact { " 	  		>> $nagios
+		echo "  contact_name  supervisor " 		>> $nagios
+		echo "  host_notifications_enabled 1" 		>> $nagios
+		echo "  service_notifications_enabled 1" 	>> $nagios
+		echo "  host_notification_period whenever" 	>> $nagios
+		echo "  service_notification_period whenever" 	>> $nagios
+		echo "  host_notification_options	n " 	>> $nagios
+		echo "  service_notification_options	n" 	>> $nagios
+		echo "  host_notification_commands nothing" 	>> $nagios
+		echo "  service_notification_commands nothing" 	>> $nagios
+		echo "} " 			 		>> $nagios
 
 # --------------------------------------
 #	nagios contact group definition
 # --------------------------------------
-	echo "define contactgroup{ "			>> $nagios
-	echo " contactgroup_name accords "		>> $nagios
-	echo " alias 'Accords Platform Contact Group' "	>> $nagios
-	echo "} " 			 		>> $nagios
+		echo "define contactgroup{ "			>> $nagios
+		echo " contactgroup_name accords "		>> $nagios
+		echo " alias 'Accords Platform Contact Group' "	>> $nagios
+		echo "} " 			 		>> $nagios
 
 # ----------------------------------
 #	nagios host definition
 # ----------------------------------
-	echo "define host { " 		 		>> $nagios
-	echo "  host_name  accords" 			>> $nagios
-	echo "  alias      'Small Accords Platform' " 	>> $nagios
-	echo "  address " $resthost 			>> $nagios
-	echo "  max_check_attempts " 2			>> $nagios
-	echo "  check_period  whenever" 		>> $nagios
-	echo "  contacts supervisor "			>> $nagios
-	echo "  contact_groups	accords "		>> $nagios		
-	echo "  notification_interval 5 "		>> $nagios		
-	echo "  notification_period whenever "		>> $nagios	
-	echo "} " 			 		>> $nagios
+		echo "define host { " 		 		>> $nagios
+		echo "  host_name  accords" 			>> $nagios
+		echo "  alias      'Small Accords Platform' " 	>> $nagios
+		echo "  address " $resthost 			>> $nagios
+		echo "  max_check_attempts " 2			>> $nagios
+		echo "  check_period  whenever" 		>> $nagios
+		echo "  contacts supervisor "			>> $nagios
+		echo "  contact_groups	accords "		>> $nagios		
+		echo "  notification_interval 5 "		>> $nagios		
+		echo "  notification_period whenever "		>> $nagios	
+		echo "} " 			 		>> $nagios
+	fi
 }
 
 _mknag() {
-	module=$1
-	echo "define service { " 			>> $nagios
-	echo "  use generic-service" 			>> $nagios
-	echo "  host_name accords " 			>> $nagios
-	echo "  service_description accords:$module "   >> $nagios
-	echo "  check_command check_occi -p $restport -t 10 "    >> $nagios
-	echo "  max_check_attempts " 6			>> $nagios
-	echo "  check_interval " 60			>> $nagios
-	echo "  retry_interval " 20			>> $nagios
-	echo "  check_period  whenever" 		>> $nagios
-	echo "  contacts supervisor "			>> $nagios
-	echo "  contact_groups	accords "		>> $nagios		
-	echo "  notification_interval 5 "		>> $nagios		
-	echo "  notification_period whenever "		>> $nagios	
-	echo "}" 					>> $nagios
+	if [ -z "$nagios" ]; then
+		return;
+	else
+		module=$1
+		echo "define service { " 			>> $nagios
+		echo "  use generic-service" 			>> $nagios
+		echo "  host_name accords " 			>> $nagios
+		echo "  service_description accords:$module "   >> $nagios
+		echo "  check_command check_occi -p $restport -t 10 "    >> $nagios
+		echo "  max_check_attempts " 6			>> $nagios
+		echo "  check_interval " 60			>> $nagios
+		echo "  retry_interval " 20			>> $nagios
+		echo "  check_period  whenever" 		>> $nagios	
+		echo "  contacts supervisor "			>> $nagios
+		echo "  contact_groups	accords "		>> $nagios		
+		echo "  notification_interval 5 "		>> $nagios		
+		echo "  notification_period whenever "		>> $nagios	
+		echo "}" 					>> $nagios
+	fi
 }
 
 _termnag() {
-	echo "#------------ " 				>> $nagios
-	echo "# end of file " 				>> $nagios
-	echo "#------------ " 				>> $nagios
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		echo "#------------ " 				>> $nagios
+		echo "# end of file " 				>> $nagios
+		echo "#------------ " 				>> $nagios
+	fi
 }
 
 _mkcfg() {
