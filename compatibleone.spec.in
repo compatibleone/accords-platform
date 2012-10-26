@@ -577,14 +577,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/parser
 %attr(0755,root,root) %{_bindir}/run-parser
 %doc %{_mandir}/man7/*
-%doc %{_mandir}/man1/accords
+%doc %{_mandir}/man1/accords*
 %doc %{_mandir}/man1/co-*
-%doc %{_mandir}/man1/accords-config
-%doc %{_mandir}/man1/test??
-%doc %{_mandir}/man1/testresolver
-%doc %{_mandir}/man1/command
-%doc %{_mandir}/man1/parser
-%doc %{_mandir}/man1/run-parser
+%doc %{_mandir}/man1/accords-config*
+%doc %{_mandir}/man1/test*
+%doc %{_mandir}/man1/command*
+%doc %{_mandir}/man1/parser*
+%doc %{_mandir}/man1/run-parser*
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
@@ -597,164 +596,164 @@ rm -rf ${RPM_BUILD_ROOT}
 %files azprocci
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/run-azprocci
-%doc %{_mandir}/man1/azprocci
-%doc %{_mandir}/man1/run-azprocci
+%doc %{_mandir}/man1/azprocci*
+%doc %{_mandir}/man1/run-azprocci*
 
 %files broker
 %attr(0755,root,root) %{_bindir}/broker
 %attr(0755,root,root) %{_bindir}/run-broker
-%doc %{_mandir}/man1/broker
-%doc %{_mandir}/man1/run-broker
+%doc %{_mandir}/man1/broker*
+%doc %{_mandir}/man1/run-broker*
 
 %files coees
 %attr(0755,root,root) %{_bindir}/coees
 %attr(0755,root,root) %{_bindir}/run-coees
-%doc %{_mandir}/man1/coees
-%doc %{_mandir}/man1/run-coees
+%doc %{_mandir}/man1/coees*
+%doc %{_mandir}/man1/run-coees*
 
 %files cops
 %attr(0755,root,root) %{_bindir}/cops
 %attr(0755,root,root) %{_bindir}/run-cops
-%doc %{_mandir}/man1/cops
-%doc %{_mandir}/man1/run-cops
+%doc %{_mandir}/man1/cops*
+%doc %{_mandir}/man1/run-cops*
 
 %files coips
 %attr(0755,root,root) %{_bindir}/coips
 %attr(0755,root,root) %{_bindir}/run-coips
-%doc %{_mandir}/man1/coips
-%doc %{_mandir}/man1/run-coips
+%doc %{_mandir}/man1/coips*
+%doc %{_mandir}/man1/run-coips*
 
 %files comons
 %attr(0755,root,root) %{_bindir}/comons
 %attr(0755,root,root) %{_bindir}/run-comons
-%doc %{_mandir}/man1/comons
-%doc %{_mandir}/man1/run-comons
+%doc %{_mandir}/man1/comons*
+%doc %{_mandir}/man1/run-comons*
 
 %files conets
 %attr(0755,root,root) %{_bindir}/conets
 %attr(0755,root,root) %{_bindir}/run-conets
-%doc %{_mandir}/man1/conets
-%doc %{_mandir}/man1/run-conets
+%doc %{_mandir}/man1/conets*
+%doc %{_mandir}/man1/run-conets*
 
 %files conagios
 %attr(0755,root,root) %{_bindir}/conagios
 %attr(0755,root,root) %{_bindir}/run-conagios
-%doc %{_mandir}/man1/conagios
-%doc %{_mandir}/man1/run-conagios
+%doc %{_mandir}/man1/conagios*
+%doc %{_mandir}/man1/run-conagios*
 
 %files coobas
 %attr(0755,root,root) %{_bindir}/coobas
 %attr(0755,root,root) %{_bindir}/run-coobas
-%doc %{_mandir}/man1/coobas
-%doc %{_mandir}/man1/run-coobas
+%doc %{_mandir}/man1/coobas*
+%doc %{_mandir}/man1/run-coobas*
 
 %files cool
 %attr(0755,root,root) %{_bindir}/cool
 #attr(0755,root,root) %{_bindir}/run-cool
-%doc %{_mandir}/man1/cool
-%doc %{_mandir}/man1/run-cool
+%doc %{_mandir}/man1/cool*
+%doc %{_mandir}/man1/run-cool*
 
 %files cosacs
 %attr(0755,root,root) %{_bindir}/cosacs
 %attr(0755,root,root) %{_bindir}/run-cosacs
-%doc %{_mandir}/man1/cosacs
-%doc %{_mandir}/man1/run-cosacs
+%doc %{_mandir}/man1/cosacs*
+%doc %{_mandir}/man1/run-cosacs*
 
 %files cosched
 %attr(0755,root,root) %{_bindir}/cosched
 %attr(0755,root,root) %{_bindir}/run-cosched
-%doc %{_mandir}/man1/cosched
-%doc %{_mandir}/man1/run-cosched
+%doc %{_mandir}/man1/cosched*
+%doc %{_mandir}/man1/run-cosched*
 
 %files coss
 %attr(0755,root,root) %{_bindir}/coss
 %attr(0755,root,root) %{_bindir}/run-coss
-%doc %{_mandir}/man1/coss
-%doc %{_mandir}/man1/run-coss
+%doc %{_mandir}/man1/coss*
+%doc %{_mandir}/man1/run-coss*
 
 %files dcprocci
 %attr(0755,root,root) %{_bindir}/dcprocci
 %attr(0755,root,root) %{_bindir}/run-dcprocci
-%doc %{_mandir}/man1/dcprocci
-%doc %{_mandir}/man1/run-dcprocci
+%doc %{_mandir}/man1/dcprocci*
+%doc %{_mandir}/man1/run-dcprocci*
 
 %files jpaasprocci
 %attr(0755,root,root) %{_bindir}/jpaasprocci
 %attr(0755,root,root) %{_bindir}/run-jpaasprocci
-%doc %{_mandir}/man1/jpaasprocci
-%doc %{_mandir}/man1/run-jpaasprocci
+%doc %{_mandir}/man1/jpaasprocci*
+%doc %{_mandir}/man1/run-jpaasprocci*
 
 %files copaas
 %attr(0755,root,root) %{_bindir}/copaas
 %attr(0755,root,root) %{_bindir}/run-copaas
-%doc %{_mandir}/man1/copaas
-%doc %{_mandir}/man1/run-copaas
+%doc %{_mandir}/man1/copaas*
+%doc %{_mandir}/man1/run-copaas*
 
 %files ezvm
 %attr(0755,root,root) %{_bindir}/ezvm
 %attr(0755,root,root) %{_bindir}/run-ezvm
-%doc %{_mandir}/man1/ezvm
-%doc %{_mandir}/man1/run-ezvm
+%doc %{_mandir}/man1/ezvm*
+%doc %{_mandir}/man1/run-ezvm*
 
 %files example
 %attr(0755,root,root) %{_bindir}/example
 %attr(0755,root,root) %{_bindir}/run-example
-%doc %{_mandir}/man1/example
-%doc %{_mandir}/man1/run-example
+%doc %{_mandir}/man1/example*
+%doc %{_mandir}/man1/run-example*
 
 %files fileserver
 %attr(0755,root,root) %{_bindir}/fileserver
 %attr(0755,root,root) %{_bindir}/run-fileserver
-%doc %{_mandir}/man1/fileserver
-%doc %{_mandir}/man1/run-fileserver
+%doc %{_mandir}/man1/fileserver*
+%doc %{_mandir}/man1/run-fileserver*
 
 %files onprocci
 %attr(0755,root,root) %{_bindir}/onprocci
 %attr(0755,root,root) %{_bindir}/run-onprocci
-%doc %{_mandir}/man1/onprocci
-%doc %{_mandir}/man1/run-onprocci
+%doc %{_mandir}/man1/onprocci*
+%doc %{_mandir}/man1/run-onprocci*
 
 %files osocciprocci
 %attr(0755,root,root) %{_bindir}/osocciprocci
 %attr(0755,root,root) %{_bindir}/run-osocciprocci
-%doc %{_mandir}/man1/osocciprocci
-%doc %{_mandir}/man1/run-osocciprocci
+%doc %{_mandir}/man1/osocciprocci*
+%doc %{_mandir}/man1/run-osocciprocci*
 
 %files osprocci
 %attr(0755,root,root) %{_bindir}/osprocci
 %attr(0755,root,root) %{_bindir}/run-osprocci
-%doc %{_mandir}/man1/osprocci
-%doc %{_mandir}/man1/run-osprocci
+%doc %{_mandir}/man1/osprocci*
+%doc %{_mandir}/man1/run-osprocci*
 
 #files paprocci
 #attr(0755,root,root) %{_bindir}/paprocci
 #attr(0755,root,root) %{_bindir}/run-paprocci
-%doc %{_mandir}/man1/paprocci
-%doc %{_mandir}/man1/run-paprocci
+%doc %{_mandir}/man1/paprocci*
+%doc %{_mandir}/man1/run-paprocci*
 
 %files procci
 %attr(0755,root,root) %{_bindir}/procci
 %attr(0755,root,root) %{_bindir}/run-procci
-%doc %{_mandir}/man1/procci
-%doc %{_mandir}/man1/run-procci
+%doc %{_mandir}/man1/procci*
+%doc %{_mandir}/man1/run-procci*
 
 %files publisher
 %attr(0755,root,root) %{_bindir}/publisher
 %attr(0755,root,root) %{_bindir}/run-publisher
-%doc %{_mandir}/man1/publisher
-%doc %{_mandir}/man1/run-publisher
+%doc %{_mandir}/man1/publisher*
+%doc %{_mandir}/man1/run-publisher*
 
 %files slam
 %attr(0755,root,root) %{_bindir}/slam
 %attr(0755,root,root) %{_bindir}/run-slam
-%doc %{_mandir}/man1/slam
-%doc %{_mandir}/man1/run-slam
+%doc %{_mandir}/man1/slam*
+%doc %{_mandir}/man1/run-slam*
 
 %files testosocci
 %attr(0755,root,root) %{_bindir}/testosocci
 %attr(0755,root,root) %{_bindir}/run-testosocci
-%doc %{_mandir}/man1/testosocci
-%doc %{_mandir}/man1/run-testosocci
+%doc %{_mandir}/man1/testosocci*
+%doc %{_mandir}/man1/run-testosocci*
 
 %files -n %{libname}
 %defattr(-,root,root,0755)
