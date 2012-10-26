@@ -13,7 +13,9 @@
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
 
-%if 0%{?mandriva_version}
+%if %{_vendor} == "Mageia" || %{_vendor} == "Mandriva"
+%define _disable_ld_no_undefined 1
+%define _disable_ld_as_needed 1
 %define group  System/Servers
 #define libgroup System/Libraries
 %define libdevgroup Development/C
@@ -477,7 +479,7 @@ heterogeneous cloud service providers.
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure CFLAGS="-Wl,--no-as-needed" LDFLAGS="-Wl,--no-as-needed"
+%configure
 make
 
 %install
