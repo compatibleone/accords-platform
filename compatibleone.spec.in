@@ -13,7 +13,31 @@
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
 
-%if %{_vendor} == "Mageia" || %{_vendor} == "Mandriva"
+%define is_mga 0
+%define is_rh 0
+%define is_suse 0
+
+%if %{_vendor} == "Mageia"
+%define is_mga 1
+%endif
+
+%if 0%{?mandriva_version}
+%define is_mga 1
+%endif
+
+%if 0%{?suse_version}
+%define is_suse 1
+%endif
+
+%if 0%{?centos_ver}
+%define is_rh 1
+%endif
+
+%if 0%{?redhat_ver}
+%define is_rh 1
+%endif
+
+%if %{is_mga}
 %define _disable_ld_no_undefined 1
 %define _disable_ld_as_needed 1
 %define group  System/Servers
@@ -23,20 +47,14 @@
 %define libnamedev %mklibname %{name}-accords %major -d
 %endif
 
-%if 0%{?suse_version}
+%if %{is_suse}
 %define group System/Management
 #define libgroup System/Libraries
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
 %endif
 
-%if 0%{?centos_ver}
-%define group System Environment/Daemons
-%define libgroup System Environment/Libraries
-#define libdevgroup Development/Libraries
-%endif
-
-%if 0%{?redhat_ver}
+%if %{is_rh}
 %define group System Environment/Daemons
 %define libgroup System Environment/Libraries
 #define libdevgroup Development/Libraries
@@ -515,12 +533,12 @@ fi
 cd %{_localstatedir}/lib/accords/ && accords-config
 # %{_sysconfdir}/init.d/compatibleone start
 
-%if 0%{?suse_version}
+%if %{is_suse}
 %preun
 %stop_on_removal compatibleone
 %endif
 
-%if 0%{?suse_version}
+%if %{is_suse}
 %postun
 %restart_on_update compatibleone
 %insserv_cleanup
