@@ -826,12 +826,10 @@ private	char *	cosacs_connection_monitor(
 	/* -------------------- */
 	/* link monitor control */
 	/* -------------------- */
-	if (!( yptr = occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() );
 
 	return( monitor );
 
-	/* Should never be reached, added to comply with rpmlint */
-	return( NULL );
 }
 
 /*	-----------------------------------------------------------	*/
