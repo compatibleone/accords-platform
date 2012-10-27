@@ -799,7 +799,11 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* ------------------------ */
 	/* prepare the subscription */
 	/* ------------------------ */
-	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+	if (!( pptr ))
+		return(118);
+	else if ( pptr->state == _OCCI_IDLE )
+		return(0);
+	else if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
 		return(118);
 	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
 		return(27);

@@ -645,19 +645,15 @@ private	struct	rest_response * stop_opennebula(
 		return( rest_html_response( aptr, status, "Not Found" ) );
 	else
 	{
-		if ( pptr->state == _OCCI_IDLE )
+		reset_opennebula_server( pptr );
+		pptr->when = time((long *) 0);
+		onptr = liberate_on_response( onptr );
+		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
-		{
-			reset_opennebula_server( pptr );
-			pptr->when = time((long *) 0);
-			onptr = liberate_on_response( onptr );
-			sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-			if (!( rest_valid_string( pptr->price ) ))
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=stop", pptr->account, reference ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
-			else	return( rest_html_response( aptr, 200, "OK" ) );
-		}
+		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=stop", pptr->account, reference ) )
+			return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
