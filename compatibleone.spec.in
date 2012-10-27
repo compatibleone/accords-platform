@@ -346,7 +346,6 @@ CompatibleOne Accords Platform - Open Nebula Procci subsystem
 %package osocciprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
-Suggests: %{name}-testosocci
 Summary: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 
 %description osocciprocci
@@ -357,7 +356,6 @@ CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 %package osprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
-Suggests: %{name}-testosocci
 Summary: CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 %description osprocci
