@@ -251,6 +251,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 			json_failure(33,"expected","matrix");
 			return( drop_data_element( dptr ) );
 		}
+		else	return( dptr );
 	}
 	else if (c == '{' )
 	{
@@ -259,6 +260,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 			json_failure(33,"expected","complex");
 			return( drop_data_element( dptr ) );
 		}
+		else	return( dptr );
 	}
 	else if (!( dptr->value = json_get_token( h )))
 	{
@@ -267,8 +269,6 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 	}
 	else	return( dptr );
 
-	/* Should never be reached, added to comply with rpmlint */
-	return( NULL );
 }
 
 /*	------------------------------------------------	*/
