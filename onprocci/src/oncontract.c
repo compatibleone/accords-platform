@@ -580,7 +580,7 @@ public	int	delete_opennebula_contract(
 		char * tls )
 {
 	struct	on_response * osptr;
-	if ( pptr->state != IDLE )
+	if ( pptr->state != _OCCI_IDLE )
 	{
 		if ((osptr = stop_opennebula_provisioning( pptr )) != (struct on_response *) 0)
 			osptr = liberate_on_response( osptr );
