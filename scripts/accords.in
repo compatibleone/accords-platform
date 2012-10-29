@@ -917,7 +917,15 @@ _initnag() {
 # --------------------------------------
 		echo "define contactgroup{ "			>> $nagios
 		echo " contactgroup_name accords "		>> $nagios
-		echo " alias 'Accords Platform Contact Group' "	>> $nagios
+		echo " alias 'AccordsPlatform ContactGroup' "	>> $nagios
+		echo "} " 			 		>> $nagios
+
+# --------------------------------------
+#	nagios service group definition
+# --------------------------------------
+		echo "define servicegroup { " 			>> $nagios
+		echo "  servicegroup_name accords "		>> $nagios
+		echo "  alias 'AccordsPlatform ServiceGroup' "	>> $nagios
 		echo "} " 			 		>> $nagios
 
 # ----------------------------------
@@ -930,6 +938,8 @@ _initnag() {
 		echo "  max_check_attempts " 2			>> $nagios
 		echo "  active_checks_enabled 1 "		>> $nagios
 		echo "  contacts supervisor "			>> $nagios
+		echo "  check_interval " 5			>> $nagios
+		echo "  retry_interval " 1			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
 		echo "  notification_interval 5 "		>> $nagios		
 		echo "} " 			 		>> $nagios
@@ -943,12 +953,13 @@ _mknag() {
 		module=$1
 		echo "define service { " 			>> $nagios
 		echo "  use generic-service" 			>> $nagios
+		echo "  servicegroups accords "			>> $nagios
 		echo "  host_name accords " 			>> $nagios
 		echo "  service_description accords:$module "   >> $nagios
 		echo "  check_command check_occi!$restport "    >> $nagios
-		echo "  max_check_attempts " 6			>> $nagios
-		echo "  check_interval " 60			>> $nagios
-		echo "  retry_interval " 20			>> $nagios
+		echo "  max_check_attempts " 4			>> $nagios
+		echo "  check_interval " 5			>> $nagios
+		echo "  retry_interval " 1			>> $nagios
 		echo "  check_period  whenever" 		>> $nagios	
 		echo "  contacts supervisor "			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
