@@ -188,7 +188,7 @@ public	char * on_create_network_request(
 		{
 			fprintf(h,"<SIZE>256</SIZE>\n");
 		}
-		else
+		else if ( strcasecmp( size, "none" ) )
 		{
 			fprintf(h,"<SIZE>%s</SIZE>\n",size);
 		}
