@@ -890,7 +890,7 @@ _initnag() {
 		if [ -z "$tls" ]; then
 			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ -u /-/ -p \$ARG1\$ -e 'Bad Request Expected Host' " >> $nagios
 		else
-			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -p \$ARG1\$ -s 'Bad Request Expected Host' " >> $nagios
+			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -p \$ARG1\$ -e 'Bad Request Expected Host' " >> $nagios
 		fi
 		echo "} " 			 		>> $nagios
 
