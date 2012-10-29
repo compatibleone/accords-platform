@@ -935,11 +935,11 @@ _initnag() {
 		echo "  host_name  accords" 			>> $nagios
 		echo "  alias      'Small Accords Platform' " 	>> $nagios
 		echo "  address " $resthost 			>> $nagios
-		echo "  max_check_attempts " 2			>> $nagios
+		echo "  max_check_attempts  2 "			>> $nagios
 		echo "  active_checks_enabled 1 "		>> $nagios
 		echo "  contacts supervisor "			>> $nagios
-		echo "  check_interval " 5			>> $nagios
-		echo "  retry_interval " 1			>> $nagios
+		echo "  normal_check_interval 5 "		>> $nagios
+		echo "  retry_check_interval 1 "		>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
 		echo "  notification_interval 5 "		>> $nagios		
 		echo "} " 			 		>> $nagios
@@ -957,9 +957,9 @@ _mknag() {
 		echo "  host_name accords " 			>> $nagios
 		echo "  service_description accords:$module "   >> $nagios
 		echo "  check_command check_occi!$restport "    >> $nagios
-		echo "  max_check_attempts " 4			>> $nagios
-		echo "  check_interval " 5			>> $nagios
-		echo "  retry_interval " 1			>> $nagios
+		echo "  max_check_attempts  4 "			>> $nagios
+		echo "  normal_check_interval 5 "		>> $nagios
+		echo "  retry_check_interval 1 "		>> $nagios
 		echo "  check_period  whenever" 		>> $nagios	
 		echo "  contacts supervisor "			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
