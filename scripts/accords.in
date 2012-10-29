@@ -960,7 +960,6 @@ _mknag() {
 		echo "  max_check_attempts  4 "			>> $nagios
 		echo "  normal_check_interval 5 "		>> $nagios
 		echo "  retry_check_interval 1 "		>> $nagios
-		echo "  check_period  whenever" 		>> $nagios	
 		echo "  contacts supervisor "			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
 		echo "}" 					>> $nagios
