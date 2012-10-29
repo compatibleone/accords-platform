@@ -154,7 +154,8 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 public	char * on_create_network_request(
 		char * name,
 		char * address,
-		char * size
+		char * size,
+		char * access
 		)
 {
 	char *	filename;
@@ -176,39 +177,32 @@ public	char * on_create_network_request(
 		/* ----------------------------------------- */
 		fprintf(h,"<NETWORK>\n");
 		fprintf(h,"<NAME>%s</NAME>\n",name);
+
 		if (!( rest_valid_string( address ) ))
 			fprintf(h,"<ADDRESS/>\n");
-		else 	fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
+		else if (!( strcasecmp( address , "none" ) ))
+			fprintf(h,"<ADDRESS/>\n");
+		else	fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
+
 		if (!( rest_valid_string( size ) ))
 		{
 			fprintf(h,"<SIZE>256</SIZE>\n");
-			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
 		}
-		else if (!( strcasecmp( size, "B" )))
+		else
 		{
-			fprintf(h,"<SIZE>%u</SIZE>\n",65635);
-			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+			fprintf(h,"<SIZE>%s</SIZE>\n",size);
 		}
 
-		else if (!( strcasecmp( size, "C" )))
+		if (!( rest_valid_string( access ) ))
 		{
-			fprintf(h,"<SIZE>%u</SIZE>\n",256);
 			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
 		}
-
-		else if (!( strcasecmp( size, "PB" )))
+		else if (!( strcasecmp( access, "PUBLIC" )))
 		{
-			fprintf(h,"<SIZE>%u</SIZE>\n",65635);
-			fprintf(h,"<PUBLIC>YES</PUBLIC>\n");
-		}
-		else if (!( strcasecmp( size, "PC" )))
-		{
-			fprintf(h,"<SIZE>%u</SIZE>\n",256);
 			fprintf(h,"<PUBLIC>YES</PUBLIC>\n");
 		}
 		else
 		{
-			fprintf(h,"<SIZE>256</SIZE>\n");
 			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
 		}
 		fprintf(h,"</NETWORK>\n");

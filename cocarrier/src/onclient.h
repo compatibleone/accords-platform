@@ -45,7 +45,7 @@ public	char * on_create_storage_request(
 	char * name, char * description, char * type, char * size );
 
 public	char * on_create_network_request(
-	char * name, char * address, char * size );
+	char * name, char * address, char * size, char * access );
 
 
 public	struct	on_response * 
