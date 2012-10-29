@@ -22,8 +22,8 @@ man1_COMPATIBLEONE = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	run-fileserver.1 run-jpaasprocci.1 run-onprocci.1 run-osocciprocci.1 \
 	run-osprocci.1 run-paprocci.1 run-parser.1 run-procci.1 run-publisher.1 \
 	run-slam.1 run-testosocci.1 slam.1 testosocci.1 co-check.1 co-platform.1 \
-	co-provider.1 co-provision.1 template.1 testaz.1 testcb.1 testcp.1 \
-	testdc.1 teston.1 testos.1 testresolver.1 accords.1
+	co-provider.1 co-provision.1 testaz.1 testcb.1 testcp.1 testdc.1 teston.1 \
+	testos.1 testresolver.1 accords.1
 
 EXTRA_DIST = $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
 
