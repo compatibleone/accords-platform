@@ -176,8 +176,41 @@ public	char * on_create_network_request(
 		/* ----------------------------------------- */
 		fprintf(h,"<NETWORK>\n");
 		fprintf(h,"<NAME>%s</NAME>\n",name);
-		fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
-		fprintf(h,"<SIZE>%s</SIZE>\n",size);
+		if (!( rest_valid_string( address ) ))
+			fprintf(h,"<ADDRESS/>\n");
+		else 	fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
+		if (!( rest_valid_string( size ) ))
+		{
+			fprintf(h,"<SIZE>256</SIZE>\n");
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
+		else if (!( strcasecmp( size, "B" )))
+		{
+			fprintf(h,"<SIZE>%u</SIZE>\n",65635);
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
+
+		else if (!( strcasecmp( size, "C" )))
+		{
+			fprintf(h,"<SIZE>%u</SIZE>\n",256);
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
+
+		else if (!( strcasecmp( size, "PB" )))
+		{
+			fprintf(h,"<SIZE>%u</SIZE>\n",65635);
+			fprintf(h,"<PUBLIC>YES</PUBLIC>\n");
+		}
+		else if (!( strcasecmp( size, "PC" )))
+		{
+			fprintf(h,"<SIZE>%u</SIZE>\n",256);
+			fprintf(h,"<PUBLIC>YES</PUBLIC>\n");
+		}
+		else
+		{
+			fprintf(h,"<SIZE>256</SIZE>\n");
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
 		fprintf(h,"</NETWORK>\n");
 		fclose(h);
 		return( filename );
