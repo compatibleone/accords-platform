@@ -580,7 +580,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %doc %{_mandir}/man1/accords-config.1*
 %doc %{_mandir}/man1/test??.1*
 %doc %{_mandir}/man1/testresolver.1*
-%doc %{_mandir}/man1/command.1*
+#doc %{_mandir}/man1/command.1*
 %doc %{_mandir}/man1/parser.1*
 %doc %{_mandir}/man1/run-parser.*
 %dir %{_localstatedir}/lib/accords
