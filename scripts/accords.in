@@ -906,8 +906,6 @@ _initnag() {
 		echo "  contact_name  supervisor " 		>> $nagios
 		echo "  host_notifications_enabled 1" 		>> $nagios
 		echo "  service_notifications_enabled 1" 	>> $nagios
-		echo "  host_notification_period whenever" 	>> $nagios
-		echo "  service_notification_period whenever" 	>> $nagios
 		echo "  host_notification_options	n " 	>> $nagios
 		echo "  service_notification_options	n" 	>> $nagios
 		echo "  host_notification_commands nothing" 	>> $nagios
@@ -930,11 +928,10 @@ _initnag() {
 		echo "  alias      'Small Accords Platform' " 	>> $nagios
 		echo "  address " $resthost 			>> $nagios
 		echo "  max_check_attempts " 2			>> $nagios
-		echo "  check_period  whenever" 		>> $nagios
+		echo "  active_checks_enabled 1 "		>> $nagios
 		echo "  contacts supervisor "			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
 		echo "  notification_interval 5 "		>> $nagios		
-		echo "  notification_period whenever "		>> $nagios	
 		echo "} " 			 		>> $nagios
 	fi
 }
@@ -955,7 +952,6 @@ _mknag() {
 		echo "  check_period  whenever" 		>> $nagios	
 		echo "  contacts supervisor "			>> $nagios
 		echo "  contact_groups	accords "		>> $nagios		
-		echo "  notification_interval 5 "		>> $nagios		
 		echo "  notification_period whenever "		>> $nagios	
 		echo "}" 					>> $nagios
 	fi
