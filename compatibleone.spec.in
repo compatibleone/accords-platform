@@ -510,8 +510,10 @@ done;
 # install some extra files
 cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
 cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp Certificates.crt ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
+ln -s %{_sysconfdir}/accords/Certificates.crt ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/Certificates.crt
 ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
 
 # add a fake file to produce a useless package
@@ -565,6 +567,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %config %{_sysconfdir}/accords/cords_user.xml
 %config %{_sysconfdir}/accords/openssl.cnf
 %config %{_sysconfdir}/accords/coips.xml
+%config %{_sysconfdir}/accords/Certificates.crt
 %config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
@@ -586,6 +589,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
+%attr(0644,root,root) %{_localstatedir}/lib/accords/Certificates.crt
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
