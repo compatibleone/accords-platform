@@ -154,7 +154,8 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 public	char * on_create_network_request(
 		char * name,
 		char * address,
-		char * size
+		char * size,
+		char * access
 		)
 {
 	char *	filename;
@@ -176,8 +177,34 @@ public	char * on_create_network_request(
 		/* ----------------------------------------- */
 		fprintf(h,"<NETWORK>\n");
 		fprintf(h,"<NAME>%s</NAME>\n",name);
-		fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
-		fprintf(h,"<SIZE>%s</SIZE>\n",size);
+
+		if (!( rest_valid_string( address ) ))
+			fprintf(h,"<ADDRESS/>\n");
+		else if (!( strcasecmp( address , "none" ) ))
+			fprintf(h,"<ADDRESS/>\n");
+		else	fprintf(h,"<ADDRESS>%s</ADDRESS>\n",address);
+
+		if (!( rest_valid_string( size ) ))
+		{
+			fprintf(h,"<SIZE>256</SIZE>\n");
+		}
+		else if ( strcasecmp( size, "none" ) )
+		{
+			fprintf(h,"<SIZE>%s</SIZE>\n",size);
+		}
+
+		if (!( rest_valid_string( access ) ))
+		{
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
+		else if (!( strcasecmp( access, "PUBLIC" )))
+		{
+			fprintf(h,"<PUBLIC>YES</PUBLIC>\n");
+		}
+		else
+		{
+			fprintf(h,"<PUBLIC>NO</PUBLIC>\n");
+		}
 		fprintf(h,"</NETWORK>\n");
 		fclose(h);
 		return( filename );
