@@ -63,7 +63,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	16.0
+Release:	16.1
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -441,6 +441,7 @@ Requires: %{name}-comons
 Requires: %{name}-conets
 Requires: %{name}-conagios
 Requires: %{name}-coobas
+Requires: %{name}-copaas
 Requires: %{name}-cosacs
 Requires: %{name}-cosched
 Requires: %{name}-coss
