@@ -63,7 +63,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	14.0
+Release:	16.0
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -515,6 +515,7 @@ cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
 ln -s %{_sysconfdir}/accords/Certificates.crt ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/Certificates.crt
 ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
+ln -s %{_sysconfdir}/accords/cords_user.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/cords_user.xml
 
 # add a fake file to produce a useless package
 cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
@@ -589,6 +590,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
+%attr(0644,root,root) %{_localstatedir}/lib/accords/cords_user.xml
 %attr(0644,root,root) %{_localstatedir}/lib/accords/Certificates.crt
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/log/accords
