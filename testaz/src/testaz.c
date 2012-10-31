@@ -146,6 +146,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else return( failure(27,"cannot capture",p2 ) );
 	}
 	else if (!( strcasecmp(p1,"START" ) ))
 	{
@@ -160,6 +161,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else return( failure(27,"cannot start",p2 ) );
 	}
 	else if (!( strcasecmp(p1,"SHUTDOWN" ) ))
 	{
@@ -174,6 +176,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else return( failure(27,"cannot shutdown",p2 ) );
 	}
 	else if (!( strcasecmp(p1,"RESTART" ) ))
 	{
@@ -188,6 +191,7 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( 0 );
 			}
 		}
+		else return( failure(27,"cannot restart",p2 ) );
 	}
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
@@ -357,8 +361,6 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	}
 	else	return( failure(32, "incorrect p1", p1 ) );
 
-	/* Should never be reached, added to comply with rpmlint */
-	return( -1 );
 }
 
 private	int	az_command(int argc, char * argv[] )

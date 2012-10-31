@@ -386,6 +386,7 @@ private	char * 	cords_provider_agreement( char * operator, char * agent, char * 
 		agreement = occi_remove_response( agreement );
 		liberate( accountid );
 		liberate( agreementid );
+		return( (char *) 0 );
 	}
 
 	/* ----------------------------------------------------- */
@@ -398,9 +399,6 @@ private	char * 	cords_provider_agreement( char * operator, char * agent, char * 
 		liberate( agreementid );
 		return( result );
 	}
-
-	/* Should never be reached, added to comply with rpmlint */
-	return( NULL );
 }
 
 /*	---------------------------------------------------------	*/

@@ -427,7 +427,10 @@ public	int	json_serialise( struct data_element * dptr, char * filename )
 	int	c;
 	FILE * h;
 	if (!( h = fopen( filename, "w" )))
+	{
 		dptr = liberate_data_element( dptr );
+		return(-1);
+	}
 	else
 	{
 		json_serialise_complex( h, dptr->first );
@@ -435,9 +438,6 @@ public	int	json_serialise( struct data_element * dptr, char * filename )
 		fclose(h);
 		return(0);
 	}
-
-	/* Should never be reached, added to comply with rpmlint */
-	return( -1 );
 }
 	
 /*	------------------------------------------------	*/
