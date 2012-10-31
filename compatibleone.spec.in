@@ -9,6 +9,7 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
+%define pythondev python2-devel
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -53,6 +54,7 @@
 #define libgroup System/Libraries
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
+%define pythondev python-devel
 %endif
 
 %if %{is_rh}
@@ -75,7 +77,7 @@ URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
 BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
-BuildRequires:  python2-devel
+BuildRequires:  %{pythondev}
 Requires:       lsb
 
 %description
