@@ -157,14 +157,14 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 
 	if ( pptr->date ) 
 		liberate( pptr->date );
-	else	t = time((long *) 0;
+	else	t = time((long *) 0);
 
 	if (!( tptr = localtime( &t )))
 		sprintf(buffer,"%u",time((long*)0));
 	else
 	{
 		sprintf(buffer,"%u/%u/%u",
-			tptr->tm_mday, tm_mon,tm_year+1900);
+			tptr->tm_mday, tptr->tm_mon,tptr->tm_year+1900);
 	}
 	if (!( pptr->date = allocate_string( buffer ) ))
 	{
@@ -180,7 +180,7 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 	fprintf(h,"tr       { border-style: none; }\n");
 	fprintf(h,"th       { border-style: none; }\n");
 	fprintf(h,"</style></head>\n");
-	fprintf(h,"<body><div align=center><p>\n";
+	fprintf(h,"<body><div align=center><p>\n");
 	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
 	fprintf(h,"<tr class=headrow><th>Invoice </th><th>%s</th></tr>\n",pptr->id);
 	fprintf(h,"<tr class=oddrow> <th>Date    </th><th>%s</th></tr>\n",pptr->date);
@@ -216,12 +216,13 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 /*	--------------------------------------------------------	*/
 private	void	update_invoice_total( struct cords_invoice * pptr, char * price )
 {
-	int	p=0;
 	char 	work[64];
 	int	t=0;
+	int	v=0;
 	if (!( price ))
 		return;
 	else	v = atoi( price );
+
 	if ( pptr->total )
 	{
 		v += atoi( pptr->total );
