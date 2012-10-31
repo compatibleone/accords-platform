@@ -47,6 +47,7 @@
 %define libdevgroup Development/C
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
+%define pythondev python-devel
 %endif
 
 %if %{is_suse}
