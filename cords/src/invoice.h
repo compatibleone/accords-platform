@@ -10,6 +10,7 @@ struct	cords_invoice
 	char *	authorization;
 	char *	total;
 	char *	taxe;
+	char *	grandtotal;
 	char *	reduction;
 	char *	rate;
 	char *	document;

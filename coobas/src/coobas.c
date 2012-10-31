@@ -30,6 +30,7 @@
 #include "cp.h"
 #include "cb.h"
 #include "occibody.h"
+#include <time.h>
 
 struct	accords_configuration CooBas = {
 	0,0,
@@ -147,6 +148,8 @@ private	struct rest_extension * coobas_extension( void * v,struct rest_server * 
 private	FILE * start_invoice_document( struct cords_invoice * pptr )
 {
 	char 	buffer[256];
+	struct	tm * tptr;
+	time_t	t;
 	FILE * h=(FILE *) 0;
 
 	if (!( h = fopen( pptr->document, "w" )))
@@ -154,9 +157,15 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 
 	if ( pptr->date ) 
 		liberate( pptr->date );
+	else	t = time((long *) 0;
 
-	sprintf(buffer,"%u",time((long*)0));
-
+	if (!( tptr = localtime( &t )))
+		sprintf(buffer,"%u",time((long*)0));
+	else
+	{
+		sprintf(buffer,"%u/%u/%u",
+			tptr->tm_mday, tm_mon,tm_year+1900);
+	}
 	if (!( pptr->date = allocate_string( buffer ) ))
 	{
 		fclose(h);
@@ -171,10 +180,10 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 	fprintf(h,"tr       { border-style: none; }\n");
 	fprintf(h,"th       { border-style: none; }\n");
 	fprintf(h,"</style></head>\n");
-	fprintf(h,"<body><div align=center><p><table width='95%c' border=1>\n",0x0025);
-	fprintf(h,"<tr class=headrow><th width='20%c'>Document</th><th>%s</th></tr>\n",0x0025,pptr->document);
-	fprintf(h,"<tr class=evenrow><th>Date    </th><th>%s</th></tr>\n",pptr->date);
-	fprintf(h,"<tr class=oddrow> <th>Invoice </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<body><div align=center><p>\n";
+	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
+	fprintf(h,"<tr class=headrow><th>Invoice </th><th>%s</th></tr>\n",pptr->id);
+	fprintf(h,"<tr class=oddrow> <th>Date    </th><th>%s</th></tr>\n",pptr->date);
 	fprintf(h,"<tr class=evenrow><th>Number  </th><th>%s</th></tr>\n",pptr->id);
 	fprintf(h,"<tr class=oddrow> <th>Account </th><th><a href='%s'>%s</a></th></tr>\n",pptr->account,pptr->account);
 	fprintf(h,"</table><p>\n");
@@ -194,8 +203,8 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 		fprintf(h,"<table width='95%c' border=1>\n",0x0025);
 		fprintf(h,"<tr class=headrow><th>Transactions</th><th width='20%c'>%u</th></tr>\n",0x0025,pptr->transactions);
 		fprintf(h,"<tr class=evenrow><th>Total      </th><th>%s</th></tr>\n",pptr->total);
-		fprintf(h,"<tr class=oddrow> <th>Taxe       </th><th>%u</th></tr>\n",0);
-		fprintf(h,"<tr class=evenrow><th>Grand Total</th><th>%s</th></tr>\n",pptr->total);
+		fprintf(h,"<tr class=oddrow> <th>Taxes      </th><th>%s</th></tr>\n",pptr->taxe);
+		fprintf(h,"<tr class=evenrow><th>Grand Total</th><th>%s</th></tr>\n",pptr->grandtotal);
 		fprintf(h,"</table><p></div></body></html>\n");
 		fclose(h);
 	}
@@ -207,8 +216,9 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 /*	--------------------------------------------------------	*/
 private	void	update_invoice_total( struct cords_invoice * pptr, char * price )
 {
-	int	v=0;
+	int	p=0;
 	char 	work[64];
+	int	t=0;
 	if (!( price ))
 		return;
 	else	v = atoi( price );
@@ -217,8 +227,23 @@ private	void	update_invoice_total( struct cords_invoice * pptr, char * price )
 		v += atoi( pptr->total );
 		liberate( pptr->total );
 	}
-	sprintf(work,"%u",v);
+	sprintf(work,"%u.00",v);
 	pptr->total = allocate_string( work );
+	t = ((v*15)/100);	
+	if ( pptr->taxe )
+	{
+		t += atoi( pptr->taxe );
+		liberate( pptr->taxe );
+	}
+	sprintf(work,"%u.00",t);
+	pptr->taxe  = allocate_string( work );
+
+	v += t;
+	if ( pptr->grandtotal )
+		liberate( pptr->grandtotal );
+
+	sprintf(work,"%u.00",v);
+	pptr->grandtotal  = allocate_string( work );
 	return;
 }
 			
