@@ -143,6 +143,9 @@ endif
 if ENABLE_TESTRESOLVER
 SUBDIRS += testresolver
 endif
+if ENABLE_TESTSUITE
+SUBDIRS += testsuite
+endif
 if ENABLE_TESTAZ
 SUBDIRS += testaz
 endif

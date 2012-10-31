@@ -466,6 +466,13 @@ AC_ARG_ENABLE([testresolver],
       [enable_testresolver=yes])
 AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 
+AC_ARG_ENABLE([testsuite],
+      [AS_HELP_STRING([--disable-testsuite],
+		      [Disable testsuite @<:@default=disable@:>@])],
+      [],
+      [enable_testsuite=yes])
+AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
+
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
@@ -516,6 +523,7 @@ AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
 AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
+AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
@@ -574,5 +582,6 @@ echo "    - testcb                   : $enable_testcb"
 echo "    - testaz                   : $enable_testaz"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
+echo "    - testsuite                : $enable_testsuite"
 echo ""
 

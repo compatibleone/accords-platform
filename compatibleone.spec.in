@@ -1,5 +1,6 @@
 %define _enable_debug_packages %{nil}
 %define debug_package          %{nil}
+%define enable_testsuite 1
 %define distname accords
 
 %define major 0
@@ -60,16 +61,21 @@
 #define libdevgroup Development/Libraries
 %endif
 
+%if %{enable_testsuite}
+%define testsuite_enabled "--enable-testsuite=yes"
+%endif
+
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	16.1
+Release:	17.2
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
 BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
+BuildRequires:  python2-devel
 Requires:       lsb
 
 %description
@@ -492,11 +498,31 @@ heterogeneous cloud service providers.
 
 #-------------------------------------------
 
+%if %{enable_testsuite}
+%package testsuite
+BuildArch: noarch
+Summary: A test suite for CompatibleOne
+Requires: %{name}-accords
+Requires: python
+Requires: python-psutil
+Requires: python-unittest
+%if %{is_rh}
+Requires: python-unittest2
+%endif
+
+%description testsuite
+This package will run a set of tests to ensure that a minimal level of working
+parts is meet. It is useful during development to ensure that there is no
+regression.
+%endif
+
+#-------------------------------------------
+
 %prep
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure
+%configure %{testsuite_enabled}
 make
 
 %install
@@ -781,6 +807,17 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root,0755)
 %dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
+
+%if %{enable_testsuite}
+%files testsuite
+%defattr(-,root,-root,0755)
+%dir %{_libexecdir}/compatibleone/testsuite/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/*.py*
+%dir %{_libexecdir}/compatibleone/testsuite/basic/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/basic/*.py*
+%dir %{_libexecdir}/compatibleone/testsuite/platform/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/platform/*.py*
+%endif
 
 %changelog
 * Wed Jan 06 2012 Jean-Philippe Braun <jpbraun@mandriva.com> - 1.0
