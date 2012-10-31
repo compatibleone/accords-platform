@@ -879,7 +879,7 @@ private	int	cosacs_monitoring_instruction(
 	/* --------------------------------------------------------- */
 	/* retrieve or create and link a connection for this session */
 	/* --------------------------------------------------------- */
-	else if (!( connection = cosacs_monitoring_connection( instruction, session, account )))
+	if (!( connection = cosacs_monitoring_connection( instruction, session, account )))
 		return( 118 );
 
 	/* -------------------------------- */
@@ -914,8 +914,6 @@ private	int	cosacs_monitoring_instruction(
 		return( 118 );
 	else	return( 0 );
 
-	/* Should never be reached, added to comply with rpmlint */
-	return( -1 );
 }
 
 
