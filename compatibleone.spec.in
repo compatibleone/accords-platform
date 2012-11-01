@@ -9,7 +9,7 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
-%define pythondev python2-devel
+%define pythondev python2
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -47,7 +47,7 @@
 %define libdevgroup Development/C
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
-%define pythondev python-devel
+%define pythondev python
 %endif
 
 %if %{is_suse}
@@ -55,7 +55,7 @@
 #define libgroup System/Libraries
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
-%define pythondev python-devel
+%define pythondev python
 %endif
 
 %if %{is_rh}
