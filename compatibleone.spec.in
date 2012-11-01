@@ -507,8 +507,8 @@ BuildArch: noarch
 Summary: A test suite for CompatibleOne
 Requires: %{name}-accords
 Requires: python
-Requires: python-psutil
 %if !%{is_mga}
+Requires: python-psutil
 Requires: python-unittest
 %endif
 %if %{is_rh}
