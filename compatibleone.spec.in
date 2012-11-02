@@ -71,7 +71,7 @@
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	17.2
+Release:	17.3
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -507,8 +507,8 @@ BuildArch: noarch
 Summary: A test suite for CompatibleOne
 Requires: %{name}-accords
 Requires: python
-%if !%{is_mga}
 Requires: python-psutil
+%if !%{is_mga}
 Requires: python-unittest
 %endif
 %if %{is_rh}
