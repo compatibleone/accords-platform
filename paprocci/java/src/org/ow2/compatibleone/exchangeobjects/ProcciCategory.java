@@ -72,6 +72,9 @@ public class ProcciCategory {
 	private String when;
 	private String status;
 	
+	public ProcciCategory(){
+	}
+
 	public ProcciCategory(String id, String name, String image, String profile,
 			String node, String price, String number, String access,
 			String reference, String publicaddr, String privateaddr,

@@ -170,9 +170,9 @@ public class SelectionScriptCondition {
 		condition += "var sigar = new Sigar();" + NEWLINE;
 		condition += "var usercpu = sigar.getCpuPerc().getUser();" + NEWLINE;
 	    condition += "if (usercpu < MINIMUM)"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR true; println(usercpu \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(usercpu + \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition += "{selected = selected OPERATOR false; println(usercpu + \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
@@ -188,14 +188,49 @@ public class SelectionScriptCondition {
 		String condition = "";
 		condition += "importClass(org.hyperic.sigar.Sigar);" + NEWLINE;
 		condition += "var sigar = new Sigar();" + NEWLINE;
-		condition += "var usercpu = sigar.XXX;" + NEWLINE;
-	    condition += "if (usercpu < MINIMUM)"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR true; println(usercpu \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
+		condition += "var paramx = sigar.XXX;" + NEWLINE;
+	    condition += "if (paramx > MINIMUM)"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(paramx + \" > than minimum XXX MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition += "{selected = selected OPERATOR false; println(paramx + \" < than minimum XXX MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
 	    condition = condition.replace("XXX", X);
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
+	
+		//Sigar sigar = new Sigar();
+		//System.out.println("ram: " + sigar.getCpuInfoList()[0].getModel());
+		//System.out.println("ram: " + sigar.getMem().getRam());
+		//System.out.println("mhz: " + sigar.getCpuInfoList()[0].getMhz());
+		//System.out.println("disk: " + sigar.getFileSystemUsage(sigar.getFileSystemList()[0].getDirName()).getTotal()/1024);
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithMemoryMb(double minimum){
+		return nodeWithXGreaterThan("getMem().getRam()", minimum);
+	}
+	
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithMHz(double minimum){
+		return nodeWithXGreaterThan("getCpuInfoList()[0].getMhz()", minimum);
+
+	}
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithDiskMb(double minimum){
+		String s = "getFileSystemUsage(sigar.getFileSystemList()[0].getDirName()).getTotal()/1024";
+		return nodeWithXGreaterThan(s, minimum);
+	}
+	
+	
 }

@@ -510,56 +510,7 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
  * @return the json String of the result of the call.
  * DO NOT MODIFY THIS FUNCTION.
  */
-char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, jobject request,  jobject response, jobject constr, jobjectArray margs){
-	jstring jstr1;
-	jstring jstr2;
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	fprintf(stderr, "Executing %s...\n", mname);
-	
-	jclass cls = (*env)->FindClass(env, "org/ow2/compatibleone/Procci");
-	if (cls == NULL) {
-		fprintf(stderr, "Problem while finding the interface Procci...\n");
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Class found.\n");
-	}
-
-	jmethodID methodid = (*env)->GetMethodID(env, cls, mname, msign);
-	if (methodid == NULL) {
-		fprintf(stderr, "Could not find the method %s.\n", mname);
-		destroy_jvm(env, jvm);
-	}else{
-		fprintf(stderr, "Method '%s' found.\n", mname);
-	}
-
-	jobject result = (*env)->CallObjectMethod(env, procci, methodid, request, response, constr, margs);
-	fprintf(stderr, "Looking for exceptions...\n");
-	if ((*env)->ExceptionOccurred(env)) {
-		(*env)->ExceptionDescribe(env);
-		return NULL;
-	}else{
-		fprintf(stderr, "Method '%s' executed.\n", mname);
-		const char *str = (*env)->GetStringUTFChars(env,result,0);
-		char * ret = (char*)malloc(strlen(str)+1);
-		strcpy(ret, str);
-		(*env)->ReleaseStringUTFChars(env, result, str);
-		return ret;
-	}
-}
-
-
-/** 
- * Make a call to the java layer.  
- * @param mname defines the name of the method to invoke
- * @param msign defines signature of the method to invoke
- * @param margs defines the concrete arguments to invoke the method
- * @return the json String of the result of the call.
- * DO NOT MODIFY THIS FUNCTION.
- */
-char * call_java_procci_nobody_uses(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
+char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
 	jstring jstr1;
 	jstring jstr2;
 	JNIEnv *env = jvmp->env;
@@ -598,6 +549,7 @@ char * call_java_procci_nobody_uses(struct jvm_struct * jvmp, char * mname, char
 		return ret;
 	}
 }
+
 
 /**** ADJUST THE FOLLOWING CODE ACCORDING TO YOUR NEEDS ****/
 
@@ -710,6 +662,8 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	jstring jstr1;
 	jstring jstr2;
 	jstring jstr3;
+	jstring jstr4;
+	jstring jstr5;
 	
 	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
@@ -720,21 +674,21 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	// The Java method to call is 'String start_server(Object[] args)'.
 	// We prepare the arguments to invoke it. 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 4, sclass, NULL);
+	jobjectArray margs = (*env)->NewObjectArray(env, 5, sclass, NULL);
 
 	jstr1 = (*env)->NewStringUTF(env, constr->image);	// Set argument. 
-	//jstr2 = (*env)->NewStringUTF(env, "demo");
-	//jstr3 = (*env)->NewStringUTF(env, "demo");
+	jstr2 = (*env)->NewStringUTF(env, "2");			// Set argument. 
+	jstr3 = (*env)->NewStringUTF(env, "3");			// Set argument. 
+	jstr4 = (*env)->NewStringUTF(env, constr->nopanodes);	// Set argument. 
+	jstr5 = (*env)->NewStringUTF(env, "5");			// Set argument. 
 
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);	// Put argument into the array.
-	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr2);
-	//(*env)->SetObjectArrayElement(env, methodargs,1,jstr3);
+	(*env)->SetObjectArrayElement(env, margs,1,jstr2);	// Put argument into the array.
+	(*env)->SetObjectArrayElement(env, margs,2,jstr3);	// Put argument into the array.
+	(*env)->SetObjectArrayElement(env, margs,3,jstr4);	// Put argument into the array.
+	(*env)->SetObjectArrayElement(env, margs,4,jstr5);	// Put argument into the array.
 
-	jobject requesto = create_java_rest_request_object(jvmp, request);
-	jobject responseo= create_java_rest_response_object(jvmp, response);
-	jobject proccico = create_java_procci_category_object(jvmp, constr);
-
-	return call_java_procci2(jvmp, "start_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, responseo, proccico, margs);
+	return call_java_procci2(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
 }
 
 /**
@@ -754,17 +708,12 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);
 
-	printf("1");
 	jstr1 = (*env)->NewStringUTF(env, constr->number);
 
-	printf("2");
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
 
-	jobject requesto = create_java_rest_request_object(jvmp, request);
-	jobject responseo= create_java_rest_response_object(jvmp, response);
-	jobject proccico = create_java_procci_category_object(jvmp, constr);
 
-	return call_java_procci2(jvmp, "stop_server", "(Lorg/ow2/compatibleone/exchangeobjects/RestRequest;Lorg/ow2/compatibleone/exchangeobjects/RestResponse;Lorg/ow2/compatibleone/exchangeobjects/ProcciCategory;[Ljava/lang/Object;)Ljava/lang/String;", requesto, responseo, proccico, margs);
+	return call_java_procci2(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
  
 
 }

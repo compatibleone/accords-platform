@@ -89,6 +89,7 @@ public final class ProcciParametersHandler {
 		args.addNewOption("d", "release-node", true);											// Release a node. 
 		args.addNewOption("j", "get-node-info", true);											// Get information of a node.  
 		args.addNewOption("k", "get-node-output", true);										// Get stdout and stderr of a task (running in a node).  
+		args.addNewOption("r", "params", true);												    // Parameters for a specific command.  
 		
 		args.addNewOption("g", "select-by-os", true);
 		args.addNewOption("n", "number-of-nodes", true);
