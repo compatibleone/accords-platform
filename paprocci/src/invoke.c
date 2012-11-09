@@ -27,323 +27,10 @@
 #define KEY_CLASSPATH "-Djava.class.path="
 #define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
-#define CLASS_REST_REQUEST "org/ow2/compatibleone/exchangeobjects/RestRequest"
-#define CLASS_REST_RESPONSE "org/ow2/compatibleone/exchangeobjects/RestResponse"
-#define CLASS_REST_HEADER "org/ow2/compatibleone/exchangeobjects/RestHeader"
-#define CLASS_BLOCK_REST_HEADER "org/ow2/compatibleone/exchangeobjects/RestHeaderBlock"
-#define CLASS_PROCCI_CATEGORY "org/ow2/compatibleone/exchangeobjects/ProcciCategory"
 
 struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp);
-jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr);
-jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_response * rptr);
-jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr);
-jobject create_java_rest_header_full_block_object(struct jvm_struct * jvmp, struct rest_header * first);
-jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proactive * category);
 
 void test_invoke(){}
-void test_invoke1(){
-	struct jvm_struct * jvmp = NULL;
-	jvmp = initialize_jvm_if_needed(&jvmp);
-
-
-	fprintf(stderr, "If you see this, is because Mauricio is testing... :)\n");
-
-	fprintf(stderr, "Creating rest_request...\n");
-	struct rest_request a;
-	a.first = NULL;
-	a.last = NULL;
-	a.method = "methoddd";
-	a.object = "objecttt";
-	a.parameters = "parameterssss";
-	a.version = "versionnnn";
-	a.type = 333;
-	a.body = "bodyyyy";
-	a.host = "hostttt";
-
-	create_java_rest_request_object(jvmp, &a);
-
-	fprintf(stderr, "Creating rest_response...\n");
-	struct rest_response b;
-	b.first = NULL;
-	b.last = NULL;
-	b.status = 333;
-	b.version = "versionnnn";
-	b.message = "messageeee";
-	b.type = 333;
-	b.body = "bodyyyy";
-
-	create_java_rest_response_object(jvmp, &b);
-
-	fprintf(stderr, "Creating rest_header...\n");
-	struct rest_header c1;
-	c1.next = NULL;
-	c1.previous = NULL;
-	c1.parent = NULL;
-	c1.name = "name1";
-	c1.value = "value1";
-
-	struct rest_header c2;
-	c2.next = NULL;
-	c2.previous = NULL;
-	c2.parent = NULL;
-	c2.name = "name2";
-	c2.value = "value2";
-
-	c1.next = &c2;
-	c2.previous = &c1;
-
-	create_java_rest_header_full_block_object(jvmp, &c1);
-
-
-	fprintf(stderr, "Creating procci category...\n");
-	struct proactive d;
-	d.id = "idddd";
-
-	create_java_procci_category_object(jvmp, &d);
-
-
-	fprintf(stderr, "All right!\n");
-	exit(0);
-
-
-}
-
-jobject create_java_procci_category_object(struct jvm_struct * jvmp, struct proactive * category){
-	// Initializing JVM parameters...
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	if (category == NULL){
-		fprintf(stderr, "Can't accept NULL parameters...\n");
-		exit(-1);
-	}
-
-	jclass sclass = (*env)->FindClass(env, CLASS_PROCCI_CATEGORY); 
-	if (sclass == 0){
-		fprintf(stderr, "Can't find class " CLASS_PROCCI_CATEGORY "...\n");
-		exit(-1);
-	}
-
-	// Looking for instantiation method.
-	printf("HEYYYYYYYYYYY FIND THE RIGHT METHIOD NAME\n");
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-
-	if (initmeth == 0){
-		fprintf(stderr, "Can't find " CLASS_PROCCI_CATEGORY " constructor method...\n");
-		exit(-1);
-	}
-
-	// Preparing parameters to instantiate the class...
-	jstring id = (*env)->NewStringUTF(env, (category->id?category->id:""));	
-	jstring name = (*env)->NewStringUTF(env, (category->name?category->name:""));	
-	jstring image = (*env)->NewStringUTF(env, (category->image?category->image:""));	
-	jstring profile = (*env)->NewStringUTF(env, (category->profile?category->profile:""));	
-	jstring node = (*env)->NewStringUTF(env, (category->node?category->node:""));	
-	jstring price = (*env)->NewStringUTF(env, (category->price?category->price:""));	
-	jstring number = (*env)->NewStringUTF(env, (category->number?category->number:""));	
-	jstring access = (*env)->NewStringUTF(env, (category->access?category->access:""));	
-	jstring reference = (*env)->NewStringUTF(env, (category->reference?category->reference:""));	
-	jstring publicaddr = (*env)->NewStringUTF(env, (category->publicaddr?category->publicaddr:""));	
-	jstring privateaddr = (*env)->NewStringUTF(env, (category->privateaddr?category->privateaddr:""));	
-	jstring nopanodes = (*env)->NewStringUTF(env, (category->nopanodes?category->nopanodes:""));	
-	jstring hostname = (*env)->NewStringUTF(env, (category->hostname?category->hostname:""));	
-	jstring workload = (*env)->NewStringUTF(env, (category->workload?category->workload:""));	
-	jstring account = (*env)->NewStringUTF(env, (category->account?category->account:""));	
-	jstring agent = (*env)->NewStringUTF(env, (category->agent?category->agent:""));	
-	jstring when = (*env)->NewStringUTF(env, "");	
-	jstring status = (*env)->NewStringUTF(env,"");	
-
-	// Instantiating the class... 
-	jobject restobj = (*env)->NewObject(env, sclass, initmeth, 
-			id, name, image, profile, node, price, number, access, reference, publicaddr, privateaddr, nopanodes, hostname, workload, account, agent, when, status);
-
-	if (restobj == 0){
-		fprintf(stderr, "Can't instantiate class " CLASS_PROCCI_CATEGORY "...\n");
-		exit(-1);
-	}
-
-	return restobj;
-
-}
-
-jobject create_java_rest_header_full_block_object(struct jvm_struct * jvmp, struct rest_header * first){
-	jmethodID initmeth;
-	jmethodID addmeth;
-	jobject resthead;
-	
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	jclass sclass = (*env)->FindClass(env, CLASS_BLOCK_REST_HEADER);
-	if (sclass == 0){
-		fprintf(stderr, "Can't find class" CLASS_BLOCK_REST_HEADER "...\n");
-		exit(-1);
-	}
-
-	initmeth = (*env)->GetMethodID(env, sclass, "<init>","()V");
-
-	if (initmeth == 0){
-		fprintf(stderr, "Can't find " CLASS_BLOCK_REST_HEADER " constructor method...\n");
-		exit(-1);
-	}
-
-	resthead = (*env)->NewObject(env, sclass, initmeth);
-
-	if (resthead == 0){
-		fprintf(stderr, "Can't instantiate class " CLASS_BLOCK_REST_HEADER "...\n");
-		exit(-1);
-	}
-
-	addmeth = (*env)->GetMethodID(env, sclass, "add","(Ljava/lang/String;Ljava/lang/String;)V");
-
-	if (addmeth == 0){
-		fprintf(stderr, "Can't find method to add...\n");
-		exit(-1);
-	}
-
-	while(first != NULL){
-		//fprintf(stderr, "Going through elements to add them %s...\n", first->name);
-		jstring namestr = (*env)->NewStringUTF(env, first->name);
-		jstring valuestr = (*env)->NewStringUTF(env, first->value);
-		(*env)->CallVoidMethod(env, resthead, addmeth, namestr, valuestr);
-
-		first = first->next;
-	}
-
-	return resthead;
-}
-
-
-jobject create_java_rest_response_object(struct jvm_struct * jvmp, struct rest_response * rptr){
-	// Initializing JVM parameters...
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	if (rptr == NULL){
-		fprintf(stderr, "Can't accept NULL parameters...\n");
-		exit(-1);
-	}
-
-	jclass sclass = (*env)->FindClass(env, CLASS_REST_RESPONSE); 
-	if (sclass == 0){
-		fprintf(stderr, "Can't find class " CLASS_REST_RESPONSE "...\n");
-		exit(-1);
-	}
-
-	// Looking for instantiation method.
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeaderBlock;ILjava/lang/String;Ljava/lang/String;ILjava/lang/String;)V");
-
-
-	if (initmeth == 0){
-		fprintf(stderr, "Can't find " CLASS_REST_RESPONSE " constructor method...\n");
-		exit(-1);
-	}
-
-	// Preparing parameters to instantiate the class...
-	jobject first = create_java_rest_header_object(jvmp, NULL);
-	jobject last = create_java_rest_header_object(jvmp, NULL);
-	jint status = (jint) rptr->status;
-	jstring version = (*env)->NewStringUTF(env, (rptr->version?rptr->version:""));	
-	jstring message = (*env)->NewStringUTF(env, (rptr->message?rptr->message:""));	
-	jint type = (jint) rptr->type;
-	jstring body = (*env)->NewStringUTF(env, (rptr->body?rptr->body:""));	
-	
-	// Instantiating the class... 
-	jobject restobj = (*env)->NewObject(env, sclass, initmeth, first, last, status, version, message, type, body);
-
-	if (restobj == 0){
-		fprintf(stderr, "Can't instantiate class " CLASS_REST_RESPONSE "...\n");
-		exit(-1);
-	}
-
-	return restobj;
-
-}
-
-jobject create_java_rest_request_object(struct jvm_struct * jvmp, struct rest_request * rptr){
-	// Initializing JVM parameters...
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	if (rptr == NULL){
-		fprintf(stderr, "Can't accept NULL parameters...\n");
-		exit(-1);
-	}
-
-	jclass sclass = (*env)->FindClass(env, CLASS_REST_REQUEST); 
-	if (sclass == 0){
-		fprintf(stderr, "Can't find class " CLASS_REST_REQUEST "...\n");
-		exit(-1);
-	}
-
-	// Looking for instantiation method.
-	jmethodID initmeth = (*env)->GetMethodID(env, sclass, "<init>","(Lorg/ow2/compatibleone/exchangeobjects/RestHeaderBlock;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V");
-
-	if (initmeth == 0){
-		fprintf(stderr, "Can't find " CLASS_REST_REQUEST " constructor method...\n");
-		exit(-1);
-	}
-
-	// Preparing parameters to instantiate the class...
-	//jobject first = create_java_rest_header_object(jvmp, NULL);
-	//jobject last = create_java_rest_header_object(jvmp, NULL);
-	jobject all = create_java_rest_header_full_block_object(jvmp, (rptr->first?rptr->first:NULL));
-	jstring method = (*env)->NewStringUTF(env, (rptr->method?rptr->method:""));	
-	jstring object = (*env)->NewStringUTF(env, (rptr->object?rptr->object:""));	
-	jstring parameters = (*env)->NewStringUTF(env, (rptr->parameters?rptr->parameters:""));	
-	jstring version = (*env)->NewStringUTF(env, (rptr->version?rptr->version:""));	
-	jint type = (jint) rptr->type;
-	jstring body = (*env)->NewStringUTF(env, (rptr->body?rptr->body:""));	
-	jstring host = (*env)->NewStringUTF(env, (rptr->host?rptr->host:""));	
-	
-	// Instantiating the class... 
-	jobject restobj = (*env)->NewObject(env, sclass, initmeth, all, method, object, parameters, version, type, body, host);
-
-	if (restobj == 0){
-		fprintf(stderr, "Can't instantiate class " CLASS_REST_REQUEST "...\n");
-		exit(-1);
-	}
-
-	return restobj;
-
-}
-
-
-jobject create_java_rest_header_object(struct jvm_struct * jvmp, struct rest_header * rptr){
-	jmethodID initmeth;
-	jobject resthead;
-	
-	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
-
-	jclass sclass = (*env)->FindClass(env, CLASS_REST_HEADER);
-	if (sclass == 0){
-		fprintf(stderr, "Can't find class " CLASS_REST_HEADER "...\n");
-		exit(-1);
-	}
-
-	initmeth = (*env)->GetMethodID(env, sclass, "<init>","()V");
-
-	if (initmeth == 0){
-		fprintf(stderr, "Can't find " CLASS_REST_HEADER " constructor method...\n");
-		exit(-1);
-	}
-
-	resthead = (*env)->NewObject(env, sclass, initmeth);
-
-	if (resthead == 0){
-		fprintf(stderr, "Can't instantiate class " CLASS_REST_HEADER "...\n");
-		exit(-1);
-	}
-
-	return resthead;
-}
-
 
 /**
  * Get a list of .jar files to add them to the CLASSPATH for the VM to use them. 
@@ -402,10 +89,9 @@ struct jvm_struct * start_jvm() {
 	jint res;
 	JNIEnv *env;
 	JavaVM *jvm;
-	jclass cls;
-	jmethodID methodid;
 
 	char * jarslist = getjars("/usr/share/java/accords/paprocci/");
+	//
 	//char* jarslist1 = getjars(JAVA_MODULE_PATH "lib/scheduling/");
 	//char* jarslist2 = getjars(JAVA_MODULE_PATH "lib/");
 	//char* jarslist3 = getjars(JAVA_MODULE_PATH "dist/");
@@ -418,7 +104,8 @@ struct jvm_struct * start_jvm() {
 	//free(jarslist1);
 	//free(jarslist2);
 	//free(jarslist3);
-	fprintf(stderr, "Jars' list: '%s'\n", jarslist);
+	//
+	fprintf(stderr, "List of jars: '%s'\n", jarslist);
 #ifdef JNI_VERSION_1_2
 	JavaVMInitArgs vm_args;
 	JavaVMOption options[2];
@@ -508,11 +195,8 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
  * @param msign defines signature of the method to invoke
  * @param margs defines the concrete arguments to invoke the method
  * @return the json String of the result of the call.
- * DO NOT MODIFY THIS FUNCTION.
  */
-char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
-	jstring jstr1;
-	jstring jstr2;
+char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
 	jobject procci = jvmp->procci;
@@ -535,29 +219,34 @@ char * call_java_procci2(struct jvm_struct * jvmp, char * mname, char * msign, j
 		fprintf(stderr, "Method '%s' found.\n", mname);
 	}
 
+	fprintf(stderr, "Calling method '%s'...\n", mname);
 	jobject result = (*env)->CallObjectMethod(env, procci, methodid, margs);
+	fprintf(stderr, "Done.\n");
 	fprintf(stderr, "Looking for exceptions...\n");
+	char * ret;
 	if ((*env)->ExceptionOccurred(env)) {
 		(*env)->ExceptionDescribe(env);
-		return NULL;
+		ret = NULL;	
 	}else{
 		fprintf(stderr, "Method '%s' executed.\n", mname);
-		const char *str = (*env)->GetStringUTFChars(env,result,0);
-		char * ret = (char*)malloc(strlen(str)+1);
+		char *str = (*env)->GetStringUTFChars(env,result,0);
+		ret = (char*)malloc(strlen(str)+1);
 		strcpy(ret, str);
 		(*env)->ReleaseStringUTFChars(env, result, str);
-		return ret;
 	}
+
+	fprintf(stderr, "MMM 21...\n");
+      	(*env)->DeleteLocalRef( env, result ); 
+	fprintf(stderr, "MMM 22...\n");
+      	(*env)->DeleteLocalRef( env, cls ); 
+	fprintf(stderr, "MMM 23...\n");
+
+	return ret;
 }
-
-
-/**** ADJUST THE FOLLOWING CODE ACCORDING TO YOUR NEEDS ****/
-
 
 /**
  * Initial connection to the cloud service provider.
  * It uses the Starter class to start up a procci connected to the provider.
- * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 	JNIEnv *env = jvmp->env;
@@ -579,7 +268,6 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 		destroy_jvm(env, jvm);
 	}
 
-	// **** START MODIFYING HERE ***
 	// Modify this section according to the arguments required for the 
 	// connection to the cloud services provider.
 	// For this case the arguments used are: user demo
@@ -592,7 +280,6 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1); // Setting up argument 0.
 	(*env)->SetObjectArrayElement(env, margs,1,jstr2); // Setting up argument 1.
 
-	// **** STOP MODIFYING HERE ***
 
 	jobject result; 
 	result = (*env)->CallStaticObjectMethod(env, cls, methodid, margs);
@@ -602,17 +289,31 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 		(*env)->ExceptionDescribe(env);
 	}
 
-	if (result == NULL) {
-	    fprintf(stderr, "Could not get a result.\n");
-	}
+	/* Create a global reference */
+	//jobject resultGlobal; 
+	//resultGlobal = (*env)->NewGlobalRef(env, result);
+		  
+	
+	//fprintf(stderr, "MMM z1...\n");
+      	//(*env)->DeleteLocalRef( env, result ); 
+
+	fprintf(stderr, "MMM z2...\n");
+      	(*env)->DeleteLocalRef( env, margs ); 
+	fprintf(stderr, "MMM z3...\n");
+      	(*env)->DeleteLocalRef( env, sclass ); 
+	fprintf(stderr, "MMM z4...\n");
+      	(*env)->DeleteLocalRef( env, jstr1 ); 
+	fprintf(stderr, "MMM z5...\n");
+      	(*env)->DeleteLocalRef( env, jstr2 ); 
+	fprintf(stderr, "MMM z6...\n");
+
+	//jvmp->procci = resultGlobal;
 	jvmp->procci = result;
 	fprintf(stderr, "Connected to cloud services provider...\n");
-
 }
 
 /**
  * Initialize the procci and connects it to the provider if needed. 
- * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 struct jvm_struct * initialize_provider_if_needed(struct pa_config * config, struct jvm_struct ** jvmpp){
 	if (*jvmpp==NULL){
@@ -635,7 +336,6 @@ struct jvm_struct * initialize_provider_if_needed(struct pa_config * config, str
 
 /**
  * Initialize the procci and connects it to the provider if needed. 
- * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp){
 	if (*jvmpp==NULL){
@@ -655,15 +355,11 @@ struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp){
  * @param jvmpp procci JVM structure.
  * @param constr constraints for this virtual machine. 
  * @return the resulting json object of the java call.
- * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct rest_request * request,  struct rest_response * response, struct proactive * constr) {
 
 	jstring jstr1;
-	jstring jstr2;
-	jstring jstr3;
-	jstring jstr4;
-	jstring jstr5;
+	//jstring jstr2;
 	
 	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
@@ -674,26 +370,32 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	// The Java method to call is 'String start_server(Object[] args)'.
 	// We prepare the arguments to invoke it. 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
-	jobjectArray margs = (*env)->NewObjectArray(env, 5, sclass, NULL);
+	//jobjectArray margs = (*env)->NewObjectArray(env, 5, sclass, NULL);
+	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);
 
 	jstr1 = (*env)->NewStringUTF(env, constr->image);	// Set argument. 
-	jstr2 = (*env)->NewStringUTF(env, "2");			// Set argument. 
-	jstr3 = (*env)->NewStringUTF(env, "3");			// Set argument. 
-	jstr4 = (*env)->NewStringUTF(env, constr->nopanodes);	// Set argument. 
-	jstr5 = (*env)->NewStringUTF(env, "5");			// Set argument. 
+	//jstr2 = (*env)->NewStringUTF(env, "2");			// Set argument. 
 
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);	// Put argument into the array.
-	(*env)->SetObjectArrayElement(env, margs,1,jstr2);	// Put argument into the array.
-	(*env)->SetObjectArrayElement(env, margs,2,jstr3);	// Put argument into the array.
-	(*env)->SetObjectArrayElement(env, margs,3,jstr4);	// Put argument into the array.
-	(*env)->SetObjectArrayElement(env, margs,4,jstr5);	// Put argument into the array.
+	//(*env)->SetObjectArrayElement(env, margs,1,jstr2);	// Put argument into the array.
 
-	return call_java_procci2(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
+	char* retur = call_java_procci(jvmp, "start_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
+
+	
+	fprintf(stderr, "MMM a...\n");
+      	(*env)->DeleteLocalRef( env, jstr1 ); 
+	fprintf(stderr, "MMM b...\n");
+      	(*env)->DeleteLocalRef( env, margs ); 
+	fprintf(stderr, "MMM c...\n");
+ 	(*env)->DeleteLocalRef( env, sclass ); 
+	fprintf(stderr, "MMM d...\n");
+	
+
+	return retur;
 }
 
 /**
  * Stop a VM.
- * MODIFY THIS FUNCTION ACCORDING TO YOUR NEEDS.
  */
 char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct rest_request * request,  struct rest_response * response, struct proactive * constr) {
 
@@ -712,10 +414,19 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 
 	(*env)->SetObjectArrayElement(env, margs,0,jstr1);
 
+	char* retur = call_java_procci(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
 
-	return call_java_procci2(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
- 
+	/*
+	fprintf(stderr, "MMM 1...\n");
+      	(*env)->DeleteLocalRef( env, jstr1 ); 
+	fprintf(stderr, "MMM 2...\n");
+      	(*env)->DeleteLocalRef( env, margs ); 
+	fprintf(stderr, "MMM 3...\n");
+ 	(*env)->DeleteLocalRef( env, sclass ); 
+	fprintf(stderr, "MMM 4...\n");
+	*/
 
+	return retur;
 }
 
 

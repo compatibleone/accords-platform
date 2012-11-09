@@ -128,55 +128,49 @@ private	int	pa_normalise_value( char * sptr, int normal )
 }
 
 /*	-----------------------------------------------------------------	*/
-/*		r e s o l v e _ c o n t r a c t _ n o n o d e s 		*/
+/*		r e s o l v e _ c o n t r a c t _ c o r e s     		*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_nonodes(struct cords_pa_contract * cptr )
+private	char *	resolve_contract_cores(struct cords_pa_contract * cptr )
 {
-	//struct	pa_compute_infos	request;
-	//struct	os_compute_infos	flavor;
-	//struct	os_compute_infos	best;
 	char *			vptr;
-
-	//struct	data_element * eptr=(struct data_element *) 0;
-	//struct	data_element * dptr=(struct data_element *) 0;
-
-	//if (!( eptr = json_element( cptr->flavors->jsonroot, "flavors" )))
-		//return((char *) 0);
-
-	/* -------------------------------------------------------------- */
-	/* retrieve appropriate parameters from infrastructure components */
-	/* -------------------------------------------------------------- */
-	/*
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
-		request.memory = 0;
-	else	request.memory = rest_normalise_value( vptr,'G' );
-
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_CORES ) ))
-		request.cores = 0;
-	else	request.cores = rest_normalise_value( vptr,'U' );
-
-	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_SPEED ) ))
-		request.speed = 0;
-	else	request.speed = rest_normalise_value(vptr,'G');
-	
-	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
-		_CORDS_STORAGE, _CORDS_SIZE ) ))
-		request.storage = 0;
-	else	request.storage = rest_normalise_value(vptr,'G');
-	*/
-
 	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_CORES);
+	return(vptr);
+}
 
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ r a m         		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_ram(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_MEMORY);
+	return(vptr);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ m h z         		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_mhz(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_SPEED);
+	return(vptr);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ d i s k       		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_disk(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->storage.message, "occi", _CORDS_STORAGE, _CORDS_SIZE);
 	return(vptr);
 }
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_image( struct cords_pa_contract * cptr )
+private	char *	resolve_contract_os( struct cords_pa_contract * cptr )
 {
 	//struct	pa_image_infos	request;
 	//struct	pa_image_infos	image;
@@ -343,6 +337,12 @@ public	int	create_proactive_contract(
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
 		return( terminate_proactive_contract( 1179, &contract ) );
 
+	char* os = NULL;
+	char* cores = NULL;
+	char* ram = NULL;
+	char* mhz = NULL;
+	char* disk = NULL;
+
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
@@ -362,18 +362,30 @@ public	int	create_proactive_contract(
 	/* ------------------------------------------------------ */
 	//else if (!( contract.images = pa_list_image_details() ))
 	//	return( terminate_proactive_contract( 1186, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+	else if (!( os = resolve_contract_os( &contract ) ))
+		return( terminate_proactive_contract( 1186, &contract ) );
+	else if (!( cores = resolve_contract_cores( &contract ) ))
 		return( terminate_proactive_contract( 1187, &contract ) );
-	else if (!( pptr->nopanodes = resolve_contract_nonodes( &contract ) ))
-		return( terminate_proactive_contract( 1187, &contract ) );
-	//else if (!( pptr->original = allocate_string( pptr->image ) ))
-	//	return( terminate_proactive_contract( 1188, &contract ) );
+	else if (!( ram = resolve_contract_ram( &contract ) ))
+		return( terminate_proactive_contract( 1188, &contract ) );
+	else if (!( mhz = resolve_contract_mhz( &contract ) ))
+		return( terminate_proactive_contract( 1189, &contract ) );
+	else if (!( disk = resolve_contract_disk( &contract ) ))
+		return( terminate_proactive_contract( 1190, &contract ) );
 	{
 		/* ----------------------------------------------- */
 		/* resolve any price informatino for this category */
 		/* ----------------------------------------------- */
+		int leng = 5;
+		leng += strlen(os);
+		leng += strlen(ram);
+		leng += strlen(mhz);
+		leng += strlen(cores);
+		leng += strlen(disk);
+		pptr->image = (char*) malloc (leng * sizeof(char));
+		sprintf(pptr->image, "%s;%s;%s;%s;%s", os, ram, mhz, cores, disk);
+
 		pptr->price = occi_resolve_category_price( _CORDS_PROACTIVE, default_operator(), agent, tls );
-	
 		return( terminate_proactive_contract( 0, &contract ) );
 	}
 }
@@ -387,21 +399,7 @@ public	int	delete_proactive_contract(
 		char * agent,
 		char * tls )
 {
-	struct	pa_response * paptr;
-	printf("Should not be called...");
-	//if ((paptr = stop_proactive_provisioning( pptr )) != (struct pa_response *) 0)
-		//paptr = liberate_pa_response( paptr );
-	//if (!( pptr->image ))
-	//	return( 0 );
-	//else if (!( pptr->original ))
-	//	return( 0 );
-	//else if (!( strcmp( pptr->original, pptr->image ) ))
-	//	return( 0 );
-	//else
-	//{
-		//pa_delete_image( pptr->image );
-		//return(0);
-	//}
+	printf("Deleting ProActive contract...\n");
 }
 
 	/* ------------- */

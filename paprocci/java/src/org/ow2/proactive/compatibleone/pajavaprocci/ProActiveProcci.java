@@ -148,6 +148,25 @@ public class ProActiveProcci implements Procci{
 		return Executors.newSingleThreadExecutor();
 	}
 	
+	private Double getvalue(String str){
+		return new Double(str.substring(0, str.length()-1));
+	}
+	
+	private String normalizem(String str){
+		String output;
+		
+		if (str.toUpperCase().endsWith("G"))
+			output = new String("" + (getvalue(str)*1024.00));
+		else if (str.toUpperCase().endsWith("M"))
+			output = new String("" + (getvalue(str)));
+		else if (str.toUpperCase().endsWith("K"))
+			output = new String("" + (getvalue(str)/1024.00));
+		else
+			output = new String("" + (getvalue(str)/(1024.0 * 1024.0)));
+		
+		logger.info("Normalized: " + str + " to: " + output + " (in Mega).");
+		return output;
+	}
 	
 	/**
 	 * Execute in a ProActive node an instance of COSACS module. 
@@ -155,20 +174,25 @@ public class ProActiveProcci implements Procci{
 	 * @throws Exception if anything goes wrong. 
 	 */
 	public String start_server(
-			Object[] argss) throws Exception{
+			Object[] args) throws Exception{
+		
+		checkparameters(args, 1);
+		
+		String[] argss = args[0].toString().split(";");
+		
 		checkparameters(argss, 5);
 		
 		String os = (argss[0]==null||argss[0].toString().isEmpty()?"linux":argss[0].toString());
-		String ram = (argss[1]==null||argss[1].toString().isEmpty()?"0":argss[1].toString());
-		String mhz = (argss[2]==null||argss[2].toString().isEmpty()?"0":argss[2].toString());
+		String rammb = normalizem((argss[1]==null||argss[1].toString().isEmpty()?"0":argss[1].toString()));
+		String mhz = normalizem((argss[2]==null||argss[2].toString().isEmpty()?"0":argss[2].toString()));
 		String nonodesstr = (argss[3]==null||argss[3].toString().isEmpty()?"1":argss[3].toString());
-		String disk = (argss[4]==null||argss[4].toString().isEmpty()?"0":argss[4].toString());
+		String diskmb = normalizem((argss[4]==null||argss[4].toString().isEmpty()?"0":argss[4].toString()));
 		
-		//String os = category.getImage();
-		//String nonodesstr = category.getNopanodes();
-		
-		logger.info("Nodes: " + nonodesstr);
-		logger.info("Image: " + os);
+		logger.info("OS: " + nonodesstr);
+		logger.info("RAMMB: " + rammb);
+		logger.info("MHZ: " + mhz);
+		logger.info("CORES: " + nonodesstr);
+		logger.info("DISKMB: " + diskmb);
 		
 		final String path_sep;
 		final String app_path;
@@ -216,8 +240,8 @@ public class ProActiveProcci implements Procci{
 					SelectionScriptCondition.nodesContainingFile(app_path),
 					SelectionScriptCondition.nodeWithoutSpecialLock(workingdir + path_sep + "lock"),
 					SelectionScriptCondition.nodeWithOS(os),
-					SelectionScriptCondition.nodeWithDiskMb(Float.valueOf(disk)),
-					SelectionScriptCondition.nodeWithMemoryMb(Float.valueOf(ram)),
+					SelectionScriptCondition.nodeWithDiskMb(Float.valueOf(diskmb)),
+					SelectionScriptCondition.nodeWithMemoryMb(Float.valueOf(rammb)),
 					SelectionScriptCondition.nodeWithMHz(Float.valueOf(mhz))
 				);
 		}

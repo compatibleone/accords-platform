@@ -189,10 +189,10 @@ public class SelectionScriptCondition {
 		condition += "importClass(org.hyperic.sigar.Sigar);" + NEWLINE;
 		condition += "var sigar = new Sigar();" + NEWLINE;
 		condition += "var paramx = sigar.XXX;" + NEWLINE;
-	    condition += "if (paramx > MINIMUM)"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR true; println(paramx + \" > than minimum XXX MINIMUM ==> SELECTED\");}"+NEWLINE ;
+	    condition += "if (paramx >= MINIMUM)"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(paramx + \" >= than minimum XXX MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR false; println(paramx + \" < than minimum XXX MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition += "{selected = selected OPERATOR false; println(paramx + \" <= than minimum XXX MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
 	    condition = condition.replace("XXX", X);
 		//logger.info("Condition for selection script created: " + condition);

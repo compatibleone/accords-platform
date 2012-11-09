@@ -222,7 +222,12 @@ public class SchedulerClient {
 			throw new Exception("Incorrect amount of tasks: " + taskssize);
 		}
 		// There is only one task for the submitted job. 
-		String runninghostname = tasks.get(0).getExecutionHostName();
+		while(jobstate.getTasks().get(0).getExecutionHostName() == null){
+			logger.warn("The host name where the task is being executed had a null name... Waiting...");
+			Thread.sleep(200);
+		}
+		
+		String runninghostname = jobstate.getTasks().get(0).getExecutionHostName();
 		
 		logger.info("Execution host name: " + runninghostname);
 		String runningnode = runninghostname.substring(runninghostname.indexOf("(")).replace("(", "").replace(")","");
