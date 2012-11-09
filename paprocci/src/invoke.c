@@ -416,7 +416,6 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 
 	char* retur = call_java_procci(jvmp, "stop_server", "([Ljava/lang/Object;)Ljava/lang/String;", margs);
 
-	/*
 	fprintf(stderr, "MMM 1...\n");
       	(*env)->DeleteLocalRef( env, jstr1 ); 
 	fprintf(stderr, "MMM 2...\n");
@@ -424,7 +423,6 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 	fprintf(stderr, "MMM 3...\n");
  	(*env)->DeleteLocalRef( env, sclass ); 
 	fprintf(stderr, "MMM 4...\n");
-	*/
 
 	return retur;
 }

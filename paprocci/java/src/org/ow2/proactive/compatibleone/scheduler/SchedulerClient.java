@@ -215,19 +215,19 @@ public class SchedulerClient {
 		}
 		
 		// Getting information about the tasks/application and its host node. 
-		ArrayList<TaskState> tasks = jobstate.getTasks();
+		ArrayList<TaskState> tasks = scheduler.getJobState(jobId).getTasks();
 		int taskssize = tasks.size();
 		if (taskssize != 1){
 			logger.warn("The amount of tasks is supposed to be 1, but it is: " + taskssize);
 			throw new Exception("Incorrect amount of tasks: " + taskssize);
 		}
 		// There is only one task for the submitted job. 
-		while(jobstate.getTasks().get(0).getExecutionHostName() == null){
+		while(scheduler.getJobState(jobId).getTasks().get(0).getExecutionHostName() == null){
 			logger.warn("The host name where the task is being executed had a null name... Waiting...");
 			Thread.sleep(200);
 		}
 		
-		String runninghostname = jobstate.getTasks().get(0).getExecutionHostName();
+		String runninghostname = scheduler.getJobState(jobId).getTasks().get(0).getExecutionHostName();
 		
 		logger.info("Execution host name: " + runninghostname);
 		String runningnode = runninghostname.substring(runninghostname.indexOf("(")).replace("(", "").replace(")","");
