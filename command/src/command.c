@@ -70,11 +70,11 @@ private	int	ll_cords_service_action( char * id, char * action )
 
 	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, tls ) ))
+	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
 	else	sprintf(buffer,"%s/%s/%s",sptr,_CORDS_SERVICE,id );
 
-	if (!( zptr =  cords_invoke_action( buffer, action, agent, tls ) ))
+	if (!( zptr =  cords_invoke_action( buffer, action, agent, default_tls() ) ))
 		return(501);
 	else
 	{
@@ -93,13 +93,13 @@ private	int	cords_service_action( char * id, char * action )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_cords_service_action( id, action );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 	return( status );
 }
@@ -116,11 +116,11 @@ private	int	ll_cords_service_delete( char * id )
 
 	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, tls ) ))
+	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
 	else	sprintf(buffer,"%s/%s/%s",sptr,_CORDS_SERVICE,id );
 
-	if (!( zptr =  occi_simple_delete( buffer, agent, tls ) ))
+	if (!( zptr =  occi_simple_delete( buffer, agent, default_tls() ) ))
 		return(501);
 	else
 	{
@@ -139,17 +139,20 @@ private	int	cords_service_delete( char * id )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_cords_service_delete( id );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 	return( status );
 }
 
+/*	-----------------------------------------------------	*/
+/*		c o s a c s _ c o m m a n d _ t o o l		*/
+/*	-----------------------------------------------------	*/
 private	int	cosacs_command_tool( char * host, char * command ,char * category, char * item )
 {
 	struct	occi_response * rptr;
@@ -168,7 +171,7 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 
 	if (!( strcasecmp( command, "LIST" ) ))
 	{
-		if (!( rptr = occi_simple_get( buffer, agent, tls ) ))
+		if (!( rptr = occi_simple_get( buffer, agent, default_tls() ) ))
 			return( failure(  400,"OCCI LIST", "request failed" ) );
 		else
 		{
@@ -179,7 +182,7 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 	}
 	else if (!( strcasecmp( command, "GET" ) ))
 	{
-		if (!( rptr = occi_simple_get( buffer, agent, tls ) ))
+		if (!( rptr = occi_simple_get( buffer, agent, default_tls() ) ))
 			return( failure(  400,"OCCI client GET", "request failed" ) );
 		else
 		{
@@ -308,15 +311,15 @@ private	int	occi_service_operation( char * filename, char * body )
 	}
 
 	if (!( strcasecmp( method, "GET" ) ))
-		rptr = rest_client_get_request( object, tls, agent, root );
+		rptr = rest_client_get_request( object, default_tls(), agent, root );
 	else if (!( strcasecmp( method, "POST" ) ))
-	 	rptr = rest_client_post_request( object, tls, agent, body, root );
+	 	rptr = rest_client_post_request( object, default_tls(), agent, body, root );
 	else if (!( strcasecmp( method, "DELETE" ) ))
-		rptr = rest_client_delete_request( object, tls, agent, root );
+		rptr = rest_client_delete_request( object, default_tls(), agent, root );
 	else if (!( strcasecmp( method, "PUT" ) ))
-		rptr = rest_client_put_request( object, tls, agent, body, root );
+		rptr = rest_client_put_request( object, default_tls(), agent, body, root );
 	else if (!( strcasecmp( method, "HEAD" ) ))
-		rptr = rest_client_head_request( object, tls, agent, root );
+		rptr = rest_client_head_request( object, default_tls(), agent, root );
 	else	rptr = (struct rest_response *) 0;
 
 	fclose(h);
@@ -478,13 +481,13 @@ private	int	cords_invoice_action( char * account, char * other )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_invoice_operation( account, other );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 	return( status );
 }
@@ -522,6 +525,8 @@ private	int	service_operation( char * command, char * service, char * syntax )
 
 		if (!( strcasecmp( command, "START" ) ))
 			return( cords_service_action( id, "start" ) );
+		else if (!( strcasecmp( command, "RESTART" ) ))
+			return( cords_service_action( id, "restart" ) );
 		else if (!( strcasecmp( command, "STOP" ) ))
 			return( cords_service_action( id, "stop" ) );
 		else if (!( strcasecmp( command, "SAVE" ) ))
@@ -589,13 +594,51 @@ private	int	command_transaction( char * account, char * price, char * reference,
 	{
 		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-		if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 			return(403);
 		else 	(void) occi_client_authentication( auth );
 
 		status = ll_command_transaction( account ,price, reference, action, description );
 
-		(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+
+		return( status );
+
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*		c o m m a n d _ t r a n s a c t i o n		*/
+/*	---------------------------------------------------	*/
+/*	invoke the indicated occi 'action' on the required 	*/
+/*	resource instance.					*/
+/*	---------------------------------------------------	*/
+private	int	invoke_action( char * action, char * instance )
+{
+	int			status=0;
+	char 			* auth=(char *) 0;
+	struct occi_response 	* zptr;
+	if (!( action ))
+		return( 30 );
+	else if (!( instance ))
+		return( 31 );
+	else
+	{
+		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+
+		if (!( zptr =  cords_invoke_action( instance, action, agent, default_tls() ) ))
+			status = 501;
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			status = 0;
+		}
+		
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 		return( status );
 
@@ -623,6 +666,8 @@ private	int	operation( int argc, char * argv[] )
 				command = aptr;
 				continue;
 			}
+			else if (!( strcasecmp( command, "INVOKE" ) ))
+				return( invoke_action( aptr, argv[argi] ) );
 			else if (!( strcasecmp( command, "TRANSACTION" ) )) 
 				return( command_transaction( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3] ) );
 
@@ -666,11 +711,12 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.02");
-	printf("\n   Beta Version : 15/10/2012 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.03");
+	printf("\n   Beta Version : 05/11/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START       <service_file> ");
+	printf("\n         command <options> RESTART     <service_file> ");
 	printf("\n         command <options> STOP        <service_file> ");
 	printf("\n         command <options> SAVE        <service_file> ");
 	printf("\n         command <options> SNAPSHOT    <service_file> ");
@@ -678,6 +724,7 @@ private	int	banner()
 	printf("\n         command <options> COSACS      <service_file> <instruction> ");
 	printf("\n         command <options> OCCI        [body] <request> ");
 	printf("\n         command <options> INVOICE     <account>      ");
+	printf("\n         command <options> INVOKE      <action> <instance> ");
 	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
