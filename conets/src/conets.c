@@ -45,6 +45,7 @@ struct	accords_configuration Conets = {
 	"domain",
 	"conets.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

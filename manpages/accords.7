@@ -1,0 +1,173 @@
+.TH ACCORDS "7" "October 2012" "CompatibleOne" "Platform"
+.PP
+Accords implements the platform of the CompatibleOne project.
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+Goal of this project is to assist in deploying your stack cloud, the way you want,
+using the providers you want for each component.
+.PP
+The CompatibleOne platform brokering is implemented in the current ACCORDS software.
+.SS CONFIGURATION
+To learn how to configure the platform, please refer to \fBaccords-config\fR(1).
+.SS SECURITY
+During the installation operation if security has been requested then a security directoy will be 
+created into which the security configuration files of each of the platform components will be 
+generated. In addition the private key and certificates will also be generated into this directory.
+
+The files generated into the security directory are not to be world readable for obvious reasons.
+
+Each individual security configuration file defines the private key, certificate, user name, password 
+and the security options of each of the server components. 
+
+The Private Keys and Certificates are currently only self signed and will therefore cause Incorrect 
+Certificate alerts and errors to be thrown when used with the Certificate Exchange and Validation 
+Mechanisms activated. This highlights the need for a mechanism within the CompatibleOne platform for 
+the production and delivery of Valid Certification Authority Signed certificates for use not only by 
+the Accords platform components but also by the provisioned resources and products delivered by the 
+platform. 
+
+The security option values are defined as follows:
+
+.TP
+1,2,4
+These three option values are undefined in this SSL / TLS implementation for ACCORDS.
+
+.TP
+8	REQUEST PEER CERTIFICATE
+When this option value is set then the server will issue a Send Certificate request to
+the client during the Server Hello phase of handshake and cypher negociation. 
+This option instructs the Client to validate the Certificate chain received from the 
+Server prior to sending the Client side certificate if one is available. Self Signed
+Certificates with throw "Incorrect Certificate" alerts when this option is active.
+If a Certificate is not exchanged then no failure will occur since it not mandatory.
+
+.TP
+16	REQUIRE PEER CERTIFICATE
+This options requires an exchange of valid Certificates by both Client and Servers.
+An error will occur if no Certificate is made available or if the Certificate is not
+Correct.
+
+.TP
+32	DER KEY FILE FORMAT
+When this option is set it indicates that the Private Key file is not a base64 PEM
+Ascii encoded file but rather a binary DSR,ASN or otherwise encoded file.
+
+.TP
+64	DER CERTIFICATE FILE FORMAT
+When this option is set it indicates that the Certificate File is not a base64 PEM
+Ascii encoded file but rather a binary DSR,ASN or otherwise encoded file.
+
+.TP
+128	SSL COMPATIBLE
+when this option is set then the SSL compatible mode will be activated and as such the
+client connection handshake will commence with an SSL V2 or V3 Hello Message. This may
+be accepted by SSL V1, V2, V3 and TLS v1 servers. However an RFC dating from April 2011
+is now recommending that this is bad practice since it allows MTM attacks to influence
+both the client and server to be misled into believing that the other party requires an
+inferior protocole. The RFC is strongly advocating that this v23 Client Hello should be
+phased out as quickly as possible. In compliance with this recommendation the TLS / SSL 
+functions of the Accords Platform will issue a TLS V1 Client Hello Message and as a
+server will only communicate with Clients behaving accordingly. This requirement may be
+relaxed by use of this option value.
+
+.TP
+256	INTERNAL SSL CERTIFICATE VERIFICATION
+This option may be set when Exchange of Self-Signed Certificates by Clients and Servers
+is required. This is necessary for instance when working with Windows Azure platforms
+which expressly request provision of a self signed certificate by the client endpoint.
+
+.TP
+\fBWARNING\fR
+These options are necessary during the development and test phases of the Accords platform and should 
+be used carefully and only by persons with a solid understanding of the RFC for TLS and their implications 
+towards the resulting platform security. 
+
+.TP
+\fBHINT\fR
+The value of the security options is provided by two different
+variables "options" and "optionst" inside the "install.linux" and "install.debian" scripts to allow the 
+value to be set for servers and for tools independantly. It is however recommened that they be set to the
+same value to ensure homogenous operation.
+
+.TP
+\fBAUTHENTICATION\fR
+When security has been requested and activated during the installation phase, an individual user name 
+and associated password will have been generated to the security configuration file of each component.
+The user category management service database will be generated to include the collection of valid user 
+name and password authentication credentials. The corresponding authorisation option of the security 
+configuration file, when set, will cause the service component to present the credentials to COSS for
+authentication prior to requesting the creation of an authorization token allowing collaboration by the 
+service in the Accords Platform. This authorization credential will be presented in the OCCI/REST/HTTP 
+header of ALL Request and Response messages sent by the Client of Server endpoints of the Service component.
+For obvious reasons neither the PUBLISHER nor the COSS modules are required to perform authentication and
+authorization though this will be introduced as a retro fit requirement at a later date.
+ 
+.SS MONITORING
+During the platform operation, log and trace information will be generated as described by the
+monitoring parameter of the installation script.
+
+.TP
+0	No monitoring
+
+.TP
+1 	All monitoring is sent to the file co-log
+
+.TP
+2	All monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
+
+.TP
+3	Monitoring information is sent to both the file co-log and to COMONS
+
+.TP
+6	Optimised Monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS and to the file co-log.
+
+When COMONS monitoring is active then only the service modules started after COMONS are able to make 
+use of the centralised monitoring service. Therefore the activation of CO-LOG monitoring is necessary
+for the fundamental modules of the platform : PUBLISHER, COSS and COMONS. 
+
+.SS DATA
+The collection of XML files cords_*.xml and links_*.xml represent the internal state of the different
+server components of the platform. They are updated as their internal state changes and will be reloaded
+when the corrresponding component restarts.
+
+.SS TEMPORARY FILES
+The directory "rest/" contains the contents of the messages exchanged by the server components during 
+operation and may be consulted. These may have several different extensions depending on the source
+of the information and may be XML, JSON, OCCI, HTML or TMP files. 
+
+.TP
+\fBHINT\fR
+This directory will need to be cleaned
+at regular intervals in cases of prolonged operation otherwise performance degradation will occur due to
+the number of files that accumulate here. 
+.SS SEE ALSO
+.TP
+\fBco-start\fR(1)
+.TP
+\fBco-status\fR(1)
+.TP
+\fBco-parser\fR(1)
+.TP
+\fBco-broker\fR(1)
+.TP
+\fBco-resolver\fR(1)
+.TP
+\fBco-command\fR(1)
+.TP
+\fBco-stop\fR(1)
+.SH AUTHOR
+The CompatibleOne project.
+.SH MANPAGE
+Most of this documents comes from the README of ACCORDS, wrote by Iain James Marshall.
+Written by Alexandre Lissy <alissy@mandriva.com> for the CompatibleOne project.
+.SH "REPORTING BUGS"
+Report CompatibleOne bugs to compatibleone@ow2.org
+.br
+CompatibleOne home page: <http://www.compatibleone.org>
+.SH COPYRIGHT
+Copyright \(co 2012 CompatibleOne.
+License Apache 2.0.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

@@ -1,3 +1,36 @@
+compatibleone-accords (0.20121022-1) unstable; urgency=low
+
+  * Upstream change: new accords bash script.
+  * All executables now have a manpage.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 22 Oct 2012 15:18:00 +0200
+
+compatibleone-accords (0.20121015-1) unstable; urgency=low
+
+  * Only recommend compatibleone-paprocci so everybody isn't forced to install the Java runtime.
+  * psmisc dep so that we're sure killall is installed.
+  * Change OpenSSL dependancy so it also builds on Debian 6.0.x
+  * Change debhelper dep so the package builds on Ubuntu 9.04.
+  * Commit work with Mauricio to build compatibleone-paprocci and run it with
+    the appropriate autodetected java environment.
+  * co-stop: can now be run from any directory.
+  * Add package compatibleone-example.
+  * Add compatibleone-nagios package.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 15 Oct 2012 11:08:00 +0200
+
+compatibleone-accords (0.20121008-1) unstable; urgency=low
+
+  * More fixes/updates (see gitorious log).
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Mon, 8 Oct 2012 14:38:16 +0200
+
+compatibleone-accords (0.20121004-1) unstable; urgency=low
+
+  * More fixes/updates, Initial init script for publisher, WIP.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Thu, 4 Oct 2012 11:55:16 +0200
+
 compatibleone-accords (0.20120918-1) unstable; urgency=low
 
   * Various fixes/updates, WIP.

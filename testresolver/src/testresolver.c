@@ -24,6 +24,7 @@ private	char *	accepts=(char *) 0;
 private	int	verbose=0;
 private	int	debug=0;
 private	int	price=0;
+private	int	php=0;
 private	char *	tls=(char *) 0;
 private	char *	publisher=_CORDS_DEFAULT_PUBLISHER;
 private	char *	agent="CO-TEST-RESOLVER";
@@ -74,12 +75,26 @@ private	void	resolver_show_response( struct occi_response * rptr, char * agent )
 		else if (!( eptr->value ))
 			continue;
 		else if (!( price ))
-			printf("   %s = %s \n",eptr->name,eptr->value );
+		{
+			if (!( php ))
+				printf("%s=%s\n",eptr->name,eptr->value );
+			else	printf("$%s=%c%s%c;\n",eptr->name,0x0022,eptr->value,0x0022 );
+		}
 		else if (!( urlprice = occi_resolve_category_price( eptr->name, eptr->value, agent, tls ) ))
-			printf("   %s = %s \n",eptr->name,eptr->value );
+		{
+			if (!( php ))
+				printf("%s=%s\n",eptr->name,eptr->value );
+			else	printf("$%s=%c%s%c;\n",eptr->name,0x0022,eptr->value,0x0022 );
+		}
 		else
 		{
-			printf("   %s = %s \n\t[ %s ] \n",eptr->name,eptr->value, urlprice );
+			if (!( php ))
+				printf("   %s = %s \n\t[ %s ] \n",eptr->name,eptr->value, urlprice );
+			else
+			{
+				printf("$%s=%c%s%c;\n$%s_price=%c%s%c;\n",
+					eptr->name,0X0022,eptr->value,0x0022,eptr->name,0x0022,urlprice,0x0022 );
+			}
 			urlprice = liberate( urlprice );
 		}
 	}
@@ -147,6 +162,8 @@ private	int	test_resolver_command( int argc, char * argv[] )
 				{	price=1; continue;	}
 				else if (!( strcmp( aptr, "debug" ) ))
 				{	debug=1; continue;	}
+				else if (!( strcmp( aptr, "php" ) ))
+				{	php=1; continue;	}
 				else if (!( strcmp( aptr, "publisher" ) ))
 				{
 					publisher = argv[argi++];
@@ -205,11 +222,12 @@ private	int	test_resolver_command( int argc, char * argv[] )
 
 private	int	test_resolver_banner()
 {
-	printf("\n   CO-TEST-RESOLVER : CompatibleOne OCCI Test Resolver : Version 1.0a.0.02");
-	printf("\n   Beta Version : 04/03/2012 ");
+	printf("\n   CO-TEST-RESOLVER : CompatibleOne OCCI Test Resolver : Version 1.0b.0.01");
+	printf("\n   Beta Version : 04/10/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue \n");
 	printf("\n   --verbose                         activate status  messages       ");
 	printf("\n   --debug                           activate debug   messages       ");
+	printf("\n   --php                             format output for php           ");
 	printf("\n   --tls       <filename>            specify TLS configuration       ");
 	printf("\n   --accept    <filename>            specify ACCEPT MIME type        ");
 	printf("\n   --publisher <hostname>            set publisher URL               ");

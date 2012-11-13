@@ -41,6 +41,7 @@ struct	accords_configuration Broker = {
 	"domain",
 	"broker.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

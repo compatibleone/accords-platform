@@ -251,6 +251,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 			json_failure(33,"expected","matrix");
 			return( drop_data_element( dptr ) );
 		}
+		else	return( dptr );
 	}
 	else if (c == '{' )
 	{
@@ -259,6 +260,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 			json_failure(33,"expected","complex");
 			return( drop_data_element( dptr ) );
 		}
+		else	return( dptr );
 	}
 	else if (!( dptr->value = json_get_token( h )))
 	{
@@ -266,6 +268,7 @@ private	struct	data_element * json_get_value( FILE * h, struct data_element * dp
 		return( drop_data_element( dptr ) );
 	}
 	else	return( dptr );
+
 }
 
 /*	------------------------------------------------	*/
@@ -424,7 +427,10 @@ public	int	json_serialise( struct data_element * dptr, char * filename )
 	int	c;
 	FILE * h;
 	if (!( h = fopen( filename, "w" )))
+	{
 		dptr = liberate_data_element( dptr );
+		return(-1);
+	}
 	else
 	{
 		json_serialise_complex( h, dptr->first );

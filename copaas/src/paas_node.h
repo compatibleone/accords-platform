@@ -4,8 +4,8 @@
 struct paas_node
 {
 	char* id;
-	char* content_type;
 	char* name;
+	char* content_type;
 	char* version;
 	char* provider;
 	int state;

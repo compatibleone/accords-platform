@@ -25,10 +25,11 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
  char * categoryAttributes;         
  char * categoryName;
  char * categoryActions;
+ char * categoryAccess;
  int flag;
 
- if (! PyArg_ParseTuple( args,"sssi",&categoryName, &categoryAttributes,&categoryActions,&flag)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,flag);
+ if (! PyArg_ParseTuple( args,"ssssi",&categoryName, &categoryAttributes,&categoryActions, &categoryAccess, &flag)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,categoryAccess,flag);
  if(dim <= 0) 
  {
    printf("Failure to create %s OCCI category\n",categoryName);
@@ -71,8 +72,8 @@ static PyObject *pycompmanager_generateComponent(PyObject *self, PyObject *args)
  char * categoryNameList;
  char * flaglist;
  
- if (! PyArg_ParseTuple( args,"sss",&moduleName,&categoryNameList,&flaglist)) return NULL;
- a=generateModuleFile(moduleName,categoryNameList,flaglist);
+ if (! PyArg_ParseTuple( args,"ss",&moduleName,&categoryNameList)) return NULL;
+ a=generateModuleFile(moduleName,categoryNameList);
  if(a)
  {
    printf(" %s component is created\n",moduleName);

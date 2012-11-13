@@ -11,6 +11,9 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = scripts
+SUBDIRS += manifests
+SUBDIRS += manpages
+
 if ENABLE_COXML
 SUBDIRS += coxml
 endif
@@ -62,8 +65,14 @@ endif
 if ENABLE_COOL
 SUBDIRS += cool
 endif
+if ENABLE_CONAGIOS
+SUBDIRS += conagios
+endif
 if ENABLE_EXAMPLE
 SUBDIRS += example
+endif
+if ENABLE_COIDMS
+SUBDIRS += coidms
 endif
 if ENABLE_COPS
 SUBDIRS += cops
@@ -141,9 +150,9 @@ if ENABLE_TESTDC
 SUBDIRS += testdc
 endif
 
-EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt example1.xml example2.xml example3.xml example4.xml example5.xml coips.xml slamtest.xml platform.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd accords.spec.in
+EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in
 
-SPEC=$(PACKAGE).spec
+SPEC=compatibleone.spec
 SPEC_DIR:=$(shell rpm -E '%{_specdir}')
 SOURCE_DIR:=$(shell rpm -E '%{_sourcedir}')
 

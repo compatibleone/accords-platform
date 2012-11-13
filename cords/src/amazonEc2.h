@@ -1,7 +1,7 @@
-#ifndef _cords_amazonEc2_h_
-#define _cords_amazonEc2_h_
+#ifndef _amazonEc2_h_
+#define _amazonEc2_h_
 
-struct cords_amazonEc2
+struct amazonEc2
 {
 	char * id;
 	char * name;

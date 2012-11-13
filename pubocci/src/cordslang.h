@@ -101,6 +101,7 @@
 #define	_CORDS_PUBLICATION	"publication"
 
 #define	_CORDS_IMPORT		"import"
+#define	_CORDS_INVOICE		"invoice"
 
 #define	_CORDS_MANIFEST		"manifest"
 #define	_CORDS_DESCRIPTION	"description"

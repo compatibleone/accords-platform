@@ -1079,6 +1079,11 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 	{
 		if ( strcmp( eptr->name, element ) != 0)
 			continue;
+		else if ((!( strcmp( eptr->name, _CORDS_ERROR ) ))
+		     ||  (!( strcmp( eptr->name, _CORDS_WARNING ) ))
+		     ||  (!( strcmp( eptr->name, _CORDS_DESCRIPTION ) ))
+		     ||  (!( strcmp( eptr->name, _CORDS_CHOICE  ) )))
+			continue;
 		else if (!(bptr = document_atribut( eptr, _CORDS_ID )))
 			return( cords_append_error(document,701,"unresolved element ID") );
 
@@ -2255,6 +2260,21 @@ private	int	cords_parser_xsd_actions(
 }
 
 /*	---------------------------------------------------	*/
+/*		c o r d s _ p a r s e _ f i l t e r  		*/
+/*	---------------------------------------------------	*/
+private	int	cords_parse_filter( struct xml_element * document )
+{
+	if (!( document ))
+		return( 0 );
+	else if ((!( strcmp( document->name, _CORDS_ERROR ) ))
+	     ||  (!( strcmp( document->name, _CORDS_WARNING ) ))
+	     ||  (!( strcmp( document->name, _CORDS_DESCRIPTION ) ))
+	     ||  (!( strcmp( document->name, _CORDS_CHOICE  ) )))
+		return( 0 );
+	else	return(1);
+}
+
+/*	---------------------------------------------------	*/
 /*		c o r d s _ t e r m i n a t e _ x s d		*/
 /*	---------------------------------------------------	*/
 /*	validation of the conformity of the element and its	*/
@@ -2280,6 +2300,12 @@ private	int	cords_terminate_xsd(
 	struct	xml_atribut * aptr;
 	int	modifications=0;
 	int	linked=0;
+
+	/* --------------------------------- */
+	/* filter out ERROR, DESCRIPTION etc */
+	/* --------------------------------- */
+	if (!( cords_parse_filter( dptr ) ))
+		return( 0 );
 
 	/* ---------------------------------- */
 	/* for each attributes of the element */
@@ -2593,12 +2619,7 @@ private	int 	ll_cords_parse_element(
 	/* --------------------- */
 	/* ensure valid category */
 	/* --------------------- */
-	if (!( document ))
-		return( 0 );
-	else if ((!( strcmp( document->name, _CORDS_ERROR ) ))
-	     ||  (!( strcmp( document->name, _CORDS_WARNING ) ))
-	     ||  (!( strcmp( document->name, _CORDS_DESCRIPTION ) ))
-	     ||  (!( strcmp( document->name, _CORDS_CHOICE  ) )))
+	if (!( cords_parse_filter( document ) ))
 		return( 0 );
 
 	/* ------------------------------------- */
@@ -2664,6 +2685,16 @@ private	int 	ll_cords_parse_element(
 					return(cords_append_error(document,706,"creating category"));
 				else if ((status = cords_resolve_location( zptr, document )) != 0)
 					return(cords_append_error(document,status,"resolving location"));
+				/* ------------------------------------------ */
+				/* retrieve the instance and integrate fields */
+				/* ------------------------------------------ */
+				else if (!( aptr = document_atribut( document, _CORDS_ID )))
+					return(cords_append_error(document,705,"resolving category id"));
+				else if (( yptr = cords_retrieve_category( document, aptr->value, agent,tls )) != (struct occi_response *) 0)
+				{
+					if (!( yptr = cords_integrate_fields( document, yptr, "occi", agent, tls ) ))
+						return(cords_append_error(document,705,"integrating category"));
+				}
 			}
 		}
 		else

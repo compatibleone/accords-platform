@@ -50,6 +50,7 @@ struct	os_compute_infos
 	int	storage;
 	char 	architecture[256];
 	char *	id;
+	char *	name;
 };
 
 struct	os_image_infos
@@ -94,6 +95,37 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 }
 
 /*	-----------------------------------------------------------------	*/
+/*			o s _ t r u s t _ l e v e l				*/
+/*	-----------------------------------------------------------------	*/
+private	char *	os_trust_level( char * sptr )
+{
+	char 	* rptr;
+	char 	* lptr;
+	char 	* wptr;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( rptr = allocate_string( sptr )))
+		return( rptr );
+	else
+	{
+		wptr = rptr;
+		while( *wptr )
+		{
+			lptr=wptr;
+			while ((*wptr != 0) && (*wptr != '.')) wptr++;
+			if ( *wptr == '.' ) *(wptr++) = 0;
+			if (!( strcasecmp( lptr, "trusted") ))
+			{
+				liberate( rptr );
+				return( "trusted" );
+			}
+		}
+		liberate( rptr );
+		return((char *) 0);
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ f l a v o r 			*/
 /*	-----------------------------------------------------------------	*/
 private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct cords_os_contract * cptr )
@@ -135,7 +167,7 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 	/* --------------------------------------------- */
 	/* collect and control the architecture required */
 	/* --------------------------------------------- */
-	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
 		strcpy(request.architecture,"blank" );
 	else if ((!(strcasecmp( vptr, "x86"    		) ))
@@ -146,7 +178,7 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 	     ||  (!(strcasecmp( vptr, "txt86_32" 	) ))
 	     ||  (!(strcasecmp( vptr, "txt86_64"  	) )))
 		strcpy(request.architecture,"trusted" );
-	else	strcpy(request.architecture,"blank" );
+	else	strcpy(request.architecture,"untrusted" );
 	
 	/* ----------------------------------------- */
 	/* for structures in flavor message response */
@@ -162,6 +194,9 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 		if (!( vptr = json_atribut( dptr, "id" ) ))
 			continue;
 		else	flavor.id = vptr;
+		if (!( vptr = json_atribut( dptr, "name" ) ))
+			flavor.name=(char *) 0;
+		else	flavor.name = vptr;
 		if (!( vptr = json_atribut( dptr, "disk" ) ))
 			flavor.storage = 0;
 		else	flavor.storage = rest_normalise_value(vptr,'G');
@@ -176,8 +211,12 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 			flavor.speed = 0;
 		else	flavor.speed = rest_normalise_value(vptr,'G');
 
-		if (!( vptr = json_atribut( dptr, "trustlevel" ) ))
-			strcpy(flavor.architecture,"blank" );
+		if (!( vptr = json_atribut( dptr, "trust_lvl" ) ))
+		{
+			if (!( vptr = os_trust_level( flavor.name )))
+				strcpy(flavor.architecture,"untrusted" );
+			else	strcpy(flavor.architecture, vptr );
+		}
 		else	strcpy(flavor.architecture,vptr  );
 
 		/* ------------------------------------ */
@@ -185,10 +224,8 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 		/* ------------------------------------ */
 		if (!( strncasecmp( request.architecture, "trusted", strlen("trusted") ) ))
 		{
-			if (!( strncasecmp( flavor.architecture, "untrusted", strlen("trusted") ) ))
-				continue;
-			else if (!( strncasecmp( flavor.architecture, "blank",strlen("trusted") ) ))
-				continue;
+			if ( strncasecmp( flavor.architecture, "trusted",strlen("trusted") ) != 0 )
+				continue; 
 		}
 		else if (!( strncasecmp( flavor.architecture, "trusted",strlen("trusted") ) ))
 			continue; 

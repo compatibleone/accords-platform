@@ -72,6 +72,7 @@ public struct cords_quota * reset_cords_quota(struct cords_quota * sptr)
 		sptr->offered =  0;
 		sptr->reserved =  0;
 		sptr->consumed =  0;
+		sptr->granularity =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -147,6 +148,10 @@ public int xmlin_cords_quota(struct cords_quota * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->consumed = atoi(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"granularity") ))
+		{
+			if ( wptr->value ) { sptr->granularity = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -177,6 +182,7 @@ public int rest_occi_cords_quota(FILE * fh,struct cords_quota * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.offered='%u'\r\n",prefix,nptr,sptr->offered);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reserved='%u'\r\n",prefix,nptr,sptr->reserved);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.consumed='%u'\r\n",prefix,nptr,sptr->consumed);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.granularity='%u'\r\n",prefix,nptr,sptr->granularity);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

@@ -19,12 +19,13 @@ PRODUCTION
 If you are reading this file then you will have cloned the accords-platform from the 
 CompatibleOne OW2 Gitorious and will perhaps want to build the binary package.
 
-Currently two build scripts are provided. The first one, build.debian, as its name
-suggests is for Debian based Linux platforms. The other one, build.linux, is to be used
-for non Debian based Linux platforms.
+Currently two build systems are provided. The first one for debian based systems is
+based on the standard Debian packaging system. Make sure you have 'dpkg-dev' installed and
+type 'dpkg-buildpackage -rsudo -b' in this directory.
+The other one, the build.linux script, is to be used for non Debian based Linux platforms.
 
 In both cases, to build the Accords Platform Binary package, simply execute the required
-buils script and wait till the compilation and link has all completed.
+build script and wait till the compilation and link has all completed.
 
 The Accords platforms depend on the following other tools and libraries which need to be 
 installed on your platform before launching your build script.
@@ -75,7 +76,7 @@ PYACCORDSSDK CONFIGURATION
 --------------------------
 
 To configure the PyAccordsSDK path, run the following (as root):
-# ./pyaccrods_config.sh
+# ./pyaccords_config.sh
 
 
 OPERATION
@@ -102,7 +103,7 @@ When no parameters are passed the installation will be performed as if it had be
 
 The configuration procedure will create the master configuration file for all of the components 
 of the Accords platform and when security is active will generate the security configurations,
-certificates and private keys for all the OCCI server modules comprising the system. In addition
+certificates and private keys for all the OCCI server modules comprising the system. In addition,
 a collection of command scripts will be generated that are configured facilitating the use of 
 the different components of the platform.
 
@@ -119,7 +120,7 @@ The following collection of command scripts are to be used for the operation of 
 2)	co-status
 	This script may be launched to inspect the status of the Accords Platform. The status inspection 
 	operation may be performed by hand using either the ps command and grepping for the processes 
-	which use the the accords.xml configuration file. It may also be perfomed using netstat to detect
+	which use the the accords.xml configuration file. It may also be performed using netstat to detect
 	the individual server's listening socket.
 
 		co-status
@@ -133,7 +134,7 @@ The following collection of command scripts are to be used for the operation of 
 		co-parser platform
 
 4)	co-broker
-	This script allows the resources described by a plan to be provisioning as a service and started.
+	This script allows the resources described by a plan to be provisioned as a service and started.
 	The script takes a single parameter, the stub name of the xml plan file without the xml file 
 	extension. The script launchs the executable bin/testcb and defines the required publisher 
 	and security information as described during installation.
@@ -164,21 +165,21 @@ The following collection of command scripts are to be used for the operation of 
 
 7)	co-stop
 	This script must be launched to stop the Accords Platform and bring the servers offline.
-	Thez script takes no command line parameter and will perform a killall -15 operation for
+	This script takes no command line parameter and will perform a killall -15 operation for
 	each of the service components of the accords platform. Service components intercept this
 	signal and perform a garceful exit after releasing all ressources and saving any data.
 
 		co-stop
 
-Several addition binary executable test programs are offered by the package allowing access to the 
+Several additional binary executable test programs are offered by the package allowing access to the 
 different cloud provider platforms currently supported for use by the Accords Platform. These tools 
 allow inspection of the different resources of the platforms and have a platform specific command 
-line sysntax.
+line syntax.
 
 1)	testos
 	This program provides a test client interface for the OpenStack platform and although it was
 	initially aligned for operation with the version 1.0 since the arrival of Diablo and version 1.1
-	interoperability has not been maintained by the platform itself. The OpenStack paltform offers
+	interoperability has not been maintained by the platform itself. The OpenStack platform offers
 	several resource types: flavors, images, servers and metadata. The specific command line syntax 
 	for the management of resources using this tool may be consulted in the integrated help screen
 	that may be obtained by simply launching the tool with no command line parameters.
@@ -193,14 +194,14 @@ During the installation operation if security has been requested then a security
 created into which the security configuration files of each of the platform components will be 
 generated. In addition the private key and certificates will also be generated into this directory.
 
-The files generated into the security directory are not to be world readable for obious reasons.
+The files generated into the security directory are not to be world readable for obvious reasons.
 
 Each individual security configuration file defines the private key, certificate, user name, password 
 and the security options of each of the server components. 
 
 The Private Keys and Certificates are currently only self signed and will therefore cause Incorrect 
 Certificate alerts and errors to be thrown when used with the Certificate Exchange and Validation 
-Mechanisms activated. This higlights the need for a mechanism within the CompatibleOne platform for 
+Mechanisms activated. This highlights the need for a mechanism within the CompatibleOne platform for 
 the production and delivery of Valid Certification Authority Signed certificates for use not only by 
 the Accords platform components but also by the provisioned resources and products delivered by the 
 platform. 
@@ -217,9 +218,8 @@ The security option values are defined as follows:
 		Certificates with throw "Incorrect Certificate" alerts when this option is active.
 		If a Certificate is not exchanged then no failure will occur since it not mandatory.
 
-
 16		REQUIRE PEER CERTIFICATE
-		This options requires and exchange of valid Certificates by both Client and Servers.
+		This options requires an exchange of valid Certificates by both Client and Servers.
 		An error will occur if no Certificate is made available or if the Certificate is not
 		Correct.
 
@@ -234,17 +234,17 @@ The security option values are defined as follows:
 128		SSL COMPATIBLE
 		when this option is set then the SSL compatible mode will be activated and as such the
 		client connection handshake will commence with an SSL V2 or V3 Hello Message. This may
-		be accepted by SSL V1, V2, V3 and TLS v1 servers. However an RFC dating from Avpril 2011
+		be accepted by SSL V1, V2, V3 and TLS v1 servers. However an RFC dating from April 2011
 		is now recommending that this is bad practice since it allows MTM attacks to influence
 		both the client and server to be misled into believing that the other party requires an
-		inferieur protocole. The RFC is strongly advocating that this v23 Client Hello should be
-		phased out as quickly as possible. In compliance with this recomendation the TLS / SSL 
+		inferior protocole. The RFC is strongly advocating that this v23 Client Hello should be
+		phased out as quickly as possible. In compliance with this recommendation the TLS / SSL 
 		functions of the Accords Platform will issue a TLS V1 Client Hello Message and as a
 		server will only communicate with Clients behaving accordingly. This requirement may be
 		relaxed by use of this option value.
 
 256		INTERNAL SSL CERTIFICATE VERIFICATION
-		This option may be set when Exchange of Self Signed Certificates by Clients and Servers
+		This option may be set when Exchange of Self-Signed Certificates by Clients and Servers
 		is required. This is necessary for instance when working with Windows Azure platforms
 		which expressly request provision of a self signed certificate by the client endpoint.
 
@@ -269,7 +269,7 @@ configuration file, when set, will cause the service component to present the cr
 authentication prior to requesting the creation of an authorization token allowing collaboration by the 
 service in the Accords Platform. This authorization credential will be presented in the OCCI/REST/HTTP 
 header of ALL Request and Response messages sent by the Client of Server endpoints of the Service component.
-For obvious reasons neither the PUBLISHER nor the COSS modules are required to perform autthentication and
+For obvious reasons neither the PUBLISHER nor the COSS modules are required to perform authentication and
 authorization though this will be introduced as a retro fit requirement at a later date.
  
 MONITORING
@@ -282,12 +282,11 @@ monitoring parameter of the installation script.
 2)	All monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
 3)	Monitoring information is sent to both the file co-log and to COMONS
 6)	Optimised Monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
-6)	Optimised Monitoring is sent to the Module COMONS, except for the PUBLISHER, COMONS and COSS
 	and to the file co-log.
 
 When COMONS monitoring is active then only the service modules started after COMONS are able to make 
 use of the centralised monitoring service. Therefore the activation of CO-LOG monitoring is necessary
-for the fundemental modules of the platform : PUBLISHER, COSS and COMONS. 
+for the fundamental modules of the platform : PUBLISHER, COSS and COMONS. 
 
 DATA
 ----

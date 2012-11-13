@@ -9,7 +9,7 @@
 
 bin_PROGRAMS = azprocci
 EXTRA_DIST = certificate.c certificate.h \
-	procciaz.c
+	procciaz.c azcontract.c
 
 azprocci_SOURCES = azprocci.c
 

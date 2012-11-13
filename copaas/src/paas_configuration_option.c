@@ -33,26 +33,32 @@ public struct paas_configuration_option * liberate_paas_configuration_option(str
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
 		if ( sptr->change_severity )
 			 sptr->change_severity = liberate(sptr->change_severity);
+		if ( sptr->default_value )
+			 sptr->default_value = liberate(sptr->default_value);
 		if ( sptr->max_length )
 			 sptr->max_length = liberate(sptr->max_length);
 		if ( sptr->max_value )
 			 sptr->max_value = liberate(sptr->max_value);
 		if ( sptr->min_value )
 			 sptr->min_value = liberate(sptr->min_value);
-		if ( sptr->regex )
-			 sptr->regex = liberate(sptr->regex);
-		if ( sptr->user_defined )
-			 sptr->user_defined = liberate(sptr->user_defined);
-		if ( sptr->value_options )
-			 sptr->value_options = liberate(sptr->value_options);
 		if ( sptr->namespace )
 			 sptr->namespace = liberate(sptr->namespace);
 		if ( sptr->option_name )
 			 sptr->option_name = liberate(sptr->option_name);
+		if ( sptr->regex )
+			 sptr->regex = liberate(sptr->regex);
+		if ( sptr->user_defined )
+			 sptr->user_defined = liberate(sptr->user_defined);
 		if ( sptr->value )
 			 sptr->value = liberate(sptr->value);
+		if ( sptr->value_options )
+			 sptr->value_options = liberate(sptr->value_options);
+		if ( sptr->value_type )
+			 sptr->value_type = liberate(sptr->value_type);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_configuration_option *) 0);
@@ -67,16 +73,19 @@ public struct paas_configuration_option * reset_paas_configuration_option(struct
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
 		sptr->change_severity = (char*) 0;
+		sptr->default_value = (char*) 0;
 		sptr->max_length = (char*) 0;
 		sptr->max_value = (char*) 0;
 		sptr->min_value = (char*) 0;
-		sptr->regex = (char*) 0;
-		sptr->user_defined = (char*) 0;
-		sptr->value_options = (char*) 0;
 		sptr->namespace = (char*) 0;
 		sptr->option_name = (char*) 0;
+		sptr->regex = (char*) 0;
+		sptr->user_defined = (char*) 0;
 		sptr->value = (char*) 0;
+		sptr->value_options = (char*) 0;
+		sptr->value_type = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -108,9 +117,17 @@ public int xmlin_paas_configuration_option(struct paas_configuration_option * sp
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"change_severity") ))
 		{
 			if ( wptr->value ) { sptr->change_severity = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"default_value") ))
+		{
+			if ( wptr->value ) { sptr->default_value = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"max_length") ))
 		{
@@ -124,18 +141,6 @@ public int xmlin_paas_configuration_option(struct paas_configuration_option * sp
 		{
 			if ( wptr->value ) { sptr->min_value = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"regex") ))
-		{
-			if ( wptr->value ) { sptr->regex = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"user_defined") ))
-		{
-			if ( wptr->value ) { sptr->user_defined = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"value_options") ))
-		{
-			if ( wptr->value ) { sptr->value_options = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"namespace") ))
 		{
 			if ( wptr->value ) { sptr->namespace = allocate_string(wptr->value); }
@@ -144,9 +149,25 @@ public int xmlin_paas_configuration_option(struct paas_configuration_option * sp
 		{
 			if ( wptr->value ) { sptr->option_name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"regex") ))
+		{
+			if ( wptr->value ) { sptr->regex = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"user_defined") ))
+		{
+			if ( wptr->value ) { sptr->user_defined = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"value") ))
 		{
 			if ( wptr->value ) { sptr->value = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"value_options") ))
+		{
+			if ( wptr->value ) { sptr->value_options = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"value_type") ))
+		{
+			if ( wptr->value ) { sptr->value_type = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -167,16 +188,19 @@ public int rest_occi_paas_configuration_option(FILE * fh,struct paas_configurati
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.change_severity='%s'\r\n",prefix,nptr,(sptr->change_severity?sptr->change_severity:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.default_value='%s'\r\n",prefix,nptr,(sptr->default_value?sptr->default_value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.max_length='%s'\r\n",prefix,nptr,(sptr->max_length?sptr->max_length:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.max_value='%s'\r\n",prefix,nptr,(sptr->max_value?sptr->max_value:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.min_value='%s'\r\n",prefix,nptr,(sptr->min_value?sptr->min_value:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.regex='%s'\r\n",prefix,nptr,(sptr->regex?sptr->regex:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.user_defined='%s'\r\n",prefix,nptr,(sptr->user_defined?sptr->user_defined:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.value_options='%s'\r\n",prefix,nptr,(sptr->value_options?sptr->value_options:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.namespace='%s'\r\n",prefix,nptr,(sptr->namespace?sptr->namespace:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.option_name='%s'\r\n",prefix,nptr,(sptr->option_name?sptr->option_name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.regex='%s'\r\n",prefix,nptr,(sptr->regex?sptr->regex:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.user_defined='%s'\r\n",prefix,nptr,(sptr->user_defined?sptr->user_defined:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.value='%s'\r\n",prefix,nptr,(sptr->value?sptr->value:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.value_options='%s'\r\n",prefix,nptr,(sptr->value_options?sptr->value_options:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.value_type='%s'\r\n",prefix,nptr,(sptr->value_type?sptr->value_type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

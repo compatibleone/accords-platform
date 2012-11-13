@@ -101,10 +101,14 @@ int deleteCategory(char categoryName[],int indice,int flag)
  char pathactbstructname[DIM];
  char pathactbstruct[DIM];
  char pathf[DIM];
+ char pathaccess[DIM];
+
 
  strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
+
+ sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
 
  sprintf(pathactstructname,"%s_",categoryName);
  sprintf(pathactstruct,"%s/%s",pathf,PY_ACT_STRUCT);
@@ -236,6 +240,8 @@ int deleteCategory(char categoryName[],int indice,int flag)
     return 0; 
  else if(!(deleteInFile(occibuilderb,occibuildername)))
     return 0;
+ else if(!(deleteInFile(pathaccess, categoryName)))
+    return 0;
  else
     return 1;
 }
@@ -248,7 +254,12 @@ int deleteCategory(char categoryName[],int indice,int flag)
 /* pathf: (char*) a path name for the directory project                                                  */
 /* return 1 if succeeded                                                                                 */
 /*-------------------------------------------------------------------------------------------------------*/
-int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *categoryActions,int flag)
+int generateAccordsCategory(
+	char *categoryName,
+	char *categoryAttributes, 
+	char *categoryActions,
+	char * categoryAccess, 
+	int flag)
 {
  FILE *f;
  char *token=NULL;
@@ -257,12 +268,14 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  char pathact[DIM];
  char pathactname[DIM];
  char pathactnumber[DIM];
+ char pathcategaccess[DIM];
  listc categoryAtr;
  listc categoryAtrB;
  listc categoryAct;
  char occipath[DIM];
  char categoryAttributesB[1024]="id";
- int indice=0;
+ int indice = 0;
+ int indiceA = 0;
  char pathf[1024];
   
  strcpy(pathf,PYPATH);
@@ -270,6 +283,7 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
  sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);
 
  if(categoryActions[0]!='\0') indice=1;
+ if(categoryAccess[0] != '\0') indiceA = 1;
 
  /*---------------------------------*/
  /*create category.h file           */
@@ -350,6 +364,14 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
      else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
          return 0;
   }
+  
+  if(indiceA)
+  {
+         sprintf(pathcategaccess,"%s/%s",PYPATH, PY_CATEGACCESS_STRUCT);
+         if(!generatePyCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
+           return 0;          
+  }
+
 
   if(!(createCategoryCordsCfile(categoryName,categoryAtr,dim,flag,pathff)))         /* create category.c file */
       return 0;
@@ -367,6 +389,67 @@ int generateAccordsCategory(char *categoryName,char *categoryAttributes, char *c
       return dim;
  
 }
+
+
+int generatePyCategoryTypeStruct(char *categoryName, char * categoryAccess, char pathf[])
+{
+	FILE *fIn;
+	FILE *fOut;
+  	int a=0;
+  	char line[256];
+  	char pathtmp[1024];
+  	char strcats[20];
+
+  	sprintf(pathtmp,"%s/pyaccords/pysrc/categaccess.tmp",PYPATH);
+  
+  	if((fIn=fopen(pathf,"r"))==NULL)
+  	{
+   		printf("Error in generate category Action struct file: No such file or directory\n");
+   		return 0;
+  	}
+  	if((fOut=fopen(pathtmp,"w")) == NULL)
+  	{
+   		fclose(fIn);
+   		printf("Error in generate category Action struct file tmp: No such file or directory\n");
+   		return 0;
+  	}
+ 
+  	while( fgets(line,256, fIn) != NULL)
+  	{
+    		if(searchWord(categoryName,line))
+    		{
+       			a=1;
+       			fprintf(fOut,"%s",line);
+    		}
+    		else
+    		{
+       			str_sub(line,0,1,strcats);
+       			if(!(strcmp(strcats,"};"))) 
+       			{
+          			break;
+       			}
+       			else 
+       			{
+         			fprintf(fOut,"%s",line);
+       			}
+    		}
+  	}
+  
+  	if(!a)
+  	{
+		fprintf(fOut,"\t{\"%s\", %s},\n",categoryName,categoryAccess);
+ 	}
+  
+  	fprintf(fOut,"};\n");
+  	fprintf(fOut,"#endif\n");
+  	fclose(fIn);
+  	fclose(fOut);
+  	if(rename(pathtmp,pathf) < 0)
+     	return 0;
+  	else
+     	return 1;
+}
+
 
 int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, char pathf[])
 {
@@ -464,18 +547,19 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
     fprintf(f,"/* ACCORDS Platform                                                              */\n"); 
     fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
     fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
-    fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+    fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");               */\n");
     fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
     fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
     fprintf(f,"/*                                                                               */\n");
     fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
     fprintf(f,"/*                                                                               */\n");
     fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
-    fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+    fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,             */\n");
     fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
     fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
     fprintf(f,"/* limitations under the License.                                                */\n");
     fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
+    fprintf(f,"\n\n/* pyaccordsSDK: This code has been generated by pyaccordsSDK                    */\n"); 
     fprintf(f,"#include \"../../occi/src/occi.h\"\n");
     fprintf(f,"#include \"ctools.h\"\n");
     fprintf(f,"#include <Python.h>\n");
@@ -641,19 +725,22 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
   else
   {
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"# Accords platform                                                            #\n");
    fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
-   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"#-----------------------------------------------------------------------------#\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");             #\n");
    fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
    fprintf(f,"# You may obtain a copy of the License at                                     #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
-   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,           #\n");
    fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
    fprintf(f,"# See the License for the specific language governing permissions and         #\n");
    fprintf(f,"# limitations under the License.                                              #\n");
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"import sys\n");
@@ -707,20 +794,22 @@ int generateCategoryActionPyfile(char *categoryName,listc categoryAtr,listc cate
   else
   {
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"# Accords platform                                                            #\n");
    fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
-   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"#-----------------------------------------------------------------------------#\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");             #\n");
    fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
    fprintf(f,"# You may obtain a copy of the License at                                     #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
-   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,           #\n");
    fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
    fprintf(f,"# See the License for the specific language governing permissions and         #\n");
    fprintf(f,"# limitations under the License.                                              #\n");
    fprintf(f,"###############################################################################\n");
-
+   fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"# Implementation of category actions\n");
@@ -785,19 +874,19 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
   fprintf(f,"/* ACCORDS Platform                                                              */\n");
   fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
   fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
-  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");               */\n");
   fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
   fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
   fprintf(f,"/*                                                                               */\n");
   fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
   fprintf(f,"/*                                                                               */\n");
   fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
-  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,             */\n");
   fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
   fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
   fprintf(f,"/* limitations under the License.                                                */\n");
   fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
-
+  fprintf(f,"\n\n/* pyaccordsSDK: This code has been generated by pyaccordsSDK                    */\n"); 
   fprintf(f,"#include \"../../occi/src/occi.h\"\n");
   fprintf(f,"#include \"ctools.h\"\n");
   fprintf(f,"#include \"listcateg.h\"\n");
@@ -941,14 +1030,14 @@ int generateCategoryInterfceStructFile(char pathf[])
   fprintf(f,"/* ACCORDS Platform                                                              */\n");
   fprintf(f,"/* copyright 2012, Hamid MEDJAHE (hmedjahed@prologue.fr)    Prologue             */\n");
   fprintf(f,"/*-------------------------------------------------------------------------------*/\n");
-  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");             */\n");
+  fprintf(f,"/* Licensed under the Apache License, Version 2.0 (the \"License\");               */\n");
   fprintf(f,"/* you may not use this file except in compliance with the License.              */\n");
   fprintf(f,"/* You may obtain a copy of the License at                                       */\n");
   fprintf(f,"/*                                                                               */\n");
   fprintf(f,"/*       http://www.apache.org/licenses/LICENSE-2.0                              */\n");
   fprintf(f,"/*                                                                               */\n");
   fprintf(f,"/* Unless required by applicable law or agreed to in writing, software           */\n");
-  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,           */\n");
+  fprintf(f,"/* distributed under the License is distributed on an \"AS IS\" BASIS,             */\n");
   fprintf(f,"/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */\n");
   fprintf(f,"/* See the License for the specific language governing permissions and           */\n");
   fprintf(f,"/* limitations under the License.                                                */\n");
@@ -1026,7 +1115,9 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
  else
  {
   fprintf(f,"###############################################################################\n");
+  fprintf(f,"# Accords platform                                                            #\n");
   fprintf(f,"# copyright 2012, Hamid MEDJAHED (hmedjahed@prologue.fr) Prologue             #\n");
+  fprintf(f,"#-----------------------------------------------------------------------------#\n");
   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
   fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
   fprintf(f,"# You may obtain a copy of the License at                                     #\n");
@@ -1039,6 +1130,7 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   fprintf(f,"# See the License for the specific language governing permissions and         #\n");
   fprintf(f,"# limitations under the License.                                              #\n");
   fprintf(f,"###############################################################################\n");
+  fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
   fprintf(f,"#!/usr/bin/env python\n");
   fprintf(f,"# -*- coding: latin-1 -*-\n");
   fprintf(f,"class C%s:\n",categoryName);
@@ -1076,19 +1168,22 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   else
   {
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"# Accords platform                                                            #\n");
    fprintf(f,"# copyright 2012, Hamid MEDJAHED    (hmedjahed@prologue.fr) Prologue          #\n");
-   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"#-----------------------------------------------------------------------------#\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");             #\n");
    fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
    fprintf(f,"# You may obtain a copy of the License at                                     #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
-   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,           #\n");
    fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
    fprintf(f,"# See the License for the specific language governing permissions and         #\n");
    fprintf(f,"# limitations under the License.                                              #\n");
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"import sys\n");
@@ -1137,20 +1232,23 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
   else
   {
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"# Accords platform                                                            #\n");
    fprintf(f,"# copyright 2012, Hamid MEDJAHED & Elyes ZEKRI (hmedjahed@prologue.fr)        #\n");
    fprintf(f,"# Prologue                                                                    #\n");
-   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
+   fprintf(f,"#-----------------------------------------------------------------------------#\n");
+   fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");             #\n");
    fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
    fprintf(f,"# You may obtain a copy of the License at                                     #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"#       http://www.apache.org/licenses/LICENSE-2.0                            #\n");
    fprintf(f,"#                                                                             #\n");
    fprintf(f,"# Unless required by applicable law or agreed to in writing, software         #\n");
-   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,         #\n");
+   fprintf(f,"# distributed under the License is distributed on an \"AS IS\" BASIS,           #\n");
    fprintf(f,"# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    #\n");
    fprintf(f,"# See the License for the specific language governing permissions and         #\n");
    fprintf(f,"# limitations under the License.                                              #\n");
    fprintf(f,"###############################################################################\n");
+   fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
    fprintf(f,"#!/usr/bin/env python\n");
    fprintf(f,"# -*- coding: latin-1 -*-\n");
    fprintf(f,"# Implementation of category CRUD functions\n");
@@ -1228,8 +1326,8 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
      i++;   
     }
     free(pelem);
-    fprintf(f,"#ifndef _%s_c_\n",categoryName);
-    fprintf(f,"#define _%s_c_\n\n",categoryName);
+    fprintf(f,"#ifndef _occi%s_c_\n",categoryName);
+    fprintf(f,"#define _occi%s_c_\n\n",categoryName);
     fprintf(f,"#include \"%s.h\"\n\n",categoryName);
     fprintf(f,"/*	--------------------------------	*/\n");
     if(!flag) fprintf(f,"/*	o c c i _ c o r d s _ %s 	        */\n",categoryName);
@@ -2111,6 +2209,21 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     fprintf(f,"\treturn;\n");
     fprintf(f,"}\n\n");
     
+    fprintf(f,"/*	------------------------------------	*/\n");
+    fprintf(f,"/*	c r u d   d e l e t e   a c t i o n 	*/\n");
+    fprintf(f,"/*	------------------------------------	*/\n");
+    if(!flag) fprintf(f,"private struct rest_response * delete_action_cords_%s(struct occi_category * optr,\n",categoryName); 
+    else fprintf(f,"private struct rest_response * delete_action_%s(struct occi_category * optr,\n",categoryName); 
+    fprintf(f,"struct rest_client * cptr,\n");  
+    fprintf(f,"struct rest_request * rptr,\n");  
+    fprintf(f,"struct rest_response * aptr,\n");  
+    fprintf(f,"void * vptr )\n");
+    fprintf(f,"{\n");
+    fprintf(f,"\taptr = liberate_rest_response( aptr );\n");
+    if(!flag) fprintf(f,"\treturn( occi_cords_%s_delete(optr,cptr,rptr));\n",categoryName);
+    else fprintf(f,"\treturn( occi_%s_delete(optr,cptr,rptr));\n",categoryName);
+    fprintf(f,"}\n");
+
     fprintf(f,"/*	------------------------------------------	*/\n");
     fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
     fprintf(f,"/*	------------------------------------------	*/\n");
@@ -2132,6 +2245,9 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
       fprintf(f,"\t\tif (!( optr = occi_add_attribute(optr, \"%s\",0,0) ))\n",nameAtr[i]);
       fprintf(f,"\t\t\treturn(optr);\n");
     }
+    if(!flag)fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_cords_%s)))\n",categoryName);
+    else fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\","",delete_action_%s)))\n",categoryName);
+    fprintf(f,"\t\t\treturn (optr);\n");
     if(!flag) fprintf(f,"\t\tautoload_cords_%s_nodes();\n",categoryName);
     else fprintf(f,"\t\tautoload_%s_nodes();\n",categoryName);
     fprintf(f,"\t\t\treturn(optr);\n");
@@ -2415,7 +2531,7 @@ int  enTete(char pathf[])
 /* pathf: (char*) path name of the project directory                                                             */
 /* return 1 if succeeded                                                                                         */
 /*---------------------------------------------------------------------------------------------------------------*/
-int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglist)
+int generateModuleFile(char * moduleName, char * categoryNameList)
 {
    char pathfd[DIM];
    char pathff[DIM];
@@ -2440,7 +2556,9 @@ int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglis
      else
      {
       fprintf(f,"###############################################################################\n");
+      fprintf(f,"# Accords platform                                                            #\n");
       fprintf(f,"# copyright 2012, Hamid MEDJAHE & Elyes ZEKRi (hmedjahed@prologue.fr) Prologue#\n");
+      fprintf(f,"#-----------------------------------------------------------------------------#\n");
       fprintf(f,"# Licensed under the Apache License, Version 2.0 (the \"License\");           #\n");
       fprintf(f,"# you may not use this file except in compliance with the License.            #\n");
       fprintf(f,"# You may obtain a copy of the License at                                     #\n");
@@ -2453,13 +2571,14 @@ int generateModuleFile(char * moduleName, char * categoryNameList,char * flaglis
       fprintf(f,"# See the License for the specific language governing permissions and         #\n");
       fprintf(f,"# limitations under the License.                                              #\n");
       fprintf(f,"###############################################################################\n");
+      fprintf(f,"\n\n# pyaccordsSDK: This code has been generated by pyaccordsSDK                  #\n"); 
       fprintf(f,"#!/usr/bin/env python\n");
       fprintf(f,"# -*- coding: latin-1 -*-\n");
       fprintf(f,"import sys\n");
       fprintf(f,"import %s\n\n",LIB_PYCOMPDEV);
       fprintf(f,"def main():\n");
       fprintf(f,"\targc=len(sys.argv)\n");
-      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\", \"%s\")\n",LIB_PYCOMPDEV,moduleName,categoryNameList,flaglist);
+      fprintf(f,"\treturn %s.launchModule(argc, sys.argv, \"%s\" ,\"%s\")\n",LIB_PYCOMPDEV,moduleName,categoryNameList);
       fprintf(f,"if __name__==\"__main__\":\n");
       fprintf(f,"\tmain()\n");
       fclose(f);

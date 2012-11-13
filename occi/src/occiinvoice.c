@@ -147,6 +147,8 @@ private void autoload_cords_invoice_nodes() {
 				pptr->total = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "taxe" )) != (struct xml_atribut *) 0)
 				pptr->taxe = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "grandtotal" )) != (struct xml_atribut *) 0)
+				pptr->grandtotal = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "reduction" )) != (struct xml_atribut *) 0)
 				pptr->reduction = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rate" )) != (struct xml_atribut *) 0)
@@ -202,6 +204,9 @@ public  void autosave_cords_invoice_nodes() {
 		fprintf(h," taxe=%c",0x0022);
 		fprintf(h,"%s",(pptr->taxe?pptr->taxe:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," grandtotal=%c",0x0022);
+		fprintf(h,"%s",(pptr->grandtotal?pptr->grandtotal:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," reduction=%c",0x0022);
 		fprintf(h,"%s",(pptr->reduction?pptr->reduction:""));
 		fprintf(h,"%c",0x0022);
@@ -250,6 +255,8 @@ private void set_cords_invoice_field(
 			pptr->total = allocate_string(vptr);
 		if (!( strcmp( nptr, "taxe" ) ))
 			pptr->taxe = allocate_string(vptr);
+		if (!( strcmp( nptr, "grandtotal" ) ))
+			pptr->grandtotal = allocate_string(vptr);
 		if (!( strcmp( nptr, "reduction" ) ))
 			pptr->reduction = allocate_string(vptr);
 		if (!( strcmp( nptr, "rate" ) ))
@@ -333,6 +340,13 @@ private int pass_cords_invoice_filter(
 		else if ( strcmp(pptr->taxe,fptr->taxe) != 0)
 			return(0);
 		}
+	if (( fptr->grandtotal )
+	&&  (strlen( fptr->grandtotal ) != 0)) {
+		if (!( pptr->grandtotal ))
+			return(0);
+		else if ( strcmp(pptr->grandtotal,fptr->grandtotal) != 0)
+			return(0);
+		}
 	if (( fptr->reduction )
 	&&  (strlen( fptr->reduction ) != 0)) {
 		if (!( pptr->reduction ))
@@ -387,6 +401,9 @@ private struct rest_response * cords_invoice_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.taxe=%s",optr->domain,optr->id,pptr->taxe);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.grandtotal=%s",optr->domain,optr->id,pptr->grandtotal);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.reduction=%s",optr->domain,optr->id,pptr->reduction);
@@ -833,6 +850,8 @@ public struct occi_category * occi_cords_invoice_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "taxe",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "grandtotal",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "reduction",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "rate",0,0) ))
@@ -936,6 +955,17 @@ public struct rest_header *  cords_invoice_occi_headers(struct cords_invoice * s
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_invoice.taxe='%s'\r\n",(sptr->taxe?sptr->taxe:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_invoice.grandtotal='%s'\r\n",(sptr->grandtotal?sptr->grandtotal:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

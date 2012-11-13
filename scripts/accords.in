@@ -6,16 +6,18 @@
 #   Prologue 2011
 #   Mandriva 2011
 #   Bull 2012
+#   CityPassenger 2012
 #
 # Author: 
 #   Jean Parpaillon
 #   Jamie Marshall
 #   Liliana Cabalantti
+#   Vincent Renardias <vincent@renardias.com>
 #
 
-set -e
+#set -e
 
-export PATH=@sitepath@:$PATH
+export PATH=@sitepath@:@bindir@:$PATH
 
 confdir=@pkgsysconfdir@
 if test -e ./accords.ini; then
@@ -27,15 +29,18 @@ fi
 # -------------------------------------
 # to activate the security using nethsm
 # set nethsm to 1
-# then specify the security directory.
+# then specify the security directory,
+# and the nagios configuration file
 # -------------------------------------
 # nethsm=1
+# nagios=/usr/local/etc/accords/accords-nagios.cfg
 tls=security
 # -------------------------------------
-# sans security 
+# with neither security nor monitoring 
 # -------------------------------------
-nethsm=
 # tls=
+nethsm=
+nagios=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls
@@ -47,7 +52,26 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
-#logdir=/var/log/accords
+
+if [ `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
+
+    if [ -z "$accords_workdir" ]; then
+         accords_workdir="."
+    fi
+
+    if [ ! -d "$accords_workdir" ]; then
+         echo "$accords_workdir: no such directory"
+         exit 1
+    fi
+
+    if [ ! -d "$accords_workdir/rest" ]; then
+         echo "$accords_workdir/rest: no such directory"
+         exit 1
+    fi
+
+fi
+
+cd $accords_workdir
 
 if [ -z "$tls" ]; then
     tempo=1
@@ -57,6 +81,14 @@ fi
 
 if [ -z "$target" ]; then
     target=accords.xml
+fi
+
+if [ `basename $0` != "accords-config" -a `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
+    if test ! -e $accords_workdir/$target; then
+	echo "Can not find target file: $accords_workdir/$target."
+	echo "Please run accords-config first !"
+	exit 1
+    fi
 fi
 
 if [ -z "$resthost" ]; then
@@ -79,168 +111,230 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-if [ -z "$logdir" ]; then
-        logdir="."
-fi
-
-if [ ! -d "$logdir" ]; then
-        echo "$logdir: no such directory"
-        exit 1
-fi
-
-if [ ! -d "$logdir/rest" ]; then
-        echo "$logdir/rest: no such directory"
-        exit 1
-fi
-
 ###
 ### Aliases
 ###
 ### The script must be called through one of the following aliases.
 ###
-# aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-coips run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-copaas run-jpaasprocci run-procci run-cosched run-publisher accords-config"
 aliases="@aliases@"
 
-_co_start() {
-    echo "Starting ACCORDS"
+_co_run_serv() {
+    serv=$1
+    name=$2
+    if [ -z "$serv" ]; then
+        return 0
+    fi
+    if [ -z "$name" ]; then
+        name=$serv
+    fi
+    which run-$serv 2>/dev/null >/dev/null
+    if [ $? -eq 0 ]; then
+        echo "Starting $name"
+        run-$serv &
+        sleep $tempo
+    else
+        echo "NOT starting $name"
+    fi
+}
 
-    echo "Starting accords publication services"
-    @bindir@/run-publisher &
-    sleep $tempo
+_co_platform() {
+    echo "Starting ACCORDS Platform"
 
-    echo "Starting accords file services"
-    @bindir@/run-fileserver &
-    sleep $tempo
-    
-    echo "Starting accords security services"
-    @bindir@/run-coss &
-    sleep $tempo
+# ---------------------------------------------------
+#       The basic accords platform components
+# ---------------------------------------------------
 
-    echo "Starting accords monitoring services"
-    @bindir@/run-comons &
-    sleep $tempo
-    
-    echo "Starting accords accounting services"
-    @bindir@/run-coobas &
-    sleep $tempo
-    
-    echo "Starting accords networking services"
-    @bindir@/run-conets &
-    sleep $tempo
+    _co_run_serv publisher "accords publication services"
+    _co_run_serv fileserver "accords file services"
+    _co_run_serv coss "accords security services" 
+    _co_run_serv comons "accords monitoring services"
+    _co_run_serv coobas "accords accounting services"
+    _co_run_serv cosched "accords scheduling services" 
+    _co_run_serv conets "accords networking services"
+    _co_run_serv cops "accords placement services"
+    _co_run_serv coees "accords energy efficiency services"
+    _co_run_serv ezvm "accords image storage services"
+    _co_run_serv coips "accords image production services"
+    _co_run_serv slam "accords sla services"
+    _co_run_serv copaas "accords paas services"
+    _co_run_serv conagios "accords nagios services"
+    _co_run_serv parser "accords parser services"
+    _co_run_serv broker "accords broker services"
+    _co_run_serv procci "accords procci services"
 
-    echo "Starting accords placement services"
-    @bindir@/run-cops &
-    sleep $tempo
-    
-    echo "Starting accords energy efficiency services"
-    @bindir@/run-coees &
-    sleep $tempo
-    
-    echo "Starting accords image storage services"
-    @bindir@/run-ezvm &
-    sleep $tempo
+# ---------------------------------------------------
+#       The provisioning services agreements 
+# ---------------------------------------------------
+    secs=20
+    echo "Please wait $secs seconds while starting the provisioning services agreements"
+    for i in $(seq 1 $secs)
+    do 
+       sleep 1
+       echo -n "."
+    done
+    echo
+    co-parser accounts
+    co-parser metrics
+    co-parser coips
 
-    echo "Starting accords image production services"
-    @bindir@/run-coips &
-    sleep $tempo
+    echo "ACCORDS Platform Started"
+}
 
-    echo "Starting accords parser services"
-    @bindir@/run-parser &
+_co_run_prov () {
+    procci=$1
+    oper=$2
+    msg=$3
+    params="$4 $5 $6 $7 $8" 	
+    echo "Starting $msg"
+    co-provider $procci accords $params
+    co-parser quota-$procci
+    co-parser sla-$procci
+    run-$procci &
     sleep $tempo
+}
 
-    echo "Starting accords broker services"
-    @bindir@/run-broker &
-    sleep $tempo
+_co_provision()
+{
+# ---------------------------------------------------
+#    The accords platform provisioning components
+# ---------------------------------------------------
+    echo "Starting ACCORDS Provisioning"
 
-    echo "Starting accords procci services"
-    @bindir@/run-procci &
-    sleep $tempo
+    _co_run_prov osprocci accords "accords open stack services" 30 10 1000 30 30
+    _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
+    _co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
+    _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
+    _co_run_prov dcprocci accords "accords delta cloud services" 1 1 1000 1 1
+    _co_run_prov jpaasprocci accords "accords jpaas procci services" 10 10 1000 10 10
 
-    echo "Starting accords scheduling services"
-    @bindir@/run-cosched &
-    sleep $tempo
+# ---------------------------------------------------
+#    These have been commented out since they are 
+#    not currently being used by an active platform
+# ---------------------------------------------------
+#    echo "Starting accords occi open stack services"
+#    @bindir@/run-osocciprocci &
+#    sleep $tempo
+# ---------------------------------------------------
+#    echo "Starting accords test occi open stack server"
+#    @bindir@/run-testosocci &
+#    sleep $tempo
+# ---------------------------------------------------
+#    echo "Starting accords procci example"
+#    @bindir@/run-example &
+#    sleep $tempo
+# ---------------------------------------------------
 
-    echo "Starting accords open stack services"
-    @bindir@/run-osprocci &
-    sleep $tempo
+    _co_run_serv cosacs "accords software configuration services"
 
-    echo "Starting accords proactive services"
-    run-paprocci &
-    sleep $tempo
+    echo "ACCORDS Provisioning Started"
+}
 
-    echo "Starting accords test occi open stack server"
-    @bindir@/run-testosocci &
-    sleep $tempo
-
-    echo "Starting accords occi open stack services"
-    @bindir@/run-osocciprocci &
-    sleep $tempo
-
-    echo "Starting accords open nebula services"
-    @bindir@/run-onprocci &
-    sleep $tempo
-    
-    echo "Starting accords windows azure services"
-    @bindir@/run-azprocci &
-    sleep $tempo
-
-    echo "Starting accords delta cloud services"
-    @bindir@/run-dcprocci &
-    sleep $tempo
-
-    echo "Starting accords sla services"
-    @bindir@/run-slam &
-    sleep $tempo
-
-    echo "Starting accords paas services"
-    @bindir@/run-copaas &
-    sleep $tempo
-
-    echo "Starting accords jpaas procci services"
-    @bindir@/run-jpaasprocci &
-    sleep $tempo
-
-    echo "Starting accords procci example"
-    @bindir@/run-example &
-    sleep $tempo
-
-    echo "Starting accords software configuration services"
-    @bindir@/run-cosacs &
-    sleep $tempo
-
-    echo "ACCORDS ready"
-    @bindir@/co-status
+_co_start()
+{
+	_co_platform
+	_co_provision
+	_nagios_start
 }
 
 _co_broker() {
     if [ -z "$tls" ]; then
-	@bindir@/testcb --publisher "$publisher" --verbose plan_$1.xml
+	testcb --publisher "$publisher" --verbose plan_$1.xml
     else
-	@bindir@/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+	testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
     fi
 } 
 
 _co_command() {
     if [ -z "$tls" ]; then
-	@bindir@/command --publisher "$publisher" $*
+	/usr/local/bin/command --publisher "$publisher" $*
     else
-	@bindir@/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+	/usr/local/bin/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
     fi
 }
 
 _co_parser() {
     if [ -z "$tls" ]; then
-	@bindir@/testcp --publisher "$publisher" --verbose $2 $1.xml
+	testcp --publisher "$publisher" --verbose $2 $1.xml
     else
-	@bindir@/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
+	testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
     fi
 }
 
+_co_provider() {
+
+name=$1
+operator=$1
+cpu=$3
+ram=$4
+disk=$5
+vm=$6
+adr=$7
+
+if [ -z "$cpu" ]; then
+cpu=10
+fi
+
+if [ -z "$ram" ]; then
+ram=10
+fi
+
+if [ -z "$disk" ]; then
+disk=1000
+fi
+
+if [ -z "$vm" ]; then
+vm=10
+fi
+
+if [ -z "$adr" ]; then
+adr=10
+fi
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > quota-$name.xml
+echo "<provider name=\"$name\" operator=\"$name\" zone=\"europe\" " > quota-$name.xml
+echo " xmlns=\"http://www.compatibleone.fr/schemes/provision.xsd\">" >> quota-$name.xml 
+echo "<quota name=\":cpu\" property=\"occi.compute.cores\" offered=\"$cpu\">" >> quota-$name.xml 
+echo "<price name=\":cpu:price\" operator=\"$name\" rate=\"0.04\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":ram\" property=\"occi.compute.memory\" offered=\"$ram\">" >> quota-$name.xml 
+echo "<price name=\":ram:price\" operator=\"$name\" rate=\"0.01\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":disk\" property=\"occi.storage.size\" offered=\"$disk\">" >> quota-$name.xml 
+echo "<price name=\":disk:price\" operator=\"$name\" rate=\"0.03\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":vm\" property=\"accords.vm.count\" offered=\"$vm\">" >> quota-$name.xml 
+echo "<price name=\":vm:price\" operator=\"$name\" rate=\"1.00\" currency=\"euro\" fixed=\"true\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":adr\" property=\"accords.address.count\" offered=\"$adr\">" >> quota-$name.xml 
+echo "<price name=\":adr:price\" operator=\"$name\" rate=\"0.05\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "</provider>" >> quota-$name.xml
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > sla-$name.xml
+echo "<agreement name=\"$name\" xmlns=\"http://www.compatibleone.fr/schemes/slam.xsd\" initiator=\"$operator\" responder=\"accords\" serviceprovider=\"initiator\" description=\"generated provider SLA\" initiation=\"now\" expiration=\"never\" template=\"none\">" >> sla-$name.xml 
+echo "<terms name=\"$name:services\" type=\"services\">" >> sla-$name.xml 
+echo "<term name=\"$name:service1\">" >> sla-$name.xml 
+echo "<provider name=\"$name\">" >> sla-$name.xml 
+echo "</manifest>" >> sla-$name.xml
+echo "</term>" >> sla-$name.xml
+echo "</terms>" >> sla-$name.xml
+echo "<terms name=\"$name:conditions\" type=\"conditions\">" >> sla-$name.xml 
+echo "<term name=\"$name:condition1\">" >> sla-$name.xml 
+echo "<variable name=\"$name:v1\" property=\"occi.placement.algorithm\" condition=\"eq\" value=\"zone\"/>" >> sla-$name.xml 
+echo "<variable name=\"$name:v2\" property=\"occi.placement.zone\" condition=\"eq\" value=\"europe\"/>" >> sla-$name.xml 
+echo "</term>" >> sla-$name.xml
+echo "</terms>" >> sla-$name.xml
+echo "<terms name=\"accords:guarantees\" type=\"guarantees\"/>" >> sla-$name.xml 
+echo "</agreement>" >> sla-$name.xml
+
+}
+
+
 _co_resolver() {
     if [ -z "$tls" ]; then
-	@bindir@/testresolver --publisher "$publisher" $*
+	testresolver --publisher "$publisher" $*
     else
-	@bindir@/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+	testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
     fi
 }
 
@@ -249,7 +343,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -265,6 +359,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep cosched || true
 	lsof -i | grep LISTEN | grep ezvm || true
 	lsof -i | grep LISTEN | grep coips || true
+	lsof -i | grep LISTEN | grep conagios || true
 	lsof -i | grep LISTEN | grep cosacs || true
     else
 	echo "Unsupported OS ($(uname -s))"
@@ -273,11 +368,11 @@ _co_status() {
 }
 
 _co_stop() {
+    _nagios_stop
     _stop_service cosacs
     _stop_service example
     _stop_service slam
     _stop_service jpaasprocci
-    _stop_service copaas
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -289,6 +384,8 @@ _co_stop() {
     _stop_service procci
     _stop_service broker
     _stop_service parser
+    _stop_service copaas
+    _stop_service conagios
     _stop_service ezvm
     _stop_service coips
     _stop_service coees
@@ -302,110 +399,114 @@ _co_stop() {
 }
 
 _run_azprocci() {
-    @bindir@/azprocci --config $target CO-AZPROCCI/1.0
+    azprocci --config $target CO-AZPROCCI/1.0
 } 
 
 _run_broker() {
-    @bindir@/broker --config $target CO-BROKER/1.0
+    broker --config $target CO-BROKER/1.0
 } 
 
 _run_cops() {
-    @bindir@/cops --config $target CO-ES/1.0
+    cops --config $target CO-ES/1.0
 } 
 
 _run_coees() {
-    @bindir@/coees --config $target CO-EES/1.0
+    coees --config $target CO-EES/1.0
 } 
 
 _run_comons() {
-    @bindir@/comons --config $target CO-MONS/1.0
+    comons --config $target CO-MONS/1.0
 }
 
 _run_conets() {
-    @bindir@/conets --config $target CO-NETS/1.0
+    conets --config $target CO-NETS/1.0
 }
 
 _run_coobas() {
-    @bindir@/coobas --config $target CO-BAS/1.0
+    coobas --config $target CO-BAS/1.0
 }
 
 _run_cosacs() {
-    @bindir@/cosacs --config $target CO-SACS/1.0
+    cosacs --config $target CO-SACS/1.0
 }
 
 _run_coss() {
-    @bindir@/coss --config $target CO-SS/1.0
+    coss --config $target CO-SS/1.0
 }
 
 _run_ezvm() {
-    @bindir@/ezvm --config $target CO-EZVM/1.0
+    ezvm --config $target CO-EZVM/1.0
 }
 
 _run_coips() {
-    @bindir@/coips --config $target CO-IPS/1.0
+    coips --config $target CO-IPS/1.0
 }
 
 _run_fileserver() {
-    @bindir@/fileserver --config $target CO-FS/1.0
+    fileserver --config $target CO-FS/1.0
 }
 
 _run_onprocci() {
-    @bindir@/onprocci --config $target CO-ONPROCCI/1.0
+    onprocci --config $target CO-ONPROCCI/1.0
 }
 
 _run_osprocci() {
-    @bindir@/osprocci --config $target CO-OSPROCCI/1.0
+    osprocci --config $target CO-OSPROCCI/1.0
 }
 
 _run_paprocci() {
-    paprocci --config $target CO-PAPROCCI/1.0
+    JDK=$(readlink -f /usr/bin/java| sed "s:/jre/bin/java::") LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386 paprocci --config $target CO-PAPROCCI/1.0
 }
 
 _run_osocciprocci() {
-    @bindir@/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+    osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
 _run_testosocci() {
-    @bindir@/testosocci --config $target CO-TESTOSOCCI/1.0
+    testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
 _run_slam() {
-    @bindir@/slam --config $target CO-SLAM/1.0
+    slam --config $target CO-SLAM/1.0
 }
 
 _run_copaas() {
-    @bindir@/copaas --config $target CO-PAAS/1.0
+    copaas --config $target CO-PAAS/1.0
+}
+
+_run_conagios() {
+    conagios --config $target CO-NAGIOS/1.0
 }
 
 _run_jpaasprocci() {
-    @bindir@/jpaasprocci --config $target CO-JPAASPROCCI/1.0
+    jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
 _run_example() {
-    @bindir@/example --config $target CO-EXAMPLE/1.0
+    example --config $target CO-EXAMPLE/1.0
 }
 
 _run_dcprocci() {
-    @bindir@/dcprocci --config $target CO-DCPROCCI/1.0
+    dcprocci --config $target CO-DCPROCCI/1.0
 }
 
 _run_parser() {
-    @bindir@/parser --config $target CO-PARSER/1.0
+    parser --config $target CO-PARSER/1.0
 }
 
 _run_procci() {
-    @bindir@/procci --config $target CO-PROCCI/1.0
+    procci --config $target CO-PROCCI/1.0
 }
 _run_cosched() {
-    @bindir@/cosched --config $target CO-SCHED/1.0
+    cosched --config $target CO-SCHED/1.0
 }
  
 _run_publisher() {
-    @bindir@/publisher --config $target CO-PUB/1.0
+    publisher --config $target CO-PUB/1.0
 }
 
 _run_fileserver() {
-    @bindir@/fileserver --config $target CO-FS/1.0
+    fileserver --config $target CO-FS/1.0
 }
 
 _make_security_files() {
@@ -433,6 +534,7 @@ _make_security_files() {
 	_mksecs dcprocci 1
 	_mksecs slam 1
 	_mksecs copaas 1
+	_mksecs conagios 1
 	_mksecs jpaasprocci 1
 	_mksecs example 1
 	_mksecs command
@@ -454,6 +556,9 @@ _accords_config() {
 	echo "Creating Accords Security Files"
     
 	export calist=Certificates.crt
+	if [ -f /etc/accords/Certificates.crt ]; then
+		export calist=/etc/accords/Certificates.crt
+	fi
 	export pass=Accords
 
 	if [ -z "$nethsm" ]; then 
@@ -505,6 +610,7 @@ _accords_config() {
 		_mkcert dcprocci
 		_mkcert slam
 		_mkcert copaas
+		_mkcert conagios
 		_mkcert jpaasprocci
 		_mkcert example
 		_mkcert cosacs
@@ -520,6 +626,7 @@ _accords_config() {
     fi
 
     echo "Creating Accords Port Configuration : ports.xml"
+    echo "Creating Accords Nagios Configuration : " $nagios
 
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ports.xml
     echo "<import name=\"accords-ports\" xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> ports.xml
@@ -528,6 +635,8 @@ _accords_config() {
     echo "Creating Accords Global Configuration File: $target"
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $target
     echo "<accords>" >> $target
+
+    _initnag
 
     _mkpub publisher
     _mkmon coss 
@@ -538,13 +647,13 @@ _accords_config() {
     _mkcfg parser 
     _mkcfg broker 
     _mkcfg procci 
-    _mkcfg osprocci  
-    _mkcfg paprocci  
+    _mkpro osprocci  
+    _mkpro paprocci  
     _mkcfg testosocci
-    _mkcfg osocciprocci  
-    _mkcfg onprocci
-    _mkcfg azprocci
-    _mkcfg dcprocci
+    _mkpro osocciprocci  
+    _mkpro onprocci
+    _mkpro azprocci
+    _mkpro dcprocci
     _mkcfg fileserver
     _mkcfg ezvm
     _mkcfg coips
@@ -552,9 +661,12 @@ _accords_config() {
     _mkcfg cosched
     _mkcfg slam
     _mkcfg copaas
-    _mkcfg jpaasprocci
+    _mkcfg conagios
+    _mkpro jpaasprocci
     _mkcfg example
     _mkcosacs cosacs
+
+    _termnag
 
     echo "</accords>" >> $target
     echo "</network>" >> ports.xml
@@ -575,8 +687,8 @@ _stop_service() {
     service=$1
     echo "Stopping service: $service"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	killall -q $service || true
-	killall -q lt-$service || true
+	killall -u $(whoami) -q $service || true
+	killall -u $(whoami) -q lt-$service || true
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	killall $service >/dev/null 2>&1 || true
 	killall lt-$service >/dev/null 2>&1 || true
@@ -660,6 +772,7 @@ _mkpub() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\"${module}\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 _mkmon() {
@@ -681,6 +794,7 @@ _mkmon() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
 _mkcosacs() {
@@ -703,6 +817,165 @@ _mkcosacs() {
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\"8286\" to=\"8286\"/>" >> ports.xml
 }
 
+# -------------------------------------------
+# addition of accords configuration to nagios
+# -------------------------------------------
+_nagios_stop() {
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		if [ -f "/usr/local/nagios/etc/nagios.cfg" ]; then
+			echo "restarting nagios for the accords platform"	
+			echo "# accords platform shutdown" > $nagios.active
+			service nagios restart
+		else
+			echo "nogios is not installed"
+		fi
+	fi
+}
+
+# -------------------------------------------
+# addition of accords configuration to nagios
+# -------------------------------------------
+_nagios_start() {
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		if [ -f "/usr/local/nagios/etc/nagios.cfg" ]; then
+			var=`grep accords /usr/local/nagios/etc/nagios.cfg`
+			if [ -z "$var" ]; then
+				echo "configuration of nagios for accords platform"
+				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg	
+				echo "# CompatibleOne Small Accords Platform " >> /usr/local/nagios/etc/nagios.cfg
+				echo "# ------------------------------------ " >> /usr/local/nagios/etc/nagios.cfg
+				echo "cfg_file=$nagios.active" >> /usr/local/nagios/etc/nagios.cfg
+			else
+				echo "nagios already configured for accords platform"
+			fi	
+			echo "restarting nagios for the accords platform"	
+			cp $nagios $nagios.active
+			service nagios restart
+		else
+			echo "nogios is not installed"
+		fi
+	fi
+}
+
+# -------------------------
+# nagios configuration file
+# -------------------------
+_initnag() {
+	if [ -z "$nagios" ]; then
+		return;
+	else
+		echo "# ---------------------- " 		>  $nagios
+		echo "# small accords platform " 		>> $nagios
+		echo "# ---------------------- " 		>> $nagios
+		echo "#  nagios configuration  " 		>> $nagios
+		echo "# ---------------------- " 		>> $nagios
+
+# ----------------------------------
+#	nagios period definition
+# ----------------------------------
+		echo "define timeperiod { " 	  		>> $nagios
+		echo "  timeperiod_name  whenever " 		>> $nagios
+		echo "  alias 'no specific time' " 		>> $nagios
+		echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios command definitions
+# ----------------------------------
+		echo "define command { " 	  		>> $nagios
+		echo "  command_name  check_occi " 		>> $nagios
+		if [ -z "$tls" ]; then
+			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ -u /-/ -p \$ARG1\$ -e 'Bad Request Expected Host' " >> $nagios
+		else
+			echo "  command_line  /usr/local/nagios/libexec/check_http -I \$HOSTADDRESS\$ --ssl -u /-/ -p \$ARG1\$ -e 'Bad Request Expected Host' " >> $nagios
+		fi
+		echo "} " 			 		>> $nagios
+
+		echo "define command { " 	  		>> $nagios
+		echo "  command_name  nothing " 		>> $nagios
+		echo "  command_line  test    "			>> $nagios
+		echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios contact definition
+# ----------------------------------
+		echo "define contact { " 	  		>> $nagios
+		echo "  contact_name  supervisor " 		>> $nagios
+		echo "  host_notifications_enabled 1" 		>> $nagios
+		echo "  service_notifications_enabled 1" 	>> $nagios
+		echo "  host_notification_options	n " 	>> $nagios
+		echo "  service_notification_options	n" 	>> $nagios
+		echo "  host_notification_commands nothing" 	>> $nagios
+		echo "  service_notification_commands nothing" 	>> $nagios
+		echo "} " 			 		>> $nagios
+
+# --------------------------------------
+#	nagios contact group definition
+# --------------------------------------
+		echo "define contactgroup{ "			>> $nagios
+		echo " contactgroup_name accords "		>> $nagios
+		echo " alias 'AccordsPlatform ContactGroup' "	>> $nagios
+		echo "} " 			 		>> $nagios
+
+# --------------------------------------
+#	nagios service group definition
+# --------------------------------------
+		echo "define servicegroup { " 			>> $nagios
+		echo "  servicegroup_name accords "		>> $nagios
+		echo "  alias 'AccordsPlatform ServiceGroup' "	>> $nagios
+		echo "} " 			 		>> $nagios
+
+# ----------------------------------
+#	nagios host definition
+# ----------------------------------
+		echo "define host { " 		 		>> $nagios
+		echo "  host_name  accords" 			>> $nagios
+		echo "  alias      'Small Accords Platform' " 	>> $nagios
+		echo "  address " $resthost 			>> $nagios
+		echo "  max_check_attempts  2 "			>> $nagios
+		echo "  active_checks_enabled 1 "		>> $nagios
+		echo "  contacts supervisor "			>> $nagios
+		echo "  normal_check_interval 5 "		>> $nagios
+		echo "  retry_check_interval 1 "		>> $nagios
+		echo "  contact_groups	accords "		>> $nagios		
+		echo "} " 			 		>> $nagios
+	fi
+}
+
+_mknag() {
+	if [ -z "$nagios" ]; then
+		return;
+	else
+		module=$1
+		echo "define service { " 			>> $nagios
+		echo "  use generic-service" 			>> $nagios
+		echo "  servicegroups accords "			>> $nagios
+		echo "  host_name accords " 			>> $nagios
+		echo "  service_description accords:$module "   >> $nagios
+		echo "  check_command check_occi!$restport "    >> $nagios
+		echo "  active_checks_enabled 1 "		>> $nagios
+		echo "  max_check_attempts  4 "			>> $nagios
+		echo "  normal_check_interval 5 "		>> $nagios
+		echo "  retry_check_interval 1 "		>> $nagios
+		echo "  contacts supervisor "			>> $nagios
+		echo "  contact_groups	accords "		>> $nagios		
+		echo "}" 					>> $nagios
+	fi
+}
+
+_termnag() {
+	if [ -z "$nagios" ]; then
+		echo "nagios is not required"
+	else
+		echo "#------------ " 				>> $nagios
+		echo "# end of file " 				>> $nagios
+		echo "#------------ " 				>> $nagios
+	fi
+}
+
 _mkcfg() {
     module=$1
     export restport=$(($restport+1))
@@ -722,19 +995,40 @@ _mkcfg() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
 }
 
-if test "`basename $0`" != "accords-config"; then
-    if test ! -e $target; then
-	echo "Can not find target file: $target."
-	echo "Please run accords-config first !"
-	exit 1
-    fi
-fi
+_mkpro() {
+    module=$1
+    export restport=$(($restport+1))
+    echo "<"${module} >> $target
+    echo "    publisher='"$publisher"'"           >> $target
+    echo "    operator='"${module}"'"               >> $target
+    echo "    identity='"$resthost":"$restport"'" >> $target
+    echo "    verbose='"$verbose"'"   >> $target
+    echo "    debug='"$debug"'"       >> $target
+    echo "    threads='"$threads"'>"  >> $target
+    echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+    echo "    <security" >> $target
+    echo "         user='service-"${module}"'" >> $target
+    echo "         password='"$password"'" >> $target
+    echo "         monitor='"$monitor"'" >> $target
+    _mktls ${module}
+    echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+    echo "</"${module}">" >> $target
+    echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
+    _mknag $module
+}
 
 case `basename $0` in
     co-start) 
 	_co_start $*
+	;;
+    co-provision) 
+	_co_provision $*
+	;;
+    co-platform) 
+	_co_platform $*
 	;;
     co-broker) 
 	_co_broker $*
@@ -744,6 +1038,9 @@ case `basename $0` in
 	;;
     co-parser) 
 	_co_parser $*
+	;;
+    co-provider) 
+	_co_provider $*
 	;;
     co-resolver)
 	_co_resolver $*
@@ -807,6 +1104,9 @@ case `basename $0` in
 	;;
     run-copaas)
 	_run_copaas $*
+	;;
+    run-conagios)
+	_run_conagios $*
 	;;
     run-jpaasprocci)
 	_run_jpaasprocci $*

@@ -826,9 +826,10 @@ private	char *	cosacs_connection_monitor(
 	/* -------------------- */
 	/* link monitor control */
 	/* -------------------- */
-	if (!( yptr = occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	occi_create_link( monitor, control, _CORDS_CONTRACT_AGENT, default_tls() );
 
 	return( monitor );
+
 }
 
 /*	-----------------------------------------------------------	*/
@@ -878,7 +879,7 @@ private	int	cosacs_monitoring_instruction(
 	/* --------------------------------------------------------- */
 	/* retrieve or create and link a connection for this session */
 	/* --------------------------------------------------------- */
-	else if (!( connection = cosacs_monitoring_connection( instruction, session, account )))
+	if (!( connection = cosacs_monitoring_connection( instruction, session, account )))
 		return( 118 );
 
 	/* -------------------------------- */
@@ -912,6 +913,7 @@ private	int	cosacs_monitoring_instruction(
 	else if (!( monitor = cosacs_connection_monitor( account, session, connection, probe, metric, control ) ))
 		return( 118 );
 	else	return( 0 );
+
 }
 
 
@@ -1011,12 +1013,21 @@ public	int	cosacs_metadata_instructions(
 		{
 			if ( check_debug() )
 			{
-				sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
+				sprintf(duffer,"cosacs::metadata(%s,%s)","account",account);
 				rest_log_debug( duffer );
 			}
-			if (!( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) ))
-				rest_log_debug("end::cosacs::metadata::static");
-			else	rest_log_debug("error::cosacs::metadata::cosacs");
+			if (!( cosacs_create_metadata( cosacs, (char *) 0, "account",  account  ) ))
+			{
+				if ( check_debug() )
+				{
+					sprintf(duffer,"cosacs::metadata(%s,%s)","cosacs",cosacs);
+					rest_log_debug( duffer );
+				}
+				if (!( cosacs_create_metadata( cosacs, (char *) 0, "cosacs",    cosacs    ) ))
+					rest_log_debug("end::cosacs::metadata::static");
+				else	rest_log_debug("error::cosacs::metadata::cosacs");
+			}
+			else	rest_log_debug("error::cosacs::metadata::account");
 		}
 		else	rest_log_debug("error::cosacs::metadata::contract");
 	}

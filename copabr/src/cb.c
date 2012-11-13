@@ -1528,7 +1528,7 @@ private	struct	occi_request  * cords_add_provider_attribute(
 /*	---------------------------------------------------------	*/
 private	char *	cords_cops_operation( 
 	struct cords_placement_criteria * selector, 
-	char * agent, char * tls )
+	char * account, char * agent, char * tls )
 {
 	struct	occi_action	* aptr;
 	struct	occi_client 	* kptr;
@@ -1569,6 +1569,7 @@ private	char *	cords_cops_operation(
 			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , selector->provider ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.name"     , "" 		  ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.solution" , "" 		  ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.account"  , account		  ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , selector->node     ) )))
 			{
 				qptr = occi_remove_request( qptr );
@@ -1583,12 +1584,6 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.algorithm", "default" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->zone )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.zone", selector->zone ) )))
@@ -1597,21 +1592,9 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.zone", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->energy )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.energy", selector->energy ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.energy", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1626,21 +1609,9 @@ private	char *	cords_cops_operation(
 				kptr = occi_remove_client( kptr );
 				continue;
 			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.opinion", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
 
 			if (( selector->security )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.security", selector->security ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.security", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1655,21 +1626,8 @@ private	char *	cords_cops_operation(
 				continue;
 			}
 
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.operator", "" ) ))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-
 			if (( selector->price )
 			&&  (!(dptr=occi_request_element(qptr,"occi.placement.price", selector->price ) )))
-			{
-				qptr = occi_remove_request( qptr );
-				kptr = occi_remove_client( kptr );
-				continue;
-			}
-			else if (!(dptr=occi_request_element(qptr,"occi.placement.price", "" ) ))
 			{
 				qptr = occi_remove_request( qptr );
 				kptr = occi_remove_client( kptr );
@@ -1756,7 +1714,7 @@ private	char *	cords_cops_operation(
 /*	----------------------------------------------------------	*/
 /*		c o r d s _ s e l e c t _ p r o v i d e r		*/
 /*	----------------------------------------------------------	*/
-private	char *	cords_select_provider( struct cords_placement_criteria * selector, char * agent, char * tls )
+private	char *	cords_select_provider( struct cords_placement_criteria * selector, char * account, char * agent, char * tls )
 {
 	struct	occi_response 	* zptr;
 	struct	occi_response 	* yptr;
@@ -1766,7 +1724,7 @@ private	char *	cords_select_provider( struct cords_placement_criteria * selector
 	/* ------------------------------------------------------ */
 	/* allow the COPS elastic placement engine to do its work */
 	/* ------------------------------------------------------ */
-	if (( solution = cords_cops_operation( selector, agent, tls )) != (char *) 0)
+	if (( solution = cords_cops_operation( selector, account, agent, tls )) != (char *) 0)
 		return( solution );
 	
 	/* ------------------------------------------------------ */
@@ -1864,7 +1822,7 @@ private	char * 	cords_contract_provider(
 	else 
 	{
 		set_placement_criteria( &App->selector, cptr->value, id );
-		if (!( zptr = cords_select_provider( &App->selector, agent, tls ) ))
+		if (!( zptr = cords_select_provider( &App->selector, App->account, agent, tls ) ))
 			return( zptr );
 	}
 
@@ -3637,7 +3595,7 @@ private	int	cords_analyse_conditions(
 /* 	this function retrieves placement conditions from	*/
 /*	the sla terms defined conditions block.			*/
 /*	-------------------------------------------------	*/
-private	int	cords_retrieve_conditions( 
+public	int	cords_retrieve_conditions( 
 		char * host,
 		char * slaid, 
 		struct occi_response * zptr,
@@ -4139,7 +4097,6 @@ public	char *	cords_service_broker(
 	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
 		return( cords_terminate_provisioning( status, &CbC ) );
 	
-
 	/* -------------------------------------------- */
 	/* perform SLA guarantee instruction processing */
 	/* -------------------------------------------- */
@@ -4153,7 +4110,6 @@ public	char *	cords_service_broker(
 	if (( CbC.release )
 	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
-	
 
 	/* -------------------------------------------- */
 	/* perform interface methods action  processing */
@@ -4266,80 +4222,85 @@ public	char *	cords_manifest_broker(
 		return( cords_terminate_provisioning( status, &CbC ) );
 	else if (!( aptr = document_atribut( CbC.document, _CORDS_ID )))
 		return( cords_terminate_provisioning( 911, &CbC ) );
+
 	else if (!( CbC.instID = occi_unquoted_value( aptr->value ) ))
 		return( cords_terminate_provisioning( 912, &CbC ) );
 	else	CgC.service = CbC.instID;
 
-	for (	eptr=cords_first_link( CbC.manifest );
-		eptr != (struct occi_element *) 0;
-		eptr = eptr->next )
+	if (!( rest_valid_string( sla ) ))
 	{
-		if (!( eptr->value ))
-			continue;
-		if (!( id =  occi_unquoted_link( eptr->value ) ))
-			continue;
-		else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
-			return( cords_terminate_provisioning( 913, &CbC ) );
-		else	
+
+		for (	eptr=cords_first_link( CbC.manifest );
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
 		{
-			/* ----------------------- */
-			/* add to list of contracts */
-			/* ----------------------- */
-			if (!( mptr->previous = CbC.document->last ))
-				CbC.document->first = mptr;
-			else 	mptr->previous->next = mptr;
-			CbC.document->last = mptr;
-			id = liberate( id );
-			CbC.nodes++;
-			continue;
+			if (!( eptr->value ))
+				continue;
+			if (!( id =  occi_unquoted_link( eptr->value ) ))
+				continue;
+			else if (!( mptr = cords_instance_node( &CpC, &CgC, host, id, agent, tls, sla, CbC.namePlan, CbC.accID, CbC.accName ) ))
+				return( cords_terminate_provisioning( 913, &CbC ) );
+			else	
+			{
+				/* ----------------------- */
+				/* add to list of contracts */
+				/* ----------------------- */
+				if (!( mptr->previous = CbC.document->last ))
+					CbC.document->first = mptr;
+				else 	mptr->previous->next = mptr;
+				CbC.document->last = mptr;
+				id = liberate( id );
+				CbC.nodes++;
+				continue;
+			}
 		}
-	}
 
-	/* ----------------------------------- */
-	/* terminate the service element level */
-	/* ----------------------------------- */
-	(void) cords_terminate_level( CbC.document, agent, tls );
+		/* ----------------------------------- */
+		/* terminate the service element level */
+		/* ----------------------------------- */
+		(void) cords_terminate_level( CbC.document, agent, tls );
 
-	if ( check_verbose() )
-		printf("   CORDS Request Broker ( %s ) Provisioned %u Nodes \n",agent,CbC.nodes);
+		if ( check_verbose() )
+			printf("   CORDS Request Broker ( %s ) Provisioned %u Nodes \n",agent,CbC.nodes);
 
-	if ( check_verbose() )
-		printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);
+		if ( check_verbose() )
+			printf("   CORDS Request Broker ( %s ) Phase 3 : Configuration \n",agent);
 
-	/* -------------------------------------------- */
-	/* perform configuration instruction processing */
-	/* -------------------------------------------- */
-	if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform configuration instruction processing */
+		/* -------------------------------------------- */
+		if (( status = cords_broker_configuration( host, CbC.document, CbC.configuration, agent, tls )) != 0)
+			return( cords_terminate_provisioning( status, &CbC ) );
 	
-	/* -------------------------------------------- */
-	/* perform SLA guarantee instruction processing */
-	/* -------------------------------------------- */
-	if ((( sla ) && ( CgC.first ))
-	&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform SLA guarantee instruction processing */
+		/* -------------------------------------------- */
+		if ((( sla ) && ( CgC.first ))
+		&&  ((status = cords_service_guarantees( host, sla, CbC.document, &CgC, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 
-	/* -------------------------------------- */
-	/* perform release instruction processing */
-	/* -------------------------------------- */
-	if (( CbC.release )
-	&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------- */
+		/* perform release instruction processing */
+		/* -------------------------------------- */
+		if (( CbC.release )
+		&&  (( status = cords_broker_release( host, CbC.document, CbC.release, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 	
-	/* -------------------------------------------- */
-	/* perform interface methods action  processing */
-	/* -------------------------------------------- */
-	if (( CbC.interface )
-	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
-		return( cords_terminate_provisioning( status, &CbC ) );
+		/* -------------------------------------------- */
+		/* perform interface methods action  processing */
+		/* -------------------------------------------- */
+		if (( CbC.interface )
+		&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
+			return( cords_terminate_provisioning( status, &CbC ) );
 
-	/* ------------------------------------ */
-	/* check if document return is required */
-	/* ------------------------------------ */
-	if ( root )
-	{
-		*root = CbC.document;
-		CbC.document = (struct xml_element *) 0;
+		/* ------------------------------------ */
+		/* check if document return is required */
+		/* ------------------------------------ */
+		if ( root )
+		{
+			*root = CbC.document;
+			CbC.document = (struct xml_element *) 0;
+		}
 	}
 
 	return( cords_terminate_provisioning( 0, &CbC ) );

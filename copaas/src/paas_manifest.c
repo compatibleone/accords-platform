@@ -35,8 +35,14 @@ public struct paas_manifest * liberate_paas_manifest(struct paas_manifest * sptr
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->xmlns )
-			 sptr->xmlns = liberate(sptr->xmlns);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
+		if ( sptr->scope )
+			 sptr->scope = liberate(sptr->scope);
+		if ( sptr->paas_description )
+			 sptr->paas_description = liberate(sptr->paas_description);
+		if ( sptr->paas_application )
+			 sptr->paas_application = liberate(sptr->paas_application);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_manifest *) 0);
@@ -52,7 +58,10 @@ public struct paas_manifest * reset_paas_manifest(struct paas_manifest * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->xmlns = (char*) 0;
+		sptr->access = (char*) 0;
+		sptr->scope = (char*) 0;
+		sptr->paas_description = (char*) 0;
+		sptr->paas_application = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -88,9 +97,21 @@ public int xmlin_paas_manifest(struct paas_manifest * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"xmlns") ))
+		else if (!( strcmp(wptr->name,"access") ))
 		{
-			if ( wptr->value ) { sptr->xmlns = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"scope") ))
+		{
+			if ( wptr->value ) { sptr->scope = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"paas_description") ))
+		{
+			if ( wptr->value ) { sptr->paas_description = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"paas_application") ))
+		{
+			if ( wptr->value ) { sptr->paas_application = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -112,7 +133,10 @@ public int rest_occi_paas_manifest(FILE * fh,struct paas_manifest * sptr,char * 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.xmlns='%s'\r\n",prefix,nptr,(sptr->xmlns?sptr->xmlns:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_description='%s'\r\n",prefix,nptr,(sptr->paas_description?sptr->paas_description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_application='%s'\r\n",prefix,nptr,(sptr->paas_application?sptr->paas_application:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

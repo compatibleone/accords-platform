@@ -1,0 +1,4 @@
+var/lib/accords
+var/log/accords/rest
+etc/accords
+etc/default

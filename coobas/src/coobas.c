@@ -29,6 +29,8 @@
 #include "cordslang.h"
 #include "cp.h"
 #include "cb.h"
+#include "occibody.h"
+#include <time.h>
 
 struct	accords_configuration CooBas = {
 	0,0,
@@ -44,9 +46,49 @@ struct	accords_configuration CooBas = {
 	"domain",
 	"coobas.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
+
+/*	----------------------------------------	*/
+/*	invoice messages and information strings	*/
+/*	----------------------------------------	*/
+private	struct	invoice_information 
+{
+	float	taxrate;
+	char *	transaction;
+	char *	description;
+	char *	price;
+	char * 	invoice;
+	char *	date;
+	char *	number;
+	char *	account;
+	char *	comment;
+	char *	legal;
+	char *	total;
+	char *	taxes;
+	char *	grandtotal;
+	char *	transactions;
+} 
+Invoice = 
+{
+	18.60,
+	"Transaction",
+	"Description",
+	"Price",
+	"Invoice",
+	"Date",
+	"Number",
+	"Account",
+	"Thanking you for your custom",
+	"Copyright (c) 2012 CompatibleOne under Creative Commons License",
+	"Total",
+	"Taxes",
+	"Grand Total",
+	"Transactions"
+
+};
 
 public	int	check_debug()		{	return(CooBas.debug);		}
 public	int	check_verbose()		{	return(CooBas.verbose);		}
@@ -140,27 +182,113 @@ private	struct rest_extension * coobas_extension( void * v,struct rest_server * 
 #include "comonsconnection.c"
 
 /*	------------------------------------------------------------------	*/
+/*			t r a n s a c t i o n _ d a t e 			*/
+/*	------------------------------------------------------------------	*/
+private	char * transaction_date( int tt )
+{
+	char 	buffer[256];
+	struct	tm * tptr;
+	time_t t;
+	t = (time_t) tt;
+
+	if (!( tptr = localtime( &t )))
+		sprintf(buffer,"%u",t);
+	else
+	{
+		sprintf(buffer,"%u/%u/%u",
+			tptr->tm_mday, tptr->tm_mon,tptr->tm_year+1900);
+	}
+	return( allocate_string( buffer ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		t r a n s a c t i o n _ d a t e _ a n d _ t i m e 		*/
+/*	------------------------------------------------------------------	*/
+private	char * transaction_date_and_time( int tt )
+{
+	char 	buffer[256];
+	struct	tm * tptr;
+	time_t t;
+	t = (time_t) tt;
+
+	if (!( tptr = localtime( &t )))
+		sprintf(buffer,"%u",t);
+	else
+	{
+		sprintf(buffer,"%u/%u/%u %u:%u:%u",
+			tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900,
+			tptr->tm_hour, tptr->tm_min, tptr->tm_sec);
+	}
+	return( allocate_string( buffer ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*	    o p e r a t o r _ i n v o i c e _ i n f o r m a t i o n		*/
+/*	------------------------------------------------------------------	*/
+	char *	description;
+	char *	price;
+	char * 	invoice;
+	char *	date;
+	char *	number;
+	char *	account;
+private char *	operator_invoice_information( char * label )
+{
+	if (!( label ))
+		return( "&nbsp;" );
+	else if (!( strcmp( label,"invoice:comment" ) ))
+		return( Invoice.comment );
+	else if (!( strcmp( label,"invoice:account" ) ))
+		return( Invoice.account );
+	else if (!( strcmp( label,"invoice:number" ) ))
+		return( Invoice.number );
+	else if (!( strcmp( label,"invoice:date" ) ))
+		return( Invoice.date );
+	else if (!( strcmp( label,"invoice:invoice" ) ))
+		return( Invoice.invoice );
+	else if (!( strcmp( label,"invoice:price" ) ))
+		return( Invoice.price );
+	else if (!( strcmp( label,"invoice:description" ) ))
+		return( Invoice.description );
+	else if (!( strcmp( label,"invoice:legal" ) ))
+		return( Invoice.legal );
+	else if (!( strcmp( label,"invoice:total" ) ))
+		return( Invoice.total );
+	else if (!( strcmp( label,"invoice:taxes" ) ))
+		return( Invoice.taxes );
+	else if (!( strcmp( label,"invoice:grandtotal" ) ))
+		return( Invoice.grandtotal );
+	else if (!( strcmp( label,"invoice:transaction" ) ))
+		return( Invoice.transaction );
+	else if (!( strcmp( label,"invoice:transactions" ) ))
+		return( Invoice.transactions );
+	else 	return("&nbsp;");
+}
+
+
+/*	------------------------------------------------------------------	*/
 /*		s t a r t _ i n v o i c e _ d o c u m e n t			*/
 /*	------------------------------------------------------------------	*/
 private	FILE * start_invoice_document( struct cords_invoice * pptr )
 {
-	char 	buffer[256];
 	FILE * h=(FILE *) 0;
+	int	t;
 
 	if (!( h = fopen( pptr->document, "w" )))
 		return( (FILE *) 0);
 
 	if ( pptr->date ) 
 		liberate( pptr->date );
+	else	t = time((long *) 0);
 
-	sprintf(buffer,"%u",time((long*)0));
-
-	if (!( pptr->date = allocate_string( buffer ) ))
+	if (!( pptr->date = transaction_date( t )))
 	{
 		fclose(h);
 		return((FILE *) 0);
 	}
 	
+	/* -------------------------- */
+	/* invoice style instructions */
+	/* -------------------------- */
 	fprintf(h,"<html><head><title>COOBAS:INVOICE:%s</title>\n",pptr->id);
 	fprintf(h,"<style type='text/css' media='SCREEN'>\n");
 	fprintf(h,".oddrow { background-color: white; }\n");
@@ -169,15 +297,43 @@ private	FILE * start_invoice_document( struct cords_invoice * pptr )
 	fprintf(h,"tr       { border-style: none; }\n");
 	fprintf(h,"th       { border-style: none; }\n");
 	fprintf(h,"</style></head>\n");
-	fprintf(h,"<body><div align=center><p><table width='95%c' border=1>\n",0x0025);
-	fprintf(h,"<tr class=headrow><th width='20%c'>Document</th><th>%s</th></tr>\n",0x0025,pptr->document);
-	fprintf(h,"<tr class=evenrow><th>Date    </th><th>%s</th></tr>\n",pptr->date);
-	fprintf(h,"<tr class=oddrow> <th>Invoice </th><th>%s</th></tr>\n",pptr->id);
-	fprintf(h,"<tr class=evenrow><th>Number  </th><th>%s</th></tr>\n",pptr->id);
-	fprintf(h,"<tr class=oddrow> <th>Account </th><th>%s</th></tr>\n",pptr->account);
-	fprintf(h,"</table><p>\n");
+	fprintf(h,"<body><div align=center><p>\n");
+
+	/* ------------------------------------------- */
+	/* Invoice description information to the left */
+	/* ------------------------------------------- */
 	fprintf(h,"<table width='95%c' border=1>\n",0x0025);
-	fprintf(h,"<tr class=headrow><th width='20%c'>Transaction<th>Date<th>Description<th width='20%c'>Price</tr>\n",0x0025,0x0025);
+	fprintf(h,"<tr><th colspan=4>%s</th></tr>\n","&nbsp;");
+	fprintf(h,"<tr class=headrow><th><div align=right>%s</div></th><th style='padding-left:2mm;'><div align=left>%s</div></th>\n",
+		operator_invoice_information("invoice:invoice"),pptr->id);
+
+	/* ---------------------------------------------------------- */
+	/* payment account information will be presented in this cell */
+	/* ---------------------------------------------------------- */
+	fprintf(h,"<th colspan=2 rowspan=4>&nbsp;</th></tr>\n");
+
+	/* ------------------------------------------------ */
+	/* More Invoice description information to the left */ 
+	/* ------------------------------------------------ */
+	fprintf(h,"<tr class=oddrow> <th><div align=right>%s</div></th><th style='padding-left: 2mm;'><div align=left>%s</div></th></tr>\n", operator_invoice_information("invoice:date"),pptr->date);
+	fprintf(h,"<tr class=evenrow><th><div align=right>%s</div></th><th style='padding-left: 2mm;'><div align=left>%s</div></th></tr>\n",operator_invoice_information("invoice:number"),pptr->id);
+	fprintf(h,"<tr class=oddrow> <th><div align=right>%s</div></th><th style='padding-left: 2mm;'><div align=left><a href='%s'>%s</a></div></th></tr>\n",operator_invoice_information("invoice:account"),pptr->account,pptr->account);
+
+	/* ---------------------------------------------------- */
+	/* fprintf(h,"</table><p>\n");				*/
+	/* fprintf(h,"<table width='95%c' border=1>\n",0x0025);	*/
+	/* ---------------------------------------------------- */
+	fprintf(h,"<tr><th colspan=4>%s</th></tr>\n","&nbsp;");
+	fprintf(h,"<tr><td colspan=4>&nbsp;</td></tr>\n");
+
+	/* --------------------------------- */
+	/* transaction details header fields */
+	/* --------------------------------- */
+	fprintf(h,"<tr class=headrow><th width='20%c'>%s",0x0025,operator_invoice_information("invoice:transaction"));
+	fprintf(h,"<th>%s</th>",operator_invoice_information("invoice:date"));
+	fprintf(h,"<th>%s</th>",operator_invoice_information("invoice:description"));
+	fprintf(h,"<th width='20%c'>%s</th></tr>\n",0x0025,operator_invoice_information("invoice:price"));
+
 	return( h );
 }
 
@@ -188,12 +344,33 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 {
 	if ( h )
 	{
-		fprintf(h,"</table><p>\n");
-		fprintf(h,"<table width='95%c' border=1>\n",0x0025);
-		fprintf(h,"<tr class=headrow><th>Transactions</th><th width='20%c'>%u</th></tr>\n",0x0025,pptr->transactions);
-		fprintf(h,"<tr class=evenrow><th>Total      </th><th>%s</th></tr>\n",pptr->total);
-		fprintf(h,"<tr class=oddrow> <th>Taxe       </th><th>%u</th></tr>\n",0);
-		fprintf(h,"<tr class=evenrow><th>Grand Total</th><th>%s</th></tr>\n",pptr->total);
+		
+		/* ---------------------------------------------------- */
+		/* fprintf(h,"</table><p>\n");				*/
+		/* fprintf(h,"<table width='95%c' border=1>\n",0x0025); */
+		/* ---------------------------------------------------- */
+		fprintf(h,"<tr><td colspan=4>&nbsp;</td></tr>\n");
+
+		/* ---------------------------- */
+		/* totals and information frame */
+		/* ---------------------------- */
+		fprintf(h,"<tr class=headrow><th colspan=2 rowspan=3>%s</th>\n",operator_invoice_information("invoice:comment"));
+
+		fprintf(h,"<th><div align=right>%s</div></th><th><div align=right>%s</div></th></tr>\n",
+			operator_invoice_information("invoice:total"),pptr->total);
+		fprintf(h,"<tr class=oddrow> <th><div align=right>%s</div></th><th><div align=right>%s</div></th></tr>\n",
+			operator_invoice_information("invoice:taxes"),pptr->taxe);
+		fprintf(h,"<tr class=evenrow><th><div align=right>%s</div></th><th><div align=right>%s</div></th></tr>\n",
+			operator_invoice_information("invoice:grandtotal"),pptr->grandtotal);
+
+		/* ------------------------------- */
+		/* legal information and copyright */
+		/* ------------------------------- */
+		fprintf(h,"<tr><th colspan=4>%s</th></tr>\n","&nbsp;");
+		fprintf(h,"<tr><th colspan=4>%s</th></tr>\n",operator_invoice_information("invoice:legal"));
+		fprintf(h,"<tr><th colspan=4>%s</th></tr>\n","&nbsp;");
+
+
 		fprintf(h,"</table><p></div></body></html>\n");
 		fclose(h);
 	}
@@ -205,19 +382,54 @@ private	void	close_invoice_document( FILE * h, struct cords_invoice * pptr )
 /*	--------------------------------------------------------	*/
 private	void	update_invoice_total( struct cords_invoice * pptr, char * price )
 {
-	int	v=0;
 	char 	work[64];
+	float	t=0.0;
+	float	v=0.0;
+	float	f=0.0;
+
+	/* ------------------------------------------- */
+	/* add this price or cost to the running total */
+	/* ------------------------------------------- */
 	if (!( price ))
 		return;
-	else	v = atoi( price );
+	else	sscanf(price,"%f",&v);
+
 	if ( pptr->total )
 	{
-		v += atoi( pptr->total );
+		sscanf(pptr->total,"%f",&f);
+		v += f;
 		liberate( pptr->total );
 	}
-	sprintf(work,"%u",v);
-	pptr->total = allocate_string( work );
-	return;
+
+	sprintf(work,"%.2f",v);
+
+	if (!( pptr->total = allocate_string( work ) ))
+		return;
+
+	/* ------------------------------------------- */
+	/* calculate the current taxe value from total */
+	/* ------------------------------------------- */
+	t = ((v*Invoice.taxrate)/100);	
+
+	if ( pptr->taxe )
+		liberate( pptr->taxe );
+
+	sprintf(work,"%.2f",t);
+	if (!( pptr->taxe  = allocate_string( work ) ))
+		return;
+
+	/* ------------------------------------------- */
+	/* calculate the grand total inclusive of taxe */
+	/* ------------------------------------------- */
+	v += t;
+	if ( pptr->grandtotal )
+		liberate( pptr->grandtotal );
+
+	sprintf(work,"%.2f",v);
+
+	if (!( pptr->grandtotal  = allocate_string( work ) ))
+		return;
+	else	return;
 }
 			
 
@@ -233,31 +445,73 @@ private	void	invoice_document_transaction(
 		struct occi_response * zptr	/* the price information	*/
 		)
 {
+	float   f=0.0;
+	char *	dptr;
 	char *	vptr;
 	char *	klass;
+
 	pptr->transactions++;
 	if (!( pptr->transactions & 1 ))
 		klass = "oddrow";
 	else	klass = "evenrow";
+
 	fprintf(h,"<tr class='%s'>",klass);
+
+	/* ------------------------ */
+	/* transaction number field */
+	/* ------------------------ */
 	fprintf(h,"<th><a href='%s'>%u</a><th> \n",transaction,pptr->transactions);
+
+	/* ---------------------- */
+	/* transaction date field */
+	/* ---------------------- */
 	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"when")))
-		fprintf(h,"%s",vptr);
-	fprintf(h,"<th><a href='%s'>",transaction);
+	{
+		if (!( dptr = transaction_date_and_time( atoi( vptr ) ) ))
+			fprintf(h,"%s",vptr);
+		else
+		{
+			fprintf(h,"%s",dptr);
+			liberate( dptr );
+		}
+	}
+	fprintf(h,"<th>");
+
+	/* ----------------------------- */
+	/* transaction description field */
+	/* ----------------------------- */
 	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"source")))
 		fprintf(h,"%s",vptr);
 	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"description")))
 		fprintf(h," %s",vptr);
-	fprintf(h,"</a></th>\n");
-	fprintf(h,"<th><a href='%s'>\n",price);
+	fprintf(h,"</th>\n");
+
+	/* ----------------------- */
+	/* transaction price field */
+	/* ----------------------- */
+
+	fprintf(h,"<th><div align=right><a href='%s'>\n",price);
+
+	/* -------------------------------------------------------------------- */
+	/* TODO : need to handle rate type pricing schemes per hour, per day .. */
+	/* -------------------------------------------------------------------- */
+	/* TODO : need to rationalise the prices to the target account currency */
+	/* -------------------------------------------------------------------- */
 	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PRICE,"rate")))
 	{
-		fprintf(h,"%s ",vptr);
+		sscanf(vptr,"%f",&f);
+		fprintf(h,"%.2f",f);
 		update_invoice_total( pptr, vptr );
 	}
-	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PRICE,"currency")))
-		fprintf(h," %s",vptr);
-	fprintf(h,"</a></th></tr>\n");
+
+	/* ---------------------------------- */
+	/* dont display the currency any more */
+	/* ---------------------------------- */
+	/* -------------------------------------------------------------------------------------------------- */
+	/* if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PRICE,"currency"))) fprintf(h," %s",vptr); */
+	/* -------------------------------------------------------------------------------------------------- */
+
+	fprintf(h,"</a></div></th></tr>\n");
 	return;
 }
 
@@ -498,6 +752,115 @@ private	struct	occi_interface	transaction_interface = {
 	};
 
 /*	------------------------------------------------------------------	*/
+/*		h t m l _ i n v o i c e _ r e n d e r i n g			*/
+/*	------------------------------------------------------------------	*/
+private	char *	html_invoice_rendering(
+		struct occi_category * cptr,
+		struct rest_header  * hptr )
+{
+	char *	vptr;
+	char *	filename=(char *) 0;
+	struct	rest_header * root=hptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * contentype=(struct rest_header *) 0;
+	while ( hptr )
+	{
+		if (!( hptr->name ))
+			hptr = hptr->next;
+		else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_TYPE ) ))
+		{
+			contentype = hptr;
+			hptr = hptr->next;
+		}
+		else if (!( strcasecmp( hptr->name, _HTTP_CONTENT_LENGTH ) ))
+		{
+			contentlength = hptr;
+			hptr = hptr->next;
+		}
+		else if (!( strcasecmp( hptr->name, _OCCI_LOCATION ) ))
+			return( occi_html_body( cptr, root ) );
+		else if (!( strcasecmp( hptr->name, _OCCI_ATTRIBUTE ) ))
+		{
+			if (!( rest_valid_string( hptr->value ) ))
+			{
+				hptr = hptr->next;
+				continue;
+			}
+			else if (!( strncasecmp( (vptr = hptr->value), "occi.invoice.document", strlen("occi.invoice.document") ) ))
+			{
+				vptr += strlen("occi.invoice.document");
+				if ( *vptr == '=' )
+					vptr++;
+				if (!( filename = allocate_string( vptr ) ))
+					return( occi_html_body( cptr, root ) );
+
+			}
+			hptr = hptr->next;
+			continue;
+		}
+		else	hptr = hptr->next;
+	}
+	if (!( filename ))
+		return( occi_html_body( cptr, root ) );
+	else if (!( contentype ))
+		return( occi_html_body( cptr, root ) );
+	else if (!( contentlength ))
+		return( occi_html_body( cptr, root ) );
+	else
+	{
+		rest_replace_header( contentype, _OCCI_TEXT_HTML );
+		return( occi_content_length( contentlength, filename) );
+	}
+}
+
+
+/*	------------------------------------------------------------------	*/
+/*			p r o c e s s _ i n v o i c e				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * process_invoice(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_invoice * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		process_invoice_transactions( pptr );
+		autosave_cords_invoice_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			    c l o s e _ i n v o i c e				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * close_invoice(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_invoice * pptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Incorrect Message Category" ) );
+	else if ( pptr->state )
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else 
+	{
+		pptr->state = 1;
+		autosave_cords_invoice_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
 /*			c o o b a s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
 private	int	coobas_operation( char * nptr )
@@ -543,7 +906,13 @@ private	int	coobas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = &invoice_interface;
+	optr->html_rendering = html_invoice_rendering;
 	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_add_action( optr,"process","",process_invoice)))
+		return( 28 );
+	else if (!( optr = occi_add_action( optr,"close","",close_invoice)))
+		return( 28 );
 
 	if (!( optr = comons_connection_builder( CooBas.domain ) ))
 		return( 27 );
@@ -627,4 +996,3 @@ public	int	main(int argc, char * argv[] )
 	/* --------- */
 #endif	/* _coobas_c */
 	/* --------- */
-

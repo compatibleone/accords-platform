@@ -33,10 +33,10 @@ public struct paas_node * liberate_paas_node(struct paas_node * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
-		if ( sptr->content_type )
-			 sptr->content_type = liberate(sptr->content_type);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->content_type )
+			 sptr->content_type = liberate(sptr->content_type);
 		if ( sptr->version )
 			 sptr->version = liberate(sptr->version);
 		if ( sptr->provider )
@@ -55,8 +55,8 @@ public struct paas_node * reset_paas_node(struct paas_node * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
-		sptr->content_type = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->content_type = (char*) 0;
 		sptr->version = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->state =  0;
@@ -90,13 +90,13 @@ public int xmlin_paas_node(struct paas_node * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"content_type") ))
-		{
-			if ( wptr->value ) { sptr->content_type = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"name") ))
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"content_type") ))
+		{
+			if ( wptr->value ) { sptr->content_type = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"version") ))
 		{
@@ -125,8 +125,8 @@ public int rest_occi_paas_node(FILE * fh,struct paas_node * sptr,char * prefix, 
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.content_type='%s'\r\n",prefix,nptr,(sptr->content_type?sptr->content_type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.content_type='%s'\r\n",prefix,nptr,(sptr->content_type?sptr->content_type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.version='%s'\r\n",prefix,nptr,(sptr->version?sptr->version:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);

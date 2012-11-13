@@ -3,6 +3,9 @@
 
 #include "cp.h"
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 private	int	purge_packets=0;
 
 /*	---------------------------------------------------	*/

@@ -1,15 +1,19 @@
 #!/usr/bin/make -f
+# (C) CityPassenger / Vincent Renardias <vrenardias@citypassenger.com>
+
+# To rebuild from source, run "dpkg-buildpackage -b -rfakeroot" from the
+# main directory.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# This has to be exported to make some magic below work.
 export DH_OPTIONS
-
-# export LD_LIBRARY_PATH=`pwd`/debian/tmp/usr/lib
 
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+# WARNING: MAKE SURE /usr/bin/javac POINTS TO SUN'S JDK (NOT OPENJDK)
+JAVA_HOME ?= $(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
 #CFLAGS = -Wall -g
 #ifeq (Debian,$(shell lsb_release -s -i))
@@ -18,11 +22,11 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 #LDFLAGS="-Wl,-z,defs"
 #endif
 
-#ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
-#else
-#	CFLAGS += -O2
-#endif
+else
+	CFLAGS += -O2
+endif
 
 configure:
 	./autogen.sh
@@ -36,6 +40,7 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+		--enable-paprocci=$(JAVA_HOME) \
 		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
@@ -43,6 +48,7 @@ build: build-stamp
 build-stamp: config.status
 	dh_testdir
 	$(MAKE)
+	# cd ./manifests && ./make-all
 	touch $@
 
 clean:
@@ -51,6 +57,7 @@ clean:
 	rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
 	-$(MAKE) distclean
 	rm -f config.{sub,guess,status,log}
+	# cd manifests && ./make-clean
 	dh_prep
 	rm -f debian/*.log debian/files
 	./clean
@@ -60,6 +67,11 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
+	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
+	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
+	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
+	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
+	cp coips.xml `pwd`/debian/tmp/etc/accords
 # Build architecture independant packages.
 
 binary-indep: build install
@@ -68,6 +80,8 @@ binary-indep: build install
 	dh_installchangelogs -i
 	dh_installdocs -i
 	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
+	dh_installdirs -i
+	dh_installinit -i
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
@@ -84,15 +98,16 @@ binary-arch: build install
 	dh_installdocs -a
 	dh_installexamples -a
 	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
+	dh_installdirs -a
+	dh_installinit -a
 	dh_installmenu -a
-	#dh_installmime -a
 	dh_installman -a
 	dh_link -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
-	LD_LIBRARY_PATH=`pwd`/debian/tmp/usr/lib dh_shlibdeps -a
+	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a

@@ -27,8 +27,9 @@ EXTRA_DIST = occiatb.h occienquiry.c occimachine.c occiparameter.c \
 	occiscript.c occifile.c occialert.c occiinterface.c occisession.c occiconsumer.c \
 	occiconnection.c occistream.c occiprobe.c occimetric.c occiquota.c occidcconfig.c \
 	occiterm.c occivariable.c occiterms.c occiguarantee.c occideltacloud.c occibusiness.c \
-        occipaconfig.c occiproactive.c occizone.c 
+        occipaconfig.c occiproactive.c occizone.c occiamazonEc2.c occicontrol.c occiec2config.c \
+	occigw.c occiintercloudGW.c occilinkgw.c occipacket.c occipenalty.c occirelease.c
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
-libocci_la_LDLAGS = $(LD_COPABR)
+libocci_la_LDFLAGS =

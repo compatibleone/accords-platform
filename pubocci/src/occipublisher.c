@@ -125,69 +125,6 @@ private	char * 	cords_consumer_publication(
 }
 
 /*	---------------------------------------------------------	*/
-/*		o c c i _ r e s o l v e _ a c c o u n t			*/
-/*	---------------------------------------------------------	*/
-/*	resolve the account identifier using provided accountname	*/
-/*	---------------------------------------------------------	*/
-private	char *	occi_resolve_account( char * name, char * agent, char * tls )
-{
-	char	*	ihost;
-	struct	occi_client * kptr;
-	struct	occi_request * qptr;
-	struct	occi_response * yptr;
-	struct	occi_response * zptr;
-	struct	occi_element * dptr;
-	struct	xml_element * eptr;
-	struct	xml_atribut * aptr;
-	struct	xml_atribut * bptr;
-	char	buffer[2048];
-
-	if (!( ihost = occi_resolve_category_provider( _CORDS_ACCOUNT, agent, tls ) ))
-		return((char *) 0);
-	else
-	{
-		sprintf(buffer,"%s/%s/",ihost,_CORDS_ACCOUNT);
-		liberate( ihost );
-	}
-
-	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
-		return((char *) 0);
-
-	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
-	{
-		kptr = occi_remove_client( kptr );
-		return((char *) 0);
-	}
-	else if (!(dptr=occi_request_element(qptr,"occi.account.name", ( name ? name : name ) ) ))
-	{
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return((char *) 0);
-	}
-	else if (!( yptr = occi_client_get( kptr, qptr ) ))
-	{
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return((char *) 0);
-	}
-	else if (!( ihost = occi_extract_location( yptr ) ))
-	{
-		yptr = occi_remove_response( yptr );
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return((char *) 0);
-	}
-	else
-	{
-		rest_add_http_prefix(buffer,2048,ihost);
-		yptr = occi_remove_response( yptr );
-		qptr = occi_remove_request( qptr );
-		kptr = occi_remove_client( kptr );
-		return( allocate_string( buffer ) );
-	}
-}
-
-/*	---------------------------------------------------------	*/
 /*		o c c i _ r e s o l v e _ a g r e e m e n t		*/
 /*	---------------------------------------------------------	*/
 /*	resolve the first agreement for the indicated initiator		*/
@@ -449,6 +386,7 @@ private	char * 	cords_provider_agreement( char * operator, char * agent, char * 
 		agreement = occi_remove_response( agreement );
 		liberate( accountid );
 		liberate( agreementid );
+		return( (char *) 0 );
 	}
 
 	/* ----------------------------------------------------- */
@@ -505,7 +443,14 @@ private	char * 	cords_provider_publication(
 		Publisher.sla = 1;
 		return ( cords_update_provider( result, identity, category, agent, tls ) );
 	}
-
+	/* ---------------------------------------------------- */
+	/* enforce the service level agreement in security mode */
+	/* ---------------------------------------------------- */
+	else if ( rest_valid_string( default_tls() ) != 0 )
+	{
+		rest_log_message("An Account and SLA is required for provider",agent);
+		return((char *) 0);
+	}
 	/* ---------------------------------- */
 	/* didnt find one so create a new one */
 	/* ---------------------------------- */
@@ -1275,9 +1220,6 @@ public	int	publishing_occi_server(
 	if (( tls ) && ( tlsconf ))
 	{
 		occi_release_AAA( user, password, agent, tls );
-		if ( Publisher.authorization )
-			Publisher.authorization = logout_occi_user( 
-				user, password, agent, Publisher.authorization, tls );
 		if ( tlsconf )
 			tlsconf = release_tls_configuration(tlsconf );
 	}

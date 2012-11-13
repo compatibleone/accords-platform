@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AUTOGEN_FILES="aclocal.m4 autom4te.cache configure config.guess config.log config.sub config.status depcomp compile libtool ltmain.sh missing mkinstalldirs config.h config.h.in py-compile install-sh"
+AUTOGEN_FILES="aclocal.m4 autom4te.cache configure config.guess config.log config.sub config.status depcomp compile libtool ltmain.sh missing mkinstalldirs config.h config.h.in py-compile install-sh pyaccords/pysrc/pypath.h  pyaccords/pysrc/pypacksrc/pypacksrc.py jaccords/jsrc/jpath.h"
 
 echo "Clean autogen generated files"
 ( cd $(dirname $0)

@@ -1,0 +1,44 @@
+#
+# Manifests Makefile.am
+#
+# Copyright 2012, Mandriva
+# All rights reserved
+#
+# Authors:
+#   Alexandre Lissy <alissy@mandriva.com>
+#
+
+man7_COMPATIBLEONE = accords.7 compatibleone.7
+
+man1_COMPATIBLEONE =  accords-config.1 co-broker.1 co-command.1 co-parser.1 \
+	co-resolver.1 co-start.1 co-status.1 co-stop.1 azprocci.1 broker.1 \
+	coees.1 coips.1 command.1 comons.1 conagios.1 conets.1 coobas.1 cool.1 \
+	copaas.1 cops.1 cosacs.1 cosched.1 coss.1 dcprocci.1 example.1 ezvm.1 \
+	fileserver.1 jpaasprocci.1 onprocci.1 osocciprocci.1 osprocci.1 \
+	paprocci.1 parser.1 procci.1 publisher.1 run-azprocci.1 run-broker.1 \
+	run-coees.1 run-coips.1 run-comons.1 run-conagios.1 run-conets.1 \
+	run-coobas.1 run-cool.1 run-copaas.1 run-cops.1 run-cosacs.1 \
+	run-cosched.1 run-coss.1 run-dcprocci.1 run-example.1 run-ezvm.1 \
+	run-fileserver.1 run-jpaasprocci.1 run-onprocci.1 run-osocciprocci.1 \
+	run-osprocci.1 run-paprocci.1 run-parser.1 run-procci.1 run-publisher.1 \
+	run-slam.1 run-testosocci.1 slam.1 testosocci.1
+
+EXTRA_DIST = $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
+
+install_man = install -m0644 -D
+
+install-data-local: $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
+	for man in $(man1_COMPATIBLEONE); do \
+		$(install_man) $$man $(DESTDIR)$(mandir)/man1/$$man; \
+	done
+	for man in $(man7_COMPATIBLEONE); do \
+		$(install_man) $$man $(DESTDIR)$(mandir)/man7/$$man; \
+	done
+
+uninstall-local:
+	for man in $(man1_COMPATIBLEONE); do \
+		rm $(DESTDIR)$(mandir)/man1/$$man; \
+	done
+	for man in $(man7_COMPATIBLEONE); do \
+		rm $(DESTDIR)$(mandir)/man7/$$man; \
+	done

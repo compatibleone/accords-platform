@@ -1,0 +1,31 @@
+.TH CO-RESOLVER "7" "October 2012" "CompatibleOne" "Platform"
+.SH SYNOPSIS
+\fBco-resolver [ --price [manifest|service|contract|openstack|opennebula] | [compute|storage|network|system|package] ]\fR
+.PP
+.SH DESCRIPTION
+.\" Add any additional description here
+This script allows the publisher to be queried for category service provider information.
+The script takes any quantity of command line parameters, expected to be category names
+that will be requested of the publisher for resolution of their service provider identity.
+The recent version of the executable bin/testresolver allows a command line option --price
+allowing activation of resolution of price information for each category processed.
+
+		co-resolver compute storage network system package
+
+		co-resolver --price manifest service contract openstack opennebula
+.PP
+.SH AUTHOR
+The CompatibleOne project.
+.SH MANPAGE
+Most of this documents comes from the README of ACCORDS, wrote by Iain James Marshall.
+Written by Alexandre Lissy <alissy@mandriva.com> for the CompatibleOne project.
+.SH "REPORTING BUGS"
+Report CompatibleOne bugs to compatibleone@ow2.org
+.br
+CompatibleOne home page: <http://www.compatibleone.org>
+.SH COPYRIGHT
+Copyright \(co 2012 CompatibleOne.
+License Apache 2.0.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

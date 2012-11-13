@@ -836,7 +836,8 @@ public	int	delete_windowsazure_contract(
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
 
-	status = stop_windowsazure_provisioning( pptr );
+	if ( pptr->state != _OCCI_IDLE )
+		status = stop_windowsazure_provisioning( pptr );
 
 	if ( pptr->hostedservice )
 	{

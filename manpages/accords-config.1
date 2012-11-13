@@ -1,0 +1,63 @@
+.TH ACCORDS-CONFIG "1" "October 2012" "CompatibleOne" "User Commands"
+.SH NAME
+accords\-config \- generate CompatibleOne accords platform configuration
+.SH SYNOPSIS
+.B accords\-config [xml] [host] [port] [publisher] [security] [monitoring]
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+The configuration procedure will create the master configuration file for all of the components 
+of the Accords platform and when security is active will generate the security configurations,
+certificates and private keys for all the OCCI server modules comprising the system. In addition,
+a collection of command scripts will be generated that are configured facilitating the use of 
+the different components of the platform.
+.PP
+It will use \fBaccords.ini\fR file, either in the current working directory if
+one is found or from \fB/etc/accords/\fR otherwise.
+.PP
+\fBOptional arguments\fR
+.TP
+\fBxml\fR
+Specify the configuration file name. Defaults to \fBaccords.xml\fR.
+.TP
+\fBhost\fR
+Specify the platform hostname. Defaults to \fBhttp://127.0.0.1\fR.
+.TP
+\fBport\fR
+Specify the base port of the installation. Defaults to \fB8086\fR.
+.TP
+\fBpublisher\fR
+Specify the publisher URL, following http://host:port scheme. Defaults to \fBhttp://127.0.0.1:8086\fR.
+.TP
+\fBsecurity\fR
+If specified, enables the platform security. See the \fBSECURITY\fR section of \fBaccords(7)\fR for more informations.
+.TP
+\fBmonitoring\fR
+If specified, enables the platform monitoring. See the \fBMONITORING\fR section of \fBaccords(7)\fR(7) for more informations.
+.PP
+\fBDefault behavior\fR
+.TP
+When launched without any argument, then the default will the:
+.TP
+accords-config accords.xml http://127.0.0.1 8086 http://127.0.0.1:8086
+.SS "Exit status:"
+.TP
+0
+if everything went OK,
+.TP
+1
+if any problem is detected.
+.SH AUTHOR
+The CompatibleOne project.
+.SH MANPAGE
+Written by Alexandre Lissy <alissy@mandriva.com> for the CompatibleOne project.
+.SH "REPORTING BUGS"
+Report CompatibleOne bugs to compatibleone@ow2.org
+.br
+CompatibleOne home page: <http://www.compatibleone.org>
+.SH COPYRIGHT
+Copyright \(co 2012 CompatibleOne.
+License Apache 2.0.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

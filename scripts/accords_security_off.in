@@ -218,21 +218,8 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p | grep LISTEN | grep publisher
-	netstat -a -p | grep LISTEN | grep fileserver
-	netstat -a -p | grep LISTEN | grep coss
-	netstat -a -p | grep LISTEN | grep comons
-	netstat -a -p | grep LISTEN | grep conets
-	netstat -a -p | grep LISTEN | grep coobas
-	netstat -a -p | grep LISTEN | grep cops
-	netstat -a -p | grep LISTEN | grep coees
-	netstat -a -p | grep LISTEN | grep parser
-	netstat -a -p | grep LISTEN | grep broker
-	netstat -a -p | grep LISTEN | grep procci
-	netstat -a -p | grep LISTEN | grep cosched
-	netstat -a -p | grep LISTEN | grep ezvm
-	netstat -a -p | grep LISTEN | grep coips
-	netstat -a -p | grep LISTEN | grep cosacs
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coi
+ps|cosacs)'	
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true

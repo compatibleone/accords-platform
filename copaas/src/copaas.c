@@ -27,6 +27,7 @@ struct	accords_configuration CoPaas = {
 	"domain",
 	"europe",
 	"copaas.xml",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

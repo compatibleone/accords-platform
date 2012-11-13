@@ -1,0 +1,37 @@
+.TH CO-COMMAND "7" "October 2012" "CompatibleOne" "Platform"
+.SH SYNOPSIS
+\fBco-command command service/uuid-of-service-instance...\fR
+.PP
+.SH DESCRIPTION
+.\" Add any additional description here
+This script allows a provisioned service to be started, stopped or saved. The script expects
+any number of command line parameters, the first of which must be one of the two keywords 
+"start" or "stop". The subsequent parameters are to be valid service instance description
+filenames in the service directory. The corresponding command will be performed on each of the 
+service instance descriptions bringing all contracts of the service up or down as required.
+.PP
+\fBMandatory arguments\fR
+.TP
+\fBcommand\fR
+Command to perform. It can be either \fBstart\fR or \fBstop\fR.
+.TP
+\fBservice/uuid-of-service-instance...\fR
+Valid service instance description filenames in the service directory. The
+corresponding command will be performed on each of the service instance
+descriptions bringing all contracts of the service up or down as required.
+.PP
+.SH AUTHOR
+The CompatibleOne project.
+.SH MANPAGE
+Most of this documents comes from the README of ACCORDS, wrote by Iain James Marshall.
+Written by Alexandre Lissy <alissy@mandriva.com> for the CompatibleOne project.
+.SH "REPORTING BUGS"
+Report CompatibleOne bugs to compatibleone@ow2.org
+.br
+CompatibleOne home page: <http://www.compatibleone.org>
+.SH COPYRIGHT
+Copyright \(co 2012 CompatibleOne.
+License Apache 2.0.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

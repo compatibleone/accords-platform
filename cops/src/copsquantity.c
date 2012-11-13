@@ -22,6 +22,118 @@
 #include "quantity.c"
 #include "occiquantity.c"
 
+/*	---------------------------------------------------------	*/
+/*		i n v o k e _ q u a n t i t y _ a c t i o n		*/
+/*	---------------------------------------------------------	*/
+private	int	invoke_quantity_action( struct cords_quantity * pptr, int action )
+{
+	struct	occi_response * zptr;
+	struct	occi_response * zzptr;
+	struct	occi_element  * eptr;
+	int			result;
+	int			value;
+	char			buffer[128];
+	char 			self[1024];
+	if (!( pptr ))
+		return(0);
+	else if (!( rest_valid_string( pptr->quota )))
+		return(0);
+	else if (!( rest_valid_string( pptr->value )))
+		return(0);
+	else if (!( zptr = occi_simple_get( pptr->quota, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return(0);
+	else
+	{
+		/* ----------------------------- */
+		/* collect the appropriate value */
+		/* ----------------------------- */
+		if (!( action & 2 ))
+		{
+			if (!( eptr = occi_locate_element( zptr->first,"occi.quota.reserved") ))
+			{
+				zptr = occi_remove_response( zptr );
+				return(0);
+			}
+		}
+		else
+		{
+			if (!( eptr = occi_locate_element( zptr->first,"occi.quota.consumed") ))
+			{
+				zptr = occi_remove_response( zptr );
+				return(0);
+			}
+		}
+
+		/* ----------------------- */
+		/* retrieve the two values */
+		/* ----------------------- */
+		value  = atoi( pptr->value );
+
+		if ( rest_valid_string( eptr->value ) )
+			result = atoi( eptr->value );
+		else	result = 0;
+
+		/* ----------------------- */
+		/* calculate the new value */
+		/* ----------------------- */
+		if ( action & 1 )
+			result += value;
+		else if ( result >= value )
+			result -= value;
+		else	result  = 0;
+		
+		/* --------------------- */
+		/* allocate occi element */
+		/* --------------------- */
+		sprintf( buffer,"%u",result);
+
+		if ( eptr->value ) 
+			eptr->value = liberate( eptr->value );		
+
+		if (!( eptr->value = allocate_string( buffer ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return(0);
+		}
+		else
+		{
+			/* --------------------- */
+			/* update the instance	 */
+			/* --------------------- */
+			if ((zzptr = occi_simple_put( pptr->quota, zptr->first, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zzptr = occi_remove_response ( zzptr );
+		}							
+
+		/* ------------------------------ */
+		/* handle an eventual transaction */
+		/* ------------------------------ */
+		if (!( action & 2 ))
+		{
+			zptr = occi_remove_response( zptr );
+			return( 0 );
+		}
+		else if (!( eptr = occi_locate_element( zptr->first, "occi.quota.price" ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return(0);
+		}
+		else if (!( rest_valid_string( eptr->value ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return(0);
+		}
+		else
+		{
+			occi_send_transaction( 
+				_CORDS_QUANTITY, eptr->value, 
+				( action & 1 ? "action=start" : "action=stop" ),
+				pptr->account, pptr->id );
+			zptr = occi_remove_response( zptr );
+			return( 0 );
+		}
+	}
+}
+
 /*	-------------------------------------------	*/
 /* 	    c o n s u m e  _ q u a n t i t y 		*/
 /*	-------------------------------------------	*/
@@ -44,6 +156,7 @@ private	struct rest_response * consume_quantity(
 	{
 		pptr->state=2;
 		autosave_cords_quantity_nodes();
+		invoke_quantity_action(pptr,3);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -70,6 +183,7 @@ private	struct rest_response * restore_quantity(
 	{
 		pptr->state=1;
 		autosave_cords_quantity_nodes();
+		invoke_quantity_action(pptr,2);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -95,6 +209,7 @@ private	struct rest_response * release_quantity(
 	{
 		pptr->state=0;
 		autosave_cords_quantity_nodes();
+		invoke_quantity_action(pptr,0);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -119,6 +234,7 @@ private	struct rest_response * reserve_quantity(
 	{
 		pptr->state = 1;
 		autosave_cords_quantity_nodes();
+		invoke_quantity_action(pptr,1);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }

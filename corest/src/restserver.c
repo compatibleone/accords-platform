@@ -726,8 +726,8 @@ public	struct	rest_response *	rest_liberate_response( struct rest_response * apt
 	if ( aptr )
 	{
 		liberate_rest_response( aptr );
-		return((struct rest_response *) 0);
 	}
+	return((struct rest_response *) 0);
 }		
 
 /*	------------------------------------------------	*/

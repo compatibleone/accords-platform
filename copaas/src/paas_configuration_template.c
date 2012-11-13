@@ -35,14 +35,14 @@ public struct paas_configuration_template * liberate_paas_configuration_template
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->uri )
-			 sptr->uri = liberate(sptr->uri);
 		if ( sptr->date_created )
 			 sptr->date_created = liberate(sptr->date_created);
 		if ( sptr->date_updated )
 			 sptr->date_updated = liberate(sptr->date_updated);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
+		if ( sptr->uri )
+			 sptr->uri = liberate(sptr->uri);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_configuration_template *) 0);
@@ -58,10 +58,10 @@ public struct paas_configuration_template * reset_paas_configuration_template(st
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->uri = (char*) 0;
 		sptr->date_created = (char*) 0;
 		sptr->date_updated = (char*) 0;
 		sptr->description = (char*) 0;
+		sptr->uri = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -97,10 +97,6 @@ public int xmlin_paas_configuration_template(struct paas_configuration_template 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"uri") ))
-		{
-			if ( wptr->value ) { sptr->uri = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"date_created") ))
 		{
 			if ( wptr->value ) { sptr->date_created = allocate_string(wptr->value); }
@@ -112,6 +108,10 @@ public int xmlin_paas_configuration_template(struct paas_configuration_template 
 		else if (!( strcmp(wptr->name,"description") ))
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"uri") ))
+		{
+			if ( wptr->value ) { sptr->uri = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -133,10 +133,10 @@ public int rest_occi_paas_configuration_template(FILE * fh,struct paas_configura
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.uri='%s'\r\n",prefix,nptr,(sptr->uri?sptr->uri:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_created='%s'\r\n",prefix,nptr,(sptr->date_created?sptr->date_created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_updated='%s'\r\n",prefix,nptr,(sptr->date_updated?sptr->date_updated:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.uri='%s'\r\n",prefix,nptr,(sptr->uri?sptr->uri:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

@@ -1,0 +1,14 @@
+etc/accords/accords.ini
+etc/accords/cords_user.xml
+etc/accords/coips.xml
+etc/default/accords
+etc/accords/openssl.cnf
+etc/accords/Certificates.crt
+usr/bin/accords
+usr/bin/run-parser
+usr/bin/parser
+usr/bin/co-*
+usr/bin/accords-config
+usr/bin/test??
+usr/bin/testresolver
+usr/bin/command

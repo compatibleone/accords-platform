@@ -151,15 +151,24 @@ private	struct	on_response * on_post_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
+		if ( p7 )
+		{
+			if ((!( strcmp( p7, "none" ) ))
+			||  (!( strcmp( p7, "any"  ) )))
+				p7 = (char *) 0;
+		}
 		if (!( filename = on_create_server_request( p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
 			return((struct on_response *) 0);
 		else 	return( on_post_request( "/compute", filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if ((!( strcmp( p7, "none" ) ))
-		||  (!( strcmp( p7, "any"  ) )))
-			p7 = (char *) 0;
+		if ( p7 )
+		{
+			if ((!( strcmp( p7, "none" ) ))
+			||  (!( strcmp( p7, "any"  ) )))
+				p7 = (char *) 0;
+		}
 
 		if (!( filename = on_create_compute_request( p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
 			return((struct on_response *) 0);
@@ -173,7 +182,7 @@ private	struct	on_response * on_post_object(
 	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
-		if (!( filename = on_create_network_request( p3, p4, p5 )))
+		if (!( filename = on_create_network_request( p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
 		else	return( on_post_request( "/network", filename ) );
 	}
@@ -596,8 +605,6 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		return( failure( 30,"p6", "required") );
 	else if (!( strcasecmp(p1,"SAVE" ) ))
 		return( on_result( on_save_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6 ) ) );
-	else if (!( p7 ))
-		return( failure( 30,"p7", "required") );
 	else if (!( strcasecmp(p1,"POST" ) ))
 		return( on_result( on_post_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6, p7 ) ) );
 	else	return( failure(32, "incorrect value for p1: ", p1 ) );
@@ -676,8 +683,8 @@ private	int	on_command(int argc, char * argv[] )
 /* ------------------------------------------------------------------------------------ */
 private	int	on_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.05");
-	printf("\n   Beta Version 20/07/2012");
+	printf("\n   CO-OS : CompatibleOne OpenNebula Client Test : Version 1.0a.0.06");
+	printf("\n   Beta Version 29/10/2012");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue" );
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -699,7 +706,7 @@ private	int	on_banner()
 	printf("\n   [ PERSISTENT storage {id} ");
 	printf("\n   [ VOLATILE   storage {id} ");
 	printf("\n   [ RENAME     storage {id} {newname} ");
-	printf("\n   [ POST       network {name} {address} {class} ");
+	printf("\n   [ POST       network {name} {[address | NONE]} {size} [PUBLIC | PRIVATE] ");
 	printf("\n   [ PUT      [ compute | storage | network | server ] {id} {filename} ");
 	printf("\n\n");
 	return( 0 );

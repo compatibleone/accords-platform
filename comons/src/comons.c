@@ -43,6 +43,7 @@ struct	accords_configuration Comons = {
 	"domain",
 	"comons.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

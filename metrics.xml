@@ -23,8 +23,11 @@
 <metric name="net:stat:unix" period="60" samples="1"
 	expression="netstat -a | grep unix | wc -l "/>
 
+<metric name="top:user" period="60" samples="1" 
+	expression="top -b -n1 | grep user | cut -f 2 -d , "/>
+
 <metric name="user:count" period="60" samples="1" 
-	expression="top -b -n1 | grep users | cut -f 2 -d , "/>
+	expression="who | wc -l"/>
 
 <metric name="cpu" period="60" samples="1" 
 	expression="top -b -n1 | grep Cpu "/>

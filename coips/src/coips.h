@@ -18,6 +18,8 @@
 #ifndef	_coips_h
 #define	_coips_h
 
+#define	_COIPS "coips"
+#define	_MODEL "model"
 #define	_COIPS_MODEL "coips:model"
 #define _COIPS_ACCOUNT "coips"
 

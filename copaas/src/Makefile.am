@@ -9,8 +9,6 @@
 
 bin_PROGRAMS = copaas
 EXTRA_DIST = occipaas_application.c \
-occipaas_config_option.c \
-occipaas_config_template.c \
 occipaas_deployable.c \
 occipaas_environment.c \
 occipaas_link.c \
@@ -20,10 +18,6 @@ occipaas_version.c \
 occipaas_version_instance.c \
 paas_application.c \
 paas_application.h \
-paas_config_option.c \
-paas_config_option.h \
-paas_config_template.c \
-paas_config_template.h \
 paas_deployable.c \
 paas_deployable.h \
 paas_environment.c \
@@ -37,7 +31,17 @@ paas_node.h \
 paas_version.c \
 paas_version.h \
 paas_version_instance.c \
-paas_version_instance.h
+paas_version_instance.h \
+copaas.h \
+occipaas_configuration_option.c \
+occipaas_configuration_template.c \
+occipaas_relation.c \
+paas_configuration_option.c \
+paas_configuration_option.h \
+paas_configuration_template.c \
+paas_configuration_template.h \
+paas_relation.c \
+paas_relation.h
 
 copaas_SOURCES = copaas.c 
 

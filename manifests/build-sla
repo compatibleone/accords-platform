@@ -15,7 +15,7 @@ echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml
 echo "<terms name=\"$1:conditions\" type=\"conditions\">" >> sla-$1.xml 
 echo "<term name=\"$1:condition1\">" >> sla-$1.xml 
-echo "<variable name=\"$1:v1\" property=\"occi.placement.algorithm\" condition=\"eq\" value=\"zone\"/>" >> sla-$1.xml 
+echo "<variable name=\"$1:v1\" property=\"occi.placement.algorithm\" condition=\"eq\" value=\"quota:zone\"/>" >> sla-$1.xml 
 echo "<variable name=\"$1:v2\" property=\"occi.placement.zone\" condition=\"eq\" value=\"europe\"/>" >> sla-$1.xml 
 echo "</term>" >> sla-$1.xml
 echo "</terms>" >> sla-$1.xml

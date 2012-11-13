@@ -205,6 +205,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			os_result( os_glance_access( subscription,p3, 1 ) );
 		else if (!( strcasecmp( p2, "PRIVATE" ) ))
 			os_result( os_glance_access( subscription,p3, 0 ) );
+		else if (!( strcasecmp( p2, "CREATE" ) ))
+			os_result( os_post_glance( subscription,p3, p4, p5 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -364,8 +366,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.02");
-	printf("\n   Beta Version 12/06/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.03");
+	printf("\n   Beta Version 28/09/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -376,6 +378,7 @@ private	int	os_banner()
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   PUBLICVM <name> <server> ");
+	printf("\n   GLANCE CREATE <name> <format> <filename> ");
 	printf("\n   GLANCE PUBLIC <id> ");
 	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");

@@ -1,3 +1,20 @@
+----------------------------------------------------------------------------- 
+ACCORDS Platform                                                              
+Copyright 2012  Hamid MEDJAHED & Elyes ZEKRI (hmedjahed@prologue.fr) Prologue               
+----------------------------------------------------------------------------- 
+Licensed under the Apache License, Version 2.0 (the "License");               
+you may not use this file except in compliance with the License.              
+You may obtain a copy of the License at                                       
+                                                                               
+       http://www.apache.org/licenses/LICENSE-2.0                              
+                                                                               
+Unless required by applicable law or agreed to in writing, software           
+distributed under the License is distributed on an "AS IS" BASIS,             
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      
+See the License for the specific language governing permissions and           
+limitations under the License.                                                
+------------------------------------------------------------------------------
+
 HOW TO INSTALL AND USE PyACCORDS SDK
        
        
@@ -16,13 +33,26 @@ Install pycompmanager
        
 Generate an OCCI category
 -------------------------
-the 4th argument is the provisionning flag indicating if the category is a category related to a cloud provider (1) or to Accords platform (0)
+The 4th argument Takes one of the foolowing value
+	- "" nothing to specify
+	- "_OCCI_PRIORITY"  the service is to be offered first   
+	- "_OCCI_PRIVATE"   the service is not to be published   
+	- "_OCCI_SECRET"    the will not appear in categories   
+	- " _OCCI_AUTO_PUBLISH"    the service will be auto publish
+	- "_OCCI_SECURE"  each access must be secure         
+	- "_OCCI_NO_PRICING"    inhibit category pricing            
+	- "_OCCI_NO_AUTHORIZE"  inhibit category authorize failure   	
+	- "_OCCI_CONSUMER"  publish monitoring consumer         
+	- "_OCCI_PROVIDER"  publish resources provider           
+	- "_OCCI_CONTRACT"  publish resources under contract 
+
+the 5th argument is the provisionning flag indicating if the category is a category related to a cloud provider (1) or to Accords platform (0)
       
 # python
       
 >>>import pycompmanager
       
->>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2", 0)
+>>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2","_OCCI_PROVIDER",0)
       
 >>>pycompmanager.commit()
       
@@ -40,11 +70,9 @@ the 3rd argument is the provisionning flag
       
 Generate an ACCORDS component/OCCI Server 
 -----------------------------------------
-(where the 3rd argument (1) indicates the category will be published as a provider)
             
->>>pycompmanager.generateComponent(“myComponent”, “myCategory”, 1)
+>>>pycompmanager.generateComponent(“myComponent”, “myCategory”)
       
-            
   
 Launching the component
 -----------------------

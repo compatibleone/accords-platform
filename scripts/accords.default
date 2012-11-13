@@ -1,0 +1,6 @@
+# Whether the Accords daemons should be started at boot time.
+# set to 1 to start.
+enabled=1
+
+tempo=1
+accords_workdir=/var/lib/accords

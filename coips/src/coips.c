@@ -47,6 +47,7 @@ struct	accords_configuration Coips = {
 	"domain",
 	"coips.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
@@ -144,6 +145,57 @@ private	void	coips_synchronise()
 	sleep(1);
 }
 
+/*	------------------------------------------------------------------	*/
+/*	       c o i p s _ l o c a t e _ i n f r a s t r u c t u r e		*/
+/*	------------------------------------------------------------------	*/
+private	struct	occi_response * coips_locate_infrastructure( char * model, char * agent, char * tls )
+{	
+	struct	occi_response * yptr;
+	struct	occi_response * uptr;
+
+	/* --------------------------------------------- */
+	/* retrieve the COIPS infrastructure description */
+	/* --------------------------------------------- */
+	if (!( yptr = cords_retrieve_named_instance_list( 
+		_CORDS_INFRASTRUCTURE, "occi.infrastructure.name", model, agent, tls ) ))
+	{
+		return( yptr );
+	}
+	else if (!( uptr = cords_retrieve_named_instance( yptr, agent, tls )))
+	{
+		yptr = occi_remove_response( yptr );
+		return((struct occi_response *) 0);
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		return( uptr );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*	     c o i p s _ r e t r i e v e _ i n f r a s t r u c t u r e		*/
+/*	------------------------------------------------------------------	*/
+private	struct	occi_response * coips_retrieve_infrastructure( char * provider, char * agent, char * tls )
+{
+	char	buffer[2048];
+	struct	occi_response * zptr;
+
+	if (!( rest_valid_string( provider ) ))
+		return(coips_locate_infrastructure( _COIPS_MODEL, agent, tls));
+	else
+	{
+		sprintf( buffer,"%s:%s:%s",_COIPS,provider,_MODEL);
+		if ((zptr = coips_locate_infrastructure( buffer, agent, tls)) != (struct occi_response *) 0)
+			return( zptr );
+		else
+		{
+			sprintf( buffer,"%s:%s",_COIPS,_MODEL);
+			return(coips_locate_infrastructure( buffer, agent, tls));
+		}
+	}
+}
+	
 /* ------------------------- */
 /* build a provisioning node */
 /* ------------------------- */
@@ -167,15 +219,10 @@ private char *	build_application_node(char * image, char * provider )
 
 	/* retrieve the COIPS infrastructure description */
 	/* --------------------------------------------- */
-	if (!( yptr = cords_retrieve_named_instance_list( 
-		_CORDS_INFRASTRUCTURE, "occi.infrastructure.name", _COIPS_MODEL, agent, tls ) ))
-	{
-		return( (char *) 0 );
-	}
-	else if (!( uptr = cords_retrieve_named_instance( yptr, agent, tls )))
-	{
-		return( (char *) 0 );
-	}
+	if (!( uptr = coips_retrieve_infrastructure( provider, agent, tls ) ))
+		return((char *) 0);
+
+
 	else
 	{
 		sprintf(buffer,"%s%s",uptr->host,uptr->name);
@@ -183,7 +230,6 @@ private char *	build_application_node(char * image, char * provider )
 		if (!( infrastructure = allocate_string( buffer ) ))
 			return((char *) 0);
 
-		yptr = occi_remove_response( yptr );
 		uptr = occi_remove_response( uptr );
 	}
 

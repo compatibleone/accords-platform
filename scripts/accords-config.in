@@ -30,11 +30,13 @@ fi
 # -------------------------------------
 # nethsm=1
 tls=security
+# nagios=/usr/local/etc/accords/small-accords-nagios.cfg
 # -------------------------------------
 # sans security 
 # -------------------------------------
 nethsm=
-#tls=
+nagios=
+# tls=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls
@@ -77,7 +79,7 @@ if [ -z "$monitor" ]; then
     monitor=$trace
 fi
 
-aliases="co-start co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-copass run-jpaasprocci run-parser run-procci run-publisher"
+aliases="co-start co-platform co-provision co-provider co-broker co-command co-parser co-resolver co-status co-stop run-azprocci run-cosched run-broker run-cops run-coees run-comons run-conets run-coobas run-coss run-ezvm run-coips run-fileserver run-onprocci run-osprocci run-paprocci run-copass run-jpaasprocci run-parser run-procci run-publisher"
 
 _usage() {
     echo "Usage: this script must be called through one of the following name:"

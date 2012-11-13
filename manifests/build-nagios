@@ -1,0 +1,8 @@
+target=$1-nagios.cfg
+echo "define service{" 		 > $target
+echo "use generic-service" 	>> $target		
+echo "host_name $1 "		>> $target
+echo "service_description Accords Platform Component $1 ">> $target		
+echo "check_command check_http! -I $2 -u /-/ -p $3 -t 10 -s 'Bad Request Expected Host'" >> $target
+echo "}" >> $target
+

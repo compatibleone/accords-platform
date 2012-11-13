@@ -1,0 +1,10 @@
+rm -f update-cosacs.tgz
+wget http://www.compatibleone.fr/accords-platform/update-cosacs.tgz
+tar -xzvf update-cosacs.tgz
+export pubhost=$accords_publisher_publisher_hostname
+bash build-config-cosacs cosacs europe $cosacs $pubhost 
+install -d /home/cosacs/service
+install -d /home/cosacs/rest
+cp *.so.* /usr/local/lib
+cp cosacs /usr/local/bin
+/usr/local/bin/cosacs --config config-cosacs.xml cosacs/1.0a

@@ -5,7 +5,7 @@ struct paas_environment{
 	char* id;
 	char* name;
 	char* uri;
-	char* config_template;
+	char* paas_configuration_template;
 	char* date_created;
 	char* date_updated;
 	char* description;

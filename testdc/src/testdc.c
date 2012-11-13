@@ -213,13 +213,13 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 			return( 46 );
 		else 	return( dc_result( dc_create_instance( filename ) ) );
 	}
-	if (!( strcmp( subject, "rule" ) ))
+	else if (!( strcmp( subject, "rule" ) ))
 	{
 		if (!( filename = dc_create_rule_message(  args[1], args[2], args[3], args[4] ) ))
 			return( 46 );
 		else 	return( dc_result( dc_create_rule( args[0], filename ) ) );
 	}
-	if (!( strcmp( subject, "loadbalancer" ) ))
+	else if (!( strcmp( subject, "loadbalancer" ) ))
 	{
 		if (!( filename = dc_create_loadbalancer_message( args[0], args[1], args[2], args[3], args[4] ) ))
 			return( 46 );
@@ -263,6 +263,7 @@ private int	dc_create_command( char * subject, int argi, int argc, char * argv[]
 	{
 		return( dc_result( dc_create_address() ) );
 	}
+	else	return( 30 );
 
 }
 

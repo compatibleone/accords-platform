@@ -48,6 +48,7 @@ struct	accords_configuration OnProcci = {
 	"domain",
 	"onprocci.xml",
 	"europe",
+	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

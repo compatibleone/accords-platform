@@ -1946,9 +1946,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 
 	set_default_agent( nptr );
 
-	if ( tls )
-		if (!( strlen(tls) ))
-			tls = (char *) 0;
+	if (!( rest_valid_string( tls ) ))
+		tls = (char *) 0;
 
 	/* -------------------------------------------------- */
 	/* ensure that the basic core information is provided */

@@ -40,6 +40,7 @@ struct	accords_configuration
 	char *	domain;			/* category domain			*/
 	char *	config;			/* configuration file			*/
 	char *	zone;			/* location of host			*/
+	char *	storage;		/* the data storage table or file name 	*/
 
 	struct	occi_category *	firstcat;
 	struct	occi_category *	lastcat;

@@ -35,7 +35,7 @@ private	struct rest_header * occi_consume_header( struct rest_header * hptr )
 /*	------------------------------------------------------------	*/
 /*		o c c i _ c o n t e n t _ l e n g t h 			*/
 /*	------------------------------------------------------------	*/
-private	char *	occi_content_length( struct rest_header * hptr, char * filename )
+public	char *	occi_content_length( struct rest_header * hptr, char * filename )
 {
 	struct	stat info;
 	char	length[64];
@@ -947,8 +947,11 @@ public	char * occi_response_body( char * accepts, struct occi_category * cptr, s
 		return( occi_text_body( cptr, hptr ) );
 
 	else if ( accept_string_includes( accepts, _OCCI_TEXT_HTML ) )
-		return( occi_html_body( cptr, hptr ) );
-
+	{
+		if ( cptr->html_rendering )
+			return((*cptr->html_rendering)(cptr, hptr));
+		else	return( occi_html_body( cptr, hptr ) );
+	}
 	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_APP_PHP  ) ))
 	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_PHP ) )))
