@@ -509,10 +509,11 @@ Requires: %{name}-accords
 Requires: python
 Requires: python-psutil
 %if !%{is_mga}
-Requires: python-unittest
-%endif
 %if %{is_rh}
 Requires: python-unittest2
+%else
+Requires: python-unittest
+%endif
 %endif
 
 %description testsuite
