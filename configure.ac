@@ -473,6 +473,13 @@ AC_ARG_ENABLE([testsuite],
       [enable_testsuite=yes])
 AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
 
+AC_ARG_ENABLE([pyaccords],
+      [AS_HELP_STRING([--disable-pyaccords],
+		      [Disable pyaccords @<:@default=disable@:>@])],
+      [],
+      [enable_pyaccords=yes])
+AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
+
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
@@ -524,6 +531,8 @@ AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
 AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
+AC_CONFIG_FILES([pyaccords/Makefile pyaccords/pysrc/Makefile pyaccords/pysrc/pypacksrc/Makefile])
+AC_CONFIG_FILES([pyaccordsSDK/Makefile pyaccordsSDK/pycompdev/Makefile pyaccordsSDK/pycompmanager/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
@@ -583,5 +592,6 @@ echo "    - testaz                   : $enable_testaz"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
 echo "    - testsuite                : $enable_testsuite"
+echo "    - pyaccords                : $enable_pyaccords"
 echo ""
 

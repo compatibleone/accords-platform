@@ -1,6 +1,7 @@
 %define _enable_debug_packages %{nil}
 %define debug_package          %{nil}
 %define enable_testsuite 1
+%define enable_pyaccords 1
 %define distname accords
 
 %define major 0
@@ -9,7 +10,8 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
-%define pythondev python2
+%define python python2
+%define pythondev python-devel
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -47,7 +49,7 @@
 %define libdevgroup Development/C
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
-%define pythondev python
+%define python python
 %endif
 
 %if %{is_suse}
@@ -55,7 +57,7 @@
 #define libgroup System/Libraries
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
-%define pythondev python
+%define python python
 %endif
 
 %if %{is_rh}
@@ -68,16 +70,21 @@
 %define testsuite_enabled "--enable-testsuite=yes"
 %endif
 
+%if %{enable_pyaccords}
+%define pyaccords_enabled "--enable-pyaccords=yes"
+%endif
+
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	17.6
+Release:	17.7
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
 BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
+BuildRequires:  %{python}
 BuildRequires:  %{pythondev}
 Requires:       lsb
 
@@ -103,6 +110,16 @@ Requires:   %{libname} = %{version}-%{release}
 
 %description -n %{libnamedev}
 CompatibleOne Accords development files; For developers only.
+
+#-------------------------------------------
+
+%package python
+Group:      %{libgroup}
+Summary:    CompatibleOne Accords Platform Python bindings
+Requires:   %{name} = %{version}-%{release}
+
+%description python
+CompatibleOne Accords platform Python bindings and interfaces
 
 #-------------------------------------------
 %package azprocci
@@ -529,7 +546,7 @@ regression.
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure %{testsuite_enabled}
+%configure %{testsuite_enabled} %{pyaccords_enabled}
 make
 
 %install
@@ -629,6 +646,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
+
+#--------------------------------------------
+
+%files python
+%defattr(-,root,root,0755)
+%{python_sitelib}/pypacksrc*
+%{python_sitearch}/pycompdev*
+%{python_sitearch}/pycompmanager*
 
 #--------------------------------------------
 

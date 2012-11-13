@@ -9,7 +9,10 @@ module1 = Extension('pycompdev',
                                    '../../fileserver/src/','onprocci/src/','../../osprocci/src/','../../parser/src/','../../procci/src/',
                                    '../../publisher/src/','../../pubocci/src/','../../pyaccords/pysrc/'
                                   ],
-                     libraries=['occi','pubocci','coxml','corest','cords','cocci','cocarrier','copabr']
+                     libraries=['occi','pubocci','coxml','corest','cords','cocci','cocarrier','copabr'],
+                     library_dirs=['../../occi/src/.libs/','../../pubocci/src/.libs/','../../coxml/src/.libs/','../../corest/src/.libs/',
+                                   '../../cords/src/.libs/','../../cocci/src/.libs/','../../cocarrier/src/.libs/','../../copabr/src/.libs/'
+                                  ]
                    )
  
 setup (name = 'pycompdev',

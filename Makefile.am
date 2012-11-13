@@ -152,6 +152,9 @@ endif
 if ENABLE_TESTDC
 SUBDIRS += testdc
 endif
+if ENABLE_PYACCORDS
+SUBDIRS += pyaccords pyaccordsSDK
+endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in
 
