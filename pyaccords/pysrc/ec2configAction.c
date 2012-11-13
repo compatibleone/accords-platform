@@ -26,7 +26,7 @@ struct rest_response * current_ec2config(
 	struct rest_response * aptr,
 	void * vptr )
 {
-	struct cords_ec2config * pptr;
+	struct ec2config * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
 	char status[1024];
