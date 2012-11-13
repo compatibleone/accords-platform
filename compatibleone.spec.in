@@ -686,7 +686,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files cool
 %attr(0755,root,root) %{_bindir}/cool
-#attr(0755,root,root) %{_bindir}/run-cool
+%attr(0755,root,root) %{_bindir}/run-cool
 %attr(0644,root,root) %doc %{_mandir}/man1/cool.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-cool.1*
 
