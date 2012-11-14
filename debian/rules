@@ -22,11 +22,11 @@ JAVA_HOME ?= $(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 #LDFLAGS="-Wl,-z,defs"
 #endif
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
+#ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0 -g
+#else
+#	CFLAGS += -O2
+#endif
 
 configure:
 	./autogen.sh
@@ -70,6 +70,7 @@ install: build
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
+	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp coips.xml `pwd`/debian/tmp/etc/accords
 # Build architecture independant packages.
