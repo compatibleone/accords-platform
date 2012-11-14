@@ -120,6 +120,7 @@ CompatibleOne Accords development files; For developers only.
 
 #-------------------------------------------
 
+%if %{enable_pyaccords}
 %package python
 Group:      %{libgroup}
 Summary:    CompatibleOne Accords Platform Python bindings
@@ -127,6 +128,7 @@ Requires:   %{name} = %{version}-%{release}
 
 %description python
 CompatibleOne Accords platform Python bindings and interfaces
+%endif
 
 #-------------------------------------------
 %package azprocci
@@ -396,6 +398,7 @@ CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 #-------------------------------------------
 
+%if %{enable_paprocci}
 %package paprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
@@ -404,6 +407,7 @@ Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
 
 %description paprocci
 CompatibleOne Accords Platform - ProActive Procci subsystem
+%endif
 
 #-------------------------------------------
 
@@ -656,11 +660,13 @@ rm -rf ${RPM_BUILD_ROOT}
 
 #--------------------------------------------
 
+%if %{enable_pyaccords}
 %files python
 %defattr(-,root,root,0755)
 %{python_sitelib}/pypacksrc*
 %{python_sitearch}/pycompdev*
 %{python_sitearch}/pycompmanager*
+%endif
 
 #--------------------------------------------
 
@@ -796,11 +802,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/osprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-osprocci.1*
 
+%if %{enable_paprocci}
 %files paprocci
 %attr(0755,root,root) %{_bindir}/paprocci
 %attr(0755,root,root) %{_bindir}/run-paprocci
 %attr(0644,root,root) %doc %{_mandir}/man1/paprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-paprocci.1*
+%endif
 
 %files procci
 %attr(0755,root,root) %{_bindir}/procci
