@@ -390,7 +390,7 @@ esac
 AC_SUBST([JVM_ARCH])
 
 AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
-AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/${JVM_ARCH} -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -ljvm -ljava -lverify"])
+AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/${JVM_ARCH} -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -R${paprocci_jdk}/jre/lib/${JVM_ARCH} -R${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -R${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -Wl,-ljvm -Wl,-ljava -Wl,-lverify"])
 AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
 #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
 #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])

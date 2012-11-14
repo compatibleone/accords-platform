@@ -77,13 +77,13 @@
 %endif
 
 %if %{enable_paprocci}
-%define paprocci_enabled "--enable-paprocci=/usr/lib/jvm/java/"
+%define paprocci_enabled "--enable-paprocci=/usr/lib/jvm/java"
 %endif
 
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	18.0
+Release:	18.2
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
