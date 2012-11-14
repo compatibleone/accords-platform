@@ -321,14 +321,14 @@ AM_CONDITIONAL([ENABLE_CONAGIOS], [test "$enable_conagios" = "yes"])
 AC_SUBST([CFLAGS_CONAGIOS], [-I\${abs_top_srcdir}/conagios/src])
 AC_SUBST([PATH_CONAGIOS], [${abs_top_srcdir}/conagios/src])
 
-AC_ARG_ENABLE([jpaasprocci],
-      [AS_HELP_STRING([--disable-jpaasprocci],
-		      [Disable jpaasprocci @<:@default=enable@:>@])],
+AC_ARG_ENABLE([paasprocci],
+      [AS_HELP_STRING([--disable-paasprocci],
+		      [Disable paasprocci @<:@default=enable@:>@])],
       [],
-      [enable_jpaasprocci=yes])
-AM_CONDITIONAL([ENABLE_JPAASPROCCI], [test "$enable_jpaasprocci" = "yes"])
-AC_SUBST([CFLAGS_JPAASPROCCI], [-I\${abs_top_srcdir}/jpaasprocci/src])
-AC_SUBST([PATH_JPAASPROCCI], [${abs_top_srcdir}/jpaasprocci/src])
+      [enable_paasprocci=yes])
+AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
+AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
+AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
 
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
@@ -497,7 +497,7 @@ AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
-AC_CONFIG_FILES([jpaasprocci/Makefile jpaasprocci/src/Makefile])
+AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
@@ -556,7 +556,7 @@ echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - copaas                   : $enable_copaas"
 echo "    - conagios                 : $enable_conagios"
-echo "    - jpaasprocci              : $enable_jpaasprocci"
+echo "    - paasprocci               : $enable_paasprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - coidms                   : $enable_coidms"

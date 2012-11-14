@@ -1,71 +1,73 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _occipaas_deployable_c_
-#define _occipaas_deployable_c_
+#ifndef _occipaas_application_version_instance_c_
+#define _occipaas_application_version_instance_c_
 
-#include "paas_deployable.h"
+#include "paas_application_version_instance.h"
 
-/*	----------------------------------------	*/
-/*	o c c i _ p a a s _ d e p l o y a b l e 	*/
-/*	----------------------------------------	*/
+/*	----------------------------------------------------------------------------	*/
+/*	o c c i _ p a a s _ a p p l i c a t i o n _ v e r s i o n _ i n s t a n c e 	*/
+/*	----------------------------------------------------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct paas_deployable * allocate_paas_deployable();
-struct paas_deployable * liberate_paas_deployable(struct paas_deployable * optr);
-private pthread_mutex_t list_paas_deployable_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * paas_deployable_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * paas_deployable_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_paas_deployable_node() { return( paas_deployable_first ); }
-public struct  occi_kind_node * occi_last_paas_deployable_node() { return( paas_deployable_last ); }
+struct paas_application_version_instance * allocate_paas_application_version_instance();
+struct paas_application_version_instance * liberate_paas_application_version_instance(struct paas_application_version_instance * optr);
+private pthread_mutex_t list_paas_application_version_instance_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * paas_application_version_instance_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * paas_application_version_instance_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_paas_application_version_instance_node() { return( paas_application_version_instance_first ); }
+public struct  occi_kind_node * occi_last_paas_application_version_instance_node() { return( paas_application_version_instance_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_paas_deployable_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_paas_application_version_instance_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		paas_deployable_first = nptr->next;
+		paas_application_version_instance_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		paas_deployable_last = nptr->previous;
+		paas_application_version_instance_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_paas_deployable_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_paas_deployable_control );
-	nptr = ll_drop_paas_deployable_node( nptr );
-	pthread_mutex_unlock( &list_paas_deployable_control );
+private struct occi_kind_node * drop_paas_application_version_instance_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_paas_application_version_instance_control );
+	nptr = ll_drop_paas_application_version_instance_node( nptr );
+	pthread_mutex_unlock( &list_paas_application_version_instance_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_paas_deployable_node(char * id) {
+private struct occi_kind_node * ll_locate_paas_application_version_instance_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
-	for ( nptr = paas_deployable_first;
+	struct paas_application_version_instance * pptr;
+	for ( nptr = paas_application_version_instance_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -74,75 +76,77 @@ private struct occi_kind_node * ll_locate_paas_deployable_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_paas_deployable_node(char * id) {
+private struct occi_kind_node * locate_paas_application_version_instance_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_paas_deployable_control );
-	nptr = ll_locate_paas_deployable_node(id);
-	pthread_mutex_unlock( &list_paas_deployable_control );
+	pthread_mutex_lock( &list_paas_application_version_instance_control );
+	nptr = ll_locate_paas_application_version_instance_node(id);
+	pthread_mutex_unlock( &list_paas_application_version_instance_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_paas_deployable_node(int mode) {
+private struct occi_kind_node * ll_add_paas_application_version_instance_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_paas_deployable()))
+		if (!( nptr->contents = allocate_paas_application_version_instance()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = paas_deployable_last ))
-				paas_deployable_first = nptr;
+			if (!( nptr->previous = paas_application_version_instance_last ))
+				paas_application_version_instance_first = nptr;
 			else	nptr->previous->next = nptr;
-			paas_deployable_last = nptr;
+			paas_application_version_instance_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_paas_deployable_node(int mode) {
+private struct occi_kind_node * add_paas_application_version_instance_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_paas_deployable_control );
-	nptr = ll_add_paas_deployable_node( mode );
-	pthread_mutex_unlock( &list_paas_deployable_control );
+	pthread_mutex_lock( &list_paas_application_version_instance_control );
+	nptr = ll_add_paas_application_version_instance_node( mode );
+	pthread_mutex_unlock( &list_paas_application_version_instance_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_paas_deployable_name="paas_deployable.xml";
-private void autoload_paas_deployable_nodes() {
-	char * fn=autosave_paas_deployable_name;	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+private char*autosave_paas_application_version_instance_name="paas_application_version_instance.xml";
+private void autoload_paas_application_version_instance_nodes() {
+	char * fn=autosave_paas_application_version_instance_name;	struct occi_kind_node * nptr;
+	struct paas_application_version_instance * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"paas_deployables")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"paas_application_version_instances")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "paas_deployable" ) ) continue;
-			else if (!( nptr = add_paas_deployable_node(0))) break;
+			else if ( strcmp( vptr->name, "paas_application_version_instance" ) ) continue;
+			else if (!( nptr = add_paas_application_version_instance_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "content_type" )) != (struct xml_atribut *) 0)
-				pptr->content_type = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
-				pptr->location = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "multitenancy_level" )) != (struct xml_atribut *) 0)
-				pptr->multitenancy_level = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "date_instantiated" )) != (struct xml_atribut *) 0)
+				pptr->date_instantiated = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "default_instance" )) != (struct xml_atribut *) 0)
+				pptr->default_instance = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "uri" )) != (struct xml_atribut *) 0)
+				pptr->uri = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -154,55 +158,58 @@ private void autoload_paas_deployable_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_paas_deployable_name(char * fn) {
-	autosave_paas_deployable_name = fn;	return;
+public  void set_autosave_paas_application_version_instance_name(char * fn) {
+	autosave_paas_application_version_instance_name = fn;	return;
 }
-public  void autosave_paas_deployable_nodes() {
-	char * fn=autosave_paas_deployable_name;	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+public  void autosave_paas_application_version_instance_nodes() {
+	char * fn=autosave_paas_application_version_instance_name;	struct occi_kind_node * nptr;
+	struct paas_application_version_instance * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_paas_deployable_control );
+	pthread_mutex_lock( &list_paas_application_version_instance_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<paas_deployables>\n");
-	for ( nptr = paas_deployable_first;
+	fprintf(h,"<paas_application_version_instances>\n");
+	for ( nptr = paas_application_version_instance_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<paas_deployable\n");
+		fprintf(h,"<paas_application_version_instance\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," content_type=%c",0x0022);
-		fprintf(h,"%s",(pptr->content_type?pptr->content_type:""));
+		fprintf(h," date_instantiated=%c",0x0022);
+		fprintf(h,"%s",(pptr->date_instantiated?pptr->date_instantiated:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," location=%c",0x0022);
-		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," multitenancy_level=%c",0x0022);
-		fprintf(h,"%s",(pptr->multitenancy_level?pptr->multitenancy_level:""));
+		fprintf(h," default_instance=%c",0x0022);
+		fprintf(h,"%s",(pptr->default_instance?pptr->default_instance:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," uri=%c",0x0022);
+		fprintf(h,"%s",(pptr->uri?pptr->uri:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</paas_deployables>\n");
+	fprintf(h,"</paas_application_version_instances>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_paas_deployable_control );
+	pthread_mutex_unlock( &list_paas_application_version_instance_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_paas_deployable_field(
+private void set_paas_application_version_instance_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -210,12 +217,14 @@ private void set_paas_deployable_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "content_type" ) ))
-			pptr->content_type = allocate_string(vptr);
-		if (!( strcmp( nptr, "location" ) ))
-			pptr->location = allocate_string(vptr);
-		if (!( strcmp( nptr, "multitenancy_level" ) ))
-			pptr->multitenancy_level = allocate_string(vptr);
+		if (!( strcmp( nptr, "date_instantiated" ) ))
+			pptr->date_instantiated = allocate_string(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "default_instance" ) ))
+			pptr->default_instance = allocate_string(vptr);
+		if (!( strcmp( nptr, "uri" ) ))
+			pptr->uri = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -225,23 +234,23 @@ private void set_paas_deployable_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct paas_deployable * filter_paas_deployable_info(
+private struct paas_application_version_instance * filter_paas_application_version_instance_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct paas_deployable * pptr;
-		if (!( pptr = allocate_paas_deployable()))
+	struct paas_application_version_instance * pptr;
+		if (!( pptr = allocate_paas_application_version_instance()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_paas_deployable_field) ))
-		return( liberate_paas_deployable(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_paas_application_version_instance_field) ))
+		return( liberate_paas_application_version_instance(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_paas_deployable_filter(
-	struct paas_deployable * pptr,struct paas_deployable * fptr) {
+private int pass_paas_application_version_instance_filter(
+	struct paas_application_version_instance * pptr,struct paas_application_version_instance * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -256,25 +265,32 @@ private int pass_paas_deployable_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->content_type )
-	&&  (strlen( fptr->content_type ) != 0)) {
-		if (!( pptr->content_type ))
+	if (( fptr->date_instantiated )
+	&&  (strlen( fptr->date_instantiated ) != 0)) {
+		if (!( pptr->date_instantiated ))
 			return(0);
-		else if ( strcmp(pptr->content_type,fptr->content_type) != 0)
-			return(0);
-		}
-	if (( fptr->location )
-	&&  (strlen( fptr->location ) != 0)) {
-		if (!( pptr->location ))
-			return(0);
-		else if ( strcmp(pptr->location,fptr->location) != 0)
+		else if ( strcmp(pptr->date_instantiated,fptr->date_instantiated) != 0)
 			return(0);
 		}
-	if (( fptr->multitenancy_level )
-	&&  (strlen( fptr->multitenancy_level ) != 0)) {
-		if (!( pptr->multitenancy_level ))
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
 			return(0);
-		else if ( strcmp(pptr->multitenancy_level,fptr->multitenancy_level) != 0)
+		else if ( strcmp(pptr->description,fptr->description) != 0)
+			return(0);
+		}
+	if (( fptr->default_instance )
+	&&  (strlen( fptr->default_instance ) != 0)) {
+		if (!( pptr->default_instance ))
+			return(0);
+		else if ( strcmp(pptr->default_instance,fptr->default_instance) != 0)
+			return(0);
+		}
+	if (( fptr->uri )
+	&&  (strlen( fptr->uri ) != 0)) {
+		if (!( pptr->uri ))
+			return(0);
+		else if ( strcmp(pptr->uri,fptr->uri) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -284,10 +300,10 @@ private int pass_paas_deployable_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_occi_response(
+private struct rest_response * paas_application_version_instance_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct paas_deployable * pptr)
+	struct paas_application_version_instance * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
@@ -296,13 +312,16 @@ private struct rest_response * paas_deployable_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.content_type=%s",optr->domain,optr->id,pptr->content_type);
+	sprintf(cptr->buffer,"%s.%s.date_instantiated=%s",optr->domain,optr->id,pptr->date_instantiated);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.location=%s",optr->domain,optr->id,pptr->location);
+	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.multitenancy_level=%s",optr->domain,optr->id,pptr->multitenancy_level);
+	sprintf(cptr->buffer,"%s.%s.default_instance=%s",optr->domain,optr->id,pptr->default_instance);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.uri=%s",optr->domain,optr->id,pptr->uri);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -318,37 +337,37 @@ private struct rest_response * paas_deployable_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_get_item(
+private struct rest_response * paas_application_version_instance_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_paas_deployable_nodes();
-	return( paas_deployable_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_paas_application_version_instance_nodes();
+	return( paas_application_version_instance_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_post_link(
+private struct rest_response * paas_application_version_instance_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	char * reqhost;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -358,16 +377,16 @@ private struct rest_response * paas_deployable_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_post_mixin(
+private struct rest_response * paas_application_version_instance_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	char * reqhost;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -377,7 +396,7 @@ private struct rest_response * paas_deployable_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_post_action(
+private struct rest_response * paas_application_version_instance_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -385,10 +404,10 @@ private struct rest_response * paas_deployable_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -404,26 +423,26 @@ private struct rest_response * paas_deployable_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_post_item(
+private struct rest_response * paas_application_version_instance_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_paas_deployable_node(1)))
+	if (!( nptr = add_paas_application_version_instance_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_deployable_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_application_version_instance_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_paas_deployable_nodes();
+	autosave_paas_application_version_instance_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -435,37 +454,37 @@ private struct rest_response * paas_deployable_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_put_item(
+private struct rest_response * paas_application_version_instance_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_deployable_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_application_version_instance_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_paas_deployable_nodes();
-	return( paas_deployable_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_paas_application_version_instance_nodes();
+	return( paas_application_version_instance_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_head_item(
+private struct rest_response * paas_application_version_instance_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	struct paas_application_version_instance * pptr;
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -475,20 +494,20 @@ private struct rest_response * paas_deployable_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_delete_item(
+private struct rest_response * paas_application_version_instance_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_deployable * pptr;
+	struct paas_application_version_instance * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_deployable_node(id)))
+	if (!( nptr = locate_paas_application_version_instance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_paas_deployable_node( nptr );
-	autosave_paas_deployable_nodes();
+	drop_paas_application_version_instance_node( nptr );
+	autosave_paas_application_version_instance_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -497,25 +516,25 @@ private struct rest_response * paas_deployable_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_get_list(
+private struct rest_response * paas_application_version_instance_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct paas_deployable * pptr;
-	struct paas_deployable * fptr;
+	struct paas_application_version_instance * pptr;
+	struct paas_application_version_instance * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_paas_deployable_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_paas_application_version_instance_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = paas_deployable_first;
+	for ( sptr = paas_application_version_instance_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_paas_deployable_filter( pptr, fptr ) ))
+		if (!( pass_paas_application_version_instance_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -529,7 +548,7 @@ private struct rest_response * paas_deployable_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_deployable_delete_all(
+private struct rest_response * paas_application_version_instance_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -537,26 +556,26 @@ private struct rest_response * paas_deployable_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct paas_deployable * pptr;
-	struct paas_deployable * fptr;
+	struct paas_application_version_instance * pptr;
+	struct paas_application_version_instance * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_paas_deployable_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_paas_application_version_instance_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=paas_deployable_first;
+	nptr=paas_application_version_instance_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_paas_deployable_filter( pptr, fptr ) ))) {
+		||  (!( pass_paas_application_version_instance_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
 			sptr = nptr->next;
-			drop_paas_deployable_node( nptr );
+			drop_paas_application_version_instance_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_paas_deployable_nodes();
+	autosave_paas_application_version_instance_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -565,7 +584,7 @@ private struct rest_response * paas_deployable_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_deployable_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_application_version_instance_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -580,16 +599,16 @@ private struct rest_response * occi_paas_deployable_get(void * vptr, struct rest
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( paas_deployable_get_list( optr, cptr, rptr, aptr ) );
+		return( paas_application_version_instance_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_deployable_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_deployable_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_application_version_instance_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -604,14 +623,14 @@ private struct rest_response * occi_paas_deployable_head(void * vptr, struct res
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_deployable_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_deployable_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_application_version_instance_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -626,24 +645,24 @@ private struct rest_response * occi_paas_deployable_post(void * vptr, struct res
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( paas_deployable_post_item( optr, cptr, rptr, aptr ) );
+		return( paas_application_version_instance_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( paas_deployable_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( paas_deployable_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( paas_deployable_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_deployable_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_application_version_instance_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -658,14 +677,14 @@ private struct rest_response * occi_paas_deployable_put(void * vptr, struct rest
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_deployable_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_deployable_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_application_version_instance_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -680,73 +699,60 @@ private struct rest_response * occi_paas_deployable_delete(void * vptr, struct r
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( paas_deployable_delete_all( optr, cptr, rptr, aptr ) );
+		return( paas_application_version_instance_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_deployable_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_application_version_instance_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_paas_deployable_mt( struct rest_interface * iptr )
+private void	redirect_occi_paas_application_version_instance_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_paas_deployable_get;
-	iptr->post = occi_paas_deployable_post;
-	iptr->put = occi_paas_deployable_put;
-	iptr->delete = occi_paas_deployable_delete;
-	iptr->head = occi_paas_deployable_head;
+	iptr->get = occi_paas_application_version_instance_get;
+	iptr->post = occi_paas_application_version_instance_post;
+	iptr->put = occi_paas_application_version_instance_put;
+	iptr->delete = occi_paas_application_version_instance_delete;
+	iptr->head = occi_paas_application_version_instance_head;
 	return;
-}
-
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_paas_deployable(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_paas_deployable_delete(optr,cptr,rptr));
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_paas_deployable */
-public struct occi_category * occi_paas_deployable_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_paas_application_version_instance */
+public struct occi_category * occi_paas_application_version_instance_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource paas_deployable";
+	char * f="CompatibleOne OCCI resource paas_application_version_instance";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_paas_deployable_mt(optr->interface);
+		redirect_occi_paas_application_version_instance_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "content_type",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "date_instantiated",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "multitenancy_level",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "default_instance",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "uri",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_deployable)))
-			return( optr );
-		autoload_paas_deployable_nodes();
+		autoload_paas_application_version_instance_nodes();
 		return(optr);
 	}
 
 }
 
-/*	--------------------------------------------------------	*/
-/*	p a a s _ d e p l o y a b l e _ o c c i _ h e a d e r s 	*/
-/*	--------------------------------------------------------	*/
-public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable * sptr)
+/*	--------------------------------------------------------------------------------------------	*/
+/*	p a a s _ a p p l i c a t i o n _ v e r s i o n _ i n s t a n c e _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------------------------------------------------------------	*/
+public struct rest_header *  paas_application_version_instance_occi_headers(struct paas_application_version_instance * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -761,7 +767,7 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"paas_deployable; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"paas_application_version_instance; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -772,7 +778,7 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_deployable.name='%s'\r\n",(sptr->name?sptr->name:""));
+	sprintf(buffer,"occi.paas_application_version_instance.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -783,7 +789,7 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_deployable.content_type='%s'\r\n",(sptr->content_type?sptr->content_type:""));
+	sprintf(buffer,"occi.paas_application_version_instance.date_instantiated='%s'\r\n",(sptr->date_instantiated?sptr->date_instantiated:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -794,7 +800,7 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_deployable.location='%s'\r\n",(sptr->location?sptr->location:""));
+	sprintf(buffer,"occi.paas_application_version_instance.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -805,7 +811,7 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_deployable.multitenancy_level='%s'\r\n",(sptr->multitenancy_level?sptr->multitenancy_level:""));
+	sprintf(buffer,"occi.paas_application_version_instance.default_instance='%s'\r\n",(sptr->default_instance?sptr->default_instance:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -816,11 +822,22 @@ public struct rest_header *  paas_deployable_occi_headers(struct paas_deployable
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_deployable.state='%u'\r\n",sptr->state);
+	sprintf(buffer,"occi.paas_application_version_instance.uri='%s'\r\n",(sptr->uri?sptr->uri:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_application_version_instance.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _occipaas_deployable_c_ */
+#endif	/* _occipaas_application_version_instance_c_ */

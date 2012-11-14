@@ -1,7 +1,7 @@
-#ifndef	_paas_deployable_h
-#define	_paas_deployable_h
+#ifndef	_paas_application_deployable_h
+#define	_paas_application_deployable_h
 
-struct paas_deployable
+struct paas_application_deployable
 {
 	char* id;
 	char* name;

@@ -607,6 +607,23 @@ private	int	command_transaction( char * account, char * price, char * reference,
 	}
 }
 
+
+/*	---------------------------	*/
+/*	c r e a t e _ a c c o u n t	*/
+/*	---------------------------	*/
+private	int	create_account( char * account )
+{
+	return( 0 );
+}
+
+/*	---------------------------	*/
+/*	   c r e a t e _ u s e r	*/
+/*	---------------------------	*/
+private	int	create_user( char * account, char * name, char * pass, char * role, char * email, char * permission )
+{
+	return( 0 );
+}
+
 /*	---------------------------------------------------	*/
 /*		c o m m a n d _ t r a n s a c t i o n		*/
 /*	---------------------------------------------------	*/
@@ -668,6 +685,10 @@ private	int	operation( int argc, char * argv[] )
 			}
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[argi] ) );
+			else if (!( strcasecmp( command, "ACCOUNT" ) ))
+				return( create_account( aptr ) );
+			else if (!( strcasecmp( command, "USER" ) ))
+				return( create_user( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3], argv[argi+4] ) );
 			else if (!( strcasecmp( command, "TRANSACTION" ) )) 
 				return( command_transaction( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3] ) );
 
@@ -712,7 +733,7 @@ private	int	operation( int argc, char * argv[] )
 private	int	banner()
 {
 	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.03");
-	printf("\n   Beta Version : 05/11/2012 ");
+	printf("\n   Beta Version : 09/11/2012 ");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START       <service_file> ");
@@ -724,6 +745,8 @@ private	int	banner()
 	printf("\n         command <options> COSACS      <service_file> <instruction> ");
 	printf("\n         command <options> OCCI        [body] <request> ");
 	printf("\n         command <options> INVOICE     <account>      ");
+	printf("\n         command <options> ACCOUNT     <name> ");
+	printf("\n         command <options> USER        <account> <name> <pass> <role> <email> <permission> ");
 	printf("\n         command <options> INVOKE      <action> <instance> ");
 	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");

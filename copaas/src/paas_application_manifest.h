@@ -1,7 +1,7 @@
-#ifndef	_paas_manifest_h
-#define	_paas_manifest_h
+#ifndef	_paas_application_manifest_h
+#define	_paas_application_manifest_h
 
-struct paas_manifest 
+struct paas_application_manifest 
 {
 	char* id;
 	char* name;

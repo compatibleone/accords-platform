@@ -39,12 +39,12 @@ public struct paas_application * liberate_paas_application(struct paas_applicati
 			 sptr->date_created = liberate(sptr->date_created);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
-		if ( sptr->paas_version )
-			 sptr->paas_version = liberate(sptr->paas_version);
-		if ( sptr->paas_environment )
-			 sptr->paas_environment = liberate(sptr->paas_environment);
-		if ( sptr->paas_configuration_template )
-			 sptr->paas_configuration_template = liberate(sptr->paas_configuration_template);
+		if ( sptr->paas_application_version )
+			 sptr->paas_application_version = liberate(sptr->paas_application_version);
+		if ( sptr->paas_application_environment )
+			 sptr->paas_application_environment = liberate(sptr->paas_application_environment);
+		if ( sptr->paas_application_configuration_template )
+			 sptr->paas_application_configuration_template = liberate(sptr->paas_application_configuration_template);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_application *) 0);
@@ -62,9 +62,9 @@ public struct paas_application * reset_paas_application(struct paas_application 
 		sptr->name = (char*) 0;
 		sptr->date_created = (char*) 0;
 		sptr->description = (char*) 0;
-		sptr->paas_version = (char*) 0;
-		sptr->paas_environment = (char*) 0;
-		sptr->paas_configuration_template = (char*) 0;
+		sptr->paas_application_version = (char*) 0;
+		sptr->paas_application_environment = (char*) 0;
+		sptr->paas_application_configuration_template = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -108,17 +108,17 @@ public int xmlin_paas_application(struct paas_application * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"paas_version") ))
+		else if (!( strcmp(wptr->name,"paas_application_version") ))
 		{
-			if ( wptr->value ) { sptr->paas_version = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->paas_application_version = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"paas_environment") ))
+		else if (!( strcmp(wptr->name,"paas_application_environment") ))
 		{
-			if ( wptr->value ) { sptr->paas_environment = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->paas_application_environment = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"paas_configuration_template") ))
+		else if (!( strcmp(wptr->name,"paas_application_configuration_template") ))
 		{
-			if ( wptr->value ) { sptr->paas_configuration_template = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->paas_application_configuration_template = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -142,9 +142,9 @@ public int rest_occi_paas_application(FILE * fh,struct paas_application * sptr,c
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_created='%s'\r\n",prefix,nptr,(sptr->date_created?sptr->date_created:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_version='%s'\r\n",prefix,nptr,(sptr->paas_version?sptr->paas_version:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_environment='%s'\r\n",prefix,nptr,(sptr->paas_environment?sptr->paas_environment:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_configuration_template='%s'\r\n",prefix,nptr,(sptr->paas_configuration_template?sptr->paas_configuration_template:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_application_version='%s'\r\n",prefix,nptr,(sptr->paas_application_version?sptr->paas_application_version:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_application_environment='%s'\r\n",prefix,nptr,(sptr->paas_application_environment?sptr->paas_application_environment:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_application_configuration_template='%s'\r\n",prefix,nptr,(sptr->paas_application_configuration_template?sptr->paas_application_configuration_template:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

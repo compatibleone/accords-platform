@@ -1,7 +1,7 @@
-#ifndef	_paas_version_instance_h
-#define	_paas_version_instance_h
+#ifndef	_paas_application_version_instance_h
+#define	_paas_application_version_instance_h
 
-struct paas_version_instance
+struct paas_application_version_instance
 {
 	char* id;
 	char* name;

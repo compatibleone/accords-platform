@@ -1,6 +1,6 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
-	<xsd:complexType name="paas_manifest">
+	<xsd:complexType name="paas_application_manifest">
 		<xsd:sequence>
 			<xsd:element name="paas_description" type="xsd:string" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="paas_application" type="paas_application" minOccurs="0" maxOccurs="1" />
@@ -16,8 +16,8 @@
 
 	<xsd:complexType name="paas_application">
 		<xsd:sequence>
-			<xsd:element name="paas_version" type="paas_version" minOccurs="0" maxOccurs="1" />	
-			<xsd:element name="paas_environment" type="paas_environment" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="paas_application_version" type="paas_application_version" minOccurs="0" maxOccurs="1" />	
+			<xsd:element name="paas_application_environment" type="paas_application_environment" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="paas_configuration_template" type="paas_configuration_template" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
@@ -30,9 +30,9 @@
 		<xsd:attribute name="description" use="required" type="xsd:NCName"/>
 	</xsd:complexType>
 
-	<xsd:complexType name="paas_version">
+	<xsd:complexType name="paas_application_version">
 		<xsd:sequence>
-			<xsd:element name="paas_version_instance" type="paas_version_instance" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="paas_application_version_instance" type="paas_application_version_instance" minOccurs="0" maxOccurs="unbounded" />
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -42,9 +42,9 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
-	<xsd:complexType name="paas_version_instance">
+	<xsd:complexType name="paas_application_version_instance">
 		<xsd:sequence>
-			<xsd:element name="paas_deployable" type="paas_deployable"  minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="paas_application_deployable" type="paas_application_deployable"  minOccurs="0" maxOccurs="unbounded" />
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
@@ -55,7 +55,7 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
-	<xsd:complexType name="paas_deployable">
+	<xsd:complexType name="paas_application_deployable">
 		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="content_type" use="required" type="xsd:NCName"/>
@@ -64,9 +64,9 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
-	<xsd:complexType name="paas_environment">
+	<xsd:complexType name="paas_application_environment">
 		<xsd:sequence>
-			<xsd:element name="paas_configuration_template" type="paas_configuration_template" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="paas_application_configuration_template" type="paas_applicaton_configuration_template" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" use="required" type="xsd:NCName"/>
@@ -79,7 +79,7 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
-	<xsd:complexType name="paas_configuration_template">
+	<xsd:complexType name="paas_application_configuration_template">
 		<xsd:sequence>
 			<xsd:element name="paas_configuration_option" type="paas_configuration_option" minOccurs="0" maxOccurs="unbounded" />
 			<xsd:element name="paas_node" maxoccurs="unbounded" type="paas_node" minOccurs="0" maxOccurs="unbounded" />
