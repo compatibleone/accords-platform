@@ -2,7 +2,6 @@
 echo Cleaning not needed files...
 rm -f rest/*
 rm -f service/*
-rm -f security/*
 rm -f links_*
 rm -f plan_*
 rm -f proactive.xml

@@ -59,8 +59,8 @@ endif
 if ENABLE_COPAAS
 SUBDIRS += copaas
 endif
-if ENABLE_JPAASPROCCI
-SUBDIRS += jpaasprocci
+if ENABLE_PAASPROCCI
+SUBDIRS += paasprocci
 endif
 if ENABLE_COOL
 SUBDIRS += cool

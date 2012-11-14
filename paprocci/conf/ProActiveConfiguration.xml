@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<!-- <prop key="proactive.net.nolocal" value="true"/> -->
+		<!--<prop key="proactive.rmi.port" value="1234"/>-->
+		<!-- new ones -->
+		<prop key="proactive.communication.protocol" value="pamr"/>
+		<prop key="proactive.net.router.address" value="node0.cloud.sophia.inria.fr"/>
+		<prop key="proactive.net.router.port" value="8090"/>
+		<prop key="proactive.communication.pamr.socketfactory" value="ssh"/>
+		<prop key="proactive.communication.pamrssh.key_directory" value="/home/cone/.ssh/"/>
+		<prop key="proactive.communication.pamrssh.username" value="mjost"/>
+		<prop key="proactive.communication.pamrssh.port" value="22"/>
+    </properties>
+    <javaProperties>
+    </javaProperties>
+</ProActiveUserProperties>

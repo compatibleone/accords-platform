@@ -34,6 +34,16 @@
 #include "../../pyaccords/pysrc/listoccibuilder.h"
 
 struct accords_configuration moduleConfig;
+private	struct rest_extension * module_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr);
+public	int	check_debug();
+public	int	check_verbose();	
+public	char *	default_publisher();	
+public	char *	default_operator();	
+public	char *	default_tls();	
+public	char *	default_zone();
+public	int	failure( int e, char * m1, char * m2 );
+private	int banner();
+private	struct rest_server * module_initialise(  void * v,struct rest_server * sptr );
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName)
 {

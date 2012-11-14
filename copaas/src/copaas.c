@@ -56,26 +56,26 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "copaas.h"
 #include "paas_application.c"
 #include "paas_configuration_option.c"
-#include "paas_configuration_template.c"
-#include "paas_deployable.c"
-#include "paas_environment.c"
+#include "paas_application_configuration_template.c"
+#include "paas_application_deployable.c"
+#include "paas_application_environment.c"
 #include "paas_link.c"
-#include "paas_manifest.c"
+#include "paas_application_manifest.c"
 #include "paas_relation.c"
 #include "paas_node.c"
-#include "paas_version.c"
-#include "paas_version_instance.c"
+#include "paas_application_version.c"
+#include "paas_application_version_instance.c"
 #include "occipaas_application.c"
 #include "occipaas_configuration_option.c"
-#include "occipaas_configuration_template.c"
-#include "occipaas_deployable.c"
-#include "occipaas_environment.c"
+#include "occipaas_application_configuration_template.c"
+#include "occipaas_application_deployable.c"
+#include "occipaas_application_environment.c"
 #include "occipaas_link.c"
-#include "occipaas_manifest.c"
+#include "occipaas_application_manifest.c"
 #include "occipaas_relation.c"
 #include "occipaas_node.c"
-#include "occipaas_version.c"
-#include "occipaas_version_instance.c"
+#include "occipaas_application_version.c"
+#include "occipaas_application_version_instance.c"
 
 /*	---------------------------------------------------------------	*/  
 /*	c o p a a s _ c o n f i g u r a t i o n				*/
@@ -173,7 +173,7 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_deployable_builder( CoPaas.domain, "paas_deployable" ) ))
+	if (!( optr = occi_paas_application_deployable_builder( CoPaas.domain, "paas_application_deployable" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -187,14 +187,14 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_environment_builder( CoPaas.domain, "paas_environment" ) ))
+	if (!( optr = occi_paas_application_environment_builder( CoPaas.domain, "paas_application_environment" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_manifest_builder( CoPaas.domain, "paas_manifest" ) ))
+	if (!( optr = occi_paas_application_manifest_builder( CoPaas.domain, "paas_application_manifest" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -208,7 +208,7 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_version_builder( CoPaas.domain, "paas_version" ) ))
+	if (!( optr = occi_paas_application_version_builder( CoPaas.domain, "paas_application_version" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -222,7 +222,7 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_version_instance_builder( CoPaas.domain, "paas_version_instance" ) ))
+	if (!( optr = occi_paas_application_version_instance_builder( CoPaas.domain, "paas_application_version_instance" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -238,7 +238,7 @@ private	int	copaas_operation( char * nptr )
 	last = optr;
 
 
-	if (!( optr = occi_paas_configuration_template_builder( CoPaas.domain, "paas_configuration_template" ) ))
+	if (!( optr = occi_paas_application_configuration_template_builder( CoPaas.domain, "paas_application_configuration_template" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

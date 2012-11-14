@@ -130,7 +130,7 @@ function verification()
 	check	opennebula	onprocci
 	check	windowsazure	azprocci
 
-	check	jpaas				jpaasprocci
+	check	paas				paasprocci
 	check	paas_application		copass
 	check	paas_deployable			copass
 	check	paas_link			copass

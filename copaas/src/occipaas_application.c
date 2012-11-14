@@ -141,12 +141,12 @@ private void autoload_paas_application_nodes() {
 				pptr->date_created = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "paas_version" )) != (struct xml_atribut *) 0)
-				pptr->paas_version = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "paas_environment" )) != (struct xml_atribut *) 0)
-				pptr->paas_environment = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "paas_configuration_template" )) != (struct xml_atribut *) 0)
-				pptr->paas_configuration_template = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application_version" )) != (struct xml_atribut *) 0)
+				pptr->paas_application_version = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application_environment" )) != (struct xml_atribut *) 0)
+				pptr->paas_application_environment = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application_configuration_template" )) != (struct xml_atribut *) 0)
+				pptr->paas_application_configuration_template = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -185,14 +185,14 @@ public  void autosave_paas_application_nodes() {
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," paas_version=%c",0x0022);
-		fprintf(h,"%s",(pptr->paas_version?pptr->paas_version:""));
+		fprintf(h," paas_application_version=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application_version?pptr->paas_application_version:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," paas_environment=%c",0x0022);
-		fprintf(h,"%s",(pptr->paas_environment?pptr->paas_environment:""));
+		fprintf(h," paas_application_environment=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application_environment?pptr->paas_application_environment:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," paas_configuration_template=%c",0x0022);
-		fprintf(h,"%s",(pptr->paas_configuration_template?pptr->paas_configuration_template:""));
+		fprintf(h," paas_application_configuration_template=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application_configuration_template?pptr->paas_application_configuration_template:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -224,12 +224,12 @@ private void set_paas_application_field(
 			pptr->date_created = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
-		if (!( strcmp( nptr, "paas_version" ) ))
-			pptr->paas_version = allocate_string(vptr);
-		if (!( strcmp( nptr, "paas_environment" ) ))
-			pptr->paas_environment = allocate_string(vptr);
-		if (!( strcmp( nptr, "paas_configuration_template" ) ))
-			pptr->paas_configuration_template = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application_version" ) ))
+			pptr->paas_application_version = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application_environment" ) ))
+			pptr->paas_application_environment = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application_configuration_template" ) ))
+			pptr->paas_application_configuration_template = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -284,25 +284,25 @@ private int pass_paas_application_filter(
 		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
-	if (( fptr->paas_version )
-	&&  (strlen( fptr->paas_version ) != 0)) {
-		if (!( pptr->paas_version ))
+	if (( fptr->paas_application_version )
+	&&  (strlen( fptr->paas_application_version ) != 0)) {
+		if (!( pptr->paas_application_version ))
 			return(0);
-		else if ( strcmp(pptr->paas_version,fptr->paas_version) != 0)
-			return(0);
-		}
-	if (( fptr->paas_environment )
-	&&  (strlen( fptr->paas_environment ) != 0)) {
-		if (!( pptr->paas_environment ))
-			return(0);
-		else if ( strcmp(pptr->paas_environment,fptr->paas_environment) != 0)
+		else if ( strcmp(pptr->paas_application_version,fptr->paas_application_version) != 0)
 			return(0);
 		}
-	if (( fptr->paas_configuration_template )
-	&&  (strlen( fptr->paas_configuration_template ) != 0)) {
-		if (!( pptr->paas_configuration_template ))
+	if (( fptr->paas_application_environment )
+	&&  (strlen( fptr->paas_application_environment ) != 0)) {
+		if (!( pptr->paas_application_environment ))
 			return(0);
-		else if ( strcmp(pptr->paas_configuration_template,fptr->paas_configuration_template) != 0)
+		else if ( strcmp(pptr->paas_application_environment,fptr->paas_application_environment) != 0)
+			return(0);
+		}
+	if (( fptr->paas_application_configuration_template )
+	&&  (strlen( fptr->paas_application_configuration_template ) != 0)) {
+		if (!( pptr->paas_application_configuration_template ))
+			return(0);
+		else if ( strcmp(pptr->paas_application_configuration_template,fptr->paas_application_configuration_template) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -330,13 +330,13 @@ private struct rest_response * paas_application_occi_response(
 	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.paas_version=%s",optr->domain,optr->id,pptr->paas_version);
+	sprintf(cptr->buffer,"%s.%s.paas_application_version=%s",optr->domain,optr->id,pptr->paas_application_version);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.paas_environment=%s",optr->domain,optr->id,pptr->paas_environment);
+	sprintf(cptr->buffer,"%s.%s.paas_application_environment=%s",optr->domain,optr->id,pptr->paas_application_environment);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.paas_configuration_template=%s",optr->domain,optr->id,pptr->paas_configuration_template);
+	sprintf(cptr->buffer,"%s.%s.paas_application_configuration_template=%s",optr->domain,optr->id,pptr->paas_application_configuration_template);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
@@ -765,11 +765,11 @@ public struct occi_category * occi_paas_application_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "paas_version",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "paas_application_version",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "paas_environment",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "paas_application_environment",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "paas_configuration_template",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "paas_application_configuration_template",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -843,7 +843,7 @@ public struct rest_header *  paas_application_occi_headers(struct paas_applicati
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application.paas_version='%s'\r\n",(sptr->paas_version?sptr->paas_version:""));
+	sprintf(buffer,"occi.paas_application.paas_application_version='%s'\r\n",(sptr->paas_application_version?sptr->paas_application_version:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -854,7 +854,7 @@ public struct rest_header *  paas_application_occi_headers(struct paas_applicati
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application.paas_environment='%s'\r\n",(sptr->paas_environment?sptr->paas_environment:""));
+	sprintf(buffer,"occi.paas_application.paas_application_environment='%s'\r\n",(sptr->paas_application_environment?sptr->paas_application_environment:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -865,7 +865,7 @@ public struct rest_header *  paas_application_occi_headers(struct paas_applicati
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application.paas_configuration_template='%s'\r\n",(sptr->paas_configuration_template?sptr->paas_configuration_template:""));
+	sprintf(buffer,"occi.paas_application.paas_application_configuration_template='%s'\r\n",(sptr->paas_application_configuration_template?sptr->paas_application_configuration_template:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

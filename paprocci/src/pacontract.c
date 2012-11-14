@@ -1,22 +1,21 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 #ifndef	_pacontract_c
 #define	_pacontract_c
 
@@ -128,11 +127,50 @@ private	int	pa_normalise_value( char * sptr, int normal )
 	return( value * factor );
 }
 
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ c o r e s     		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_cores(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_CORES);
+	return(vptr);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ r a m         		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_ram(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_MEMORY);
+	return(vptr);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ m h z         		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_mhz(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->compute.message, "occi", _CORDS_COMPUTE, _CORDS_SPEED);
+	return(vptr);
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ c o n t r a c t _ d i s k       		*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_contract_disk(struct cords_pa_contract * cptr )
+{
+	char *			vptr;
+	vptr = occi_extract_atribut( cptr->storage.message, "occi", _CORDS_STORAGE, _CORDS_SIZE);
+	return(vptr);
+}
 
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_contract_image( struct cords_pa_contract * cptr )
+private	char *	resolve_contract_os( struct cords_pa_contract * cptr )
 {
 	//struct	pa_image_infos	request;
 	//struct	pa_image_infos	image;
@@ -299,6 +337,12 @@ public	int	create_proactive_contract(
 	else if (!( contract.storage.message = occi_simple_get( contract.storage.id, agent, tls ) ))
 		return( terminate_proactive_contract( 1179, &contract ) );
 
+	char* os = NULL;
+	char* cores = NULL;
+	char* ram = NULL;
+	char* mhz = NULL;
+	char* disk = NULL;
+
 	/* ---------------------------------- */
 	/* recover the node image description */
 	/* ---------------------------------- */
@@ -313,22 +357,35 @@ public	int	create_proactive_contract(
 		return( terminate_proactive_contract( 1184, &contract ) );
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
 		return( terminate_proactive_contract( 1185, &contract ) );
-
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
 	//else if (!( contract.images = pa_list_image_details() ))
 	//	return( terminate_proactive_contract( 1186, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( &contract ) ))
+	else if (!( os = resolve_contract_os( &contract ) ))
+		return( terminate_proactive_contract( 1186, &contract ) );
+	else if (!( cores = resolve_contract_cores( &contract ) ))
 		return( terminate_proactive_contract( 1187, &contract ) );
-	//else if (!( pptr->original = allocate_string( pptr->image ) ))
-	//	return( terminate_proactive_contract( 1188, &contract ) );
+	else if (!( ram = resolve_contract_ram( &contract ) ))
+		return( terminate_proactive_contract( 1188, &contract ) );
+	else if (!( mhz = resolve_contract_mhz( &contract ) ))
+		return( terminate_proactive_contract( 1189, &contract ) );
+	else if (!( disk = resolve_contract_disk( &contract ) ))
+		return( terminate_proactive_contract( 1190, &contract ) );
 	{
 		/* ----------------------------------------------- */
 		/* resolve any price informatino for this category */
 		/* ----------------------------------------------- */
+		int leng = 5;
+		leng += strlen(os);
+		leng += strlen(ram);
+		leng += strlen(mhz);
+		leng += strlen(cores);
+		leng += strlen(disk);
+		pptr->image = (char*) malloc (leng * sizeof(char));
+		sprintf(pptr->image, "%s;%s;%s;%s;%s", os, ram, mhz, cores, disk);
+
 		pptr->price = occi_resolve_category_price( _CORDS_PROACTIVE, default_operator(), agent, tls );
-	
 		return( terminate_proactive_contract( 0, &contract ) );
 	}
 }
@@ -342,20 +399,7 @@ public	int	delete_proactive_contract(
 		char * agent,
 		char * tls )
 {
-	struct	pa_response * paptr;
-	if ((paptr = stop_proactive_provisioning( pptr )) != (struct pa_response *) 0)
-		paptr = liberate_pa_response( paptr );
-	//if (!( pptr->image ))
-	//	return( 0 );
-	//else if (!( pptr->original ))
-	//	return( 0 );
-	//else if (!( strcmp( pptr->original, pptr->image ) ))
-	//	return( 0 );
-	else
-	{
-		//pa_delete_image( pptr->image );
-		return(0);
-	}
+	printf("Deleting ProActive contract...\n");
 }
 
 	/* ------------- */
