@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
 /* -------------------------------------------------------------------- */
 /* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
 /* you may not use this file except in compliance with the License. 	*/
@@ -15,6 +15,7 @@
 /* See the License for the specific language governing permissions and 	*/
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
+
 #ifndef _pa_client_h
 #define _pa_client_h
 
@@ -108,8 +109,8 @@ public	struct	pa_response *	pa_list_locations();
 /* servers */
 /* ------- */
 public	struct	pa_response *	pa_list_servers	();
-public	struct	pa_response *	pa_create_server(struct proactive * constr);
-public	struct	pa_response *	pa_delete_server(struct proactive * constr);
+public	struct	pa_response *	pa_create_server(struct rest_request * request,  struct rest_response * response, struct proactive * constr);
+public	struct	pa_response *	pa_delete_server(struct rest_request * request,  struct rest_response * response, struct proactive * constr);
 public	struct	pa_response *	pa_get_server	( char * id );
 public	struct	pa_response *	pa_update_server( char * id, char * filename );
 

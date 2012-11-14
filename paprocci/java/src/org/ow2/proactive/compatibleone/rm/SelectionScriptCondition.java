@@ -1,39 +1,20 @@
-/*
- * ################################################################
- *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
- *
- * Copyright (C) 1997-2011 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
- * the License.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- * If needed, contact us to obtain a release under GPL Version 2 or 3
- * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
- */
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 package org.ow2.proactive.compatibleone.rm;
 
@@ -189,9 +170,9 @@ public class SelectionScriptCondition {
 		condition += "var sigar = new Sigar();" + NEWLINE;
 		condition += "var usercpu = sigar.getCpuPerc().getUser();" + NEWLINE;
 	    condition += "if (usercpu < MINIMUM)"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR true; println(usercpu \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(usercpu + \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition += "{selected = selected OPERATOR false; println(usercpu + \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
@@ -207,14 +188,49 @@ public class SelectionScriptCondition {
 		String condition = "";
 		condition += "importClass(org.hyperic.sigar.Sigar);" + NEWLINE;
 		condition += "var sigar = new Sigar();" + NEWLINE;
-		condition += "var usercpu = sigar.XXX;" + NEWLINE;
-	    condition += "if (usercpu < MINIMUM)"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR true; println(usercpu \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
+		condition += "var paramx = sigar.XXX;" + NEWLINE;
+	    condition += "if (paramx >= MINIMUM)"+NEWLINE ;
+	    condition += "{selected = selected OPERATOR true; println(paramx + \" >= than minimum XXX MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
-	    condition += "{selected = selected OPERATOR false; println(usercpu \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
+	    condition += "{selected = selected OPERATOR false; println(paramx + \" <= than minimum XXX MINIMUM  ==> NOT selected\");}" + NEWLINE;
 	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
 	    condition = condition.replace("XXX", X);
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
+	
+		//Sigar sigar = new Sigar();
+		//System.out.println("ram: " + sigar.getCpuInfoList()[0].getModel());
+		//System.out.println("ram: " + sigar.getMem().getRam());
+		//System.out.println("mhz: " + sigar.getCpuInfoList()[0].getMhz());
+		//System.out.println("disk: " + sigar.getFileSystemUsage(sigar.getFileSystemList()[0].getDirName()).getTotal()/1024);
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithMemoryMb(double minimum){
+		return nodeWithXGreaterThan("getMem().getRam()", minimum);
+	}
+	
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithMHz(double minimum){
+		return nodeWithXGreaterThan("getCpuInfoList()[0].getMhz()", minimum);
+
+	}
+	/**
+	 * XX 
+	 * @param 
+	 * @return 
+	 */
+	public static SelectionScriptCondition nodeWithDiskMb(double minimum){
+		String s = "getFileSystemUsage(sigar.getFileSystemList()[0].getDirName()).getTotal()/1024";
+		return nodeWithXGreaterThan(s, minimum);
+	}
+	
+	
 }

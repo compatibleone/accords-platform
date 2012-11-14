@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
 /* -------------------------------------------------------------------- */
 /* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
 /* you may not use this file except in compliance with the License. 	*/
@@ -15,6 +15,7 @@
 /* See the License for the specific language governing permissions and 	*/
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
+
 #ifndef	_proccipa_c
 #define	_proccipa_c
 
@@ -252,13 +253,14 @@ private	struct	rest_response * start_proactive(
 	printf("start_proactive\n");
 	if (!( pptr = vptr ))							// Can't provide null.
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->status != _OCCI_IDLE )     
+	else if ( pptr->status != _OCCI_IDLE )     {
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_proactive_configuration( pptr->profile )) != 0)	// Set up configuration according to profile (where the user and pass are).
+	}else if ((status = use_proactive_configuration( pptr->profile )) != 0){// Set up configuration according to profile (where the user and pass are).
+		printf("ERROR Profile '%s' not found. \n", pptr->profile);
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( paptr = pa_create_server(pptr)))				// Request of a node using constraints. 
+	}else if (!( paptr = pa_create_server(rptr, aptr, pptr))){		// Request of a node using constraints. 
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else
+	}else
 	{
 		/* ------------------------------- */
 		/* parse data obtained from server */
@@ -307,7 +309,7 @@ private	struct	rest_response * save_proactive(
 /*	--------------------------------------------------------	*/
 /* 	 s t o p  _ p r o a c t i v e _ p r o v i s i o n i n g  	*/
 /*	--------------------------------------------------------	*/
-private	struct pa_response *	stop_proactive_provisioning( struct proactive * pptr )
+private	struct pa_response *	stop_proactive_provisioning2( struct proactive * pptr )
 {
 	int	status;
 	struct	pa_response * osptr;
@@ -319,8 +321,8 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
-		if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
-		{
+		//if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
+		//{
 			/* ----------------------------- */
 			/* await server instance removal */
 			/* ----------------------------- */
@@ -339,7 +341,7 @@ private	struct pa_response *	stop_proactive_provisioning( struct proactive * ppt
 			//	}
 			//}
 			//while ((osptr=pa_get_server( pptr->number )) != (struct os_response *) 0);
-		}
+		//}
 		/* ------------------------------------------- */
 		/* ensure release of the allocated floating IP */
 		/* ------------------------------------------- */
@@ -367,7 +369,7 @@ private	struct	rest_response * stop_proactive(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if ((status = use_proactive_configuration( pptr->profile )) != 0)  // Set up configuration according to the profile (where user and pass are)
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if (!( osptr = pa_delete_server(pptr)))
+	else if (!( osptr = pa_delete_server(rptr, aptr, pptr)))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else
 	{

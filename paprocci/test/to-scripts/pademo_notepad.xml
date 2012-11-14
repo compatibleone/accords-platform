@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF8"?>
+<manifest name="pademo_notepad" xmlns="file:///tmp/manifest.xsd">
+	<node name="webnode" type="simple" access="public" scope="normal" provider="proactive" >
+		<infrastructure name="painfrastructure">
+			<compute name="pacompute" architecture="x86" cores="2" memory="4G" speed="1.6G"/>
+			<storage name="pastorage" size="40G"/>
+			<network name="panetwork" label="ethernet" vlan="100M"/>
+		</infrastructure>
+		<image name="paimage">
+			<system name="windows"/>
+                </image>
+	</node>
+        <configuration name="paconfig_notepad">
+		<action name="run_notepad" expression="webnode.system('start notepad');"/>
+        </configuration>
+	<account name="paaccount"/>
+	<security name="pasecurity"/>
+</manifest>
+

@@ -19,11 +19,11 @@
 package org.ow2.proactive.compatibleone.exceptions;
 
 /** 
- * General exception thrown whenever a particular needed element in a set is not found.  */
-public class ElementNotFoundException extends Exception{
+ * General exception thrown whenever information of a node cannot be obtained. */
+public class NodeInfoException extends Exception{
 	private static final long serialVersionUID = 1L;
 
-	public ElementNotFoundException(String message){
+	public NodeInfoException(String message){
 		super(message);
 	}
 }

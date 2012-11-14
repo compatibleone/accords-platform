@@ -36,12 +36,5 @@ addalljars $BASEDIR/dist/
 export CLASSPATH=$CPATH
 #echo CLASSPATH $CPATH
 
-# Uncomment if local ProActive scheduler connection wanted (default). 
-# $JAVA_HOME/bin/java -Xmx1024m org.ow2.proactive.compatibleone.pajavaprocci.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-local.properties $@  -v 3
-
-# Uncomment if demo ProActive scheduler connection wanted . 
-#$JAVA_HOME/bin/java -Xmx1024m org.ow2.proactive.compatibleone.pajavaprocci.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-demo.properties $@ -v 3
-
-# Uncomment if PACA Grid connection wanted (needs a PACA Grid account). 
-$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/procci-pacagrid.properties $@  -v 3
+$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/paprocci.properties $@  -v 3
 

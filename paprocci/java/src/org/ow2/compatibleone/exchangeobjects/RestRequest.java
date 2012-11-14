@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2012 by Oasis (INRIA Sophia Antipolis) and ActiveEon teams.     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 package org.ow2.compatibleone.exchangeobjects;
 
 public class RestRequest {
@@ -15,8 +33,7 @@ struct  rest_request {
 };	 
  */
 
-	private RestHeader first;
-	private RestHeader last;
+	private RestHeaderBlock all;
     private String method;
     private String object;
     private String parameters;
@@ -26,8 +43,7 @@ struct  rest_request {
     private String host;
     
     public RestRequest(
-    		RestHeader first, 
-    		RestHeader last, 
+    		RestHeaderBlock all,
     		String method, 
     		String object, 
     		String parameters, 
@@ -36,8 +52,7 @@ struct  rest_request {
     		String body,
     		String host){
     	
-    		this.first = first;
-    		this.last = last;
+    		this.all = all;
     		this.method = method;
     		this.object = object;
     		this.parameters = parameters;
@@ -46,11 +61,8 @@ struct  rest_request {
     		this.body = body;
     		this.host = host;
     }
-    public RestHeader getFirst() {
-		return first;
-	}
-    public RestHeader getLast() {
-		return last;
+    public RestHeaderBlock getBlock() {
+		return all;
 	}
     public String getMethod() {
 		return method;
@@ -73,4 +85,17 @@ struct  rest_request {
     public String getHost() {
 		return host;
 	}
+    public String toString(){
+    	return 
+    		"[" + 
+    		"block " +  all + ", \n" + 
+    		"method " +  method + ", \n" + 
+    		"object " +  object + ", \n" + 
+    		"parameters " +  parameters + ", \n" + 
+    		"version " +  version + ", \n" + 
+    		"type " +  type + ", \n" + 
+    		"body " +  body + ", \n" + 
+    		"host " +  host + ", \n" + 
+    		"]"  ;
+    }
 }
