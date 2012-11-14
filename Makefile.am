@@ -164,4 +164,3 @@ dist-srpm: dist-gzip spec
 	cp $(SPEC) $(SPEC_DIR)
 	cp $(distdir).tar.gz $(SOURCE_DIR)
 	rpmbuild -bs $(SPEC_DIR)/$(SPEC)
-

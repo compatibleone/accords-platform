@@ -16,7 +16,7 @@ aliases = \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas run-conagios \
 	run-coss run-example run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-testosocci run-osocciprocci run-dcprocci run-slam \
-	run-cosacs run-copaas run-jpaasprocci accords-config
+	run-cosacs run-copaas run-paasprocci accords-config
 
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
