@@ -201,11 +201,11 @@ _co_provision()
 #    The accords platform provisioning components
 # ---------------------------------------------------
     if [ -z "$runcops" ]; then
-         echo "Starting ACCORDS Provisioning"
-    else
          echo "Validate Launch of COPS"
 	 read var
          echo "Starting ACCORDS Provisioning"
+    else
+          echo "Starting ACCORDS Provisioning"
     fi
 
     _co_run_prov osprocci accords "accords open stack services" 30 10 1000 30 30
