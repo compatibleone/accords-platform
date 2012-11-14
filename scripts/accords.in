@@ -35,12 +35,14 @@ fi
 # nethsm=1
 # nagios=/usr/local/etc/accords/accords-nagios.cfg
 tls=security
+runcops=1
 # -------------------------------------
 # with neither security nor monitoring 
 # -------------------------------------
 # tls=
 nethsm=
 nagios=
+# runcops=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls
@@ -198,7 +200,13 @@ _co_provision()
 # ---------------------------------------------------
 #    The accords platform provisioning components
 # ---------------------------------------------------
-    echo "Starting ACCORDS Provisioning"
+    if [ -z "$runcops" ]; then
+         echo "Starting ACCORDS Provisioning"
+    else
+         echo "Validate Launch of COPS"
+	 read var
+         echo "Starting ACCORDS Provisioning"
+    fi
 
     _co_run_prov osprocci accords "accords open stack services" 30 10 1000 30 30
     _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
@@ -407,7 +415,11 @@ _run_broker() {
 } 
 
 _run_cops() {
-    cops --config $target CO-ES/1.0
+    if [ -z "$runcops" ]; then
+	echo inhibited cops
+    else
+        cops --config $target CO-ES/1.0
+    fi
 } 
 
 _run_coees() {
