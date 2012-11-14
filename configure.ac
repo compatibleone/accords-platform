@@ -383,7 +383,7 @@ AC_ARG_ENABLE([paprocci],
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
 
 AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
-AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client ${paprocci_jdk}/jre/lib/i386/client/libjvm.so ${paprocci_jdk}/jre/lib/i386/libjava.so ${paprocci_jdk}/jre/lib/i386/libverify.so"])
 AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
 #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
 #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
