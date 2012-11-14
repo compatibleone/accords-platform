@@ -467,15 +467,15 @@ AC_ARG_ENABLE([testresolver],
 AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 
 AC_ARG_ENABLE([testsuite],
-      [AS_HELP_STRING([--disable-testsuite],
-		      [Disable testsuite @<:@default=disable@:>@])],
+      [AS_HELP_STRING([--enable-testsuite],
+		      [Enable testsuite @<:@default=disable@:>@])],
       [],
       [enable_testsuite=yes])
 AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
 
 AC_ARG_ENABLE([pyaccords],
-      [AS_HELP_STRING([--disable-pyaccords],
-		      [Disable pyaccords @<:@default=disable@:>@])],
+      [AS_HELP_STRING([--enable-pyaccords],
+		      [Enable pyaccords @<:@default=disable@:>@])],
       [],
       [enable_pyaccords=yes])
 AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
