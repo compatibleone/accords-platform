@@ -382,8 +382,15 @@ AC_ARG_ENABLE([paprocci],
       [enable_paprocci=no;paprocci_jdk=jdk_not_used])
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
 
+case $target_cpu in
+     x86_64) JVM_ARCH=amd64 ;;
+     i?86)   JVM_ARCH=i386 ;;
+     *)      JVM_ARCH=$target_cpu ;;
+esac
+AC_SUBST([JVM_ARCH])
+
 AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
-AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client ${paprocci_jdk}/jre/lib/i386/client/libjvm.so ${paprocci_jdk}/jre/lib/i386/libjava.so ${paprocci_jdk}/jre/lib/i386/libverify.so"])
+AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/${JVM_ARCH} -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -ljvm -ljava -lverify"])
 AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
 #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
 #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
