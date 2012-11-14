@@ -11,9 +11,9 @@
 #cc -g -I$JDK/include/ -I$JDK/include/linux/ -L$JDK/jre/lib/i386 -L$JDK/jre/lib/i386/client -ljava $CURRDIR/invoke.c -o cprocci
 
 bin_PROGRAMS = paprocci
-EXTRA_DIST = proccipa.c
+EXTRA_DIST = proccipa.c paclient.h invoke.h pacontract.c
 
-paprocci_SOURCES = paprocci.c paclient.c paclient.h invoke.c invoke.h pacontract.c
+paprocci_SOURCES = paprocci.c paclient.c invoke.c
 
 paprocci_CFLAGS =  $(CFLAGS_PAPROCCI) $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COPABR)   
 paprocci_LDFLAGS = $(LDFLAGS_PAPROCCI) $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)  
