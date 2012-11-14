@@ -2,6 +2,7 @@
 %define debug_package          %{nil}
 %define enable_testsuite 1
 %define enable_pyaccords 1
+%define enable_paprocci 1
 %define distname accords
 
 %define major 0
@@ -12,6 +13,7 @@
 %define uuiddev libuuid-devel
 %define python python2
 %define pythondev python-devel
+%define javadev java-devel
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -74,10 +76,14 @@
 %define pyaccords_enabled "--enable-pyaccords=yes"
 %endif
 
+%if %{enable_paprocci}
+%define paprocci_enabled "--enable-paprocci=/usr/lib/jvm/java/"
+%endif
+
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	17.7
+Release:	18.0
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -86,6 +92,7 @@ BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
 BuildRequires:  %{python}
 BuildRequires:  %{pythondev}
+BuildRequires:  %{javadev}
 Requires:       lsb
 
 %description
@@ -304,13 +311,13 @@ CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
 #-------------------------------------------
 
-%package jpaasprocci
+%package paasprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
-Summary: CompatibleOne Accords Platform - JPaaS Procci subsystem
+Summary: CompatibleOne Accords Platform - PaaS Procci subsystem
 
-%description jpaasprocci
-CompatibleOne Accords Platform - JPaaS Procci subsystem
+%description paasprocci
+CompatibleOne Accords Platform - PaaS Procci subsystem
 
 #-------------------------------------------
 
@@ -389,14 +396,13 @@ CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 #-------------------------------------------
 
-#%package paprocci
-#Group: %{group}
-#Requires: %{name} = %{version}-%{release}
-#Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
-#
-#%description paprocci
-#CompatibleOne Accords Platform - ProActive Procci subsystem
-#
+%package paprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
+
+%description paprocci
+CompatibleOne Accords Platform - ProActive Procci subsystem
 
 #-------------------------------------------
 
@@ -546,7 +552,7 @@ regression.
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure %{testsuite_enabled} %{pyaccords_enabled}
+%configure %{testsuite_enabled} %{pyaccords_enabled} %{paprocci_enabled}
 make
 
 %install
@@ -574,7 +580,7 @@ This package contains nothing, and only exists to pull dependencies.
 EOF
 
 #TODO: remove this line once paprocci is packaged again
-rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
+#rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
 %post
 
@@ -741,11 +747,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/dcprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-dcprocci.1*
 
-%files jpaasprocci
-%attr(0755,root,root) %{_bindir}/jpaasprocci
-%attr(0755,root,root) %{_bindir}/run-jpaasprocci
-%attr(0644,root,root) %doc %{_mandir}/man1/jpaasprocci.1*
-%attr(0644,root,root) %doc %{_mandir}/man1/run-jpaasprocci.1*
+%files paasprocci
+%attr(0755,root,root) %{_bindir}/paasprocci
+%attr(0755,root,root) %{_bindir}/run-paasprocci
+%attr(0644,root,root) %doc %{_mandir}/man1/paasprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-paasprocci.1*
 
 %files copaas
 %attr(0755,root,root) %{_bindir}/copaas
@@ -789,9 +795,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/osprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-osprocci.1*
 
-#files paprocci
-#attr(0755,root,root) %{_bindir}/paprocci
-#attr(0755,root,root) %{_bindir}/run-paprocci
+%files paprocci
+%attr(0755,root,root) %{_bindir}/paprocci
+%attr(0755,root,root) %{_bindir}/run-paprocci
 %attr(0644,root,root) %doc %{_mandir}/man1/paprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-paprocci.1*
 
