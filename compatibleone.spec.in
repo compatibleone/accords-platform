@@ -13,7 +13,7 @@
 %define uuiddev libuuid-devel
 %define python python2
 %define pythondev python-devel
-%define javadev java-devel
+%define javadev java-devel >= 1.6.0
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -399,6 +399,7 @@ CompatibleOne Accords Platform - Open Stack Procci subsystem
 %package paprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
+Requires: java >= 1.6.0
 Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
 
 %description paprocci
