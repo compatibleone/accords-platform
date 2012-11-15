@@ -1,0 +1,42 @@
+module=$1
+target=config-$1.xml
+zone=$2
+thishost=$3
+pubhost=$4
+tls=security
+if test -z "$tls"; then
+	prefix="http://"
+else
+	prefix="https://"
+fi
+resthost=127.0.0.1
+restport=8286
+publisher=""
+identity=""
+operator=accords
+password=co-system
+domain=occi
+verbose=0
+debug=0
+threads=1
+monitor=1
+
+echo "<accords>" > $target
+echo "<"${module} >> $target
+echo "    publisher='"$publisher"'"     >> $target
+echo "    operator='"$operator"'"       >> $target
+echo "    identity='"$identity"'" 	>> $target
+echo "    verbose='"$verbose"'"   	>> $target
+echo "    debug='"$debug"'"       	>> $target
+echo "    threads='"$threads"'>"  	>> $target
+echo "    <rest host='"$resthost"' port='"$restport"'/>" >> $target
+echo "    <security" >> $target
+echo "         user='service-"${module}"'" >> $target
+echo "         password='"$password"'" >> $target
+echo "         monitor='"$monitor"'" >> $target
+echo "         tls='"${tls}"/"${module}"Tls.xml'/>" >> $target
+echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
+echo "</"${module}">" >> $target
+echo "</accords>" >> $target
+
+

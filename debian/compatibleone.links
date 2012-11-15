@@ -2,3 +2,4 @@
 /etc/accords/openssl.cnf /var/lib/accords/openssl.cnf
 /etc/accords/Certificates.crt /var/lib/accords/Certificates.crt
 /etc/accords/coips.xml /var/lib/accords/coips.xml
+/etc/accords/os_config.xml /var/lib/accords/os_config.xml

@@ -21,5 +21,5 @@ bash build-install parser $1
 bash build-install procci $1
 bash build-install slam $1
 bash build-install copaas $1
-bash build-install jpaasprocci $1
+bash build-install paasprocci $1
 

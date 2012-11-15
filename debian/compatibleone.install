@@ -1,6 +1,7 @@
 etc/accords/accords.ini
 etc/accords/cords_user.xml
 etc/accords/coips.xml
+etc/accords/os_config.xml
 etc/default/accords
 etc/accords/openssl.cnf
 etc/accords/Certificates.crt
