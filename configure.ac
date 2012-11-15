@@ -391,8 +391,12 @@ if test "x$enable_paprocci" = "xyes"; then
       AC_SUBST([JVM_ARCH])
       JAVA_HOME=${paprocci_jdk}/jre/lib/${JVM_ARCH}
       AC_SUBST([JAVA_HOME])
+      CFLAGS_JNI="-I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"
+      AC_SUBST([CFLAGS_JNI])
 
-      # Checks for jni.
+       # Checks for jni.
+      save_CFLAGS=$CFLAGS
+      CFLAGS="$CFLAGS_JNI $CFLAGS"
       AC_CHECK_HEADERS([${paprocci_jdk}/include/jni.h], [
           save_LDFLAGS=$LDFLAGS
           LDFLAGS="-L$JAVA_HOME/client -L$JAVA_HOME/server $LDFLAGS"
@@ -415,9 +419,10 @@ if test "x$enable_paprocci" = "xyes"; then
 #              [AC_MSG_ERROR(The JDK verify library is required in order to build the program!)]
 #          )
           LDFLAGS=$save_LDFLAGS
+          CFLAGS=$save_CFLAGS
       ], AC_MSG_ERROR(The JVM header is required in order to build the program!))
 
-      AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
+      AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src ${CFLAGS_JNI}"])
       AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JAVA_HOME} -L${JAVA_HOME}/server -L${JAVA_HOME}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
       AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
       #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
