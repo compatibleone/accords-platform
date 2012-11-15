@@ -22,6 +22,12 @@
 #include <jni.h>
 #include <dirent.h>
 
+#include <proactive.h>
+#include <paconfig.h>
+#include <restrequest.h>
+#include <restresponse.h>
+#include <restheader.h>
+
 void destroy(JNIEnv * env, JavaVM * jvm);
 
 struct list_jar {
@@ -41,4 +47,6 @@ char* getjars(const char* targetdir);
 
 struct jvm_struct * startjvm();
 void connect_proactive(struct jvm_struct * jvmp);
+char * start_server(struct pa_config *, struct jvm_struct **, struct rest_request *,  struct rest_response *, struct proactive *); 
+char * stop_server(struct pa_config *, struct jvm_struct **, struct rest_request *,  struct rest_response *, struct proactive *); 
 
