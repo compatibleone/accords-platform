@@ -52,6 +52,7 @@
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
 %define python python
+%define javadev java-devel >= 1.6.0, java-rpmbuild
 %endif
 
 %if %{is_suse}
