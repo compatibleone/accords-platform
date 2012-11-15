@@ -382,18 +382,47 @@ AC_ARG_ENABLE([paprocci],
       [enable_paprocci=no;paprocci_jdk=jdk_not_used])
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
 
-case $target_cpu in
-     x86_64) JVM_ARCH=amd64 ;;
-     i?86)   JVM_ARCH=i386 ;;
-     *)      JVM_ARCH=$target_cpu ;;
-esac
-AC_SUBST([JVM_ARCH])
+if test "x$enable_paprocci" = "xyes"; then
+      case $target_cpu in
+           x86_64) JVM_ARCH=amd64 ;;
+           i?86)   JVM_ARCH=i386 ;;
+           *)      JVM_ARCH=$target_cpu ;;
+      esac
+      AC_SUBST([JVM_ARCH])
+      JAVA_HOME=${paprocci_jdk}/jre/lib/${JVM_ARCH}
+      AC_SUBST([JAVA_HOME])
 
-AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
-AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/${JVM_ARCH} -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -R${paprocci_jdk}/jre/lib/${JVM_ARCH} -R${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -R${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -Wl,-ljvm -Wl,-ljava -Wl,-lverify"])
-AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
-#AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
-#AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+      # Checks for jni.
+      AC_CHECK_HEADERS([${paprocci_jdk}/include/jni.h], [
+          save_LDFLAGS=$LDFLAGS
+          LDFLAGS="-L$JAVA_HOME/client -L$JAVA_HOME/server $LDFLAGS"
+          AC_CHECK_LIB(
+              [jvm],
+              [JNI_CreateJavaVM],
+              [LDFLAGS_JNI_JVM="-ljvm"],
+              [AC_MSG_ERROR(The JDK jvm library is required in order to build the program!)]
+          )
+#          AC_CHECK_LIB(
+#              [java],
+#              [JNI_CreateJavaVM],
+#              [LDFLAGS_JNI_JAVA="-ljava"],
+#              [AC_MSG_ERROR(The JDK java library is required in order to build the program!)]
+#          )
+#          AC_CHECK_LIB(
+#              [verify],
+#              [JNI_CreateJavaVM],
+#              [LDFLAGS_JNI_VERIFY="-lverify"],
+#              [AC_MSG_ERROR(The JDK verify library is required in order to build the program!)]
+#          )
+          LDFLAGS=$save_LDFLAGS
+      ], AC_MSG_ERROR(The JVM header is required in order to build the program!))
+
+      AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
+      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JAVA_HOME} -L${JAVA_HOME}/server -L${JAVA_HOME}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
+      AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
+      #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
+      #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+fi
 
 AC_ARG_ENABLE([coidms],
       [AS_HELP_STRING([--enable-coidms],
