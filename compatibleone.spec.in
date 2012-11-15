@@ -77,7 +77,7 @@
 %endif
 
 %if %{enable_paprocci}
-%define paprocci_enabled "--enable-paprocci=/usr/lib/jvm/java"
+%define paprocci_enabled "--enable-paprocci=%java_home"
 %endif
 
 Summary:	CompatibleOne cloud brokering platform
