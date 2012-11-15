@@ -14,7 +14,7 @@ dcprocci
 example
 ezvm
 fileserver
-jpaasprocci
+paasprocci
 onprocci
 osocciprocci
 osprocci
