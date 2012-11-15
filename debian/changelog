@@ -1,3 +1,10 @@
+compatibleone-accords (0.20121114-1) unstable; urgency=low
+
+  * Uptream update,
+  * jpaasprocci -> paasprocci renaming.
+
+ -- Vincent Renardias <vrenardias@citypassenger.com>  Wed, 14 Nov 2012 14:24:57 +0200
+
 compatibleone-accords (0.20121022-1) unstable; urgency=low
 
   * Upstream change: new accords bash script.

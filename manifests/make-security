@@ -27,7 +27,7 @@ else
 	bash build-security procci 1
 	bash build-security slam 1
 	bash build-security copaas 1
-	bash build-security jpaasprocci 1
+	bash build-security paasprocci 1
 fi
 
 

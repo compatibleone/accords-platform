@@ -10,7 +10,7 @@
 
 	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/paastypes.xsd"/>
 
-	<xsd:element name="paas_manifest" type="paas_manifest"/>
+	<xsd:element name="paas_application_manifest" type="paas_application_manifest"/>
 
 </xsd:schema>
 

@@ -21,7 +21,7 @@ bash build-update azprocci
 bash build-update dcprocci
 bash build-update osocciprocci
 bash build-update paprocci
-bash build-update jpaasprocci
+bash build-update paasprocci
 bash build-update-tools
 
 

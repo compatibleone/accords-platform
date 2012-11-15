@@ -35,12 +35,14 @@ fi
 # nethsm=1
 # nagios=/usr/local/etc/accords/accords-nagios.cfg
 tls=security
+runcops=1
 # -------------------------------------
 # with neither security nor monitoring 
 # -------------------------------------
 # tls=
 nethsm=
 nagios=
+# runcops=
 # -------------------------------------
 resthost=127.0.0.1
 secdir=$tls
@@ -198,14 +200,20 @@ _co_provision()
 # ---------------------------------------------------
 #    The accords platform provisioning components
 # ---------------------------------------------------
-    echo "Starting ACCORDS Provisioning"
+    if [ -z "$runcops" ]; then
+         echo "Validate Launch of COPS"
+	 read var
+         echo "Starting ACCORDS Provisioning"
+    else
+          echo "Starting ACCORDS Provisioning"
+    fi
 
     _co_run_prov osprocci accords "accords open stack services" 30 10 1000 30 30
     _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
     _co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
     _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
     _co_run_prov dcprocci accords "accords delta cloud services" 1 1 1000 1 1
-    _co_run_prov jpaasprocci accords "accords jpaas procci services" 10 10 1000 10 10
+    _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
 
 # ---------------------------------------------------
 #    These have been commented out since they are 
@@ -372,7 +380,7 @@ _co_stop() {
     _stop_service cosacs
     _stop_service example
     _stop_service slam
-    _stop_service jpaasprocci
+    _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service testosocci
@@ -407,7 +415,11 @@ _run_broker() {
 } 
 
 _run_cops() {
-    cops --config $target CO-ES/1.0
+    if [ -z "$runcops" ]; then
+	echo inhibited cops
+    else
+        cops --config $target CO-ES/1.0
+    fi
 } 
 
 _run_coees() {
@@ -478,8 +490,8 @@ _run_conagios() {
     conagios --config $target CO-NAGIOS/1.0
 }
 
-_run_jpaasprocci() {
-    jpaasprocci --config $target CO-JPAASPROCCI/1.0
+_run_paasprocci() {
+    paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
 _run_example() {
@@ -535,7 +547,7 @@ _make_security_files() {
 	_mksecs slam 1
 	_mksecs copaas 1
 	_mksecs conagios 1
-	_mksecs jpaasprocci 1
+	_mksecs paasprocci 1
 	_mksecs example 1
 	_mksecs command
     
@@ -611,7 +623,7 @@ _accords_config() {
 		_mkcert slam
 		_mkcert copaas
 		_mkcert conagios
-		_mkcert jpaasprocci
+		_mkcert paasprocci
 		_mkcert example
 		_mkcert cosacs
 	
@@ -662,7 +674,7 @@ _accords_config() {
     _mkcfg slam
     _mkcfg copaas
     _mkcfg conagios
-    _mkpro jpaasprocci
+    _mkpro paasprocci
     _mkcfg example
     _mkcosacs cosacs
 
@@ -1108,8 +1120,8 @@ case `basename $0` in
     run-conagios)
 	_run_conagios $*
 	;;
-    run-jpaasprocci)
-	_run_jpaasprocci $*
+    run-paasprocci)
+	_run_paasprocci $*
 	;;
     run-example)
 	_run_example $*

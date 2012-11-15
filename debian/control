@@ -115,6 +115,19 @@ Description: CompatibleOne Accords Platform - COOL subsystem
  executable program and must have been started before any provisioning of application
  images may be performed through the broker.
 
+Package: compatibleone-cosacs-client
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform - COSACS Client
+ The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
+ server executable program that will have been embedded in the application image produced by
+ the preceding Application Image Production tool. The component will be used through the
+ provisioning procci components for the personalization of the application image during
+ resource deployment startup.
+ The module also provides the monitoring control channels for the activation of monitoring
+ agents and their data collection probes.
+
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
@@ -156,12 +169,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
-Package: compatibleone-jpaasprocci
+Package: compatibleone-paasprocci
 Section: net
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
-Description: CompatibleOne Accords Platform - JPaaS Procci subsystem
- CompatibleOne Accords Platform - JPaaS Procci subsystem
+Description: CompatibleOne Accords Platform - PaaS Procci subsystem
+ CompatibleOne Accords Platform - PaaS Procci subsystem
 
 Package: compatibleone-copaas
 Section: net

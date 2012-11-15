@@ -7,9 +7,9 @@ struct paas_application
 	char* name;
 	char* date_created;
 	char* description;		
-	char* paas_version;
-	char* paas_environment;
-	char* paas_configuration_template;
+	char* paas_application_version;
+	char* paas_application_environment;
+	char* paas_application_configuration_template;
 	int state;
 };
 
