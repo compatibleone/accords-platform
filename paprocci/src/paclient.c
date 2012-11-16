@@ -20,6 +20,7 @@
 #define _pa_client_c
 
 #include "paclient.h"
+#include "invoke.h"
 #include "tlsconfig.h"
 #include "tlsload.h"
 

@@ -17,15 +17,15 @@
 /* -------------------------------------------------------------------- */
 
 #include <invoke.h>
-#include <proactive.h>
-#include <paconfig.h>
-#include <restrequest.h>
-#include <restresponse.h>
-#include <restheader.h>
+//#include <proactive.h>
+//#include <paconfig.h>
+//#include <restrequest.h>
+//#include <restresponse.h>
+//#include <restheader.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
-#define JAVA_MODULE_PATH "./java/"
+//#define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
 
 struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp);
@@ -199,7 +199,7 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
 char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
+	//jobject* procci = jvmp->procci;
 
 	fprintf(stderr, "Executing %s...\n", mname);
 	
@@ -220,7 +220,7 @@ char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jo
 	}
 
 	fprintf(stderr, "Calling method '%s'...\n", mname);
-	jobject result = (*env)->CallObjectMethod(env, procci, methodid, margs);
+	jobject result = (*env)->CallObjectMethod(env, *(jvmp->procci), methodid, margs);
 	fprintf(stderr, "Done.\n");
 	fprintf(stderr, "Looking for exceptions...\n");
 	char * ret;
@@ -405,7 +405,6 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);

@@ -18,6 +18,7 @@ function addalljars()
 FIRSTDIR=`pwd`
 THISDIR=`dirname $0`          # This will always point to ./bin
 BASEDIR=$THISDIR/../          # This will always point to .
+JARS=/usr/share/java/accords/paprocci
 
 # NOTE: remember to set up the environment given by the env.sh file (must set up PAUSER and PAPASS environment variables)
 
@@ -29,9 +30,7 @@ cd $BASEDIR
 # Preparing classpath
 CPATH=.
 
-addalljars $BASEDIR/lib/
-
-addalljars $BASEDIR/dist/
+addalljars $JARS
 
 export CLASSPATH=$CPATH
 #echo CLASSPATH $CPATH
