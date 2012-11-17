@@ -7,7 +7,8 @@ co-parser accords-publisher
 co-parser accords-coss
 co-parser accords-comons
 co-parser accords-coobas
-co-parser accords-coes
+co-parser accords-cops
+co-parser accords-copaas
 co-parser accords-coees
 co-parser accords-conets
 co-parser accords-cosched

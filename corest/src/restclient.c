@@ -811,6 +811,7 @@ public	struct	rest_response * rest_client_get_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while (1)
 	{
@@ -828,8 +829,8 @@ public	struct	rest_response * rest_client_get_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
@@ -865,6 +866,7 @@ public	struct	rest_response * rest_client_try_get_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while (1)
 	{
@@ -882,8 +884,8 @@ public	struct	rest_response * rest_client_try_get_request(
 
 	else if (!( cptr = rest_try_open_client(uptr->host,uptr->port,tls, timeout, retry)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
@@ -919,6 +921,7 @@ public	struct	rest_response * rest_client_delete_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while(1)
 	{
@@ -930,8 +933,8 @@ public	struct	rest_response * rest_client_delete_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
@@ -966,6 +969,7 @@ public	struct	rest_response * rest_client_head_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while(1)
 	{
@@ -977,8 +981,8 @@ public	struct	rest_response * rest_client_head_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
@@ -1013,6 +1017,7 @@ public	struct	rest_response * rest_client_post_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while(1)
 	{
@@ -1024,8 +1029,8 @@ public	struct	rest_response * rest_client_post_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
@@ -1063,6 +1068,7 @@ public	struct	rest_response * rest_client_put_request(
 	struct	url		* uptr;
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
+	char 	buffer[2048];
 	
 	while(1)
 	{
@@ -1074,8 +1080,8 @@ public	struct	rest_response * rest_client_put_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		if ( check_debug() )
-			printf("Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
 	}
