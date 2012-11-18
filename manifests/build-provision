@@ -10,10 +10,10 @@ echo "</node>" >> accords-$1.xml
 echo "<configuration name=\"${makesystem}:$1\">" >> accords-$1.xml 
 echo "<action expression=\"$1.configure(accords:publisher.publisher.hostname);\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-tools');\"/>" >> accords-$1.xml 
-echo "<action expression=\"$1.fork('bash run-tools');\"/>" >> accords-$1.xml 
-echo "<action expression=\"$1.fork('co-provider $1 accords 30 10 100 30 30 ');\"/>" >> accords-$1.xml 
-echo "<action expression=\"$1.fork('./co-parser quota-$1 ');\"/>" >> accords-$1.xml 
-echo "<action expression=\"$1.fork('./co-parser sla-$1 ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('bash run-tools');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('bash provider-sla $1 $1 30 30 3000 30 30 ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('./testcp --tls security/$1Tls.xml --publisher http://\$accords_publisher_publisher_hostname:8086 --verbose quota-$1 ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('./testcp --tls security/$1Tls.xml --publisher http://\$accords_publisher_publisher_hostname:8086 --verbose sla-$1 ');\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-$1');\"/>" >> accords-$1.xml 
 echo "<action expression=\"$1.fork('bash run-$1');\"/>" >> accords-$1.xml 
 echo "</configuration>" >> accords-$1.xml 
