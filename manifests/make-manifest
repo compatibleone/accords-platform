@@ -20,6 +20,8 @@ bash build-manifest cops 8087
 echo "<node name=\"accords:cops\" scope=normal access=public type=\"accords:cops\"/>" >> accords-platform.xml
 bash build-manifest coees 8087
 echo "<node name=\"accords:coees\" scope=normal access=public type=\"accords:coees\"/>" >> accords-platform.xml
+bash build-manifest copaas 8087
+echo "<node name=\"accords:copaas\" scope=normal access=public type=\"accords:copaas\"/>" >> accords-platform.xml
 bash build-manifest slam 8087
 echo "<node name=\"accords:slam\" scope=normal access=public type=\"accords:slam\"/>" >> accords-platform.xml
 bash build-manifest ezvm 8087
@@ -32,8 +34,6 @@ bash build-manifest parser 8087
 echo "<node name=\"accords:parser\" scope=normal access=public type=\"accords:parser\"/>" >> accords-platform.xml
 bash build-manifest procci 8087
 echo "<node name=\"accords:procci\" scope=normal access=public type=\"accords:procci\"/>" >> accords-platform.xml
-bash build-manifest copaas 8087
-echo "<node name=\"accords:copaas\" scope=normal access=public type=\"accords:copaas\"/>" >> accords-provisioning.xml
 echo "<configuration name=\"accords:platform\"/>" >> accords-platform.xml
 echo "<security name=\"accords:security\"/>" >> accords-platform.xml
 echo "<account name=\"accords:account\"/>" >> accords-platform.xml
