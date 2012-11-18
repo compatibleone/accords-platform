@@ -35,6 +35,12 @@ if [ -z "$adr" ]; then
 adr=10
 fi
 
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > account-$name.xml
+echo "<import name=\"import:$name\" " >> account-$name.xml 
+echo " xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> account-$name.xml 
+echo "<account name=\"$name\"/>" >> account-$name.xml 
+echo "</import>" >> account-$name.xml
+
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > quota-$name.xml
 echo "<provider name=\"$name\" operator=\"$name\" zone=\"europe\" " > quota-$name.xml
 echo " xmlns=\"http://www.compatibleone.fr/schemes/provision.xsd\">" >> quota-$name.xml 
