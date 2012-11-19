@@ -7,7 +7,7 @@ echo "bash build-config tools europe \$cosacs \$pubhost " >> run-tools
 echo "install -d /home/cosacs/service" >> run-tools
 echo "install -d /home/cosacs/rest" >> run-tools
 echo "cp testcp testcb testresolver command /usr/local/bin" >> run-tools
-echo "cp co-parser co-broker co-resolver co-command co-provider /usr/local/bin" >> run-tools
+echo "cp co-parser co-broker co-resolver co-command /usr/local/bin" >> run-tools
 echo '/usr/local/bin/testcp --publisher $pubhost \$1.xml \$2 \$3 \$4 ' > ./co-parser
 chmod +x ./co-parser
 echo '/usr/local/bin/testcb --publisher $pubhost plan_\$1.xml \$2 \$3 \$4 ' > ./co-broker

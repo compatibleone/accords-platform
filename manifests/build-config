@@ -23,7 +23,10 @@ else
 	export restport=$(($restport+1))
 	identity=${prefix}${resthost}:${restport}
 fi
-operator=accords
+operator=$5
+if test -z "$operator"; then
+	operator=accords
+fi
 password=co-system
 domain=occi
 verbose=0
