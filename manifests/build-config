@@ -1,3 +1,5 @@
+#!/bin/bash
+
 module=$1
 target=config-$1.xml
 zone=$2
