@@ -7,13 +7,13 @@ echo "bash build-config tools europe \$cosacs \$pubhost accords " >> run-tools
 echo "install -d /home/cosacs/service" >> run-tools
 echo "install -d /home/cosacs/rest" >> run-tools
 echo "cp testcp testcb testresolver command /usr/local/bin" >> run-tools
-echo "echo \"/usr/local/bin/testcp --publisher https://\$pubhost:8086 --verbose \\\$1.xml \\\$2 \\\$3 \\\$4 \" > ./co-parser " >> run-tools
+echo "echo \"/usr/local/bin/testcp --tls security/cosacsTls.xml --publisher https://\$pubhost:8086 --verbose \\\$1.xml \\\$2 \\\$3 \\\$4 \" > ./co-parser " >> run-tools
 echo "chmod +x ./co-parser" >> run-tools
-echo "echo \"/usr/local/bin/testcb --publisher https://\$pubhost:8086 --verbose  plan_\\\$1.xml \\\$2 \\\$3 \\\$4 \" > ./co-broker " >> run-tools
+echo "echo \"/usr/local/bin/testcb --tls security/cosacsTls.xml --publisher https://\$pubhost:8086 --verbose  plan_\\\$1.xml \\\$2 \\\$3 \\\$4 \" > ./co-broker " >> run-tools
 echo "chmod +x ./co-broker" >> run-tools
-echo "echo \"/usr/local/bin/testresolver --publisher https://\$pubhost:8086 \\\$1 \\\$2 \\\$3 \\\$4 \" > ./co-resolver " >> run-tools
+echo "echo \"/usr/local/bin/testresolver--tls security/cosacsTls.xml  --publisher https://\$pubhost:8086 \\\$1 \\\$2 \\\$3 \\\$4 \" > ./co-resolver " >> run-tools
 echo "chmod +x ./co-resolver" >> run-tools
-echo "echo \"/usr/local/bin/command --publisher https://\$pubhost:8086 --verbose \\\$1 \\\$2 \\\$3 \\\$4 \\\$5 \\\$6 \\\$7 \\\$8 \" > ./co-command " >> run-tools
+echo "echo \"/usr/local/bin/command --tls security/cosacsTls.xml --publisher https://\$pubhost:8086 --verbose \\\$1 \\\$2 \\\$3 \\\$4 \\\$5 \\\$6 \\\$7 \\\$8 \" > ./co-command " >> run-tools
 echo "chmod +x ./co-command" >> run-tools
 echo "cp co-parser co-broker co-resolver co-command /usr/local/bin" >> run-tools
 chmod +x run-tools
