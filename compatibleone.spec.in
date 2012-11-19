@@ -809,6 +809,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/run-paprocci
 %attr(0644,root,root) %doc %{_mandir}/man1/paprocci.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-paprocci.1*
+%dir %{_datadir}/java/accords
+%attr(0644,root,root) %{_datadir}/java/accords/*.jar
 %endif
 
 %files procci
