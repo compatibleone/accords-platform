@@ -1,5 +1,8 @@
 /var/log/accords/rest /var/lib/accords/rest
+/var/log/accords/service /var/lib/accords/service
 /etc/accords/openssl.cnf /var/lib/accords/openssl.cnf
 /etc/accords/Certificates.crt /var/lib/accords/Certificates.crt
 /etc/accords/coips.xml /var/lib/accords/coips.xml
+/etc/accords/cords_user.xml /var/lib/accords/cords_user.xml
 /etc/accords/os_config.xml /var/lib/accords/os_config.xml
+/etc/accords/accounts.xml /var/lib/accords/accounts.xml

@@ -71,6 +71,7 @@ install: build
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
+	cp accounts.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp coips.xml `pwd`/debian/tmp/etc/accords
 # Build architecture independant packages.
