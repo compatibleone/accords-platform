@@ -2,20 +2,20 @@ echo "rm -f update-tools.tgz" > run-tools
 echo "wget http://www.compatibleone.fr/accords-platform/${makesystem}/update-tools.tgz" >> run-tools
 echo "tar -xzvf update-tools.tgz" >> run-tools
 echo "export pubhost=\$accords_publisher_publisher_hostname" >> run-tools
-echo "export thisport=\tools" >> run-tools
-echo "bash build-config tools europe \$cosacs \$pubhost " >> run-tools
+echo "export thisport=8087" >> run-tools
+echo "bash build-config tools europe \$cosacs \$pubhost accords " >> run-tools
 echo "install -d /home/cosacs/service" >> run-tools
 echo "install -d /home/cosacs/rest" >> run-tools
 echo "cp testcp testcb testresolver command /usr/local/bin" >> run-tools
+echo "'/usr/local/bin/testcp --publisher $pubhost --verbose \$1.xml \$2 \$3 \$4 ' > ./co-parser " >> run-tools
+echo "chmod +x ./co-parser" >> run-tools
+echo "'/usr/local/bin/testcb --publisher $pubhost --verbose  plan_\$1.xml \$2 \$3 \$4 ' > ./co-broker " >> run-tools
+echo "chmod +x ./co-broker" >> run-tools
+echo "'/usr/local/bin/testresolver --publisher $pubhost \$1 \$2 \$3 \$4 ' > ./co-resolver " >> run-tools
+echo "chmod +x ./co-resolver" >> run-tools
+echo "'/usr/local/bin/command --publisher $pubhost --verbose \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 ' > ./co-command " >> run-tools
+echo "chmod +x ./co-command" >> run-tools
 echo "cp co-parser co-broker co-resolver co-command /usr/local/bin" >> run-tools
-echo '/usr/local/bin/testcp --publisher $pubhost \$1.xml \$2 \$3 \$4 ' > ./co-parser
-chmod +x ./co-parser
-echo '/usr/local/bin/testcb --publisher $pubhost plan_\$1.xml \$2 \$3 \$4 ' > ./co-broker
-chmod +x ./co-broker
-echo '/usr/local/bin/testresolver --publisher $pubhost \$1 \$2 \$3 \$4 ' > ./co-resolver
-chmod +x ./co-resolver
-echo '/usr/local/bin/command --publisher $pubhost \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 ' > ./co-command
-chmod +x ./co-command
 chmod +x run-tools
 
 
