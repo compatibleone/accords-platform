@@ -8,7 +8,7 @@
 				<port name="publisher" protocol="tcp" range="0.0.0.0/0" from="8086" to="8086"/>
 				<port name="coss" protocol="tcp" range="0.0.0.0/0" from="8087" to="8087"/>
 				<port name="comons" protocol="tcp" range="0.0.0.0/0" from="8088" to="8088"/>
-				<port name="coes" protocol="tcp" range="0.0.0.0/0" from="8089" to="8089"/>
+				<port name="cops" protocol="tcp" range="0.0.0.0/0" from="8089" to="8089"/>
 				<port name="conets" protocol="tcp" range="0.0.0.0/0" from="8090" to="8090"/>
 				<port name="coobas" protocol="tcp" range="0.0.0.0/0" from="8091" to="8091"/>
 				<port name="parser" protocol="tcp" range="0.0.0.0/0" from="8092" to="8092"/>
@@ -40,7 +40,7 @@
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-publisher; bash run-publisher 8086');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coss; bash run-coss 8087');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-comons; bash run-comons 8088');"/>
-		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coes; bash run-coes 8089');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-cops; bash run-cops 8089');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-conets; bash run-conets 8090');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-coobas; bash run-coobas 8091');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-parser; bash run-parser 8092');"/>
@@ -79,7 +79,7 @@
 		<action expression="ap.kill('parser');"/>
 		<action expression="ap.kill('coobas');"/>
 		<action expression="ap.kill('conets');"/>
-		<action expression="ap.kill('coes');"/>
+		<action expression="ap.kill('cops');"/>
 		<action expression="ap.kill('comons');"/>
 		<action expression="ap.kill('coss');"/>
 		<action expression="ap.kill('publisher');"/>

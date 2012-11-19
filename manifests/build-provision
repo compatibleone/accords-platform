@@ -1,0 +1,42 @@
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > accords-$1.xml
+echo "<manifest name=\"accords:$1\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">" >> accords-$1.xml 
+echo "<node name=\"accords:publisher\" access=\"public\" scope=\"common\" type=\"accords:publisher\"/>" >> accords-$1.xml 
+echo "<node name=\"$1\" access=\"public\" scope=\"normal\" type=\"simple\" provider=\"${makeplatform}\">" >> accords-$1.xml 
+echo "<infrastructure name=\"accords:component\"/>" >> accords-$1.xml 
+echo "<image name=\"${makesystem}:$1\">" >> accords-$1.xml 
+echo "<system name=\"${makesystem}_with_cosacs\"/>" >> accords-$1.xml 
+echo "</image>" >> accords-$1.xml 
+echo "</node>" >> accords-$1.xml 
+echo "<configuration name=\"${makesystem}:$1\">" >> accords-$1.xml 
+echo "<action expression=\"$1.configure(accords:publisher.publisher.hostname);\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-tools');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('bash run-tools');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('bash provider-sla $1 $1 30 30 3000 30 30 ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('./testcp --tls security/$1Tls.xml --publisher http://\$accords_publisher_publisher_hostname:8086 --verbose account-$1.xml ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('./testcp --tls security/$1Tls.xml --publisher http://\$accords_publisher_publisher_hostname:8086 --verbose quota-$1.xml ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('./testcp --tls security/$1Tls.xml --publisher http://\$accords_publisher_publisher_hostname:8086 --verbose sla-$1.xml ');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('wget http://www.compatibleone.fr/accords-platform/${makesystem}/run-$1');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.fork('bash run-$1');\"/>" >> accords-$1.xml 
+echo "</configuration>" >> accords-$1.xml 
+echo "<release name=\"${makesystem}:$1\">" >> accords-$1.xml 
+echo "<action expression=\"$1.kill('$1');\"/>" >> accords-$1.xml 
+echo "<action expression=\"$1.system('sleep 2');\"/>" >> accords-$1.xml 
+echo "</release>" >> accords-$1.xml 
+echo "<security name=\"accords:security\"/>" >> accords-$1.xml 
+echo "<account name=\"accords:account\"/>" >> accords-$1.xml 
+echo "</manifest>" >> accords-$1.xml 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

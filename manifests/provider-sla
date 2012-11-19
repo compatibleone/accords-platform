@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# Copyright: 
+#   Prologue 2011
+#
+# Author: 
+#   Jamie Marshall
+#
+
+name=$1
+operator=$2
+cpu=$3
+ram=$4
+disk=$5
+vm=$6
+adr=$7
+
+if [ -z "$cpu" ]; then
+cpu=10
+fi
+
+if [ -z "$ram" ]; then
+ram=10
+fi
+
+if [ -z "$disk" ]; then
+disk=1000
+fi
+
+if [ -z "$vm" ]; then
+vm=10
+fi
+
+if [ -z "$adr" ]; then
+adr=10
+fi
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > account-$name.xml
+echo "<import name=\"import:$name\" " >> account-$name.xml 
+echo " xmlns=\"http://www.compatibleone.fr/schemes/cords.xsd\">" >> account-$name.xml 
+echo "<account name=\"$name\"/>" >> account-$name.xml 
+echo "</import>" >> account-$name.xml
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > quota-$name.xml
+echo "<provider name=\"$name\" operator=\"$name\" zone=\"europe\" " > quota-$name.xml
+echo " xmlns=\"http://www.compatibleone.fr/schemes/provision.xsd\">" >> quota-$name.xml 
+echo "<quota name=\":cpu\" property=\"occi.compute.cores\" offered=\"$cpu\">" >> quota-$name.xml 
+echo "<price name=\":cpu:price\" operator=\"$name\" rate=\"0.04\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":ram\" property=\"occi.compute.memory\" offered=\"$ram\">" >> quota-$name.xml 
+echo "<price name=\":ram:price\" operator=\"$name\" rate=\"0.01\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":disk\" property=\"occi.storage.size\" offered=\"$disk\">" >> quota-$name.xml 
+echo "<price name=\":disk:price\" operator=\"$name\" rate=\"0.03\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":vm\" property=\"accords.vm.count\" offered=\"$vm\">" >> quota-$name.xml 
+echo "<price name=\":vm:price\" operator=\"$name\" rate=\"1.00\" currency=\"euro\" fixed=\"true\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "<quota name=\":adr\" property=\"accords.address.count\" offered=\"$adr\">" >> quota-$name.xml 
+echo "<price name=\":adr:price\" operator=\"$name\" rate=\"0.05\" currency=\"euro\" period=\"hour\"/>" >> quota-$name.xml
+echo "</quota>" >> quota-$name.xml
+echo "</provider>" >> quota-$name.xml
+
+echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > sla-$name.xml
+echo "<agreement name=\"$name\" xmlns=\"http://www.compatibleone.fr/schemes/slam.xsd\" initiator=\"$operator\" responder=\"accords\" serviceprovider=\"initiator\" description=\"generated provider SLA\" initiation=\"now\" expiration=\"never\" template=\"none\">" >> sla-$name.xml 
+echo "<terms name=\"$name:services\" type=\"services\">" >> sla-$name.xml 
+echo "<term name=\"$name:service1\">" >> sla-$name.xml 
+echo "<provider name=\"$name\">" >> sla-$name.xml 
+echo "</manifest>" >> sla-$name.xml
+echo "</term>" >> sla-$name.xml
+echo "</terms>" >> sla-$name.xml
+echo "<terms name=\"$name:conditions\" type=\"conditions\">" >> sla-$name.xml 
+echo "<term name=\"$name:condition1\">" >> sla-$name.xml 
+echo "<variable name=\"$name:v1\" property=\"occi.placement.algorithm\" condition=\"eq\" value=\"zone\"/>" >> sla-$name.xml 
+echo "<variable name=\"$name:v2\" property=\"occi.placement.zone\" condition=\"eq\" value=\"europe\"/>" >> sla-$name.xml 
+echo "</term>" >> sla-$name.xml
+echo "</terms>" >> sla-$name.xml
+echo "<terms name=\"accords:guarantees\" type=\"guarantees\"/>" >> sla-$name.xml 
+echo "</agreement>" >> sla-$name.xml
+
+# -----------
+# end of file
+# -----------
+

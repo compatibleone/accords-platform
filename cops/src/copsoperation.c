@@ -949,7 +949,6 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 			}
 			else if (!( sptr = validate_cops_quota( sptr, yptr, pptr, qptr ) ))
 			{
-				yptr = occi_remove_response( yptr );
 				continue;
 			}
 			else if (!( sptr->previous = last ))

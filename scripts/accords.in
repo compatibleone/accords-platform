@@ -209,7 +209,7 @@ _co_provision()
           echo "Starting ACCORDS Provisioning"
     fi
 
-    _co_run_prov osprocci accords "accords open stack services" 30 10 1000 30 30
+    _co_run_prov osprocci accords "accords open stack services" 30 30 1000 30 30
     _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
     _co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
     _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10

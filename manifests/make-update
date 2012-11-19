@@ -15,13 +15,13 @@ bash build-update-cool
 bash build-update broker
 bash build-update parser
 bash build-update procci
-bash build-update osprocci os_config.xml
-bash build-update onprocci on_config.xml
-bash build-update azprocci
-bash build-update dcprocci
-bash build-update osocciprocci
-bash build-update paprocci
-bash build-update paasprocci
+bash build-update osprocci os_config.xml provider-sla
+bash build-update onprocci on_config.xml provider-sla
+bash build-update azprocci provider-sla 
+bash build-update dcprocci provider-sla
+bash build-update osocciprocci provider-sla
+bash build-update paprocci provider-sla
+bash build-update paasprocci provider-sla
 bash build-update-tools
 
 

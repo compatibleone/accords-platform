@@ -1,4 +1,4 @@
-tar -czf update-tools.tgz testcp testcb testresolver command co-parser co-broker co-resolver co-command
+tar -czf update-tools.tgz testcp testcb testresolver command co-parser co-broker co-resolver co-command co-provider
 
 
 
