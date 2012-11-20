@@ -95,7 +95,10 @@ BuildRequires:  %{ssldev}
 BuildRequires:  %{python}
 BuildRequires:  %{pythondev}
 %endif
+%if %{enable_paprocci}
 BuildRequires:  %{javadev}
+BuildRequires:  ant
+%endif
 Requires:       lsb
 
 %description

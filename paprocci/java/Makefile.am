@@ -9,6 +9,8 @@
 
 SUBDIRS = libs
 
+EXTRA_DIST = build.xml lib/*.jar src/
+
 javadir = $(datadir)/java/accords
 
 java_DATA = dist/co-proactive-procci.jar
