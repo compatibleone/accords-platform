@@ -22,7 +22,13 @@ ${PATEST}: ${PAFILE}
 	unzip ${PAFILE} -d ${TEMPDIR} && touch ${PATEST}
 
 proactive: ${PATEST}
-	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar $(distdir)
+	for jar in ProActive.jar ProActive_ResourceManager.jar \
+		ProActive_SRM-common-client.jar ProActive_SRM-common.jar \
+		ProActive_Scheduler-client.jar ProActive_Scheduler-core.jar \
+		bouncycastle.jar commons-cli-1.1.jar commons-httpclient-3.1.jar \
+		http-2.0.4.jar javassist.jar log4j.jar trilead-ssh2.jar; do \
+		cp ${TEMPDIR}/${PANAME}/dist/lib/$$jar $(distdir); \
+	done
 
 dist-hook: proactive
 
