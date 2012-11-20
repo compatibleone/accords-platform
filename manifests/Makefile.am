@@ -9,4 +9,4 @@
 #   Vincent Renardias <vrenardias@citypassenger.com>
 #
 
-EXTRA_DIST = openssl.cnf
+EXTRA_DIST = openssl.cnf os_config.xml
