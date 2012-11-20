@@ -59,6 +59,7 @@ echo "-------------------------------------------- "
 bash make-install 
 echo "building run scripts"
 echo "-------------------------------------------- "
+bash make-provider
 bash make-run
 echo "building packages" 
 echo "-------------------------------------------- "
