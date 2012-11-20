@@ -639,6 +639,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %config %{_sysconfdir}/accords/openssl.cnf
 %config %{_sysconfdir}/accords/coips.xml
 %config %{_sysconfdir}/accords/Certificates.crt
+%config %{_sysconfdir}/accords/accounts.xml
+%config %{_sysconfdir}/accords/os_config.xml
 %config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
@@ -662,6 +664,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
 %attr(0644,root,root) %{_localstatedir}/lib/accords/cords_user.xml
 %attr(0644,root,root) %{_localstatedir}/lib/accords/Certificates.crt
+%attr(0644,root,root) %{_localstatedir}/lib/accords/accounts.xml
 %dir %{_localstatedir}/lib/accords/rest
 %dir %{_localstatedir}/lib/accords/service
 %dir %{_localstatedir}/log/accords
