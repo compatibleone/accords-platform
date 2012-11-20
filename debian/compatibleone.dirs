@@ -1,4 +1,5 @@
 var/lib/accords
 var/log/accords/rest
+var/log/accords/service
 etc/accords
 etc/default

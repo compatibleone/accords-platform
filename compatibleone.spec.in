@@ -571,19 +571,24 @@ rm -rf ${RPM_BUILD_ROOT}
 make DESTDIR="${RPM_BUILD_ROOT}" install
 
 # create some directories
-for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords/rest %{_localstatedir}/log/accords/rest; do
+for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords %{_localstatedir}/log/accords/rest %{_localstatedir}/log/accords/service; do
 	mkdir -p ${RPM_BUILD_ROOT}$dir
 done;
 
 # install some extra files
 cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
 cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp manifests/os_config.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp accounts.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 cp Certificates.crt ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
 ln -s %{_sysconfdir}/accords/Certificates.crt ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/Certificates.crt
 ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
 ln -s %{_sysconfdir}/accords/cords_user.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/cords_user.xml
+ln -s %{_sysconfdir}/accords/accounts.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/accounts.xml
+ln -s %{_localstatedir}/log/accords/rest ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/rest
+ln -s %{_localstatedir}/log/accords/service ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/service
 
 # add a fake file to produce a useless package
 cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
@@ -661,8 +666,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %{_localstatedir}/lib/accords/cords_user.xml
 %attr(0644,root,root) %{_localstatedir}/lib/accords/Certificates.crt
 %dir %{_localstatedir}/lib/accords/rest
+%dir %{_localstatedir}/lib/accords/service
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
+%dir %{_localstatedir}/log/accords/service
 
 #--------------------------------------------
 

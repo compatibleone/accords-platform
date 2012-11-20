@@ -115,19 +115,19 @@ Description: CompatibleOne Accords Platform - COOL subsystem
  executable program and must have been started before any provisioning of application
  images may be performed through the broker.
 
-Package: compatibleone-cosacs-client
-Section: net
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform - COSACS Client
- The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
- server executable program that will have been embedded in the application image produced by
- the preceding Application Image Production tool. The component will be used through the
- provisioning procci components for the personalization of the application image during
- resource deployment startup.
- The module also provides the monitoring control channels for the activation of monitoring
- agents and their data collection probes.
-
+#Package: compatibleone-cosacs-client
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}
+#Description: CompatibleOne Accords Platform - COSACS Client
+# The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
+# server executable program that will have been embedded in the application image produced by
+# the preceding Application Image Production tool. The component will be used through the
+# provisioning procci components for the personalization of the application image during
+# resource deployment startup.
+# The module also provides the monitoring control channels for the activation of monitoring
+# agents and their data collection probes.
+#
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
@@ -212,7 +212,7 @@ Description: CompatibleOne Accords Platform - Fileserver subsystem
 Package: compatibleone-nagios
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), nagios3
 Description: CompatibleOne Accords Platform - Nagios subsystem
  CompatibleOne Accords Platform - Nagios subsystem
 
@@ -288,7 +288,7 @@ Description: CompatibleOne Accords Platform - Open Stack inspection tool
 
 Package: compatibleone-accords
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-nagios, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Recommends: compatibleone-paprocci
 Suggests: compatibleone-example
 Description: CompatibleOne Accords Platform - All packages

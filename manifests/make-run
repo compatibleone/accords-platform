@@ -1,26 +1,26 @@
 bash build-run-cosacs cosacs
-bash build-run publisher
-bash build-run azprocci
-bash build-run broker
-bash build-run coees
-bash build-run cops
-bash build-run comons
-bash build-run conets
-bash build-run coobas
-bash build-run cosched
-bash build-run coss
-bash build-run dcprocci
-bash build-run ezvm
-bash build-run coips
-bash build-run onprocci
-bash build-run osocciprocci
-bash build-run osprocci
-bash build-run paprocci
-bash build-run parser
-bash build-run procci
-bash build-run slam
-bash build-run copaas
-bash build-run paasprocci
-bash build-run-cool
-bash build-run-tools
+bash build-run publisher accords
+bash build-run broker accords
+bash build-run coees accords
+bash build-run cops accords
+bash build-run comons accords
+bash build-run conets accords
+bash build-run coobas accords
+bash build-run cosched accords
+bash build-run coss accords
+bash build-run ezvm accords
+bash build-run coips accords
+bash build-run parser accords
+bash build-run procci accords
+bash build-run slam accords
+bash build-run copaas accords
+bash build-run-provider azprocci azprocci
+bash build-run-provider dcprocci dcprocci
+bash build-run-provider onprocci onprocci
+bash build-run-provider osocciprocci osocciprocci
+bash build-run-provider osprocci osprocci
+bash build-run-provider paprocci paprocci
+bash build-run-provider paasprocci paasprocci
+bash build-run-cool 
+bash build-run-tools 
 

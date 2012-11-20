@@ -1,3 +1,5 @@
+#!/bin/bash
+
 module=$1
 target=config-$1.xml
 zone=$2
@@ -23,7 +25,10 @@ else
 	export restport=$(($restport+1))
 	identity=${prefix}${resthost}:${restport}
 fi
-operator=accords
+operator=$5
+if test -z "$operator"; then
+	operator=accords
+fi
 password=co-system
 domain=occi
 verbose=0
