@@ -91,8 +91,10 @@ URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
 BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
+%if %{enable_pyaccords}
 BuildRequires:  %{python}
 BuildRequires:  %{pythondev}
+%endif
 BuildRequires:  %{javadev}
 Requires:       lsb
 
