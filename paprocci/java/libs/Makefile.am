@@ -10,16 +10,19 @@
 TEMPDIR = /tmp/ProActive
 PAVERSION = 3.3.0
 PANAME = ProActiveScheduling-${PAVERSION}_bin
+PAPATH = ${TEMPDIR}/${PANAME}/
+PATEST = ${TEMPDIR}/${PANAME}/.stamp
 PAFILE = ${PANAME}.zip
 PAURL = http://www.activeeon.com/public_content/releases/ProActive/${PAVERSION}/${PAFILE}
 
-${TEMPDIR}/${PAFILE}:
-	mkdir -p ${TEMPDIR} && curl ${PAURL} -o ${TEMPDIR}/${PAFILE}
+${PAFILE}:
+	mkdir -p ${TEMPDIR} && curl ${PAURL} -o ${PAFILE}
 
-extract: ${TEMPDIR}/${PAFILE}
+${PATEST}: ${PAFILE}
 	cd ${TEMPDIR} && unzip ${PAFILE}
+	touch ${PATEST}
 
-proactive: extract
+proactive: ${PATEST}
 	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar .
 
 distdir: proactive
@@ -27,7 +30,8 @@ distdir: proactive
 dist: proactive
 
 clean:
-	rm ${TEMPDIR}/${PAFILE} || true
+	rm ${PAFILE} || true
+	rm *.jar || true
 	rm -rf ${TEMPDIR}/${PANAME} || true
 
 javadir = $(datadir)/java/accords
