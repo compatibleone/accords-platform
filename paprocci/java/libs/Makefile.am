@@ -31,3 +31,5 @@ clean:
 javadir = $(datadir)/java/accords
 
 java_DATA = $(wildcard *.jar)
+
+EXTRA_DIST = ${java_DATA}
