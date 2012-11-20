@@ -22,7 +22,7 @@ ${PATEST}: ${PAFILE}
 	unzip ${PAFILE} -d ${TEMPDIR} && touch ${PATEST}
 
 proactive: ${PATEST}
-	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar .
+	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar $(distdir)
 
 dist-hook: proactive
 
