@@ -7,7 +7,7 @@
 #
 
 data_TESTSUITEBASIC = accords.py cocheck.py command.py coobas.py coplatform.py \
-	coresolver.py costart.py example.py jpaasprocci.py onprocci.py parser.py \
+	coresolver.py costart.py example.py paasprocci.py onprocci.py parser.py \
 	testaz.py teston.py azprocci.py cocommand.py comons.py cool.py coprovider.py \
 	cosacs.py costatus.py ezvm.py osocciprocci.py procci.py testbin.py testosocci.py \
 	broker.py coees.py conagios.py copaas.py coprovision.py cosched.py costop.py \
