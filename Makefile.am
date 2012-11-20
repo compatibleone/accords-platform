@@ -156,7 +156,7 @@ if ENABLE_PYACCORDS
 SUBDIRS += pyaccords pyaccordsSDK
 endif
 
-EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in accords.xml
+EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in accords.xml accounts.xml
 
 SPEC=compatibleone.spec
 SPEC_DIR:=$(shell rpm -E '%{_specdir}')
