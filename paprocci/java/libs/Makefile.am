@@ -14,7 +14,7 @@ PAFILE = ${PANAME}.zip
 PAURL = http://www.activeeon.com/public_content/releases/ProActive/${PAVERSION}/${PAFILE}
 
 ${TEMPDIR}/${PAFILE}:
-	curl ${PAURL} -o ${TEMPDIR}/${PAFILE}
+	mkdir -p ${TEMPDIR} && curl ${PAURL} -o ${TEMPDIR}/${PAFILE}
 
 extract: ${TEMPDIR}/${PAFILE}
 	cd ${TEMPDIR} && unzip ${PAFILE}
