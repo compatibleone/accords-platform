@@ -35,7 +35,7 @@ from basic.cosacs import *
 from basic.cosched import *
 from basic.coss import *
 from basic.dcprocci import *
-from basic.jpaasprocci import *
+from basic.paasprocci import *
 from basic.copaas import *
 from basic.ezvm import *
 from basic.example import *
