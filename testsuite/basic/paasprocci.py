@@ -4,10 +4,10 @@ import unittest
 import utils
 from testbin import TestBin
 
-class TestBinJpaasprocci(TestBin, unittest.TestCase):
+class TestBinPaasprocci(TestBin, unittest.TestCase):
 
     def setUp(self):
-        self.bin = 'jpaasprocci'
+        self.bin = 'paasprocci'
 
     def tearDown(self):
         pass
