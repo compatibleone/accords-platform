@@ -19,15 +19,12 @@ ${PAFILE}:
 	mkdir -p ${TEMPDIR} && curl ${PAURL} -o ${PAFILE}
 
 ${PATEST}: ${PAFILE}
-	cd ${TEMPDIR} && unzip ${PAFILE}
-	touch ${PATEST}
+	unzip ${PAFILE} -d ${TEMPDIR} && touch ${PATEST}
 
 proactive: ${PATEST}
 	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar .
 
-distdir: proactive
-
-dist: proactive
+dist-hook: proactive
 
 clean:
 	rm ${PAFILE} || true
@@ -36,6 +33,4 @@ clean:
 
 javadir = $(datadir)/java/accords
 
-java_DATA = $(wildcard *.jar)
-
-EXTRA_DIST = ${java_DATA}
+dist_java_DATA = $(wildcard *.jar)
