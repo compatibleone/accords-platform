@@ -215,26 +215,39 @@ public class SchedulerClient {
 		}
 		
 		// Getting information about the tasks/application and its host node. 
-		ArrayList<TaskState> tasks = scheduler.getJobState(jobId).getTasks();
-		int taskssize = tasks.size();
+		int taskssize = scheduler.getJobState(jobId).getTasks().size();
 		if (taskssize != 1){
 			logger.warn("The amount of tasks is supposed to be 1, but it is: " + taskssize);
 			throw new Exception("Incorrect amount of tasks: " + taskssize);
 		}
 		// There is only one task for the submitted job. 
-		while(scheduler.getJobState(jobId).getTasks().get(0).getExecutionHostName() == null){
+		while(scheduler.getJobState(jobId).getTasks().get(0).getExecutionHostName() == null 
+				&& stopsignal.getValue()==false){
 			logger.warn("The host name where the task is being executed had a null name... Waiting...");
 			Thread.sleep(200);
 		}
 		
+		logger.warn("Up to date2...");
+		while(!scheduler.getJobState(jobId).getTasks().get(0).getStatus().equals(TaskStatus.RUNNING)
+				&& stopsignal.getValue()==false){
+			logger.warn("The task status was not running... Waiting...");
+			Thread.sleep(200);
+		}
+
 		String runninghostname = scheduler.getJobState(jobId).getTasks().get(0).getExecutionHostName();
-		
 		logger.info("Execution host name: " + runninghostname);
 		String runningnode = runninghostname.substring(runninghostname.indexOf("(")).replace("(", "").replace(")","");
 		logger.info("Execution node: " + runningnode);
-		TaskStatus status = tasks.get(0).getStatus();
+		TaskStatus status = scheduler.getJobState(jobId).getTasks().get(0).getStatus();
 		logger.info("Execution status: " + status);
-
+		
+		if (stopsignal.getValue()==true){
+			logger.info("Job status is faulty...");
+			removeJobAlone(jobId);
+			logger.info("Removed the job " + jobId);
+			throw new Exception("Job " + jobId + " status faulty...");
+		}
+		
 		ResourceManagerClient rm = ResourceManagerClient.getInstance();
 		NodePublicInfo nodePublicInfo = rm.getCompleteNodePublicInfo(runningnode, null);
 		rm.disconnect();

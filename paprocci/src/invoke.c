@@ -17,15 +17,9 @@
 /* -------------------------------------------------------------------- */
 
 #include <invoke.h>
-//#include <proactive.h>
-//#include <paconfig.h>
-//#include <restrequest.h>
-//#include <restresponse.h>
-//#include <restheader.h>
 
 #define PATH_SEPARATOR ';' 
 #define KEY_CLASSPATH "-Djava.class.path="
-//#define JAVA_MODULE_PATH "./java/"
 #define STARTER_CLASS "org/ow2/compatibleone/Starter"
 
 struct jvm_struct * initialize_jvm_if_needed(struct jvm_struct ** jvmpp);
@@ -41,7 +35,6 @@ char* getjars(const char* targetdir){
 	struct dirent *ent;
 	char* buffer;
 	item_jar * curr, * head;
-	//fprintf(stderr, "Looking for .jars in '%s'...\n", targetdir);
 	head = NULL;
 	dir = opendir (targetdir);
 	if (dir != NULL) { /* print all the files and directories within directory */
@@ -61,7 +54,6 @@ char* getjars(const char* targetdir){
 	curr = head;
 	int counter=0;
 	while(curr) {
-		//fprintf(stderr, "Found: %s\n", curr->value);
 		counter+=strlen(curr->value);
 		curr = curr->next;
 	}
@@ -71,7 +63,6 @@ char* getjars(const char* targetdir){
 
 	curr = head;
 	while(curr) {
-		//fprintf(stderr, "Using: %s\n", curr->value);
 		strcat (buffer,curr->value);
 		free(curr->value);
 		head = curr;
@@ -91,20 +82,6 @@ struct jvm_struct * start_jvm() {
 	JavaVM *jvm;
 
 	char * jarslist = getjars("/usr/share/java/accords/paprocci/");
-	//
-	//char* jarslist1 = getjars(JAVA_MODULE_PATH "lib/scheduling/");
-	//char* jarslist2 = getjars(JAVA_MODULE_PATH "lib/");
-	//char* jarslist3 = getjars(JAVA_MODULE_PATH "dist/");
-	//char* jarslist = (char*) malloc (strlen(jarslist1) + strlen(jarslist2) + strlen(jarslist3) + 1);
-	//jarslist[0] = '\0';
-	//strcat(classpt, KEY_CLASSPATH);
-	//strcat(jarslist, jarslist1);
-	//strcat(jarslist, jarslist2);
-	//strcat(jarslist, jarslist3);
-	//free(jarslist1);
-	//free(jarslist2);
-	//free(jarslist3);
-	//
 	fprintf(stderr, "List of jars: '%s'\n", jarslist);
 #ifdef JNI_VERSION_1_2
 	JavaVMInitArgs vm_args;
@@ -181,6 +158,7 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
 	fprintf(stderr, "Looking for exceptions...\n");
 	if ((*env)->ExceptionOccurred(env)) {
 		(*env)->ExceptionDescribe(env);
+		exit(1);
 	}
 	fprintf(stderr, "Done.\n");
 	//printf("Destroying JVM...\n");
@@ -197,9 +175,10 @@ void destroy_jvm(JNIEnv * env, JavaVM * jvm){
  * @return the json String of the result of the call.
  */
 char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jobjectArray margs){
+
+
 	JNIEnv *env = jvmp->env;
 	JavaVM *jvm = jvmp->jvm;
-	//jobject* procci = jvmp->procci;
 
 	fprintf(stderr, "Executing %s...\n", mname);
 	
@@ -220,7 +199,7 @@ char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jo
 	}
 
 	fprintf(stderr, "Calling method '%s'...\n", mname);
-	jobject result = (*env)->CallObjectMethod(env, *(jvmp->procci), methodid, margs);
+	jobject result = (*env)->CallObjectMethod(env, jvmp->procci, methodid, margs);
 	fprintf(stderr, "Done.\n");
 	fprintf(stderr, "Looking for exceptions...\n");
 	char * ret;
@@ -229,11 +208,17 @@ char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jo
 		ret = NULL;	
 	}else{
 		fprintf(stderr, "Method '%s' executed.\n", mname);
-		char *str = (*env)->GetStringUTFChars(env,result,0);
-		ret = (char*)malloc(strlen(str)+1);
-		strcpy(ret, str);
-		(*env)->ReleaseStringUTFChars(env, result, str);
+		jboolean isCopy;
+		const char *str = (*env)->GetStringUTFChars(env,result,&isCopy);
+		if (isCopy == JNI_TRUE) {
+			ret = (char*)malloc(strlen(str)+1);
+			strcpy(ret, str);
+			(*env)->ReleaseStringUTFChars(env, result, str);
+		}else{
+			fprintf(stderr, "Problem getting the jstring result of the method '%s'...\n",mname);
+		}
 	}
+
 
 	fprintf(stderr, "MMM 21...\n");
       	(*env)->DeleteLocalRef( env, result ); 
@@ -290,10 +275,11 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 	}
 
 	/* Create a global reference */
-	//jobject resultGlobal; 
-	//resultGlobal = (*env)->NewGlobalRef(env, result);
+	jobject resultGlobal = (*env)->NewGlobalRef(env, result);
 		  
-	
+	/* The local reference is no longer useful */
+	(*env)->DeleteLocalRef(env, result);
+
 	//fprintf(stderr, "MMM z1...\n");
       	//(*env)->DeleteLocalRef( env, result ); 
 
@@ -307,8 +293,8 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
       	(*env)->DeleteLocalRef( env, jstr2 ); 
 	fprintf(stderr, "MMM z6...\n");
 
-	//jvmp->procci = resultGlobal;
-	jvmp->procci = result;
+	//jvmp->procci = result;
+	jvmp->procci = resultGlobal;
 	fprintf(stderr, "Connected to cloud services provider...\n");
 }
 
