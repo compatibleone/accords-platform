@@ -22,6 +22,8 @@ extract: ${TEMPDIR}/${PAFILE}
 proactive: extract
 	cp ${TEMPDIR}/${PANAME}/dist/lib/*.jar .
 
+distdir: proactive
+
 dist: proactive
 
 clean:
