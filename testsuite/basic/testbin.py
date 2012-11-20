@@ -11,6 +11,11 @@ class TestBin():
         self.assertTrue(os.path.isfile('/usr/bin/' + self.bin))
 
     def test_runnning(self):
+        retval = 0
+        try:
+            retval = self.return_value
+        except AttributeError:
+            pass
         # Check if it's explicitely disabled or enabled
         try:
             if self.do_not_test_running:
@@ -18,4 +23,4 @@ class TestBin():
                 return
         # If it's not explicitely disabled
         except AttributeError:
-            self.assertEqual(subprocess.call(['/usr/bin/' + self.bin]), 0)
+            self.assertEqual(subprocess.call(['/usr/bin/' + self.bin]), retval)
