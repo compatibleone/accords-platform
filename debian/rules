@@ -67,6 +67,8 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
+	sed -e 's@/usr/local/nagios/etc/nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/usr/bin/accords > `pwd`/debian/tmp/usr/bin/accords.tmp
+	mv `pwd`/debian/tmp/usr/bin/accords.tmp `pwd`/debian/tmp/usr/bin/accords
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/

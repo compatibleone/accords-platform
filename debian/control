@@ -212,7 +212,7 @@ Description: CompatibleOne Accords Platform - Fileserver subsystem
 Package: compatibleone-nagios
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), nagios3
 Description: CompatibleOne Accords Platform - Nagios subsystem
  CompatibleOne Accords Platform - Nagios subsystem
 
