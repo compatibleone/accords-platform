@@ -8,6 +8,7 @@ class TestBinAccords(TestBin, unittest.TestCase):
 
     def setUp(self):
         self.bin = 'accords'
+        self.return_value = 1
 
     def tearDown(self):
         pass
