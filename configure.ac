@@ -391,8 +391,8 @@ if test "x$enable_paprocci" = "xyes"; then
            *)      JVM_ARCH=$target_cpu ;;
       esac
       AC_SUBST([JVM_ARCH])
-      JAVA_HOME=${paprocci_jdk}/jre/lib/${JVM_ARCH}
-      AC_SUBST([JAVA_HOME])
+      JDK_ROOT=${paprocci_jdk}/jre/lib/${JVM_ARCH}
+      AC_SUBST([JDK_ROOT])
       CFLAGS_JNI="-I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"
       AC_SUBST([CFLAGS_JNI])
 
@@ -401,7 +401,7 @@ if test "x$enable_paprocci" = "xyes"; then
       CFLAGS="$CFLAGS_JNI $CFLAGS"
       AC_CHECK_HEADERS([${paprocci_jdk}/include/jni.h], [
           save_LDFLAGS=$LDFLAGS
-          LDFLAGS="-L$JAVA_HOME/client -L$JAVA_HOME/server $LDFLAGS"
+          LDFLAGS="-L$JDK_ROOT/client -L$JDK_ROOT/server $LDFLAGS"
           AC_CHECK_LIB(
               [jvm],
               [JNI_CreateJavaVM],
@@ -425,7 +425,7 @@ if test "x$enable_paprocci" = "xyes"; then
       ], AC_MSG_ERROR(The JVM header is required in order to build the program!))
 
       AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src ${CFLAGS_JNI}"])
-      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JAVA_HOME} -L${JAVA_HOME}/server -L${JAVA_HOME}/client -R${JAVA_HOME} -R${JAVA_HOME}/server -R${JAVA_HOME}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
+      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JDK_ROOT} -L${JDK_ROOT}/server -L${JDK_ROOT}/client -R${JDK_ROOT} -R${JDK_ROOT}/server -R${JDK_ROOT}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
       AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
       #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
       #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
