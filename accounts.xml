@@ -4,11 +4,12 @@
 
 <account name="accords"><user name="operator" role="admin"/></account>
 <account name="osprocci"><user name="operator" role="admin"/></account>
+<account name="osocciprocci"><user name="operator" role="admin"/></account>
 <account name="onprocci"><user name="operator" role="admin"/></account>
 <account name="azprocci"><user name="operator" role="admin"/></account>
 <account name="dcprocci"><user name="operator" role="admin"/></account>
 <account name="paprocci"><user name="operator" role="admin"/></account>
-<account name="jpaasprocci"><user name="operator" role="admin"/></account>
+<account name="paasprocci"><user name="operator" role="admin"/></account>
 <account name="pcprocci"><user name="operator" role="admin"/></account>
 <account name="ecprocci"><user name="operator" role="admin"/></account>
 
