@@ -638,12 +638,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_sysconfdir}/init.d/compatibleone
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/accords.ini
-%config %{_sysconfdir}/accords/cords_user.xml
-%config %{_sysconfdir}/accords/openssl.cnf
-%config %{_sysconfdir}/accords/coips.xml
-%config %{_sysconfdir}/accords/Certificates.crt
+%attr(0600,root,root) %config %{_sysconfdir}/accords/cords_user.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/openssl.cnf
+%attr(0600,root,root) %config %{_sysconfdir}/accords/coips.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/Certificates.crt
 %config %{_sysconfdir}/accords/accounts.xml
-%config %{_sysconfdir}/accords/os_config.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/os_config.xml
 %config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
