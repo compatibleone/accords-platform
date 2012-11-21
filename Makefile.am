@@ -158,15 +158,56 @@ endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in accounts.xml
 
-SPEC=compatibleone.spec
+ACCORDS_SPEC=compatibleone.spec
+PAPROCCI_SPEC=compatibleone-paprocci-java.spec
+PAARCH=compatibleone-paprocci-java-$(VERSION)
+PAPROCCI_SRCS=$(PAARCH).tar.gz
 SPEC_DIR:=$(shell rpm -E '%{_specdir}')
 SOURCE_DIR:=$(shell rpm -E '%{_sourcedir}')
 
-spec:
-	cp $(SPEC).in $(SPEC)
-	sed -ri -e "s|_VERSION|$(VERSION)|g" $(SPEC)
+TEMPDIR = /tmp/ProActive
+PAVERSION = 3.3.0
+PANAME = ProActiveScheduling-${PAVERSION}_bin
+PAROOT = ${TEMPDIR}/$(PAARCH)/
+PAPATH = ${TEMPDIR}/${PANAME}/
+PATEST = ${TEMPDIR}/${PANAME}/.stamp
+PAFILE = ${PANAME}.zip
+PAURL = http://www.activeeon.com/public_content/releases/ProActive/${PAVERSION}/${PAFILE}
 
-dist-srpm: dist-gzip spec
-	cp $(SPEC) $(SPEC_DIR)
+${PAFILE}:
+	mkdir -p ${TEMPDIR} && curl ${PAURL} -o ${PAFILE}
+
+${PATEST}: ${PAFILE}
+	unzip ${PAFILE} -d ${TEMPDIR} && touch ${PATEST}
+
+$(ACCORDS_SPEC): $(ACCORDS_SPEC).in
+	cp $(ACCORDS_SPEC).in $(ACCORDS_SPEC)
+	sed -ri -e "s|_VERSION|$(VERSION)|g" $(ACCORDS_SPEC)
+
+$(PAPROCCI_SRCS): ${PATEST}
+	rm $(PAPROCCI_SRCS) || true
+	mkdir -p $(PAROOT)
+	for jar in ProActive.jar ProActive_ResourceManager.jar \
+		ProActive_SRM-common-client.jar ProActive_SRM-common.jar \
+		ProActive_Scheduler-client.jar ProActive_Scheduler-core.jar \
+		bouncycastle.jar commons-cli-1.1.jar commons-httpclient-3.1.jar \
+		http-2.0.4.jar javassist.jar log4j.jar trilead-ssh2.jar \
+		hibernate-jpa-2.0-api-1.0.1.Final.jar \
+	; do \
+		cp ${TEMPDIR}/${PANAME}/dist/lib/$$jar $(PAROOT); \
+	done
+	cd $(TEMPDIR) && tar czf $(abs_top_srcdir)/$(PAPROCCI_SRCS) $(PAARCH)/
+
+$(PAPROCCI_SPEC): $(PAPROCCI_SPEC).in
+	cp $(PAPROCCI_SPEC).in $(PAPROCCI_SPEC)
+	sed -ri -e "s|_VERSION|$(VERSION)|g" $(PAPROCCI_SPEC)
+
+paprocci-srpm: $(PAPROCCI_SPEC) $(PAPROCCI_SRCS)
+
+dist-srpm: dist-gzip $(ACCORDS_SPEC) paprocci-srpm
+	cp $(ACCORDS_SPEC) $(SPEC_DIR)
+	cp $(PAPROCCI_SPEC) $(SPEC_DIR)
 	cp $(distdir).tar.gz $(SOURCE_DIR)
-	rpmbuild -bs $(SPEC_DIR)/$(SPEC)
+	cp $(PAPROCCI_SRCS) $(SOURCE_DIR)
+	rpmbuild -bs $(SPEC_DIR)/$(ACCORDS_SPEC)
+	rpmbuild -bs $(SPEC_DIR)/$(PAPROCCI_SPEC)
