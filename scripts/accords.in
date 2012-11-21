@@ -363,7 +363,6 @@ _co_status() {
 _co_stop() {
     _nagios_stop
     _stop_service cosacs
-    _stop_service example
     _stop_service slam
     _stop_service paasprocci
     _stop_service onprocci
@@ -479,10 +478,6 @@ _run_paasprocci() {
     paasprocci --config $target CO-PAASPROCCI/1.0
 }
 
-_run_example() {
-    example --config $target CO-EXAMPLE/1.0
-}
-
 _run_dcprocci() {
     dcprocci --config $target CO-DCPROCCI/1.0
 }
@@ -533,7 +528,6 @@ _make_security_files() {
 	_mksecs copaas 1
 	_mksecs conagios 1
 	_mksecs paasprocci 1
-	_mksecs example 1
 	_mksecs command
     
 	_mksect testcp 1
@@ -609,7 +603,6 @@ _accords_config() {
 		_mkcert copaas
 		_mkcert conagios
 		_mkcert paasprocci
-		_mkcert example
 		_mkcert cosacs
 	
 		_mkcert testcp
@@ -660,7 +653,6 @@ _accords_config() {
     _mkcfg copaas
     _mkcfg conagios
     _mkpro paasprocci
-    _mkcfg example
     _mkcosacs cosacs
 
     _termnag
@@ -1107,9 +1099,6 @@ case `basename $0` in
 	;;
     run-paasprocci)
 	_run_paasprocci $*
-	;;
-    run-example)
-	_run_example $*
 	;;
     run-dcprocci)
 	_run_dcprocci $*
