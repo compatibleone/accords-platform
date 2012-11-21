@@ -18,6 +18,8 @@
 %define group System/Daemons
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
+%define nagioscfg %{_sysconfdir}/nagios/nagios.cfg
+%define nagioslibexec %{_libexecdir}/nagios
 
 %define is_mga 0
 %define is_rh 0
@@ -598,6 +600,12 @@ EOF
 #TODO: remove this line once paprocci is packaged again
 #rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
+# Correct the nagios path
+sed -ri \
+	-e 's@/usr/local/nagios/etc/nagios.cfg@%{nagioscfg}@g' \
+	-e 's@/usr/local/nagios/libexec@%{nagioslibexec}@g' \
+	${RPM_BUILD_ROOT}%{_bindir}/accords
+
 %post
 
 if [ -e %{_localstatedir}/lib/accords/accords.xml ] ; then
@@ -638,12 +646,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_sysconfdir}/init.d/compatibleone
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/accords.ini
-%config %{_sysconfdir}/accords/cords_user.xml
-%config %{_sysconfdir}/accords/openssl.cnf
-%config %{_sysconfdir}/accords/coips.xml
-%config %{_sysconfdir}/accords/Certificates.crt
+%attr(0600,root,root) %config %{_sysconfdir}/accords/cords_user.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/openssl.cnf
+%attr(0600,root,root) %config %{_sysconfdir}/accords/coips.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/Certificates.crt
 %config %{_sysconfdir}/accords/accounts.xml
-%config %{_sysconfdir}/accords/os_config.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/os_config.xml
 %config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
