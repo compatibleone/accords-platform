@@ -202,15 +202,17 @@ char * call_java_procci(struct jvm_struct * jvmp, char * mname, char * msign, jo
 	jobject result = (*env)->CallObjectMethod(env, jvmp->procci, methodid, margs);
 	fprintf(stderr, "Done.\n");
 	fprintf(stderr, "Looking for exceptions...\n");
-	char * ret;
+	char * ret = NULL;
+
 	if ((*env)->ExceptionOccurred(env)) {
+		fprintf(stderr, "Exception got when calling method '%s'.\n", mname);
 		(*env)->ExceptionDescribe(env);
-		ret = NULL;	
+		(*env)->ExceptionClear(env);
 	}else{
 		fprintf(stderr, "Method '%s' executed.\n", mname);
 		jboolean isCopy;
 		const char *str = (*env)->GetStringUTFChars(env,result,&isCopy);
-		if (isCopy == JNI_TRUE) {
+		if (isCopy == JNI_TRUE && str!=NULL) {
 			ret = (char*)malloc(strlen(str)+1);
 			strcpy(ret, str);
 			(*env)->ReleaseStringUTFChars(env, result, str);
@@ -272,6 +274,7 @@ void connect_to_provider(struct jvm_struct * jvmp, char ** args) {
 	if ((*env)->ExceptionOccurred(env)) {
 		fprintf(stderr, "Exception got when trying to connect to provider...\n");
 		(*env)->ExceptionDescribe(env);
+		(*env)->ExceptionClear(env);
 	}
 
 	/* Create a global reference */
@@ -350,8 +353,6 @@ char * start_server(struct pa_config * config, struct jvm_struct ** jvmpp, struc
 	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
 	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
-	jobject procci = jvmp->procci;
 
 	// The Java method to call is 'String start_server(Object[] args)'.
 	// We prepare the arguments to invoke it. 
@@ -390,7 +391,6 @@ char * stop_server(struct pa_config * config, struct jvm_struct ** jvmpp, struct
 	struct jvm_struct * jvmp = initialize_provider_if_needed(config, jvmpp);
 
 	JNIEnv *env = jvmp->env;
-	JavaVM *jvm = jvmp->jvm;
 
 	jclass sclass = (*env)->FindClass(env, "java/lang/String");
 	jobjectArray margs = (*env)->NewObjectArray(env, 1, sclass, NULL);

@@ -12,7 +12,9 @@ rm sla-accords-*.xml -f
 rm co-parser co-broker co-resolver co-command -f
 rm testcp testcb testresolver command -f
 rm -r security -f 
-
+rm quota-*.xml
+rm account-*.xml
+rm sla-*.xml
 
 
 
