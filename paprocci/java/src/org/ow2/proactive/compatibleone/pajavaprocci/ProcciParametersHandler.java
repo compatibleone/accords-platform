@@ -53,6 +53,9 @@ import org.ow2.proactive.compatibleone.misc.ProcciProperties;
  * This class provides support to ProActiveProcci dealing
  * with command-line parameters treatment, help, version, etc. */
 public final class ProcciParametersHandler {
+	private static final String CONF_PATH = "/var/lib/accords/paprocci/";
+	private static final String PROPERTIES_FILE = "paprocci.properties";
+	private static final String LOG4J_FILE = "log4j.properties";
 	
 	protected static Logger logger =						// Logger. 
 			Logger.getLogger(ProcciParametersHandler.class.getName()); 
@@ -118,7 +121,8 @@ public final class ProcciParametersHandler {
 			Misc.log4jConfiguration(getArgs().getInt("debug"), getArgs().getStr("logconf"));	// Loading log4j configuration. 
 		}else{
 			// No command-line arguments. 
-			Misc.log4jConfiguration(2, null);							// Loading log4j configuration. 
+			//Misc.log4jConfiguration(2, null);							// Loading log4j configuration. 
+			Misc.log4jConfiguration(3, CONF_PATH + LOG4J_FILE);			// Loading log4j configuration. 
 		}
 		
 		
@@ -136,7 +140,7 @@ public final class ProcciParametersHandler {
 		if (initialization==INIT_CLI){
 			filename = this.getArgs().getStr("properties-file");
 		}else{
-			filename = "/var/lib/accords/paprocci/paprocci.properties";
+			filename = CONF_PATH + PROPERTIES_FILE ;
 		}
 		
 		File f = new File(filename);	// Load a set of properties for this procci.

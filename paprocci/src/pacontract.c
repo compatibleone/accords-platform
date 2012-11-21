@@ -400,7 +400,7 @@ public	int	delete_proactive_contract(
 		char * agent,
 		char * tls )
 {
-	printf("Deleting ProActive contract...\n");
+	return 0;
 }
 
 	/* ------------- */
