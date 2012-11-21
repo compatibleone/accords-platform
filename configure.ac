@@ -425,7 +425,7 @@ if test "x$enable_paprocci" = "xyes"; then
       ], AC_MSG_ERROR(The JVM header is required in order to build the program!))
 
       AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src ${CFLAGS_JNI}"])
-      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JAVA_HOME} -L${JAVA_HOME}/server -L${JAVA_HOME}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
+      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JAVA_HOME} -L${JAVA_HOME}/server -L${JAVA_HOME}/client -R${JAVA_HOME} -R${JAVA_HOME}/server -R${JAVA_HOME}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
       AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
       #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
       #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
