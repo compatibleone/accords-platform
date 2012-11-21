@@ -513,14 +513,14 @@ AC_ARG_ENABLE([testsuite],
       [AS_HELP_STRING([--enable-testsuite],
 		      [Enable testsuite @<:@default=disable@:>@])],
       [],
-      [enable_testsuite=yes])
+      [enable_testsuite=no])
 AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
 
 AC_ARG_ENABLE([pyaccords],
       [AS_HELP_STRING([--enable-pyaccords],
 		      [Enable pyaccords @<:@default=disable@:>@])],
       [],
-      [enable_pyaccords=yes])
+      [enable_pyaccords=no])
 AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
 
 dnl files to generate with automake
