@@ -75,5 +75,5 @@ for jar in *.jar; do
 done;
 
 %files
-%dir %{_datadir}/java/accords
+%dir %{_datadir}/java/accords/paprocci/
 %attr(0644,root,root) %{_datadir}/java/accords/paprocci/*.jar
