@@ -76,4 +76,4 @@ done;
 
 %files
 %dir %{_datadir}/java/accords
-%attr(0644,root,root) %{_datadir}/java/accords/*.jar
+%attr(0644,root,root) %{_datadir}/java/accords/paprocci/*.jar
