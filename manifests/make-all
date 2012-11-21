@@ -21,6 +21,7 @@ read var
 export makeplatform=$var
 export makeuser=$1
 export makesecurity=$2
+export makeoptions=$3
 echo "--------------------------------------------------------------"
 echo "building accords platform demonstrator for : "
 echo "-------------------------------------------- "
@@ -28,6 +29,7 @@ echo "System Type  : "$makesystem
 echo "Platform Type: "$makeplatform
 echo "Account Name : "$makeuser
 echo "Security Info: "$makesecurity
+echo "Security Code: "$makeoptions
 echo "-------------------------------------------- "
 echo "cleaning packages"
 echo "-------------------------------------------- "
@@ -38,7 +40,7 @@ if [ -z "$makesecurity" ]; then
 	cp build-config-cosacs-unsafe build-config-cosacs
 	cp build-config-cool-unsafe build-config-cool
 else
-	bash make-security
+	bash make-security $makeoptions
 	cp build-config-secure build-config
 	cp build-config-cosacs-secure build-config-cosacs
 	cp build-config-cool-secure build-config-cool
