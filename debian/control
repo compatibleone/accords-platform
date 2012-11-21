@@ -23,9 +23,18 @@ Description: compatibleOne Accords development files
 Package: python-compatibleone-accords
 Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7, python-dev, python-boto
 Description: CompatibleOne Accords platform Python bindings and interfaces
  CompatibleOne Accords platform Python bindings and interfaces
+
+Package: compatibleone-accords-testsuite
+Section: devel
+Architecture: all
+Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7, python-unittest2, python-dev
+Description: CompatibleOne Accords platform testsuite
+ This package will run a set of tests to ensure that a minimal level of working
+ parts is meet. It is useful during development to ensure that there is no
+ regression.
 
 Package: libcompatibleone-accords0
 Section: libs
@@ -295,10 +304,9 @@ Description: CompatibleOne Accords Platform - Open Stack inspection tool
 
 Package: compatibleone-accords
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
+Depends: compatibleone, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-testosocci, compatibleone-accords-doc
 Recommends: compatibleone-paprocci, compatibleone-nagios
-Suggests: compatibleone-example
-Description: CompatibleOne Accords Platform - All packages
+Description: CompatibleOne Accords Platform - All packages (runtime)
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
  ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
@@ -312,6 +320,16 @@ Description: CompatibleOne Accords Platform - All packages
  - Provide innovative platform of services, that go beyond the standard services provided by existing cloud providers
  - Remove the constraints of vendor lock-in
  - Provide a platform that the community can evolve rapidly and adapt according to their needs
+
+Package: compatibleone-accords-dev
+Architecture: all
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, compatibleone-example, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
+Recommends: compatibleone-paprocci, compatibleone-nagios
+Description: CompatibleOne Accords Platform - All packages (development)
+ CompatibleOne is an open source project which provides a model, CORDS
+ (CompatibleOne Resource Description Schema), and a platform,
+ ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
+ for the description and federation of different clouds comprising resources provisioned
 
 Package: compatibleone-accords-doc
 Architecture: all
