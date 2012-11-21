@@ -2,7 +2,7 @@ Source: compatibleone-accords
 Section: net
 Priority: extra
 Maintainer: Vincent Renardias <vrenardias@citypassenger.com>
-Build-Depends: debhelper (>= 7.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev, sun-java6-jdk, python-dev
+Build-Depends: debhelper (>= 7.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev, sun-java6-jdk, ant, curl, python-dev
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
@@ -19,6 +19,13 @@ Architecture: any
 Depends: compatibleone (= ${binary:Version}), libcompatibleone-accords0 (= ${binary:Version})
 Description: compatibleOne Accords development files
  CompatibleOne Accords development files; For developpers only.
+
+Package: python-compatibleone-accords
+Section: python
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7
+Description: CompatibleOne Accords platform Python bindings and interfaces
+ CompatibleOne Accords platform Python bindings and interfaces
 
 Package: libcompatibleone-accords0
 Section: libs
