@@ -215,23 +215,7 @@ _co_provision()
     _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
     _co_run_prov dcprocci accords "accords delta cloud services" 1 1 1000 1 1
     _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
-
-# ---------------------------------------------------
-#    These have been commented out since they are 
-#    not currently being used by an active platform
-# ---------------------------------------------------
-#    echo "Starting accords occi open stack services"
-#    @bindir@/run-osocciprocci &
-#    sleep $tempo
-# ---------------------------------------------------
-#    echo "Starting accords test occi open stack server"
-#    @bindir@/run-testosocci &
-#    sleep $tempo
-# ---------------------------------------------------
-#    echo "Starting accords procci example"
-#    @bindir@/run-example &
-#    sleep $tempo
-# ---------------------------------------------------
+    _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
 
     _co_run_serv cosacs "accords software configuration services"
 
@@ -323,8 +307,7 @@ echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > sla-$name.xml
 echo "<agreement name=\"$name\" xmlns=\"http://www.compatibleone.fr/schemes/slam.xsd\" initiator=\"$operator\" responder=\"accords\" serviceprovider=\"initiator\" description=\"generated provider SLA\" initiation=\"now\" expiration=\"never\" template=\"none\">" >> sla-$name.xml 
 echo "<terms name=\"$name:services\" type=\"services\">" >> sla-$name.xml 
 echo "<term name=\"$name:service1\">" >> sla-$name.xml 
-echo "<provider name=\"$name\">" >> sla-$name.xml 
-echo "</manifest>" >> sla-$name.xml
+echo "<provider name=\"$name\"/>" >> sla-$name.xml 
 echo "</term>" >> sla-$name.xml
 echo "</terms>" >> sla-$name.xml
 echo "<terms name=\"$name:conditions\" type=\"conditions\">" >> sla-$name.xml 
