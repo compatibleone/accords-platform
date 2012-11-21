@@ -368,7 +368,6 @@ _co_stop() {
     _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
-    _stop_service testosocci
     _stop_service dcprocci
     _stop_service osprocci
     _stop_service paprocci
@@ -464,10 +463,6 @@ _run_osocciprocci() {
     osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
-_run_testosocci() {
-    testosocci --config $target CO-TESTOSOCCI/1.0
-}
-
 _run_slam() {
     slam --config $target CO-SLAM/1.0
 }
@@ -530,7 +525,6 @@ _make_security_files() {
 	_mksecs cosched 1
 	_mksecs osprocci 1
 	_mksecs paprocci 1
-	_mksecs testosocci 1
 	_mksecs osocciprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
@@ -606,7 +600,6 @@ _accords_config() {
 		_mkcert procci
 		_mkcert cosched
 		_mkcert osprocci
-		_mkcert testosocci
 		_mkcert osocciprocci
 		_mkcert onprocci
 		_mkcert paprocci
@@ -654,7 +647,6 @@ _accords_config() {
     _mkcfg procci 
     _mkpro osprocci  
     _mkpro paprocci  
-    _mkcfg testosocci
     _mkpro osocciprocci  
     _mkpro onprocci
     _mkpro azprocci
@@ -1103,9 +1095,6 @@ case `basename $0` in
 	;;
     run-osocciprocci)
 	_run_osocciprocci $*
-	;;
-    run-testosocci)
-	_run_testosocci $*
 	;;
     run-slam)
 	_run_slam $*
