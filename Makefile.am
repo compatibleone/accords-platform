@@ -180,7 +180,7 @@ ${PAFILE}:
 ${PATEST}: ${PAFILE}
 	unzip ${PAFILE} -d ${TEMPDIR} && touch ${PATEST}
 
-$(ACCORDS_SPEC):
+$(ACCORDS_SPEC): $(ACCORDS_SPEC).in
 	cp $(ACCORDS_SPEC).in $(ACCORDS_SPEC)
 	sed -ri -e "s|_VERSION|$(VERSION)|g" $(ACCORDS_SPEC)
 
@@ -198,7 +198,7 @@ $(PAPROCCI_SRCS): ${PATEST}
 	done
 	cd $(TEMPDIR) && tar czf $(abs_top_srcdir)/$(PAPROCCI_SRCS) $(PAARCH)/
 
-$(PAPROCCI_SPEC):
+$(PAPROCCI_SPEC): $(PAPROCCI_SPEC).in
 	cp $(PAPROCCI_SPEC).in $(PAPROCCI_SPEC)
 	sed -ri -e "s|_VERSION|$(VERSION)|g" $(PAPROCCI_SPEC)
 
