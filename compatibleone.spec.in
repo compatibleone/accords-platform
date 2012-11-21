@@ -1,5 +1,8 @@
 %define _enable_debug_packages %{nil}
 %define debug_package          %{nil}
+%define enable_testsuite 1
+%define enable_pyaccords 1
+%define enable_paprocci 1
 %define distname accords
 
 %define major 0
@@ -8,10 +11,15 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
+%define python python2
+%define pythondev python-devel
+%define javadev java-devel >= 1.6.0
 
 %define group System/Daemons
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
+%define nagioscfg %{_sysconfdir}/nagios/nagios.cfg
+%define nagioslibexec %{_libexecdir}/nagios
 
 %define is_mga 0
 %define is_rh 0
@@ -45,6 +53,8 @@
 %define libdevgroup Development/C
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
+%define python python
+%define javadev java-devel >= 1.6.0, java-rpmbuild
 %endif
 
 %if %{is_suse}
@@ -52,6 +62,7 @@
 #define libgroup System/Libraries
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
+%define python python
 %endif
 
 %if %{is_rh}
@@ -60,16 +71,36 @@
 #define libdevgroup Development/Libraries
 %endif
 
+%if %{enable_testsuite}
+%define testsuite_enabled "--enable-testsuite=yes"
+%endif
+
+%if %{enable_pyaccords}
+%define pyaccords_enabled "--enable-pyaccords=yes"
+%endif
+
+%if %{enable_paprocci}
+%define paprocci_enabled "--enable-paprocci=%java_home"
+%endif
+
 Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
-Release:	12.0
+Release:	19.2
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
 BuildRequires:  %{uuiddev}
 BuildRequires:  %{ssldev}
+%if %{enable_pyaccords}
+BuildRequires:  %{python}
+BuildRequires:  %{pythondev}
+%endif
+%if %{enable_paprocci}
+BuildRequires:  %{javadev}
+BuildRequires:  ant
+%endif
 Requires:       lsb
 
 %description
@@ -94,6 +125,18 @@ Requires:   %{libname} = %{version}-%{release}
 
 %description -n %{libnamedev}
 CompatibleOne Accords development files; For developers only.
+
+#-------------------------------------------
+
+%if %{enable_pyaccords}
+%package python
+Group:      %{libgroup}
+Summary:    CompatibleOne Accords Platform Python bindings
+Requires:   %{name} = %{version}-%{release}
+
+%description python
+CompatibleOne Accords platform Python bindings and interfaces
+%endif
 
 #-------------------------------------------
 %package azprocci
@@ -278,13 +321,13 @@ CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
 #-------------------------------------------
 
-%package jpaasprocci
+%package paasprocci
 Group: %{group}
 Requires: %{name} = %{version}-%{release}
-Summary: CompatibleOne Accords Platform - JPaaS Procci subsystem
+Summary: CompatibleOne Accords Platform - PaaS Procci subsystem
 
-%description jpaasprocci
-CompatibleOne Accords Platform - JPaaS Procci subsystem
+%description paasprocci
+CompatibleOne Accords Platform - PaaS Procci subsystem
 
 #-------------------------------------------
 
@@ -363,14 +406,16 @@ CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 #-------------------------------------------
 
-#%package paprocci
-#Group: %{group}
-#Requires: %{name} = %{version}-%{release}
-#Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
-#
-#%description paprocci
-#CompatibleOne Accords Platform - ProActive Procci subsystem
-#
+%if %{enable_paprocci}
+%package paprocci
+Group: %{group}
+Requires: %{name} = %{version}-%{release}
+Requires: java >= 1.6.0
+Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
+
+%description paprocci
+CompatibleOne Accords Platform - ProActive Procci subsystem
+%endif
 
 #-------------------------------------------
 
@@ -441,6 +486,8 @@ Requires: %{name}-comons
 Requires: %{name}-conets
 Requires: %{name}-conagios
 Requires: %{name}-coobas
+Requires: %{name}-cool
+Requires: %{name}-copaas
 Requires: %{name}-cosacs
 Requires: %{name}-cosched
 Requires: %{name}-coss
@@ -491,11 +538,34 @@ heterogeneous cloud service providers.
 
 #-------------------------------------------
 
+%if %{enable_testsuite}
+%package testsuite
+BuildArch: noarch
+Summary: A test suite for CompatibleOne
+Requires: %{name}-accords
+Requires: python
+Requires: python-psutil
+%if !%{is_mga}
+%if %{is_rh}
+Requires: python-unittest2
+%else
+Requires: python-unittest
+%endif
+%endif
+
+%description testsuite
+This package will run a set of tests to ensure that a minimal level of working
+parts is meet. It is useful during development to ensure that there is no
+regression.
+%endif
+
+#-------------------------------------------
+
 %prep
 %setup -q -n %{distname}-%{version}
 
 %build
-%configure
+%configure %{testsuite_enabled} %{pyaccords_enabled} %{paprocci_enabled}
 make
 
 %install
@@ -503,16 +573,24 @@ rm -rf ${RPM_BUILD_ROOT}
 make DESTDIR="${RPM_BUILD_ROOT}" install
 
 # create some directories
-for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords/rest %{_localstatedir}/log/accords/rest; do
+for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords %{_localstatedir}/log/accords/rest %{_localstatedir}/log/accords/service; do
 	mkdir -p ${RPM_BUILD_ROOT}$dir
 done;
 
 # install some extra files
 cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
 cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp manifests/os_config.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp accounts.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp Certificates.crt ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
 ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
+ln -s %{_sysconfdir}/accords/Certificates.crt ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/Certificates.crt
 ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
+ln -s %{_sysconfdir}/accords/cords_user.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/cords_user.xml
+ln -s %{_sysconfdir}/accords/accounts.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/accounts.xml
+ln -s %{_localstatedir}/log/accords/rest ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/rest
+ln -s %{_localstatedir}/log/accords/service ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/service
 
 # add a fake file to produce a useless package
 cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
@@ -520,7 +598,13 @@ This package contains nothing, and only exists to pull dependencies.
 EOF
 
 #TODO: remove this line once paprocci is packaged again
-rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
+#rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
+
+# Correct the nagios path
+sed -ri \
+	-e 's@/usr/local/nagios/etc/nagios.cfg@%{nagioscfg}@g' \
+	-e 's@/usr/local/nagios/libexec@%{nagioslibexec}@g' \
+	${RPM_BUILD_ROOT}%{_bindir}/accords
 
 %post
 
@@ -562,9 +646,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_sysconfdir}/init.d/compatibleone
 %dir %{_sysconfdir}/accords
 %config %{_sysconfdir}/accords/accords.ini
-%config %{_sysconfdir}/accords/cords_user.xml
-%config %{_sysconfdir}/accords/openssl.cnf
-%config %{_sysconfdir}/accords/coips.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/cords_user.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/openssl.cnf
+%attr(0600,root,root) %config %{_sysconfdir}/accords/coips.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/Certificates.crt
+%config %{_sysconfdir}/accords/accounts.xml
+%attr(0600,root,root) %config %{_sysconfdir}/accords/os_config.xml
 %config %{_sysconfdir}/default/accords
 %attr(0755,root,root) %{_bindir}/accords
 %attr(0755,root,root) %{_bindir}/co-*
@@ -575,183 +662,203 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0755,root,root) %{_bindir}/parser
 %attr(0755,root,root) %{_bindir}/run-parser
 %doc %{_mandir}/man7/*
-%doc %{_mandir}/man1/accords*
-%doc %{_mandir}/man1/co-*
-%doc %{_mandir}/man1/accords-config*
-%doc %{_mandir}/man1/test*
-%doc %{_mandir}/man1/command*
-%doc %{_mandir}/man1/parser*
-%doc %{_mandir}/man1/run-parser*
+%doc %{_mandir}/man1/accords.1*
+%doc %{_mandir}/man1/co-*.1*
+%doc %{_mandir}/man1/accords-config.1*
+%doc %{_mandir}/man1/test??.1*
+%doc %{_mandir}/man1/testresolver.1*
+#doc %{_mandir}/man1/command.1*
+%doc %{_mandir}/man1/parser.1*
+%doc %{_mandir}/man1/run-parser.*
 %dir %{_localstatedir}/lib/accords
 %attr(0644,root,root) %{_localstatedir}/lib/accords/openssl.cnf
 %attr(0644,root,root) %{_localstatedir}/lib/accords/coips.xml
+%attr(0644,root,root) %{_localstatedir}/lib/accords/cords_user.xml
+%attr(0644,root,root) %{_localstatedir}/lib/accords/Certificates.crt
+%attr(0644,root,root) %{_localstatedir}/lib/accords/accounts.xml
 %dir %{_localstatedir}/lib/accords/rest
+%dir %{_localstatedir}/lib/accords/service
 %dir %{_localstatedir}/log/accords
 %dir %{_localstatedir}/log/accords/rest
+%dir %{_localstatedir}/log/accords/service
+
+#--------------------------------------------
+
+%if %{enable_pyaccords}
+%files python
+%defattr(-,root,root,0755)
+%{python_sitelib}/pypacksrc*
+%{python_sitearch}/pycompdev*
+%{python_sitearch}/pycompmanager*
+%endif
 
 #--------------------------------------------
 
 %files azprocci
 %attr(0755,root,root) %{_bindir}/azprocci
 %attr(0755,root,root) %{_bindir}/run-azprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/azprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-azprocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/azprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-azprocci.1*
 
 %files broker
 %attr(0755,root,root) %{_bindir}/broker
 %attr(0755,root,root) %{_bindir}/run-broker
-%attr(0755,root,root) %doc %{_mandir}/man1/broker*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-broker*
+%attr(0644,root,root) %doc %{_mandir}/man1/broker.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-broker.1*
 
 %files coees
 %attr(0755,root,root) %{_bindir}/coees
 %attr(0755,root,root) %{_bindir}/run-coees
-%attr(0755,root,root) %doc %{_mandir}/man1/coees*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-coees*
+%attr(0644,root,root) %doc %{_mandir}/man1/coees.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-coees.1*
 
 %files cops
 %attr(0755,root,root) %{_bindir}/cops
 %attr(0755,root,root) %{_bindir}/run-cops
-%attr(0755,root,root) %doc %{_mandir}/man1/cops*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-cops*
+%attr(0644,root,root) %doc %{_mandir}/man1/cops.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-cops.1*
 
 %files coips
 %attr(0755,root,root) %{_bindir}/coips
 %attr(0755,root,root) %{_bindir}/run-coips
-%attr(0755,root,root) %doc %{_mandir}/man1/coips*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-coips*
+%attr(0644,root,root) %doc %{_mandir}/man1/coips.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-coips.1*
 
 %files comons
 %attr(0755,root,root) %{_bindir}/comons
 %attr(0755,root,root) %{_bindir}/run-comons
-%attr(0755,root,root) %doc %{_mandir}/man1/comons*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-comons*
+%attr(0644,root,root) %doc %{_mandir}/man1/comons.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-comons.1*
 
 %files conets
 %attr(0755,root,root) %{_bindir}/conets
 %attr(0755,root,root) %{_bindir}/run-conets
-%attr(0755,root,root) %doc %{_mandir}/man1/conets*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-conets*
+%attr(0644,root,root) %doc %{_mandir}/man1/conets.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-conets.1*
 
 %files conagios
 %attr(0755,root,root) %{_bindir}/conagios
 %attr(0755,root,root) %{_bindir}/run-conagios
-%attr(0755,root,root) %doc %{_mandir}/man1/conagios*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-conagios*
+%attr(0644,root,root) %doc %{_mandir}/man1/conagios.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-conagios.1*
 
 %files coobas
 %attr(0755,root,root) %{_bindir}/coobas
 %attr(0755,root,root) %{_bindir}/run-coobas
-%attr(0755,root,root) %doc %{_mandir}/man1/coobas*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-coobas*
+%attr(0644,root,root) %doc %{_mandir}/man1/coobas.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-coobas.1*
 
 %files cool
 %attr(0755,root,root) %{_bindir}/cool
-#attr(0755,root,root) %{_bindir}/run-cool
-%attr(0755,root,root) %doc %{_mandir}/man1/cool*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-cool*
+%attr(0755,root,root) %{_bindir}/run-cool
+%attr(0644,root,root) %doc %{_mandir}/man1/cool.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-cool.1*
 
 %files cosacs
 %attr(0755,root,root) %{_bindir}/cosacs
 %attr(0755,root,root) %{_bindir}/run-cosacs
-%attr(0755,root,root) %doc %{_mandir}/man1/cosacs*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-cosacs*
+%attr(0644,root,root) %doc %{_mandir}/man1/cosacs.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-cosacs.1*
 
 %files cosched
 %attr(0755,root,root) %{_bindir}/cosched
 %attr(0755,root,root) %{_bindir}/run-cosched
-%attr(0755,root,root) %doc %{_mandir}/man1/cosched*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-cosched*
+%attr(0644,root,root) %doc %{_mandir}/man1/cosched.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-cosched.1*
 
 %files coss
 %attr(0755,root,root) %{_bindir}/coss
 %attr(0755,root,root) %{_bindir}/run-coss
-%attr(0755,root,root) %doc %{_mandir}/man1/coss*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-coss*
+%attr(0644,root,root) %doc %{_mandir}/man1/coss.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-coss.1*
 
 %files dcprocci
 %attr(0755,root,root) %{_bindir}/dcprocci
 %attr(0755,root,root) %{_bindir}/run-dcprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/dcprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-dcprocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/dcprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-dcprocci.1*
 
-%files jpaasprocci
-%attr(0755,root,root) %{_bindir}/jpaasprocci
-%attr(0755,root,root) %{_bindir}/run-jpaasprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/jpaasprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-jpaasprocci*
+%files paasprocci
+%attr(0755,root,root) %{_bindir}/paasprocci
+%attr(0755,root,root) %{_bindir}/run-paasprocci
+%attr(0644,root,root) %doc %{_mandir}/man1/paasprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-paasprocci.1*
 
 %files copaas
 %attr(0755,root,root) %{_bindir}/copaas
 %attr(0755,root,root) %{_bindir}/run-copaas
-%attr(0755,root,root) %doc %{_mandir}/man1/copaas*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-copaas*
+%attr(0644,root,root) %doc %{_mandir}/man1/copaas.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-copaas.1*
 
 %files ezvm
 %attr(0755,root,root) %{_bindir}/ezvm
 %attr(0755,root,root) %{_bindir}/run-ezvm
-%attr(0755,root,root) %doc %{_mandir}/man1/ezvm*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-ezvm*
+%attr(0644,root,root) %doc %{_mandir}/man1/ezvm.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-ezvm.1*
 
 %files example
 %attr(0755,root,root) %{_bindir}/example
 %attr(0755,root,root) %{_bindir}/run-example
-%attr(0755,root,root) %doc %{_mandir}/man1/example*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-example*
+%attr(0644,root,root) %doc %{_mandir}/man1/example.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-example.1*
 
 %files fileserver
 %attr(0755,root,root) %{_bindir}/fileserver
 %attr(0755,root,root) %{_bindir}/run-fileserver
-%attr(0755,root,root) %doc %{_mandir}/man1/fileserver*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-fileserver*
+%attr(0644,root,root) %doc %{_mandir}/man1/fileserver.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-fileserver.1*
 
 %files onprocci
 %attr(0755,root,root) %{_bindir}/onprocci
 %attr(0755,root,root) %{_bindir}/run-onprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/onprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-onprocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/onprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-onprocci.1*
 
 %files osocciprocci
 %attr(0755,root,root) %{_bindir}/osocciprocci
 %attr(0755,root,root) %{_bindir}/run-osocciprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/osocciprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-osocciprocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/osocciprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-osocciprocci.1*
 
 %files osprocci
 %attr(0755,root,root) %{_bindir}/osprocci
 %attr(0755,root,root) %{_bindir}/run-osprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/osprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-osprocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/osprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-osprocci.1*
 
-#files paprocci
-#attr(0755,root,root) %{_bindir}/paprocci
-#attr(0755,root,root) %{_bindir}/run-paprocci
-%attr(0755,root,root) %doc %{_mandir}/man1/paprocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-paprocci*
+%if %{enable_paprocci}
+%files paprocci
+%attr(0755,root,root) %{_bindir}/paprocci
+%attr(0755,root,root) %{_bindir}/run-paprocci
+%attr(0644,root,root) %doc %{_mandir}/man1/paprocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-paprocci.1*
+%dir %{_datadir}/java/accords
+%attr(0644,root,root) %{_datadir}/java/accords/*.jar
+%endif
 
 %files procci
 %attr(0755,root,root) %{_bindir}/procci
 %attr(0755,root,root) %{_bindir}/run-procci
-%attr(0755,root,root) %doc %{_mandir}/man1/procci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-procci*
+%attr(0644,root,root) %doc %{_mandir}/man1/procci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-procci.1*
 
 %files publisher
 %attr(0755,root,root) %{_bindir}/publisher
 %attr(0755,root,root) %{_bindir}/run-publisher
-%attr(0755,root,root) %doc %{_mandir}/man1/publisher*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-publisher*
+%attr(0644,root,root) %doc %{_mandir}/man1/publisher.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-publisher.1*
 
 %files slam
 %attr(0755,root,root) %{_bindir}/slam
 %attr(0755,root,root) %{_bindir}/run-slam
-%attr(0755,root,root) %doc %{_mandir}/man1/slam*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-slam*
+%attr(0644,root,root) %doc %{_mandir}/man1/slam.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-slam.1*
 
 %files testosocci
 %attr(0755,root,root) %{_bindir}/testosocci
 %attr(0755,root,root) %{_bindir}/run-testosocci
-%attr(0755,root,root) %doc %{_mandir}/man1/testosocci*
-%attr(0755,root,root) %doc %{_mandir}/man1/run-testosocci*
+%attr(0644,root,root) %doc %{_mandir}/man1/testosocci.1*
+%attr(0644,root,root) %doc %{_mandir}/man1/run-testosocci.1*
 
 %files -n %{libname}
 %defattr(-,root,root,0755)
@@ -773,6 +880,18 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root,0755)
 %dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
+
+%if %{enable_testsuite}
+%files testsuite
+%defattr(-,root,-root,0755)
+%dir %{_libexecdir}/compatibleone/
+%dir %{_libexecdir}/compatibleone/testsuite/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/*.py*
+%dir %{_libexecdir}/compatibleone/testsuite/basic/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/basic/*.py*
+%dir %{_libexecdir}/compatibleone/testsuite/platform/
+%attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/platform/*.py*
+%endif
 
 %changelog
 * Wed Jan 06 2012 Jean-Philippe Braun <jpbraun@mandriva.com> - 1.0

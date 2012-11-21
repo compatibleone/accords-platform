@@ -14,7 +14,9 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([-Wno-portability])
+# tar-pax is needed for having paths with more than 99 chars
+# which happens for java paprocci
+AM_INIT_AUTOMAKE([1.9 -Wno-portability tar-pax])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES(yes)])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -382,18 +384,52 @@ AC_ARG_ENABLE([paprocci],
       [enable_paprocci=no;paprocci_jdk=jdk_not_used])
 AM_CONDITIONAL([ENABLE_PAPROCCI], [test "$enable_paprocci" = "yes"])
 
-case $target_cpu in
-     x86_64) JVM_ARCH=amd64 ;;
-     i?86)   JVM_ARCH=i386 ;;
-     *)      JVM_ARCH=$target_cpu ;;
-esac
-AC_SUBST([JVM_ARCH])
+if test "x$enable_paprocci" = "xyes"; then
+      case $target_cpu in
+           x86_64) JVM_ARCH=amd64 ;;
+           i?86)   JVM_ARCH=i386 ;;
+           *)      JVM_ARCH=$target_cpu ;;
+      esac
+      AC_SUBST([JVM_ARCH])
+      JDK_ROOT=${paprocci_jdk}/jre/lib/${JVM_ARCH}
+      AC_SUBST([JDK_ROOT])
+      CFLAGS_JNI="-I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"
+      AC_SUBST([CFLAGS_JNI])
 
-AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src -I${paprocci_jdk}/include -I${paprocci_jdk}/include/linux"])
-AC_SUBST([LDFLAGS_PAPROCCI], ["-L${paprocci_jdk}/jre/lib/${JVM_ARCH} -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/server -L${paprocci_jdk}/jre/lib/${JVM_ARCH}/client -ljvm -ljava -lverify"])
-AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
-#AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
-#AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+       # Checks for jni.
+      save_CFLAGS=$CFLAGS
+      CFLAGS="$CFLAGS_JNI $CFLAGS"
+      AC_CHECK_HEADERS([${paprocci_jdk}/include/jni.h], [
+          save_LDFLAGS=$LDFLAGS
+          LDFLAGS="-L$JDK_ROOT/client -L$JDK_ROOT/server $LDFLAGS"
+          AC_CHECK_LIB(
+              [jvm],
+              [JNI_CreateJavaVM],
+              [LDFLAGS_JNI_JVM="-ljvm"],
+              [AC_MSG_ERROR(The JDK jvm library is required in order to build the program!)]
+          )
+#          AC_CHECK_LIB(
+#              [java],
+#              [JNI_CreateJavaVM],
+#              [LDFLAGS_JNI_JAVA="-ljava"],
+#              [AC_MSG_ERROR(The JDK java library is required in order to build the program!)]
+#          )
+#          AC_CHECK_LIB(
+#              [verify],
+#              [JNI_CreateJavaVM],
+#              [LDFLAGS_JNI_VERIFY="-lverify"],
+#              [AC_MSG_ERROR(The JDK verify library is required in order to build the program!)]
+#          )
+          LDFLAGS=$save_LDFLAGS
+          CFLAGS=$save_CFLAGS
+      ], AC_MSG_ERROR(The JVM header is required in order to build the program!))
+
+      AC_SUBST([CFLAGS_PAPROCCI], ["-I\${abs_top_srcdir}/paprocci/src ${CFLAGS_JNI}"])
+      AC_SUBST([LDFLAGS_PAPROCCI], ["-L${JDK_ROOT} -L${JDK_ROOT}/server -L${JDK_ROOT}/client -R${JDK_ROOT} -R${JDK_ROOT}/server -R${JDK_ROOT}/client ${LDFLAGS_JNI_JVM} ${LDFLAGS_JNI_JAVA} ${LDFLAGS_JNI_VERIFY}"])
+      AC_SUBST([PATH_PAPROCCI], ["${abs_top_srcdir}/paprocci/src"])
+      #AC_SUBST([CFLAGS_JNI], ["-I${paprocci_jdk}/include/ -I${paprocci_jdk}/include/linux/"])
+      #AC_SUBST([LDFLAGS_JNI], ["-L${paprocci_jdk}/jre/lib/i386 -L${paprocci_jdk}/jre/lib/i386/client -ljvm -ljava -lverify"])
+fi
 
 AC_ARG_ENABLE([coidms],
       [AS_HELP_STRING([--enable-coidms],
@@ -473,6 +509,20 @@ AC_ARG_ENABLE([testresolver],
       [enable_testresolver=yes])
 AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 
+AC_ARG_ENABLE([testsuite],
+      [AS_HELP_STRING([--enable-testsuite],
+		      [Enable testsuite @<:@default=disable@:>@])],
+      [],
+      [enable_testsuite=yes])
+AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
+
+AC_ARG_ENABLE([pyaccords],
+      [AS_HELP_STRING([--enable-pyaccords],
+		      [Enable pyaccords @<:@default=disable@:>@])],
+      [],
+      [enable_pyaccords=yes])
+AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
+
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
@@ -513,7 +563,7 @@ AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
 AC_CONFIG_FILES([dcprocci/Makefile dcprocci/src/Makefile])
-AC_CONFIG_FILES([paprocci/Makefile paprocci/src/Makefile])
+AC_CONFIG_FILES([paprocci/Makefile paprocci/src/Makefile paprocci/java/Makefile paprocci/java/libs/Makefile])
 AC_CONFIG_FILES([command/Makefile command/src/Makefile])
 AC_CONFIG_FILES([testdc/Makefile testdc/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
@@ -523,6 +573,9 @@ AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
 AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
+AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
+AC_CONFIG_FILES([pyaccords/Makefile pyaccords/pysrc/Makefile pyaccords/pysrc/pypacksrc/Makefile])
+AC_CONFIG_FILES([pyaccordsSDK/Makefile pyaccordsSDK/pycompdev/Makefile pyaccordsSDK/pycompmanager/Makefile])
 
 dnl write all stuff
 AC_OUTPUT
@@ -581,5 +634,7 @@ echo "    - testcb                   : $enable_testcb"
 echo "    - testaz                   : $enable_testaz"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
+echo "    - testsuite                : $enable_testsuite"
+echo "    - pyaccords                : $enable_pyaccords"
 echo ""
 

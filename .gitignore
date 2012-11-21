@@ -160,3 +160,4 @@ testresolver/Makefile.in
 testresolver/src/Makefile.in
 testresolver/src/testresolver
 *.tgz
+paprocci/java/libs/*.jar
