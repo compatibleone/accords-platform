@@ -18,6 +18,8 @@
 %define group System/Daemons
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
+%define nagioscfg %{_sysconfdir}/nagios/nagios.cfg
+%define nagioslibexec %{_libexecdir}/nagios
 
 %define is_mga 0
 %define is_rh 0
@@ -597,6 +599,12 @@ EOF
 
 #TODO: remove this line once paprocci is packaged again
 #rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
+
+# Correct the nagios path
+sed -ri \
+	-e 's@/usr/local/nagios/etc/nagios.cfg@%{nagioscfg}@g' \
+	-e 's@/usr/local/nagios/libexec@%{nagioslibexec}@g' \
+	${RPM_BUILD_ROOT}%{_bindir}/accords
 
 %post
 
