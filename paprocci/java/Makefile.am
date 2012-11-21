@@ -7,8 +7,6 @@
 #   Alexandre Lissy <alissy@mandriva.com>
 #
 
-SUBDIRS = libs
-
 EXTRA_DIST = build.xml lib/*.jar src/
 
 javadir = $(datadir)/java/accords
