@@ -237,7 +237,7 @@ private	int	paprocci(int argc, char * argv[] )
 /*	------------------------------------------------------------------	*/
 public	int	main(int argc, char * argv[] )
 {
-	printf("Starting procci...\n");
+	printf("Starting PaProcci...\n");
 	if ( argc == 1 )
 		return( banner() );
 	else	return( paprocci( argc, argv ) );

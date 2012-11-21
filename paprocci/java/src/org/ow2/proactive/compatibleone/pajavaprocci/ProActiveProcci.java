@@ -38,14 +38,12 @@
 package org.ow2.proactive.compatibleone.pajavaprocci;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.ow2.compatibleone.Procci;
-import org.ow2.compatibleone.exchangeobjects.ProcciCategory;
-import org.ow2.compatibleone.exchangeobjects.RestRequest;
-import org.ow2.compatibleone.exchangeobjects.RestResponse;
 import org.ow2.proactive.compatibleone.exceptions.ElementNotFoundException;
 import org.ow2.proactive.compatibleone.exchangeobjects.*;
 import org.ow2.proactive.compatibleone.misc.*;
@@ -88,17 +86,12 @@ public class ProActiveProcci implements Procci{
 				Misc.print(nodesinfo);
 			}else if (args.getBool("get-cosacs")){
 				String par = args.getStr("params");
-				// OS null null nonodes
-				String[] params = par.split(";");
+				if (par==null){throw new ElementNotFoundException("Argument 'params' should be present.");}
+				String[] params = {par};
 				logger.info("Parameters found:");
 				for (String s: params){
 					logger.info("  '" + s + "'");
 				}
-				//String os = args.getStr("select-by-os");
-				//String hostname = null; //args.getStr("select-by-hostname");
-				//String file = null; //args.getStr("select-by-file-existent");
-				//String nonodes = args.getStr("number-of-nodes");
-				//Object[] param = {os, null, null, nonodes};
 				String nodeid = start_server(params);
 				Misc.print(nodeid);
 			}else if (args.getBool("get-node-info")){
@@ -120,6 +113,8 @@ public class ProActiveProcci implements Procci{
 			}else{ 
 				Misc.print("No command given");  
 			}
+			logger.warn("Trying to undo if needed...");
+			try{Thread.sleep(20000);}catch(Exception er){}
 			Misc.exit();  
 		}catch(Throwable e){
 			logger.warn("Execution error detected: " + e.getMessage());
@@ -154,15 +149,15 @@ public class ProActiveProcci implements Procci{
 	
 	private String normalizem(String str){
 		String output;
-		
+        DecimalFormat f = new DecimalFormat("#.##");
 		if (str.toUpperCase().endsWith("G"))
-			output = new String("" + (getvalue(str)*1024.00));
+			output = f.format(getvalue(str)*1024.00);
 		else if (str.toUpperCase().endsWith("M"))
-			output = new String("" + (getvalue(str)));
+			output = f.format(getvalue(str));
 		else if (str.toUpperCase().endsWith("K"))
-			output = new String("" + (getvalue(str)/1024.00));
+			output = f.format(getvalue(str)/1024.00);
 		else
-			output = new String("" + (getvalue(str)/(1024.0 * 1024.0)));
+			output = f.format(getvalue(str)/(1024.0 * 1024.0));
 		
 		logger.info("Normalized: " + str + " to: " + output + " (in Mega).");
 		return output;
@@ -173,7 +168,7 @@ public class ProActiveProcci implements Procci{
 	 * @return a json object telling the result of the operation and some extra data. 
 	 * @throws Exception if anything goes wrong. 
 	 */
-	public String start_server(
+	public synchronized String start_server(
 			Object[] args) throws Exception{
 		
 		checkparameters(args, 1);
@@ -230,14 +225,17 @@ public class ProActiveProcci implements Procci{
 		if (gridlockfile != null){
 			selection = SelectionScriptCreator.createSelectionScript(
 					SelectionScriptCreator.AND, 
-					SelectionScriptCondition.nodeWithFileMark(workingdir + path_sep + gridlockfile),
+					SelectionScriptCondition.nodeWithFileMark(workingdir + path_sep + gridlockfile), // gridlockfile
 					SelectionScriptCondition.nodeWithoutSpecialLock(workingdir + path_sep + "lock"),
-					SelectionScriptCondition.nodeWithOS(os)
+					SelectionScriptCondition.nodeWithOS(os),
+					SelectionScriptCondition.nodeWithDiskMb(Float.valueOf(diskmb)),
+					SelectionScriptCondition.nodeWithMemoryMb(Float.valueOf(rammb)),
+					SelectionScriptCondition.nodeWithMHz(Float.valueOf(mhz))
 				);
 		}else{	
 			selection = SelectionScriptCreator.createSelectionScript(
 					SelectionScriptCreator.AND, 
-					SelectionScriptCondition.nodesContainingFile(app_path),
+					SelectionScriptCondition.nodesContainingFile(app_path), // application file (cosacs)
 					SelectionScriptCondition.nodeWithoutSpecialLock(workingdir + path_sep + "lock"),
 					SelectionScriptCondition.nodeWithOS(os),
 					SelectionScriptCondition.nodeWithDiskMb(Float.valueOf(diskmb)),
@@ -295,17 +293,7 @@ public class ProActiveProcci implements Procci{
 	 * @param uuid id of the node locked. 
 	 * @return a json object telling the result of the operation. 
 	 */
-	/*          
- 			start_proactive ( 
-				struct occi_category * optr,
-				struct rest_client * cptr,
-				struct rest_request * rptr,
-                struct rest_response * aptr,
-                void * vptr 
-            )  
-            despues de recibir la llamada esta funcion llama a C para actualizar la category o no
-	*/
-	public String stop_server(
+	public synchronized String stop_server(
 			Object[] args) throws Exception{
 		checkparameters(args, 1);
 		final String id = args[0].toString();

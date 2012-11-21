@@ -76,6 +76,7 @@ install: build
 	cp accounts.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp coips.xml `pwd`/debian/tmp/etc/accords
+	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf os_config.xml
 # Build architecture independant packages.
 
 binary-indep: build install

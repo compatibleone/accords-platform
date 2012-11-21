@@ -18,6 +18,8 @@
 
 package org.ow2.proactive.compatibleone.rm;
 
+import java.text.DecimalFormat;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -173,7 +175,7 @@ public class SelectionScriptCondition {
 	    condition += "{selected = selected OPERATOR true; println(usercpu + \" < than minimum MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
 	    condition += "{selected = selected OPERATOR false; println(usercpu + \" > than minimum MINIMUM  ==> NOT selected\");}" + NEWLINE;
-	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
+	    condition = condition.replace("MINIMUM", format(minimum));
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
@@ -193,12 +195,16 @@ public class SelectionScriptCondition {
 	    condition += "{selected = selected OPERATOR true; println(paramx + \" >= than minimum XXX MINIMUM ==> SELECTED\");}"+NEWLINE ;
 	    condition += "else"+NEWLINE ;
 	    condition += "{selected = selected OPERATOR false; println(paramx + \" <= than minimum XXX MINIMUM  ==> NOT selected\");}" + NEWLINE;
-	    condition = condition.replace("MINIMUM", new Double(minimum).toString());
+	    condition = condition.replace("MINIMUM", format(minimum));
 	    condition = condition.replace("XXX", X);
 		//logger.info("Condition for selection script created: " + condition);
 		return new SelectionScriptCondition(condition);
 	}
 	
+	private static String format(double val){
+        DecimalFormat f = new DecimalFormat("#.##");
+        return f.format(val);
+	}
 		//Sigar sigar = new Sigar();
 		//System.out.println("ram: " + sigar.getCpuInfoList()[0].getModel());
 		//System.out.println("ram: " + sigar.getMem().getRam());

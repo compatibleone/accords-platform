@@ -20,6 +20,7 @@
 #define	_pacontract_c
 
 #include "occiclient.h"
+#include "occiresolver.h"
 
 struct	cords_vector
 {
