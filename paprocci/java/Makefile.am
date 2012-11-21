@@ -14,7 +14,7 @@ javadir = $(datadir)/java/accords
 java_DATA = dist/co-proactive-procci.jar
 
 dist/co-proactive-procci.jar:
-	ant dist -Dpalib.dir=libs
+	ant dist
 
 clean:
 	rm dist/co-proactive-procci.jar || true
