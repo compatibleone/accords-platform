@@ -69,7 +69,10 @@ that are needed to run paprocci.
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
-cp *.jar ${RPM_BUILD_ROOT}%{_datadir}/java/accords/
+
+for jar in *.jar; do
+	install -m0644 -D $jar ${RPM_BUILD_ROOT}%{_datadir}/java/accords/$jar
+done;
 
 %files
 %dir %{_datadir}/java/accords
