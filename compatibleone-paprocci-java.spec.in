@@ -52,7 +52,7 @@
 Summary:	CompatibleOne ProActive OCCI Java dependencies
 Name:		compatibleone-paprocci-java
 Version:	_VERSION
-Release:	1.0
+Release:	2.0
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
@@ -71,7 +71,7 @@ that are needed to run paprocci.
 rm -rf ${RPM_BUILD_ROOT}
 
 for jar in *.jar; do
-	install -m0644 -D $jar ${RPM_BUILD_ROOT}%{_datadir}/java/accords/$jar
+	install -m0644 -D $jar ${RPM_BUILD_ROOT}%{_datadir}/java/accords/paprocci/$jar
 done;
 
 %files
