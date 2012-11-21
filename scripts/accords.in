@@ -984,7 +984,9 @@ _mkcfg() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
-    _mknag $module
+	if [ "$module" != "cool" ]; then
+    	_mknag $module
+	fi
 }
 
 _mkpro() {
