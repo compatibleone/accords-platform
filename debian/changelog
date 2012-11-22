@@ -1,8 +1,9 @@
 compatibleone-accords (0.20121121-1) unstable; urgency=low
 
   * Uptream update 2012/11/21 codebase + python enabled.
+  * compatibleone-example and compatibleone-testosocci are now gone.
 
- -- Vincent Renardias <vrenardias@citypassenger.com>  Wed, 21 Nov 2012 11:12:59 +0200
+ -- Vincent Renardias <vincent@renardias.com>  Wed, 21 Nov 2012 11:12:59 +0200
 
 compatibleone-accords (0.20121120-1) unstable; urgency=low
 
