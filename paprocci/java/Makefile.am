@@ -9,7 +9,7 @@
 
 EXTRA_DIST = build.xml src/ lib/
 
-javadir = $(datadir)/java/accords
+javadir = $(datadir)/java/accords/
 
 java_DATA = dist/co-proactive-procci.jar
 
