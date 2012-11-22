@@ -52,7 +52,7 @@
 Summary:	CompatibleOne ProActive OCCI Java dependencies
 Name:		compatibleone-paprocci-java
 Version:	_VERSION
-Release:	2.0
+Release:	3.0
 License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
