@@ -8,7 +8,7 @@
 		<prop key="proactive.net.router.address" value="node0.cloud.sophia.inria.fr"/>
 		<prop key="proactive.net.router.port" value="8090"/>
 		<prop key="proactive.communication.pamr.socketfactory" value="ssh"/>
-		<prop key="proactive.communication.pamrssh.key_directory" value="/home/cone/.ssh/"/>
+		<prop key="proactive.communication.pamrssh.key_directory" value="/home/co/.ssh/"/>
 		<prop key="proactive.communication.pamrssh.username" value="mjost"/>
 		<prop key="proactive.communication.pamrssh.port" value="22"/>
     </properties>

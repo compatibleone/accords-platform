@@ -35,5 +35,5 @@ addalljars $JARS
 export CLASSPATH=$CPATH
 #echo CLASSPATH $CPATH
 
-$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/conf/paprocci.properties $@  -v 3
+$JAVA_HOME/bin/java -Xmx1024m org.ow2.compatibleone.Starter $@ --logconf $BASEDIR/conf/log4j.properties --properties-file $BASEDIR/../conf/paprocci.properties -v 3
 

@@ -1,5 +1,8 @@
 #!/bin/bash
+set -e
 echo Cleaning not needed files...
+mkdir -p rest
+mkdir -p service
 rm -f rest/*
 rm -f service/*
 rm -f links_*
