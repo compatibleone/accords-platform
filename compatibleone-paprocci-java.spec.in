@@ -57,6 +57,7 @@ License:	Apache Software License 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
 Source0:	%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 CompatibleOne ProActive OCCI Java dependencies, i.e., JAR files
