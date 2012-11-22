@@ -23,14 +23,14 @@ Description: compatibleOne Accords development files
 Package: python-compatibleone-accords
 Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7, python-dev, python-boto
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python-dev, python-boto
 Description: CompatibleOne Accords platform Python bindings and interfaces
  CompatibleOne Accords platform Python bindings and interfaces
 
 Package: compatibleone-accords-testsuite
 Section: devel
 Architecture: all
-Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python2.7, python-unittest2, python-dev
+Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev
 Description: CompatibleOne Accords platform testsuite
  This package will run a set of tests to ensure that a minimal level of working
  parts is meet. It is useful during development to ensure that there is no
