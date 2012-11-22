@@ -571,41 +571,41 @@ regression.
 make
 
 %install
-make DESTDIR="%{buildroot}" install
+make DESTDIR="${RPM_BUILD_ROOT}" install
 
 # create some directories
 for dir in %{_sysconfdir}/defaults %{_sysconfdir}/accords %{_datadir}/accords %{_docdir}/accords %{_localstatedir}/lib/accords %{_localstatedir}/log/accords/rest %{_localstatedir}/log/accords/service; do
-	mkdir -p %{buildroot}$dir
+	mkdir -p ${RPM_BUILD_ROOT}$dir
 done;
 
 # install some extra files
-cp *.xsd %{buildroot}%{_docdir}/accords
-cp manifests/openssl.cnf %{buildroot}%{_sysconfdir}/accords/
-cp manifests/os_config.xml %{buildroot}%{_sysconfdir}/accords/
-cp accounts.xml %{buildroot}%{_sysconfdir}/accords/
-cp Certificates.crt %{buildroot}%{_sysconfdir}/accords/
-cp coips.xml %{buildroot}%{_sysconfdir}/accords/
-ln -s %{_sysconfdir}/accords/openssl.cnf %{buildroot}%{_localstatedir}/lib/accords/openssl.cnf
-ln -s %{_sysconfdir}/accords/Certificates.crt %{buildroot}%{_localstatedir}/lib/accords/Certificates.crt
-ln -s %{_sysconfdir}/accords/coips.xml %{buildroot}%{_localstatedir}/lib/accords/coips.xml
-ln -s %{_sysconfdir}/accords/cords_user.xml %{buildroot}%{_localstatedir}/lib/accords/cords_user.xml
-ln -s %{_sysconfdir}/accords/accounts.xml %{buildroot}%{_localstatedir}/lib/accords/accounts.xml
-ln -s %{_localstatedir}/log/accords/rest %{buildroot}%{_localstatedir}/lib/accords/rest
-ln -s %{_localstatedir}/log/accords/service %{buildroot}%{_localstatedir}/lib/accords/service
+cp *.xsd ${RPM_BUILD_ROOT}%{_docdir}/accords
+cp manifests/openssl.cnf ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp manifests/os_config.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp accounts.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp Certificates.crt ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+cp coips.xml ${RPM_BUILD_ROOT}%{_sysconfdir}/accords/
+ln -s %{_sysconfdir}/accords/openssl.cnf ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/openssl.cnf
+ln -s %{_sysconfdir}/accords/Certificates.crt ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/Certificates.crt
+ln -s %{_sysconfdir}/accords/coips.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/coips.xml
+ln -s %{_sysconfdir}/accords/cords_user.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/cords_user.xml
+ln -s %{_sysconfdir}/accords/accounts.xml ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/accounts.xml
+ln -s %{_localstatedir}/log/accords/rest ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/rest
+ln -s %{_localstatedir}/log/accords/service ${RPM_BUILD_ROOT}%{_localstatedir}/lib/accords/service
 
 # add a fake file to produce a useless package
-cat <<EOF >%{buildroot}%{_datadir}/accords/README
+cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
 This package contains nothing, and only exists to pull dependencies.
 EOF
 
 #TODO: remove this line once paprocci is packaged again
-#rm %{buildroot}%{_bindir}/run-paprocci
+#rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
 # Correct the nagios path
 sed -ri \
 	-e 's@/usr/local/nagios/etc/nagios.cfg@%{nagioscfg}@g' \
 	-e 's@/usr/local/nagios/libexec@%{nagioslibexec}@g' \
-	%{buildroot}%{_bindir}/accords
+	${RPM_BUILD_ROOT}%{_bindir}/accords
 
 %post
 
@@ -640,7 +640,7 @@ cd %{_localstatedir}/lib/accords/ && accords-config
 /sbin/ldconfig
 
 %clean
-rm -rf %{buildroot}
+rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(-,root,root,0755)
