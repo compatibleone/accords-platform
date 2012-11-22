@@ -8,9 +8,9 @@
 #   Alexandre Lissy <alissy@mandriva.com>
 #
 
-dist_coman1_DATA = accords.7 compatibleone.7
+dist_coman7_DATA = accords.7 compatibleone.7
 
-dist_coman7_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
+dist_coman1_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-resolver.1 co-start.1 co-status.1 co-stop.1 azprocci.1 broker.1 \
 	coees.1 coips.1 comons.1 conagios.1 conets.1 coobas.1 cool.1 \
 	copaas.1 cops.1 cosacs.1 cosched.1 coss.1 dcprocci.1 example.1 ezvm.1 \
