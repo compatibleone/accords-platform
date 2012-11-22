@@ -25,5 +25,5 @@ dist_coman7_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-provider.1 co-provision.1 testaz.1 testcb.1 testcp.1 testdc.1 teston.1 \
 	testos.1 testresolver.1 accords.1
 
-coman1dir = $(DESTDIR)$(mandir)/man1/
-coman7dir = $(DESTDIR)$(mandir)/man7/
+coman1dir = $(mandir)/man1/
+coman7dir = $(mandir)/man7/
