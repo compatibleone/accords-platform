@@ -106,23 +106,25 @@ public struct rest_client * drop_rest_client(struct rest_client * sptr)
 {
 	if ( sptr )
 	{
-		if (!( sptr->parent )) return(sptr);
-		if (!( sptr->previous ))
+		if ( sptr->parent )
 		{
-			if (!( sptr->parent->first = sptr->next ))
-				sptr->parent->last = (struct rest_client *) 0;
-			else	sptr->parent->first->previous = (struct rest_client *) 0;
+			if (!( sptr->previous ))
+			{
+				if (!( sptr->parent->first = sptr->next ))
+					sptr->parent->last = (struct rest_client *) 0;
+				else	sptr->parent->first->previous = (struct rest_client *) 0;
+			}
+			else if (!( sptr->previous->next = sptr->next ))
+				sptr->parent->last = sptr->previous;
+			if (!( sptr->next ))
+			{
+				if (!( sptr->parent->last = sptr->previous ))
+					sptr->parent->first = (struct rest_client *) 0;
+				else	sptr->parent->last->next = (struct rest_client *) 0;
+			}
+			else if (!( sptr->next->previous = sptr->previous ))
+				sptr->parent->first = sptr->next;
 		}
-		else if (!( sptr->previous->next = sptr->next ))
-			sptr->parent->last = sptr->previous;
-		if (!( sptr->next ))
-		{
-			if (!( sptr->parent->last = sptr->previous ))
-				sptr->parent->first = (struct rest_client *) 0;
-			else	sptr->parent->last->next = (struct rest_client *) 0;
-		}
-		else if (!( sptr->next->previous = sptr->previous ))
-			sptr->parent->first = sptr->next;
 		sptr = liberate_rest_client(sptr);
 	}
 	return((struct rest_client *) 0);
