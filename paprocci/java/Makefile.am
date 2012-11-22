@@ -7,11 +7,11 @@
 #   Alexandre Lissy <alissy@mandriva.com>
 #
 
-EXTRA_DIST = build.xml lib/*.jar src/
+EXTRA_DIST = build.xml src/
 
 javadir = $(datadir)/java/accords
 
-java_DATA = dist/co-proactive-procci.jar
+java_DATA = dist/co-proactive-procci.jar lib/*.jar
 
 dist/co-proactive-procci.jar:
 	ant dist
