@@ -134,6 +134,7 @@ CompatibleOne Accords development files; For developers only.
 Group:      %{libgroup}
 Summary:    CompatibleOne Accords Platform Python bindings
 Requires:   %{name} = %{version}-%{release}
+Requires:   python-boto
 
 %description python
 CompatibleOne Accords platform Python bindings and interfaces
