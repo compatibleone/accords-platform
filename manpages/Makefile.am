@@ -8,9 +8,9 @@
 #   Alexandre Lissy <alissy@mandriva.com>
 #
 
-man7_COMPATIBLEONE = accords.7 compatibleone.7
+dist_coman1_DATA = accords.7 compatibleone.7
 
-man1_COMPATIBLEONE = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
+dist_coman7_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-resolver.1 co-start.1 co-status.1 co-stop.1 azprocci.1 broker.1 \
 	coees.1 coips.1 comons.1 conagios.1 conets.1 coobas.1 cool.1 \
 	copaas.1 cops.1 cosacs.1 cosched.1 coss.1 dcprocci.1 example.1 ezvm.1 \
@@ -25,22 +25,5 @@ man1_COMPATIBLEONE = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-provider.1 co-provision.1 testaz.1 testcb.1 testcp.1 testdc.1 teston.1 \
 	testos.1 testresolver.1 accords.1
 
-EXTRA_DIST = $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
-
-install_man = install -m0644 -D
-
-install-data-local: $(man1_COMPATIBLEONE) $(man7_COMPATIBLEONE)
-	for man in $(man1_COMPATIBLEONE); do \
-		$(install_man) $$man $(DESTDIR)$(mandir)/man1/$$man; \
-	done
-	for man in $(man7_COMPATIBLEONE); do \
-		$(install_man) $$man $(DESTDIR)$(mandir)/man7/$$man; \
-	done
-
-uninstall-local:
-	for man in $(man1_COMPATIBLEONE); do \
-		rm $(DESTDIR)$(mandir)/man1/$$man; \
-	done
-	for man in $(man7_COMPATIBLEONE); do \
-		rm $(DESTDIR)$(mandir)/man7/$$man; \
-	done
+coman1dir = $(DESTDIR)$(mandir)/man1
+coman7dir = $(DESTDIR)$(mandir)/man7

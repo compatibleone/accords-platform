@@ -65,7 +65,8 @@ uninstall-local:
 	done
 	rm -f $(DESTDIR)$(bindir)/accords
 	rm -f $(DESTDIR)$(bindir)/co-check
-	rm -f $(DESTDIR)$(sysconfdir)/init.d/accords
+	rm -f $(DESTDIR)$(sysconfdir)/init.d/compatibleone
+	rm -f $(DESTDIR)$(sysconfdir)/default/accords
 
 accords: accords.in
 accords: Makefile
