@@ -75,10 +75,12 @@ install: build
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
+	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
+	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
 	cp accounts.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp coips.xml `pwd`/debian/tmp/etc/accords
-	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf os_config.xml
+	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 # Build architecture independant packages.
 
 binary-indep: build install
