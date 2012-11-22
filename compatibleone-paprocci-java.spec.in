@@ -1,0 +1,80 @@
+%define _enable_debug_packages %{nil}
+%define debug_package          %{nil}
+
+%define group System/Daemons
+%define libgroup System/Libraries
+%define libdevgroup Development/Libraries
+
+%define is_mga 0
+%define is_rh 0
+%define is_suse 0
+
+%if 0%{?mgaversion}
+%define is_mga 1
+%endif
+
+%if 0%{?mandriva_version}
+%define is_mga 1
+%endif
+
+%if 0%{?suse_version}
+%define is_suse 1
+%endif
+
+%if 0%{?centos_ver}
+%define is_rh 1
+%endif
+
+%if 0%{?redhat_ver}
+%define is_rh 1
+%endif
+
+%if %{is_mga}
+%define _disable_ld_no_undefined 1
+%define _disable_ld_as_needed 1
+%define group  System/Servers
+#define libgroup System/Libraries
+%define libdevgroup Development/C
+%endif
+
+%if %{is_suse}
+%define group System/Management
+#define libgroup System/Libraries
+%define libdevgroup Development/Libraries/C and C++
+%endif
+
+%if %{is_rh}
+%define group System Environment/Daemons
+%define libgroup System Environment/Libraries
+#define libdevgroup Development/Libraries
+%endif
+
+Summary:	CompatibleOne ProActive OCCI Java dependencies
+Name:		compatibleone-paprocci-java
+Version:	_VERSION
+Release:	2.0
+License:	Apache Software License 2.0
+Group:		%{group}
+URL:		http://www.compatibleone.org
+Source0:	%{name}-%{version}.tar.gz
+
+%description
+CompatibleOne ProActive OCCI Java dependencies, i.e., JAR files
+that are needed to run paprocci.
+
+%prep
+%setup
+
+%build
+
+%install
+rm -rf ${RPM_BUILD_ROOT}
+
+for jar in *.jar; do
+	install -m0644 -D $jar ${RPM_BUILD_ROOT}%{_datadir}/java/accords/paprocci/$jar
+done;
+
+%files
+%dir %{_datadir}/java/accords/
+%dir %{_datadir}/java/accords/paprocci/
+%attr(0644,root,root) %{_datadir}/java/accords/paprocci/*.jar

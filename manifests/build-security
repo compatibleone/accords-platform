@@ -1,5 +1,9 @@
 module=$1
 auth=$2
+option=$3
+if [ -z "$option" ]; then
+option=13
+fi
 export calist=$makesecurity/Certificates.crt
 export pass=Accords
 export bits=2048
@@ -8,7 +12,7 @@ export sslconfig=./openssl.cnf
 export secdir=$makesecurity
 
 if [ -z "$nethsm" ]; then 
-	export options=13
+	export options=$option
 else
 	export options=525
 fi

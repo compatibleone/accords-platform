@@ -513,14 +513,14 @@ AC_ARG_ENABLE([testsuite],
       [AS_HELP_STRING([--enable-testsuite],
 		      [Enable testsuite @<:@default=disable@:>@])],
       [],
-      [enable_testsuite=yes])
+      [enable_testsuite=no])
 AM_CONDITIONAL([ENABLE_TESTSUITE], [test "$enable_testsuite" = "yes"])
 
 AC_ARG_ENABLE([pyaccords],
       [AS_HELP_STRING([--enable-pyaccords],
 		      [Enable pyaccords @<:@default=disable@:>@])],
       [],
-      [enable_pyaccords=yes])
+      [enable_pyaccords=no])
 AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
 
 dnl files to generate with automake
@@ -563,7 +563,7 @@ AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
 AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
 AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
 AC_CONFIG_FILES([dcprocci/Makefile dcprocci/src/Makefile])
-AC_CONFIG_FILES([paprocci/Makefile paprocci/src/Makefile paprocci/java/Makefile paprocci/java/libs/Makefile])
+AC_CONFIG_FILES([paprocci/Makefile paprocci/src/Makefile paprocci/java/Makefile])
 AC_CONFIG_FILES([command/Makefile command/src/Makefile])
 AC_CONFIG_FILES([testdc/Makefile testdc/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])

@@ -363,12 +363,10 @@ _co_status() {
 _co_stop() {
     _nagios_stop
     _stop_service cosacs
-    _stop_service example
     _stop_service slam
     _stop_service paasprocci
     _stop_service onprocci
     _stop_service osocciprocci
-    _stop_service testosocci
     _stop_service dcprocci
     _stop_service osprocci
     _stop_service paprocci
@@ -464,10 +462,6 @@ _run_osocciprocci() {
     osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
-_run_testosocci() {
-    testosocci --config $target CO-TESTOSOCCI/1.0
-}
-
 _run_slam() {
     slam --config $target CO-SLAM/1.0
 }
@@ -482,10 +476,6 @@ _run_conagios() {
 
 _run_paasprocci() {
     paasprocci --config $target CO-PAASPROCCI/1.0
-}
-
-_run_example() {
-    example --config $target CO-EXAMPLE/1.0
 }
 
 _run_dcprocci() {
@@ -530,7 +520,6 @@ _make_security_files() {
 	_mksecs cosched 1
 	_mksecs osprocci 1
 	_mksecs paprocci 1
-	_mksecs testosocci 1
 	_mksecs osocciprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
@@ -539,7 +528,6 @@ _make_security_files() {
 	_mksecs copaas 1
 	_mksecs conagios 1
 	_mksecs paasprocci 1
-	_mksecs example 1
 	_mksecs command
     
 	_mksect testcp 1
@@ -606,7 +594,6 @@ _accords_config() {
 		_mkcert procci
 		_mkcert cosched
 		_mkcert osprocci
-		_mkcert testosocci
 		_mkcert osocciprocci
 		_mkcert onprocci
 		_mkcert paprocci
@@ -616,7 +603,6 @@ _accords_config() {
 		_mkcert copaas
 		_mkcert conagios
 		_mkcert paasprocci
-		_mkcert example
 		_mkcert cosacs
 	
 		_mkcert testcp
@@ -654,7 +640,6 @@ _accords_config() {
     _mkcfg procci 
     _mkpro osprocci  
     _mkpro paprocci  
-    _mkcfg testosocci
     _mkpro osocciprocci  
     _mkpro onprocci
     _mkpro azprocci
@@ -668,7 +653,6 @@ _accords_config() {
     _mkcfg copaas
     _mkcfg conagios
     _mkpro paasprocci
-    _mkcfg example
     _mkcosacs cosacs
 
     _termnag
@@ -1000,7 +984,9 @@ _mkcfg() {
     echo "    <domain name='"$domain"' zone='"$zone"'/>" >> $target
     echo "</"${module}">" >> $target
     echo "<port name=\""${module}"\" protocol=\"tcp\" range=\"0.0.0.0/0\" from=\""$restport"\" to=\""$restport"\"/>" >> ports.xml
-    _mknag $module
+	if [ "$module" != "cool" ]; then
+    	_mknag $module
+	fi
 }
 
 _mkpro() {
@@ -1104,9 +1090,6 @@ case `basename $0` in
     run-osocciprocci)
 	_run_osocciprocci $*
 	;;
-    run-testosocci)
-	_run_testosocci $*
-	;;
     run-slam)
 	_run_slam $*
 	;;
@@ -1118,9 +1101,6 @@ case `basename $0` in
 	;;
     run-paasprocci)
 	_run_paasprocci $*
-	;;
-    run-example)
-	_run_example $*
 	;;
     run-dcprocci)
 	_run_dcprocci $*

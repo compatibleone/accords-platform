@@ -4,6 +4,12 @@
 <cords_user
  id="3d960eb3-cogw-4bdd-a7a7-20e9coms85f2" name="service-conets-paas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-papr-4bdd-a7a7-20e9coms85f3" name="service-paprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
+ id="3d960eb3-dcpr-4bdd-a7a7-20e9coms85f3" name="service-dcprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
+ id="3d960eb3-osoc-4bdd-a7a7-20e9coms85f3" name="service-osocciprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-copa-4bdd-a7a7-20e9coms85f3" name="service-copaas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-cona-4bdd-a7a7-20e9coms56e4" name="service-conagios" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
