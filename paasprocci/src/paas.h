@@ -9,6 +9,9 @@ struct	paas
 	char *	name;
 	char *	environment;
 	char *	application;
+	char *	topology;
+	char *	description;
+	char *	artefact;
 	char *	version;
 	char *	instance;
 	char *	profile;

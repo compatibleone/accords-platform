@@ -335,7 +335,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cool|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cool|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -354,6 +354,8 @@ _co_status() {
 	lsof -i | grep LISTEN | grep coips || true
 	lsof -i | grep LISTEN | grep conagios || true
 	lsof -i | grep LISTEN | grep cosacs || true
+	lsof -i | grep LISTEN | grep slam || true
+	lsof -i | grep LISTEN | grep copaas || true
     else
 	echo "Unsupported OS ($(uname -s))"
 	exit 1

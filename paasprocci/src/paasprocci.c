@@ -27,6 +27,7 @@
 #include "occipublisher.h"
 #include "cordslang.h"
 #include "paas.h"
+#include "paasclient.h"
 #include "paascontract.h"
 
 #include "paas.c"
