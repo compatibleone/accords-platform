@@ -602,6 +602,9 @@ EOF
 #TODO: remove this line once paprocci is packaged again
 #rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
+rm ${RPM_BUILD_ROOT}%{_bindir}/example
+rm ${RPM_BUILD_ROOT}%{_bindir}/testosocci
+
 # Correct the nagios path
 sed -ri \
 	-e 's@/usr/local/nagios/etc/nagios.cfg@%{nagioscfg}@g' \
