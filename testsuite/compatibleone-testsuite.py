@@ -38,7 +38,7 @@ from basic.dcprocci import *
 from basic.paasprocci import *
 from basic.copaas import *
 from basic.ezvm import *
-from basic.example import *
+# from basic.example import *
 from basic.fileserver import *
 from basic.onprocci import *
 from basic.osocciprocci import *
@@ -52,7 +52,7 @@ from basic.testcb import *
 from basic.testdc import *
 from basic.teston import *
 from basic.testos import *
-from basic.testosocci import *
+# from basic.testosocci import *
 from basic.testresolver import *
 
 # Check platform basic running

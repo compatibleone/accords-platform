@@ -358,13 +358,13 @@ for the provisioning of application images for computational resources.
 
 #-------------------------------------------
 
-%package example
-Group: %{group}
-Requires: %{name} = %{version}-%{release}
-Summary: CompatibleOne Accords Platform - Example OCCI subsystem
-
-%description example
-CompatibleOne Accords Platform - Example OCCI subsystem
+##%package example
+##Group: %{group}
+##Requires: %{name} = %{version}-%{release}
+##Summary: CompatibleOne Accords Platform - Example OCCI subsystem
+##
+##%description example
+##CompatibleOne Accords Platform - Example OCCI subsystem
 
 #-------------------------------------------
 
@@ -463,15 +463,15 @@ Service Level Agreement for the CompatibleOne Accords Platform
 
 #-------------------------------------------
 
-%package testosocci
-Group: %{group}
-Requires: %{name} = %{version}-%{release}
-Summary: CompatibleOne Accords Platform - Open Stack inspection tool
-
-%description testosocci
-This command line tool allows inspection of the Open Stack platform resources
-that are available or have been provisioned using the following command line
-syntax
+##%package testosocci
+##Group: %{group}
+##Requires: %{name} = %{version}-%{release}
+##Summary: CompatibleOne Accords Platform - Open Stack inspection tool
+##
+##%description testosocci
+##This command line tool allows inspection of the Open Stack platform resources
+##that are available or have been provisioned using the following command line
+##syntax
 
 #-------------------------------------------
 
@@ -502,7 +502,7 @@ Requires: %{name}-osprocci
 Requires: %{name}-procci
 Requires: %{name}-publisher
 Requires: %{name}-slam
-Requires: %{name}-testosocci
+#Requires: %{name}-testosocci
 Requires: %{name}-accords-doc
 Conflicts: accords
 Obsoletes: accords
@@ -798,11 +798,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/ezvm.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-ezvm.1*
 
-%files example
-%attr(0755,root,root) %{_bindir}/example
-%attr(0755,root,root) %{_bindir}/run-example
-%attr(0644,root,root) %doc %{_mandir}/man1/example.1*
-%attr(0644,root,root) %doc %{_mandir}/man1/run-example.1*
+##%files example
+##%attr(0755,root,root) %{_bindir}/example
+##%attr(0755,root,root) %{_bindir}/run-example
+##%attr(0644,root,root) %doc %{_mandir}/man1/example.1*
+##%attr(0644,root,root) %doc %{_mandir}/man1/run-example.1*
 
 %files fileserver
 %attr(0755,root,root) %{_bindir}/fileserver
@@ -856,11 +856,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/slam.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-slam.1*
 
-%files testosocci
-%attr(0755,root,root) %{_bindir}/testosocci
-%attr(0755,root,root) %{_bindir}/run-testosocci
-%attr(0644,root,root) %doc %{_mandir}/man1/testosocci.1*
-%attr(0644,root,root) %doc %{_mandir}/man1/run-testosocci.1*
+##%files testosocci
+##%attr(0755,root,root) %{_bindir}/testosocci
+##%attr(0755,root,root) %{_bindir}/run-testosocci
+##%attr(0644,root,root) %doc %{_mandir}/man1/testosocci.1*
+##%attr(0644,root,root) %doc %{_mandir}/man1/run-testosocci.1*
 
 %files -n %{libname}
 %defattr(-,root,root,0755)
