@@ -14,6 +14,8 @@
 %define python python2
 %define pythondev python-devel
 %define javadev java-devel >= 1.6.0
+%define nagios nagios
+%define nagios_plugin_http nagios-plugins-http
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -231,12 +233,14 @@ application images may be performed through the broker.
 
 #-------------------------------------------
 
-%package conagios
+%package nagios
 Group: %{group}
 Requires: %{name}
+Requires: %{nagios}
+Requires: %{nagios_plugin_http}
 Summary: CompatibleOne Accords Platform - CONAGIOS subsystem
 
-%description conagios
+%description nagios
 The CompatibleOne Nagios Description Management Service Component.
 
 #-------------------------------------------
@@ -488,7 +492,7 @@ Requires: %{name}-cops
 Requires: %{name}-coips
 Requires: %{name}-comons
 Requires: %{name}-conets
-Requires: %{name}-conagios
+Requires: %{name}-nagios
 Requires: %{name}-coobas
 Requires: %{name}-cool
 Requires: %{name}-copaas
@@ -743,7 +747,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/conets.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-conets.1*
 
-%files conagios
+%files nagios
 %attr(0755,root,root) %{_bindir}/conagios
 %attr(0755,root,root) %{_bindir}/run-conagios
 %attr(0644,root,root) %doc %{_mandir}/man1/conagios.1*
