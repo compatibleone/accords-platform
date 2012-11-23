@@ -509,6 +509,7 @@ Requires: %{name}-procci
 Requires: %{name}-publisher
 Requires: %{name}-slam
 #Requires: %{name}-testosocci
+Requires: %{name}-paasprocci
 Requires: %{name}-accords-doc
 Conflicts: accords
 Obsoletes: accords
