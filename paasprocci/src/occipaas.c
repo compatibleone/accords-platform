@@ -143,6 +143,12 @@ private void autoload_paas_nodes() {
 				pptr->environment = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
 				pptr->application = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "topology" )) != (struct xml_atribut *) 0)
+				pptr->topology = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "artefact" )) != (struct xml_atribut *) 0)
+				pptr->artefact = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "version" )) != (struct xml_atribut *) 0)
 				pptr->version = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "instance" )) != (struct xml_atribut *) 0)
@@ -214,6 +220,15 @@ public  void autosave_paas_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," application=%c",0x0022);
 		fprintf(h,"%s",(pptr->application?pptr->application:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," topology=%c",0x0022);
+		fprintf(h,"%s",(pptr->topology?pptr->topology:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," artefact=%c",0x0022);
+		fprintf(h,"%s",(pptr->artefact?pptr->artefact:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," version=%c",0x0022);
 		fprintf(h,"%s",(pptr->version?pptr->version:""));
@@ -296,6 +311,12 @@ private void set_paas_field(
 			pptr->environment = allocate_string(vptr);
 		if (!( strcmp( nptr, "application" ) ))
 			pptr->application = allocate_string(vptr);
+		if (!( strcmp( nptr, "topology" ) ))
+			pptr->topology = allocate_string(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "artefact" ) ))
+			pptr->artefact = allocate_string(vptr);
 		if (!( strcmp( nptr, "version" ) ))
 			pptr->version = allocate_string(vptr);
 		if (!( strcmp( nptr, "instance" ) ))
@@ -382,6 +403,27 @@ private int pass_paas_filter(
 		if (!( pptr->application ))
 			return(0);
 		else if ( strcmp(pptr->application,fptr->application) != 0)
+			return(0);
+		}
+	if (( fptr->topology )
+	&&  (strlen( fptr->topology ) != 0)) {
+		if (!( pptr->topology ))
+			return(0);
+		else if ( strcmp(pptr->topology,fptr->topology) != 0)
+			return(0);
+		}
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
+			return(0);
+		else if ( strcmp(pptr->description,fptr->description) != 0)
+			return(0);
+		}
+	if (( fptr->artefact )
+	&&  (strlen( fptr->artefact ) != 0)) {
+		if (!( pptr->artefact ))
+			return(0);
+		else if ( strcmp(pptr->artefact,fptr->artefact) != 0)
 			return(0);
 		}
 	if (( fptr->version )
@@ -520,6 +562,15 @@ private struct rest_response * paas_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.application=%s",optr->domain,optr->id,pptr->application);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.topology=%s",optr->domain,optr->id,pptr->topology);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.artefact=%s",optr->domain,optr->id,pptr->artefact);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.version=%s",optr->domain,optr->id,pptr->version);
@@ -986,6 +1037,12 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "topology",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "artefact",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "version",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "instance",0,0) ))
@@ -1080,6 +1137,39 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas.application='%s'\r\n",(sptr->application?sptr->application:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.topology='%s'\r\n",(sptr->topology?sptr->topology:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.description='%s'\r\n",(sptr->description?sptr->description:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.artefact='%s'\r\n",(sptr->artefact?sptr->artefact:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
