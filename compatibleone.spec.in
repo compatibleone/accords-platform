@@ -125,11 +125,29 @@ CompatibleOne Accords platform base dynamic libraries and Files
 Group:      %{libdevgroup}
 Summary:    CompatibleOne Accords development files
 Requires:   %{libname}
-Requires:   %{uuiddev}
-Requires:   %{ssldev}
 
 %description -n %{libnamedev}
 CompatibleOne Accords development files; For developers only.
+
+#-------------------------------------------
+
+%package devel
+Group:      %{libdevgroup}
+Summary:    CompatibleOne Accords Platform - All packages (development)
+Requires:   %{libnamedev}
+Requires:   %{uuiddev}
+Requires:   %{ssldev}
+Requires:   %{name}-accords
+Requires:   %{name}-python
+Requires:   %{name}-testsuite
+Requires:   %{name}-paprocci
+Requires:   %{name}-nagios
+
+%description devel
+CompatibleOne is an open source project which provides a model, CORDS
+(CompatibleOne Resource Description Schema), and a platform,
+ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
+for the description and federation of different clouds comprising resources provisioned
 
 #-------------------------------------------
 
@@ -606,6 +624,10 @@ cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
 This package contains nothing, and only exists to pull dependencies.
 EOF
 
+cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README.devel
+This package contains nothing, and only exists to pull dependencies.
+EOF
+
 #TODO: remove this line once paprocci is packaged again
 #rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
@@ -892,6 +914,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root,0755)
 %dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
+
+%files devel
+%defattr(-,root,root,0755)
+%dir %{_datadir}/accords
+%attr(0644,root,root) %{_datadir}/accords/README.devel
 
 %if %{enable_testsuite}
 %files testsuite
