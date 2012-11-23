@@ -123,6 +123,8 @@ CompatibleOne Accords platform base dynamic libraries and Files
 Group:      %{libdevgroup}
 Summary:    CompatibleOne Accords development files
 Requires:   %{libname} = %{version}-%{release}
+Requires:   %{uuiddev}
+Requires:   %{ssldev}
 
 %description -n %{libnamedev}
 CompatibleOne Accords development files; For developers only.
