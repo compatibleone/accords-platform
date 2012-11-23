@@ -112,7 +112,7 @@ CompatibleOne Accords platform base files
 %package -n %{libname}
 Group:      %{libgroup}
 Summary:    CompatibleOne Accords Platform Base Libraries and Files
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}
 
 %description -n %{libname}
 CompatibleOne Accords platform base dynamic libraries and Files
@@ -122,7 +122,7 @@ CompatibleOne Accords platform base dynamic libraries and Files
 %package -n %{libnamedev}
 Group:      %{libdevgroup}
 Summary:    CompatibleOne Accords development files
-Requires:   %{libname} = %{version}-%{release}
+Requires:   %{libname}
 Requires:   %{uuiddev}
 Requires:   %{ssldev}
 
@@ -135,7 +135,7 @@ CompatibleOne Accords development files; For developers only.
 %package python
 Group:      %{libgroup}
 Summary:    CompatibleOne Accords Platform Python bindings
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}
 Requires:   python-boto
 
 %description python
@@ -145,7 +145,7 @@ CompatibleOne Accords platform Python bindings and interfaces
 #-------------------------------------------
 %package azprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Azur Procci subsystem
 
 %description azprocci
@@ -155,7 +155,7 @@ CompatibleOne Accords Platform - Azur Procci subsystem
 
 %package broker
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Broker subsystem
 
 %description broker
@@ -165,7 +165,7 @@ Broker subsystem of the CompatibleOne Accords Platform
 
 %package coees
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COEES subsystem
 
 %description coees
@@ -178,7 +178,7 @@ resources.
 
 %package cops
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COPS subsystem
 
 %description cops
@@ -195,7 +195,7 @@ operations.
 
 %package coips
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COIPS subsystem
 
 %description coips
@@ -209,7 +209,7 @@ computational resources.
 
 %package comons
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COMONS subsystem
 
 %description comons
@@ -221,7 +221,7 @@ services and before all other components of the platform.
 
 %package conets
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - CONETS subsystem
 
 %description conets
@@ -233,7 +233,7 @@ application images may be performed through the broker.
 
 %package conagios
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - CONAGIOS subsystem
 
 %description conagios
@@ -243,7 +243,7 @@ The CompatibleOne Nagios Description Management Service Component.
 
 %package coobas
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COOBAS subsystem
 
 %description coobas
@@ -261,7 +261,7 @@ hand by editing the corresponding category configuration file,
 
 %package cool
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COOL subsystem
 
 %description cool
@@ -273,7 +273,7 @@ application images may be performed through the broker.
 
 %package cosacs
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COSACS subsystem
 
 %description cosacs
@@ -289,7 +289,7 @@ activation of monitoring agents and their data collection probes.
 
 %package cosched
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COSCHED subsystem
 
 %description cosched
@@ -299,7 +299,7 @@ Scheduling subsystem for the CompatibleOne Accords Platform
 
 %package coss
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - COSS subsystem
 
 %description coss
@@ -317,7 +317,7 @@ the platform and its components.
 
 %package dcprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
 %description dcprocci
@@ -327,7 +327,7 @@ CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
 %package paasprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - PaaS Procci subsystem
 
 %description paasprocci
@@ -337,7 +337,7 @@ CompatibleOne Accords Platform - PaaS Procci subsystem
 
 %package copaas
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - PaaS Services subsystem
 
 %description copaas
@@ -347,7 +347,7 @@ CompatibleOne Accords Platform - PaaS Services subsystem
 
 %package ezvm
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - EZVM subsystem
 
 %description ezvm
@@ -362,7 +362,7 @@ for the provisioning of application images for computational resources.
 
 ##%package example
 ##Group: %{group}
-##Requires: %{name} = %{version}-%{release}
+##Requires: %{name}
 ##Summary: CompatibleOne Accords Platform - Example OCCI subsystem
 ##
 ##%description example
@@ -372,7 +372,7 @@ for the provisioning of application images for computational resources.
 
 %package fileserver
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Fileserver subsystem
 
 %description fileserver
@@ -382,7 +382,7 @@ CompatibleOne Accords Platform - Fileserver subsystem
 
 %package onprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Open Nebula Procci subsystem
 
 %description onprocci
@@ -392,7 +392,7 @@ CompatibleOne Accords Platform - Open Nebula Procci subsystem
 
 %package osocciprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 
 %description osocciprocci
@@ -402,7 +402,7 @@ CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 
 %package osprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 %description osprocci
@@ -413,7 +413,7 @@ CompatibleOne Accords Platform - Open Stack Procci subsystem
 %if %{enable_paprocci}
 %package paprocci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Requires: java >= 1.6.0
 Summary: CompatibleOne Accords Platform - ProActive Procci subsystem
 
@@ -425,7 +425,7 @@ CompatibleOne Accords Platform - ProActive Procci subsystem
 
 %package procci
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Procci
 
 %description procci
@@ -442,7 +442,7 @@ resources.
 
 %package publisher
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - Publisher
 
 %description publisher
@@ -457,7 +457,7 @@ before any of the other components may be used.
 
 %package slam
 Group: %{group}
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Summary: CompatibleOne Accords Platform - SLA Manager
 
 %description slam
@@ -467,7 +467,7 @@ Service Level Agreement for the CompatibleOne Accords Platform
 
 ##%package testosocci
 ##Group: %{group}
-##Requires: %{name} = %{version}-%{release}
+##Requires: %{name}
 ##Summary: CompatibleOne Accords Platform - Open Stack inspection tool
 ##
 ##%description testosocci
@@ -480,7 +480,7 @@ Service Level Agreement for the CompatibleOne Accords Platform
 %package accords
 Group: %{group}
 BuildArch: noarch
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}
 Requires: %{name}-azprocci
 Requires: %{name}-broker
 Requires: %{name}-coees
