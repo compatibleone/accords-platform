@@ -20,7 +20,7 @@
 #include "occiclient.h"
 #include "cordslang.h"
 #include "ec2_procci_boto.c"
-
+#include "occiresolver.c"
 
 
  char accesskey[256]=" ";
