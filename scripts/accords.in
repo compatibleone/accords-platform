@@ -820,7 +820,7 @@ _nagios_stop() {
 			echo "# accords platform shutdown" > $nagios.active
 			service nagios restart
 		else
-			echo "nogios is not installed"
+			echo "nagios is not installed"
 		fi
 	fi
 }
@@ -847,7 +847,7 @@ _nagios_start() {
 			cp $nagios $nagios.active
 			service nagios restart
 		else
-			echo "nogios is not installed"
+			echo "nagios is not installed"
 		fi
 	fi
 }

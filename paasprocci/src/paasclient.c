@@ -27,6 +27,7 @@
 /*	-----------------------------------------	*/
 #include "paasclient.h"
 #include "restclient.h"
+#include "restpublic.h"
 
 /*	--------------------------	*/
 /*	Paas Client Configuration	*/
@@ -226,11 +227,24 @@ public	struct paas_response * create_paas_application(char * artifact, char * de
 {
 	/* POST /app */
 	char *	filename=(char *) 0;
-	/* -----------------------------------------	*/
-	/* TODO : need message format to be able to 	*/
-	/* complete the request.			*/
-	/* -----------------------------------------	*/
-	return( paas_result( paas_post_request( "/app", filename ) ));
+	FILE *	h;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return((struct paas_response *) 0 );
+	else if (!( h = fopen( filename, "w" )))
+	{
+		liberate( filename );
+		return((struct paas_response *) 0 );
+	}
+	else
+	{
+		fprintf(h,"<application name=%c%s%c description=%c%s%c version=%c%s%c/>\n",
+			0x0022,artifact,0x0022,
+			0x0022,description,0x0022,
+			0x0022,version,0x0022
+			);		
+		fclose(h);
+		return( paas_result( paas_post_request( "/app", filename ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
@@ -251,12 +265,21 @@ public	struct paas_response * create_paas_application_version(char * application
 	/* POST /app/{appId}/version */
 	char *	filename=(char *) 0;
 	char 	uri[2048];
-	/* -----------------------------------------	*/
-	/* TODO : need message format to be able to 	*/
-	/* complete the request.			*/
-	/* -----------------------------------------	*/
-	sprintf(uri,"/app/%s/version",application);	
-	return( paas_result( paas_post_request( uri, filename ) ));
+	FILE *	h;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return((struct paas_response *) 0 );
+	else if (!( h = fopen( filename, "w" )))
+	{
+		liberate( filename );
+		return((struct paas_response *) 0 );
+	}
+	else
+	{
+		fprintf(h,"<application_version name=%c%s%c description=%c%s%c version=%c%s%c label=%c%s%c/>\n",artifact,description,version,application);		
+		fclose(h);
+		sprintf(uri,"/app/%s/version",application);	
+		return( paas_result( paas_post_request( uri, filename ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
@@ -271,12 +294,22 @@ public	struct paas_response * create_paas_application_instance(char * applicatio
 	/* POST /app/{appId}/version/{versionId}/instance */
 	char *	filename=(char *) 0;
 	char 	uri[2048];
-	/* -----------------------------------------	*/
-	/* TODO : need message format to be able to 	*/
-	/* complete the request.			*/
-	/* -----------------------------------------	*/
-	sprintf(uri,"/app/%s/version/%s/instance",application,version);	
-	return( paas_result( paas_post_request( uri, filename ) ));
+	FILE *	h;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return((struct paas_response *) 0 );
+	else if (!( h = fopen( filename, "w" )))
+	{
+		liberate( filename );
+		return((struct paas_response *) 0 );
+	}
+	else
+	{
+		fprintf(h,"<application_version_instance>\n");		
+		fprintf(h,"</application_version_instance>\n");		
+		fclose(h);
+		sprintf(uri,"/app/%s/version/%s/instance",application,version);	
+		return( paas_result( paas_post_request( uri, filename ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
@@ -452,11 +485,20 @@ public	struct paas_response * create_paas_environment( char * environment )
 {
 	/* POST /environment	*/
 	char *	filename=(char *) 0;
-	/* -----------------------------------------	*/
-	/* TODO : need message format to be able to 	*/
-	/* complete the request.			*/
-	/* -----------------------------------------	*/
-	return( paas_result( paas_post_request( "/environment", filename ) ));
+	FILE *	h;
+	if (!( filename = rest_temporary_filename(".xml")))
+		return((struct paas_response *) 0 );
+	else if (!( h = fopen( filename, "w" )))
+	{
+		liberate( filename );
+		return((struct paas_response *) 0 );
+	}
+	else
+	{
+		fprintf(h,"<environment name=%c%s%c/>\n",environment);		
+		fclose(h);
+		return( paas_result( paas_post_request( "/environment", filename ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
