@@ -11,9 +11,12 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
+%define pythongroup Python
 %define python python2
 %define pythondev python-devel
 %define javadev java-devel >= 1.6.0
+%define nagios nagios
+%define nagios_plugin_http nagios-plugins-http
 
 %define group System/Daemons
 %define libgroup System/Libraries
@@ -123,22 +126,40 @@ CompatibleOne Accords platform base dynamic libraries and Files
 Group:      %{libdevgroup}
 Summary:    CompatibleOne Accords development files
 Requires:   %{libname}
-Requires:   %{uuiddev}
-Requires:   %{ssldev}
 
 %description -n %{libnamedev}
 CompatibleOne Accords development files; For developers only.
 
 #-------------------------------------------
 
+%package devel
+Group:      %{libdevgroup}
+Summary:    CompatibleOne Accords Platform - All packages (development)
+Requires:   %{libnamedev}
+Requires:   %{uuiddev}
+Requires:   %{ssldev}
+Requires:   %{name}-accords
+Requires:   python-%{name}-accords
+Requires:   %{name}-testsuite
+Requires:   %{name}-paprocci
+Requires:   %{name}-nagios
+
+%description devel
+CompatibleOne is an open source project which provides a model, CORDS
+(CompatibleOne Resource Description Schema), and a platform,
+ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
+for the description and federation of different clouds comprising resources provisioned
+
+#-------------------------------------------
+
 %if %{enable_pyaccords}
-%package python
-Group:      %{libgroup}
+%package -n python-%{name}-accords
+Group:      %{pythongroup}
 Summary:    CompatibleOne Accords Platform Python bindings
 Requires:   %{name}
 Requires:   python-boto
 
-%description python
+%description -n python-%{name}-accords
 CompatibleOne Accords platform Python bindings and interfaces
 %endif
 
@@ -231,12 +252,14 @@ application images may be performed through the broker.
 
 #-------------------------------------------
 
-%package conagios
+%package nagios
 Group: %{group}
 Requires: %{name}
+Requires: %{nagios}
+Requires: %{nagios_plugin_http}
 Summary: CompatibleOne Accords Platform - CONAGIOS subsystem
 
-%description conagios
+%description nagios
 The CompatibleOne Nagios Description Management Service Component.
 
 #-------------------------------------------
@@ -488,7 +511,7 @@ Requires: %{name}-cops
 Requires: %{name}-coips
 Requires: %{name}-comons
 Requires: %{name}-conets
-Requires: %{name}-conagios
+Requires: %{name}-nagios
 Requires: %{name}-coobas
 Requires: %{name}-cool
 Requires: %{name}-copaas
@@ -505,6 +528,7 @@ Requires: %{name}-procci
 Requires: %{name}-publisher
 Requires: %{name}-slam
 #Requires: %{name}-testosocci
+Requires: %{name}-paasprocci
 Requires: %{name}-accords-doc
 Conflicts: accords
 Obsoletes: accords
@@ -601,6 +625,10 @@ cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README
 This package contains nothing, and only exists to pull dependencies.
 EOF
 
+cat <<EOF >${RPM_BUILD_ROOT}%{_datadir}/accords/README.devel
+This package contains nothing, and only exists to pull dependencies.
+EOF
+
 #TODO: remove this line once paprocci is packaged again
 #rm ${RPM_BUILD_ROOT}%{_bindir}/run-paprocci
 
@@ -692,7 +720,7 @@ rm -rf ${RPM_BUILD_ROOT}
 #--------------------------------------------
 
 %if %{enable_pyaccords}
-%files python
+%files -n python-%{name}-accords
 %defattr(-,root,root,0755)
 %{python_sitelib}/pypacksrc*
 %{python_sitearch}/pycompdev*
@@ -743,7 +771,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(0644,root,root) %doc %{_mandir}/man1/conets.1*
 %attr(0644,root,root) %doc %{_mandir}/man1/run-conets.1*
 
-%files conagios
+%files nagios
 %attr(0755,root,root) %{_bindir}/conagios
 %attr(0755,root,root) %{_bindir}/run-conagios
 %attr(0644,root,root) %doc %{_mandir}/man1/conagios.1*
@@ -888,9 +916,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %dir %{_datadir}/accords
 %attr(0644,root,root) %{_datadir}/accords/README
 
+%files devel
+%defattr(-,root,root,0755)
+%dir %{_datadir}/accords
+%attr(0644,root,root) %{_datadir}/accords/README.devel
+
 %if %{enable_testsuite}
 %files testsuite
-%defattr(-,root,-root,0755)
+%defattr(-,root,root,0755)
 %dir %{_libexecdir}/compatibleone/
 %dir %{_libexecdir}/compatibleone/testsuite/
 %attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/*.py*
