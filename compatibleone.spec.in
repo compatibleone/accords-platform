@@ -11,6 +11,7 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
+%define pythongroup Python
 %define python python2
 %define pythondev python-devel
 %define javadev java-devel >= 1.6.0
@@ -138,7 +139,7 @@ Requires:   %{libnamedev}
 Requires:   %{uuiddev}
 Requires:   %{ssldev}
 Requires:   %{name}-accords
-Requires:   %{name}-python
+Requires:   python-%{name}-accords
 Requires:   %{name}-testsuite
 Requires:   %{name}-paprocci
 Requires:   %{name}-nagios
@@ -152,13 +153,13 @@ for the description and federation of different clouds comprising resources prov
 #-------------------------------------------
 
 %if %{enable_pyaccords}
-%package python
-Group:      %{libgroup}
+%package -n python-%{name}-accords
+Group:      %{pythongroup}
 Summary:    CompatibleOne Accords Platform Python bindings
 Requires:   %{name}
 Requires:   python-boto
 
-%description python
+%description -n python-%{name}-accords
 CompatibleOne Accords platform Python bindings and interfaces
 %endif
 
@@ -719,7 +720,7 @@ rm -rf ${RPM_BUILD_ROOT}
 #--------------------------------------------
 
 %if %{enable_pyaccords}
-%files python
+%files -n python-%{name}-accords
 %defattr(-,root,root,0755)
 %{python_sitelib}/pypacksrc*
 %{python_sitearch}/pycompdev*
