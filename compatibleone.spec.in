@@ -922,7 +922,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %if %{enable_testsuite}
 %files testsuite
-%defattr(-,root,-root,0755)
+%defattr(-,root,root,0755)
 %dir %{_libexecdir}/compatibleone/
 %dir %{_libexecdir}/compatibleone/testsuite/
 %attr(0644,root,root) %{_libexecdir}/compatibleone/testsuite/*.py*
