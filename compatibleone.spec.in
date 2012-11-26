@@ -11,7 +11,6 @@
 
 %define ssldev openssl-devel
 %define uuiddev libuuid-devel
-%define pythongroup Python
 %define python python2
 %define pythondev python-devel
 %define javadev java-devel >= 1.6.0
@@ -19,6 +18,7 @@
 %define nagios_plugin_http nagios-plugins-http
 
 %define group System/Daemons
+%define pythongroup Libraries/Python
 %define libgroup System/Libraries
 %define libdevgroup Development/Libraries
 %define nagioscfg %{_sysconfdir}/nagios/nagios.cfg
@@ -53,6 +53,7 @@
 %define _disable_ld_as_needed 1
 %define group  System/Servers
 #define libgroup System/Libraries
+%define pythongroup  Development/Python
 %define libdevgroup Development/C
 %define libname %mklibname %{name}-accords %major
 %define libnamedev %mklibname %{name}-accords %major -d
@@ -63,6 +64,7 @@
 %if %{is_suse}
 %define group System/Management
 #define libgroup System/Libraries
+%define pythongroup Development/Libraries/Python
 %define libdevgroup Development/Libraries/C and C++
 %define ssldev libopenssl-devel
 %define python python
@@ -71,6 +73,7 @@
 %if %{is_rh}
 %define group System Environment/Daemons
 %define libgroup System Environment/Libraries
+%define pythongroup Development/Languages
 #define libdevgroup Development/Libraries
 %endif
 
