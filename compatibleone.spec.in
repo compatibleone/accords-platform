@@ -93,7 +93,7 @@ Summary:	CompatibleOne cloud brokering platform
 Name:		compatibleone
 Version:	_VERSION
 Release:	20.0
-License:	Apache Software License 2.0
+License:	ASL 2.0
 Group:		%{group}
 URL:		http://www.compatibleone.org
 Source0:	%{distname}-%{version}.tar.gz
