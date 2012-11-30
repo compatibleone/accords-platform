@@ -17,7 +17,7 @@
 /*-------------------------------------------------------------------------------*/
 
 #include "compmgr.h"
-#include "../../jaccords/jsrc/jcategactionnumber.h"
+#include "jcategoryaction.h"
 
 /*----------------------------------------------------------------------------------*/
 /*               Function to remove a component                                     */
@@ -39,14 +39,14 @@ int deleteJModule(char moduleName[])
 /*---------------------------------------------------------------------------------------------*/
 /*      Function to get category action number for the category specified in name variable     */
 /*---------------------------------------------------------------------------------------------*/
-int callocciCategoryActionNumber(const char *name)
+int callocciCategoryAct(const char *name)
 {
   	int i;
-   	for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   	for (i = 0; i < (sizeof(occiCategoryAct_map) / sizeof(occiCategoryAct_map[0])); i++) 
    	{
-    		if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
+    		if (!strcmp(occiCategoryAct_map[i].name, name)) 
      		{
-       			return occiCategoryActionNumber_map[i].func();
+       			return occiCategoryAct_map[i].a;
      		}
   	}
 
@@ -96,6 +96,7 @@ int deleteJCategory(char categoryName[])
 	char pathactbstruct[DIM];
 	char pathf[DIM];
         char pathaccess[DIM];
+        char pathcategoryact[DIM];
         int flag = 1;
         int indice = 0;
 
@@ -103,6 +104,8 @@ int deleteJCategory(char categoryName[])
  	sprintf(pathactcname,"%sAction.c",categoryName);
  	sprintf(pathactclist,"%s/%s",pathf,J_ACT_LIST);
         
+        sprintf(pathcategoryact,"%s/%s",pathf,J_CATEGORY_ACT);
+
         sprintf(pathaccess,"%s/%s",pathf, J_CATEGACCESS_STRUCT);
 
  	sprintf(pathactstructname,"%s_",categoryName);
@@ -214,7 +217,9 @@ int deleteJCategory(char categoryName[])
   		else if(!(deleteInFile(pathactnstruct,pathactnstructname)))
      			return 0;
   		else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
-     			return 0;  
+     			return 0; 
+                else if(!(deleteInFile(pathcategoryact,categoryName)))
+                        return 0; 
  	}
 
  	if(!flag)
@@ -266,6 +271,7 @@ int generateJAccordsCategory(
 	char pathactname[DIM];
 	char pathactnumber[DIM];
         char pathcategaccess[DIM];
+        char pathcategoryact[DIM];
 	listc categoryAtr;
 	listc categoryAtrB;
 	listc categoryAct;
@@ -349,6 +355,8 @@ int generateJAccordsCategory(
      		sprintf(pathact,"%s/%s",JPATH,J_ACT_STRUCT);
      		sprintf(pathactname,"%s/%s",JPATH,J_ACT_NAME_STRUCT);
      		sprintf(pathactnumber,"%s/%s",JPATH,J_ACT_NUMBER_STRUCT);
+                sprintf(pathcategoryact,"%s/%s",PYPATH,J_CATEGORY_ACT);
+
 
      		if(!(generateJCategoryActionCfile(categoryName,categoryAtrB,categoryAct,flag,pathf)))
          		return 0;
@@ -360,6 +368,8 @@ int generateJAccordsCategory(
          		return 0;
      		else if(!(generateJCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
          		return 0;
+                else if(!(generateCategoryActionStruct(categoryName,categoryAct,3,pathcategoryact)))
+                        return 0;
   	}
         
         if(indiceA)
@@ -510,6 +520,9 @@ int generateJCategoryActionStruct(char *categoryName, listc categoryAct, int n, 
          		case 2:
               			fprintf(fOut,"\t{\"%s\", %s_getnumber },\n",categoryName,categoryName);
               			break;
+                        case 3:
+	                        fprintf(fOut,"\t{\"%s\", 1 },\n",categoryName);
+	                        break;
     		}
  	}
   

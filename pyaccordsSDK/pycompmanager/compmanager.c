@@ -294,7 +294,6 @@ int generateAccordsCategory(
  char pathactnumber[DIM];
  char pathcategaccess[DIM];
  char pathcategoryact[DIM];
- char namecategoryact[DIM];
  listc categoryAtr;
  listc categoryAtrB;
  listc categoryAct;
