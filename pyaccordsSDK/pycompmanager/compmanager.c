@@ -119,12 +119,15 @@ int deleteCategory(char categoryName[])
  char pathactbstruct[DIM];
  char pathf[DIM];
  char pathaccess[DIM];
+ char pathcategoyact[DIM];
  int flag = 1;
  int indice = 0;
 
  strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
+
+ sprintf(pathcategoryact,"%s/%s",pathf,PY_CATEGORY_ACT);
 
  sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
 
@@ -238,6 +241,8 @@ int deleteCategory(char categoryName[])
      return 0;
   else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
      return 0;  
+  else if(!(deleteInFile(pathcategoryact,categoryName)))
+     return 0; 
  }
 
  if(!flag)
@@ -288,6 +293,8 @@ int generateAccordsCategory(
  char pathactname[DIM];
  char pathactnumber[DIM];
  char pathcategaccess[DIM];
+ char pathcategoryact[DIM];
+ char namecategoryact[DIM];
  listc categoryAtr;
  listc categoryAtrB;
  listc categoryAct;
@@ -372,6 +379,7 @@ int generateAccordsCategory(
      sprintf(pathact,"%s/%s",PYPATH,PY_ACT_STRUCT);
      sprintf(pathactname,"%s/%s",PYPATH,PY_ACT_NAME_STRUCT);
      sprintf(pathactnumber,"%s/%s",PYPATH,PY_ACT_NUMBER_STRUCT);
+     sprintf(pathcategoryact,"%s/%s",PYPATH,PY_CATEGORY_ACT);
 
      if(!(generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,flag,pathf)))
          return 0;
@@ -383,6 +391,9 @@ int generateAccordsCategory(
          return 0;
      else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
          return 0;
+     else if(!(generateCategoryActionStruct(categoryName,categoryAct,3,pathcategoryact)))
+         return 0;
+
   }
   
   if(indiceA)
@@ -533,6 +544,9 @@ int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, ch
          case 2:
               fprintf(fOut,"\t{\"%s\", %s_getnumber },\n",categoryName,categoryName);
               break;
+         case 3:
+	      fprintf(fOut,"\t{\"%s\", 1 },\n",categoryName);
+	      break;
     }
  }
   
