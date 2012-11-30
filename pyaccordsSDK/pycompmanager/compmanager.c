@@ -17,7 +17,7 @@
 /*-------------------------------------------------------------------------------*/
 
 #include "compmanager.h"
-#include "../../pyaccords/pysrc/categactionnumber.h"
+#include "categoryaction.h"
 
 /*--------------------------------------------------------------------------------*/
 /*               Function to commit accords platform                              */
@@ -62,14 +62,14 @@ int deleteModule(char moduleName[])
 /*---------------------------------------------------------------------------------------------*/
 /*      Function to get category action number for the category specified in name variable     */
 /*---------------------------------------------------------------------------------------------*/
-int callocciCategoryActionNumber(const char *name)
+int callocciCategoryAct(const char *name)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   for (i = 0; i < (sizeof(occiCategoryAct_map) / sizeof(occiCategoryAct_map[0])); i++) 
    {
-     if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
+     if (!strcmp(occiCategoryAct_map[i].name, name)) 
      {
-       return occiCategoryActionNumber_map[i].func();
+       return occiCategoryAct_map[i].a;
      }
   }
 
@@ -210,7 +210,7 @@ int deleteCategory(char categoryName[])
   return 0;
  }
  
-  indice = callocciCategoryActionNumber(categoryName);
+  indice = callocciCategoryAct(categoryName);
  
  if(indice != 0)
  {

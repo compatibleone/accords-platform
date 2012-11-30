@@ -19,6 +19,6 @@ int generateCategoryActionStruct(char *categoryName, listc categoryAct, int n, c
 int generateCategoryActionPyfile(char *categoryName, listc categoryAtr, listc categoryAct, char pathf[]);
 int generateCategoryActionCfile(char *categoryName, listc categoryAtr, listc categoryAct, int flag, char pathf[]);
 int generatePyCategoryTypeStruct(char *categoryName, char * categoryAccess, char pathf[]);
-int callocciCategoryActionNumber(const char *name);
+int callocciCategoryAct(const char *name);
 
 #endif
