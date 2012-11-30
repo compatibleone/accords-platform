@@ -17,6 +17,7 @@
 /*-------------------------------------------------------------------------------*/
 
 #include "compmgr.h"
+#include "../../jaccords/jsrc/jcategactionnumber.h"
 
 /*----------------------------------------------------------------------------------*/
 /*               Function to remove a component                                     */
@@ -35,13 +36,30 @@ int deleteJModule(char moduleName[])
 	return 1;
 }
 
+/*---------------------------------------------------------------------------------------------*/
+/*      Function to get category action number for the category specified in name variable     */
+/*---------------------------------------------------------------------------------------------*/
+int callocciCategoryActionNumber(const char *name)
+{
+  	int i;
+   	for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   	{
+    		if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
+     		{
+       			return occiCategoryActionNumber_map[i].func();
+     		}
+  	}
+
+  	return 0;
+}
+
 /*-----------------------------------------------------------------------------------*/
 /* Function to delete a category from accords platform                               */
 /* pathf: char * path of the directory project                                       */
 /* categoryName: char * the name of the category                                     */
 /* return 1 if succeeded                                                             */
 /*-----------------------------------------------------------------------------------*/
-int deleteJCategory(char categoryName[],int indice,int flag)
+int deleteJCategory(char categoryName[])
 {
 	char cordsh[DIM];
 	char cordshname[DIM];
@@ -78,6 +96,8 @@ int deleteJCategory(char categoryName[],int indice,int flag)
 	char pathactbstruct[DIM];
 	char pathf[DIM];
         char pathaccess[DIM];
+        int flag = 1;
+        int indice = 0;
 
 	strcpy(pathf,JPATH);
  	sprintf(pathactcname,"%sAction.c",categoryName);
@@ -166,8 +186,10 @@ int deleteJCategory(char categoryName[],int indice,int flag)
   		printf( "Error in delete category( CLASS PY):No such category name\n" );
   		return 0;
  	}
- 
-	if(indice)
+        
+        indice = callocciCategoryActionNumber(categoryName);
+
+	if(indice != 0)
  	{
   		if( remove( pathactc) != 0 )
   		{
@@ -234,8 +256,7 @@ int generateJAccordsCategory(
 	char *categoryName,
 	char *categoryAttributes, 
 	char *categoryActions, 
-	char * categoryAccess, 
-	int flag)
+	char * categoryAccess)
 {
 	FILE *f;
 	char *token=NULL;
@@ -253,6 +274,8 @@ int generateJAccordsCategory(
 	int indice = 0;
         int indiceA = 0;
 	char pathf[1024];
+        int flag = 1;
+
  	strcpy(pathf,JPATH);
 	sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
 	sprintf(occipath,"%s/%s/occi%s.c",pathf,OCCI_PATH,categoryName);

@@ -25,17 +25,15 @@ JNIEXPORT jint JNICALL Java_JcompMgr_generateCategory(
 	jstring categoryN, 
 	jstring categoryAtr, 
 	jstring categoryAct, 
-	jstring categoryA, 
-	jint flag)
+	jstring categoryA)
 {
 	int dim;
 	char * categoryName = (char*) (*env)->GetStringUTFChars(env, categoryN, 0);
 	char * categoryAttributes = (char*) (*env)->GetStringUTFChars(env, categoryAtr, 0);         
 	char * categoryActions = (char*) (*env)->GetStringUTFChars(env, categoryAct, 0) ;
 	char * categoryAccess = (char*) (*env)->GetStringUTFChars(env, categoryA, 0);
-	int flags = flag;
  
-	dim=generateJAccordsCategory(categoryName, categoryAttributes, categoryActions, categoryAccess, flags);
+	dim=generateJAccordsCategory(categoryName, categoryAttributes, categoryActions, categoryAccess);
 	if(dim <= 0) 
 	{
 		printf("Failure to create %s OCCI category\n",categoryName);
@@ -61,16 +59,12 @@ JNIEXPORT jint JNICALL Java_JcompMgr_generateCategory(
 JNIEXPORT jint JNICALL  Java_JcompMgr_removeCategory(
 	JNIEnv *env,
 	jobject thisobject,
-	jstring categoryN,
-	jint index,
-	jint flag)
+	jstring categoryN)
 {
 	int a;
 	char *categoryName = (char*)(*env)->GetStringUTFChars(env, categoryN, 0);
-	int indice = index;
-	int flags = flag;
 	
-	a=deleteJCategory(categoryName,indice,flag);
+	a=deleteJCategory(categoryName);
 	if(a)
 	{
 		printf("%s OCCI category is removed\n",categoryName);

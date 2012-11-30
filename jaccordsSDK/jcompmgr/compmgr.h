@@ -22,7 +22,7 @@
 
 #include "jutools.h"
 
-int generateJAccordsCategory(char *name,char *categoryAttributes, char *categoryActions, char * categoryAccess, int flag);
+int generateJAccordsCategory(char *name,char *categoryAttributes, char *categoryActions, char * categoryAccess);
 int createJCategoryCordsCfile(char *categoryName, listc categoryAttributes, int dim, int flag, char pathf[]);
 int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim, int flag, char pathf[]);
 int enJTete(char pathf[]);
@@ -30,11 +30,12 @@ int generateJModuleFile(char * moduleName, char * categoryNameList);
 int generateJCategoryInterfceStructFile(char pathf[]);
 int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int flag, char pathf[]);
 int generateCategoryJSourcefile(char *categoryName, listc categoryAtr, char pathf[]);
-int deleteJCategory(char categoryName[], int indice, int flag);
+int deleteJCategory(char categoryName[]);
 int deleteJModule(char moduleName[]);
 int generateJCategoryActionStruct(char *categoryName, listc categoryAct, int n, char pathf[]);
 int generateCategoryActionJfile(char *categoryName, listc categoryAtr, listc categoryAct, char pathf[]);
 int generateJCategoryActionCfile(char *categoryName, listc categoryAtr, listc categoryAct, int flag, char pathf[]);
 int generateJCategoryTypeStruct(char *categoryName, char * categoryAccess, char pathf[]);
+int callocciCategoryActionNumber(const char *name);
 
 #endif
