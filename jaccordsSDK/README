@@ -37,7 +37,7 @@ HOW to use jaccordsSDK
 Class examples
 
 # A class that generates a category is shown in this example
-	- where generateCategory(String catName, String catAtr, String catAct, String occiFlag, int pFlag) takes five parameters	
+	- where generateCategory(String catName, String catAtr, String catAct, String occiFlag) takes five parameters	
 	- catName: Category name
 	- catAtr: Attributes of the category (exp: "atr1 atr2 atr2")
         - catAct: Actions of the category (exp: "act1 act2 act3")
@@ -53,9 +53,6 @@ Class examples
 		- "_OCCI_CONSUMER"  publish monitoring consumer         
 		- "_OCCI_PROVIDER"  publish resources provider           
 		- "_OCCI_CONTRACT"  publish resources under contract 
-	- pFlag: Takes 0 or 1
-		- 0 the category is related to Accords platform
-		- 1 the category is related to a cloud provider
     
 		public class Testjcompmgr{
         		static{
@@ -67,17 +64,14 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		gen.generateCategory("mycategory","atr1 atr2","start stop","",0); 
+                 		gen.generateCategory("mycategory","atr1 atr2","start stop",""); 
 			}
 		}
 
 
 # To remove a category use this class example
-	- where removeCategory(String catName, int actFlag, int pFlag) takes three parameters
+	- where removeCategory(String catName) takes three parameters
 	- catName: Category name
-	- actFlag: takes 0 àr 1
-		-0 if the category does not have actions
-		- 1 if category have actions
 			
 		public class Testjcompmgr{
         		static{
@@ -90,7 +84,7 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		gen.removeCategory("mycategory",1,0);
+                 		gen.removeCategory("mycategory");
 			}
 		}
 
