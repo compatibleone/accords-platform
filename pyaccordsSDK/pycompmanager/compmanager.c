@@ -119,7 +119,7 @@ int deleteCategory(char categoryName[])
  char pathactbstruct[DIM];
  char pathf[DIM];
  char pathaccess[DIM];
- char pathcategoyact[DIM];
+ char pathcategoryact[DIM];
  int flag = 1;
  int indice = 0;
 
