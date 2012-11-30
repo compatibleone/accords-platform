@@ -33,6 +33,7 @@ struct	cords_vector
 
 struct	cords_az_contract
 {
+	struct	az_subscription * subscription;
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
@@ -465,9 +466,9 @@ private	int 	resolve_windowsazure_location(
 	/* ----------------------------------------------- */
 	if ( rest_valid_string( pptr->group ) )
 	{
-		if (!( zptr = az_retrieve_affinity_group( pptr->group ) ))
+		if (!( zptr = az_retrieve_affinity_group( cptr->subscription, pptr->group ) ))
 			return( 801 );
-		else if ((status = check_windowsazure_operation( zptr )) != 200)
+		else if ((status = check_windowsazure_operation( cptr->subscription,zptr )) != 200)
 			return( status );
 		else	return( 0 );
 	}
@@ -478,7 +479,7 @@ private	int 	resolve_windowsazure_location(
 	else if (!( rest_valid_string( pptr->location )))
 		return( 56 );
 	{
-		if (!( zptr = az_list_locations() ))
+		if (!( zptr = az_list_locations(cptr->subscription) ))
 			return( 801 );
 		else if (!( zptr->response ))
 			return( 802 );
@@ -566,28 +567,29 @@ private	int 	resolve_windowsazure_storage(
 	/* ----------------------------------------------- */
 	if (!( pptr->storageaccount = az_normalise_name( buffer, 24 )))
 		return( 817 );
-	else if (!( zptr = az_retrieve_storage_service( pptr->storageaccount )))
+	else if (!( zptr = az_retrieve_storage_service( cptr->subscription, pptr->storageaccount )))
 		return( 500 );
-	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+	else if (( status = check_windowsazure_operation( cptr->subscription,zptr )) == 200 )
 		return( 0 );
 
 	/* ------------------------------ */
 	/* create the new storage account */
 	/* ------------------------------ */
-	if (!( filename = az_create_storage_service_request( 
+	if (!( filename = az_create_storage_service_request(
+				cptr->subscription, 
 				pptr->storageaccount,
 				pptr->storageaccount,
 				pptr->storageaccount,
 				pptr->location,
 				pptr->group )))
 		return( 820 );
-	else if (!( zptr = az_create_storage_service( filename )))
+	else if (!( zptr = az_create_storage_service( cptr->subscription, filename )))
 		return( 500 );
 
 	/* ------------------------------------------ */
 	/* ensure creation of the appropriate Account */
 	/* ------------------------------------------ */
-	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+	else if (( status = check_windowsazure_operation( cptr->subscription,zptr )) == 200 )
 		return( 0 );
 	else	return( status );
 
@@ -627,15 +629,16 @@ private	int 	resolve_windowsazure_service(
 	/* ---------------------------------------------- */
 	if (!( pptr->hostedservice = az_normalise_name( buffer, 24 )))
 		return( 817 );
-	else if (!( zptr = az_get_hosted_service( pptr->hostedservice )))
+	else if (!( zptr = az_get_hosted_service( cptr->subscription,pptr->hostedservice )))
 		return( 500 );
-	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+	else if (( status = check_windowsazure_operation( cptr->subscription,zptr )) == 200 )
 		return( 0 );
 
 	/* ----------------------------- */
 	/* create the new hosted service */
 	/* ----------------------------- */
 	if (!( filename = az_create_hosted_service_request( 
+				cptr->subscription,
 				pptr->hostedservice,
 				pptr->hostedservice,
 				pptr->hostedservice,
@@ -643,13 +646,13 @@ private	int 	resolve_windowsazure_service(
 				pptr->group )))
 		return( 820 );
 
-	else if (!( zptr = az_create_hosted_service( filename )))
+	else if (!( zptr = az_create_hosted_service( cptr->subscription, filename )))
 		return( 500 );
 
 	/* ------------------------------------------ */
 	/* ensure creation of the appropriate Account */
 	/* ------------------------------------------ */
-	else if (( status = check_windowsazure_operation( zptr )) == 200 )
+	else if (( status = check_windowsazure_operation( cptr->subscription,zptr )) == 200 )
 		return( 0 );
 	else	return( status );
 }
@@ -668,6 +671,7 @@ public	int	create_windowsazure_contract(
 	struct	cords_az_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	struct 	az_subscription * subscription=(struct az_subscription *) 0;
 	char *	filename;
 	int	status;
 	char	buffer[1024];
@@ -675,14 +679,17 @@ public	int	create_windowsazure_contract(
 	/* ----------------------------------------- */
 	/* resolve the user or operator subscription */
 	/* ----------------------------------------- */
-	if ((status = use_windowsazure_configuration( pptr->profile )) != 0)
+	if ((subscription = use_windowsazure_configuration( pptr->profile )) != 0)
 		return( terminate_windowsazure_contract( status, &contract ) );
 
 	else if (!( cfptr = resolve_az_configuration( pptr->profile )))
 		return( terminate_windowsazure_contract( 404, &contract ) );
 
-	else	memset( &contract, 0, sizeof( struct cords_az_contract ));
-
+	else
+	{
+		memset( &contract, 0, sizeof( struct cords_az_contract ));
+		contract.subscription = subscription;
+	}
 	/* ------------------------------------------ */
 	/* Resolve the required Geographical Location */
 	/* ------------------------------------------ */
@@ -757,7 +764,7 @@ public	int	create_windowsazure_contract(
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-	else if (!( contract.flavors = az_list_flavors() ))
+	else if (!( contract.flavors = az_list_flavors(contract.subscription) ))
 		return( terminate_windowsazure_contract( 1579, &contract ) );
 	else if (!( pptr->flavor = resolve_windowsazure_flavor( &contract ) ))
 		return( terminate_windowsazure_contract( 1580, &contract ) );
@@ -795,7 +802,7 @@ public	int	create_windowsazure_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = az_list_os_images() ))
+	else if (!( contract.images = az_list_os_images(contract.subscription) ))
 		return( terminate_windowsazure_contract( 1585, &contract ) );
 	else if (!( pptr->image = resolve_windowsazure_image( &contract, pptr ) ))
 		return( terminate_windowsazure_contract( 1586, &contract ) );
@@ -805,7 +812,7 @@ public	int	create_windowsazure_contract(
 	/* --------------------------------------- */
 	/* retrieve the public network information */
 	/* --------------------------------------- */
-	else if (!( contract.networks = az_list_network() ))
+	else if (!( contract.networks = az_list_network(contract.subscription) ))
 		return( terminate_windowsazure_contract( 1588, &contract ) );
 	else if (!( pptr->publicnetwork = resolve_windowsazure_network( &contract ) ))
 		return( terminate_windowsazure_contract( 1589, &contract ) );
@@ -832,6 +839,7 @@ public	int	delete_windowsazure_contract(
 		char * tls )
 {
 	int	status;
+	struct 	az_subscription * subscription=(struct az_subscription *) 0;
 	struct	az_response * azptr;
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
@@ -844,14 +852,14 @@ public	int	delete_windowsazure_contract(
 		/* ------------------------- */
 		/* delete the hosted service */
 		/* ------------------------- */
-		if (( azptr = az_delete_hosted_service( pptr->hostedservice )) != (struct az_response *) 0)
-			check_windowsazure_operation( azptr );
+		if (( azptr = az_delete_hosted_service( subscription, pptr->hostedservice )) != (struct az_response *) 0)
+			check_windowsazure_operation( subscription,azptr );
 		pptr->hostedservice = liberate( pptr->hostedservice );
 
 		/* ------------------------------------------------------------ */
 		/* scan list of disks to locate the OS storage disk for removal */
 		/* ------------------------------------------------------------ */
-		if ((( azptr = az_list_os_disks()) != (struct az_response *) 0)
+		if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
 		&&  ( azptr->response )
 		&&  ( azptr->response->status == 200 )
 		&&  ((eptr = azptr->xmlroot) != (struct xml_element *) 0)
@@ -870,8 +878,8 @@ public	int	delete_windowsazure_contract(
 					continue;
 				else
 				{
-					if (( azptr = az_delete_os_disk( dptr->value )) != (struct az_response *) 0)
-						check_windowsazure_operation( azptr );
+					if (( azptr = az_delete_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
+						check_windowsazure_operation( subscription, azptr );
 					break;
 				}
 			}
