@@ -10,14 +10,26 @@ Package: compatibleone
 Section: net
 Architecture: any
 Depends: openssl (>= 0.9.8o), lsb-base (>= 3.0-6), psmisc, ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform Base Files
- CompatibleOne Accords platform base files
+Description: CompatibleOne Accords Platform (Base Files And Configuration Scripts)
+ CompatibleOne is an open source project which provides a model, CORDS
+ (CompatibleOne Resource Description Schema), and a platform,
+ ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution Services),
+ for the description and federation of different clouds comprising resources provisioned
+ by heterogeneous cloud service providers. CompatibleOne's flexible service architecture
+ makes it independent from any Cloud Service Provider (from OpenStack to OpenNebula,
+ from Azure to Vcloud) and can address all types of cloud services (IaaS, PaaS, SaaS,
+ XaaS, BpaaS, …) and any type of cloud service deployment (public, private, community and hybrid).
+ The goals of CompatibleOne are to:
+ - Provide entrepreneurs and organisations unimpeded access to cloud technologies
+ - Provide innovative platform of services, that go beyond the standard services provided by existing cloud providers
+ - Remove the constraints of vendor lock-in
+ - Provide a platform that the community can evolve rapidly and adapt according to their needs
 
 Package: libcompatibleone-accords-dev
 Section: libdevel
 Architecture: any
 Depends: compatibleone (= ${binary:Version}), libcompatibleone-accords0 (= ${binary:Version})
-Description: compatibleOne Accords development files
+Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: python-compatibleone-accords
@@ -30,8 +42,8 @@ Description: CompatibleOne Accords platform Python bindings and interfaces
 Package: compatibleone-accords-testsuite
 Section: devel
 Architecture: all
-Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev
-Description: CompatibleOne Accords platform testsuite
+Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev, python-psutil
+Description: CompatibleOne Accords platform (python testsuite)
  This package will run a set of tests to ensure that a minimal level of working
  parts is meet. It is useful during development to ensure that there is no
  regression.
@@ -40,7 +52,7 @@ Package: libcompatibleone-accords0
 Section: libs
 Architecture: any
 Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: CompatibleOne Accords Platform Base Libraries and Files
+Description: CompatibleOne Accords Platform (Base Libraries)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: compatibleone-azprocci
@@ -164,6 +176,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
 Description: CompatibleOne Accords Platform - COSCHED subsystem
  Scheduling subsystem for the CompatibleOne Accords Platform
 
+#Package: compatibleone-coidms
+#Section: net
+#Architecture: all
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), python-compatibleone-accords
+#Description: CompatibleOne Accords Platform - COIDMS subsystem
+# IDentity Management subsystem for the CompatibleOne Accords Platform
+#
 Package: compatibleone-coss
 Section: net
 Architecture: any
@@ -321,7 +340,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 
 Package: compatibleone-accords-dev
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios, compatibleone-coidms
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
  CompatibleOne is an open source project which provides a model, CORDS

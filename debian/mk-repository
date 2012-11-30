@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+# (C) CityPassenger / Vincent Renardias <vrenardias@citypassenger.com>
+
+# Sample Makefile to create a Debian Apt'able repository.
+# The user running this script should have GPG set up fully with his own 
+# key sent to gnupg's keyserver.
+
+# Fill in below with a place accessible with a ssh key
+REPOSITORY=LOGIN@SERVER
+RELEASE=ubuntu1204
+
+all: repository
+
+repository:
+	dpkg-scanpackages $(RELEASE) /dev/null > $(RELEASE)/Packages
+	dpkg-scanpackages all /dev/null >> $(RELEASE)/Packages
+	dpkg-scansources  $(RELEASE) /dev/null > $(RELEASE)/Sources
+
+	bzip2 -c9 $(RELEASE)/Packages > $(RELEASE)/Packages.bz2
+	gzip -c9 $(RELEASE)/Packages > $(RELEASE)/Packages.gz
+	bzip2 -c9 $(RELEASE)/Sources  > $(RELEASE)/Sources.bz2
+	gzip -c9 $(RELEASE)/Sources  > $(RELEASE)/Sources.gz
+	
+	apt-ftparchive -c=Release_u1204.conf release $(RELEASE) > $(RELEASE)/Release
+	-rm $(RELEASE)/Release.gpg
+	gpg -abs -o $(RELEASE)/Release.gpg $(RELEASE)/Release
+
+clean:
+	rm -f $(RELEASE)/Packages* $(RELEASE)/Sources* $(RELEASE)/Release*
+
+upload:
+	rsync -avx --delete --exclude Makefile .  $(REPOSITORY):debian

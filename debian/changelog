@@ -1,3 +1,9 @@
+compatibleone-accords (0.20121129-1) unstable; urgency=low
+
+  * Upstream update.
+
+ -- Vincent Renardias <vincent@renardias.com>  Mon, 26 Nov 2012 11:43:34 +0200
+
 compatibleone-accords (0.20121121-1) unstable; urgency=low
 
   * Uptream update 2012/11/21 codebase + python enabled.
