@@ -84,7 +84,7 @@ private	int	az_result( struct az_response * rptr )
 	else	return( failure(99,"no","result") );
 }
 
-private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8, char * p9, char * p10 )
+private	int	az_operation( struct az_subscription * s, char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8, char * p9, char * p10 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "CO-AZCLIENT/1.0";
@@ -103,33 +103,33 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "OS" ) ))
-			az_result( az_list_os_images() );
+			az_result( az_list_os_images(s) );
 		else if (!( strcasecmp( p2, "DISKS" ) ))
-			az_result( az_list_os_disks() );
+			az_result( az_list_os_disks(s) );
 		else if (!( strcasecmp( p2, "HOSTS" ) ))
-			az_result( az_list_hosted_services() );
+			az_result( az_list_hosted_services(s) );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
-			az_result( az_list_network() );
+			az_result( az_list_network(s) );
 		else if (!( strcasecmp( p2, "CONTAINERS" ) ))
-			az_result( az_list_containers( p3 ) );
+			az_result( az_list_containers( s,p3 ) );
 		else if (!( strcasecmp( p2, "VM" ) ))
-			az_result( az_list_vm( p3 ) );
+			az_result( az_list_vm( s,p3 ) );
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
-			az_result( az_list_deployments(p3) );
+			az_result( az_list_deployments(s,p3) );
 		else if (!( strcasecmp( p2, "CERTIFICATES" ) ))
-			az_result( az_list_certificates(p3) );
+			az_result( az_list_certificates(s) );
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
-			az_result( az_list_affinity_groups() );
+			az_result( az_list_affinity_groups(s) );
 		else if (!( strcasecmp( p2, "STORAGE" ) ))
-			az_result( az_list_storage_services() );
+			az_result( az_list_storage_services(s) );
 		else if (!( strcasecmp( p2, "OPERATIONS" ) ))
-			az_result( az_list_operations(p3,p4) );
+			az_result( az_list_operations(s,p3,p4) );
 		else if (!( strcasecmp( p2, "PROFILES" ) ))
-			az_result( az_list_WATM_profiles() );
+			az_result( az_list_WATM_profiles(s) );
 		else if (!( strcasecmp( p2, "DEFINITIONS" ) ))
-			az_result( az_list_WATM_definitions(p3) );
+			az_result( az_list_WATM_definitions(s,p3) );
 		else if (!( strcasecmp( p2, "LOCATIONS" ) ))
-			az_result( az_list_locations() );
+			az_result( az_list_locations(s) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -138,11 +138,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_capture_vm_request( p5, p6, p7, atoi(p8)  ) ))
+			if (!( nomfic = az_capture_vm_request( s,p5, p6, p7, atoi(p8)  ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				az_result( az_operation_vm( s,nomfic, p3, p4 ) );
 				return( 0 );
 			}
 		}
@@ -153,11 +153,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_start_vm_request( ) ))
+			if (!( nomfic = az_start_vm_request(s ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				az_result( az_operation_vm( s,nomfic, p3, p4 ) );
 				return( 0 );
 			}
 		}
@@ -168,11 +168,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_shutdown_vm_request( ) ))
+			if (!( nomfic = az_shutdown_vm_request(s ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				az_result( az_operation_vm( s,nomfic, p3, p4 ) );
 				return( 0 );
 			}
 		}
@@ -183,11 +183,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_restart_vm_request( ) ))
+			if (!( nomfic = az_restart_vm_request(s ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_operation_vm( nomfic, p3, p4 ) );
+				az_result( az_operation_vm( s,nomfic, p3, p4 ) );
 				return( 0 );
 			}
 		}
@@ -197,83 +197,83 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if  (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = az_create_hosted_service_request( p3, p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_hosted_service_request( s,p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","request" ) );
 			else
 			{ 	
-				az_result( az_create_hosted_service( nomfic ) );
+				az_result( az_create_hosted_service( s,nomfic ) );
 				return( 0 );
 			}
 		}
 		else if  (!( strcasecmp( p2, "OS" ) ))
 		{
-			if (!( nomfic = az_create_os_request( p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_os_request( s,p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","OS request" ) );
 			else
 			{ 	
-				az_result( az_create_os_image( nomfic ) );
+				az_result( az_create_os_image( s,nomfic ) );
 				return( 0 );
 			}
 		}
 		else if  (!( strcasecmp( p2, "DISK" ) ))
 		{
-			if (!( nomfic = az_add_os_disk_request( p3, p4, p5, atoi(p6) ) ))
+			if (!( nomfic = az_add_os_disk_request( s,p3, p4, p5, atoi(p6) ) ))
 				return( failure(27,"cannot create","DISK request" ) );
 			else
 			{ 	
-				az_result( az_add_os_disk( nomfic ) );
+				az_result( az_add_os_disk( s,nomfic ) );
 				return( 0 );
 			}
 		}
 		else if (!( strcasecmp( p2, "DEPLOYMENTS" ) ))
 		{
-			if (!( nomfic = az_create_deployment_request( p3, p3, p4, p5 ) ))
+			if (!( nomfic = az_create_deployment_request( s,p3, p3, p4, p5 ) ))
 				return( failure(27,"cannot create","deployment request" ) );
 			else
 			{ 	
-				az_result( az_create_deployment( nomfic, p7, p7 ) );
+				az_result( az_create_deployment( s,nomfic, p7, p7 ) );
 				return( 0 );
 			}
 		}
 		else if  (!( strcasecmp( p2, "VM" ) ))
 		{
 
-			if (!( nomfic = az_create_vm_request( p4, p3, p5, p6, p7, p8, p9, atoi(p10), (char *) 0 ) ))
+			if (!( nomfic = az_create_vm_request( s,p4, p3, p5, p6, p7, p8, p9, atoi(p10), (char *) 0 ) ))
 				return( failure(27,"cannot create","vm deployment request" ) );
 			else
 			{ 	
-				az_result( az_create_vm( nomfic ) );
+				az_result( az_create_vm( s,nomfic ) );
 				return( 0 );
 			}
 		}
 		else if  (!( strcasecmp( p2, "GROUP" ) ))
 		{
-			if (!( nomfic = az_create_affinity_group_request( p3, p3, p4, p5 ) ))
+			if (!( nomfic = az_create_affinity_group_request( s,p3, p3, p4, p5 ) ))
 				return( failure(27,"cannot create","affinity group request" ) );
 			else
 			{ 	
-				az_result( az_create_affinity_group( nomfic ) );
+				az_result( az_create_affinity_group( s, nomfic ) );
 				return( 0 );
 			}
 		}
 
 		else if  (!( strcasecmp( p2, "STORAGE" ) ))
 		{
-			if (!( nomfic = az_create_storage_service_request( p3, p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_storage_service_request( s, p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","storage service request" ) );
 			else
 			{ 	
-				az_result( az_create_storage_service( nomfic ) );
+				az_result( az_create_storage_service( s, nomfic ) );
 				return( 0 );
 			}
 		}
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
 		{
-			if (!( nomfic = az_create_network_config_request( p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_network_config_request( s, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","network config" ) );
 			else
 			{
-				az_result( az_update_network_config(  nomfic ) );
+				az_result( az_update_network_config(  s, nomfic ) );
 				return(0);
 			}
 		}
@@ -285,27 +285,27 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SUBSCRIPTION" ) ))
-			az_result( az_get_subscription() );
+			az_result( az_get_subscription(s) );
 		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
-			az_result( az_get_deployment( p3, p4 ) );
+			az_result( az_get_deployment( s,p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
-			az_result( az_get_hosted_service( p3 ) );
+			az_result( az_get_hosted_service( s,p3 ) );
 		else if (!( strcasecmp( p2, "VM" ) ))
-			az_result( az_get_vm( p3, p4 ) );
+			az_result( az_get_vm( s,p3, p4 ) );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
-			az_result( az_get_network_config() );
+			az_result( az_get_network_config(s) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
-			az_result( az_get_flavor( p3 ) );
+			az_result( az_get_flavor( s,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			az_result( az_get_image( p3 ) );
+			az_result( az_get_image( s,p3 ) );
 		else if (!( strcasecmp( p2, "OS" ) ))
-			az_result( az_get_os_image( p3 ) );
+			az_result( az_get_os_image( s,p3 ) );
 		else if (!( strcasecmp( p2, "DISK" ) ))
-			az_result( az_get_os_disk( p3 ) );
+			az_result( az_get_os_disk( s,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
-			az_result( az_retrieve_affinity_group( p3 ) );
+			az_result( az_retrieve_affinity_group( s,p3 ) );
 		else if (!( strcasecmp( p2, "STORAGE") ))
-			az_result( az_retrieve_storage_service( p3 ) );
+			az_result( az_retrieve_storage_service( s,p3 ) );
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
@@ -315,11 +315,11 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "HOST" ) ))
 		{
-			if (!( nomfic = az_create_hosted_service_request( p3, p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_create_hosted_service_request( s,p3, p3, p4, p5, p6 ) ))
 				return( failure(27,"cannot create","affinity group request" ) );
 			else
 			{
-				az_result( az_update_hosted_service( p4, nomfic ) );
+				az_result( az_update_hosted_service( s,p4, nomfic ) );
 				return(0);
 			}
 		}
@@ -331,28 +331,28 @@ private	int	az_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		if (!( p2 ))
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "DEPLOYMENT") ))
-			az_result( az_delete_deployment( p3, p4 ) );
+			az_result( az_delete_deployment( s,p3, p4 ) );
 		else if (!( strcasecmp( p2, "HOST" ) ))
-			az_result( az_delete_hosted_service( p3 ) );
+			az_result( az_delete_hosted_service( s,p3 ) );
 		else if (!( strcasecmp( p2, "VM" ) ))
-			az_result( az_delete_vm( p3, p4 ) );
+			az_result( az_delete_vm( s,p3, p4 ) );
 		else if (!( strcasecmp( p2, "OS" ) ))
-			az_result( az_delete_os_image( p3 ) );
+			az_result( az_delete_os_image( s,p3 ) );
 		else if (!( strcasecmp( p2, "DISK" ) ))
-			az_result( az_delete_os_disk( p3 ) );
+			az_result( az_delete_os_disk( s,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
-			az_result( az_delete_image( p3 ) );
+			az_result( az_delete_image( s,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
-			az_result( az_delete_affinity_group( p3 ) );
+			az_result( az_delete_affinity_group( s,p3 ) );
 		else if (!( strcasecmp( p2, "STORAGE" ) ))
-			az_result( az_delete_storage_service( p3 ) );
+			az_result( az_delete_storage_service( s,p3 ) );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
 		{
-			if (!( nomfic = az_delete_network_config_request( p3, p4, p5, p6 ) ))
+			if (!( nomfic = az_delete_network_config_request( s ) ))
 				return( failure(27,"cannot delete","network config" ) );
 			else
 			{
-				az_result( az_delete_network_config( nomfic ) );
+				az_result( az_delete_network_config( s,nomfic ) );
 				return(0);
 			}
 		}
@@ -377,19 +377,22 @@ private	int	az_command(int argc, char * argv[] )
 	char *	version="2012-03-01";
 	char * 	subscription="f346740d-e45e-42e9-80b8-4865f3a855d1";
 	char *	namespace="http://schemas.microsoft.com/windowsazure";
+	struct az_subscription * subptr=(struct az_subscription *) 0;
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[argi++] ))
 			break;
 		else if ( *aptr != '-' )
 		{
-			if ((status = az_initialise_client( user, pass, host, agent, version, tls,
-					namespace, subscription )) != 0)
-				return( failure( status, "initialising", "client" ) );
-			else if (( status = az_initialise_service( hostingservice )) != 0)
-				return( failure( status, "initialising", "service" ) );
-			
-			else return( az_operation( aptr, 
+			if (!( subptr ))
+			{
+				if (!( subptr = az_initialise_client( user, pass, host, agent, version, tls,
+						namespace, subscription )))
+					return( failure( status, "initialising", "client" ) );
+				else if (( status = az_initialise_service( subptr, hostingservice )) != 0)
+					return( failure( status, "initialising", "service" ) );
+			}
+			return( az_operation( subptr, aptr, 
 				( argi < argc ? argv[argi] : (char *) 0 ),
 				( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
 				( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),

@@ -342,18 +342,18 @@ public	struct	az_response * az_client_put_request(char * target, char * tls, cha
 /*	------------------------------------------------------------	*/
 /*			a z _ a u t h e n t i c a t e ()	        */
 /*	------------------------------------------------------------	*/
-public	struct	rest_header   *	az_authenticate	( char * content_type, char * accepts )
+public	struct	rest_header   *	az_authenticate	( struct az_subscription * subptr, char * content_type, char * accepts )
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	struct	rest_header 	*	root=(struct rest_header * ) 0;
 	struct	rest_header 	*	foot=(struct rest_header * ) 0;
-	if (!( Waz.user ))
+	if (!( subptr->Az.user ))
 		return( hptr );
-	else if (!( Waz.password ))
+	else if (!( subptr->Az.password ))
 		return( hptr );
-	else if (!( Waz.version ))
+	else if (!( subptr->Az.version ))
 		return( hptr );
-	else if (!( foot = root = rest_create_header( "x-ms-version", Waz.version ) ))
+	else if (!( foot = root = rest_create_header( "x-ms-version", subptr->Az.version ) ))
 		return( root );
 	if ( content_type )
 	{
@@ -384,15 +384,15 @@ public	struct	rest_header   *	az_authenticate	( char * content_type, char * acce
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ u p d a t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	azure_update_operation( char * action, char * filename )
+public	struct	az_response *	azure_update_operation( struct az_subscription * subptr, char * action, char * filename )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -401,7 +401,7 @@ public	struct	az_response *	azure_update_operation( char * action, char * filena
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_put_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	else if (!( rptr = az_client_put_request( nptr, subptr->Az.tls, subptr->Az.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -412,15 +412,15 @@ public	struct	az_response *	azure_update_operation( char * action, char * filena
 /*	------------------------------------------------------------	*/
 /*		n e t w o r k _ u p d a t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	network_update_operation( char * action, char * filename )
+public	struct	az_response *	network_update_operation( struct az_subscription * subptr, char * action, char * filename )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/plain","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/plain","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -429,7 +429,7 @@ public	struct	az_response *	network_update_operation( char * action, char * file
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_put_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	else if (!( rptr = az_client_put_request( nptr, subptr->Az.tls, subptr->Az.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -440,15 +440,15 @@ public	struct	az_response *	network_update_operation( char * action, char * file
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	azure_create_operation( char * action, char * filename )
+public	struct	az_response *	azure_create_operation( struct az_subscription * subptr, char * action, char * filename )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -457,7 +457,7 @@ public	struct	az_response *	azure_create_operation( char * action, char * filena
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_post_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	else if (!( rptr = az_client_post_request( nptr, subptr->Az.tls, subptr->Az.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -468,16 +468,16 @@ public	struct	az_response *	azure_create_operation( char * action, char * filena
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-private	struct	az_response * azure_list_operation( char * buffer )
+private	struct	az_response * azure_list_operation( struct az_subscription * subptr, char * buffer )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -486,7 +486,7 @@ private	struct	az_response * azure_list_operation( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_get_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -498,16 +498,16 @@ private	struct	az_response * azure_list_operation( char * buffer )
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ re t r i e v e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-private	struct	az_response * azure_retrieve_operation( char * buffer )
+private	struct	az_response * azure_retrieve_operation( struct az_subscription * subptr, char * buffer )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -516,7 +516,7 @@ private	struct	az_response * azure_retrieve_operation( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_get_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -528,16 +528,16 @@ private	struct	az_response * azure_retrieve_operation( char * buffer )
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-private	struct	az_response * azure_delete_operation( char * buffer )
+private	struct	az_response * azure_delete_operation( struct az_subscription * subptr, char * buffer )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -546,7 +546,7 @@ private	struct	az_response * azure_delete_operation( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_delete_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_delete_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -559,51 +559,51 @@ private	struct	az_response * azure_delete_operation( char * buffer )
 /*	------------------------------------------------------------	*/
 /* 	a z u r e  _ l i s t _ c o n t a i n e r		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_container( char * myStorageAccount,char *mykeyStorage)
+public	struct	az_response * azure_list_container( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage)
 {
 	char uri[1024]="?comp=list";
 	char *contentBody=NULL;
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e _ c o n t a i n e r		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_container( char * myStorageAccount,char *mykeyStorage,char* containerName)
+public	struct	az_response * azure_delete_container( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char* containerName)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"%s?restype=container",containerName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
 }
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e _ c o n t a i n e r		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_container( char * myStorageAccount,char *mykeyStorage,char* containerName)
+public	struct	az_response * azure_create_container( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char* containerName)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"%s?restype=container",containerName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		 a z u r e  _ l i s t _ b l o b s	                */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_blob( char * myStorageAccount,char *mykeyStorage,char*containerName)
+public	struct	az_response * azure_list_blob( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char*containerName)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s?restype=container&comp=list",containerName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _c r e a t e _ b l o b 		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_blob( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName, char *content)
+public	struct	az_response * azure_create_blob( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName, char *content)
 {
 	char uri[1024];
 	char *contentBody=NULL;
@@ -614,37 +614,37 @@ public	struct	az_response * azure_create_blob( char * myStorageAccount,char *myk
 	else
 	{
 		sprintf(uri,"%s/%s",containerName,blobName);
-		return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
+		return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
 	}
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e _d e l e t e _ b l o b_           		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_blob( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
+public	struct	az_response * azure_delete_blob( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s/%s",containerName,blobName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
 }
 /*	------------------------------------------------------------	*/
 /*		a z u r e _g e t _ b l o b_c o n t e n t 	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_get_blob_content( char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
+public	struct	az_response * azure_get_blob_content( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char*containerName,char * blobName)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isBlob=1;
 	sprintf(uri,"%s/%s",containerName,blobName);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  b l o b_ c o n t e n t   		*/
 /*	------------------------------------------------------------	*/
-public	char * az_create_blob_content(char *contentBody)
+public	char * az_create_blob_content(struct az_subscription * subptr, char *contentBody)
 {
 	char *filename;
 	FILE *	h;
@@ -663,19 +663,19 @@ public	char * az_create_blob_content(char *contentBody)
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t _ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_table( char * myStorageAccount,char *mykeyStorage)
+public	struct	az_response * azure_list_table( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isTable=1;
 	sprintf(uri,"Tables");
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e _ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_table( char * myStorageAccount,char *mykeyStorage,char *tablename)
+public	struct	az_response * azure_create_table( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char *tablename)
 {
 	char uri[1024];
 	char *contentBody=NULL;
@@ -684,13 +684,13 @@ public	struct	az_response * azure_create_table( char * myStorageAccount,char *my
 	sprintf(uri,"Tables");
 	if (!( contentBody=allocate_string(tablename) ))
 		return((struct az_response *) 0);
-	else	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"POST",contentBody));
+	else	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"POST",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  t a b l e _ b o d y	                */
 /*	------------------------------------------------------------	*/
-public	char * az_create_table_request_body( char *tablename)
+public	char * az_create_table_request_body( struct az_subscription * subptr, char *tablename)
 {
 	char *	filename;
 	FILE *	h;
@@ -724,67 +724,67 @@ public	char * az_create_table_request_body( char *tablename)
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e _ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_table( char * myStorageAccount,char *mykeyStorage,char *tablename)
+public	struct	az_response * azure_delete_table( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char *tablename)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isTable=1;
 	sprintf(uri,"Tables('%s')",tablename);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
 }
 
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ q u e u e_ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_queue( char * myStorageAccount,char *mykeyStorage)
+public	struct	az_response * azure_list_queue( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"?comp=list");
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"GET",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_queue( char * myStorageAccount,char *mykeyStorage,char *name)
+public	struct	az_response * azure_create_queue( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char *name)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"%s",name);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"PUT",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ t a b l e		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_queue( char * myStorageAccount,char *mykeyStorage,char *name)
+public	struct	az_response * azure_delete_queue( struct az_subscription * subptr, char * myStorageAccount,char *mykeyStorage,char *name)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	isQue=1;
 	sprintf(uri,"%s",name);
-	return (azure_storage_request(myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
+	return (azure_storage_request(subptr,myStorageAccount,mykeyStorage,uri,"DELETE",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ s t o r a g e_ a c c o u t        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_storage_account()
+public	struct	az_response * azure_list_storage_account(struct az_subscription * subptr )
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/storageservices");
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ s t o r a g e_ a c c o u n t  */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_storage_account(char *strgname,char *location, char *affigroupe)
+public	struct	az_response * azure_create_storage_account(struct az_subscription * subptr, char *strgname,char *location, char *affigroupe)
 {
 	char uri[1024];
 	char *contentBody=NULL;
@@ -792,19 +792,19 @@ public	struct	az_response * azure_create_storage_account(char *strgname,char *lo
 	char description[]="storageaccountdescription";
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_create_storage_account_request_body(strgname,label,description,location,affigroupe) ))
+	if (!( filename=az_create_storage_account_request_body(subptr,strgname,label,description,location,affigroupe) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/storageservices");
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr,uri,"POST",filename));
 	}
 }
 
 /*	-------------------------------------------------------------------------	*/
 /*		a z _ c r e a te _  s t o r a g e _ a c c o u n t _ b o d y	        */
 /*	-------------------------------------------------------------------------	*/
-public	char * az_create_storage_account_request_body( char * name,char * label,char * description,char * location,char * group )
+public	char * az_create_storage_account_request_body( struct az_subscription * subptr, char * name,char * label,char * description,char * location,char * group )
 {
 	char *	filename;
 	FILE *	h;
@@ -818,7 +818,7 @@ public	char * az_create_storage_account_request_body( char * name,char * label,c
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		fprintf(h,"\t<Description>%s</Description>\n",description);
@@ -835,50 +835,50 @@ public	char * az_create_storage_account_request_body( char * name,char * label,c
 /*	------------------------------------------------------------	*/
 /*	 a z u r e  _ d e l e t e_ s t o r a g e_ a c c o u n t		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_storage_account(char *strgname)
+public	struct	az_response * azure_delete_storage_account(struct az_subscription * subptr, char *strgname)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	
 	sprintf(uri,"/services/storageservices/%s",strgname);
-	return (azure_service_management_request(uri,"DELETE",contentBody));
+	return (azure_service_management_request(subptr,uri,"DELETE",contentBody));
 }
 
 /*	----------------------------------------------------------------	*/
 /*		a z u r e  _ g e t_ s t o r a g e_ a c c o u n t _ k e y s      */
 /*	----------------------------------------------------------------	*/
-public	struct	az_response * azure_get_storage_account_keys(char *strgname)
+public	struct	az_response * azure_get_storage_account_keys(struct az_subscription * subptr, char *strgname)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	
 	sprintf(uri,"/services/storageservices/%s/keys",strgname);
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	-----------------------------------------------------------------------------	*/
 /*		a z u r e  _ r e g e r a t e_ s t o r a g e_ a c c o u n t _ k e y s    */
 /*      keytype = Primary|Secondary                                                     */
 /*	-----------------------------------------------------------------------------	*/
-public	struct	az_response * azure_regenerate_storage_account_key(char *strgname,char *keytype)
+public	struct	az_response * azure_regenerate_storage_account_key(struct az_subscription * subptr, char *strgname,char *keytype)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_regenerate_storage_account_key_request_body(keytype) ))
+	if (!( filename=az_regenerate_storage_account_key_request_body(subptr,keytype) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/storageservices/%s/keys?action=regenerate",strgname);
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr,uri,"POST",filename));
 	}
 }
 
 /*	-----------------------------------------------------------------------------------  */
 /*		a z _ r e g e n e r a t e _  s t o r a g e _ a c c o u n t _ k e y_b o d y   */
 /*	-----------------------------------------------------------------------------------  */
-public	char * az_regenerate_storage_account_key_request_body( char * keytype )
+public	char * az_regenerate_storage_account_key_request_body( struct az_subscription * subptr, char * keytype )
 {
 	char *	filename;
 	FILE *	h;
@@ -889,7 +889,7 @@ public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<RegenerateKeys xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<RegenerateKeys xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\tKeyType>%s</KeyType>\n",keytype);
 		fprintf(h,"</RegenerateKeys>\n");
 		fclose(h);
@@ -912,7 +912,7 @@ public	char * az_regenerate_storage_account_key_request_body( char * keytype )
 /* startdeploy: true or false.Indicates whether to start the        */
 /*              deployment immediately after it is created          */
 /*	------------------------------------------------------------*/
-public	struct	az_response * azure_create_deployment(
+public	struct	az_response * azure_create_deployment(struct az_subscription * subptr, 
 	char *servicename, 
 	char *deploymentslot, 
 	char *deployname, 
@@ -925,19 +925,19 @@ public	struct	az_response * azure_create_deployment(
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_create_deployment_request_body(deployname,pkgUrl,label,configfile,startdeploy) ))
+	if (!( filename=az_create_deployment_request_body(subptr,deployname,pkgUrl,label,configfile,startdeploy) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr, uri,"POST",filename));
 	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  d e p l o y m e n t _ r e q u e s t _ b o d y	*/
 /*	------------------------------------------------------------------	*/
-public char* az_create_deployment_request_body(char *deployname,char*pkgUrl,char *label,char *configfile, char *startdeploy)
+public char* az_create_deployment_request_body(struct az_subscription * subptr, char *deployname,char*pkgUrl,char *label,char *configfile, char *startdeploy)
 {
 	char *	filename;
 	FILE *	h;
@@ -968,58 +968,58 @@ public char* az_create_deployment_request_body(char *deployname,char*pkgUrl,char
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ d e p y m e n t               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_deployement_slots(char *servicename, char *deploymentslot)
+public	struct	az_response * azure_delete_deployement_slots(struct az_subscription * subptr, char *servicename, char *deploymentslot)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/hostedservices/%s/deploymentslots/%s",servicename,deploymentslot);
-	return (azure_service_management_request(uri,"DELETE",contentBody));
+	return (azure_service_management_request(subptr,uri,"DELETE",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ d e p y m e n t               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_deployement(char *servicename, char *deploymentslot)
+public	struct	az_response * azure_delete_deployement(struct az_subscription * subptr, char *servicename, char *deploymentslot)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/hostedservices/%s/deployments/%s",servicename,deploymentslot);
-	return (azure_service_management_request(uri,"DELETE",contentBody));
+	return (azure_service_management_request(subptr,uri,"DELETE",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ a f f i n i t y g r o u p s       */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_affinitygroups()
+public	struct	az_response * azure_list_affinitygroups(struct az_subscription * subptr )
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/affinitygroups");
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ c r e a t e_ a f f i n i t y g r o u p s	*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_create_affinitygroups(char * name,char * label,char * description,char * location)
+public	struct	az_response * azure_create_affinitygroups(struct az_subscription * subptr, char * name,char * label,char * description,char * location)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_create_affinity_group_request_body(name,label,description,location ) ))
+	if (!( filename=az_create_affinity_group_request_body(subptr,name,label,description,location ) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/affinitygroups");
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr,uri,"POST",filename));
 	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t	*/
 /*	------------------------------------------------------------------	*/
-public	char * az_create_affinity_group_request(
+public	char * az_create_affinity_group_request(struct az_subscription * subptr, 
 	char * name,
 	char * label,
 	char * description,
@@ -1037,7 +1037,7 @@ public	char * az_create_affinity_group_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<Name>%s</Name>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		if ( description )
@@ -1052,7 +1052,7 @@ public	char * az_create_affinity_group_request(
 /*	--------------------------------------------------------------------------- */
 /*	a z _ c r e a t e _  a f f i n i t y _ g r o u p _ r e q u e s t_ b o d y   */
 /*	--------------------------------------------------------------------------- */
-public	char * az_create_affinity_group_request_body(
+public	char * az_create_affinity_group_request_body(struct az_subscription * subptr, 
 	char * name,
 	char * label,
 	char * description,
@@ -1070,7 +1070,7 @@ public	char * az_create_affinity_group_request_body(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateAffinityGroup xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<Name>%s</Name>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		if ( description )
@@ -1084,34 +1084,34 @@ public	char * az_create_affinity_group_request_body(
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ d e l e t e_ a f f i n i t y g r o u p     */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_affinitygroup(char *name)
+public	struct	az_response * azure_delete_affinitygroup(struct az_subscription * subptr, char *name)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/affinitygroups/%s",name);
-	return (azure_service_management_request(uri,"DELETE",contentBody));
+	return (azure_service_management_request(subptr,uri,"DELETE",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ l o c a t i o n s                 */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_locations()
+public	struct	az_response * azure_list_locations(struct az_subscription * subptr)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/locations");
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z u r e  _ l i s t_ o s_ i m a g e s                  */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * azure_list_os_image()
+public	struct	az_response * azure_list_os_image(struct az_subscription * subptr)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/images");
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	----------------------------------------------------------------------------*/
@@ -1126,7 +1126,7 @@ public	struct	az_response * azure_list_os_image()
 /* os: The operating system type of the OS image.                                   */
 /*       Possible values are:Linux / Windows                                        */
 /*	----------------------------------------------------------------------------*/
-public	struct	az_response * azure_add_os_image(
+public	struct	az_response * azure_add_os_image(struct az_subscription * subptr, 
 	char * name,
 	char * label,
 	char *medialink,
@@ -1136,19 +1136,19 @@ public	struct	az_response * azure_add_os_image(
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_create_os_image_request_body(name,label,medialink,os ) ))
+	if (!( filename=az_create_os_image_request_body(subptr,name,label,medialink,os ) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/images");
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr,uri,"POST",filename));
 	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  o s _ i m a g e _ r e q u e s t_ b o d y   	*/
 /*	------------------------------------------------------------------	*/
-public char *az_create_os_image_request_body(char * name,char * label,char *medialink,char * os)
+public char *az_create_os_image_request_body(struct az_subscription * subptr, char * name,char * label,char *medialink,char * os)
 {
   char *	filename;
 	FILE *	h;
@@ -1176,25 +1176,25 @@ public char *az_create_os_image_request_body(char * name,char * label,char *medi
 /*  name:the image to delete                                                    */
 /*  label: Specifies the friendly name of the image to delete                   */
 /*	----------------------------------------------------------------------	*/
-public	struct	az_response * azure_delete_os_image(char *name, char *label)
+public	struct	az_response * azure_delete_os_image(struct az_subscription * subptr, char *name, char *label)
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
-	if (!( filename=az_delete_os_image_request_body(label) ))
+	if (!( filename=az_delete_os_image_request_body(subptr,label) ))
 		return((struct az_response *) 0);
 	else
 	{
 		isCstrg=1;
 		sprintf(uri,"/services/images/%s",name);
-		return (azure_service_management_request(uri,"DELETE",filename));
+		return (azure_service_management_request(subptr,uri,"DELETE",filename));
 	}
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ d e le t e _  o s _ i m a g e _ r e q u e s t_ b o d y     	*/
 /*	------------------------------------------------------------------	*/
-public char *az_delete_os_image_request_body(char * label)
+public char *az_delete_os_image_request_body(struct az_subscription * subptr, char * label)
 {
   char *	filename;
 	FILE *	h;
@@ -1225,7 +1225,7 @@ public char *az_delete_os_image_request_body(char * label)
 /* os: The operating system type of the OS image.                                       */
 /*       Possible values are:Linux / Windows                                            */
 /*	-------------------------------------------------------------------------------	*/
-public	struct	az_response * azure_update_os_image(
+public	struct	az_response * azure_update_os_image(struct az_subscription * subptr, 
 	char * name,
 	char * label,
 	char *medialink,
@@ -1235,19 +1235,19 @@ public	struct	az_response * azure_update_os_image(
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	if (!( filename=az_create_os_image_request_body(name,label,medialink,os )))
+	if (!( filename=az_create_os_image_request_body(subptr,name,label,medialink,os )))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/images/%s",name);
-		return (azure_service_management_request(uri,"PUT",filename));
+		return (azure_service_management_request(subptr,uri,"PUT",filename));
 	}
 }
 
 /* -------------------------------------------------------------------------------*/
 /*   a z u r e  _ c r e a t e_ V i r t u a l M a c h i n e _ D e p l o y m e n t  */
 /* -------------------------------------------------------------------------------*/
-public	struct	az_response * azure_create_vm_deployment(
+public	struct	az_response * azure_create_vm_deployment(struct az_subscription * subptr, 
 	char * sname,
 	char * dname,
 	char * label,
@@ -1260,19 +1260,19 @@ public	struct	az_response * azure_create_vm_deployment(
 	char *filename;
 	isCstrg=1;
 	isTable=1;
-	if (!( filename=az_create_vm_request_body(dname,label,vnetworkname,vmname,provisioningconfig) ))
+	if (!( filename=az_create_vm_request_body(subptr,dname,label,vnetworkname,vmname,provisioningconfig) ))
 		return((struct az_response *) 0);
 	else
 	{
 		sprintf(uri,"/services/hostedservices/%s/deployments/",sname);
-		return (azure_service_management_request(uri,"POST",filename));
+		return (azure_service_management_request(subptr,uri,"POST",filename));
 	}
 }
 
 /* ------------------------------------------------------------------	*/
 /*  a z _ c r e a t e _  v m _ r e q u e s t_ b o d y   	        */
 /* ------------------------------------------------------------------	*/
-public char *az_create_vm_request_body(char *name,char *label,char *vnetworkname,char *vmname, char *provisioningconfig)
+public char *az_create_vm_request_body(struct az_subscription * subptr, char *name,char *label,char *vnetworkname,char *vmname, char *provisioningconfig)
 {
     char *	filename;
 	FILE *	h;
@@ -1603,21 +1603,21 @@ public char *az_create_vm_request_body(char *name,char *label,char *vnetworkname
 /*	----------------------------------------------------------------------------	*/
 /*		a z u r e  _ s e t_ n e t w o r k _ c o n f i g u r a t i o n           */
 /*	----------------------------------------------------------------------------	*/
-public	struct	az_response * azure_set_network_configuration()
+public	struct	az_response * azure_set_network_configuration(struct az_subscription * subptr )
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	char *filename;
 	isCstrg=1;
-	filename=az_ceate_network_configuration_request_body();
+	filename=az_ceate_network_configuration_request_body(subptr);
 	sprintf(uri,"/services/networking/media");
-	return (azure_service_management_request(uri,"POST",filename));
+	return (azure_service_management_request(subptr,uri,"POST",filename));
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  v m _ r e q u e s t_ b o d y   	                */
 /*	------------------------------------------------------------------	*/
-public char *az_ceate_network_configuration_request_body()
+public char *az_ceate_network_configuration_request_body(struct az_subscription * subptr )
 {
     char *	filename;
 	FILE *	h;
@@ -1766,18 +1766,18 @@ public char *az_ceate_network_configuration_request_body()
 /*	----------------------------------------------------------------------------	*/
 /*		a z u r e  _ g e t_ n e t w o r k _ c o n f i g u r a t i o n           */
 /*	----------------------------------------------------------------------------	*/
-public	struct	az_response * azure_get_network_configuration()
+public	struct	az_response * azure_get_network_configuration(struct az_subscription * subptr )
 {
 	char uri[1024];
 	char *contentBody=NULL;
 	sprintf(uri,"/services/networking/media");
-	return (azure_service_management_request(uri,"GET",contentBody));
+	return (azure_service_management_request(subptr,uri,"GET",contentBody));
 }
 
 /*	-------------------------------------------------------------------------	*/
 /*		a z u r e  _ s e r v i c e _ m a n a g e m e n t _ r e q u e s t        */
 /*	--------------------------------------------------------------------------	*/
-public	struct	az_response *azure_service_management_request(char *uri,char *method,char *contentBody)
+public	struct	az_response *azure_service_management_request(struct az_subscription * subptr, char *uri,char *method,char *contentBody)
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	struct	az_response	*	rptr=(struct az_response *) 0;
@@ -1792,18 +1792,18 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 		filename=contentBody;
 	else 	filename=allocate_string("\n");
 
-	sprintf(base,"https://management.core.windows.net/%s",Waz.subscription);
-	Waz.base=allocate_string(base);
+	sprintf(base,"https://management.core.windows.net/%s",subptr->Az.subscription);
+	subptr->Az.base=allocate_string(base);
 
 	tls=allocate_string("azureTls.xml");
 
-	if (!( hptr = rest_create_header( "x-ms-version",(Waz.version ? Waz.version : "")) ))
+	if (!( hptr = rest_create_header( "x-ms-version",(subptr->Az.version ? subptr->Az.version : "")) ))
 		return( rptr );
 	else if (!( hptr->next = rest_create_header( "Content-Type","text/xml") ))
 		return( rptr );
 	else	hptr->next->previous = hptr;
 
-	if (!( uptr = analyse_url( Waz.base )))
+	if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -1812,7 +1812,7 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_request( nptr, tls, Waz.agent, filename,hptr,method) ))
+	else if (!( rptr = az_client_request( nptr, tls, subptr->Az.agent, filename,hptr,method) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -1823,7 +1823,7 @@ public	struct	az_response *azure_service_management_request(char *uri,char *meth
 /*------------------------------------------------------------	*/
 /*		a z u r e  _ s t o r a g e _ r e q u e s t      */
 /*------------------------------------------------------------	*/
-public	struct	az_response * azure_storage_request(
+public	struct	az_response * azure_storage_request(struct az_subscription * subptr, 
 		char * myStorageAccount,
 		char * mykeyStorage,
 		char *uri,
@@ -1863,9 +1863,9 @@ public	struct	az_response * azure_storage_request(
 	}
 	else	Wazbase[0] = 0;
 
-	if (!( Waz.base=allocate_string(Wazbase) ))
+	if (!( subptr->Az.base=allocate_string(Wazbase) ))
 		return( rptr );		
-	else	sprintf(base,"http://%s.%s", myStorageAccount,Waz.base);
+	else	sprintf(base,"http://%s.%s", myStorageAccount,subptr->Az.base);
 
 	sprintf(urii,"/%s",uri);
 
@@ -1875,7 +1875,7 @@ public	struct	az_response * azure_storage_request(
 		if (!(root = rest_create_header("x-ms-blob-type", "BlockBlob")))
 			return( rptr );
 		else	foot = root;
-		filename=az_create_blob_content(contentBody);
+		filename=az_create_blob_content(subptr,contentBody);
 		lengthb=strlen(contentBody);
 		sprintf(contentL,"%d",lengthb);
 	}
@@ -1887,7 +1887,7 @@ public	struct	az_response * azure_storage_request(
 		else	root = hptr;
 	}
 
-	if (!( hptr = rest_postfix_header( root, "x-ms-version",( Waz.version ? Waz.version : " "))))
+	if (!( hptr = rest_postfix_header( root, "x-ms-version",( subptr->Az.version ? subptr->Az.version : " "))))
 		return( rptr );
 	else	foot = hptr;
 	
@@ -1915,7 +1915,7 @@ public	struct	az_response * azure_storage_request(
 			return( rptr );
 		else	foot = hptr;
 	  	if(isTablec)
-			filename= az_create_table_request_body(contentBody);
+			filename= az_create_table_request_body(subptr,contentBody);
     	}
 
 	if ((!(strcmp(method,"PUT") )) || (!( strcmp(method,"DELETE") )))
@@ -1936,7 +1936,7 @@ public	struct	az_response * azure_storage_request(
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_request( nptr, Waz.tls, Waz.agent, filename,hptr,method) ))
+	else if (!( rptr = az_client_request( nptr, subptr->Az.tls, subptr->Az.agent, filename,hptr,method) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -2346,25 +2346,25 @@ char *timestampo()
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_affinity_group( char * filename )
+public	struct	az_response *	az_create_affinity_group( struct az_subscription * subptr, char * filename )
 {
-	return( azure_create_operation("/affinitygroups", filename) );
+	return( azure_create_operation(subptr,"/affinitygroups", filename) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	   a z _ r e t r i e v e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_retrieve_affinity_group( char * id )
+public	struct	az_response *	az_retrieve_affinity_group( struct az_subscription * subptr, char * id )
 {
 	char 	buffer[1024];
 	sprintf(buffer,"/affinitygroups/%s",id);
-	return( azure_retrieve_operation( buffer ) );
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ u p d a t e _ a f f i n i t y _ g r o u p 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_update_affinity_group( char * filename )
+public	struct	az_response *	az_update_affinity_group( struct az_subscription * subptr, char * filename )
 {
 	return((struct az_response *) 0);
 }
@@ -2372,25 +2372,25 @@ public	struct	az_response *	az_update_affinity_group( char * filename )
 /*	------------------------------------------------------------	*/
 /*	     a z _ d e l e t e _ a f f i n i t y _ g r o u p s	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_affinity_group( char * id )
+public	struct	az_response *	az_delete_affinity_group( struct az_subscription * subptr, char * id )
 {
 	char 	buffer[1024];
 	sprintf(buffer,"/affinitygroups/%s",id);
-	return( azure_delete_operation( buffer ) );
+	return( azure_delete_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ a f f i n i t y _ g r o u p s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_affinity_groups()
+public	struct	az_response *	az_list_affinity_groups(struct az_subscription * subptr )
 {
-	return( azure_list_operation( "/affinitygroups" ) );
+	return( azure_list_operation( subptr,"/affinitygroups" ) );
 }
 
 /*	------------------------------------------------------------------	*/
 /*	a z _ c r e a t e _  s t o r a g e _ s e r v i c e _ r e q u e s t	*/
 /*	------------------------------------------------------------------	*/
-public	char * az_create_storage_service_request(
+public	char * az_create_storage_service_request(struct az_subscription * subptr,
 	char * name,
 	char * label,
 	char * description,
@@ -2410,7 +2410,7 @@ public	char * az_create_storage_service_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateStorageServiceInput xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
 		fprintf(h,"\t<Description>%s</Description>\n",description);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
@@ -2427,7 +2427,7 @@ public	char * az_create_storage_service_request(
 /*	------------------------------------------------------------------	*/
 /*			a z _ s t a r t _ e n d p o i n t s			*/
 /*	------------------------------------------------------------------	*/
-public	FILE * az_start_endpoints( char * filename )
+public	FILE * az_start_endpoints( struct az_subscription * subptr,char * filename )
 {
 	FILE * h;
 	if (!( h = fopen( filename, "w")))
@@ -2442,7 +2442,7 @@ public	FILE * az_start_endpoints( char * filename )
 /*	------------------------------------------------------------------	*/
 /*			a z _ c r e a t e _ e n d p o i n t s			*/
 /*	------------------------------------------------------------------	*/
-public	void	az_create_endpoint( FILE * h, char * name, int localport, int port, char * protocol ) 
+public	void	az_create_endpoint( struct az_subscription * subptr,FILE * h, char * name, int localport, int port, char * protocol ) 
 {
 	if ( h )
 	{
@@ -2460,7 +2460,7 @@ public	void	az_create_endpoint( FILE * h, char * name, int localport, int port, 
 /*	------------------------------------------------------------------	*/
 /*			a z _ c l o s e _ e n d p o i n t s			*/
 /*	------------------------------------------------------------------	*/
-public	void	az_close_endpoints( FILE * h )
+public	void	az_close_endpoints( struct az_subscription * subptr, FILE * h )
 {
 	if ( h )
 	{
@@ -2473,25 +2473,25 @@ public	void	az_close_endpoints( FILE * h )
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ s t o r a g e _ s e r v i c e 	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_storage_service( char * filename )
+public	struct	az_response *	az_create_storage_service(struct az_subscription * subptr, char * filename )
 {
-	return( azure_create_operation("/services/storageservices", filename) );
+	return( azure_create_operation(subptr,"/services/storageservices", filename) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	   a z _ r e t r i e v e _ s t o r a g e _ s e r v i c e 	*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_retrieve_storage_service( char * id )
+public	struct	az_response *	az_retrieve_storage_service(struct az_subscription * subptr, char * id )
 {
 	char 	buffer[1024];
 	sprintf(buffer,"/services/storageservices/%s",id);
-	return( azure_retrieve_operation( buffer ) );
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ u p d a t e _ s t o r a g e _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_update_storage_service( char * filename )
+public	struct	az_response *	az_update_storage_service(struct az_subscription * subptr, char * filename )
 {
 	return((struct az_response *) 0);
 }
@@ -2499,112 +2499,112 @@ public	struct	az_response *	az_update_storage_service( char * filename )
 /*	------------------------------------------------------------	*/
 /*	     a z _ d e l e t e _ s t o r a g e _ s e r v i c e		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_storage_service( char * id )
+public	struct	az_response *	az_delete_storage_service(struct az_subscription * subptr, char * id )
 {
 	char 	buffer[1024];
 	sprintf(buffer,"/services/storageservices/%s",id);
-	return( azure_delete_operation( buffer ) );
+	return( azure_delete_operation( subptr, buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ s t o r a g e _ s e r v i c e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_storage_services()
+public	struct	az_response *	az_list_storage_services(struct az_subscription * subptr)
 {
-	return( azure_list_operation( "/services/storageservices" ) );
+	return( azure_list_operation( subptr,"/services/storageservices" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ o p e r a t i o n s			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_operations(char * start,char * end)
+public	struct	az_response *	az_list_operations(struct az_subscription * subptr,char * start,char * end)
 {
 	char buffer[2048];
 	sprintf(buffer,"/operations?StartTime=%s&EndTime=%s",start,end);
-	return( azure_list_operation( buffer ) );
+	return( azure_list_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ g e t _ o p e r a t i o n _ s t a t u s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_operation_status(char * opid)
+public	struct	az_response *	az_get_operation_status(struct az_subscription * subptr,char * opid)
 {
 	char buffer[2048];
 	sprintf(buffer,"/operations/%s",opid);
-	return( azure_retrieve_operation( buffer ) );
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ W A T M _ p r o f i l e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_WATM_profiles()
+public	struct	az_response *	az_list_WATM_profiles(struct az_subscription * subptr)
 {
-	return( azure_list_operation( "/services/WATM/profiles" ) );
+	return( azure_list_operation( subptr,"/services/WATM/profiles" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ W A T M _ definitions			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_WATM_definitions(char * profile )
+public	struct	az_response *	az_list_WATM_definitions(struct az_subscription * subptr,char * profile )
 {
 	char 	url[2048];
 	sprintf(url,"/services/WATM/profiles/%s/definitions",profile );
-	return( azure_list_operation( url ) );
+	return( azure_list_operation( subptr,url ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ h o s t e d _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_hosted_service( char * filename )
+public	struct	az_response *	az_create_hosted_service(struct az_subscription * subptr, char * filename )
 {
 	char 	uri[2048];
 	sprintf(uri,"/services/hostedservices");
-	return (azure_create_operation(uri,filename));
+	return (azure_create_operation(subptr,uri,filename));
 }
 
 /*	------------------------------------------------------------	*/
 /*	   	a z _ g e t _ h o s t e d _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_hosted_service( char * hostname )
+public	struct	az_response *	az_get_hosted_service(struct az_subscription * subptr, char * hostname )
 {
 	char 	uri[2048];
 	sprintf(uri,"/services/hostedservices/%s",hostname);
-	return (azure_retrieve_operation(uri));
+	return (azure_retrieve_operation(subptr,uri));
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ u p d a t e _ h o s t e d _ s e r v i c e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_update_hosted_service( char * hostname, char * filename )
+public	struct	az_response *	az_update_hosted_service(struct az_subscription * subptr, char * hostname, char * filename )
 {
 	char 	uri[2048];
 	sprintf(uri,"/services/hostedservices/%s",hostname);
-	return (azure_update_operation(uri,filename));
+	return (azure_update_operation(subptr,uri,filename));
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ d e l e t e _ h o s t e d _ s e r v i c e 	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_hosted_service( char * hostname )
+public	struct	az_response *	az_delete_hosted_service(struct az_subscription * subptr, char * hostname )
 {
 	char 	uri[2048];
 	sprintf(uri,"/services/hostedservices/%s",hostname);
-	return (azure_delete_operation(uri));
+	return (azure_delete_operation(subptr,uri));
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ h o s t e d _ s e r v i c e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_hosted_services()
+public	struct	az_response *	az_list_hosted_services(struct az_subscription * subptr)
 {
-	return( azure_list_operation( "/services/hostedservices" ) );
+	return( azure_list_operation( subptr,"/services/hostedservices" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ c r e a t e _ c e r t i f i c a t e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_certificate( char * filename )
+public	struct	az_response *	az_create_certificate(struct az_subscription * subptr, char * filename )
 {
 	return((struct az_response *) 0);
 }
@@ -2612,79 +2612,79 @@ public	struct	az_response *	az_create_certificate( char * filename )
 /*	------------------------------------------------------------	*/
 /*	   a z _ r e t r i e v e _ c e r t i f i c a t e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_retrieve_certificate( char * filename )
+public	struct	az_response *	az_retrieve_certificate(struct az_subscription * subptr, char * filename )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostedservice, filename ); 
-	return( azure_retrieve_operation( buffer ) );
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , subptr->Az.hostedservice, filename ); 
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	     a z _ d e l e t e _ c e r t i f i c a t e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_certificate( char * filename )
+public	struct	az_response *	az_delete_certificate(struct az_subscription * subptr, char * filename )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , Waz.hostedservice,filename ); 
-	return( azure_delete_operation( buffer ) );
+	sprintf(buffer,"/services/hostedservices/%s/certificates/%s" , subptr->Az.hostedservice,filename ); 
+	return( azure_delete_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ l i s t _ c e r t i f i c a t e s		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_certificates()
+public	struct	az_response *	az_list_certificates(struct az_subscription * subptr)
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/certificates" , Waz.hostedservice ); 
-	return( azure_list_operation( buffer ) );
+	sprintf(buffer,"/services/hostedservices/%s/certificates" , subptr->Az.hostedservice ); 
+	return( azure_list_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ l o c a t i o n s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_locations()
+public	struct	az_response *	az_list_locations(struct az_subscription * subptr )
 {
-	return( azure_list_operation( "/locations" ) );
+	return( azure_list_operation( subptr,"/locations" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ r e t r i e v e _ l o c a t i o n s 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_retrieve_location(char * nptr)
+public	struct	az_response *	az_retrieve_location(struct az_subscription * subptr,char * nptr)
 {
 	char	buffer[2048];
 	sprintf(buffer,"/locations/%s",nptr);
-	return( azure_list_operation( nptr ) );
+	return( azure_list_operation( subptr,nptr ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ s e r v e r s			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_servers	( )
+public	struct	az_response *	az_list_servers	(struct az_subscription * subptr )
 {
-	return( azure_list_operation( "/services/hostedservices" ) );
+	return( azure_list_operation( subptr,"/services/hostedservices" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ f l a v o u r s			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_flavors( )
+public	struct	az_response *	az_list_flavors(struct az_subscription * subptr )
 {
-	return( azure_list_operation( "/flavors" )) ;
+	return( azure_list_operation( subptr,"/flavors" )) ;
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ i m a g e s 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_images( )
+public	struct	az_response *	az_list_images(struct az_subscription * subptr )
 {
-	return( azure_list_operation( "/images" ) );
+	return( azure_list_operation( subptr,"/images" ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a te _  i m a g e _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * az_create_image_request(char * identity, char * server )
+public	char * az_create_image_request(struct az_subscription * subptr,char * identity, char * server )
 {
 	char *	filename;
 	FILE *	h;
@@ -2696,7 +2696,7 @@ public	char * az_create_image_request(char * identity, char * server )
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateImage xmlns=%c%s%c\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateImage xmlns=%c%s%c\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\tName=%c%s%c\n",0x0022,identity,0x0022);
 		fprintf(h,"\tDeployment=%c%s%c />\n",0x0022,server,0x0022);
 		fclose(h);
@@ -2707,7 +2707,7 @@ public	char * az_create_image_request(char * identity, char * server )
 /*	------------------------------------------------------------	*/
 /*			a z _ c r e a t e _  i m a g e   		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_image( char * filename )
+public	struct	az_response *	az_create_image(struct az_subscription * subptr, char * filename )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
@@ -2715,9 +2715,9 @@ public	struct	az_response *	az_create_image( char * filename )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images");
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -2726,7 +2726,7 @@ public	struct	az_response *	az_create_image( char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_post_request( nptr, Waz.tls, Waz.agent, filename, hptr ) ))
+	else if (!( rptr = az_client_post_request( nptr, subptr->Az.tls, subptr->Az.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
@@ -2734,7 +2734,7 @@ public	struct	az_response *	az_create_image( char * filename )
 	else	return( rptr );
 }
 
-private	void	az_configuration_set( FILE * h, char * hostname, char * user, char * password, int option )
+private	void	az_configuration_set(struct az_subscription * subptr, FILE * h, char * hostname, char * user, char * password, int option )
 {
 	/* ------------------------------------- */
 	/* determine the VM type windows | linux */
@@ -2780,7 +2780,7 @@ private	void	az_configuration_set( FILE * h, char * hostname, char * user, char 
 /*	------------------------------------------------	*/
 /*		a z _ s t a r t _ v m _ r e q u e s t		*/
 /*	------------------------------------------------	*/
-public	char * az_start_vm_request()
+public	char * az_start_vm_request(struct az_subscription * subptr)
 {
 	FILE *	h=(FILE *) 0;
 	char *	filename=(char *) 0;
@@ -2811,7 +2811,7 @@ public	char * az_start_vm_request()
 /*	------------------------------------------------	*/
 /*	  a z _ s h u t d o w n _ v m _ r e q u e s t		*/
 /*	------------------------------------------------	*/
-public	char * az_shutdown_vm_request()
+public	char * az_shutdown_vm_request(struct az_subscription * subptr )
 {
 	FILE *	h=(FILE *) 0;
 	char *	filename=(char *) 0;
@@ -2843,7 +2843,7 @@ public	char * az_shutdown_vm_request()
 /*	------------------------------------------------	*/
 /*	   a z _ r e s t a r t _ v m _ r e q u e s t		*/
 /*	------------------------------------------------	*/
-public	char * az_restart_vm_request()
+public	char * az_restart_vm_request(struct az_subscription * subptr)
 {
 	FILE *	h=(FILE *) 0;
 	char *	filename=(char *) 0;
@@ -2877,7 +2877,7 @@ public	char * az_restart_vm_request()
 /*	      a z _ c a p t u r e _ v m _ r e q u e s t		*/
 /*	---------------------------------------------------	*/
 public	char * az_capture_vm_request(
-	/* 	struct os_subscription * subptr,	*/
+	struct az_subscription * subptr,
 	char *  hostname,
 	char *	ilabel,
 	char *	iname,
@@ -2908,7 +2908,7 @@ public	char * az_capture_vm_request(
 		if ( option & _AZURE_REPROVISION )
 		{
 			fprintf(h,"<ProvisioningConfiguration>\n");
-			az_configuration_set( h, hostname, Waz.user, Waz.password, option );
+			az_configuration_set( subptr, h, hostname, subptr->Az.user, subptr->Az.password, option );
 			fprintf(h,"</ProvisioningConfiguration>\n");
 		}
 		fprintf(h,"<TargetImageLabel>%s</TargetImageLabel>\n",ilabel);
@@ -2939,7 +2939,7 @@ public	char * az_capture_vm_request(
 /*									*/
 /*	------------------------------------------------------------	*/
 public	char * az_create_vm_request(
-	/* 	struct os_subscription * subptr,	*/
+	struct az_subscription * subptr,
 	char * deployment,	/* the identity of the server 	*/
 	char * role,		/* the contract ID of the server*/
 	char * image,		/* the server image identifier  */
@@ -3020,7 +3020,7 @@ public	char * az_create_vm_request(
 			fprintf(h,"\t\t<ConfigurationSets>\n");
 			fprintf(h,"\t\t<ConfigurationSet>\n");
 
-			az_configuration_set( h, role, Waz.user, Waz.password, option );
+			az_configuration_set( subptr,h, role, subptr->Az.user, subptr->Az.password, option );
 
 			fprintf(h,"\t\t</ConfigurationSet>\n");
 			if ( rest_valid_string( endpoints ) )
@@ -3086,58 +3086,58 @@ public	char * az_create_vm_request(
 /*	----------------------------------------	*/
 /*		a z _ c a p t u r e _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_operation_vm( char * filename, char * depname, char * rolename )
+public	struct	az_response *	az_operation_vm(  struct az_subscription * subptr,char * filename, char * depname, char * rolename )
 {
 	char	url[2048];
 	sprintf(url,"/services/hostedservices/%s/deployments/%s/roleInstances/%s/Operations",
-			Waz.hostedservice,depname,rolename);
-	return( azure_create_operation( url, filename ) );
+			subptr->Az.hostedservice,depname,rolename);
+	return( azure_create_operation( subptr,url, filename ) );
 }
 
 /*	----------------------------------------	*/
 /*		a z _ c r e a t e _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_create_vm( char * filename )
+public	struct	az_response *	az_create_vm( struct az_subscription * subptr, char * filename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments",Waz.hostedservice);
-	return( azure_create_operation( url, filename ) );
+	sprintf(url,"/services/hostedservices/%s/deployments",subptr->Az.hostedservice);
+	return( azure_create_operation( subptr,url, filename ) );
 }
 
 /*	----------------------------------------	*/
 /*		a z _ d e l e t e _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_delete_vm( char * depname, char * rolename )
+public	struct	az_response *	az_delete_vm( struct az_subscription * subptr, char * depname, char * rolename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostedservice,depname,rolename);
-	return( azure_delete_operation( url ) );
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",subptr->Az.hostedservice,depname,rolename);
+	return( azure_delete_operation( subptr,url ) );
 }
 
 /*	----------------------------------------	*/
 /*		a z _ g e t _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_get_vm( char * depname, char * rolename )
+public	struct	az_response *	az_get_vm( struct az_subscription * subptr, char * depname, char * rolename )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",Waz.hostedservice,depname,rolename);
-	return( azure_retrieve_operation( url ) );
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles/%s",subptr->Az.hostedservice,depname,rolename);
+	return( azure_retrieve_operation( subptr,url ) );
 }
 
 /*	----------------------------------------	*/
 /*		a z _ l i s t _ vm 			*/
 /*	----------------------------------------	*/
-public	struct	az_response *	az_list_vm( char * depname )
+public	struct	az_response *	az_list_vm( struct az_subscription * subptr, char * depname )
 {
 	char	url[2048];
-	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles",Waz.hostedservice,depname);
-	return( azure_list_operation( url ) );
+	sprintf(url,"/services/hostedservices/%s/deployments/%s/roles",subptr->Az.hostedservice,depname);
+	return( azure_list_operation( subptr,url ) );
 }
 
 /*	-------------------------------------------------	*/
 /*	a z _ n e t w o r k _ c o n f i g _ r e q u e s t	*/
 /*	-------------------------------------------------	*/
-public	char *	az_delete_network_config_request()
+public	char *	az_delete_network_config_request( struct az_subscription * subptr)
 {
 	FILE * h;
 	char *	filename;
@@ -3174,7 +3174,7 @@ public	char *	az_delete_network_config_request()
 /*	-------------------------------------------------	*/
 /*	a z _ n e t w o r k _ c o n f i g _ r e q u e s t 	*/
 /*	-------------------------------------------------	*/
-public	char *	az_create_network_config_request(char * name, char * group, char * address, char * label )
+public	char *	az_create_network_config_request( struct az_subscription * subptr,char * name, char * group, char * address, char * label )
 {
 	FILE * h;
 	char *	filename;
@@ -3218,47 +3218,47 @@ public	char *	az_create_network_config_request(char * name, char * group, char *
 /*	-----------------------------------------	*/
 /*	a z _ g e t _ n e t w o r k _ c o n f i g	*/
 /*	-----------------------------------------	*/
-public	struct	az_response * az_get_network_config()
+public	struct	az_response * az_get_network_config( struct az_subscription * subptr)
 {
 	char	url[2048];
 	sprintf(url,"/services/networking/media");
-	return( azure_retrieve_operation( url ) );
+	return( azure_retrieve_operation( subptr, url ) );
 }
 
 /*	-----------------------------------------------	*/
 /*	a z _ u p d a t e _ n e t w o r k _ c o n f i g	*/
 /*	-----------------------------------------------	*/
-public	struct	az_response * az_update_network_config(char * filename)
+public	struct	az_response * az_update_network_config( struct az_subscription * subptr,char * filename)
 {
 	char	url[2048];
 	sprintf(url,"/services/networking/media");
-	return( network_update_operation( url, filename ) );
+	return( network_update_operation( subptr,url, filename ) );
 }
 
 /*	-----------------------------------------------	*/
 /*	a z _ d e l e t e _ n e t w o r k _ c o n f i g	*/
 /*	-----------------------------------------------	*/
-public	struct	az_response * az_delete_network_config(char * filename)
+public	struct	az_response * az_delete_network_config( struct az_subscription * subptr,char * filename)
 {
 	char	url[2048];
 	sprintf(url,"/services/networking/media");
-	return( network_update_operation( url, filename ) );
+	return( network_update_operation( subptr,url, filename ) );
 }
 
 /*	----------------------------------------	*/
 /*	     a z _ l i s t _ n e t w o r k 		*/
 /*	----------------------------------------	*/
-public	struct	az_response * az_list_network()
+public	struct	az_response * az_list_network( struct az_subscription * subptr)
 {
 	char	url[2048];
 	sprintf(url,"/services/networking/virtualnetwork");
-	return( azure_list_operation( url ) );
+	return( azure_list_operation( subptr,url ) );
 }
 
 /*	-----------------------------------------------------------------	*/
 /*	 a z _ c r e a t e _ h o s t e d _ s e r v i c e _ r e q u e s t 	*/ 
 /*	-----------------------------------------------------------------	*/
-public	char * az_create_hosted_service_request(
+public	char * az_create_hosted_service_request( struct az_subscription * subptr,
 	char * name,
 	char * label,
 	char * description,
@@ -3279,7 +3279,7 @@ public	char * az_create_hosted_service_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateHostedService xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<ServiceName>%s</ServiceName>\n",name);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		fprintf(h,"\t<Description>%s</Description>\n",description);
@@ -3296,7 +3296,7 @@ public	char * az_create_hosted_service_request(
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char * az_create_os_request(char * name, char * label, char * media, char * os)
+public	char * az_create_os_request( struct az_subscription * subptr,char * name, char * label, char * media, char * os)
 {
 	char *	filename;
 	FILE *	h;
@@ -3312,7 +3312,7 @@ public	char * az_create_os_request(char * name, char * label, char * media, char
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<OSImage xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<OSImage xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<Label>%s</Label>\n",buffer);
 		fprintf(h,"\t<MediaLink>%s</MediaLink>\n",media);
 		fprintf(h,"\t<Name>%s</Name>\n",name);
@@ -3326,53 +3326,53 @@ public	char * az_create_os_request(char * name, char * label, char * media, char
 /*	------------------------------------------------------------	*/
 /*			a z _ c r e a t e _ o s _ i m a g e 		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_create_os_image(char * filename )
+public	struct	az_response * az_create_os_image( struct az_subscription * subptr,char * filename )
 {
-	return( azure_create_operation("/services/images",filename) ); 
+	return( azure_create_operation(subptr,"/services/images",filename) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ i m a g e s               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_list_os_images()
+public	struct	az_response * az_list_os_images( struct az_subscription * subptr)
 {
-	return( azure_list_operation("/services/images") ); 
+	return( azure_list_operation(subptr,"/services/images") ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ i m a g e s               */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_get_os_image(char * name)
+public	struct	az_response * az_get_os_image( struct az_subscription * subptr,char * name)
 {
 	char	url[2048];
 	sprintf(url,"/services/images/%s",name);
-	return( azure_retrieve_operation(url) ); 
+	return( azure_retrieve_operation(subptr,url) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*		    a z _ d e l e t e _ o s _ i m a g e s		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_delete_os_image(char * name)
+public	struct	az_response * az_delete_os_image( struct az_subscription * subptr,char * name)
 {
 	char	url[2048];
 	sprintf(url,"/services/images/%s",name);
-	return( azure_delete_operation(url) ); 
+	return( azure_delete_operation(subptr,url) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ c o n t a i n e r s             */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_list_containers(char * storage)
+public	struct	az_response * az_list_containers( struct az_subscription * subptr,char * storage)
 {
 	char	url[2048];
 	sprintf(url,"http://%s.blob.core.windows.net/?comp=list",storage);
-	return( azure_retrieve_operation(url) ); 
+	return( azure_retrieve_operation(subptr,url) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ a d d _ o s _ d i s k _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
-public	char *	az_add_os_disk_request( char * name, char * description, char * media, int option )
+public	char *	az_add_os_disk_request( struct az_subscription * subptr, char * name, char * description, char * media, int option )
 {
 	char *	filename;
 	FILE *	h;
@@ -3384,7 +3384,7 @@ public	char *	az_add_os_disk_request( char * name, char * description, char * me
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<Disk xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<Disk xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<HasOperatingSysteml>true</HasOperatingSystem>\n");
 		fprintf(h,"\t<Label>%s</Label>\n",description);
 		fprintf(h,"\t<MediaLink>%s</MediaLink>\n",media);
@@ -3399,122 +3399,122 @@ public	char *	az_add_os_disk_request( char * name, char * description, char * me
 /*	------------------------------------------------------------	*/
 /*			a z _ a d d _ o s _ d i s k 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_add_os_disk( char * filename )
+public	struct	az_response * az_add_os_disk( struct az_subscription * subptr, char * filename )
 {
-	return( azure_create_operation("/services/disks",  filename ) ); 
+	return( azure_create_operation(subptr,"/services/disks",  filename ) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ o s _ d i s k		*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_delete_os_disk(char * disk)
+public	struct	az_response * az_delete_os_disk( struct az_subscription * subptr,char * disk)
 {
 	char	url[2048];
 	sprintf(url,"/services/disks/%s",disk);
-	return( azure_delete_operation(url) ); 
+	return( azure_delete_operation(subptr,url) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ o s _ d i s k s			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_list_os_disks()
+public	struct	az_response * az_list_os_disks( struct az_subscription * subptr)
 {
-	return( azure_retrieve_operation("/services/disks") ); 
+	return( azure_retrieve_operation(subptr,"/services/disks") ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ o s _ d i s k	                */
 /*	------------------------------------------------------------	*/
-public	struct	az_response * az_get_os_disk(char * name)
+public	struct	az_response * az_get_os_disk( struct az_subscription * subptr,char * name)
 {
 	char	url[2048];
 	sprintf(url,"/services/disks/%s",name);
-	return( azure_retrieve_operation(url) ); 
+	return( azure_retrieve_operation(subptr,url) ); 
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ s u b s c r i p t i o n	        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_subscription()
+public	struct	az_response *	az_get_subscription( struct az_subscription * subptr)
 {
 
-	return( azure_list_operation( "" ));
+	return( azure_list_operation( subptr,"" ));
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ d e p l o y m e n t             */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_deployment_slots(char * server)
+public	struct	az_response *	az_list_deployment_slots( struct az_subscription * subptr,char * server)
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deploymentslots" , server ); 
-	return( azure_list_operation( buffer ) );
+	return( azure_list_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ l i s t _ d e p l o y m e n t             */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_list_deployments(char * server)
+public	struct	az_response *	az_list_deployments( struct az_subscription * subptr,char * server)
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deployments" , server ); 
-	return( azure_list_operation( buffer ) );
+	return( azure_list_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ c r e a t e _ d e p l o y m e n t		        */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_create_deployment( char * filename, char * server, char * slot )
+public	struct	az_response *	az_create_deployment( struct az_subscription * subptr, char * filename, char * server, char * slot )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
-	return( azure_create_operation( buffer, filename ) );
+	return( azure_create_operation( subptr,buffer, filename ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		a z _ g e t _ d e p l o y m e n t _ s l o t      	*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_deployment_slot( char * deployment, char * slot )
+public	struct	az_response *	az_get_deployment_slot( struct az_subscription * subptr, char * deployment, char * slot )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , Waz.hostedservice, deployment, slot ); 
-	return( azure_retrieve_operation( buffer ) );
+	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , subptr->Az.hostedservice, deployment, slot ); 
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*				a z _ g e t _ d e p l o y m e n t       */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_deployment( char * service, char * deployment )
+public	struct	az_response *	az_get_deployment( struct az_subscription * subptr, char * service, char * deployment )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , service, deployment ); 
-	return( azure_retrieve_operation( buffer ) );
+	return( azure_retrieve_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ d e p l o y m e n t         */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_deployment_slots( char * server, char * slot )
+public	struct	az_response *	az_delete_deployment_slots( struct az_subscription * subptr, char * server, char * slot )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deploymentslots/%s" , server, slot ); 
-	return( azure_delete_operation( buffer ) );
+	return( azure_delete_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ d e p l o y m e n t         */
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_deployment( char * server, char *deployment )
+public	struct	az_response *	az_delete_deployment( struct az_subscription * subptr, char * server, char *deployment )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/services/hostedservices/%s/deployments/%s" , server, deployment );
-	return( azure_delete_operation( buffer ) );
+	return( azure_delete_operation( subptr,buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*	  a z _ c r e a t e _ d e p l o y m e n t _ r e q u e s t       */
 /*	------------------------------------------------------------	*/
-public	char * az_create_deployment_request(
+public	char * az_create_deployment_request( struct az_subscription * subptr,
 	char * name, char * label, char * image, char * configuration )
 {
 	char *	filename;
@@ -3528,7 +3528,7 @@ public	char * az_create_deployment_request(
 	else
 	{
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
-		fprintf(h,"<CreateDeployment xmlns=%c%s%c>\n",0x0022,Waz.namespace,0x0022);
+		fprintf(h,"<CreateDeployment xmlns=%c%s%c>\n",0x0022,subptr->Az.namespace,0x0022);
 		fprintf(h,"\t<Name>%s</Name>\n",name);
 		fprintf(h,"\t<PackageUrl>%s</PackageUrl>\n",image);
 		n = EncodeBase64( buffer, label,strlen(label));
@@ -3546,7 +3546,7 @@ public	char * az_create_deployment_request(
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ f l av o u r			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_flavor(  char * id )
+public	struct	az_response *	az_get_flavor(  struct az_subscription * subptr, char * id )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
@@ -3554,9 +3554,9 @@ public	struct	az_response *	az_get_flavor(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/flavors/%s",id);
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -3565,7 +3565,7 @@ public	struct	az_response *	az_get_flavor(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_get_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -3577,7 +3577,7 @@ public	struct	az_response *	az_get_flavor(  char * id )
 /*	------------------------------------------------------------	*/
 /*			a z _ g e t _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_get_image 	(  char * id )
+public	struct	az_response *	az_get_image 	( struct az_subscription * subptr,  char * id )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
@@ -3585,9 +3585,9 @@ public	struct	az_response *	az_get_image 	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -3596,7 +3596,7 @@ public	struct	az_response *	az_get_image 	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_get_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -3609,7 +3609,7 @@ public	struct	az_response *	az_get_image 	(  char * id )
 /*	------------------------------------------------------------	*/
 /*			a z _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
-public	struct	az_response *	az_delete_image	(  char * id )
+public	struct	az_response *	az_delete_image	( struct az_subscription * subptr,  char * id )
 {
 	struct	az_response	*	rptr=(struct az_response *) 0;
 	struct	url		*	uptr;
@@ -3617,9 +3617,9 @@ public	struct	az_response *	az_delete_image	(  char * id )
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/images/%s",id);
-	if (!( hptr = az_authenticate("text/xml","application/xml") ))
+	if (!( hptr = az_authenticate(subptr,"text/xml","application/xml") ))
 		return( rptr );
-	else if (!( uptr = analyse_url( Waz.base )))
+	else if (!( uptr = analyse_url( subptr->Az.base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -3628,7 +3628,7 @@ public	struct	az_response *	az_delete_image	(  char * id )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = az_client_get_request( nptr, Waz.tls, Waz.agent, hptr ) ))
+	else if (!( rptr = az_client_get_request( nptr, subptr->Az.tls, subptr->Az.agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -3640,12 +3640,13 @@ public	struct	az_response *	az_delete_image	(  char * id )
 /*	------------------------------------------------------------	*/
 /*		a z _ i n i t i a l i s e _ s e r v i c e		*/
 /*	------------------------------------------------------------	*/
-public	int	az_initialise_service( char * servicename )
+public	int az_initialise_service( struct az_subscription * subptr, char * servicename )
 {
-	struct	az_response * azptr;
-	int	status;
-	if ( Waz.hostedservice ) Waz.hostedservice = liberate( Waz.hostedservice );
-	if (!( Waz.hostedservice = allocate_string( servicename ) ))
+	if (!( subptr ))
+		return( 118 );
+	if ( subptr->Az.hostedservice ) 
+		subptr->Az.hostedservice = liberate( subptr->Az.hostedservice );
+	if (!( subptr->Az.hostedservice = allocate_string( servicename ) ))
 		return( 27 );
 	else	return( 0  );
 }
@@ -3654,34 +3655,36 @@ public	int	az_initialise_service( char * servicename )
 /*	------------------------------------------------------------	*/
 /*		a z _ i n i t i a l i s e _ c l i e n t 	        */
 /*	------------------------------------------------------------	*/
-public	int	az_initialise_client( 
-		char * user, char * password, 
-		char * host, char * agent, 
-		char * version, char * tls,
-		char * ns, char * subscription )
+public	struct az_subscription * az_initialise_client( char * user, char * password, char * host, char * agent, char * version, char * tls,char * ns, char * subscription )
 {
-	if (!( Waz.user = allocate_string( user )))
-		return( 27 );
-	if (!( Waz.password = allocate_string( password )))
-		return( 27 );
-	if (!( Waz.host = allocate_string( host )))
-		return( 27 );
-	else if (!( Waz.agent = allocate_string( agent )))
-		return( 27 );
-	else if (!( Waz.version = allocate_string( version )))
-		return( 27 );
-	else if (!( Waz.namespace = allocate_string( ns ) ))
-		return( 27 );
-	else if (!( Waz.subscription = allocate_string( subscription ) ))
-		return( 27 );
+	struct	az_subscription * subptr;
 
-	else if (!( Waz.base = allocate( strlen( Waz.host ) + strlen( Waz.subscription ) + 16 ) ))
-		return( 27 );
-	else	sprintf(Waz.base,"%s%s",Waz.host,Waz.subscription);
+	if (!( subptr = allocate( sizeof( struct az_subscription ) )))
+		return( subptr );
+	else	memset( subptr, 0, sizeof( struct az_subscription ) );
 
-	Waz.authenticate= (char *) 0;
-	Waz.tls = tls;
-	return( 0 );
+	if (!( subptr->Az.user = allocate_string( user )))
+		return( liberate( subptr ) );
+	if (!( subptr->Az.password = allocate_string( password )))
+		return( liberate( subptr ) );
+	if (!( subptr->Az.host = allocate_string( host )))
+		return( liberate( subptr ) );
+	else if (!( subptr->Az.agent = allocate_string( agent )))
+		return( liberate( subptr ) );
+	else if (!( subptr->Az.version = allocate_string( version )))
+		return( liberate( subptr ) );
+	else if (!( subptr->Az.namespace = allocate_string( ns ) ))
+		return( liberate( subptr ) );
+	else if (!( subptr->Az.subscription = allocate_string( subscription ) ))
+		return( liberate( subptr ) );
+
+	else if (!( subptr->Az.base = allocate( strlen( subptr->Az.host ) + strlen( subptr->Az.subscription ) + 16 ) ))
+		return( liberate( subptr ) );
+	else	sprintf(subptr->Az.base,"%s%s",subptr->Az.host,subptr->Az.subscription);
+
+	subptr->Az.authenticate= (char *) 0;
+	subptr->Az.tls = tls;
+	return( subptr );
 }
 
 #endif	/* _az_client_c */
