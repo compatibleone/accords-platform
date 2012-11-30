@@ -26,10 +26,9 @@ static PyObject *pycompmanager_generateCategory(PyObject *self, PyObject *args)
  char * categoryName;
  char * categoryActions;
  char * categoryAccess;
- int flag;
 
- if (! PyArg_ParseTuple( args,"ssssi",&categoryName, &categoryAttributes,&categoryActions, &categoryAccess, &flag)) return NULL;
- dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,categoryAccess,flag);
+ if (! PyArg_ParseTuple( args,"ssss",&categoryName, &categoryAttributes,&categoryActions, &categoryAccess)) return NULL;
+ dim=generateAccordsCategory(categoryName,categoryAttributes,categoryActions,categoryAccess);
  if(dim <= 0) 
  {
    printf("Failure to create %s OCCI category\n",categoryName);
@@ -50,8 +49,8 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   int a;
   int indice;
   int flag;
-  if (! PyArg_ParseTuple( args,"sii",&categoryName,&indice,&flag)) return NULL;
-  a=deleteCategory(categoryName,indice,flag);
+  if (! PyArg_ParseTuple( args,"s",&categoryName)) return NULL;
+  a=deleteCategory(categoryName);
   if(a)
   {
    printf("%s OCCI category is removed\n",categoryName);

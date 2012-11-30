@@ -17,7 +17,7 @@
 /*-------------------------------------------------------------------------------*/
 
 #include "compmanager.h"
-
+#include "../../pyaccords/pysrc/categactionnumber.h"
 
 /*--------------------------------------------------------------------------------*/
 /*               Function to commit accords platform                              */
@@ -59,13 +59,30 @@ int deleteModule(char moduleName[])
  return 1;
 }
 
+/*---------------------------------------------------------------------------------------------*/
+/*      Function to get category action number for the category specified in name variable     */
+/*---------------------------------------------------------------------------------------------*/
+int callocciCategoryActionNumber(const char *name)
+{
+  int i;
+   for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   {
+     if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
+     {
+       return occiCategoryActionNumber_map[i].func();
+     }
+  }
+
+  return 0;
+}
+
 /*-----------------------------------------------------------------------------------*/
 /* Function to delete a category from accords platform                               */
 /* pathf: char * path of the directory project                                       */
 /* categoryName: char * the name of the category                                     */
 /* return 1 if succeeded                                                             */
 /*-----------------------------------------------------------------------------------*/
-int deleteCategory(char categoryName[],int indice,int flag)
+int deleteCategory(char categoryName[])
 {
  char cordsh[DIM];
  char cordshname[DIM];
@@ -102,7 +119,8 @@ int deleteCategory(char categoryName[],int indice,int flag)
  char pathactbstruct[DIM];
  char pathf[DIM];
  char pathaccess[DIM];
-
+ int flag = 1;
+ int indice = 0;
 
  strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
@@ -192,7 +210,9 @@ int deleteCategory(char categoryName[],int indice,int flag)
   return 0;
  }
  
- if(indice)
+  indice = callocciCategoryActionNumber(categoryName);
+ 
+ if(indice != 0)
  {
   if( remove( pathactc) != 0 )
   {
@@ -258,8 +278,7 @@ int generateAccordsCategory(
 	char *categoryName,
 	char *categoryAttributes, 
 	char *categoryActions,
-	char * categoryAccess, 
-	int flag)
+	char * categoryAccess)
 {
  FILE *f;
  char *token=NULL;
@@ -277,6 +296,7 @@ int generateAccordsCategory(
  int indice = 0;
  int indiceA = 0;
  char pathf[1024];
+ int flag = 1;
   
  strcpy(pathf,PYPATH);
  sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
