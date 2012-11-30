@@ -689,7 +689,7 @@ private	int	on_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ compute | storage | network | server ] ");
+	printf("\n   LIST [ compute | servers | storage | images | network ] ");
 	printf("\n");
 	printf("\n   REST Methods");
 	printf("\n");
@@ -708,6 +708,17 @@ private	int	on_banner()
 	printf("\n   [ RENAME     storage {id} {newname} ");
 	printf("\n   [ POST       network {name} {[address | NONE]} {size} [PUBLIC | PRIVATE] ");
 	printf("\n   [ PUT      [ compute | storage | network | server ] {id} {filename} ");
+	printf("\n ");
+	printf("\n   Options");
+	printf("\n     --user <username>     set account user name ");
+	printf("\n     --password <value>    set account password  ");
+	printf("\n     --host <hostname>     set host name         ");
+	printf("\n     --version <value>     set host version      ");
+	printf("\n     --agent   <name>      set test agent name   ");
+	printf("\n     --tls <config>        set tls config        ");
+	printf("\n     --verbose             activate verbose messages ");
+	printf("\n     --debug               activate debug messages ");
+
 	printf("\n\n");
 	return( 0 );
 }
