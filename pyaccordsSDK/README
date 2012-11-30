@@ -33,6 +33,15 @@ Install pycompmanager
        
 Generate an OCCI category
 -------------------------
+      
+# python
+      
+>>>import pycompmanager
+      
+>>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2","_OCCI_PROVIDER")
+      
+>>>pycompmanager.commit()
+      
 The 4th argument Takes one of the foolowing value
 	- "" nothing to specify
 	- "_OCCI_PRIORITY"  the service is to be offered first   
@@ -45,26 +54,12 @@ The 4th argument Takes one of the foolowing value
 	- "_OCCI_CONSUMER"  publish monitoring consumer         
 	- "_OCCI_PROVIDER"  publish resources provider           
 	- "_OCCI_CONTRACT"  publish resources under contract 
-
-the 5th argument is the provisionning flag indicating if the category is a category related to a cloud provider (1) or to Accords platform (0)
-      
-# python
-      
->>>import pycompmanager
-      
->>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2","_OCCI_PROVIDER",0)
-      
->>>pycompmanager.commit()
-      
-      
+     
       
 Remove an existing OCCI category 
 ---------------------------------
-(where '1' indicates that the category contains at least one action)
-
-the 3rd argument is the provisionning flag       
       
->>>pycompmanager.removeCategory("myCategory", 1, 0)
+>>>pycompmanager.removeCategory("myCategory")
       
 
       
