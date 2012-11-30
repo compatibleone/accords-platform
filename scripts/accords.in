@@ -19,13 +19,6 @@
 
 export PATH=@sitepath@:@bindir@:$PATH
 
-confdir=@pkgsysconfdir@
-if test -e ./accords.ini; then
-    . ./accords.ini
-elif test -e $confdir/accords.ini; then
-    . $confdir/accords.ini
-fi
-
 # -------------------------------------
 # to activate the security using nethsm
 # set nethsm to 1
@@ -45,7 +38,6 @@ nagios=
 # runcops=
 # -------------------------------------
 resthost=127.0.0.1
-secdir=$tls
 zone="europe"
 trace=1
 threads=1
@@ -54,6 +46,14 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
+
+confdir=@pkgsysconfdir@
+if test -e ./accords.ini; then
+    . ./accords.ini
+elif test -e $confdir/accords.ini; then
+    . $confdir/accords.ini
+fi
+secdir=$tls
 
 if [ `basename $0` != "co-status" -a `basename $0` != "co-stop" ]; then
 

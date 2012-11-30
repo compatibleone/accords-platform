@@ -131,18 +131,17 @@ function verification()
 	check	windowsazure	azprocci
 
 	check	paas				paasprocci
-	check	paas_application		copass
-	check	paas_deployable			copass
-	check	paas_link			copass
-	check	paas_environment		copass
-	check	paas_manifest			copass
-	check	paas_node			copass
-	check	paas_version			copass
-	check	paas_relation			copass
-	check	paas_version_instance		copass
-	check	paas_configuration_option	copass
-	check	paas_configuration_template	copass
-
+        check   paas_application                        copaas
+        check   paas_application_deployable             copaas
+        check   paas_link                               copaas
+        check   paas_application_environment            copaas
+        check   paas_application_manifest               copaas
+        check   paas_node                               copaas
+        check   paas_application_version                copaas
+        check   paas_relation                           copaas
+        check   paas_application_version_instance       copaas
+        check   paas_configuration_option               copaas
+        check   paas_application_configuration_template copaas
 }
 
 if [ -z "$verbose" ]; then
