@@ -486,7 +486,7 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(subscription = use_windowsazure_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
-	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Hosted Service Failure" ) );
 	else if (!(filename = build_windowsazure_firewall( subscription, pptr )))
 		return( rest_html_response( aptr, 888, "WINDOWS AZURE Firewall Failure" ) );
@@ -649,7 +649,7 @@ private	struct	rest_response * save_windowsazure(
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if (!( subscription = use_windowsazure_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 
 	/* --------------------------------- */
@@ -762,7 +762,7 @@ private	struct	rest_response * snapshot_windowsazure(
 		return( rest_html_response( aptr, 400, "Contract Not Active" ) );
 	else if (!( subscription = use_windowsazure_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 
 	/* --------------------------------- */
@@ -813,7 +813,7 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 		return(0);
 	else if (!(subscription = use_windowsazure_configuration( pptr->profile )))
 		return(118);
-	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return(27);
 	else	sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 
@@ -902,7 +902,7 @@ private	struct	rest_response * restart_windowsazure(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if (!(subscription = use_windowsazure_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Not Found" ) );
-	else if ((status = az_initialise_service( pptr->hostedservice)) != 0)
+	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Service Failure Found" ) );
 	else if (!( filename = az_restart_vm_request(subscription) ))
 	 	return( rest_html_response( aptr, 400, "Bad Request" ) );		
