@@ -679,7 +679,7 @@ public	int	create_windowsazure_contract(
 	/* ----------------------------------------- */
 	/* resolve the user or operator subscription */
 	/* ----------------------------------------- */
-	if ((subscription = use_windowsazure_configuration( pptr->profile )) != 0)
+	if (!(subscription = use_windowsazure_configuration( pptr->profile )))
 		return( terminate_windowsazure_contract( status, &contract ) );
 
 	else if (!( cfptr = resolve_az_configuration( pptr->profile )))
@@ -849,6 +849,9 @@ public	int	delete_windowsazure_contract(
 
 	if ( pptr->hostedservice )
 	{
+		if ((subscription = use_windowsazure_configuration( pptr->profile )) != (struct az_subscription *) 0)
+		{
+
 		/* ------------------------- */
 		/* delete the hosted service */
 		/* ------------------------- */
@@ -883,6 +886,7 @@ public	int	delete_windowsazure_contract(
 					break;
 				}
 			}
+		}
 		}
 	}
 

@@ -447,8 +447,8 @@ private	int	az_command(int argc, char * argv[] )
 
 private	int	az_banner()
 {
-	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0a.0.04");
-	printf("\n   Beta Version 03/08/2012");
+	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0b.0.01");
+	printf("\n   Beta Version 30/11/2012");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   General Options ");
