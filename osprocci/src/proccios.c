@@ -1225,7 +1225,7 @@ private	struct	rest_response * start_openstack(
 		/* ---------------------------- */
 		if ( use_cosacs_agent( pptr->agent ) )
 		{
-			if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+			if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 			{
 				cosacs_metadata_instructions( 
 					pptr->hostname, _CORDS_CONFIGURATION,
@@ -1525,9 +1525,12 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 
 		if ( use_cosacs_agent( pptr->agent ) )
 		{
-			cosacs_metadata_instructions( 
-				pptr->hostname, _CORDS_RELEASE,
-				reference, OsProcci.publisher, pptr->account );
+			if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
+			{
+				cosacs_metadata_instructions( 
+					pptr->hostname, _CORDS_RELEASE,
+					reference, OsProcci.publisher, pptr->account );
+			}
 		}
 
 		/* ------------------------------------------ */

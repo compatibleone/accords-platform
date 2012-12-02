@@ -18,8 +18,11 @@
 #ifndef	_cosacsctrl_h
 #define	_cosacsctrl_h
 
-#define	_COSACS_TIMEOUT	15
-#define	_COSACS_RETRY   60
+#define	_COSACS_START_TIMEOUT	15
+#define	_COSACS_START_RETRY   60
+
+#define	_COSACS_STOP_TIMEOUT	15
+#define	_COSACS_STOP_RETRY   2
 
 public	void	cosacs_release_interface( char * host );
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value );

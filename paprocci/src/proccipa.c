@@ -318,33 +318,13 @@ private	struct pa_response *	stop_proactive_provisioning2( struct proactive * pp
 		return((struct pa_response *) 0);
 	else
 	{
-		/* ------------------------------------------ */
-		/* launch the deletion of the server instance */
-		/* ------------------------------------------ */
-		//if ((osptr=pa_delete_server( pptr )) != (struct pa_response *) 0)
-		//{
-			/* ----------------------------- */
-			/* await server instance removal */
-			/* ----------------------------- */
-			//do
-			//{
-			//	if (!( osptr ))
-			//		break;
-			//	else if (!( osptr->response ))
-			//		break;
-			//	else if ( osptr->response->status > 299 )
-			//		break;
-			//	else
-			//	{
-			//		sleep(1);
-			//		osptr = liberate_pa_response( osptr );
-			//	}
-			//}
-			//while ((osptr=pa_get_server( pptr->number )) != (struct os_response *) 0);
-		//}
-		/* ------------------------------------------- */
-		/* ensure release of the allocated floating IP */
-		/* ------------------------------------------- */
+		/* ---------------------------- */
+		/* launch the COSACS operations */
+		/* ---------------------------- */
+		cosacs_metadata_instructions( 
+			pptr->hostname, _CORDS_RELEASE,
+			"reference", WpaProcci.publisher );
+
 		//remove_floating_address( pptr );
 		return( osptr );
 	}

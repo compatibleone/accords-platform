@@ -589,7 +589,7 @@ private	struct	rest_response * start_windowsazure(
 	/* ---------------------------- */
 	if ( use_cosacs_agent( pptr->agent ) )
 	{
-		if ( cosacs_test_interface( pptr->hostname, _COSACS_TIMEOUT, _COSACS_RETRY ) )
+		if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 		{
 			cosacs_metadata_instructions( 
 				pptr->hostname, _CORDS_CONFIGURATION,
@@ -822,9 +822,12 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* ------------------------------------------- */
 	if ( use_cosacs_agent( pptr->agent ) )
 	{
-		cosacs_metadata_instructions( 
-			pptr->hostname, _CORDS_RELEASE,
-			reference, WazProcci.publisher, pptr->account );
+		if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
+		{
+			cosacs_metadata_instructions( 
+				pptr->hostname, _CORDS_RELEASE,
+				reference, WazProcci.publisher, pptr->account );
+		}
 	}
 
 	/* --------------------------------- */
