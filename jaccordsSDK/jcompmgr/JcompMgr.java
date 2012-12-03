@@ -17,7 +17,7 @@
 
 public class JcompMgr{
 	public native int generateCategory(String categoryName, String categoryAttributes, String categoryActions, String categoryAccess); 
-	public native int removeCategory(String categoryName);
+	public native int removeCategory(String categoryName, int index);
 	public native int generateComponent(String moduleName, String Categories);
 	public native int removeComponent(String moduleName);
 }

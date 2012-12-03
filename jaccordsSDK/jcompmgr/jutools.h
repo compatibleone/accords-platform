@@ -48,7 +48,6 @@
 #define J_ACT_LIST "jaccords/jsrc/jlistaction.h"
 #define J_CLASS_SRC "jaccords/jsrc/jclass/"
 #define J_CATEGACCESS_STRUCT "jaccords/jsrc/jcategaccess.h"
-#define J_CATEGORY_ACT "jaccordsSDK/jcompmgr/jcategoryaction.h"
 
 int insertCategory(char pathf[], char categoryName[],int indice,int flag);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);

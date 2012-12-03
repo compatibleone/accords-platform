@@ -30,7 +30,7 @@ int generateJModuleFile(char * moduleName, char * categoryNameList);
 int generateJCategoryInterfceStructFile(char pathf[]);
 int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int flag, char pathf[]);
 int generateCategoryJSourcefile(char *categoryName, listc categoryAtr, char pathf[]);
-int deleteJCategory(char categoryName[]);
+int deleteJCategory(char categoryName[], int indice);
 int deleteJModule(char moduleName[]);
 int generateJCategoryActionStruct(char *categoryName, listc categoryAct, int n, char pathf[]);
 int generateCategoryActionJfile(char *categoryName, listc categoryAtr, listc categoryAct, char pathf[]);

@@ -18,10 +18,10 @@ JNIEXPORT jint JNICALL Java_JcompMgr_generateCategory
 /*
  * Class:     JcompMgr
  * Method:    removeCategory
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_JcompMgr_removeCategory
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jobject, jstring,jint);
 
 /*
  * Class:     JcompMgr

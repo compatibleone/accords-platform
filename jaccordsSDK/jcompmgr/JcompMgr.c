@@ -59,12 +59,14 @@ JNIEXPORT jint JNICALL Java_JcompMgr_generateCategory(
 JNIEXPORT jint JNICALL  Java_JcompMgr_removeCategory(
 	JNIEnv *env,
 	jobject thisobject,
-	jstring categoryN)
+	jstring categoryN,
+        jint index)
 {
 	int a;
 	char *categoryName = (char*)(*env)->GetStringUTFChars(env, categoryN, 0);
+        int indice = index;
 	
-	a=deleteJCategory(categoryName);
+	a=deleteJCategory(categoryName, indice);
 	if(a)
 	{
 		printf("%s OCCI category is removed\n",categoryName);
