@@ -70,9 +70,10 @@ Class examples
 
 
 # To remove a category use this class example
-	- where removeCategory(String catName) takes three parameters
+	- where removeCategory(String catName, int indice) takes two parameters
 	- catName: Category name
-			
+        - indice: 1 ->  the category contains actions
+                  0 ->  no actions for this category			
 		public class Testjcompmgr{
         		static{
                 		try{
@@ -84,7 +85,7 @@ Class examples
         		}
         		public static void main(String[] argv){
                 		JcompMgr gen = new JcompMgr();
-                 		gen.removeCategory("mycategory");
+                 		gen.removeCategory("mycategory", 1);
 			}
 		}
 

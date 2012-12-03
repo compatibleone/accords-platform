@@ -39,10 +39,8 @@ Generate an OCCI category
 >>>import pycompmanager
       
 >>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2","_OCCI_PROVIDER")
-      
->>>pycompmanager.commit()
-      
-The 4th argument Takes one of the foolowing value
+   
+    The 4th argument Takes one of the foolowing value
 	- "" nothing to specify
 	- "_OCCI_PRIORITY"  the service is to be offered first   
 	- "_OCCI_PRIVATE"   the service is not to be published   
@@ -54,12 +52,17 @@ The 4th argument Takes one of the foolowing value
 	- "_OCCI_CONSUMER"  publish monitoring consumer         
 	- "_OCCI_PROVIDER"  publish resources provider           
 	- "_OCCI_CONTRACT"  publish resources under contract 
+   
+>>>pycompmanager.commit()
+      
      
       
 Remove an existing OCCI category 
 ---------------------------------
       
->>>pycompmanager.removeCategory("myCategory")
+>>>pycompmanager.removeCategory("myCategory",1)
+   (where '1' indicates that the category contains at least one action)
+
       
 
       
@@ -69,7 +72,7 @@ Generate an ACCORDS component/OCCI Server
 >>>pycompmanager.generateComponent(“myComponent”, “myCategory”)
       
   
-Launching the component
+aunching the component
 -----------------------
 
       
