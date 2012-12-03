@@ -30,9 +30,9 @@ int commitPlatform()
  char pathf[1024];
  
  strcpy(pathf,PYPATH);
- sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
  sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
-
+ sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
+ 
  a= system(makeCommand);
  if(a!=0) return 0;
  b= system(pysetupCommand);
