@@ -65,7 +65,7 @@ int deleteModule(char moduleName[])
 int callocciCategoryAct(const char *name)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryAct_map) / sizeof(occiCategoryAct_map[0])); i++) 
+   for (i = 0; i <= (sizeof(occiCategoryAct_map) / sizeof(occiCategoryAct_map[0])); i++) 
    {
      if (!strcmp(occiCategoryAct_map[i].name, name)) 
      {

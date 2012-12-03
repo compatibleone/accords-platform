@@ -182,7 +182,7 @@ private	struct rest_extension * module_extension( void * v,struct rest_server * 
 int callocciCategoryAccess(const char *name)
 {
 	int i;
-	for (i=0; i< (sizeof(occiCategoryAccess_map)/ sizeof(occiCategoryAccess_map[0])); i++)
+	for (i=0; i<= (sizeof(occiCategoryAccess_map)/ sizeof(occiCategoryAccess_map[0])); i++)
 	{
 		if(!strcmp(occiCategoryAccess_map[i].name, name))
 		{
@@ -199,7 +199,7 @@ int callocciCategoryAccess(const char *name)
 struct rest_response * callocciCategoryAction(const char *name)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryAction_map) / sizeof(occiCategoryAction_map[0])); i++) 
+   for (i = 0; i <= (sizeof(occiCategoryAction_map) / sizeof(occiCategoryAction_map[0])); i++) 
    {
      if (!strcmp(occiCategoryAction_map[i].name, name)) 
      {
@@ -216,7 +216,7 @@ struct rest_response * callocciCategoryAction(const char *name)
 int callocciCategoryActionNumber(const char *name)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
+   for (i = 0; i <= (sizeof(occiCategoryActionNumber_map) / sizeof(occiCategoryActionNumber_map[0])); i++) 
    {
      if (!strcmp(occiCategoryActionNumber_map[i].name, name)) 
      {
@@ -232,7 +232,7 @@ int callocciCategoryActionNumber(const char *name)
 char * callocciCategoryActionName(const char *name, int a)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryActionName_map) / sizeof(occiCategoryActionName_map[0])); i++) 
+   for (i = 0; i <= (sizeof(occiCategoryActionName_map) / sizeof(occiCategoryActionName_map[0])); i++) 
    {
      if (!strcmp(occiCategoryActionName_map[i].name, name) && occiCategoryActionName_map[i].func) 
      {
@@ -248,7 +248,7 @@ char * callocciCategoryActionName(const char *name, int a)
 struct occi_category * callocciCategoryBuilder(const char *name, char *a,char *b)
 {
   int i;
-   for (i = 0; i < (sizeof(occiCategoryBuilder_map) / sizeof(occiCategoryBuilder_map[0])); i++) 
+   for (i = 0; i <= (sizeof(occiCategoryBuilder_map) / sizeof(occiCategoryBuilder_map[0])); i++) 
    {
      if (!strcmp(occiCategoryBuilder_map[i].name, name) && occiCategoryBuilder_map[i].func) 
      {
@@ -265,7 +265,7 @@ struct occi_category * callocciCategoryBuilder(const char *name, char *a,char *b
 struct occi_interface * callocciCategoryInterface(const char *name)
 {
   int i;
-  for (i=0; i<(sizeof(occiCategoryInterface_map)/ sizeof(occiCategoryInterface_map[0])); i++)
+  for (i=0; i<= (sizeof(occiCategoryInterface_map)/ sizeof(occiCategoryInterface_map[0])); i++)
   {
     if(!strcmp(occiCategoryInterface_map[i].name,name))
     {
