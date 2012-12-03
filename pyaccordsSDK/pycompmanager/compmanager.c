@@ -2279,7 +2279,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
       fprintf(f,"\t\t\treturn(optr);\n");
     }
     if(!flag)fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_cords_%s)))\n",categoryName);
-    else fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\","",delete_action_%s)))\n",categoryName);
+    else fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_%s)))\n",categoryName);
     fprintf(f,"\t\t\treturn (optr);\n");
     if(!flag) fprintf(f,"\t\tautoload_cords_%s_nodes();\n",categoryName);
     else fprintf(f,"\t\tautoload_%s_nodes();\n",categoryName);
