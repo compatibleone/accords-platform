@@ -17,7 +17,6 @@
 /*-------------------------------------------------------------------------------*/
 
 #include "compmanager.h"
-#include "categoryaction.h"
 
 /*--------------------------------------------------------------------------------*/
 /*               Function to commit accords platform                              */
@@ -59,30 +58,13 @@ int deleteModule(char moduleName[])
  return 1;
 }
 
-/*---------------------------------------------------------------------------------------------*/
-/*      Function to get category action number for the category specified in name variable     */
-/*---------------------------------------------------------------------------------------------*/
-int callocciCategoryAct(const char *name)
-{
-  int i;
-   for (i = 0; i <= (sizeof(occiCategoryAct_map) / sizeof(occiCategoryAct_map[0])); i++) 
-   {
-     if (!strcmp(occiCategoryAct_map[i].name, name)) 
-     {
-       return occiCategoryAct_map[i].a;
-     }
-  }
-
-  return 0;
-}
-
 /*-----------------------------------------------------------------------------------*/
 /* Function to delete a category from accords platform                               */
 /* pathf: char * path of the directory project                                       */
 /* categoryName: char * the name of the category                                     */
 /* return 1 if succeeded                                                             */
 /*-----------------------------------------------------------------------------------*/
-int deleteCategory(char categoryName[])
+int deleteCategory(char categoryName[], int indice)
 {
  char cordsh[DIM];
  char cordshname[DIM];
@@ -119,15 +101,12 @@ int deleteCategory(char categoryName[])
  char pathactbstruct[DIM];
  char pathf[DIM];
  char pathaccess[DIM];
- char pathcategoryact[DIM];
  int flag = 1;
- int indice = 0;
 
  strcpy(pathf,PYPATH);
  sprintf(pathactcname,"%sAction.c",categoryName);
  sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
 
- sprintf(pathcategoryact,"%s/%s",pathf,PY_CATEGORY_ACT);
 
  sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
 
@@ -211,9 +190,7 @@ int deleteCategory(char categoryName[])
  {
   printf( "Error in delete category( CLASS PY):No such category name\n" );
   return 0;
- }
- 
-  indice = callocciCategoryAct(categoryName);
+ } 
  
  if(indice != 0)
  {
@@ -241,8 +218,6 @@ int deleteCategory(char categoryName[])
      return 0;
   else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
      return 0;  
-  else if(!(deleteInFile(pathcategoryact,categoryName)))
-     return 0; 
  }
 
  if(!flag)
@@ -293,7 +268,6 @@ int generateAccordsCategory(
  char pathactname[DIM];
  char pathactnumber[DIM];
  char pathcategaccess[DIM];
- char pathcategoryact[DIM];
  listc categoryAtr;
  listc categoryAtrB;
  listc categoryAct;
@@ -378,7 +352,6 @@ int generateAccordsCategory(
      sprintf(pathact,"%s/%s",PYPATH,PY_ACT_STRUCT);
      sprintf(pathactname,"%s/%s",PYPATH,PY_ACT_NAME_STRUCT);
      sprintf(pathactnumber,"%s/%s",PYPATH,PY_ACT_NUMBER_STRUCT);
-     sprintf(pathcategoryact,"%s/%s",PYPATH,PY_CATEGORY_ACT);
 
      if(!(generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,flag,pathf)))
          return 0;
@@ -390,9 +363,6 @@ int generateAccordsCategory(
          return 0;
      else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
          return 0;
-     else if(!(generateCategoryActionStruct(categoryName,categoryAct,3,pathcategoryact)))
-         return 0;
-
   }
   
   if(indiceA)

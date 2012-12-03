@@ -49,8 +49,8 @@ static PyObject *pycompmanager_removeCategory(PyObject *self, PyObject *args)
   int a;
   int indice;
   int flag;
-  if (! PyArg_ParseTuple( args,"s",&categoryName)) return NULL;
-  a=deleteCategory(categoryName);
+  if (! PyArg_ParseTuple( args,"si",&categoryName,&indice)) return NULL;
+  a=deleteCategory(categoryName, indice);
   if(a)
   {
    printf("%s OCCI category is removed\n",categoryName);

@@ -12,7 +12,7 @@ int generateModuleFile(char * moduleName, char * categoryNameList);
 int generateCategoryInterfceStructFile(char pathf[]);
 int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int flag, char pathf[]);
 int generateCategoryPySourcefile(char *categoryName, listc categoryAtr, char pathf[]);
-int deleteCategory(char categoryName[]);
+int deleteCategory(char categoryName[],int indice);
 int deleteModule(char moduleName[]);
 int commitPlatform();
 int generateCategoryActionStruct(char *categoryName, listc categoryAct, int n, char pathf[]);

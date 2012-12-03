@@ -47,7 +47,6 @@
 #define PY_ACT_NUMBER_STRUCT "pyaccords/pysrc/categactionnumber.h"
 #define PY_ACT_LIST "pyaccords/pysrc/listaction.h"
 #define PY_CATEGACCESS_STRUCT "pyaccords/pysrc/categaccess.h"
-#define PY_CATEGORY_ACT "pyaccordsSDK/pycompmanager/categoryaction.h"
 
 int insertCategory(char pathf[], char categoryName[],int indice,int flag);
 void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
