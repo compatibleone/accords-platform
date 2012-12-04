@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
  
 module1 = Extension('pycompdev', 
                      sources = ['pycompdev.c','list.c','../../pyaccords/pysrc/ctools.c','../../pyaccords/pysrc/pytools.c'],
-                     depends = ['component.c','list.c'],
+                     depends = ['component.c','list.c','../../pyaccords/pysrc/listoccibuilder.h'],
                      include_dirs=['../../occi/src/','../../azprocci/src/','../../broker/src/','../../cocarrier/src/','../../cocci/src/',
                                    '../../coes/src/','../../command/src/','../../comons/src','../../conets/src/','../../coobas/src',
                                    '../../copabr/src','../../cords/src/','../../corest/src','../../coss/src/','../../coxml/src/',
