@@ -38,7 +38,7 @@ Generate an OCCI category
       
 >>>import pycompmanager
       
->>>pycompmanager.generateCategory (“myCategory”, “attrbute1 attribute2”, "action1 action2","_OCCI_PROVIDER")
+>>>pycompmanager.generateCategory ("myCategory", "attrbute1 attribute2", "action1 action2","_OCCI_PROVIDER")
    
     The 4th argument Takes one of the foolowing value
 	- "" nothing to specify
@@ -69,7 +69,7 @@ Remove an existing OCCI category
 Generate an ACCORDS component/OCCI Server 
 -----------------------------------------
             
->>>pycompmanager.generateComponent(“myComponent”, “myCategory”)
+>>>pycompmanager.generateComponent("myComponent", "myCategory")
       
   
 aunching the component
