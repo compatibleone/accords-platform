@@ -9,6 +9,8 @@
 
 bin_PROGRAMS = command
 
+EXTRA_DIST = cspi.c cspi.h
+
 command_SOURCES = command.c command.h
 
 command_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COCCI) \

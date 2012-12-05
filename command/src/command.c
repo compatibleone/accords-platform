@@ -58,6 +58,8 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+#include "cspi.c"
+
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
 /*	-----------------------------------------------------	*/
@@ -662,6 +664,29 @@ private	int	invoke_action( char * action, char * instance )
 	}
 }
 
+/*	---------------------------------------------------	*/
+/*	r u n _ c o r d s c r i p t _ i n t e r p r e t e r	*/
+/*	---------------------------------------------------	*/
+private	int	run_cordscript_interpreter( char * filename )
+{
+	int			status=0;
+	char 			* auth=(char *) 0;
+	struct occi_response 	* zptr;
+
+	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	cordscript_interpreter( filename );
+
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+
+	return( status );
+
+}
+
 /*	-----------------------------------	*/
 /*		o p e r a t i o n		*/
 /*	-----------------------------------	*/
@@ -685,6 +710,8 @@ private	int	operation( int argc, char * argv[] )
 			}
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[argi] ) );
+			else if (!( strcasecmp( command, "RUN" ) ))
+				return( run_cordscript_interpreter( aptr ) );
 			else if (!( strcasecmp( command, "ACCOUNT" ) ))
 				return( create_account( aptr ) );
 			else if (!( strcasecmp( command, "USER" ) ))
@@ -748,6 +775,7 @@ private	int	banner()
 	printf("\n         command <options> ACCOUNT     <name> ");
 	printf("\n         command <options> USER        <account> <name> <pass> <role> <email> <permission> ");
 	printf("\n         command <options> INVOKE      <action> <instance> ");
+	printf("\n         command <options> RUN         <script> ");
 	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");

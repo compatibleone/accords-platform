@@ -27,12 +27,12 @@ export PATH=@sitepath@:@bindir@:$PATH
 # -------------------------------------
 # nethsm=1
 # nagios=/usr/local/etc/accords/accords-nagios.cfg
-tls=security
+# tls=security
 runcops=1
 # -------------------------------------
 # with neither security nor monitoring 
 # -------------------------------------
-# tls=
+tls=
 nethsm=
 nagios=
 # runcops=
@@ -46,6 +46,7 @@ debug=0
 domain=occi
 operator=accords
 password=co-system
+detect_killall=
 
 confdir=@pkgsysconfdir@
 if test -e ./accords.ini; then
@@ -677,7 +678,10 @@ _usage() {
 _stop_service() {
     service=$1
     echo "Stopping service: $service"
-    if [ "$(uname -s)" = 'Linux' ] ; then
+    if [ -z "$detect_killall" ]; then
+	killall $service >/dev/null 2>&1 || true
+	killall lt-$service >/dev/null 2>&1 || true
+    elif [ "$(uname -s)" = 'Linux' ] ; then
 	killall -u $(whoami) -q $service || true
 	killall -u $(whoami) -q lt-$service || true
     elif [ "$(uname -s)" = 'Darwin' ] ; then
