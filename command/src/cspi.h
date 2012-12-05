@@ -11,6 +11,13 @@
 
 #define	_CORDSCRIPT_AGENT "cordscript/1.0a"
 
+#define	_CSP_EQ	1
+#define	_CSP_LS	2
+#define	_CSP_LE	3
+#define	_CSP_GR	4
+#define	_CSP_GE	5
+#define	_CSP_NE	6
+
 struct	cordscript_context;
 struct	cordscript_instruction;
 
@@ -51,6 +58,7 @@ private struct cordscript_value 	* allocate_cordscript_value(char * value, char 
 public struct cordscript_value 		* duplicate_cordscript_value( struct cordscript_value * vptr );
 public struct cordscript_instruction	* allocate_cordscript_instruction( struct cordscript_value * (*fptr)(struct cordscript_instruction * self) );
 public struct cordscript_context	* allocate_cordscript_context();
+private	struct	cordscript_instruction * compile_cordscript_instruction( struct cordscript_context * cptr );
 
 public struct cordscript_value 		* liberate_cordscript_value(struct cordscript_value * vptr);
 public struct cordscript_instruction	* liberate_cordscript_instruction(struct cordscript_instruction * iptr); 
