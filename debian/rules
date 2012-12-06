@@ -43,8 +43,8 @@ endif
 		--enable-paprocci=$(JAVA_HOME) \
 		--enable-pyaccords \
 		--enable-testsuite \
-		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib  \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS),--as-needed"
 
 build: build-stamp
 build-stamp: config.status
@@ -69,9 +69,9 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
-	sed -e 's@/usr/local/nagios/etc/nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/usr/bin/accords > `pwd`/debian/tmp/usr/bin/accords.tmp
+	sed -e 's@/usr/.*nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/usr/bin/accords > `pwd`/debian/tmp/usr/bin/accords.tmp
 	mv `pwd`/debian/tmp/usr/bin/accords.tmp `pwd`/debian/tmp/usr/bin/accords
-	sed -e 's@/usr/local/etc/accords/accords-nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/etc/accords/accords.ini > `pwd`/debian/tmp/etc/accords/accords.ini.tmp
+	sed -e 's@/usr/.*/accords-nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/etc/accords/accords.ini > `pwd`/debian/tmp/etc/accords/accords.ini.tmp
 	mv `pwd`/debian/tmp/etc/accords/accords.ini.tmp `pwd`/debian/tmp/etc/accords/accords.ini
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
@@ -79,9 +79,10 @@ install: build
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
 	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
-	cp accounts.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
-	cp coips.xml `pwd`/debian/tmp/etc/accords
+	cp accounts.xml coips.xml metrics.xml slamtest.xml `pwd`/debian/tmp/etc/accords
+	cp scripts/amazon_manifest.xml  scripts/cords_ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords
+	cp manifests/style.css `pwd`/debian/tmp/etc/accords
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc debian/tmp/usr/lib/python2.7/cocarrier
 	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/

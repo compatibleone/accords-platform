@@ -321,7 +321,7 @@ Description: CompatibleOne Accords Platform - SLA Manager
 #
 Package: compatibleone-accords
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-coees, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-accords-doc
+Depends: compatibleone, libcompatibleone-accords0, compatibleone-azprocci, compatibleone-broker, compatibleone-cool, compatibleone-coees, compatibleone-copaas, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-accords-doc
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (runtime)
  CompatibleOne is an open source project which provides a model, CORDS
@@ -340,7 +340,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 
 Package: compatibleone-accords-dev
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios, compatibleone-coidms
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
  CompatibleOne is an open source project which provides a model, CORDS
