@@ -21,6 +21,13 @@
 struct	cordscript_context;
 struct	cordscript_instruction;
 
+struct	cordscript_label
+{
+	struct	cordscript_label 	* next;
+	struct	cordscript_instruction 	* value;
+	int	type;
+};
+
 struct	cordscript_value
 {
 	struct	cordscript_value * next;
@@ -58,7 +65,7 @@ private struct cordscript_value 	* allocate_cordscript_value(char * value, char 
 public struct cordscript_value 		* duplicate_cordscript_value( struct cordscript_value * vptr );
 public struct cordscript_instruction	* allocate_cordscript_instruction( struct cordscript_value * (*fptr)(struct cordscript_instruction * self) );
 public struct cordscript_context	* allocate_cordscript_context();
-private	struct	cordscript_instruction * compile_cordscript_instruction( struct cordscript_context * cptr );
+private	struct	cordscript_instruction 	* compile_cordscript_instruction( struct cordscript_context * cptr, int level );
 
 public struct cordscript_value 		* liberate_cordscript_value(struct cordscript_value * vptr);
 public struct cordscript_instruction	* liberate_cordscript_instruction(struct cordscript_instruction * iptr); 
