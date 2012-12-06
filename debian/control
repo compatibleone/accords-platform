@@ -340,7 +340,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 
 Package: compatibleone-accords-dev
 Architecture: all
-Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios, compatibleone-coidms
+Depends: compatibleone, libcompatibleone-accords-dev, libcompatibleone-accords0, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
  CompatibleOne is an open source project which provides a model, CORDS
