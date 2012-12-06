@@ -79,9 +79,9 @@ install: build
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
 	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
-	cp accounts.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
-	cp coips.xml `pwd`/debian/tmp/etc/accords
+	cp accounts.xml coips.xml metrics.xml `pwd`/debian/tmp/etc/accords
+	cp manifests/style.css `pwd`/debian/tmp/etc/accords
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc debian/tmp/usr/lib/python2.7/cocarrier
 	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/

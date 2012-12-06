@@ -1,10 +1,5 @@
-etc/accords/accords.ini
-etc/accords/cords_user.xml
-etc/accords/coips.xml
-etc/accords/*_config.xml
+etc/accords/*
 etc/default/accords
-etc/accords/openssl.cnf
-etc/accords/Certificates.crt
 usr/bin/accords
 usr/bin/run-parser
 usr/bin/parser
