@@ -43,8 +43,8 @@ endif
 		--enable-paprocci=$(JAVA_HOME) \
 		--enable-pyaccords \
 		--enable-testsuite \
-		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib  \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS),--as-needed"
 
 build: build-stamp
 build-stamp: config.status
@@ -80,7 +80,8 @@ install: build
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
 	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
-	cp accounts.xml coips.xml metrics.xml `pwd`/debian/tmp/etc/accords
+	cp accounts.xml coips.xml metrics.xml slamtest.xml `pwd`/debian/tmp/etc/accords
+	cp scripts/amazon_manifest.xml  scripts/cords_ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords
 	cp manifests/style.css `pwd`/debian/tmp/etc/accords
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc debian/tmp/usr/lib/python2.7/cocarrier

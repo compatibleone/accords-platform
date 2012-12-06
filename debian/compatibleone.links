@@ -8,3 +8,7 @@
 /etc/accords/os_config.xml /var/lib/accords/os_config.xml
 /etc/accords/accounts.xml /var/lib/accords/accounts.xml
 /etc/accords/metrics.xml /var/lib/accords/metrics.xml
+/etc/accords/amazon_manifest.xml /var/lib/accords/amazon_manifest.xml
+/etc/accords/cords_ec2config.xml /var/lib/accords/cords_ec2config.xml
+/etc/accords/publication.xml /var/lib/accords/publication.xml
+/etc/accords/slamtest.xml /var/lib/accords/slamtest.xml
