@@ -38,9 +38,9 @@ Generate an OCCI category
       
 >>>import pycompmanager
       
->>>pycompmanager.generateCategory ("myCategory", "attrbute1 attribute2", "action1 action2","_OCCI_PROVIDER")
+>>>pycompmanager.generateCategory ("myCategory", "attribute1 attribute2", "action1 action2","_OCCI_PROVIDER")
    
-    The 4th argument Takes one of the foolowing value
+    The 4th argument takes one of the following value
 	- "" nothing to specify
 	- "_OCCI_PRIORITY"  the service is to be offered first   
 	- "_OCCI_PRIVATE"   the service is not to be published   
@@ -71,9 +71,19 @@ Generate an ACCORDS component/OCCI Server
             
 >>>pycompmanager.generateComponent("myComponent", "myCategory")
       
-  
-aunching the component
+Generated code location
 -----------------------
 
-      
-# python mycomponent.py --config config_file.xml CO-MYCOMPO-AGENT/1.0
+* pyaccords/<category_name>Interface.py for the CRUD functions
+* pyaccords/<category_name>Action.py for the actions
+
+* <component_name>/<component_name>.py for the module starting code.
+
+Launching the component
+-----------------------
+
+- step 1: Edit accords.xml and cords_user.xml to add the relevant stanza for
+  your component.      
+- step 2: run the command:
+  # python mycomponent.py --config config_file.xml CO-MYCOMPO-AGENT/1.0
+
