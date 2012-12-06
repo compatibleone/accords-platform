@@ -69,9 +69,9 @@ install: build
 	dh_testroot
 	dh_prep
 	make DESTDIR=`pwd`/debian/tmp install
-	sed -e 's@/usr/local/nagios/etc/nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/usr/bin/accords > `pwd`/debian/tmp/usr/bin/accords.tmp
+	sed -e 's@/usr/.*nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/usr/bin/accords > `pwd`/debian/tmp/usr/bin/accords.tmp
 	mv `pwd`/debian/tmp/usr/bin/accords.tmp `pwd`/debian/tmp/usr/bin/accords
-	sed -e 's@/usr/local/etc/accords/accords-nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/etc/accords/accords.ini > `pwd`/debian/tmp/etc/accords/accords.ini.tmp
+	sed -e 's@/usr/.*/accords-nagios.cfg@/etc/nagios3/nagios.cfg@g' < `pwd`/debian/tmp/etc/accords/accords.ini > `pwd`/debian/tmp/etc/accords/accords.ini.tmp
 	mv `pwd`/debian/tmp/etc/accords/accords.ini.tmp `pwd`/debian/tmp/etc/accords/accords.ini
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
