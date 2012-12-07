@@ -1,3 +1,10 @@
+compatibleone-accords (0.20121207-1) unstable; urgency=low
+
+  * Upstream update.
+  * Lots of packaging fixes (see gitorious log for the gory details)
+
+ -- Vincent Renardias <vincent@renardias.com>  Fri, 07 Dec 2012 10:25:21 +0200
+
 compatibleone-accords (0.20121129-1) unstable; urgency=low
 
   * Upstream update.
