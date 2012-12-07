@@ -544,6 +544,13 @@ _make_security_files() {
 
 _accords_config() {
 
+    accordsRunning=`ps -edf | grep run-publisher | wc -l`
+    if [ $accordsRunning -gt 1 ] ;
+    then
+        echo "ACCORDS platform is already running: please stop it first !"
+        exit 1
+    fi
+
     if [ -z "$tls" ]; then
 	echo "Accords Security Not Required"
     else
@@ -749,6 +756,23 @@ _mktls() {
     fi
 }
 
+# _nextPort is used to select a new port number for the next accords serveur 
+_nextPort() {
+     max=10
+     for ii in `seq $max`
+     do
+         newPort=$(($restport+$ii))
+         alreadyUsed=`netstat -an | grep $newPort | grep LISTEN | wc -l`
+         if [ $alreadyUsed -eq 0 ] ;
+         then
+             break
+         elif [ $ii -eq $max ] ;
+         then
+             echo "$0 Can't find a free port number"
+         fi
+     done
+}
+
 _mkpub() {
     module=$1
     echo "<"${module} >> $target
@@ -772,7 +796,7 @@ _mkpub() {
 
 _mkmon() {
     module=$1
-    export restport=$(($restport+1))
+    _nextPort; export restport=$newPort
     echo "<"${module} >> $target
     echo "    publisher='"$publisher"'"           >> $target
     echo "    operator='"$operator"'"           >> $target
@@ -973,7 +997,7 @@ _termnag() {
 
 _mkcfg() {
     module=$1
-    export restport=$(($restport+1))
+    _nextPort; export restport=$newPort
     echo "<"${module} >> $target
     echo "    publisher='"$publisher"'"           >> $target
     echo "    operator='"$operator"'"           >> $target
@@ -997,7 +1021,7 @@ _mkcfg() {
 
 _mkpro() {
     module=$1
-    export restport=$(($restport+1))
+    _nextPort; export restport=$newPort
     echo "<"${module} >> $target
     echo "    publisher='"$publisher"'"           >> $target
     echo "    operator='"${module}"'"               >> $target
