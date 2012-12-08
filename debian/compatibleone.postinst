@@ -10,8 +10,12 @@ if [ "$1" = "configure" ] || [ "$1" = "triggered" ] || [ "$1" = "upgrade" ] ; th
 	cd /var/lib/accords/ && accords-config
 fi
 
-if [ -x /usr/sbin/invoke-rc.d ]; then
-    invoke-rc.d compatibleone start
-else
-    /etc/init.d/compatibleone start
+if [ -x /etc/init.d/compatibleone ]; then
+	update-rc.d compatibleone defaults > /dev/null
+	if [ -x /usr/sbin/invoke-rc.d ]; then
+		invoke-rc.d compatibleone start
+	else
+		/etc/init.d/compatibleone start
+	fi
 fi
+
