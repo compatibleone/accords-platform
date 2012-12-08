@@ -18,6 +18,9 @@
 #define	_CSP_GE	5
 #define	_CSP_NE	6
 
+#define	_MAX_NAME	2048
+#define	_MAX_VALUE	16000
+
 struct	cordscript_context;
 struct	cordscript_instruction;
 
@@ -33,6 +36,7 @@ struct	cordscript_value
 	struct	cordscript_value * next;
 	char *	name;
 	struct	cordscript_instruction * code;
+	struct	cordscript_context * body;
 	char *	value;
 };
 
@@ -48,11 +52,12 @@ struct	cordscript_instruction
 	struct	cordscript_instruction * next;
 	struct	cordscript_operand * first;
 	struct	cordscript_operand * last;
-	struct	cordscript_value * (*evaluate)(struct cordscript_instruction * self);
+	struct	cordscript_instruction * (*evaluate)(struct cordscript_instruction * self);
 };
 
 struct	cordscript_context
 {
+	struct	cordscript_instruction * caller;
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;
 	struct	cordscript_value * code;
@@ -63,7 +68,7 @@ struct	cordscript_context
 	
 private struct cordscript_value 	* allocate_cordscript_value(char * value, char * name);
 public struct cordscript_value 		* duplicate_cordscript_value( struct cordscript_value * vptr );
-public struct cordscript_instruction	* allocate_cordscript_instruction( struct cordscript_value * (*fptr)(struct cordscript_instruction * self) );
+public struct cordscript_instruction	* allocate_cordscript_instruction( struct cordscript_instruction * (*fptr)(struct cordscript_instruction * self) );
 public struct cordscript_context	* allocate_cordscript_context();
 private	struct	cordscript_instruction 	* compile_cordscript_instruction( struct cordscript_context * cptr, int level );
 
