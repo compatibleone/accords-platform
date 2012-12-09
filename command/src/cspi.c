@@ -1001,14 +1001,15 @@ private	struct	cordscript_instruction * call_operation( struct cordscript_instru
 private	struct	cordscript_instruction * ret_operation( struct cordscript_instruction * iptr )
 {
 	struct cordscript_context * cptr;
+	if ( check_debug() )
+		printf("ret_operation();\n");
 	if (!( iptr ))
 		return((struct cordscript_instruction *) 0);
 	else if (!( cptr = iptr->context ))
 		return((struct cordscript_instruction *) 0);
 	else if (!( iptr = cptr->caller ))
 		return((struct cordscript_instruction *) 0);
-	else	iptr = iptr->next;		
-	return( iptr );
+	else	return( iptr );
 }
 
 /*	-------------------------	*/
@@ -1018,6 +1019,8 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 {
 	struct 	cordscript_context * cptr;
 	struct	cordscript_value * vptr;
+	if ( check_debug() )
+		printf("retvalue_operation();\n");
 	if (!( iptr ))
 		return((struct cordscript_instruction *) 0);
 	else if (!( vptr = pop_stack( iptr->context ) ))
@@ -1026,9 +1029,11 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 		return((struct cordscript_instruction *) 0);
 	else if (!( iptr = cptr->caller ))
 		return((struct cordscript_instruction *) 0);
-	else	iptr = iptr->next;		
-	push_value( cptr, vptr );
-	return(iptr);
+	else
+	{
+		push_value( cptr, vptr );
+		return(iptr);
+	}
 }
 
 
@@ -1079,6 +1084,7 @@ public struct cordscript_context * allocate_cordscript_context()
 private	char *  linebuffer=(char *) 0;
 private	int	linecounter=0;
 private	int	ungotc=0;
+private	char * 	ungot_token=(char *) 0;
 
 private	int	initialise_line( char * sptr )
 {
@@ -1095,6 +1101,15 @@ private	int	initialise_file( FILE * h )
 {
 	infile = h;
 	return( 1 );
+}
+
+/*	-----------	*/
+/*	ungot_token	*/
+/*	-----------	*/
+private	void	unget_token( char * sptr )
+{
+	ungot_token = allocate_string( sptr );
+	return;
 }
 
 /*	------------	*/
@@ -1243,6 +1258,14 @@ private	int	get_token( char * result )
 	int	quote=0;
 	int	c;
 	int	nb=0;
+
+	if ( ungot_token )
+	{
+		strcpy( result, ungot_token );
+		liberate( ungot_token );
+		return( strlen( result ) );
+	}
+
 	if (!( remove_white() ))
 		return( 0 );
 	while (1)
@@ -1539,7 +1562,7 @@ private	struct cordscript_instruction * compile_cordscript_if( struct cordscript
 		iptr->context = cptr;
 		add_operand( rptr, instruction_value( iptr ) );
 		if (( c = get_punctuation()) == '{' )
-			allocate_cordscript_label( iptr, 0 );
+			allocate_cordscript_label( iptr, 1 );
 		else if (!( c ))
 			add_instruction( cptr, iptr );
 		else
@@ -1936,6 +1959,104 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 	else	return( iptr );
 }
 
+/*	-----------	*/
+/*	handle_else	*/
+/*	-----------	*/
+private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr )
+{
+	struct	cordscript_instruction * jptr;
+	struct	cordscript_instruction * xptr;
+	struct	cordscript_instruction * yptr;
+
+	if ( get_punctuation() != '{' )
+	{
+		lptr = liberate_cordscript_label( lptr );
+		return((struct cordscript_instruction *) 0);
+	}
+
+	else if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
+	{
+		lptr = liberate_cordscript_label( lptr );
+		return( xptr );
+	}
+	else if (!( jptr = allocate_cordscript_instruction( jmp_operation ) ))
+	{
+		xptr = liberate_cordscript_instruction( xptr );
+		lptr = liberate_cordscript_label( lptr );
+		return( jptr );
+	}
+	else
+	{
+		add_operand( jptr, instruction_value( xptr ) );
+		add_instruction( cptr, jptr );
+	}
+
+	for (	yptr=lptr->value;
+		yptr != (struct cordscript_instruction *) 0;
+		yptr = yptr->next )
+		add_instruction( cptr, yptr );
+
+	lptr->value = xptr;
+	lptr->type = 0;
+	return((struct cordscript_instruction *) 0);
+}
+
+/*	--------------		*/
+/*	check_line_end		*/
+/*	--------------		*/
+private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
+{
+	struct	cordscript_label * lptr;
+	struct	cordscript_instruction * xptr;
+	char	buffer[_MAX_NAME];
+	if ((lptr = labelheap) != (struct cordscript_label *) 0)
+	{
+
+		if ( c == ';' )
+			end_of_instruction=1;
+
+		if ((!( level ))
+		&&  ( end_of_instruction ))
+		{
+			while ((lptr = labelheap) != (struct cordscript_label *) 0)
+			{
+				if (( c = get_punctuation()) == '}' )
+				{
+					if ( lptr->type )
+					{
+						/* -------------------------------------- */
+						/* it could be an IF and may have an ELSE */
+						/* -------------------------------------- */
+						if ( get_token( buffer ) )
+						{
+							if (!( strcmp( buffer, "else" ) ))
+							{
+								end_of_instruction=0;
+								handle_else( cptr, lptr );
+								return;
+							}
+							else	unget_token( buffer );
+						}
+					}
+					labelheap = lptr->next;
+					for (	xptr=lptr->value;
+						xptr != (struct cordscript_instruction *) 0;
+						xptr = xptr->next )
+						add_instruction( cptr, xptr );
+					lptr = liberate_cordscript_label( lptr );
+				}
+				else 
+				{	
+					if ( c != 0 ) unget_byte( c );	
+					break;
+				}
+			}
+		}
+		end_of_instruction=0;
+	}
+	return;
+}
+
 /*   ------------------------------ */
 /*   compile_cordscript_instruction */
 /*   ------------------------------ */
@@ -1945,7 +2066,6 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 	int	c;
 	int	bracing=0;
 	struct	cordscript_value * vptr;
-	struct	cordscript_label * lptr;
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_instruction * xptr;
 
@@ -2092,35 +2212,9 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 	/* -------------------------------- */
 	add_instruction(cptr, iptr );
 
-	if ( labelheap )
-	{
+	check_line_end(cptr, level,c);
 
-		if ( c == ';' )
-			end_of_instruction=1;
-
-		if ((!( level ))
-		&&  ( end_of_instruction ))
-		{
-			if (( c = get_punctuation()) == '}' )
-			{
-				if ((lptr = labelheap) != (struct cordscript_label *) 0)
-				{
-					labelheap = lptr->next;
-					for (	xptr=lptr->value;
-						xptr != (struct cordscript_instruction *) 0;
-						xptr = xptr->next )
-						add_instruction( cptr, xptr );
-					lptr = liberate_cordscript_label( lptr );
-				}
-			}
-			else if ( c != 0 )
-				unget_byte( c );	
-		
-			end_of_instruction=0;
-		}
-	}
-
-	return( iptr );
+	return(iptr);
 }
 
 /*   ------------------------------- */
