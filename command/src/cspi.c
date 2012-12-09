@@ -973,6 +973,63 @@ private	void	pop_instruction( struct cordscript_context * cptr )
 	}
 }
 
+private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscript_value * sptr )
+{
+	int	c;
+	char *	mptr;
+	char *	vptr;
+
+	/* check valid parameters or fail */
+	/* ------------------------------ */
+	if (!( rptr )) 
+		return(0);
+	else if (!( sptr ))
+		return(0);
+	else if (!(mptr = sptr->value))
+		return(0);
+
+	/* detect source matrix or fail */
+	/* ---------------------------- */
+	while ( *mptr == ' ' ) mptr++;
+
+	if ( *(mptr++) != '[' ) return(0);
+
+	while ( *mptr == ' ' ) mptr++;
+
+	for ( vptr=mptr; *vptr != 0; vptr++ )
+	{
+		if (( *vptr == ']' )
+		||  ( *vptr == ',' ))
+			break;
+	}
+	c = *vptr;
+	*vptr = 0;
+
+	if ( rptr->value )
+		liberate( rptr->value );
+
+	if (!( rptr->value = allocate_string( mptr ) ))
+		return(0);
+	
+	if ( c == ']' )
+	{
+		sptr->value = liberate( sptr->value );
+		return(1);
+	}
+	else if (!( mptr = allocate( strlen( (vptr+1) ) + 4 ) ))
+	{
+		sptr->value = liberate( sptr->value );
+		return(1);
+	}
+	else
+	{
+		sprintf(mptr, "[%s",(vptr+1));
+		sptr->value = liberate( sptr->value );
+		sptr->value = mptr;
+		return(1);
+	}
+}
+
 /*	-------------------------	*/
 /*		each_operation		*/
 /*	-------------------------	*/
@@ -989,15 +1046,17 @@ private	struct	cordscript_instruction * each_operation( struct cordscript_instru
 	/* ------------------------------------------------- */
 	/* collect source and target operands from the stack */
 	/* ------------------------------------------------- */
-	if (!( sptr = pop_stack( iptr->context ) ))
+	if (!(optr = iptr->first))
 		return( iptr->next );
-	else if (!( tptr = pop_stack( iptr->context ) ))
+	else if (!(sptr = optr->value))
 		return( iptr->next );
-	
-	/* ------------------------------ */
-	/* TODI : evaluate the ForEach As */
-	/* ------------------------------ */
-	else if (!(optr = iptr->first))
+	else if (!(optr = optr->next))
+		return( iptr->next );
+	else if (!(vptr = optr->value))
+		return( iptr->next );
+	else if ( crop_matrix_element( vptr, sptr ) )
+		return( iptr->next );
+	else if (!(optr = optr->next))
 		return( iptr->next );
 	else if (!(vptr = optr->value))
 		return( iptr->next );
@@ -1686,6 +1745,8 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 	struct	cordscript_instruction * jptr;
 	struct	cordscript_instruction * xptr;
 	struct	cordscript_instruction * iptr;
+	struct	cordscript_value *	 sptr;
+	struct	cordscript_value *	 tptr;
 	char	buffer[_MAX_NAME];
 
 	if ( get_punctuation() != '(' )
@@ -1703,7 +1764,10 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 		return( xptr );
 	else	jptr->next = xptr;
 
-	if (!( iptr = compile_cordscript_instruction( cptr, 0 ) ))
+	if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( sptr = resolve_variable( buffer, cptr ) ))
 		return((struct cordscript_instruction *) 0);
 
 	else if (!( get_token(buffer)))
@@ -1712,7 +1776,10 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 	else if ( strcmp( buffer,"as" ) )
 		return((struct cordscript_instruction *) 0);
 
-	else if (!( iptr = compile_cordscript_instruction( cptr, 0 ) ))
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( tptr = resolve_variable( buffer, cptr ) ))
 		return((struct cordscript_instruction *) 0);
 
 	else if ( get_punctuation() != ')' )
@@ -1722,6 +1789,8 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 		return( iptr );
 	else
 	{
+		add_operand( iptr, sptr );
+		add_operand( iptr, tptr );
 		add_operand( iptr, instruction_value( xptr ) );
 		add_instruction( cptr, iptr );
 	}
