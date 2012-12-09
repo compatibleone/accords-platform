@@ -974,6 +974,39 @@ private	void	pop_instruction( struct cordscript_context * cptr )
 }
 
 /*	-------------------------	*/
+/*		each_operation		*/
+/*	-------------------------	*/
+private	struct	cordscript_instruction * each_operation( struct cordscript_instruction * iptr )
+{
+	struct cordscript_operand * optr;
+	struct cordscript_value * vptr;
+	struct cordscript_value * tptr;
+	struct cordscript_value * sptr;
+	
+	if ( check_debug() )
+		printf("each_operation();\n");
+	
+	/* ------------------------------------------------- */
+	/* collect source and target operands from the stack */
+	/* ------------------------------------------------- */
+	if (!( sptr = pop_stack( iptr->context ) ))
+		return( iptr->next );
+	else if (!( tptr = pop_stack( iptr->context ) ))
+		return( iptr->next );
+	
+	/* ------------------------------ */
+	/* TODI : evaluate the ForEach As */
+	/* ------------------------------ */
+	else if (!(optr = iptr->first))
+		return( iptr->next );
+	else if (!(vptr = optr->value))
+		return( iptr->next );
+	else if (!( vptr->code ))
+		return( iptr->next );
+	else	return( vptr->code );
+}
+
+/*	-------------------------	*/
 /*		call_operation		*/
 /*	-------------------------	*/
 private	struct	cordscript_instruction * call_operation( struct cordscript_instruction * iptr )
@@ -1643,6 +1676,78 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 	}
 }
 
+/*   --------------------------		*/
+/*   compile_cordscript_foreach		*/
+/*   --------------------------		*/
+private	struct cordscript_instruction * compile_cordscript_foreach( struct cordscript_context * cptr )
+{
+	int	c;
+	struct	cordscript_instruction * lptr;
+	struct	cordscript_instruction * jptr;
+	struct	cordscript_instruction * xptr;
+	struct	cordscript_instruction * iptr;
+	char	buffer[_MAX_NAME];
+
+	if ( get_punctuation() != '(' )
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( lptr = allocate_cordscript_instruction( no_operation ) ))
+		return( lptr );
+	else	add_instruction(cptr, lptr );
+
+	if (!( jptr = allocate_cordscript_instruction( jmp_operation ) ))
+		return( xptr );
+	else	add_operand( jptr, instruction_value( lptr ) );
+
+	if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
+		return( xptr );
+	else	jptr->next = xptr;
+
+	if (!( iptr = compile_cordscript_instruction( cptr, 0 ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( strcmp( buffer,"as" ) )
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( iptr = compile_cordscript_instruction( cptr, 0 ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( get_punctuation() != ')' )
+		return((struct cordscript_instruction *) 0);
+
+	if (!( iptr = allocate_cordscript_instruction( each_operation ) ))
+		return( iptr );
+	else
+	{
+		add_operand( iptr, instruction_value( xptr ) );
+		add_instruction( cptr, iptr );
+	}
+
+	/* ----------------------------------- */
+	/* detect and handle conditional block */
+	/* ----------------------------------- */
+	if (( c = get_punctuation()) == '{' )
+		allocate_cordscript_label( jptr, 0 );
+
+	else if (!( c ))
+	{
+		add_instruction( cptr, jptr );
+		add_instruction( cptr, xptr );
+	}
+	else
+	{
+		unget_byte(c);
+		add_instruction( cptr, jptr );
+		add_instruction( cptr, xptr );
+	}
+	return((struct cordscript_instruction *) 0);
+
+}
+
+
 /*   ----------------------	*/
 /*   compile_cordscript_for	*/
 /*   ----------------------	*/
@@ -1946,6 +2051,8 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 		return( compile_cordscript_while( cptr ) );
 	else if (!( strcmp( token, "for" ) ))
 		return( compile_cordscript_for( cptr ) );
+	else if (!( strcmp( token, "foreach" ) ))
+		return( compile_cordscript_foreach( cptr ) );
 	else if (!( strcmp( token, "return" ) ))
 		return( compile_cordscript_return( cptr ) );
 	else if (!( strcmp( token, "function" ) ))
