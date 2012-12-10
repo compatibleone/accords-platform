@@ -534,7 +534,14 @@ private	char *	build_category_reference( char * name )
 {
 	char buffer[1024];
 	char *	id;
-	if (!( id = occi_resolve_category_provider( name, "Cordscripter", default_tls() ) ))
+	if (!( name ))
+		return( name );
+	else if (!( strcmp(name,"publication") ))
+	{
+		sprintf(buffer,"%s/%s/",default_publisher(),name);
+		return( allocate_string( buffer ) );
+	}
+	else if (!( id = occi_resolve_category_provider( name, "Cordscripter", default_tls() ) ))
 		return( id );
 	else
 	{
@@ -543,6 +550,46 @@ private	char *	build_category_reference( char * name )
 		return( allocate_string( buffer ) );
 	}
 }
+
+private	char *	add_array( char * aptr, char * vptr )
+{
+	char *	rptr;
+	if (!( vptr ))
+		return( aptr );
+	else if (!( aptr ))
+	{
+		if (!( rptr = allocate( strlen( vptr ) + 16 ) ))
+			return( rptr );
+		else
+		{
+			sprintf(rptr,"[%c%s%c",0x0022,vptr,0x0022);
+			return( rptr );
+		}
+	}
+	else if ( *aptr != '[' )
+		return( aptr );
+	else
+	{
+		if (!( rptr = allocate( strlen(aptr) + strlen( vptr ) + 16 ) ))
+			return( rptr );
+		else
+		{
+			sprintf(rptr,"%s,%c%s%c",aptr,0x0022,vptr,0x0022);
+			aptr = liberate( aptr );
+			return( rptr );
+		}
+	}
+}
+
+private	char *	close_array( char * aptr )
+{
+	if (!( aptr ))
+		return( aptr );
+	else if ( *aptr != '[' )
+		return( aptr );
+	else 	return( strcat( aptr, "]" ) );
+}
+
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -555,6 +602,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	struct	occi_element * dptr=(struct occi_element *) 0;
 	struct	occi_response* zptr=(struct occi_response *) 0;
 	char *	ihost;
+	char *	aptr;
+	char *	tptr;
 	char *	sptr;
 	int	status;
 
@@ -624,9 +673,30 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 				else	push_value( iptr->context, string_value("[error]") );
 			}
-			else if (!( strcmp( wptr->value, "list" ) ))
+			else if ((!( strcmp( wptr->value, "list" ) ))
+			     ||  (!( strcmp( wptr->value, "get"  ) )))
 			{
-				push_value( iptr->context, string_value(sptr) );
+				if (( zptr = occi_simple_get( sptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else if (!( aptr = add_array( aptr, tptr ) ))
+							break;
+						else	continue;
+					}
+					aptr = close_array( aptr );
+					push_value( iptr->context, string_value(aptr) );
+					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
