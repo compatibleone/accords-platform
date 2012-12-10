@@ -551,18 +551,18 @@ private	char *	build_category_reference( char * name )
 	}
 }
 
-private	char *	add_array( char * aptr, char * vptr )
+private	char *	add_array( char * aptr, char * hptr, char * vptr )
 {
 	char *	rptr;
 	if (!( vptr ))
 		return( aptr );
 	else if (!( aptr ))
 	{
-		if (!( rptr = allocate( strlen( vptr ) + 16 ) ))
+		if (!( rptr = allocate( strlen( hptr ) + strlen( vptr ) + 16 ) ))
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"[%c%s%c",0x0022,vptr,0x0022);
+			sprintf(rptr,"[%s%s",hptr,vptr);
 			return( rptr );
 		}
 	}
@@ -570,11 +570,11 @@ private	char *	add_array( char * aptr, char * vptr )
 		return( aptr );
 	else
 	{
-		if (!( rptr = allocate( strlen(aptr) + strlen( vptr ) + 16 ) ))
+		if (!( rptr = allocate( strlen( hptr ) + strlen(aptr) + strlen( vptr ) + 16 ) ))
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"%s,%c%s%c",aptr,0x0022,vptr,0x0022);
+			sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
 			aptr = liberate( aptr );
 			return( rptr );
 		}
@@ -601,6 +601,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	struct	cordscript_operand * optr;
 	struct	occi_element * dptr=(struct occi_element *) 0;
 	struct	occi_response* zptr=(struct occi_response *) 0;
+	char	vbuffer[_MAX_VALUE];
 	char *	ihost;
 	char *	aptr;
 	char *	tptr;
@@ -639,7 +640,31 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			if ((!( strcasecmp( wptr->value, "get"      ) ))
 			||  (!( strcmp( wptr->value, "retrieve" ) )))
 			{
-				push_value( iptr->context, string_value(vptr->value) );
+				if (( zptr = occi_simple_get( vptr->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else	
+						{
+							sprintf(vbuffer,"{%c%s%c:%c%s%c}",
+								0x0022,(dptr->name ? dptr->name : ""), 0x0022,
+								0x0022,(dptr->name ? dptr->value : ""), 0x0022);
+							if (!( aptr = add_array( aptr, "", vbuffer ) ))
+								break;
+							else	continue;
+						}
+					}
+					aptr = close_array( aptr );
+					push_value( iptr->context, string_value(aptr) );
+					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
 			}
 			else if ((!( strcasecmp( wptr->value, "put") ))
 			     ||  (!( strcmp( wptr->value, "update" ) )))
@@ -687,7 +712,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 							continue;
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
-						else if (!( aptr = add_array( aptr, tptr ) ))
+						else if (!( aptr = add_array( aptr, sptr, tptr ) ))
 							break;
 						else	continue;
 					}
