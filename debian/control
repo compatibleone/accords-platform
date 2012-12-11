@@ -51,133 +51,133 @@ Description: CompatibleOne Accords platform (devel/debug libraries)
 Package: libcompatibleone-cocarrier0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cocarrier)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-cocarrier-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-cocarrier0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cocarrier0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-cocci0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cocci)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-cocci-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-cocci0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cocci0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-copabr0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: copabr)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-copabr-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-cords0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cords)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-cords-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-cords0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cords0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-corest0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: corest)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-corest-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-corest0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-corest0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-coxml0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: coxml)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-coxml-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-coxml0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-coxml0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-occi0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: occi)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-occi-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-occi0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-occi0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: libcompatibleone-pubocci0
 Section: libs
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: pubocci)
  CompatibleOne Accords platform base dynamic libraries and Files
 
 Package: libcompatibleone-pubocci-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
 Package: compatibleone-azprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Azur Procci subsystem
  CompatibleOne Accords Platform - Azur Procci subsystem
 
 Package: compatibleone-broker
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Broker subsystem
  Broker subsystem of the CompatibleOne Accords Platform
 
 Package: compatibleone-coees
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COEES subsystem
  The CompatibleOne Energy Efficiency Service component is a standalone OCCI REST
  server executable program and must have been started before any provisioning plan
@@ -186,7 +186,7 @@ Description: CompatibleOne Accords Platform - COEES subsystem
 Package: compatibleone-cops
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COPS subsystem
  The CompatibleOne Placement Services module is a standalone OCCI REST server
  executable program and must have been started before any provisioning plan smart
@@ -199,7 +199,7 @@ Description: CompatibleOne Accords Platform - COPS subsystem
 Package: compatibleone-coips
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COIPS subsystem
  COIPS subsystem of the CompatibleOne Accords Platform
  The CompatibleOne Image Production Services module is a standalone OCCI REST
@@ -210,7 +210,7 @@ Description: CompatibleOne Accords Platform - COIPS subsystem
 Package: compatibleone-comons
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COMONS subsystem
  The CompatibleOne Monitoring Services component is a standalone OCCI REST server
  executable program and must have been started after the security services and
@@ -219,7 +219,7 @@ Description: CompatibleOne Accords Platform - COMONS subsystem
 Package: compatibleone-conets
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - CONETS subsystem
  The CompatibleOne Network Services component is a standalone OCCI REST server
  executable program and must have been started before any provisioning of application
@@ -228,7 +228,7 @@ Description: CompatibleOne Accords Platform - CONETS subsystem
 Package: compatibleone-coobas
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COOBAS subsystem
  The CompatibleOne Ordering, Billing and Accountancy Services component is a standalone
  OCCI REST server executable program and must have been started after the monitoring
@@ -242,7 +242,7 @@ Description: CompatibleOne Accords Platform - COOBAS subsystem
 Package: compatibleone-cool
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COOL subsystem
  The CompatibleOne Elasticity Manager subsystem is a standalone OCCI REST server
  executable program and must have been started before any provisioning of application
@@ -264,7 +264,7 @@ Description: CompatibleOne Accords Platform - COOL subsystem
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COSACS subsystem
  The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
  server executable program that will have been embedded in the application image produced by
@@ -277,21 +277,21 @@ Description: CompatibleOne Accords Platform - COSACS subsystem
 Package: compatibleone-cosched
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COSCHED subsystem
  Scheduling subsystem for the CompatibleOne Accords Platform
 
 #Package: compatibleone-coidms
 #Section: net
 #Architecture: all
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), python-compatibleone-accords
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python-compatibleone-accords
 #Description: CompatibleOne Accords Platform - COIDMS subsystem
 # IDentity Management subsystem for the CompatibleOne Accords Platform
 #
 Package: compatibleone-coss
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - COSS subsystem
  The CompatibleOne Security Services component is a standalone OCCI REST server
  executable program and must have been started after the publisher and before all other
@@ -305,35 +305,35 @@ Description: CompatibleOne Accords Platform - COSS subsystem
 Package: compatibleone-dcprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - PaaS Procci subsystem
  CompatibleOne Accords Platform - PaaS Procci subsystem
 
 Package: compatibleone-copaas
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - PaaS Services subsystem
  CompatibleOne Accords Platform - PaaS Services subsystem
 
 #Package: compatibleone-example
 #Section: net
 #Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 #Description: CompatibleOne Accords Platform - Example OCCI subsystem
 # CompatibleOne Accords Platform - Example OCCI subsystem
 #
 Package: compatibleone-ezvm
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - EZVM subsystem
  This standalone OCCI REST server executable program enables the instantiations of
  VM on various cloud service providers while providing a complete abstraction of the
@@ -345,49 +345,49 @@ Description: CompatibleOne Accords Platform - EZVM subsystem
 Package: compatibleone-fileserver
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Fileserver subsystem
  CompatibleOne Accords Platform - Fileserver subsystem
 
 Package: compatibleone-nagios
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), nagios3
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), nagios3
 Description: CompatibleOne Accords Platform - Nagios subsystem
  CompatibleOne Accords Platform - Nagios subsystem
 
 Package: compatibleone-onprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Nebula Procci subsystem
  CompatibleOne Accords Platform - Open Nebula Procci subsystem
 
 Package: compatibleone-osocciprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
  CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 
 Package: compatibleone-osprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
  CompatibleOne Accords Platform - Open Stack Procci subsystem
 
 Package: compatibleone-paprocci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
 Description: CompatibleOne Accords Platform - ProActive Procci subsystem
  CompatibleOne Accords Platform - ProActive Procci subsystem
 
 Package: compatibleone-procci
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Procci
  This component of the ACCORDS platform is responsible for the management of generic
  provisioning contracts as requested by the service broker during the creation of the
@@ -400,7 +400,7 @@ Description: CompatibleOne Accords Platform - Procci
 Package: compatibleone-publisher
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Publisher
  The publisher is responsible for the management of service publications performed
  by the components comprising the platform. Each of the different service provider
@@ -412,14 +412,14 @@ Description: CompatibleOne Accords Platform - Publisher
 Package: compatibleone-slam
 Section: net
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - SLA Manager
  Service Level Agreement for the CompatibleOne Accords Platform
 
 #Package: compatibleone-testosocci
 #Section: net
 #Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (= ${binary:Version})
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 #Description: CompatibleOne Accords Platform - Open Stack inspection tool
 # This command line tool allows inspection of the Open Stack platform
 # resources that are available or have been provisioned using the following command line syntax
