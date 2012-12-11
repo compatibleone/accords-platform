@@ -1,3 +1,10 @@
+compatibleone-accords (0.20121212-1) unstable; urgency=low
+
+  * Upstream update.
+  * Major packaging update: each lib now has its own packages.
+
+ -- Vincent Renardias <vincent@renardias.com>  Tue, 11 Dec 2012 15:47:00 +0200
+
 compatibleone-accords (0.20121207-1) unstable; urgency=low
 
   * Upstream update.
