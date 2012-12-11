@@ -942,7 +942,7 @@ public	int	accept_string_includes( char * sptr, char * tptr )
 /*	---------------------------------------------------	*/
 public	char * occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr )
 {
-	if ((!( strcasecmp( accepts, _OCCI_TEXT_PLAIN ) ))
+	if ((!( strncasecmp( accepts, _OCCI_TEXT_PLAIN, strlen(_OCCI_TEXT_PLAIN) ) ))
 	||  (!( strcasecmp( accepts, "*/*" ) )))
 		return( occi_text_body( cptr, hptr ) );
 
@@ -952,22 +952,22 @@ public	char * occi_response_body( char * accepts, struct occi_category * cptr, s
 			return((*cptr->html_rendering)(cptr, hptr));
 		else	return( occi_html_body( cptr, hptr ) );
 	}
-	else if ((!( strcasecmp( accepts, _OCCI_OCCI_PHP ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_APP_PHP  ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_PHP ) )))
+	else if ((!( strncasecmp( accepts, _OCCI_OCCI_PHP, strlen(_OCCI_OCCI_PHP) ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_APP_PHP, strlen(_OCCI_APP_PHP)  ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_TEXT_PHP, strlen(_OCCI_TEXT_PHP) ) )))
 		return( occi_php_body(  cptr, hptr ) );
 
-	else if ((!( strcasecmp( accepts, _OCCI_OCCI_JSON ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_APP_JSON  ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_JSON ) )))
+	else if ((!( strncasecmp( accepts, _OCCI_OCCI_JSON, strlen(_OCCI_OCCI_JSON) ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_APP_JSON, strlen(_OCCI_APP_JSON)  ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_TEXT_JSON, strlen(_OCCI_TEXT_JSON) ) )))
 		return( occi_json_body(  cptr, hptr ) );
 
-	else if (!( strcasecmp( accepts, _OCCI_OLD_JSON ) ))
+	else if (!( strncasecmp( accepts, _OCCI_OLD_JSON, strlen(_OCCI_OLD_JSON) ) ))
 		return( occi_old_json_body(  cptr, hptr ) );
 
-	else if ((!( strcasecmp( accepts, _OCCI_MIME_XML  ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_APP_XML   ) ))
-	     ||  (!( strcasecmp( accepts, _OCCI_TEXT_XML  ) )))
+	else if ((!( strncasecmp( accepts, _OCCI_MIME_XML, strlen(_OCCI_MIME_XML)  ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_APP_XML, strlen(_OCCI_APP_XML)  ) ))
+	     ||  (!( strncasecmp( accepts, _OCCI_TEXT_XML, strlen(_OCCI_TEXT_XML)  ) )))
 		return( occi_xml_body(  cptr, hptr  ) );
 
 	else	return( occi_text_body( cptr, hptr ) );

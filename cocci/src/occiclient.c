@@ -1322,18 +1322,18 @@ private	struct	occi_client * occi_analyse_categories( struct occi_client * cptr,
 		return( occi_analyse_http_categories( cptr, rptr ) );
 	else if (!( hptr->value ))
 		return( occi_analyse_http_categories( cptr, rptr ) );
-	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_OCCI ) ))
+	else if (!( strncasecmp( hptr->value, _OCCI_TEXT_OCCI, strlen(_OCCI_TEXT_OCCI) ) ))
 		return( occi_analyse_http_categories( cptr, rptr ) );
-	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_PLAIN ) ))
+	else if (!( strncasecmp( hptr->value, _OCCI_TEXT_PLAIN, strlen(_OCCI_TEXT_PLAIN) ) ))
 		return( occi_analyse_text_categories( cptr, rptr ) );
-	else if ((!( strcasecmp( hptr->value, _OCCI_OCCI_JSON ) ))
-	     ||  (!( strcasecmp( hptr->value, _OCCI_OLD_JSON  ) ))
-	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_JSON  ) ))
-	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_JSON ) )))
+	else if ((!( strncasecmp( hptr->value, _OCCI_OCCI_JSON, strlen(_OCCI_OCCI_JSON) ) ))
+	     ||  (!( strncasecmp( hptr->value, _OCCI_OLD_JSON, strlen(_OCCI_OLD_JSON)  ) ))
+	     ||  (!( strncasecmp( hptr->value, _OCCI_APP_JSON, strlen(_OCCI_APP_JSON)  ) ))
+	     ||  (!( strncasecmp( hptr->value, _OCCI_TEXT_JSON, strlen(_OCCI_TEXT_JSON) ) )))
 		return( occi_analyse_json_categories( cptr, rptr ) );
-	else if ((!( strcasecmp( hptr->value, _OCCI_MIME_XML  ) ))
-	     ||  (!( strcasecmp( hptr->value, _OCCI_APP_XML   ) ))
-	     ||  (!( strcasecmp( hptr->value, _OCCI_TEXT_XML  ) )))
+	else if ((!( strncasecmp( hptr->value, _OCCI_MIME_XML, strlen(_OCCI_MIME_XML)  ) ))
+	     ||  (!( strncasecmp( hptr->value, _OCCI_APP_XML, strlen(_OCCI_APP_XML)   ) ))
+	     ||  (!( strncasecmp( hptr->value, _OCCI_TEXT_XML, strlen(_OCCI_TEXT_XML)  ) )))
 		return( occi_analyse_xml_categories( cptr, rptr ) );
 	else	return( occi_analyse_http_categories( cptr, rptr ) );
 }

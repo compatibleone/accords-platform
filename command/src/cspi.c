@@ -373,184 +373,6 @@ private	struct	cordscript_instruction * set_operation( struct cordscript_instruc
 	else	return( iptr->next );
 }
 
-/*	--------------		*/
-/*	 add_operation		*/
-/*	--------------		*/
-private	struct	cordscript_instruction * add_operation( struct cordscript_instruction * iptr )
-{
-	struct	cordscript_operand * optr;
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * wptr;
-	int	value=0;
-	if ( check_debug() )
-		printf("add_operation();\n");
-	
-	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
-	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
-		if ( vptr->value )
-			value = atoi( vptr->value );
-	{
-		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
-		{
-			if ( wptr->value )
-				value += atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
-			drop_value( wptr );
-		}
-	}
-
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
-}
-/*	--------------		*/
-/*	 sub_operation		*/
-/*	--------------		*/
-private	struct	cordscript_instruction * sub_operation( struct cordscript_instruction * iptr )
-{
-	struct	cordscript_operand * optr;
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * wptr;
-	int	value=0;
-	if ( check_debug() )
-		printf("sub_operation();\n");
-	
-	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
-	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
-		if ( vptr->value )
-			value = atoi( vptr->value );
-	{
-		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
-		{
-			if ( wptr->value )
-				value -= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
-			drop_value( wptr );
-		}
-	}
-
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
-}
-
-/*	--------------		*/
-/*	 mul_operation		*/
-/*	--------------		*/
-private	struct	cordscript_instruction * mul_operation( struct cordscript_instruction * iptr )
-{
-	struct	cordscript_operand * optr;
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * wptr;
-	int	value=0;
-	if ( check_debug() )
-		printf("mul_operation();\n");
-	
-	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
-	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
-		if ( vptr->value )
-			value = atoi( vptr->value );
-	{
-		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
-		{
-			if ( wptr->value )
-				value *= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
-			drop_value( wptr );
-		}
-	}
-
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
-}
-
-/*	--------------		*/
-/*	 div_operation		*/
-/*	--------------		*/
-private	struct	cordscript_instruction * div_operation( struct cordscript_instruction * iptr )
-{
-	struct	cordscript_operand * optr;
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * wptr;
-	int	value=0;
-	if ( check_debug() )
-		printf("div_operation();\n");
-	
-	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
-	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
-		if ( vptr->value )
-			value = atoi( vptr->value );
-	{
-		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
-		{
-			if ( wptr->value )
-				value /= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
-			drop_value( wptr );
-		}
-	}
-
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
-}
-
-/*	--------------		*/
-/*	 mod_operation		*/
-/*	--------------		*/
-private	struct	cordscript_instruction * mod_operation( struct cordscript_instruction * iptr )
-{
-	struct	cordscript_operand * optr;
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * wptr;
-	int	value=0;
-	if ( check_debug() )
-		printf("mod_operation();\n");
-	
-	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
-	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
-		if ( vptr->value )
-			value = atoi( vptr->value );
-	{
-		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
-		{
-			if ( wptr->value )
-				value %= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
-			drop_value( wptr );
-		}
-	}
-
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
-}
-
-/*	------------------------	*/
-/*	build_category_reference	*/
-/*	------------------------	*/
-private	char *	build_category_reference( char * name )
-{
-	char buffer[1024];
-	char *	id;
-	if (!( name ))
-		return( name );
-	else if (!( strcmp(name,"publication") ))
-	{
-		sprintf(buffer,"%s/%s/",default_publisher(),name);
-		return( allocate_string( buffer ) );
-	}
-	else if (!( id = occi_resolve_category_provider( name, "Cordscripter", default_tls() ) ))
-		return( id );
-	else
-	{
-		sprintf(buffer,"%s/%s/",id,name);
-		liberate(id);
-		return( allocate_string( buffer ) );
-	}
-}
-
 /*	----------------	*/
 /*	   add_array		*/
 /*	----------------	*/
@@ -596,6 +418,370 @@ private	char *	close_array( char * aptr )
 	else 	return( strcat( aptr, "]" ) );
 }
 
+/*	----------------	*/
+/*	   add_structure		*/
+/*	----------------	*/
+private	char *	add_structure( char * aptr, char * hptr, char * vptr )
+{
+	char *	rptr;
+	if (!( vptr ))
+		return( aptr );
+	else if (!( aptr ))
+	{
+		if (!( rptr = allocate( strlen( hptr ) + strlen( vptr ) + 16 ) ))
+			return( rptr );
+		else
+		{
+			sprintf(rptr,"{%s%s",hptr,vptr);
+			return( rptr );
+		}
+	}
+	else if ( *aptr != '{' )
+		return( aptr );
+	else
+	{
+		if (!( rptr = allocate( strlen( hptr ) + strlen(aptr) + strlen( vptr ) + 16 ) ))
+			return( rptr );
+		else
+		{
+			sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
+			aptr = liberate( aptr );
+			return( rptr );
+		}
+	}
+}
+
+/*	----------------	*/
+/*	  close_structure		*/
+/*	----------------	*/
+private	char *	close_structure( char * aptr )
+{
+	if (!( aptr ))
+		return( aptr );
+	else if ( *aptr != '[' )
+		return( aptr );
+	else 	return( strcat( aptr, "}" ) );
+}
+
+
+
+/*	------------		*/
+/*	join_array		*/
+/*	------------		*/
+private	struct	cordscript_value * join_array( char * lptr, char * rptr )
+{
+	int	i;
+	if (!( rptr ))
+	{
+		if (!( lptr ))
+			return( string_value( "" ) );
+		else	return( string_value( lptr ) );
+	}
+	else if (!( lptr ))
+		return( string_value( rptr ) );
+	else if (!( lptr = allocate_string( lptr ) ))
+		return( string_value("[error]" ) );
+	else
+	{
+		i = strlen(lptr);
+		while ( i > 0 )
+		{
+			--i;
+			if ( *(lptr+i) == ']' )
+			{
+				*(lptr+i) = 0;
+				break;
+			} 
+		}
+		if (!( lptr = add_array( lptr, rptr, "" ) ))
+			return( string_value( "[error]" ) );
+		else	return( string_value( close_array( lptr ) ));
+	}
+}
+
+/*	--------------		*/
+/*	join_structure		*/
+/*	--------------		*/
+private	struct	cordscript_value * join_structure( char * lptr, char * rptr )
+{
+	int	i;
+	if (!( rptr ))
+	{
+		if (!( lptr ))
+			return( string_value( "" ) );
+		else	return( string_value( lptr ) );
+	}
+	else if (!( lptr ))
+		return( string_value( rptr ) );
+	else if (!( lptr = allocate_string( lptr ) ))
+		return( string_value("[error]" ) );
+	else
+	{
+		i = strlen(lptr);
+		while ( i > 0 )
+		{
+			--i;
+			if ( *(lptr+i) == '}' )
+			{
+				*(lptr+i) = 0;
+				break;
+			} 
+		}
+		if (!( lptr = add_structure( lptr, rptr, "" ) ))
+			return( string_value( "[error]" ) );
+		else	return( string_value( close_structure( lptr ) ));
+	}
+}
+
+/*	------------		*/
+/*	join_strings		*/
+/*	------------		*/
+private	struct	cordscript_value * join_value_strings( char * lptr, char * rptr )
+{
+	char *	wptr;
+	struct	cordscript_value * vptr;
+	if ( lptr )
+	{
+		if (!( rptr ))
+			return( string_value( lptr ) );
+		else if (!( wptr = allocate( strlen( lptr ) + strlen( rptr ) +1 ) ))
+			return( string_value("[Error]") );
+		else
+		{
+			sprintf(wptr,"%s%s",lptr,rptr);
+			vptr = string_value( wptr );
+			liberate( wptr );
+			return( vptr );
+		}
+	}
+	else if (!( rptr ))
+		return( string_value( "" ) );
+	else	return( string_value( rptr ) );
+}
+
+
+private	int	check_value_type( char * sptr )
+{
+	if (!( sptr ))
+		return(0);
+	else if ( *sptr == '[' )
+		return( 2 );
+	else if ( *sptr == '{' )
+		return( 3 );
+	else if (( *sptr >= '0' ) && ( *sptr <= 9 ))
+		return( 0 );
+	else if ( *sptr == '"' )
+		return( 1 );
+	else if (( *sptr == '+' ) || ( *sptr == '-' ))
+		return( 0 );
+	else	return( 1 );
+}
+
+
+/*	--------------		*/
+/*	 add_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * add_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("add_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	0	:
+				/* numeric addition */
+				/* ---------------- */
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value += atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			case	1	:
+				/* string concatenation */
+				/* -------------------- */
+				push_value( iptr->context, join_value_strings( vptr->value, wptr->value ) );
+				break;
+			case	2	:
+				/* add array elements */
+				/* ------------------ */
+				push_value( iptr->context, join_array( vptr->value, wptr->value ) );
+				break;
+			case	3	:
+				/* add structure members */
+				/* --------------------- */
+				push_value( iptr->context, join_structure( vptr->value, wptr->value ) );
+				break;
+			default		:
+				push_value( iptr->context, string_value( "[error]" ) );
+				break;
+
+			}
+			
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+/*	--------------		*/
+/*	 sub_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * sub_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("sub_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ( vptr->value )
+			value = atoi( vptr->value );
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			if ( wptr->value )
+				value -= atoi( wptr->value );
+			push_value( iptr->context, integer_value( value ) );
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
+/*	--------------		*/
+/*	 mul_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * mul_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("mul_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ( vptr->value )
+			value = atoi( vptr->value );
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			if ( wptr->value )
+				value *= atoi( wptr->value );
+			push_value( iptr->context, integer_value( value ) );
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
+/*	--------------		*/
+/*	 div_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * div_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("div_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ( vptr->value )
+			value = atoi( vptr->value );
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			if ( wptr->value )
+				value /= atoi( wptr->value );
+			push_value( iptr->context, integer_value( value ) );
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
+/*	--------------		*/
+/*	 mod_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * mod_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("mod_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ( vptr->value )
+			value = atoi( vptr->value );
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			if ( wptr->value )
+				value %= atoi( wptr->value );
+			push_value( iptr->context, integer_value( value ) );
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
+/*	------------------------	*/
+/*	build_category_reference	*/
+/*	------------------------	*/
+private	char *	build_category_reference( char * name )
+{
+	char buffer[1024];
+	char *	id;
+	if (!( name ))
+		return( name );
+	else if (!( strcmp(name,"publication") ))
+	{
+		sprintf(buffer,"%s/%s/",default_publisher(),name);
+		return( allocate_string( buffer ) );
+	}
+	else if (!( id = occi_resolve_category_provider( name, "Cordscripter", default_tls() ) ))
+		return( id );
+	else
+	{
+		sprintf(buffer,"%s/%s/",id,name);
+		liberate(id);
+		return( allocate_string( buffer ) );
+	}
+}
 
 /*	----------------	*/
 /*	evaluation_value	*/
@@ -660,7 +846,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* --------------------------------------- */
 		/* check for a universal unique identifier */
 		/* --------------------------------------- */
-		if (!( evalue = evaluation_value( vptr->value ) ))
+		else if (!( evalue = evaluation_value( vptr->value ) ))
 			push_value( iptr->context, string_value("[error]") );
 
 		else if (!( strncmp( evalue, "http", strlen("http" ) ) ))
@@ -695,6 +881,22 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("") );
+			}
+			/* -------------------------------- */
+			/* rest/crud methods for categories */
+			/* -------------------------------- */
+			else if ((!( strcmp( wptr->value, "new"      ) ))
+			     ||  (!( strcmp( wptr->value, "create"   ) ))
+			     ||  (!( strcasecmp( wptr->value, "post" ) )))
+			{
+				if (( zptr = occi_simple_post( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					if (( ihost = occi_extract_location( zptr )) != (char *) 0)
+						push_value( iptr->context, string_value(ihost) );
+					else	push_value( iptr->context, string_value("[error]") );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("[error]") );
 			}
 			else if ((!( strcasecmp( wptr->value, "put") ))
 			     ||  (!( strcmp( wptr->value, "update" ) )))
