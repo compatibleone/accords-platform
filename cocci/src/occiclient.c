@@ -407,6 +407,48 @@ public	struct	occi_element  *	occi_response_element(struct occi_response * rptr,
 	}
 }
 
+
+/*	------------------------------------------------------------	*/
+/*		o c c i _ r e s p o n s e _ e l e m e n t s		*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_element  *	occi_response_elements(struct occi_response * rptr, char * nptr, char * vptr )
+{
+	struct	occi_element * eptr;
+	char *	sptr;
+	char *	wptr;
+	char *	xptr;
+	if (!( vptr ))
+		return( occi_response_element( rptr, nptr, vptr ) );
+	else if (!( sptr = allocate_string( vptr ) ))
+		return( occi_response_element( rptr, nptr, vptr ) );
+	else
+	{
+		wptr = sptr;
+		xptr = sptr;
+		while( 1 )
+		{
+			while ( *wptr )
+			{
+				if ( *wptr == ',' )
+					break;
+				else	wptr++;
+			}
+			if (!( *wptr ))
+			{
+				eptr = occi_response_element( rptr, nptr, xptr );
+				liberate( sptr );
+				return( eptr );
+			}
+			else
+			{
+				*(wptr++) = 0;
+				eptr = occi_response_element( rptr, nptr, xptr );
+				xptr = wptr;
+			}			
+		}
+	}		
+}
+
 /*	------------------------------------------------------------	*/
 /*		o c c i _ r e s ol v e _ c a t e g o r y 		*/
 /*	------------------------------------------------------------	*/
@@ -609,7 +651,9 @@ public	struct	occi_response *	occi_create_default_response(
 {
 	struct	rest_header * hptr;
 	struct	occi_element * eptr;
+	char	*	root;
 	char	*	nptr;
+	char 	*	comma;
 	char	*	vptr;
 	for (	hptr=zptr->first;
 		hptr != (struct rest_header *) 0;
@@ -623,20 +667,38 @@ public	struct	occi_response *	occi_create_default_response(
 				continue;
 			else
 			{
-				for ( vptr=nptr; *vptr != 0; vptr++ )
+				root=nptr;
+				comma=nptr;
+				while (comma)
+				{
+					nptr = comma;
+					for ( vptr=nptr; *vptr != 0; vptr++ )
+						if ( *vptr == '=' )
+							break;
 					if ( *vptr == '=' )
-						break;
-				if ( *vptr == '=' )
-					*(vptr++) = 0;
-				eptr=occi_response_element(aptr,nptr,vptr);
-				nptr = liberate( nptr );
+					{
+						*(vptr++) = 0;
+						comma = vptr;
+						while ( *comma )
+						{
+							if ( *comma == ',' )
+								break;
+							else	comma++;
+						}
+						if ( *comma )
+							*(comma++) = 0;
+						else	comma = (char *) 0;
+					}
+					eptr=occi_response_element(aptr,nptr,vptr);
+				}
+				root = liberate( root );
 				if (!( eptr ))
 					break;
 			}
 		}
 		else if (!( strcasecmp( hptr->name, _OCCI_LOCATION )))
 		{
-			if (!(eptr=occi_response_element(aptr,rptr->name,hptr->value)))
+			if (!(eptr=occi_response_elements(aptr,rptr->name,hptr->value)))
 				break;
 		}
 		else if (!( strcasecmp( hptr->name, _OCCI_LINKHEAD )))

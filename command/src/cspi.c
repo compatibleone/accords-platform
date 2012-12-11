@@ -856,11 +856,19 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					{
 						if (!( tptr = dptr->name ))
 							continue;
-						else	
 						{
-							sprintf(vbuffer,"{%c%s%c:%c%s%c}",
-								0x0022,(dptr->name ? dptr->name : ""), 0x0022,
-								0x0022,(dptr->name ? dptr->value : ""), 0x0022);
+							if ( *dptr->name == '"' )
+							{
+								sprintf(vbuffer,"{%s:%s}",
+								(dptr->name ? dptr->name : ""), 
+								(dptr->value ? dptr->value : "")); 
+							}
+							else
+							{
+								sprintf(vbuffer,"{%c%s%c:%c%s%c}",
+									0x0022,(dptr->name ? dptr->name : ""), 0x0022,
+									0x0022,(dptr->value ? dptr->value : ""), 0x0022);
+							}
 							if (!( aptr = add_array( aptr, "", vbuffer ) ))
 								break;
 							else	continue;
