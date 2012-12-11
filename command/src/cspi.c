@@ -1388,6 +1388,9 @@ private	void	pop_instruction( struct cordscript_context * cptr )
 	}
 }
 
+/*	-------------------	*/
+/*	crop_matrix_element	*/
+/*	-------------------	*/
 private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscript_value * sptr )
 {
 	int	c;
@@ -1447,6 +1450,85 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 	}
 }
 
+/*	----------------------	*/
+/*	crop_structure_element	*/
+/*	----------------------	*/
+private	int	crop_structure_element( struct cordscript_value * nptr, struct cordscript_value * rptr, struct cordscript_value * sptr )
+{
+	int	c;
+	char *	mptr;
+	char *	vptr;
+	char *	wptr;
+
+	/* check valid parameters or fail */
+	/* ------------------------------ */
+	if (!( rptr )) 
+		return(0);
+	else if (!( sptr ))
+		return(0);
+	else if (!(mptr = sptr->value))
+		return(0);
+
+	/* detect source matrix or fail */
+	/* ---------------------------- */
+	while ( *mptr == ' ' ) mptr++;
+
+	if ( *(mptr++) != '{' ) return(0);
+
+	while ( *mptr == ' ' ) mptr++;
+
+	for ( vptr=mptr; *vptr != 0; vptr++ )
+	{
+		if (( *vptr == '}' )
+		||  ( *vptr == ',' ))
+			break;
+	}
+	c = *vptr;
+	*vptr = 0;
+
+	if ( nptr->value )
+		liberate( nptr->value );
+
+	if ( rptr->value )
+		liberate( rptr->value );
+
+	for  ( wptr = mptr; *wptr != 0; wptr++ )
+		if ( *wptr == ':' )
+			break;
+
+	if ( *wptr == ':' )
+		*(wptr++)=0;
+
+
+	if (!( nptr->value = allocate_string( mptr ) ))
+		return(0);
+	else if (!( nptr->value = occi_unquoted_value( nptr->value ) ))
+		return( 0 );
+	
+	if (!( rptr->value = allocate_string( wptr ) ))
+		return(0);
+	else if (!( rptr->value = occi_unquoted_value( rptr->value ) ))
+		return( 0 );
+	
+	if ( c == '}' )
+	{
+		sptr->value = liberate( sptr->value );
+		return(1);
+	}
+	else if (!( mptr = allocate( strlen( (vptr+1) ) + 4 ) ))
+	{
+		sptr->value = liberate( sptr->value );
+		return(1);
+	}
+	else
+	{
+		sprintf(mptr, "{%s",(vptr+1));
+		sptr->value = liberate( sptr->value );
+		sptr->value = mptr;
+		return(1);
+	}
+}
+
 /*	-------------------------	*/
 /*		each_operation		*/
 /*	-------------------------	*/
@@ -1472,6 +1554,46 @@ private	struct	cordscript_instruction * each_operation( struct cordscript_instru
 	else if (!(vptr = optr->value))
 		return( iptr->next );
 	else if ( crop_matrix_element( vptr, sptr ) )
+		return( iptr->next );
+	else if (!(optr = optr->next))
+		return( iptr->next );
+	else if (!(vptr = optr->value))
+		return( iptr->next );
+	else if (!( vptr->code ))
+		return( iptr->next );
+	else	return( vptr->code );
+}
+
+/*	-------------------------	*/
+/*		both_operation		*/
+/*	-------------------------	*/
+private	struct	cordscript_instruction * both_operation( struct cordscript_instruction * iptr )
+{
+	struct cordscript_operand * optr;
+	struct cordscript_value * nptr;
+	struct cordscript_value * vptr;
+	struct cordscript_value * tptr;
+	struct cordscript_value * sptr;
+	
+	if ( check_debug() )
+		printf("both_operation();\n");
+	
+	/* ------------------------------------------------- */
+	/* collect source and target operands from the stack */
+	/* ------------------------------------------------- */
+	if (!(optr = iptr->first))
+		return( iptr->next );
+	else if (!(sptr = optr->value))
+		return( iptr->next );
+	else if (!(optr = optr->next))
+		return( iptr->next );
+	else if (!(nptr = optr->value))
+		return( iptr->next );
+	else if (!(optr = optr->next))
+		return( iptr->next );
+	else if (!(vptr = optr->value))
+		return( iptr->next );
+	else if ( crop_structure_element( nptr, vptr, sptr ) )
 		return( iptr->next );
 	else if (!(optr = optr->next))
 		return( iptr->next );
@@ -2242,6 +2364,102 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 }
 
 
+/*   --------------------------		*/
+/*   compile_cordscript_forboth		*/
+/*   --------------------------		*/
+private	struct cordscript_instruction * compile_cordscript_forboth( struct cordscript_context * cptr )
+{
+	int	c;
+	struct	cordscript_instruction * lptr;
+	struct	cordscript_instruction * jptr;
+	struct	cordscript_instruction * xptr;
+	struct	cordscript_instruction * iptr;
+	struct	cordscript_value *	 sptr;
+	struct	cordscript_value *	 tptr;
+	struct	cordscript_value *	 vptr;
+	char	buffer[_MAX_NAME];
+
+	if ( get_punctuation() != '(' )
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( lptr = allocate_cordscript_instruction( no_operation ) ))
+		return( lptr );
+	else	add_instruction(cptr, lptr );
+
+	if (!( jptr = allocate_cordscript_instruction( jmp_operation ) ))
+		return( xptr );
+	else	add_operand( jptr, instruction_value( lptr ) );
+
+	if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
+		return( xptr );
+	else	jptr->next = xptr;
+
+	if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( sptr = resolve_variable( buffer, cptr ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( strcmp( buffer,"as" ) )
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( tptr = resolve_variable( buffer, cptr ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( strcmp( buffer,"and" ) )
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( get_token(buffer)))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( vptr = resolve_variable( buffer, cptr ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( get_punctuation() != ')' )
+		return((struct cordscript_instruction *) 0);
+
+	if (!( iptr = allocate_cordscript_instruction( both_operation ) ))
+		return( iptr );
+	else
+	{
+		add_operand( iptr, sptr );
+		add_operand( iptr, tptr );
+		add_operand( iptr, vptr );
+		add_operand( iptr, instruction_value( xptr ) );
+		add_instruction( cptr, iptr );
+	}
+
+	/* ----------------------------------- */
+	/* detect and handle conditional block */
+	/* ----------------------------------- */
+	if (( c = get_punctuation()) == '{' )
+		allocate_cordscript_label( jptr, 0 );
+
+	else if (!( c ))
+	{
+		add_instruction( cptr, jptr );
+		add_instruction( cptr, xptr );
+	}
+	else
+	{
+		unget_byte(c);
+		add_instruction( cptr, jptr );
+		add_instruction( cptr, xptr );
+	}
+	return((struct cordscript_instruction *) 0);
+
+}
+
+
 /*   ----------------------	*/
 /*   compile_cordscript_for	*/
 /*   ----------------------	*/
@@ -2547,6 +2765,8 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 		return( compile_cordscript_for( cptr ) );
 	else if (!( strcmp( token, "foreach" ) ))
 		return( compile_cordscript_foreach( cptr ) );
+	else if (!( strcmp( token, "forboth" ) ))
+		return( compile_cordscript_forboth( cptr ) );
 	else if (!( strcmp( token, "return" ) ))
 		return( compile_cordscript_return( cptr ) );
 	else if (!( strcmp( token, "function" ) ))
@@ -2652,8 +2872,8 @@ private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
 					break;
 				}
 			}
+			end_of_instruction=0;
 		}
-		end_of_instruction=0;
 	}
 	return;
 }
