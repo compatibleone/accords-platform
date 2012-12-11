@@ -1028,11 +1028,25 @@ private	struct	cordscript_instruction * jeq_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(wptr->value) == atoi(vptr->value))
+
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(wptr->value) == atoi(vptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+			case	1	:
+				if (!( strcmp( wptr->value, vptr->value ) ))
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			}
 		}
 	}
@@ -1076,11 +1090,26 @@ private	struct	cordscript_instruction * jne_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(wptr->value) != atoi(vptr->value))
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(wptr->value) != atoi(vptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+			case	1	:
+				if ( strcmp( wptr->value, vptr->value ) != 0 )
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+
 			}
 		}
 	}
@@ -1121,12 +1150,27 @@ private	struct	cordscript_instruction * jle_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(vptr->value) <= atoi(wptr->value))
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(vptr->value) <= atoi(wptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+			case	1	:
+				if ( strcmp( vptr->value, wptr->value ) <= 0 )
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			}
+
 		}
 	}
 	iptr->context->ip = iptr->next;
@@ -1165,11 +1209,25 @@ private	struct	cordscript_instruction * jls_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(vptr->value) < atoi(wptr->value))
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(vptr->value) < atoi(wptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+			case	1	:
+				if ( strcmp( vptr->value, wptr->value ) < 0 )
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			}
 		}
 	}
@@ -1209,11 +1267,25 @@ private	struct	cordscript_instruction * jgr_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(vptr->value) > atoi(wptr->value))
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(vptr->value) > atoi(wptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+			case	1	:
+				if ( strcmp( vptr->value, wptr->value ) > 0 )
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			}
 		}
 	}
@@ -1254,11 +1326,26 @@ private	struct	cordscript_instruction * jge_operation( struct cordscript_instruc
 		}
 		else if (( wptr->value ) && ( vptr->value ))
 		{
-			if (atoi(vptr->value) >= atoi(wptr->value))
+			switch( check_value_type( vptr->value ) )
 			{
-				iptr->context->ip = lptr->code;
-				drop_value( vptr );
-				return(iptr->context->ip);
+			case	0	:
+				if (atoi(vptr->value) >= atoi(wptr->value))
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
+
+			case	1	:
+				if ( strcmp( vptr->value, wptr->value ) >= 0 )
+				{
+
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			}
 		}
 	}
@@ -1573,25 +1660,31 @@ private	int	get_byte()
 private	int	remove_white()
 {
 	int	c;
-	while (1) 
+
+	if ( ungot_token )
+		return( 1 );
+	else
 	{
-		if (!(c = get_byte()))
-			break;
-		else if ( c== '\r' )
-			continue;
-		else if ( c == '\n' )
-			continue;
-		else if ( c == '\t' )
-			continue;
-		else if ( c == ' ' )
-			continue;
-		else
+		while (1) 
 		{
-			unget_byte(c);
-			return( 1 );
+			if (!(c = get_byte()))
+				break;
+			else if ( c== '\r' )
+				continue;
+			else if ( c == '\n' )
+				continue;
+			else if ( c == '\t' )
+				continue;
+			else if ( c == ' ' )
+				continue;
+			else
+			{
+				unget_byte(c);
+				return( 1 );
+			}
 		}
+		return(0);
 	}
-	return(0);
 }
 
 /*	---------	*/
@@ -1685,6 +1778,7 @@ private	int	get_token( char * result )
 	{
 		strcpy( result, ungot_token );
 		liberate( ungot_token );
+		ungot_token = (char *) 0;
 		return( strlen( result ) );
 	}
 
