@@ -60,7 +60,7 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 				strcat( buffer,"{immutable}" );
 			if (!( result = join_string( result, buffer )))
 				return( result );
-			term=",";
+			term=" ";
 		}
 		strcpy( buffer, "\";" );
 		if (!( result = join_string( result, buffer )))
@@ -90,7 +90,7 @@ public	char *	occi_http_capacity( struct occi_category * optr )
 			strcat( buffer, fptr->name );
 			if (!( result = join_string( result, buffer )))
 				return( result );
-			term=",";
+			term=" ";
 		}
 		strcpy( buffer, "\";" );
 		if (!( result = join_string( result, buffer )))

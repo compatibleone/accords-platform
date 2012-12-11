@@ -551,6 +551,9 @@ private	char *	build_category_reference( char * name )
 	}
 }
 
+/*	----------------	*/
+/*	   add_array		*/
+/*	----------------	*/
 private	char *	add_array( char * aptr, char * hptr, char * vptr )
 {
 	char *	rptr;
@@ -581,6 +584,9 @@ private	char *	add_array( char * aptr, char * hptr, char * vptr )
 	}
 }
 
+/*	----------------	*/
+/*	  close_array		*/
+/*	----------------	*/
 private	char *	close_array( char * aptr )
 {
 	if (!( aptr ))
@@ -590,6 +596,26 @@ private	char *	close_array( char * aptr )
 	else 	return( strcat( aptr, "]" ) );
 }
 
+
+/*	----------------	*/
+/*	evaluation_value	*/
+/*	----------------	*/
+private	char *	evaluation_value( char * sptr )
+{
+	char *	rptr;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( rptr = allocate_string( sptr ) ))
+		return( rptr );
+	else if ( *rptr != '"' )
+		return( rptr );
+	else
+	{ 	
+		sptr = occi_unquoted_value( rptr );
+		rptr = liberate( rptr );
+		return( sptr );
+	}
+}
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -603,6 +629,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	struct	occi_response* zptr=(struct occi_response *) 0;
 	char	vbuffer[_MAX_VALUE];
 	char *	ihost;
+	char *	evalue=(char *) 0;
 	char *	aptr;
 	char *	tptr;
 	char *	sptr;
@@ -633,14 +660,17 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* --------------------------------------- */
 		/* check for a universal unique identifier */
 		/* --------------------------------------- */
-		else if (!( strncmp( vptr->value, "http", strlen("http" ) ) ))
+		if (!( evalue = evaluation_value( vptr->value ) ))
+			push_value( iptr->context, string_value("[error]") );
+
+		else if (!( strncmp( evalue, "http", strlen("http" ) ) ))
 		{
 			/* rest/crud methods for instances */
 			/* ------------------------------- */
 			if ((!( strcasecmp( wptr->value, "get"      ) ))
 			||  (!( strcmp( wptr->value, "retrieve" ) )))
 			{
-				if (( zptr = occi_simple_get( vptr->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				if (( zptr = occi_simple_get( evalue, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
 					for (	dptr=zptr->first;
@@ -673,14 +703,14 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
-				if (( zptr = occi_simple_delete( vptr->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				if (( zptr = occi_simple_delete( evalue, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
 			}
 		}
 		/* --------------------------------------- */
 		/* else it should be a category identifier */
 		/* --------------------------------------- */
-		else if (( sptr = build_category_reference( vptr->value )) != (char *) 0)
+		else if (( sptr = build_category_reference( evalue )) != (char *) 0)
 		{
 			/* -------------------------------- */
 			/* rest/crud methods for categories */
@@ -738,6 +768,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		}
 	}
 
+	if ( evalue )
+		evalue = liberate( evalue );
 	if (!( iptr ))
 		return( (struct cordscript_instruction *) 0);
 	else	return( iptr->next );
