@@ -568,7 +568,7 @@ private	int	check_value_type( char * sptr )
 		return( 2 );
 	else if ( *sptr == '{' )
 		return( 3 );
-	else if (( *sptr >= '0' ) && ( *sptr <= 9 ))
+	else if (( *sptr >= '0' ) && ( *sptr <= '9' ))
 		return( 0 );
 	else if ( *sptr == '"' )
 		return( 1 );
@@ -791,16 +791,7 @@ private	char *	evaluation_value( char * sptr )
 	char *	rptr;
 	if (!( sptr ))
 		return( sptr );
-	else if (!( rptr = allocate_string( sptr ) ))
-		return( rptr );
-	else if ( *rptr != '"' )
-		return( rptr );
-	else
-	{ 	
-		sptr = occi_unquoted_value( rptr );
-		rptr = liberate( rptr );
-		return( sptr );
-	}
+	else 	return( allocate_string( sptr ) );
 }
 
 /*	---------------		*/
@@ -1339,6 +1330,8 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 
 	if (!( rptr->value = allocate_string( mptr ) ))
 		return(0);
+	else if (!( rptr->value = occi_unquoted_value( rptr->value ) ))
+		return( 0 );
 	
 	if ( c == ']' )
 	{
@@ -1696,9 +1689,11 @@ private	int	get_token( char * result )
 		else if ( quote )
 		{
 			if ( c == quote )
-				quote=0;
-			*(result+nb) = c;
-			nb++;
+				break;
+			{
+				*(result+nb) = c;
+				nb++;
+			}
 		}
 		else if ((!( nb )) && ( c == '[' ))
 			return( get_array( result ) );
@@ -1707,8 +1702,7 @@ private	int	get_token( char * result )
 		else if (( c == '"' ) || ( c == 0x0027 ))
 		{
 			quote = c;
-			*(result+nb) = c;
-			nb++;
+			continue;
 		}
 		else if (!( token_legal(c) ))
 		{
