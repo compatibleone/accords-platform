@@ -29,7 +29,7 @@ private	int	verbose=0;
 private	int	debug=0;
 
 private	char *	agent="CO-COMMAND/1.0";
-private	char *	publisher=(char *) 0;
+private	char *	publisher="http://127.0.0.1:8086";
 private	char *	operator="accords";
 private	char *	zone="europe";
 private	char *	tls=(char *) 0;

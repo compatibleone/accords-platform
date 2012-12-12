@@ -774,9 +774,31 @@ public	struct	rest_header *	rest_client_header( struct rest_header * root, char 
 private	struct	rest_response *	rest_client_accept_response( struct rest_client * cptr, char * agent )
 {
 	struct	rest_response * aptr;
+	struct	rest_header * hptr;
 	if (!( aptr = rest_accept_response( cptr ) ))
 		rest_log_recv_response( agent, aptr );
 	else	rest_log_recv_response( agent, aptr );
+	if ( show_rest_request )
+	{
+		if (!( aptr ))
+			printf("\nNULL RESPONSE");
+		else
+		{
+			printf("\n%s %u %s",
+				( aptr->version ? aptr->version : "NULL/VERSION"),
+				aptr->status,
+				( aptr->message ? aptr->message : "NULL/MESSAGE"));
+			for ( 	hptr=aptr->first;
+				hptr != (struct rest_header *) 0;
+				hptr = hptr->next )
+			{
+				printf("\n%s: %s",
+					(hptr->name ? hptr->name : "NULL/NAME"),
+					(hptr->value ? hptr->value : "NULL/VALUE"));
+			}
+		}
+		printf("\n");
+	}
 	return( aptr );
 }
 

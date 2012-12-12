@@ -794,16 +794,58 @@ private	char *	evaluation_value( char * sptr )
 	else 	return( allocate_string( sptr ) );
 }
 
+/*	----------------------	*/
+/*	cordscript_occi_filter	*/
+/*	----------------------	*/
+private	struct occi_element * cordscript_occi_filter( char * vptr )
+{
+	struct	occi_element * root=(struct occi_element *) 0;
+	struct	occi_element * foot=(struct occi_element *) 0;
+	struct	occi_element * dptr=(struct occi_element *) 0;
+	char *	wptr;
+	char *	sptr;
+	if ( vptr )
+	{
+		if (( *vptr != '{' )
+		&&  ( *vptr != '[' ))
+		{
+			if (!( wptr = allocate_string( vptr ) ))
+				return( root );
+			else
+			{
+				for ( sptr=wptr; *sptr; sptr++ )
+					if ( *sptr == '=' )
+						break;
+				if ( *sptr == '=' )
+					*(sptr++) = 0;
+			}
+			if ((dptr = occi_create_element( wptr, sptr )) != (struct occi_element *) 0)
+			{
+				if (!( dptr->previous = foot ))
+					root = dptr;
+				else	foot->next = dptr;
+				foot = dptr;
+			}
+			liberate( wptr );
+		}
+	}
+	return( root );
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
 private	struct	cordscript_instruction * eval_operation( struct cordscript_instruction * iptr )
 {
 	struct	cordscript_value * vptr;
+	struct	cordscript_value * nptr;
 	struct	cordscript_value * wptr;
 	struct	cordscript_operand * optr;
 	struct	occi_element * dptr=(struct occi_element *) 0;
 	struct	occi_response* zptr=(struct occi_response *) 0;
+	struct	cordscript_value * 	argv[10];
+	int				argc=0;
+	int				argi=0;
 	char	vbuffer[_MAX_VALUE];
 	char *	ihost;
 	char *	evalue=(char *) 0;
@@ -815,6 +857,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	if ( check_debug() )
 		printf("eval_operation();\n");
 
+	for ( argi=0; argi < 10; argi++ )
+		argv[argi] = (struct cordscript_value *) 0;
+
 	/* ----------------------------------- */
 	/* detect nature of evaluation operand */
 	/* ----------------------------------- */
@@ -823,6 +868,24 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	&&  ((optr = optr->next)  != (struct cordscript_operand *) 0)
 	&&  ((wptr = optr->value) != (struct cordscript_value   *) 0))
 	{
+		/* ------------------------- */
+		/* check for pushed operands */
+		/* ------------------------- */
+		if ((( optr = optr->next ) != (struct cordscript_operand *) 0)
+		&&  (( nptr = optr->value) != (struct cordscript_value *) 0))
+		{
+			if ((argc = (nptr->value ? atoi( nptr->value ) : 0)) != 0 )
+			{
+				for ( argi=0; argi < argc; argi++ )
+				{
+					if (!( argv[argi] = pop_stack( iptr->context ) ))
+						break;
+					else if ( check_verbose )
+						printf("argv[%i] = %s \n",argi,( argv[argi]->value ? argv[argi]->value : "0"));
+				}
+			}
+		}
+
 		if (!( strcmp( wptr->value, "display" ) ))
 		{
 			if ( vptr->value )
@@ -832,6 +895,11 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		{
 			if ( vptr->value )
 				sleep( atoi(vptr->value) );
+		}
+
+		else if (!( strcmp( wptr->value, "debug" ) ))
+		{
+			rest_show_request( atoi(vptr->value ) );
 		}
 
 		/* --------------------------------------- */
@@ -888,6 +956,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			     ||  (!( strcmp( wptr->value, "create"   ) ))
 			     ||  (!( strcasecmp( wptr->value, "post" ) )))
 			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
 				if (( zptr = occi_simple_post( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					if (( ihost = occi_extract_location( zptr )) != (char *) 0)
@@ -900,10 +970,60 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			else if ((!( strcasecmp( wptr->value, "put") ))
 			     ||  (!( strcmp( wptr->value, "update" ) )))
 			{
-				status = 0;
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
+				if (( zptr = occi_simple_put( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else if (!( aptr = add_array( aptr, evalue, tptr ) ))
+							break;
+						else	continue;
+					}
+					aptr = close_array( aptr );
+					push_value( iptr->context, string_value(aptr) );
+					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("[error]") );
+			}
+			else if (!( strcmp( wptr->value, "list" ) ))
+			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
+				if (( zptr = occi_simple_list( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else if (!( aptr = add_array( aptr, evalue, tptr ) ))
+							break;
+						else	continue;
+					}
+					aptr = close_array( aptr );
+					push_value( iptr->context, string_value(aptr) );
+					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
 				if (( zptr = occi_simple_delete( evalue, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
 			}
@@ -920,6 +1040,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			||  (!( strcmp( wptr->value, "create"   ) ))
 			||  (!( strcasecmp( wptr->value, "post" ) )))
 			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
 				if (( zptr = occi_simple_post( sptr, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					if (( ihost = occi_extract_location( zptr )) != (char *) 0)
@@ -929,8 +1051,33 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 				else	push_value( iptr->context, string_value("[error]") );
 			}
-			else if ((!( strcmp( wptr->value, "list" ) ))
-			     ||  (!( strcmp( wptr->value, "get"  ) )))
+			else if (!( strcmp( wptr->value, "list" ) ))
+			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
+				if (( zptr = occi_simple_list( sptr, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else if (!( aptr = add_array( aptr, sptr, tptr ) ))
+							break;
+						else	continue;
+					}
+					aptr = close_array( aptr );
+					push_value( iptr->context, string_value(aptr) );
+					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
+			}
+			else if (!( strcmp( wptr->value, "get"  ) ))
 			{
 				if (( zptr = occi_simple_get( sptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
@@ -956,6 +1103,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
 				if (( zptr = occi_simple_delete( sptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
 			}
@@ -2886,8 +3035,10 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 	char	token[_MAX_VALUE];
 	int	c;
 	int	bracing=0;
+	int	operands=0;
 	struct	cordscript_value * vptr;
 	struct	cordscript_instruction * iptr;
+	struct	cordscript_instruction * jptr;
 	struct	cordscript_instruction * xptr;
 
 	/* -------------------------------------- */
@@ -3009,11 +3160,41 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		}
 		else if ( c == '(' )
 		{
-			iptr->evaluate = eval_operation;
-			if (!( c = get_punctuation() ))
+			if ( operands )
 				break;
-			else if ( c != ')' )
-				break;
+			else	iptr->evaluate = eval_operation;
+			/* --------------------------------- */
+			/* parameters to be stacked for eval */
+			/* --------------------------------- */
+			while (1)
+			{
+				if (( c = get_punctuation() ) != 0)
+				{
+					if ( c == ')' )
+						break;
+					else if ( c == ',' )
+						continue;
+					else if ((c == '[' ) || ( c == '{' ))
+					{
+						unget_byte( c ); 
+						if (!( jptr = compile_cordscript_instruction(cptr, (level+1) ) ))
+							break;
+						else
+						{
+							operands++;
+							continue;
+						}
+					}
+					else 	break;
+				}
+				else if (!( jptr = compile_cordscript_instruction(cptr, (level+1) ) ))
+					break;
+				else	operands++;
+			}
+			if (( operands ) && ( c == ')' ))
+			{
+				add_operand( iptr, integer_value( operands ) );
+			}
 		}
 		else if ( c == ';' )
 		{
