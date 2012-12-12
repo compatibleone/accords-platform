@@ -44,119 +44,119 @@ Description: CompatibleOne Accords platform (python testsuite)
 Package: libcompatibleone-accords-dev
 Section: devel
 Architecture: all
-Depends: libcompatibleone-cocarrier-dev, libcompatibleone-cocci-dev, libcompatibleone-copabr-dev, libcompatibleone-cords-dev, libcompatibleone-corest-dev, libcompatibleone-coxml-dev, libcompatibleone-occi-dev, libcompatibleone-pubocci-dev
+Depends: libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
 Description: CompatibleOne Accords platform (devel/debug libraries)
  CompatibleOne Accords platform development and debug libraries and files
 
-Package: libcompatibleone-cocarrier0
+Package: libcocarrier0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cocarrier)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-cocarrier-dev
+Package: libcocarrier-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cocarrier0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcocarrier0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-cocci0
+Package: libcocci0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cocci)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-cocci-dev
+Package: libcocci-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cocci0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcocci0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-copabr0
+Package: libcopabr0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: copabr)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-copabr-dev
+Package: libcopabr-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcopabr0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-cords0
+Package: libcords0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: cords)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-cords-dev
+Package: libcords-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-cords0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcords0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-corest0
+Package: libcorest0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: corest)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-corest-dev
+Package: libcorest-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-corest0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcorest0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-coxml0
+Package: libcoxml0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: coxml)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-coxml-dev
+Package: libcoxml-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-coxml0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcoxml0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-occi0
+Package: libocci0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: occi)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-occi-dev
+Package: libocci-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-occi0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libocci0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
-Package: libcompatibleone-pubocci0
+Package: libpubocci0
 Section: libs
 Architecture: any
 Depends: compatibleone (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform (Base Library: pubocci)
  CompatibleOne Accords platform base dynamic libraries and Files
 
-Package: libcompatibleone-pubocci-dev
+Package: libpubocci-dev
 Section: libdevel
 Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libcompatibleone-copabr0 (= ${binary:Version})
+Depends: compatibleone (>= ${binary:Version}), libcopabr0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
@@ -237,7 +237,7 @@ Description: CompatibleOne Accords Platform - COOBAS subsystem
  the prices of the different categories and provisioning operations. This information
  is intended to be configured using external user interfaced tools provided by third
  party software vendors but can also be configured by hand by editing the corresponding
- category configuration file, “cords_price.xml”,  prior to launching the COOBAS module.
+ category configuration file, cords_price.xml,  prior to launching the COOBAS module.
 
 Package: compatibleone-cool
 Section: net
@@ -260,7 +260,7 @@ Description: CompatibleOne Accords Platform - COOL subsystem
 # resource deployment startup.
 # The module also provides the monitoring control channels for the activation of monitoring
 # agents and their data collection probes.
-#
+
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
@@ -426,6 +426,7 @@ Description: CompatibleOne Accords Platform - SLA Manager
 #
 Package: compatibleone-accords
 Architecture: all
+Section: net
 Depends: compatibleone, compatibleone-azprocci, compatibleone-broker, compatibleone-cool, compatibleone-coees, compatibleone-copaas, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-accords-doc
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (runtime)
@@ -436,7 +437,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
  by heterogeneous cloud service providers. CompatibleOne's flexible service architecture
  makes it independent from any Cloud Service Provider (from OpenStack to OpenNebula,
  from Azure to Vcloud) and can address all types of cloud services (IaaS, PaaS, SaaS,
- XaaS, BpaaS, …) and any type of cloud service deployment (public, private, community and hybrid).
+ XaaS, BpaaS, ...) and any type of cloud service deployment (public, private, community and hybrid).
  The goals of CompatibleOne are to:
  - Provide entrepreneurs and organisations unimpeded access to cloud technologies
  - Provide innovative platform of services, that go beyond the standard services provided by existing cloud providers
@@ -445,6 +446,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 
 Package: compatibleone-accords-dev
 Architecture: all
+Section: libdevel
 Depends: compatibleone, libcompatibleone-accords-dev, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
@@ -455,6 +457,7 @@ Description: CompatibleOne Accords Platform - All packages (development)
 
 Package: compatibleone-accords-doc
 Architecture: all
+Section: doc
 Description: documentation for CompatibleOne Accord's platform
  CompatibleOne is an open source project which provides a model
  and a platform for the description and federation of different clouds comprising resources
