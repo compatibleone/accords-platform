@@ -296,22 +296,22 @@ private struct rest_response * cords_enquiry_occi_response(
 	struct cords_enquiry * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.where=%s",optr->domain,optr->id,pptr->where);
+	sprintf(cptr->buffer,"%s.%s.where=%c%s%c",optr->domain,optr->id,0x0022,pptr->where,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.what=%s",optr->domain,optr->id,pptr->what);
+	sprintf(cptr->buffer,"%s.%s.what=%c%s%c",optr->domain,optr->id,0x0022,pptr->what,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.who=%s",optr->domain,optr->id,pptr->who);
+	sprintf(cptr->buffer,"%s.%s.who=%c%s%c",optr->domain,optr->id,0x0022,pptr->who,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.pass=%s",optr->domain,optr->id,pptr->pass);
+	sprintf(cptr->buffer,"%s.%s.pass=%c%s%c",optr->domain,optr->id,0x0022,pptr->pass,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%s",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%s%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)

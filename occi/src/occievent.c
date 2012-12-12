@@ -312,28 +312,28 @@ private struct rest_response * cords_event_occi_response(
 	struct cords_event * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.source=%s",optr->domain,optr->id,pptr->source);
+	sprintf(cptr->buffer,"%s.%s.source=%c%s%c",optr->domain,optr->id,0x0022,pptr->source,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.target=%s",optr->domain,optr->id,pptr->target);
+	sprintf(cptr->buffer,"%s.%s.target=%c%s%c",optr->domain,optr->id,0x0022,pptr->target,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.nature=%s",optr->domain,optr->id,pptr->nature);
+	sprintf(cptr->buffer,"%s.%s.nature=%c%s%c",optr->domain,optr->id,0x0022,pptr->nature,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.compliment=%s",optr->domain,optr->id,pptr->compliment);
+	sprintf(cptr->buffer,"%s.%s.compliment=%c%s%c",optr->domain,optr->id,0x0022,pptr->compliment,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.timestamp=%u",optr->domain,optr->id,pptr->timestamp);
+	sprintf(cptr->buffer,"%s.%s.timestamp=%c%u%c",optr->domain,optr->id,0x0022,pptr->timestamp,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)

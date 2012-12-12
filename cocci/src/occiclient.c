@@ -325,6 +325,8 @@ public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr )
 		return( occi_remove_element( eptr ) );
 	else if (!( eptr->value = allocate_string( vptr )))
 		return( occi_remove_element( eptr ) );
+	else if (!( eptr->value = occi_unquoted_value( eptr->value ) ))
+		return( occi_remove_element( eptr ) );
 	else	return( eptr );
 }
 
@@ -655,6 +657,7 @@ public	struct	occi_response *	occi_create_default_response(
 	char	*	nptr;
 	char 	*	comma;
 	char	*	vptr;
+	int		quote=0;
 	for (	hptr=zptr->first;
 		hptr != (struct rest_header *) 0;
 		hptr = hptr->next )
@@ -681,7 +684,16 @@ public	struct	occi_response *	occi_create_default_response(
 						comma = vptr;
 						while ( *comma )
 						{
-							if ( *comma == ',' )
+							if ( *comma == quote )
+							{
+								comma++;
+								quote=0;
+							}
+							else if ( *comma == '"' )
+								quote=*(comma++);
+							else if ( quote )
+								comma++;
+							else if ( *comma == ',' )
 								break;
 							else	comma++;
 						}
@@ -689,6 +701,7 @@ public	struct	occi_response *	occi_create_default_response(
 							*(comma++) = 0;
 						else	comma = (char *) 0;
 					}
+					else comma=(char *) 0;
 					eptr=occi_response_element(aptr,nptr,vptr);
 				}
 				root = liberate( root );

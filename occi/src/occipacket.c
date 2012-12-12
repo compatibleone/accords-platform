@@ -348,37 +348,37 @@ private struct rest_response * cords_packet_occi_response(
 	struct cords_packet * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.connection=%s",optr->domain,optr->id,pptr->connection);
+	sprintf(cptr->buffer,"%s.%s.connection=%c%s%c",optr->domain,optr->id,0x0022,pptr->connection,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.probe=%s",optr->domain,optr->id,pptr->probe);
+	sprintf(cptr->buffer,"%s.%s.probe=%c%s%c",optr->domain,optr->id,0x0022,pptr->probe,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.start=%s",optr->domain,optr->id,pptr->start);
+	sprintf(cptr->buffer,"%s.%s.start=%c%s%c",optr->domain,optr->id,0x0022,pptr->start,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.finish=%s",optr->domain,optr->id,pptr->finish);
+	sprintf(cptr->buffer,"%s.%s.finish=%c%s%c",optr->domain,optr->id,0x0022,pptr->finish,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.metric=%s",optr->domain,optr->id,pptr->metric);
+	sprintf(cptr->buffer,"%s.%s.metric=%c%s%c",optr->domain,optr->id,0x0022,pptr->metric,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.data=%s",optr->domain,optr->id,pptr->data);
+	sprintf(cptr->buffer,"%s.%s.data=%c%s%c",optr->domain,optr->id,0x0022,pptr->data,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.sequence=%u",optr->domain,optr->id,pptr->sequence);
+	sprintf(cptr->buffer,"%s.%s.sequence=%c%u%c",optr->domain,optr->id,0x0022,pptr->sequence,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.samples=%u",optr->domain,optr->id,pptr->samples);
+	sprintf(cptr->buffer,"%s.%s.samples=%c%u%c",optr->domain,optr->id,0x0022,pptr->samples,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.status=%c%u%c",optr->domain,optr->id,0x0022,pptr->status,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)

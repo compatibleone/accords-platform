@@ -198,6 +198,7 @@ public	char *	occi_http_attribute( struct occi_category * optr, struct occi_attr
 public	char *	occi_http_attribute_value( struct occi_category * optr, struct occi_attribute * aptr, char * vptr )
 {
 	char	buffer[8192];
+	char	* rptr;
 	if ( optr->domain )
 	{
 		strcpy( buffer, optr->domain );
@@ -207,9 +208,13 @@ public	char *	occi_http_attribute_value( struct occi_category * optr, struct occ
 		strcat( buffer, aptr->name );
 	}
 	else 	strcpy( buffer, aptr->name );
-	strcat( buffer, "=" );
-	strcat( buffer, vptr );
-	return( allocate_string( buffer ) );
+	if (!( rptr = allocate( strlen(buffer) + strlen( vptr ) + 4 ) ))
+		return( rptr );
+	else
+	{
+		sprintf(rptr,"%s=%c%s%c",buffer,0x0022,vptr,0x0022);
+		return( rptr );
+	}
 }
 
 #endif	/* _occihttp_c */

@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occixlink_c_
@@ -262,16 +264,16 @@ private struct rest_response * cords_xlink_occi_response(
 	struct cords_xlink * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.source=%s",optr->domain,optr->id,pptr->source);
+	sprintf(cptr->buffer,"%s.%s.source=%c%s%c",optr->domain,optr->id,0x0022,pptr->source,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.target=%s",optr->domain,optr->id,pptr->target);
+	sprintf(cptr->buffer,"%s.%s.target=%c%s%c",optr->domain,optr->id,0x0022,pptr->target,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)

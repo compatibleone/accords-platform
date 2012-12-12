@@ -156,4 +156,4 @@ public int rest_occi_cords_guarantee(FILE * fh,struct cords_guarantee * sptr,cha
 
 }
 
-#endif	/* _guarantee_c_ */
+#endif	/* _guarantee_cguarantee_c_ */

@@ -368,40 +368,40 @@ private struct rest_response * cords_agreement_occi_response(
 	struct cords_agreement * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.initiator=%s",optr->domain,optr->id,pptr->initiator);
+	sprintf(cptr->buffer,"%s.%s.initiator=%c%s%c",optr->domain,optr->id,0x0022,pptr->initiator,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.responder=%s",optr->domain,optr->id,pptr->responder);
+	sprintf(cptr->buffer,"%s.%s.responder=%c%s%c",optr->domain,optr->id,0x0022,pptr->responder,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.serviceprovider=%s",optr->domain,optr->id,pptr->serviceprovider);
+	sprintf(cptr->buffer,"%s.%s.serviceprovider=%c%s%c",optr->domain,optr->id,0x0022,pptr->serviceprovider,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.initiation=%s",optr->domain,optr->id,pptr->initiation);
+	sprintf(cptr->buffer,"%s.%s.initiation=%c%s%c",optr->domain,optr->id,0x0022,pptr->initiation,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.expiration=%s",optr->domain,optr->id,pptr->expiration);
+	sprintf(cptr->buffer,"%s.%s.expiration=%c%s%c",optr->domain,optr->id,0x0022,pptr->expiration,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.templateid=%s",optr->domain,optr->id,pptr->templateid);
+	sprintf(cptr->buffer,"%s.%s.templateid=%c%s%c",optr->domain,optr->id,0x0022,pptr->templateid,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.templatename=%s",optr->domain,optr->id,pptr->templatename);
+	sprintf(cptr->buffer,"%s.%s.templatename=%c%s%c",optr->domain,optr->id,0x0022,pptr->templatename,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.termss=%u",optr->domain,optr->id,pptr->termss);
+	sprintf(cptr->buffer,"%s.%s.termss=%c%u%c",optr->domain,optr->id,0x0022,pptr->termss,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)

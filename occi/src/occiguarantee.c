@@ -17,8 +17,8 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _guarantee_c_
-#define _guarantee_c_
+#ifndef _occiguarantee_c_
+#define _occiguarantee_c_
 
 #include "guarantee.h"
 
@@ -35,6 +35,7 @@ private pthread_mutex_t list_cords_guarantee_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_guarantee_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_guarantee_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_guarantee_node() { return( cords_guarantee_first ); }
+public struct  occi_kind_node * occi_last_cords_guarantee_node() { return( cords_guarantee_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -325,31 +326,31 @@ private struct rest_response * cords_guarantee_occi_response(
 	struct cords_guarantee * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.obligated=%s",optr->domain,optr->id,pptr->obligated);
+	sprintf(cptr->buffer,"%s.%s.obligated=%c%s%c",optr->domain,optr->id,0x0022,pptr->obligated,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.importance=%s",optr->domain,optr->id,pptr->importance);
+	sprintf(cptr->buffer,"%s.%s.importance=%c%s%c",optr->domain,optr->id,0x0022,pptr->importance,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.scope=%s",optr->domain,optr->id,pptr->scope);
+	sprintf(cptr->buffer,"%s.%s.scope=%c%s%c",optr->domain,optr->id,0x0022,pptr->scope,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.variable=%s",optr->domain,optr->id,pptr->variable);
+	sprintf(cptr->buffer,"%s.%s.variable=%c%s%c",optr->domain,optr->id,0x0022,pptr->variable,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.values=%u",optr->domain,optr->id,pptr->values);
+	sprintf(cptr->buffer,"%s.%s.values=%c%u%c",optr->domain,optr->id,0x0022,pptr->values,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -743,6 +744,19 @@ private void	redirect_occi_cords_guarantee_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_cords_guarantee(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_cords_guarantee_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -772,6 +786,8 @@ public struct occi_category * occi_cords_guarantee_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_guarantee)))
+			return( optr );
 		autoload_cords_guarantee_nodes();
 		return(optr);
 	}
@@ -891,4 +907,4 @@ public struct rest_header *  cords_guarantee_occi_headers(struct cords_guarantee
 
 }
 
-#endif	/* _guarantee_c_ */
+#endif	/* _occiguarantee_c_ */

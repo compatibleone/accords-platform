@@ -1743,8 +1743,15 @@ public	int	occi_process_atributs(
 				}
 			}	
 			for ( ; *vptr == ' '; vptr++);
-			(*method)(optr,pptr, nptr, vptr);
-			liberate( mptr );
+			if ((!( vptr = allocate_string( vptr ) ))
+			||  (!( vptr = occi_unquoted_value( vptr ) )))
+				return(0);
+			else
+			{
+				(*method)(optr,pptr, nptr, vptr);
+				liberate( mptr );
+				liberate( vptr );
+			}
 		}
 	}
 	return(1);
