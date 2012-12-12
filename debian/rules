@@ -73,8 +73,8 @@ install: build
 	mv `pwd`/debian/tmp/usr/bin/accords.tmp `pwd`/debian/tmp/usr/bin/accords
 	sed -e 's@/usr/.*/accords-nagios.cfg@/etc/accords/nagios.cfg@g' < `pwd`/debian/tmp/etc/accords/accords.ini > `pwd`/debian/tmp/etc/accords/accords.ini.tmp
 	mv `pwd`/debian/tmp/etc/accords/accords.ini.tmp `pwd`/debian/tmp/etc/accords/accords.ini
-	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/accords
-	cp *.xsd `pwd`/debian/tmp/usr/share/doc/accords
+	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
+	cp *.xsd `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
@@ -88,6 +88,7 @@ install: build
 	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
 	cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
+	rm -f `find debian/tmp/ -name \*.pyc`
 # Build architecture independant packages.
 
 binary-indep: build install
