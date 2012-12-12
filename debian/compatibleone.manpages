@@ -1,6 +1,7 @@
 manpages/*.7
 manpages/accords.1
 manpages/co-*.1
+manpages/command.1
 manpages/accords-config.1
 manpages/test??.1
 manpages/testresolver.1

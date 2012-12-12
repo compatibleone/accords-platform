@@ -47,13 +47,6 @@ Description: CompatibleOne Accords platform (python testsuite)
  parts is meet. It is useful during development to ensure that there is no
  regression.
 
-Package: libcompatibleone-accords-dev
-Section: libdevel
-Architecture: all
-Depends: libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
-Description: CompatibleOne Accords platform (devel/debug libraries)
- CompatibleOne Accords platform development and debug libraries and files
-
 Package: libcocarrier0
 Section: libs
 Architecture: any
@@ -466,7 +459,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
-Depends: compatibleone, libcompatibleone-accords-dev, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
+Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
  CompatibleOne is an open source project which provides a model, CORDS
