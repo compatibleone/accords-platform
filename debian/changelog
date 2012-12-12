@@ -1,3 +1,10 @@
+compatibleone-accords (0.20121212-2) unstable; urgency=low
+
+  * Major renaming of packages to be fully Debian compliant and prepare the
+    integration of the Cosacs client.
+
+ -- Vincent Renardias <vincent@renardias.com>  Tue, 12 Dec 2012 15:16:00 +0200
+
 compatibleone-accords (0.20121212-1) unstable; urgency=low
 
   * Upstream update.
