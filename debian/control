@@ -426,6 +426,7 @@ Description: CompatibleOne Accords Platform - SLA Manager
 #
 Package: compatibleone-accords
 Architecture: all
+Section: net
 Depends: compatibleone, compatibleone-azprocci, compatibleone-broker, compatibleone-cool, compatibleone-coees, compatibleone-copaas, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-accords-doc
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (runtime)
@@ -445,6 +446,7 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 
 Package: compatibleone-accords-dev
 Architecture: all
+Section: libdevel
 Depends: compatibleone, libcompatibleone-accords-dev, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
@@ -455,6 +457,7 @@ Description: CompatibleOne Accords Platform - All packages (development)
 
 Package: compatibleone-accords-doc
 Architecture: all
+Section: doc
 Description: documentation for CompatibleOne Accord's platform
  CompatibleOne is an open source project which provides a model
  and a platform for the description and federation of different clouds comprising resources
