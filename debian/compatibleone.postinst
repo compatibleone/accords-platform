@@ -3,11 +3,9 @@ set -e
 
 if [ "$1" = "configure" ] || [ "$1" = "triggered" ] || [ "$1" = "upgrade" ] ; then
 
-	if [ -e /var/lib/accords/accords.xml ] ; then
-		exit 0
+	if [ ! -e /var/lib/accords/accords.xml ] ; then
+		cd /var/lib/accords/ && accords-config
 	fi
-
-	cd /var/lib/accords/ && accords-config
 fi
 
 if [ -x /etc/init.d/compatibleone ]; then

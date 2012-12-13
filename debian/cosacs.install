@@ -1,0 +1,4 @@
+usr/bin/cosacs
+etc/cosacs/*
+etc/default/cosacs
+#var/lib/cosacs/*

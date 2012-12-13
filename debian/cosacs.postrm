@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+case $1 in
+	purge)
+		update-rc.d cosacs remove > /dev/null
+	;;
+esac
+
+#EOF

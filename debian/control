@@ -22,13 +22,13 @@ Description: Cloud broker CompatibleOne Accords Platform (Base Files)
  XaaS, BpaaS,... ) and any type of cloud service deployment (public, private,
  community and hybrid).
  The goals of CompatibleOne are to:
- - Provide entrepreneurs and organisations unimpeded access to cloud
-   technologies
- - Provide innovative platform of services, that go beyond the standard
-   services provided by existing cloud providers
- - Remove the constraints of vendor lock-in
- - Provide a platform that the community can evolve rapidly and adapt
-   according to their needs
+   - Provide entrepreneurs and organisations unimpeded access to cloud
+     technologies
+   - Provide innovative platform of services, that go beyond the standard
+     services provided by existing cloud providers
+   - Remove the constraints of vendor lock-in
+   - Provide a platform that the community can evolve rapidly and adapt
+     according to their needs
 
 Package: python-compatibleone-accords
 Section: python
@@ -250,23 +250,30 @@ Description: CompatibleOne Accords Platform - COOL subsystem
  server executable program and must have been started before any provisioning
  of application images may be performed through the broker.
 
-#Package: compatibleone-cosacs-client
-#Section: net
-#Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}
-#Description: CompatibleOne Accords Platform - COSACS Client
-# The CompatibleOne Software Appliance Configuration Services module is a standalone OCCI REST
-# server executable program that will have been embedded in the application image produced by
-# the preceding Application Image Production tool. The component will be used through the
-# provisioning procci components for the personalization of the application image during
-# resource deployment startup.
-# The module also provides the monitoring control channels for the activation of monitoring
-# agents and their data collection probes.
+Package: cosacs
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: compatibleone-cosacs
+Description: CompatibleOne Accords Platform - COSACS Standalone Client
+ The CompatibleOne Software Appliance Configuration Services module is a
+ standalone OCCI REST server executable program that will have been
+ embedded in the application image produced by the preceding Application
+ Image Production tool. The component will be used through the provisioning
+ procci components for the personalization of the application image during
+ resource deployment startup.
+ The module also provides the monitoring control channels for the activation
+ of monitoring agents and their data collection probes.
+ .
+ This package is the 'standalone' version of COSACS to be used on machines
+ that only receive configuration commands (opposed to the ones running the
+ full CompatibleOne platform).
 
 Package: compatibleone-cosacs
 Section: net
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+Conflicts: cosacs
 Description: CompatibleOne Accords Platform - COSACS subsystem
  The CompatibleOne Software Appliance Configuration Services module is a
  standalone OCCI REST server executable program that will have been embedded
@@ -276,6 +283,11 @@ Description: CompatibleOne Accords Platform - COSACS subsystem
  deployment startup.
  The module also provides the monitoring control channels for the activation
  of monitoring agents and their data collection probes.
+ .
+ This package is the 'server' version of COSACS; if you want to only run
+ COSACS as a client but not run other compatibleone services, please install
+ the 'cosacs' package instead.
+
 
 Package: compatibleone-cosched
 Section: net
@@ -383,12 +395,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
  CompatibleOne Accords Platform - Open Stack Procci subsystem package
 
-Package: compatibleone-paprocci
-Section: net
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
-Description: CompatibleOne Accords Platform - ProActive Procci subsystem
- CompatibleOne Accords Platform - ProActive Procci subsystem package.
+#Package: compatibleone-paprocci
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
+#Description: CompatibleOne Accords Platform - ProActive Procci subsystem
+# CompatibleOne Accords Platform - ProActive Procci subsystem package.
 
 Package: compatibleone-procci
 Section: net
@@ -448,18 +460,18 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
  BpaaS, ...) and any type of cloud service deployment (public, private,
  community and hybrid).
  The goals of CompatibleOne are to:
- - Provide entrepreneurs and organisations unimpeded access to cloud
-   technologies
- - Provide innovative platform of services, that go beyond the standard
-   services provided by existing cloud providers
- - Remove the constraints of vendor lock-in
- - Provide a platform that the community can evolve rapidly and adapt according
-   to their needs
+   - Provide entrepreneurs and organisations unimpeded access to cloud
+     technologies
+   - Provide innovative platform of services, that go beyond the standard
+     services provided by existing cloud providers
+   - Remove the constraints of vendor lock-in
+   - Provide a platform that the community can evolve rapidly and adapt
+     according to their needs
 
 Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
-Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-paprocci, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
+Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
 Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development)
  CompatibleOne is an open source project which provides a model, CORDS

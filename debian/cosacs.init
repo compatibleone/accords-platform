@@ -1,0 +1,85 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          cosacs
+# Required-Start:    $remote_fs $network $local_fs
+# Required-Stop:     $remote_fs $network $local_fs
+# Default-Start:     
+# Default-Stop:      
+# Short-Description: CompatibleOne COSACS init script
+# Description:       This script is responsible for the management of CompatibleOne COSACS 
+#               client side daemon.
+### END INIT INFO
+
+# Author: Vincent <vincent@renardias.com>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC='CompatibleOne COSACS Client'	# Introduce a short description here
+NAME=cosacs				# Introduce the short server's name here
+DAEMON_ARGS=""				# Arguments to run the daemon with
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Read configuration variable file if it is present
+[ -r /etc/default/cosacs ] && . /etc/default/cosacs
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+
+if [ "$enabled" = 0 ]; then
+	exit 0
+fi
+
+if [ -z "$accords_workdir" ]; then
+        accords_workdir="."
+fi
+
+if [ ! -d "$accords_workdir" ]; then
+        echo "$accords_workdir: no such directory"
+        exit 1
+fi
+
+cd $accords_workdir
+
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
+	/usr/bin/cosacs --config config-cosacs.xml cosacs/1.0a
+  ;;
+  stop)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	/usr/bin/co-stop
+	sleep $tempo
+	;;
+  status)
+       echo "Not implemented (yet)"
+       ;;
+  #reload|force-reload)
+	#
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
+	#
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
+  restart|force-reload)
+	#
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
+	#
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	/etc/init.d/$NAME stop
+	sleep 5
+	/etc/init.d/$NAME start
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
+
+:
