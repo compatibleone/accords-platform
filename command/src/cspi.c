@@ -4,7 +4,9 @@
 #include "cspi.h"
 
 private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
+private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	int	end_of_instruction=0;
+private	int	echo=0;
 
 /*   ----------*/
 /*   show_value*/
@@ -280,6 +282,17 @@ public struct cordscript_context * liberate_cordscript_context( struct cordscrip
 	return( (struct cordscript_context *) 0 );
 }
 
+/*	----------	*/
+/*	drop_value	*/
+/*	----------	*/
+private	void	drop_value( struct cordscript_value * vptr )
+{
+	if ( vptr )
+		if (!( vptr->name ))
+			liberate_cordscript_value( vptr );
+	return;
+}
+
 /*   ---------  */
 /*   pop_stack  */
 /*   ---------  */
@@ -309,6 +322,26 @@ private	struct	cordscript_instruction * no_operation( struct cordscript_instruct
 }
 
 /*	-------------------------	*/
+/*		pop_operation		*/
+/*	-------------------------	*/
+private	struct	cordscript_instruction * pop_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_value * vptr;
+	if ( check_debug() )
+		printf("pop_operation();\n");
+
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else
+	{
+		if ((vptr = pop_stack(iptr->context)) != (struct cordscript_value*) 0)
+			drop_value( vptr );
+		return( iptr->next );
+	}
+}
+
+/*	-------------------------	*/
 /*		push_operation		*/
 /*	-------------------------	*/
 private	struct	cordscript_instruction * push_operation( struct cordscript_instruction * iptr )
@@ -330,15 +363,27 @@ private	struct	cordscript_instruction * push_operation( struct cordscript_instru
 }
 
 
-/*	----------	*/
-/*	drop_value	*/
-/*	----------	*/
-private	void	drop_value( struct cordscript_value * vptr )
+/*	-------------------------	*/
+/*		dup_operation		*/
+/*	-------------------------	*/
+private	struct	cordscript_instruction * dup_operation( struct cordscript_instruction * iptr )
 {
-	if ( vptr )
-		if (!( vptr->name ))
-			liberate_cordscript_value( vptr );
-	return;
+	struct	cordscript_value * vptr;
+
+	if ( check_debug() )
+		printf("dup_operation();\n");
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else
+	{
+		if ((vptr = pop_stack(iptr->context)) != (struct cordscript_value*) 0)
+		{
+			push_value( iptr->context, vptr );
+			push_value( iptr->context, string_value( vptr->value ) );
+		}
+		return( iptr->next );
+	}
 }
 
 /*	-------------------------	*/
@@ -953,6 +998,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	char *	tptr;
 	char *	sptr;
 	int	status;
+	int	v;
 
 	if ( check_debug() )
 		printf("eval_operation();\n");
@@ -999,7 +1045,13 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 
 		else if (!( strcmp( wptr->value, "debug" ) ))
 		{
-			rest_show_request( atoi(vptr->value ) );
+			v = atoi( vptr->value );
+			if ( v & 1 )
+				rest_show_request( 1 );
+			else	rest_show_request( 0 );
+			if ( v & 2 )
+				echo = 1;
+			else	echo = 0;
 		}
 
 		/* --------------------------------------- */
@@ -1986,10 +2038,11 @@ private	int	initialise_line( char * sptr )
 /*	initialise_file		*/
 /*   	----------------	*/
 private	FILE * 	infile=(FILE *) 0;
-private	int	initialise_file( FILE * h )
+private	FILE *	initialise_file( FILE * h )
 {
+	FILE * hh=h;
 	infile = h;
-	return( 1 );
+	return( hh );
 }
 
 /*	-----------	*/
@@ -2006,19 +2059,18 @@ private	void	unget_token( char * sptr )
 /*	------------	*/
 private	int	unget_byte(int c)
 {
-	ungotc = c;
+	ungotc = ((ungotc << 8) | ( c & 0x00FF));
 	return(0);
 }
 
 /*	------------	*/
 /*	  get_byte	*/
 /*	------------	*/
-private	int	echo=0;
 private	int	get_byte()
 {
 	int	c;
-	if ((c = ungotc) != 0 )
-		ungotc = 0;
+	if ((c = (ungotc & 0x00FF)) != 0 )
+		ungotc >>= 8;
 	else if ( linebuffer )
 	{
 		if (!( c = *(linebuffer++) ))
@@ -2032,6 +2084,37 @@ private	int	get_byte()
 		if ( c )
 			printf("%c",c);	
 	return( c );
+}
+
+/*	------------	*/
+/*	remove_line	*/
+/*	------------	*/
+private	int	remove_line()
+{
+	int	c;
+	while ((c = get_byte()) != 0)
+		if ( c == '\n' )
+			break;
+	return(c);
+}
+
+/*	--------------	*/
+/*	remove_comment	*/
+/*	--------------	*/
+private	int	remove_comment()
+{
+	int	c;
+	while ((c = get_byte()) != 0)
+	{
+		if ( c != '*' )
+			continue;
+		else if (( c = get_byte()) == '/' )
+			break;
+		else if (!( c ))
+			break;
+		else	continue;
+	}
+	return(c);
 }
 
 /*	------------	*/
@@ -2057,6 +2140,27 @@ private	int	remove_white()
 				continue;
 			else if ( c == ' ' )
 				continue;
+			else if ( c == '/' )
+			{
+				if (( c = get_byte()) == '/' )
+				{
+					if (!( remove_line() ))
+						return(0);
+					else	continue;
+				}
+				else if ( c == '*' )
+				{
+					if (!( remove_comment() ))
+						return(0);
+					else	continue;
+				}
+				else
+				{
+					unget_byte( c ); 
+					unget_byte('/');
+					return( 1 );
+				}
+			}
 			else
 			{
 				unget_byte(c);
@@ -2481,7 +2585,7 @@ private	struct cordscript_instruction * compile_cordscript_if( struct cordscript
 		iptr->context = cptr;
 		add_operand( rptr, instruction_value( iptr ) );
 		if (( c = get_punctuation()) == '{' )
-			allocate_cordscript_label( iptr, 1 );
+			allocate_cordscript_label( iptr, _IF_LABEL );
 		else if (!( c ))
 			add_instruction( cptr, iptr );
 		else
@@ -2626,7 +2730,7 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
-		allocate_cordscript_label( jptr, 0 );
+		allocate_cordscript_label( jptr, _FOREACH_LABEL );
 
 	else if (!( c ))
 	{
@@ -2722,7 +2826,7 @@ private	struct cordscript_instruction * compile_cordscript_forboth( struct cords
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
-		allocate_cordscript_label( jptr, 0 );
+		allocate_cordscript_label( jptr, _FORBOTH_LABEL );
 
 	else if (!( c ))
 	{
@@ -2739,6 +2843,18 @@ private	struct cordscript_instruction * compile_cordscript_forboth( struct cords
 
 }
 
+/*	------------------------	*/
+/*	flush_label_instructions 	*/
+/*	------------------------	*/
+private	void	flush_label_instructions( struct cordscript_context * cptr, struct cordscript_instruction * xptr )
+{
+	while ( xptr  )
+	{
+		add_instruction( cptr, xptr );
+		xptr = xptr->next;
+	}
+	return;
+}
 
 /*   ----------------------	*/
 /*   compile_cordscript_for	*/
@@ -2888,7 +3004,7 @@ private	struct cordscript_instruction * compile_cordscript_for( struct cordscrip
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
-		allocate_cordscript_label( jptr, 0 );
+		allocate_cordscript_label( jptr, _FOR_LABEL );
 	else if (!( c ))
 	{
 		add_instruction( cptr, jptr );
@@ -2975,7 +3091,7 @@ private	struct cordscript_instruction * compile_cordscript_while( struct cordscr
 		add_operand( rptr, instruction_value( fptr ) );
 
 		if (( c = get_punctuation()) == '{' )
-			allocate_cordscript_label( jptr, 0 );
+			allocate_cordscript_label( jptr, _WHILE_LABEL );
 		else if (!( c ))
 		{
 			add_instruction( cptr, jptr );
@@ -2990,6 +3106,335 @@ private	struct cordscript_instruction * compile_cordscript_while( struct cordscr
 		return((struct cordscript_instruction *) 0);
 	}
 }
+
+/*	--------------------	*/
+/*	switch_default_fixup	*/
+/*	--------------------	*/
+private	void	switch_default_fixup( struct cordscript_context * cptr, struct cordscript_label * lptr )
+{
+	struct	cordscript_instruction * optr;
+
+	flush_label_instructions( cptr, (optr = lptr->other) );
+	lptr->other = (struct cordscript_instruction *) 0;
+
+	/* -------------------- */
+	/* fixup the DUP as NOP */
+	/* -------------------- */
+	if ( optr->next )
+	{
+		optr->next->evaluate = no_operation;
+		add_operand( optr, instruction_value( optr->next ) );
+	}
+	return;
+}
+
+/*	--------------		*/
+/*	check_line_end		*/
+/*	--------------		*/
+private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
+{
+	struct	cordscript_label * lptr;
+	struct	cordscript_instruction * xptr;
+	char	buffer[_MAX_NAME];
+	if ((lptr = labelheap) != (struct cordscript_label *) 0)
+	{
+
+		if ( c == ';' )
+			end_of_instruction=1;
+
+		if ((!( level ))
+		&&  ( end_of_instruction ))
+		{
+			while ((lptr = labelheap) != (struct cordscript_label *) 0)
+			{
+				if (( c = get_punctuation()) == '}' )
+				{
+					if ( lptr->type == _SWITCH_LABEL )
+					{
+						/* ------------------- */
+						/* check for CASE exit */
+						/* ------------------- */
+						if ( lptr->other )
+							switch_default_fixup( cptr, lptr );
+					}
+					else if ( lptr->type == _IF_LABEL )
+					{
+						/* -------------------------------------- */
+						/* it could be an IF and may have an ELSE */
+						/* -------------------------------------- */
+						if ( get_token( buffer ) )
+						{
+							if (!( strcmp( buffer, "else" ) ))
+							{
+								end_of_instruction=0;
+								handle_else( cptr, lptr );
+								return;
+							}
+							else	unget_token( buffer );
+						}
+					}
+					labelheap = lptr->next;
+					flush_label_instructions( cptr, lptr->value );
+					lptr = liberate_cordscript_label( lptr );
+				}
+				else 
+				{	
+					if ( c != 0 ) unget_byte( c );	
+					break;
+				}
+			}
+			end_of_instruction=0;
+		}
+	}
+	return;
+}
+
+
+/*   -------------------------	*/
+/*   compile_cordscript_break	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_break( struct cordscript_context * cptr )
+{
+	struct	cordscript_label       * lptr;
+	struct	cordscript_instruction * optr;
+
+	/* ----------------------------------- */
+	/* BREAK must be inside a construction */
+	/* ----------------------------------- */
+	if (!(lptr = labelheap))
+		return((struct cordscript_instruction *) 0);
+	else if (!( optr = allocate_cordscript_instruction( jmp_operation ) ))
+		return( optr );
+	else
+	{
+	 	add_instruction( cptr, optr );
+		add_operand( optr, instruction_value( lptr->value ) );
+	
+		if ( get_punctuation() == ';' )
+			check_line_end(cptr,0,';');
+
+		return((struct cordscript_instruction *) 0);
+	}
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_default	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_default( struct cordscript_context * cptr )
+{
+	struct	cordscript_label       * lptr;
+	struct	cordscript_instruction * optr;
+	/* ------------------------------------------- */
+	/* detect CASE inside legal SWITCH instruction */
+	/* ------------------------------------------- */
+	if (!(lptr = labelheap))
+		return((struct cordscript_instruction *) 0);
+	else if ( lptr->type != _SWITCH_LABEL )
+		return((struct cordscript_instruction *) 0);
+
+	else if ( get_punctuation() != ':' )
+		return((struct cordscript_instruction *) 0);
+
+	/* ------------------------------------------- */
+	/* detect a subsequent CASE after initial CASE */
+	/* ------------------------------------------- */
+	else if ( lptr->other )
+	{
+		switch_default_fixup( cptr, lptr );
+	}
+
+	return((struct cordscript_instruction *) 0);
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_case	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_case( struct cordscript_context * cptr )
+{
+	int	c;
+	struct	cordscript_label       * lptr;
+	struct	cordscript_instruction * rptr;
+	struct	cordscript_instruction * fptr;
+	struct	cordscript_instruction * optr;
+	struct	cordscript_instruction * nptr;
+
+	/* ------------------------------------------- */
+	/* detect CASE inside legal SWITCH instruction */
+	/* ------------------------------------------- */
+	if (!(lptr = labelheap))
+		return((struct cordscript_instruction *) 0);
+	else if ( lptr->type != _SWITCH_LABEL )
+		return((struct cordscript_instruction *) 0);
+
+	/* ------------------------------------------- */
+	/* detect a subsequent CASE after initial CASE */
+	/* ------------------------------------------- */
+	else if ( lptr->other )
+	{
+		flush_label_instructions( cptr, (optr = lptr->other) );
+		lptr->other = (struct cordscript_instruction *) 0;
+	}
+	else
+	{
+		/* ----------------------------------------- */
+		/* otherwise its the first case expression : */
+		/* ----------------------------------------- */
+		if (!( fptr = allocate_cordscript_instruction( dup_operation ) ))
+			return( fptr );
+		else 	add_instruction( cptr, fptr );
+	}
+
+	/* compile the conditional expression */
+	/* ---------------------------------- */
+	if (!( rptr = compile_cordscript_instruction( cptr, 0 ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if ( get_punctuation() != ':' )
+		return((struct cordscript_instruction *) 0);
+
+	else 	rptr->evaluate = jne_operation;
+
+	if (!( fptr = allocate_cordscript_instruction( dup_operation ) ))
+		return( fptr );
+	else
+	{	fptr->context = cptr;
+		add_operand( rptr, instruction_value( fptr ) );
+	}
+
+	/* -------------------------------------------------------------- */
+	/* if this is a secondary case then spill over JMP linkage needed */
+	/* -------------------------------------------------------------- */
+	if ( optr )
+	{
+		if (!( nptr = allocate_cordscript_instruction( no_operation ) ))
+			return( nptr );
+		else 	add_instruction( cptr, nptr );
+
+		add_operand( optr, instruction_value( nptr ) );
+	}
+
+
+	/* ------------------------------------ */
+	/* add the spill over jmp for next case */
+	/* ------------------------------------ */
+	if (!( nptr = allocate_cordscript_instruction( jmp_operation ) ))
+		return( nptr );
+	else
+	{
+		nptr->next = fptr;
+		lptr->other = nptr;
+	}
+
+	return((struct cordscript_instruction *) 0);
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_switch	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_switch( struct cordscript_context * cptr )
+{
+	int	c;
+	struct	cordscript_instruction * lptr;
+	struct	cordscript_instruction * fptr;
+	char	buffer[_MAX_NAME];
+
+	/* ----------------------- */
+	/* switch ( expression ) { */
+	/* ----------------------- */
+	/* push expression	   */
+	/* ----------------------- */
+	if ( get_punctuation() != '(' )
+		return((struct cordscript_instruction *) 0);
+	else if (!( lptr = compile_cordscript_instruction( cptr, 0 ) ))
+		return((struct cordscript_instruction *) 0);
+	else if ( get_punctuation() != ')' )
+		return((struct cordscript_instruction *) 0);
+
+	else if ( get_punctuation() != '{' )
+		return((struct cordscript_instruction *) 0);
+
+	/* --------------------- */
+	/* allocate the exit POP */
+	/* --------------------- */
+	if (!( fptr = allocate_cordscript_instruction( pop_operation ) ))
+		return( fptr );
+	else 	allocate_cordscript_label( fptr, _SWITCH_LABEL );
+
+	if (!( get_token( buffer ) ))
+		return((struct cordscript_instruction *) 0);
+
+	else if (!( strcmp( buffer, "case" ) ))
+		return( compile_cordscript_case( cptr ) );
+	else
+	{
+		unget_token( buffer );
+		return((struct cordscript_instruction *) 0);
+	}
+}			
+
+/*   --------------------------	*/
+/*   compile_cordscript_include */
+/*   --------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_include( struct cordscript_context * cptr )
+{
+	struct	cordscript_instruction * iptr;
+	FILE 	*	h;
+	FILE 	*	hh;
+	char	buffer[8192];
+
+	if (!( get_token( buffer ) ))
+		return((struct cordscript_instruction *) 0);
+	else if (!( h = fopen( buffer, "r" ) ))
+		return((struct cordscript_instruction *) 0);
+	else
+	{
+		if ( check_verbose() ) { printf("include file: %s\n",buffer); }
+
+		hh = initialise_file( h );
+
+		while ( remove_white() )
+		{
+			iptr = compile_cordscript_instruction( cptr, 0 );
+			if ( get_punctuation() )
+				break;
+		}
+		h = initialise_file( hh );
+		fclose(h);
+		return((struct cordscript_instruction *) 0);
+	}
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_try	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_try( struct cordscript_context * cptr )
+{
+	return((struct cordscript_instruction *) 0);
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_catch	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_catch( struct cordscript_context * cptr )
+{
+	return((struct cordscript_instruction *) 0);
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_throw	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_throw( struct cordscript_context * cptr )
+{
+	return((struct cordscript_instruction *) 0);
+}			
+
+/*   -------------------------	*/
+/*   compile_cordscript_continue	*/
+/*   -------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_continue( struct cordscript_context * cptr )
+{
+	return((struct cordscript_instruction *) 0);
+}			
 
 /*   -------------------------	*/
 /*   compile_cordscript_return	*/
@@ -3047,10 +3492,28 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 		return( compile_cordscript_foreach( cptr ) );
 	else if (!( strcmp( token, "forboth" ) ))
 		return( compile_cordscript_forboth( cptr ) );
+	else if (!( strcmp( token, "try" ) ))
+		return( compile_cordscript_try( cptr ) );
+	else if (!( strcmp( token, "catch" ) ))
+		return( compile_cordscript_catch( cptr ) );
+	else if (!( strcmp( token, "throw" ) ))
+		return( compile_cordscript_throw( cptr ) );
+	else if (!( strcmp( token, "switch" ) ))
+		return( compile_cordscript_switch( cptr ) );
+	else if (!( strcmp( token, "case" ) ))
+		return( compile_cordscript_case( cptr ) );
+	else if (!( strcmp( token, "default" ) ))
+		return( compile_cordscript_default( cptr ) );
+	else if (!( strcmp( token, "break" ) ))
+		return( compile_cordscript_break( cptr ) );
+	else if (!( strcmp( token, "continue" ) ))
+		return( compile_cordscript_continue( cptr ) );
 	else if (!( strcmp( token, "return" ) ))
 		return( compile_cordscript_return( cptr ) );
 	else if (!( strcmp( token, "function" ) ))
 		return( compile_cordscript_function( cptr ) );
+	else if (!( strcmp( token, "include" ) ))
+		return( compile_cordscript_include( cptr ) );
 	else if (( fptr = resolve_function( token, cptr )) !=(struct cordscript_value *) 0)
 		return( compile_cordscript_call( cptr, fptr ) );
 	else if (!( iptr = allocate_cordscript_instruction( push_operation )))
@@ -3100,62 +3563,6 @@ private	struct cordscript_instruction * handle_else( struct cordscript_context *
 	lptr->value = xptr;
 	lptr->type = 0;
 	return((struct cordscript_instruction *) 0);
-}
-
-/*	--------------		*/
-/*	check_line_end		*/
-/*	--------------		*/
-private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
-{
-	struct	cordscript_label * lptr;
-	struct	cordscript_instruction * xptr;
-	char	buffer[_MAX_NAME];
-	if ((lptr = labelheap) != (struct cordscript_label *) 0)
-	{
-
-		if ( c == ';' )
-			end_of_instruction=1;
-
-		if ((!( level ))
-		&&  ( end_of_instruction ))
-		{
-			while ((lptr = labelheap) != (struct cordscript_label *) 0)
-			{
-				if (( c = get_punctuation()) == '}' )
-				{
-					if ( lptr->type )
-					{
-						/* -------------------------------------- */
-						/* it could be an IF and may have an ELSE */
-						/* -------------------------------------- */
-						if ( get_token( buffer ) )
-						{
-							if (!( strcmp( buffer, "else" ) ))
-							{
-								end_of_instruction=0;
-								handle_else( cptr, lptr );
-								return;
-							}
-							else	unget_token( buffer );
-						}
-					}
-					labelheap = lptr->next;
-					for (	xptr=lptr->value;
-						xptr != (struct cordscript_instruction *) 0;
-						xptr = xptr->next )
-						add_instruction( cptr, xptr );
-					lptr = liberate_cordscript_label( lptr );
-				}
-				else 
-				{	
-					if ( c != 0 ) unget_byte( c );	
-					break;
-				}
-			}
-			end_of_instruction=0;
-		}
-	}
-	return;
 }
 
 /*   ------------------------------ */
@@ -3334,6 +3741,8 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		else if (( c == '<' )
 		     ||  ( c == '>' )
 		     ||  ( c == '!' )
+		     ||  ( c == ':' )
+		     ||  ( c == ',' )
 		     ||  ( c == ')' ))
 		{
 			unget_byte( c );
@@ -3404,7 +3813,11 @@ public struct cordscript_context	* compile_cordscript_file( char * expression )
 	 	linecounter=0;
 		initialise_file( h );
 		while ( remove_white() )
-			  iptr = compile_cordscript_instruction( cptr, 0 );
+		{	
+			iptr = compile_cordscript_instruction( cptr, 0 );
+			if ( get_punctuation() != 0 )
+				break;
+		}
 		fclose(h);
 		return( cptr );
 	}

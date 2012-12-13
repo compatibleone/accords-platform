@@ -21,6 +21,14 @@
 #define	_MAX_NAME	2048
 #define	_MAX_VALUE	16000
 
+#define	_IF_LABEL	1
+#define	_SWITCH_LABEL	2
+#define	_FOR_LABEL	3
+#define	_FOREACH_LABEL	4
+#define	_FORBOTH_LABEL	5
+#define	_WHILE_LABEL	6
+#define	_TRY_LABEL	7
+
 struct	cordscript_context;
 struct	cordscript_instruction;
 
@@ -28,6 +36,7 @@ struct	cordscript_label
 {
 	struct	cordscript_label 	* next;
 	struct	cordscript_instruction 	* value;
+	struct	cordscript_instruction 	* other;
 	int	type;
 };
 
