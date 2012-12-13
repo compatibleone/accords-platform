@@ -40,11 +40,11 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
-		--enable-paprocci=$(JAVA_HOME) \
 		--enable-pyaccords \
 		--enable-testsuite \
 		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib  \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS),--as-needed"
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+		#--enable-paprocci=$(JAVA_HOME) \
 
 build: build-stamp
 build-stamp: config.status
@@ -61,7 +61,7 @@ clean:
 	rm -f config.{sub,guess,status,log}
 	# cd manifests && ./make-clean
 	dh_prep
-	rm -f debian/*.log debian/files
+	rm -f debian/*.log debian/files debian/*.shlibs
 	./clean
 
 install: build
@@ -124,7 +124,11 @@ binary-arch: build install
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
-	dh_makeshlibs -a
+	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
+	for i in libcocarrier0 libcocci0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20121213-1)") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= 0.20121213-1)"; \
+	done
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a
