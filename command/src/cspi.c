@@ -5,6 +5,7 @@
 
 private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
+private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	int	end_of_instruction=0;
 private	int	echo=0;
 
@@ -3157,6 +3158,26 @@ private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
 						if ( lptr->other )
 							switch_default_fixup( cptr, lptr );
 					}
+					else if ( lptr->type == _TRY_LABEL )
+					{
+						/* --------------------------- */
+						/* it could be a TRY and CATCH */
+						/* --------------------------- */
+						if ( get_token( buffer ) )
+						{
+							if (!( strcmp( buffer, "catch" ) ))
+							{
+								end_of_instruction=0;
+								handle_catch( cptr, lptr );
+								return;
+							}
+							else	
+							{
+								unget_token( buffer );
+
+							}
+						}
+					}
 					else if ( lptr->type == _IF_LABEL )
 					{
 						/* -------------------------------------- */
@@ -3189,6 +3210,51 @@ private	void	check_line_end(struct cordscript_context * cptr, int level, int c)
 	return;
 }
 
+
+/*   ---------------------------	*/
+/*   compile_cordscript_continue	*/
+/*   ---------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_continue( struct cordscript_context * cptr )
+{
+	struct	cordscript_label       * lptr;
+	struct	cordscript_instruction * optr;
+
+	/* ----------------------------------- */
+	/* BREAK must be inside a construction */
+	/* ----------------------------------- */
+	if (!(lptr = labelheap))
+		return((struct cordscript_instruction *) 0);
+
+	while ( lptr )
+	{
+		switch( lptr->type )
+		{
+		case	_TRY_LABEL	:
+			break;
+
+		case	_FOR_LABEL	:
+		case	_FOREACH_LABEL	:
+		case	_FORBOTH_LABEL	:
+		case	_WHILE_LABEL	:
+			if (!( optr = allocate_cordscript_instruction( jmp_operation ) ))
+				break;
+			else
+			{
+			 	add_instruction( cptr, optr );
+				add_operand( optr, instruction_value( lptr->value ) );
+				break;
+			}
+
+		case	_IF_LABEL	:
+		case	_SWITCH_LABEL	:
+		default			:
+			lptr = lptr->next;
+			continue;
+		}
+		break;
+	}
+	return((struct cordscript_instruction *) 0);
+}			
 
 /*   -------------------------	*/
 /*   compile_cordscript_break	*/
@@ -3409,7 +3475,38 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 /*   -------------------------	*/
 private	struct cordscript_instruction * compile_cordscript_try( struct cordscript_context * cptr )
 {
-	return((struct cordscript_instruction *) 0);
+	struct	cordscript_instruction * iptr;
+	struct	cordscript_instruction * jptr;
+	struct	cordscript_instruction * xptr;
+	struct	cordscript_label * lptr;
+	if ( get_punctuation() != '{' )
+		return((struct cordscript_instruction *) 0);
+	else if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
+		return( xptr );
+	else if (!( jptr = allocate_cordscript_instruction( jmp_operation ) ))
+		return( jptr );
+	else if (!( iptr = allocate_cordscript_instruction( set_operation ) ))
+		return( iptr );
+	else 	
+	{
+		/* ----------------------- */
+		/* connect JMP to EXIT NOP */
+		/* ----------------------- */
+		add_operand( jptr, instruction_value( xptr ) );
+		jptr->next = iptr;
+
+		/* --------------- */
+		/* Set EXIT to JMP */
+		/* --------------- */
+		if (( lptr = allocate_cordscript_label( xptr, _TRY_LABEL )) != (struct cordscript_label *)0)
+		{
+			/* ------------------------ */
+			/* and other to SET / CATCH */
+			/* ------------------------ */
+			lptr->other = jptr;
+		}
+		return((struct cordscript_instruction *) 0);
+	}
 }			
 
 /*   -------------------------	*/
@@ -3425,14 +3522,37 @@ private	struct cordscript_instruction * compile_cordscript_catch( struct cordscr
 /*   -------------------------	*/
 private	struct cordscript_instruction * compile_cordscript_throw( struct cordscript_context * cptr )
 {
-	return((struct cordscript_instruction *) 0);
-}			
+	struct	cordscript_instruction * iptr;
+	struct	cordscript_label * lptr;
 
-/*   -------------------------	*/
-/*   compile_cordscript_continue	*/
-/*   -------------------------	*/
-private	struct cordscript_instruction * compile_cordscript_continue( struct cordscript_context * cptr )
-{
+	if (!( lptr = labelheap ))
+		return((struct cordscript_instruction *) 0);
+
+	while ( lptr )
+	{
+		switch( lptr->type )
+		{
+		case	_TRY_LABEL	:
+			if (!( lptr->other ))
+				break;
+			else if (!( lptr->other->next ))
+				break;
+			else if (!( iptr = allocate_cordscript_instruction( jmp_operation ) ))
+				break;
+			else
+			{
+				add_operand( iptr, instruction_value( lptr->other->next ) );
+				compile_cordscript_instruction( cptr, 1 );
+				add_instruction( cptr, iptr );
+				check_line_end(cptr,0,';');
+				break;
+			}
+		default			:
+			lptr = lptr->next;
+			continue;
+		}
+		break;
+	}
 	return((struct cordscript_instruction *) 0);
 }			
 
@@ -3563,6 +3683,41 @@ private	struct cordscript_instruction * handle_else( struct cordscript_context *
 	lptr->value = xptr;
 	lptr->type = 0;
 	return((struct cordscript_instruction *) 0);
+}
+
+/*	------------	*/
+/*	handle_catch	*/
+/*	------------	*/
+private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr )
+{
+	struct	cordscript_value * vptr;
+	struct	cordscript_instruction * iptr;
+	char	buffer[_MAX_NAME];
+	
+	if ( lptr->type != _TRY_LABEL )
+		return((struct cordscript_instruction *) 0);
+	else if (!( iptr = lptr->other ))
+		return((struct cordscript_instruction *) 0);
+	else if (!( iptr = iptr->next ))
+		return((struct cordscript_instruction *) 0);
+	else if ( get_punctuation() != '(' )
+		return((struct cordscript_instruction *) 0);
+	else if (!( get_token( buffer ) ))
+		return((struct cordscript_instruction *) 0);
+	else if (!( vptr = resolve_value( buffer, cptr ) ))
+		return((struct cordscript_instruction *) 0);
+	else if ( get_punctuation() != ')' )
+		return((struct cordscript_instruction *) 0);
+	else if ( get_punctuation() != '{' )
+		return((struct cordscript_instruction *) 0);
+	else
+	{
+		add_operand( iptr, vptr );
+		flush_label_instructions( cptr, lptr->other );
+		lptr->other = (struct cordscript_instruction *) 0;
+		lptr->type  = _CATCH_LABEL;
+		return((struct cordscript_instruction *) 0);
+	}
 }
 
 /*   ------------------------------ */

@@ -28,6 +28,7 @@
 #define	_FORBOTH_LABEL	5
 #define	_WHILE_LABEL	6
 #define	_TRY_LABEL	7
+#define	_CATCH_LABEL	8
 
 struct	cordscript_context;
 struct	cordscript_instruction;
