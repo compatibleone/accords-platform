@@ -2471,7 +2471,9 @@ private	struct	cordscript_value * 	resolve_value( char * token, struct cordscrip
 private	int	get_punctuation()
 {
 	int	c;
-	if (!( remove_white( linebuffer ) ))
+	if ( ungot_token )
+		return( 0 );
+	else if (!( remove_white( linebuffer ) ))
 		return( 0 );
 	else if (!( c = get_byte()))
 		return( c );
