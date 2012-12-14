@@ -89,8 +89,11 @@ debian/libocci-dev/
 debian/libocci0/
 debian/libpubocci-dev/
 debian/libpubocci0/
+debian/cosacs/
+debian/compatibleone-base/
 debian/files
 debian/*.log
+debian/*.shlibs
 debian/*.substvars
 debian/*.debhelper
 debian/tmp/

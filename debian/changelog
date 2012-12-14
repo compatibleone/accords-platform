@@ -1,7 +1,7 @@
 compatibleone-accords (0.20121213-2) unstable; urgency=low
 
-  * Add 'cosacs' package (client side COSACS to
-    be run in the VM images).
+  * Add 'cosacs' package (client side COSACS to be run in the VM images).
+  * Split 'compatibleone' in 'compatibleone-base' and 'compatibleone'.
 
  -- Vincent Renardias <vincent@renardias.com>  Thu, 13 Dec 2012 17:47:00 +0200
 

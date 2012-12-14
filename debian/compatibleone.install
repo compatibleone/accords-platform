@@ -1,4 +1,3 @@
-etc/accords/*
 etc/default/accords
 usr/bin/accords
 usr/bin/run-parser
