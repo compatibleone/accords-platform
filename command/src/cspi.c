@@ -1110,7 +1110,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				{
 					if (!( argv[argi] = pop_stack( iptr->context ) ))
 						break;
-					else if ( check_verbose )
+					else if ( check_verbose() )
 						printf("argv[%i] = %s \n",argi,( argv[argi]->value ? argv[argi]->value : "0"));
 				}
 			}
