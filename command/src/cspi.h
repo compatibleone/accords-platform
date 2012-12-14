@@ -50,6 +50,13 @@ struct	cordscript_value
 	char *	value;
 };
 
+struct	cordscript_exception
+{
+	struct	cordscript_exception *	next;
+	struct	cordscript_instruction * handler;
+};
+
+
 struct	cordscript_operand
 {
 	struct	cordscript_operand 	* next;

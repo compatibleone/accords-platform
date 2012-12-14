@@ -4,6 +4,8 @@
 #include "cspi.h"
 
 private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
+private	struct	cordscript_exception * exceptionheap=(struct cordscript_exception *) 0;
+
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	int	end_of_instruction=0;
@@ -66,6 +68,38 @@ public	struct	cordscript_label * allocate_cordscript_label( struct cordscript_in
 		lptr->next  = labelheap;
 		labelheap   = lptr;
 		return( lptr );
+	}
+}
+
+/*	-------------------------	*/
+/*	liberate_cordscript_exception	*/
+/*	-------------------------	*/
+private	int	exceptions=0;
+public	struct	cordscript_exception * liberate_cordscript_exception( struct cordscript_exception * xptr )
+{
+	if ( xptr )
+	{
+		if ( exceptions ) exceptions--;
+		liberate( xptr );
+	}
+	return((struct cordscript_exception *) 0);
+}
+
+/*	-------------------------	*/
+/*	allocate_cordscript_exception	*/
+/*	-------------------------	*/
+public	struct	cordscript_exception * allocate_cordscript_exception( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_exception * xptr;
+	exceptions++;
+	if (!( xptr = allocate( sizeof( struct cordscript_exception ) ) ))
+		return( xptr );
+	else
+	{
+		xptr->handler = iptr;
+		xptr->next  = exceptionheap;
+		exceptionheap   = xptr;
+		return( xptr );
 	}
 }
 
@@ -976,6 +1010,54 @@ private	struct occi_element * cordscript_occi_filter( char * vptr )
 	if ( aptr )
 		liberate( aptr );
 	return( root );
+}
+
+/*	---------------		*/
+/*	 enter_operation		*/
+/*	---------------		*/
+private	struct	cordscript_instruction * enter_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr=(struct	cordscript_value *) 0;
+	if ( check_debug() )
+		printf("enter_operation();\n");
+
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value) != (struct cordscript_value   *) 0)
+        &&  ( vptr->code ))
+	{
+		allocate_cordscript_exception( vptr->code );
+	}
+	
+	iptr->context->ip = iptr->next;
+
+	return(iptr->context->ip);
+}
+
+/*	---------------		*/
+/*	 leave_operation		*/
+/*	---------------		*/
+private	struct	cordscript_instruction * leave_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr=(struct	cordscript_value *) 0;
+	struct	cordscript_exception * xptr;
+	if ( check_debug() )
+		printf("leave_operation();\n");
+
+	if (( xptr = exceptionheap ) != (struct cordscript_exception *) 0)
+	{
+		exceptionheap = xptr->next;
+		liberate_cordscript_exception( xptr) ;
+	}
+
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value) != (struct cordscript_value   *) 0)
+        &&  ( vptr->code ))
+		iptr->context->ip = vptr->code;
+	else	iptr->context->ip = iptr->next;
+
+	return(iptr->context->ip);
 }
 
 /*	---------------		*/
@@ -2389,7 +2471,9 @@ private	struct	cordscript_value * 	resolve_value( char * token, struct cordscrip
 private	int	get_punctuation()
 {
 	int	c;
-	if (!( remove_white( linebuffer ) ))
+	if ( ungot_token )
+		return( 0 );
+	else if (!( remove_white( linebuffer ) ))
 		return( 0 );
 	else if (!( c = get_byte()))
 		return( c );
@@ -3477,23 +3561,34 @@ private	struct cordscript_instruction * compile_cordscript_try( struct cordscrip
 {
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_instruction * jptr;
+	struct	cordscript_instruction * kptr;
 	struct	cordscript_instruction * xptr;
+	struct	cordscript_instruction * aptr;
 	struct	cordscript_label * lptr;
 	if ( get_punctuation() != '{' )
 		return((struct cordscript_instruction *) 0);
-	else if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
+	else if (!( aptr = allocate_cordscript_instruction( enter_operation ) ))
+		return( aptr );
+	else	add_instruction( cptr, aptr );
+
+	if (!( xptr = allocate_cordscript_instruction( no_operation ) ))
 		return( xptr );
-	else if (!( jptr = allocate_cordscript_instruction( jmp_operation ) ))
+	else if (!( jptr = allocate_cordscript_instruction( leave_operation ) ))
 		return( jptr );
+	else if (!( kptr = allocate_cordscript_instruction( leave_operation ) ))
+		return( kptr );
 	else if (!( iptr = allocate_cordscript_instruction( set_operation ) ))
 		return( iptr );
 	else 	
 	{
+		add_operand( aptr, instruction_value( iptr ) );
+
 		/* ----------------------- */
 		/* connect JMP to EXIT NOP */
 		/* ----------------------- */
 		add_operand( jptr, instruction_value( xptr ) );
 		jptr->next = iptr;
+		iptr->next = kptr;
 
 		/* --------------- */
 		/* Set EXIT to JMP */
