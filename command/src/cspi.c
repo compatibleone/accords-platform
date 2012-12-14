@@ -1109,6 +1109,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	char *	tptr;
 	char *	sptr;
 	int	status;
+	int	count=0;
 	int	v;
 
 	if ( check_debug() )
@@ -1152,6 +1153,11 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		{
 			if ( vptr->value )
 				sleep( atoi(vptr->value) );
+		}
+
+		else if (!( strcmp( wptr->value, "length" ) ))
+		{
+			push_value( iptr->context, integer_value( ( vptr->value ? strlen( vptr->value ) : 0 ) ));
 		}
 
 		else if (!( strcmp( wptr->value, "debug" ) ))
@@ -1283,6 +1289,29 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 				else	push_value( iptr->context, string_value("") );
 			}
+			else if (!( strcmp( wptr->value, "count" ) ))
+			{
+				count=0;
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
+				if (( zptr = occi_simple_list( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else 	count++;
+					}
+					push_value( iptr->context, integer_value(count) );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
+			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
 				if ( argv[0] != (struct cordscript_value *) 0)
@@ -1344,6 +1373,29 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					aptr = close_array( aptr );
 					push_value( iptr->context, string_value(aptr) );
 					liberate( aptr );
+					zptr = occi_remove_response( zptr );
+				}
+				else	push_value( iptr->context, string_value("") );
+			}
+			else if (!( strcmp( wptr->value, "count" ) ))
+			{
+				count=0;
+				if ( argv[0] != (struct cordscript_value *) 0)
+					dptr = cordscript_occi_filter( argv[0]->value );
+				if (( zptr = occi_simple_list( sptr, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				{
+					aptr = (char *) 0;
+					for (	dptr=zptr->first;
+						dptr != (struct occi_element *) 0;
+						dptr = dptr->next )
+					{
+						if (!( tptr = dptr->name ))
+							continue;
+						else if (!( tptr = occi_category_id( dptr->value ) ))
+							continue;
+						else 	count++;
+					}
+					push_value( iptr->context, integer_value(count) );
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("") );
@@ -4068,12 +4120,14 @@ public struct cordscript_context * compile_cordscript_string( char * expression 
 /*   ----------------------- */
 /*   compile_cordscript_file */
 /*   ----------------------- */
-public struct cordscript_context	* compile_cordscript_file( char * expression )
+public struct cordscript_context	* compile_cordscript_file( char * expression, int argc, char * argv[] )
 {
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_context * cptr;
+	struct	cordscript_value * vptr;
 	FILE 	*	h;
 	char 	*	lptr;
+	int		argi;
 	char	buffer[8192];
 	if (!( h = fopen( expression , "r" ) ))
 		return((struct cordscript_context *) 0);
@@ -4081,6 +4135,17 @@ public struct cordscript_context	* compile_cordscript_file( char * expression )
 		return( cptr );
 	else
 	{
+		for ( argi=0; argi < argc; argi++ )
+		{
+			sprintf(buffer,"$%u",argi+1);
+			if (!( argv[argi] ))
+				break;
+			else if (!( vptr = resolve_variable( buffer, cptr )))
+				break;
+			else if (!( vptr->value = allocate_string( argv[argi] )))
+				break;
+			else	continue;
+		}
 	 	linecounter=0;
 		abandon_compile=0;
 		initialise_file( h );
@@ -4164,7 +4229,7 @@ public struct cordscript_value 	* execute_cordscript( struct  cordscript_context
 /*   ----------- */
 /*   interpreter */
 /*   ----------- */
-public	int	cordscript_interpreter( char * sptr )
+public	int	cordscript_interpreter( char * sptr, int argc, char * argv[] )
 {
 	struct	cordscript_context * cptr;
 	struct	cordscript_value * vptr;
@@ -4173,7 +4238,7 @@ public	int	cordscript_interpreter( char * sptr )
 		printf("Cordscript Interpreter\n");
 		printf("Compiling: %s \n",sptr);
 	}
-	if (!( cptr = compile_cordscript_file( sptr ) ))
+	if (!( cptr = compile_cordscript_file( sptr, argc, argv ) ))
 		return( failure(30, "error compiling", sptr) );
 	else
 	{

@@ -667,7 +667,7 @@ private	int	invoke_action( char * action, char * instance )
 /*	---------------------------------------------------	*/
 /*	r u n _ c o r d s c r i p t _ i n t e r p r e t e r	*/
 /*	---------------------------------------------------	*/
-private	int	run_cordscript_interpreter( char * filename )
+private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[] )
 {
 	int			status=0;
 	char 			* auth=(char *) 0;
@@ -679,7 +679,7 @@ private	int	run_cordscript_interpreter( char * filename )
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	cordscript_interpreter( filename );
+	cordscript_interpreter( filename, argc, argv );
 
 	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
@@ -711,7 +711,7 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[argi] ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
-				return( run_cordscript_interpreter( aptr ) );
+				return( run_cordscript_interpreter( aptr, argc-argi, &argv[argi] ) );
 			else if (!( strcasecmp( command, "ACCOUNT" ) ))
 				return( create_account( aptr ) );
 			else if (!( strcasecmp( command, "USER" ) ))
