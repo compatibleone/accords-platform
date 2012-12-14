@@ -10,6 +10,7 @@ private	struct cordscript_instruction * handle_else( struct cordscript_context *
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	int	end_of_instruction=0;
 private	int	echo=0;
+private	int	abandon_compile=0;
 
 /*   ----------*/
 /*   show_value*/
@@ -2499,9 +2500,29 @@ private	void	add_instruction( struct cordscript_context * cptr, struct cordscrip
 	return;
 }
 
-/*   ----------------------------	*/
-/*   compile_cordscript_statement	*/
-/*   ----------------------------	*/
+private	struct	cordscript_instruction	* compile_failure( int type, char * operand )
+{
+	abandon_compile=1;
+	switch ( type )
+	{
+	case	1 :	
+		printf("\nexpected punctuation : %s\n",operand);
+		return((struct cordscript_instruction *) 0);
+	case	2 :	
+		printf("\nallocation failure : %s\n",operand);
+		return((struct cordscript_instruction *) 0);
+	case	3 :	
+		printf("\nexpected operand : %s\n",operand);
+		return((struct cordscript_instruction *) 0);
+	default	:
+		printf("\nunexpected failure \n");
+		return((struct cordscript_instruction *) 0);
+	}
+}
+	
+/*   -----------------------	*/
+/*   compile_cordscript_call 	*/
+/*   -----------------------	*/
 private	struct	cordscript_instruction * compile_cordscript_call(struct cordscript_context * cptr, struct cordscript_value * fptr )
 {
 	struct	cordscript_instruction * iptr;
@@ -2510,10 +2531,10 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 	if ((c = get_punctuation()) != '(' )
 	{
 		if ( c ) unget_byte( c );
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(1,")") );
 	}
 	else if (!( iptr = allocate_cordscript_instruction( call_operation ) ))
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(2,"i") );
 	else
 	{
 		while (1)
@@ -2523,22 +2544,14 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 				break;
 			else if ( c == ',' )
 				continue;
-			else	return((struct cordscript_instruction *) 0);
+			else	return( compile_failure(1,",") );
 		}
 		add_operand( iptr, fptr );
 		add_instruction( cptr, iptr );
 		if ((c = get_punctuation()) == ';' )
 			return((struct cordscript_instruction *) 0);
-		else 	return((struct cordscript_instruction *) 0);
+		else	return( compile_failure(1,";") );
 	}
-}
-
-/*   ----------------------------	*/
-/*   compile_cordscript_statement	*/
-/*   ----------------------------	*/
-private	struct	cordscript_instruction * compile_cordscript_statement()
-{
-	return((struct cordscript_instruction *) 0);
 }
 
 /*   ------------------------	*/
@@ -2563,7 +2576,7 @@ private	struct	cordscript_instruction * compile_cordscript_block(struct cordscri
 /*   ------------	*/
 private	struct cordscript_instruction * syntax_error( struct cordscript_instruction * iptr )
 {
-	failure(30,"syntax error","");
+	compile_failure(4,"syntax error");
 	return( liberate_cordscript_instruction( iptr ) );
 }
 
@@ -2629,17 +2642,17 @@ private	struct cordscript_instruction * compile_cordscript_if( struct cordscript
 	int	operator=0;
 
 	if ( get_punctuation() != '(' )
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(1,"(") );
 	else if (!( lptr = compile_cordscript_instruction( cptr, 0 ) ))
 		return((struct cordscript_instruction *) 0);
 
 	else if (!( operator = cordscript_compare() ))
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(4,"operator") );
 	else if (!( rptr = compile_cordscript_instruction( cptr, 0 ) ))
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(3,"i") );
 
 	if ( get_punctuation() != ')' )
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(1,")") );
 
 	switch ( operator )
 	{
@@ -2703,11 +2716,11 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 	if (!( get_token( buffer ) ))
 		return((struct cordscript_instruction *) 0);
 	else if (!( fptr = allocate_cordscript_value( (char *) 0, buffer ) ))
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(2,"v") );
 	else if ((c = get_punctuation()) != '(' )
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(1,"(") );
 	else if (!( cptr = allocate_cordscript_context() ))
-		return((struct cordscript_instruction *) 0);
+		return( compile_failure(2,"") );
 	{
 		while (1)
 		{
@@ -2717,7 +2730,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 				if (!( vptr = allocate_cordscript_value( (char *) 0, buffer ) ))
 				{
 					liberate_cordscript_context( cptr );
-					return((struct cordscript_instruction *) 0);
+					return( compile_failure(2,"v") );
 				}
 				else
 				{
@@ -2732,7 +2745,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 			else			
 			{
 				liberate_cordscript_context( cptr );
-				return((struct cordscript_instruction *) 0);
+				return( compile_failure(1,",") );
 			}
 		}		
 		fptr->next = kptr->code;
@@ -2741,7 +2754,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 		if (( c = get_punctuation()) != '{' )
 		{
 			liberate_cordscript_context( cptr );
-			return((struct cordscript_instruction *) 0);
+			return( compile_failure(1,"{") );
 		}
 		else
 		{
@@ -2815,20 +2828,11 @@ private	struct cordscript_instruction * compile_cordscript_foreach( struct cords
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
+	{
 		allocate_cordscript_label( jptr, _FOREACH_LABEL );
-
-	else if (!( c ))
-	{
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, xptr );
+		return((struct cordscript_instruction *) 0);
 	}
-	else
-	{
-		unget_byte(c);
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, xptr );
-	}
-	return((struct cordscript_instruction *) 0);
+	else	return( compile_failure(1,"{") );
 
 }
 
@@ -2911,21 +2915,11 @@ private	struct cordscript_instruction * compile_cordscript_forboth( struct cords
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
+	{
 		allocate_cordscript_label( jptr, _FORBOTH_LABEL );
-
-	else if (!( c ))
-	{
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, xptr );
+		return((struct cordscript_instruction *) 0);
 	}
-	else
-	{
-		unget_byte(c);
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, xptr );
-	}
-	return((struct cordscript_instruction *) 0);
-
+	else	return( compile_failure(1,"{") );
 }
 
 /*	------------------------	*/
@@ -3089,19 +3083,11 @@ private	struct cordscript_instruction * compile_cordscript_for( struct cordscrip
 	/* detect and handle conditional block */
 	/* ----------------------------------- */
 	if (( c = get_punctuation()) == '{' )
+	{
 		allocate_cordscript_label( jptr, _FOR_LABEL );
-	else if (!( c ))
-	{
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, iptr );
+		return((struct cordscript_instruction *) 0);
 	}
-	else
-	{
-		unget_byte(c);
-		add_instruction( cptr, jptr );
-		add_instruction( cptr, iptr );
-	}
-	return((struct cordscript_instruction *) 0);
+	else	return( compile_failure(1,"{") );
 }
 
 /*   ------------------------	*/
@@ -3176,19 +3162,11 @@ private	struct cordscript_instruction * compile_cordscript_while( struct cordscr
 		add_operand( rptr, instruction_value( fptr ) );
 
 		if (( c = get_punctuation()) == '{' )
+		{
 			allocate_cordscript_label( jptr, _WHILE_LABEL );
-		else if (!( c ))
-		{
-			add_instruction( cptr, jptr );
-			add_instruction( cptr, fptr );
+			return((struct cordscript_instruction *) 0);
 		}
-		else
-		{
-			unget_byte(c);
-			add_instruction( cptr, jptr );
-			add_instruction( cptr, fptr );
-		}
-		return((struct cordscript_instruction *) 0);
+		else	return( compile_failure(1,"{") );
 	}
 }
 
@@ -3546,6 +3524,8 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 		{
 			iptr = compile_cordscript_instruction( cptr, 0 );
 			if ( get_punctuation() )
+				break;
+			else if ( abandon_compile )
 				break;
 		}
 		h = initialise_file( hh );
@@ -4061,11 +4041,14 @@ public struct cordscript_context	* compile_cordscript_file( char * expression )
 	else
 	{
 	 	linecounter=0;
+		abandon_compile=0;
 		initialise_file( h );
 		while ( remove_white() )
 		{	
 			iptr = compile_cordscript_instruction( cptr, 0 );
 			if ( get_punctuation() != 0 )
+				break;
+			else if ( abandon_compile )
 				break;
 		}
 		fclose(h);
