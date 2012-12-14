@@ -660,6 +660,32 @@ private	int	check_value_type( char * sptr )
 
 
 /*	--------------		*/
+/*	 cat_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * cat_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("cat_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			push_value( iptr->context, join_value_strings( vptr->value, wptr->value ) );
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+/*	--------------		*/
 /*	 add_operation		*/
 /*	--------------		*/
 private	struct	cordscript_instruction * add_operation( struct cordscript_instruction * iptr )
@@ -716,6 +742,7 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 		return( (struct cordscript_instruction *) 0);
 	else	return( iptr->next );
 }
+
 /*	--------------		*/
 /*	 sub_operation		*/
 /*	--------------		*/
@@ -3860,6 +3887,20 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		else if ( c == '+' )
 		{	
 			iptr->evaluate = add_operation;
+			/* ------------------------------- */
+			/* compile the affectation operand */
+			/* the result will be on the stack */
+			/* ------------------------------- */
+			if (!( compile_cordscript_instruction( cptr, (level+1) ) ))
+			{
+				return( liberate_cordscript_instruction( iptr ) );
+			}
+			else	break;
+			
+		}
+		else if ( c == '#' )
+		{	
+			iptr->evaluate = cat_operation;
 			/* ------------------------------- */
 			/* compile the affectation operand */
 			/* the result will be on the stack */
