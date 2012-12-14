@@ -50,8 +50,7 @@ case "$1" in
 	/usr/bin/cosacs --config config-cosacs.xml cosacs/1.0a &
   ;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-	killall /usr/bin/cosacs >/dev/null 2>&1 || true
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC " "$NAME"
 	kill -TERM $(ps auwxw|grep "/usr/bin/cosacs --config"|grep -v grep|awk '{print $2}') > /dev/null 2>&1 || true
 	sleep 1
 	;;
