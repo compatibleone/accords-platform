@@ -2203,7 +2203,7 @@ private	int	initialise_line( char * sptr )
 private	FILE * 	infile=(FILE *) 0;
 private	FILE *	initialise_file( FILE * h )
 {
-	FILE * hh=h;
+	FILE * hh=infile;
 	infile = h;
 	return( hh );
 }
@@ -2441,6 +2441,7 @@ private	int	get_token( char * result )
 {
 	int	quote=0;
 	int	c;
+	int	cc;
 	int	nb=0;
 
 	if ( ungot_token )
@@ -2475,15 +2476,37 @@ private	int	get_token( char * result )
 			quote = c;
 			continue;
 		}
-		else if (!( token_legal(c) ))
+		else if (!( nb ))
+		{
+			if (( c == '+' )
+			||  ( c == '-' ))
+			{
+				if (((c = get_byte()) >= '0' )
+				&&  (c <= '9'))
+				{
+					if ( c == '-' )
+					{
+						*(result+nb) = c; nb++;
+					}
+					*(result+nb) = cc; nb++;
+					continue;
+				}
+				else	
+				{
+					unget_byte( cc );
+					unget_byte( c );
+					break;
+				}
+			}
+		}
+		if (!( token_legal(c) ))
 		{
 			unget_byte(c);
 			break;
 		}
 		else
 		{
-			*(result+nb) = c;
-			nb++;
+			*(result+nb) = c; nb++;
 		}
 	}
 	*(result+nb) = 0;
