@@ -12,3 +12,4 @@
 /etc/accords/cords_ec2config.xml /var/lib/accords/cords_ec2config.xml
 /etc/accords/publication.xml /var/lib/accords/publication.xml
 /etc/accords/slamtest.xml /var/lib/accords/slamtest.xml
+/etc/accords/accords.ini /var/lib/accords/accords.ini

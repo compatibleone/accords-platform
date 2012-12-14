@@ -240,9 +240,9 @@ _co_broker() {
 
 _co_command() {
     if [ -z "$tls" ]; then
-	/usr/local/bin/command --publisher "$publisher" $*
+	@bindir@/command --publisher "$publisher" $*
     else
-	/usr/local/bin/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+	@bindir@/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
     fi
 }
 
