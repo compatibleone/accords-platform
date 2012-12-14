@@ -2476,30 +2476,27 @@ private	int	get_token( char * result )
 			quote = c;
 			continue;
 		}
-		else if (!( nb ))
+		else if (((!( nb )) && ( c == '+' ))
+		     || ((!( nb )) && ( c == '-' )))
 		{
-			if (( c == '+' )
-			||  ( c == '-' ))
+			if (((c = get_byte()) >= '0' )
+			&&  (c <= '9'))
 			{
-				if (((c = get_byte()) >= '0' )
-				&&  (c <= '9'))
+				if ( c == '-' )
 				{
-					if ( c == '-' )
-					{
-						*(result+nb) = c; nb++;
-					}
-					*(result+nb) = cc; nb++;
-					continue;
+					*(result+nb) = c; nb++;
 				}
-				else	
-				{
-					unget_byte( cc );
-					unget_byte( c );
-					break;
-				}
+				*(result+nb) = cc; nb++;
+				continue;
+			}
+			else	
+			{
+				unget_byte( cc );
+				unget_byte( c );
+				break;
 			}
 		}
-		if (!( token_legal(c) ))
+		else if (!( token_legal(c) ))
 		{
 			unget_byte(c);
 			break;
