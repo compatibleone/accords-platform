@@ -45,6 +45,7 @@ struct	cordscript_value
 {
 	struct	cordscript_value * next;
 	char *	name;
+	int	parameter;
 	struct	cordscript_instruction * code;
 	struct	cordscript_context * body;
 	char *	value;

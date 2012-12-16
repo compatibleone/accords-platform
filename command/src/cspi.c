@@ -2083,8 +2083,12 @@ private	struct	cordscript_instruction * both_operation( struct cordscript_instru
 private	struct	cordscript_instruction * call_operation( struct cordscript_instruction * iptr )
 {
 	struct cordscript_operand * optr;
-	struct cordscript_value * vptr;
+	struct cordscript_value   * vptr;
+	struct cordscript_value   * nptr;
 	struct cordscript_context * bptr;
+	struct cordscript_value   * pptr;
+	struct cordscript_value   * qptr;
+	int	parameters=0;
 
 	if ( check_debug() )
 		printf("call_operation();\n");
@@ -2093,6 +2097,31 @@ private	struct	cordscript_instruction * call_operation( struct cordscript_instru
 	&&  ((vptr = optr->value) != (struct cordscript_value *) 0 ) 
 	&&  ((bptr = vptr->body ) != (struct cordscript_context *) 0))
 	{
+		/* --------------------------------------------- */
+		/* detect and handle invocation parameter values */
+		/* --------------------------------------------- */
+		if (((optr = optr->next) != (struct cordscript_operand *) 0)
+		&&  ((nptr = optr->value) != (struct cordscript_value *) 0)
+		&&  ((parameters = (nptr->value ? atoi(nptr->value) : 0 )) != 0))
+		{
+			for (	pptr=bptr->data;
+				pptr != (struct cordscript_value *) 0;
+				pptr = pptr->next )
+			{
+				if ( pptr->parameter == parameters )
+				{
+					if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+					{
+						if ( pptr->value )
+							pptr->value = liberate( pptr->value );
+						if ( qptr->value )
+							pptr->value = allocate_string( qptr->value );
+						drop_value( qptr );
+					}
+					parameters--;
+				}
+			}
+		}
 		bptr->caller = iptr->next;
 		return((bptr->ip = bptr->cs));
 	}
@@ -2135,7 +2164,7 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 		return((struct cordscript_instruction *) 0);
 	else
 	{
-		push_value( cptr, vptr );
+		push_value( iptr->context, vptr );
 		return(iptr);
 	}
 }
@@ -2627,6 +2656,7 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_instruction * jptr;
 	int	c;
+	int	operands=0;
 	if ((c = get_punctuation()) != '(' )
 	{
 		if ( c ) unget_byte( c );
@@ -2638,18 +2668,33 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 	{
 		while (1)
 		{
-			jptr = compile_cordscript_instruction( cptr, 0 );
-			if ((c = get_punctuation()) == ')' )
+			if (( c = get_punctuation() ) != 0)
+			{
+				if ( c == ')' )
+					break;
+				else if ( c == ',' )
+					continue;
+				else if ((c == '[' ) || ( c == '{' ))
+				{
+					unget_byte( c ); 
+					if (!( jptr = compile_cordscript_instruction(cptr, 1 ) ))
+						break;
+					else
+					{
+						operands++;
+						continue;
+					}
+				}
+				else 	break;
+			}
+			else if (!( jptr = compile_cordscript_instruction(cptr, 1 ) ))
 				break;
-			else if ( c == ',' )
-				continue;
-			else	return( compile_failure(1,",") );
+			else	operands++;
 		}
 		add_operand( iptr, fptr );
+		add_operand( iptr, integer_value( operands ) );
 		add_instruction( cptr, iptr );
-		if ((c = get_punctuation()) == ';' )
-			return((struct cordscript_instruction *) 0);
-		else	return( compile_failure(1,";") );
+		return( iptr );
 	}
 }
 
@@ -2811,6 +2856,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 	struct	cordscript_context * cptr;
 	struct	cordscript_value * fptr;
 	char	buffer[_MAX_NAME];
+	int	parameters=0;
 	int	c;
 	if (!( get_token( buffer ) ))
 		return((struct cordscript_instruction *) 0);
@@ -2833,6 +2879,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 				}
 				else
 				{
+					vptr->parameter = ++parameters;
 					vptr->next = cptr->data;
 					cptr->data = vptr;
 				}
@@ -3390,9 +3437,6 @@ private	struct cordscript_instruction * compile_cordscript_continue( struct cord
 	{
 		switch( lptr->type )
 		{
-		case	_TRY_LABEL	:
-			break;
-
 		case	_FOR_LABEL	:
 		case	_FOREACH_LABEL	:
 		case	_FORBOTH_LABEL	:
@@ -3408,12 +3452,16 @@ private	struct cordscript_instruction * compile_cordscript_continue( struct cord
 
 		case	_IF_LABEL	:
 		case	_SWITCH_LABEL	:
+		case	_TRY_LABEL	:
 		default			:
 			lptr = lptr->next;
 			continue;
 		}
 		break;
 	}
+	if ( get_punctuation() == ';' )
+		check_line_end(cptr,0,';');
+
 	return((struct cordscript_instruction *) 0);
 }			
 
@@ -3754,7 +3802,7 @@ private	struct cordscript_instruction * compile_cordscript_return( struct cordsc
 			return((struct cordscript_instruction *) 0);
 		if ((c = get_punctuation()) == ';' )
 		{
-			if (!( iptr = allocate_cordscript_instruction( ret_operation ) ))
+			if (!( iptr = allocate_cordscript_instruction( retvalue_operation ) ))
 				return( iptr );
 			else
 			{
