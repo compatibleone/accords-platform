@@ -45,6 +45,7 @@ struct	cordscript_value
 {
 	struct	cordscript_value * next;
 	char *	name;
+	int	parameter;
 	struct	cordscript_instruction * code;
 	struct	cordscript_context * body;
 	char *	value;
@@ -94,7 +95,7 @@ public struct cordscript_instruction	* liberate_cordscript_instruction(struct co
 public struct cordscript_context	* liberate_cordscript_context( struct cordscript_context * xptr );
 
 public struct cordscript_context	* compile_cordscript_string( char * expression );
-public struct cordscript_context	* compile_cordscript_file( char * expression );
+public struct cordscript_context	* compile_cordscript_file( char * expression, int argc, char * argv[] );
 public struct cordscript_value 		* execute_cordscript( struct cordscript_context * cptr );
 
 #endif	/* _cspi_h */
