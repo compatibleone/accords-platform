@@ -1,4 +1,4 @@
-usr/bin/cosacs
+usr/bin/cosacs-client
 etc/cosacs/*
 etc/default/cosacs
 #var/lib/cosacs/*

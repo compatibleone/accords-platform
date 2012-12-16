@@ -277,8 +277,7 @@ Description: CompatibleOne Accords Platform - COOL subsystem
 Package: cosacs
 Section: net
 Architecture: any
-Depends: psmisc, ${shlibs:Depends}, ${misc:Depends}, compatibleone-base (>= ${binary:Version})
-Conflicts: compatibleone-cosacs
+Depends: psmisc, ${shlibs:Depends}, ${misc:Depends}
 Description: CompatibleOne Accords Platform - COSACS Standalone Client
  The CompatibleOne Software Appliance Configuration Services module is a
  standalone OCCI REST server executable program that will have been
@@ -297,7 +296,6 @@ Package: compatibleone-cosacs
 Section: net
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
-Conflicts: cosacs
 Description: CompatibleOne Accords Platform - COSACS subsystem
  The CompatibleOne Software Appliance Configuration Services module is a
  standalone OCCI REST server executable program that will have been embedded
