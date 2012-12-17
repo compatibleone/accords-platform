@@ -75,12 +75,14 @@ install: build
 	mv `pwd`/debian/tmp/etc/accords/accords.ini.tmp `pwd`/debian/tmp/etc/accords/accords.ini
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/compatibleone-accords `pwd`/debian/tmp/var/lib/accords `pwd`/debian/tmp/etc/cosacs/
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
+	cp debian/co-docs/* `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
 	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/cosacs/
+	cp `pwd`/debian/tmp/usr/bin/cosacs `pwd`/debian/tmp/usr/bin/cosacs-client
 	cp accounts.xml coips.xml metrics.xml slamtest.xml `pwd`/debian/tmp/etc/accords
 	cp scripts/amazon_manifest.xml  scripts/cords_ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords
 	cp manifests/style.css `pwd`/debian/tmp/etc/accords
@@ -129,8 +131,8 @@ binary-arch: build install
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
 	for i in libcocarrier0 libcocci0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
-		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20121213-1)") > debian/$$i.shlibs; \
-		dh_makeshlibs -p $$i -V "$$i (>= 0.20121213-1)"; \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20121214-1)") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= 0.20121214-1)"; \
 	done
 	dh_shlibdeps -a
 	dh_gencontrol -a

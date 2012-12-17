@@ -14,7 +14,7 @@
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC='CompatibleOne COSACS Client'	# Introduce a short description here
-NAME=cosacs				# Introduce the short server's name here
+NAME=cosacs-client			# Introduce the short server's name here
 DAEMON_ARGS=""				# Arguments to run the daemon with
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
@@ -47,11 +47,11 @@ cd $accords_workdir
 case "$1" in
   start)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
-	/usr/bin/cosacs --config config-cosacs.xml cosacs/1.0a &
+	/usr/bin/cosacs-client --config config-cosacs.xml cosacs/1.0a &
   ;;
   stop)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC " "$NAME"
-	kill -TERM $(ps auwxw|grep "/usr/bin/cosacs --config"|grep -v grep|awk '{print $2}') > /dev/null 2>&1 || true
+	kill -TERM $(ps auwxw|grep "/usr/bin/cosacs-client --config"|grep -v grep|awk '{print $2}') > /dev/null 2>&1 || true
 	sleep 1
 	;;
   status)
