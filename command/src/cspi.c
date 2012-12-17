@@ -1108,6 +1108,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	char *	aptr;
 	char *	tptr;
 	char *	sptr;
+	char *	lptr;
 	int	status;
 	int	count=0;
 	int	v;
@@ -1194,7 +1195,21 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						if (!( tptr = dptr->name ))
 							continue;
 						{
-							if ( *dptr->name == '"' )
+							if (!( strcmp( dptr->name, "link" ) ))
+							{
+								if (!( lptr = allocate_string( dptr->value ) ))
+									continue;
+								else if (!( lptr = occi_unquoted_link( lptr ) ))
+									continue;
+								else
+								{
+									sprintf(vbuffer,"{%c%s%c:%c%s%c}",
+										0x0022,dptr->name,0x0022,
+										0x0022,lptr,0x0022);
+									lptr = liberate( lptr );
+								}
+							}
+							else if ( *dptr->name == '"' )
 							{
 								sprintf(vbuffer,"{%s:%s}",
 								(dptr->name ? dptr->name : ""), 
