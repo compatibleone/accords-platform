@@ -1,2 +1,3 @@
 /etc/cosacs/style.css /var/lib/cosacs/style.css
+/etc/cosacs/config-cosacs.xml /var/lib/cosacs/config-cosacs.xml
 /etc/cosacs/Certificates.crt /var/lib/cosacs/Certificates.crt

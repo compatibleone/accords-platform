@@ -1,0 +1,17 @@
+<accords>
+<cosacs
+    publisher=''
+    operator='accords'
+    identity=''
+    verbose='0'
+    debug='0'
+    threads='1'>
+    <rest host='127.0.0.1' port='8286'/>
+    <security
+         user='service-cosacs'
+         password='co-system'
+         monitor='1'
+         tls=''/>
+    <domain name='occi' zone='europe'/>
+</cosacs>
+</accords>
