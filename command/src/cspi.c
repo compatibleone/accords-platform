@@ -1118,7 +1118,9 @@ private	void	cut_operation( struct cordscript_instruction * iptr,  char * source
 				else	xptr = wptr;
 			}
 		}
-		push_value( iptr->context, string_value( rptr ) );
+		if ( strlen( xptr ) > 0 )
+			rptr = add_array( rptr, xptr, "" );
+		push_value( iptr->context, string_value( close_array( rptr ) ) );
 		return;
 	}
 }
