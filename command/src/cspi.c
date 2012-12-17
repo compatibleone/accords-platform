@@ -1088,6 +1088,43 @@ private	struct	cordscript_instruction * leave_operation( struct cordscript_instr
 	return(iptr->context->ip);
 }
 
+private	void	join_operation( struct cordscript_instruction * iptr,char * source, struct cordscript_value * separator )
+{
+	return;
+}
+
+private	void	cut_operation( struct cordscript_instruction * iptr,  char * source, struct cordscript_value * separator )
+{
+	char *	rptr=(char *) 0;
+	char *	sptr;
+	char *	wptr;
+	char *	xptr;	
+	int	cutat = ( separator ? ( separator->value ? *(separator->value) : ' ' ) : ' ' );
+	if (!( sptr = allocate_string( source ) ))
+		push_value( iptr->context, string_value("" ) );
+	else
+	{
+		for ( 	xptr=wptr=sptr;
+			*wptr != 0;
+			wptr++ )
+		{
+			if ( *wptr != cutat )
+				continue;
+			else 
+			{
+				*(wptr++) = 0;
+				if (!( rptr = add_array( rptr, xptr, "" )))
+					break;
+				else	xptr = wptr;
+			}
+		}
+		if ( strlen( xptr ) > 0 )
+			rptr = add_array( rptr, xptr, "" );
+		push_value( iptr->context, string_value( close_array( rptr ) ) );
+		return;
+	}
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
@@ -1108,6 +1145,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	char *	aptr;
 	char *	tptr;
 	char *	sptr;
+	char *	lptr;
 	int	status;
 	int	count=0;
 	int	v;
@@ -1160,6 +1198,16 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			push_value( iptr->context, integer_value( ( vptr->value ? strlen( vptr->value ) : 0 ) ));
 		}
 
+		else if (!( strcmp( wptr->value, "cut" ) ))
+		{
+			cut_operation( iptr, vptr->value, argv[0] );
+		}
+
+		else if (!( strcmp( wptr->value, "join" ) ))
+		{
+			join_operation( iptr, vptr->value, argv[0] );
+		}
+
 		else if (!( strcmp( wptr->value, "debug" ) ))
 		{
 			v = atoi( vptr->value );
@@ -1194,7 +1242,21 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						if (!( tptr = dptr->name ))
 							continue;
 						{
-							if ( *dptr->name == '"' )
+							if (!( strcmp( dptr->name, "link" ) ))
+							{
+								if (!( lptr = allocate_string( dptr->value ) ))
+									continue;
+								else if (!( lptr = occi_unquoted_link( lptr ) ))
+									continue;
+								else
+								{
+									sprintf(vbuffer,"{%c%s%c:%c%s%c}",
+										0x0022,dptr->name,0x0022,
+										0x0022,lptr,0x0022);
+									lptr = liberate( lptr );
+								}
+							}
+							else if ( *dptr->name == '"' )
 							{
 								sprintf(vbuffer,"{%s:%s}",
 								(dptr->name ? dptr->name : ""), 
