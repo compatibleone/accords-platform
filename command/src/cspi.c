@@ -1273,6 +1273,35 @@ private	void	member_operation( struct cordscript_instruction * iptr, struct cord
 	return;
 }
 
+/*	------------------------------------------------------------------	*/
+/*		t r a n s a c t i o n _ d a t e _ a n d _ t i m e 		*/
+/*	------------------------------------------------------------------	*/
+private	void	date_operation( struct cordscript_instruction * iptr, struct cordscript_value * vptr )
+{
+	int 	tt;
+	char 	buffer[256];
+	struct	tm * tptr;
+	time_t t;
+	if ((!( vptr ))
+	||  ( check_value_type( vptr->value ) != _INTEGER_VALUE ))
+		push_value( iptr->context, string_value( "" ) );
+	else
+	{
+		t = (time_t) atoi( vptr->value );
+
+		if (!( tptr = localtime( &t )))
+			sprintf(buffer,"%u",t);
+		else
+		{
+			sprintf(buffer,"%u/%u/%u %u:%u:%u",
+				tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900,
+				tptr->tm_hour, tptr->tm_min, tptr->tm_sec);
+		}
+		push_value( iptr->context, string_value( buffer ) );
+		return;
+	}
+}
+
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -1350,6 +1379,11 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		else if (!( strcmp( wptr->value, "member" ) ))
 		{
 			member_operation( iptr, vptr, argv[0] );
+		}
+
+		else if (!( strcmp( wptr->value, "date" ) ))
+		{
+			date_operation( iptr, vptr );
 		}
 
 		else if (!( strcmp( wptr->value, "cut" ) ))
