@@ -3668,6 +3668,7 @@ private	char *	cords_brokering_account(
 				return( cords_terminate_provisioning( 905, CbC ) );
 			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 				return( cords_terminate_provisioning( 905, CbC ) );
+			else	return( allocate_string( CbC->accID ) );
 		}
 	}
 	else
@@ -3692,6 +3693,7 @@ private	char *	cords_brokering_account(
 				return( cords_terminate_provisioning( 905, CbC ) );
 			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
 				return( cords_terminate_provisioning( 905, CbC ) );
+			else	return( allocate_string( CbC->accID ) );
 		}
 	}
 	return("OK");
