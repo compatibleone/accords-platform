@@ -184,3 +184,7 @@ testresolver/src/testresolver
 *.tgz
 paprocci/java/libs/*.jar
 testsuite/*.pyc
+paasprocci/src/paasprocci
+pyaccords/pysrc/pypacksrc/build/
+pyaccordsSDK/pycompdev/build/
+pyaccordsSDK/pycompmanager/build/
