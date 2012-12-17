@@ -11,6 +11,12 @@
 
 #define	_CORDSCRIPT_AGENT "cordscript/1.0a"
 
+#define	_INTEGER_VALUE		0
+#define	_STRING_VALUE		1
+#define	_ARRAY_VALUE		2
+#define	_STRUCTURE_VALUE	3
+#define	_FLOAT_VALUE		4
+
 #define	_CSP_EQ	1
 #define	_CSP_LS	2
 #define	_CSP_LE	3

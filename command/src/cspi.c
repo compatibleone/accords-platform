@@ -6,6 +6,8 @@
 private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
 private	struct	cordscript_exception * exceptionheap=(struct cordscript_exception *) 0;
 
+private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscript_value * sptr );
+private	int	crop_structure_element( struct cordscript_value * nptr, struct cordscript_value * rptr, struct cordscript_value * sptr );
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	int	end_of_instruction=0;
@@ -644,18 +646,18 @@ private	struct	cordscript_value * join_value_strings( char * lptr, char * rptr )
 private	int	check_value_type( char * sptr )
 {
 	if (!( sptr ))
-		return(0);
+		return( _INTEGER_VALUE );
 	else if ( *sptr == '[' )
-		return( 2 );
+		return( _ARRAY_VALUE );
 	else if ( *sptr == '{' )
-		return( 3 );
+		return( _STRUCTURE_VALUE );
 	else if (( *sptr >= '0' ) && ( *sptr <= '9' ))
-		return( 0 );
+		return( _INTEGER_VALUE );
 	else if ( *sptr == '"' )
-		return( 1 );
+		return( _STRING_VALUE );
 	else if (( *sptr == '+' ) || ( *sptr == '-' ))
-		return( 0 );
-	else	return( 1 );
+		return( _INTEGER_VALUE );
+	else	return( _STRING_VALUE );
 }
 
 
@@ -704,7 +706,7 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 		{
 			switch ( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				/* numeric addition */
 				/* ---------------- */
 				if ( vptr->value )
@@ -713,17 +715,17 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 					value += atoi( wptr->value );
 				push_value( iptr->context, integer_value( value ) );
 				break;
-			case	1	:
+			case	_STRING_VALUE	:
 				/* string concatenation */
 				/* -------------------- */
 				push_value( iptr->context, join_value_strings( vptr->value, wptr->value ) );
 				break;
-			case	2	:
+			case	_ARRAY_VALUE	:
 				/* add array elements */
 				/* ------------------ */
 				push_value( iptr->context, join_array( vptr->value, wptr->value ) );
 				break;
-			case	3	:
+			case	_STRUCTURE_VALUE	:
 				/* add structure members */
 				/* --------------------- */
 				push_value( iptr->context, join_structure( vptr->value, wptr->value ) );
@@ -1088,11 +1090,17 @@ private	struct	cordscript_instruction * leave_operation( struct cordscript_instr
 	return(iptr->context->ip);
 }
 
+/*	----------------	*/
+/*	join_operation		*/
+/*	----------------	*/
 private	void	join_operation( struct cordscript_instruction * iptr,char * source, struct cordscript_value * separator )
 {
 	return;
 }
 
+/*	----------------	*/
+/*	cut_operation		*/
+/*	----------------	*/
 private	void	cut_operation( struct cordscript_instruction * iptr,  char * source, struct cordscript_value * separator )
 {
 	char *	rptr=(char *) 0;
@@ -1124,6 +1132,147 @@ private	void	cut_operation( struct cordscript_instruction * iptr,  char * source
 		return;
 	}
 }
+
+/*	----------------------	*/
+/*	   duplicate_value	*/
+/*	----------------------	*/
+private	struct	cordscript_value * duplicate_value(struct cordscript_value * source)
+{
+	return( allocate_cordscript_value( source->value, source->name ) );
+}
+
+
+/*	--------------------------	*/
+/*	structure_member_operation	*/
+/*	--------------------------	*/
+private	int	structure_member_operation( struct cordscript_instruction * iptr,  struct cordscript_value * source, struct cordscript_value * selector  )
+{
+	char *	item;
+	struct	cordscript_value *	result;
+	struct	cordscript_value *	token;
+
+	switch ( check_value_type( selector->value ) )
+	{
+	case	_INTEGER_VALUE	:
+		return(0);
+	case	_STRING_VALUE	:
+		if (!( item = selector->value ))
+			return(0);
+		else if (!( source = duplicate_value( source ) ))
+			return(0);
+		else if (!( result = allocate_cordscript_value( (char *) 0, (char *) 0) ))
+			return(0);
+		else if (!( token = allocate_cordscript_value( (char *) 0, (char *) 0) ))
+			return(0);
+		else
+		{
+			while ( crop_structure_element( token, result, source ) )
+			{
+				if (!( token->value ))
+					break;
+				else if (!( strcmp( token->value, item ) ))
+				{
+					push_value( iptr->context, result );
+					drop_value( token );
+					drop_value( source );
+					return(1);
+				}					
+			}
+		}
+		drop_value( result );
+		drop_value( token );
+		drop_value( source );
+	default	:
+		return(0);
+	}
+}
+
+/*	----------------------	*/
+/*	array_member_operation	*/
+/*	----------------------	*/
+private	int	array_member_operation( struct cordscript_instruction * iptr,  struct cordscript_value * source, struct cordscript_value * selector )
+{
+	int	item;
+	struct	cordscript_value *	result;
+
+	switch ( check_value_type( selector->value ) )
+	{
+	case	_INTEGER_VALUE	:
+		if (!( source = duplicate_value( source ) ))
+			return(0);
+		else if (!( result = allocate_cordscript_value( (char *) 0, (char *) 0) ))
+			return(0);
+		else
+		{
+			item=(selector->value ? atoi( selector->value ) : 0 );
+			while (1)
+			{
+				if (!( crop_matrix_element( result, source ) ))
+				{
+					drop_value( result );
+					drop_value( source );
+					return(0);
+				}
+				else if (!( item ))
+					break;
+				else	item--;
+			}
+			push_value( iptr->context, result );
+			drop_value( source );
+			return(1);
+		}
+
+	case	_STRING_VALUE	:
+		if (!( source = duplicate_value( source ) ))
+			return(0);
+		else if (!( result = allocate_cordscript_value( (char *) 0, (char *) 0) ))
+			return(0);
+		else
+		{
+			item=(selector->value ? atoi( selector->value ) : 0 );
+			while ( crop_matrix_element( result, source ) )
+			{
+				if ( check_value_type( result->value ) == _STRUCTURE_VALUE )
+				{
+					if ( structure_member_operation( iptr, result, selector ) )
+					{
+						drop_value( source );
+						drop_value( result );
+						return(1);
+					}
+				}
+			}			
+			drop_value( result );
+			drop_value( source );
+			return(0);
+		}
+	default		:
+		return(0);
+	}
+}
+
+/*	----------------	*/
+/*	member_operation	*/
+/*	----------------	*/
+private	void	member_operation( struct cordscript_instruction * iptr, struct cordscript_value * source, struct cordscript_value * selector  )
+{
+	if ((!( source )) || (!( source->value )))
+		push_value( iptr->context, string_value( "" ) );
+
+	else if (*source->value == '[' )
+	{
+		if (!( array_member_operation( iptr, source,selector ) ))
+			push_value( iptr->context, string_value( "" ) );
+	}
+	else if (*source->value == '{' )
+	{
+		if (!( structure_member_operation( iptr, source, selector ) ))
+			push_value( iptr->context, string_value( "" ) );
+	}
+	else	push_value( iptr->context, string_value( "" ) );
+	return;
+}
+
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -1196,6 +1345,11 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		else if (!( strcmp( wptr->value, "length" ) ))
 		{
 			push_value( iptr->context, integer_value( ( vptr->value ? strlen( vptr->value ) : 0 ) ));
+		}
+
+		else if (!( strcmp( wptr->value, "member" ) ))
+		{
+			member_operation( iptr, vptr, argv[0] );
 		}
 
 		else if (!( strcmp( wptr->value, "cut" ) ))
@@ -1566,14 +1720,15 @@ private	struct	cordscript_instruction * jeq_operation( struct cordscript_instruc
 
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(wptr->value) == atoi(vptr->value))
 				{
 					iptr->context->ip = lptr->code;
 					drop_value( vptr );
 					return(iptr->context->ip);
 				}
-			case	1	:
+				else	break;
+			case	_STRING_VALUE	:
 				if (!( strcmp( wptr->value, vptr->value ) ))
 				{
 
@@ -1627,7 +1782,7 @@ private	struct	cordscript_instruction * jne_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(wptr->value) != atoi(vptr->value))
 				{
 					iptr->context->ip = lptr->code;
@@ -1635,7 +1790,7 @@ private	struct	cordscript_instruction * jne_operation( struct cordscript_instruc
 					return(iptr->context->ip);
 				}
 				else	break;
-			case	1	:
+			case	_STRING_VALUE	:
 				if ( strcmp( wptr->value, vptr->value ) != 0 )
 				{
 
@@ -1687,7 +1842,7 @@ private	struct	cordscript_instruction * jle_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) <= atoi(wptr->value))
 				{
 					iptr->context->ip = lptr->code;
@@ -1695,7 +1850,7 @@ private	struct	cordscript_instruction * jle_operation( struct cordscript_instruc
 					return(iptr->context->ip);
 				}
 				else	break;
-			case	1	:
+			case	_STRING_VALUE	:
 				if ( strcmp( vptr->value, wptr->value ) <= 0 )
 				{
 
@@ -1746,7 +1901,7 @@ private	struct	cordscript_instruction * jls_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) < atoi(wptr->value))
 				{
 					iptr->context->ip = lptr->code;
@@ -1754,7 +1909,7 @@ private	struct	cordscript_instruction * jls_operation( struct cordscript_instruc
 					return(iptr->context->ip);
 				}
 				else	break;
-			case	1	:
+			case	_STRING_VALUE	:
 				if ( strcmp( vptr->value, wptr->value ) < 0 )
 				{
 
@@ -1804,7 +1959,7 @@ private	struct	cordscript_instruction * jgr_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) > atoi(wptr->value))
 				{
 					iptr->context->ip = lptr->code;
@@ -1812,7 +1967,7 @@ private	struct	cordscript_instruction * jgr_operation( struct cordscript_instruc
 					return(iptr->context->ip);
 				}
 				else	break;
-			case	1	:
+			case	_STRING_VALUE	:
 				if ( strcmp( vptr->value, wptr->value ) > 0 )
 				{
 
@@ -1863,7 +2018,7 @@ private	struct	cordscript_instruction * jge_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
-			case	0	:
+			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) >= atoi(wptr->value))
 				{
 					iptr->context->ip = lptr->code;
@@ -1872,7 +2027,7 @@ private	struct	cordscript_instruction * jge_operation( struct cordscript_instruc
 				}
 				else	break;
 
-			case	1	:
+			case	_STRING_VALUE	:
 				if ( strcmp( vptr->value, wptr->value ) >= 0 )
 				{
 
@@ -4034,6 +4189,7 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 	{
 		if (!( c = get_punctuation() ))
 			break;
+		/* resolve object method member */
 		else if ( c == '.' )
 		{
 			if (!( get_token( token ) ))
@@ -4042,6 +4198,21 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 				break;
 			else
 				add_operand( iptr, vptr );
+		}
+		/* resolve structure or array member */
+		else if ( c == '[' )
+		{
+			if (!( compile_cordscript_instruction( cptr, (level+1) ) ))
+				return( liberate_cordscript_instruction( iptr ) );
+			else if ( get_punctuation() != ']' )
+				return( liberate_cordscript_instruction( iptr ) );
+			else
+			{
+				iptr->evaluate = eval_operation;
+				add_operand( iptr, string_value( "member" ));
+				add_operand( iptr, integer_value( 1 ));
+				continue;
+			}			
 		}
 		else if ( c == '=' )
 		{
@@ -4196,6 +4367,8 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		     ||  ( c == '!' )
 		     ||  ( c == ':' )
 		     ||  ( c == ',' )
+		     ||  ( c == ']' )
+		     ||  ( c == '}' )
 		     ||  ( c == ')' ))
 		{
 			unget_byte( c );
