@@ -7,8 +7,13 @@
  - make sure your PKG_PATH is pointing to the appropriate place, for example:
 export PKG_PATH=http://ftp.openbsd.org/pub/OpenBSD/5.2/packages/i386/
 
- - then use the pkg_add command to make sure you have coreutils (for 'install' program with -D switch, 
-   automake, autoconf, libtool, gmake and e2fsprogs (for uuid).
+ - then use the pkg_add command to make sure you have
+   - coreutils (for 'ginstall'), 
+   - automake, 
+   - autoconf, 
+   - libtool, 
+   - gmake and 
+   - e2fsprogs (for uuid).
    ("pkg_add libtool-2.4.2", "pkg_add e2fsprogs-1.41.4p8", etc...)
 
 2. Compilation:
