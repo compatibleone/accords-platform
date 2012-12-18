@@ -29,7 +29,7 @@
 #include "connections.h"
 #include "element.h"
 
-#if defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh)
+#if defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh) || defined(__OpenBSD__)
 /* TCP level */
 # define SOL_TCP 6
 /* Type of a signal handler.  */
