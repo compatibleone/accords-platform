@@ -132,8 +132,8 @@ binary-arch: build install
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
 	for i in libcocarrier0 libcocci0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
-		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20121214-1)") > debian/$$i.shlibs; \
-		dh_makeshlibs -p $$i -V "$$i (>= 0.20121214-1)"; \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20121218-1)") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= 0.20121218-1)"; \
 	done
 	dh_shlibdeps -a
 	dh_gencontrol -a

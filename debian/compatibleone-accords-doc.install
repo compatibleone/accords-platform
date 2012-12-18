@@ -1,2 +1,3 @@
 #DOCS#
-usr/share/doc/compatibleone-accords/*
+usr/share/doc/compatibleone-accords/*.pdf
+usr/share/doc/compatibleone-accords/*.xsd
