@@ -1513,6 +1513,14 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 				else	push_value( iptr->context, string_value("[error]") );
 			}
+			else if (!( strcmp( wptr->value, "link" ) ))
+			{
+				if ( argv[0] != (struct cordscript_value *) 0)
+				{
+					if (( zptr = occi_create_link( evalue, argv[0]->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
+						zptr = occi_remove_response( zptr );
+				}
+			}
 			else if (!( strcmp( wptr->value, "list" ) ))
 			{
 				if ( argv[0] != (struct cordscript_value *) 0)
