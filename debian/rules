@@ -61,7 +61,7 @@ clean:
 	rm -f config.{sub,guess,status,log}
 	# cd manifests && ./make-clean
 	dh_prep
-	rm -f debian/*.log debian/files debian/*.shlibs
+	rm -f debian/*.log debian/files debian/*.shlibs debian/lintianreport.txt
 	./clean
 
 install: build
@@ -76,7 +76,7 @@ install: build
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/compatibleone-accords `pwd`/debian/tmp/var/lib/accords `pwd`/debian/tmp/etc/cosacs/
 	cp debian/config-cosacs.xml `pwd`/debian/tmp/etc/cosacs/
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
-	cp debian/co-docs/* `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
+	cp debian/co-docs/* debian/CompatibleOne-Howto.txt `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
