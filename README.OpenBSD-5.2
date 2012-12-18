@@ -1,0 +1,31 @@
+====================================================
+=     OpenBSD 5.2 Specific Installation notes      =
+=  (C) 2012 CityPassenger <vincent@renardias.com>  =
+====================================================
+
+1. Dependencies:
+ - make sure your PKG_PATH is pointing to the appropriate place, for example:
+export PKG_PATH=http://ftp.openbsd.org/pub/OpenBSD/5.2/packages/i386/
+
+ - then use the pkg_add command to make sure you have automake, autoconf, libtool, gmake and e2fsprogs (for uuid).
+("pkg_add libtool-2.4.2", "pkg_add e2fsprogs-1.41.4p8", etc...)
+
+2. Compilation:
+ - in configure.ac, replace the uuid.h checking macro by this one:
+"
+AC_CHECK_HEADERS([/usr/local/include/uuid/uuid.h /usr/local/include/uuid.h],
+                [break],
+                [AC_MSG_ERROR([You are missing uuid development files])])
+AC_SUBST([CFLAGS_UUID], ["-I/usr/local/include/uuid"])
+"
+
+ - use the command "AUTOCONF_VERSION=2.68 AUTOMAKE_VERSION=1.12 ./autogen.sh" (or whichever autoconf/automake
+   version you just installed).
+
+ - run ./configure CFLAGS=" -I/usr/local/include " LDFLAGS=" -L/usr/local/lib -le2fs-uuid  "
+
+ - gmake
+
+(FIXME: To be continued, document in progress)
+
+=
