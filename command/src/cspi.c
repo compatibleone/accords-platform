@@ -777,6 +777,7 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 	int	value=0;
+	int	vt;
 	if ( check_debug() )
 		printf("add_operation();\n");
 	
@@ -785,11 +786,12 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			switch ( check_value_type( vptr->value ) )
-			{
-			case	_FLOAT_VALUE	:
+			if (((vt = check_value_type( vptr->value ))  == _FLOAT_VALUE )
+			||  ( check_value_type( wptr->value )  == _FLOAT_VALUE ))
 				double_operation( iptr, vptr, wptr, '+' );
-				break;
+			else
+		 	switch ( vt )
+			{
 			case	_INTEGER_VALUE	:
 				/* numeric addition */
 				/* ---------------- */
@@ -837,6 +839,7 @@ private	struct	cordscript_instruction * sub_operation( struct cordscript_instruc
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
+	int	vt;
 	int	value=0;
 	if ( check_debug() )
 		printf("sub_operation();\n");
@@ -846,11 +849,12 @@ private	struct	cordscript_instruction * sub_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			switch ( check_value_type( vptr->value ) )
-			{
-			case	_FLOAT_VALUE	:
+			if (((vt = check_value_type( vptr->value ))  == _FLOAT_VALUE )
+			||  ( check_value_type( wptr->value )  == _FLOAT_VALUE ))
 				double_operation( iptr, vptr, wptr, '-' );
-				break;
+			else
+		 	switch ( vt )
+			{
 			case	_INTEGER_VALUE	:
 				if ( vptr->value )
 					value = atoi( vptr->value );
@@ -875,6 +879,7 @@ private	struct	cordscript_instruction * mul_operation( struct cordscript_instruc
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
+	int	vt;
 	int	value=0;
 	if ( check_debug() )
 		printf("mul_operation();\n");
@@ -884,11 +889,12 @@ private	struct	cordscript_instruction * mul_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			switch ( check_value_type( vptr->value ) )
-			{
-			case	_FLOAT_VALUE	:
+			if (((vt = check_value_type( vptr->value ))  == _FLOAT_VALUE )
+			||  ( check_value_type( wptr->value )  == _FLOAT_VALUE ))
 				double_operation( iptr, vptr, wptr, '*' );
-				break;
+			else
+		 	switch ( vt )
+			{
 			case	_INTEGER_VALUE	:
 				if ( vptr->value )
 					value = atoi( vptr->value );
@@ -1032,6 +1038,7 @@ private	struct	cordscript_instruction * div_operation( struct cordscript_instruc
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
+	int	vt;
 	int	value=0;
 	if ( check_debug() )
 		printf("div_operation();\n");
@@ -1041,11 +1048,12 @@ private	struct	cordscript_instruction * div_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			switch ( check_value_type( vptr->value ) )
-			{
-			case	_FLOAT_VALUE	:
+			if (((vt = check_value_type( vptr->value ))  == _FLOAT_VALUE )
+			||  ( check_value_type( wptr->value )  == _FLOAT_VALUE ))
 				double_operation( iptr, vptr, wptr, '/' );
-				break;
+			else
+		 	switch ( vt )
+			{
 			case	_INTEGER_VALUE	:
 				if ( vptr->value )
 					value = atoi( vptr->value );
@@ -1074,6 +1082,7 @@ private	struct	cordscript_instruction * mod_operation( struct cordscript_instruc
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
+	int	vt;
 	int	value=0;
 	if ( check_debug() )
 		printf("mod_operation();\n");
@@ -1083,11 +1092,12 @@ private	struct	cordscript_instruction * mod_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			switch ( check_value_type( vptr->value ) )
-			{
-			case	_FLOAT_VALUE	:
+			if (((vt = check_value_type( vptr->value ))  == _FLOAT_VALUE )
+			||  ( check_value_type( wptr->value )  == _FLOAT_VALUE ))
 				double_operation( iptr, vptr, wptr, 0x0025 );
-				break;
+			else
+		 	switch ( vt )
+			{
 			case	_INTEGER_VALUE	:
 				if ( vptr->value )
 					value = atoi( vptr->value );
