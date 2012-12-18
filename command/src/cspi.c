@@ -6,6 +6,8 @@
 private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
 private	struct	cordscript_exception * exceptionheap=(struct cordscript_exception *) 0;
 
+private	void	cut_operation( struct cordscript_instruction * iptr,  char * source, struct cordscript_value * separator );
+private	void	join_operation( struct cordscript_instruction * iptr,struct cordscript_value * source, struct cordscript_value * separator );
 private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscript_value * sptr );
 private	int	crop_structure_element( struct cordscript_value * nptr, struct cordscript_value * rptr, struct cordscript_value * sptr );
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
@@ -172,6 +174,14 @@ public struct cordscript_value * allocate_cordscript_value(char * value, char * 
 				return( liberate_cordscript_value( vptr ) );
 		return( vptr );
 	}
+}
+
+/*	----------------------	*/
+/*	   duplicate_value	*/
+/*	----------------------	*/
+private	struct	cordscript_value * duplicate_value(struct cordscript_value * source)
+{
+	return( allocate_cordscript_value( source->value, source->name ) );
 }
 
 /*   -----------------*/
@@ -652,11 +662,21 @@ private	int	check_value_type( char * sptr )
 	else if ( *sptr == '{' )
 		return( _STRUCTURE_VALUE );
 	else if (( *sptr >= '0' ) && ( *sptr <= '9' ))
+	{
+		while ( *sptr )
+			if ( *(sptr++) =='.' )
+				return( _FLOAT_VALUE );
 		return( _INTEGER_VALUE );
+	}
 	else if ( *sptr == '"' )
 		return( _STRING_VALUE );
 	else if (( *sptr == '+' ) || ( *sptr == '-' ))
+	{
+		while ( *sptr )
+			if ( *(sptr++) =='.' )
+				return( _FLOAT_VALUE );
 		return( _INTEGER_VALUE );
+	}
 	else	return( _STRING_VALUE );
 }
 
@@ -687,6 +707,67 @@ private	struct	cordscript_instruction * cat_operation( struct cordscript_instruc
 		return( (struct cordscript_instruction *) 0);
 	else	return( iptr->next );
 }
+
+/*	----------------	*/
+/*	double_operation	*/
+/*	----------------	*/
+private	void	double_operation( 
+	struct cordscript_instruction * iptr,
+	struct	cordscript_value * vptr,
+	struct	cordscript_value * wptr,
+	int	operation )
+{
+	double	v=0.0;
+	double	w=0.0;
+	char	buffer[256];
+
+	if ( vptr->value )
+		sscanf(vptr->value,"%lf",&v);
+	if ( wptr->value )
+		sscanf(wptr->value,"%lf",&w);
+
+	switch ( operation )
+	{
+	case	'+'	:	v += w; break;
+	case	'-'	:	v -= w; break;
+	case	'*'	:	v *= w; break;
+	case	'/'	:	v /= w; break;
+	case	0x0025	:	v /= w; break;
+	}
+	sprintf(buffer,"%f",v);
+	push_value( iptr->context, string_value( buffer ) );
+	return;
+}
+
+/*	--------------	*/
+/*	double_compare	*/
+/*	--------------	*/
+private	int 	double_compare( 
+	struct	cordscript_value * vptr,
+	struct	cordscript_value * wptr,
+	int	operation )
+{
+	double	v=0.0;
+	double	w=0.0;
+	char	buffer[256];
+
+	if ( vptr->value )
+		sscanf(vptr->value,"%lf",&v);
+	if ( wptr->value )
+		sscanf(wptr->value,"%lf",&w);
+
+	switch ( operation )
+	{
+	case	_CSP_EQ		:	return( ( v == w  ? 1 : 0 ) );
+	case	_CSP_NE		:	return( ( v != w  ? 1 : 0 ) );
+	case	_CSP_GE		:	return( ( v >= w  ? 1 : 0 ) );
+	case	_CSP_LE		:	return( ( v <= w  ? 1 : 0 ) );
+	case	_CSP_LS		:	return( ( v < w  ? 1 : 0 ) );
+	case	_CSP_GR		:	return( ( v > w  ? 1 : 0 ) );
+	default			:	return( 0 );
+	}
+}
+
 /*	--------------		*/
 /*	 add_operation		*/
 /*	--------------		*/
@@ -706,6 +787,9 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 		{
 			switch ( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				double_operation( iptr, vptr, wptr, '+' );
+				break;
 			case	_INTEGER_VALUE	:
 				/* numeric addition */
 				/* ---------------- */
@@ -760,13 +844,20 @@ private	struct	cordscript_instruction * sub_operation( struct cordscript_instruc
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
 	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
 	{
-		if ( vptr->value )
-			value = atoi( vptr->value );
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			if ( wptr->value )
-				value -= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_FLOAT_VALUE	:
+				double_operation( iptr, vptr, wptr, '-' );
+				break;
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value -= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+			}
 			drop_value( wptr );
 		}
 	}
@@ -791,13 +882,139 @@ private	struct	cordscript_instruction * mul_operation( struct cordscript_instruc
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
 	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
 	{
-		if ( vptr->value )
-			value = atoi( vptr->value );
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			if ( wptr->value )
-				value *= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_FLOAT_VALUE	:
+				double_operation( iptr, vptr, wptr, '*' );
+				break;
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value *= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			case	_ARRAY_VALUE	:
+				join_operation( iptr, vptr, wptr );
+				break;
+			}
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
+/*	--------------		*/
+/*	 and_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * and_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("and_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value &= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			default			:
+				push_value( iptr->context, integer_value( 0 ) );
+
+			}
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+/*	--------------		*/
+/*	 or_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * or_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("or_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value |= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			default			:
+				push_value( iptr->context, integer_value( 0 ) );
+
+			}
+			drop_value( wptr );
+		}
+	}
+
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+/*	--------------		*/
+/*	 xor_operation		*/
+/*	--------------		*/
+private	struct	cordscript_instruction * xor_operation( struct cordscript_instruction * iptr )
+{
+	struct	cordscript_operand * optr;
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * wptr;
+	int	value=0;
+	if ( check_debug() )
+		printf("xor_operation();\n");
+	
+	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
+	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
+	{
+		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+		{
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value ^= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			default			:
+				push_value( iptr->context, integer_value( 0 ) );
+
+			}
 			drop_value( wptr );
 		}
 	}
@@ -822,13 +1039,24 @@ private	struct	cordscript_instruction * div_operation( struct cordscript_instruc
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
 	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
 	{
-		if ( vptr->value )
-			value = atoi( vptr->value );
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			if ( wptr->value )
-				value /= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_FLOAT_VALUE	:
+				double_operation( iptr, vptr, wptr, '/' );
+				break;
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value /= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+				break;
+			case	_STRING_VALUE	:
+				cut_operation( iptr, vptr->value, wptr );
+				break;
+			}
 			drop_value( wptr );
 		}
 	}
@@ -853,13 +1081,20 @@ private	struct	cordscript_instruction * mod_operation( struct cordscript_instruc
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
 	&&  ((vptr = optr->value)  != (struct cordscript_value *)   0))
 	{
-		if ( vptr->value )
-			value = atoi( vptr->value );
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
-			if ( wptr->value )
-				value %= atoi( wptr->value );
-			push_value( iptr->context, integer_value( value ) );
+			switch ( check_value_type( vptr->value ) )
+			{
+			case	_FLOAT_VALUE	:
+				double_operation( iptr, vptr, wptr, 0x0025 );
+				break;
+			case	_INTEGER_VALUE	:
+				if ( vptr->value )
+					value = atoi( vptr->value );
+				if ( wptr->value )
+					value %= atoi( wptr->value );
+				push_value( iptr->context, integer_value( value ) );
+			}
 			drop_value( wptr );
 		}
 	}
@@ -1093,8 +1328,51 @@ private	struct	cordscript_instruction * leave_operation( struct cordscript_instr
 /*	----------------	*/
 /*	join_operation		*/
 /*	----------------	*/
-private	void	join_operation( struct cordscript_instruction * iptr,char * source, struct cordscript_value * separator )
+private	void	join_operation( struct cordscript_instruction * iptr,struct cordscript_value * source, struct cordscript_value * separator )
 {
+	struct	cordscript_value * vptr;
+	struct	cordscript_value * rptr;
+	struct	cordscript_value * xptr;
+	char	*	sptr;
+	char 	*	wptr;
+	if (!( vptr = duplicate_value( source )))
+		push_value( iptr->context, string_value("" ) );
+	else if (!( separator ))
+		sptr = " ";
+	else if (!( sptr = separator->value ))
+		sptr = " ";
+	if (!( rptr = allocate_cordscript_value((char *) 0, (char *) 0 )))
+	{
+		liberate_cordscript_value( vptr );
+		push_value( iptr->context, string_value("" ) );
+	}
+	else if (!( xptr = allocate_cordscript_value((char *) 0, (char *) 0 )))
+	{
+		liberate_cordscript_value( vptr );
+		liberate_cordscript_value( rptr );
+		push_value( iptr->context, string_value("" ) );
+	}
+	else
+	{
+		while ( crop_matrix_element( rptr, vptr ) )
+		{
+			if (!( wptr = allocate( 
+				( rptr->value ? strlen( rptr->value ) : 0 ) +
+				( xptr->value ? strlen( xptr->value ) : 0 ) +
+				strlen( sptr ) + 1 ) ))
+				break;
+			else
+			{
+				sprintf( wptr, "%s%s%s",(xptr->value ? xptr->value : ""), sptr, (rptr->value ?rptr->value : ""));
+				if ( xptr->value )
+					liberate( xptr->value );
+				xptr->value = wptr;
+			}
+		}
+		push_value( iptr->context, xptr );
+		liberate_cordscript_value( vptr );
+		liberate_cordscript_value( rptr );
+	} 
 	return;
 }
 
@@ -1132,15 +1410,6 @@ private	void	cut_operation( struct cordscript_instruction * iptr,  char * source
 		return;
 	}
 }
-
-/*	----------------------	*/
-/*	   duplicate_value	*/
-/*	----------------------	*/
-private	struct	cordscript_value * duplicate_value(struct cordscript_value * source)
-{
-	return( allocate_cordscript_value( source->value, source->name ) );
-}
-
 
 /*	--------------------------	*/
 /*	structure_member_operation	*/
@@ -1302,6 +1571,24 @@ private	void	date_operation( struct cordscript_instruction * iptr, struct cordsc
 	}
 }
 
+/*	----------------	*/
+/*	round_operation		*/
+/*	----------------	*/
+private	void	round_operation( struct cordscript_instruction * iptr, struct cordscript_value * source, struct cordscript_value * size  )
+{
+	double	v=0.0;
+	char	buffer[256];
+	char 	format[256];
+	if ( check_value_type( source->value ) == _FLOAT_VALUE )
+	{
+		sscanf(source->value,"%lf",&v);
+		sprintf(format,"%c.%uf",0x0025,(size ? ( size->value ? atoi( size->value ) : 0 ) : 0));
+		sprintf(buffer,format,v);
+		push_value( iptr->context, string_value( buffer ) );
+	}
+	else 	push_value( iptr->context, string_value( source->value ) );
+	return;
+}
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -1376,6 +1663,11 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			push_value( iptr->context, integer_value( ( vptr->value ? strlen( vptr->value ) : 0 ) ));
 		}
 
+		else if (!( strcmp( wptr->value, "round" ) ))
+		{
+			round_operation( iptr, vptr, argv[0] );
+		}
+
 		else if (!( strcmp( wptr->value, "member" ) ))
 		{
 			member_operation( iptr, vptr, argv[0] );
@@ -1393,7 +1685,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 
 		else if (!( strcmp( wptr->value, "join" ) ))
 		{
-			join_operation( iptr, vptr->value, argv[0] );
+			join_operation( iptr, vptr, argv[0] );
 		}
 
 		else if (!( strcmp( wptr->value, "debug" ) ))
@@ -1762,6 +2054,14 @@ private	struct	cordscript_instruction * jeq_operation( struct cordscript_instruc
 
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_EQ ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(wptr->value) == atoi(vptr->value))
 				{
@@ -1824,6 +2124,14 @@ private	struct	cordscript_instruction * jne_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_NE ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(wptr->value) != atoi(vptr->value))
 				{
@@ -1884,6 +2192,14 @@ private	struct	cordscript_instruction * jle_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_LE ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) <= atoi(wptr->value))
 				{
@@ -1943,6 +2259,14 @@ private	struct	cordscript_instruction * jls_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_LS ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) < atoi(wptr->value))
 				{
@@ -2001,6 +2325,14 @@ private	struct	cordscript_instruction * jgr_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_GR ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) > atoi(wptr->value))
 				{
@@ -2060,6 +2392,14 @@ private	struct	cordscript_instruction * jge_operation( struct cordscript_instruc
 		{
 			switch( check_value_type( vptr->value ) )
 			{
+			case	_FLOAT_VALUE	:
+				if ( double_compare( vptr, wptr , _CSP_GE ) )
+				{
+					iptr->context->ip = lptr->code;
+					drop_value( vptr );
+					return(iptr->context->ip);
+				}
+				else	break;
 			case	_INTEGER_VALUE	:
 				if (atoi(vptr->value) >= atoi(wptr->value))
 				{
@@ -2701,7 +3041,7 @@ private	int	get_structure( char * bptr )
 }
 
 /*   ---------------- */
-/*  token_legal   */
+/*  	token_legal   */
 /*   ---------------- */
 private	int	token_legal( int c )
 {
@@ -2722,10 +3062,10 @@ private	int	token_legal( int c )
 	else	return( 0 );
 }
 
-/*   ---------	*/
-/*   get_token	*/
-/*   ---------	*/
-private	int	get_token( char * result )
+/*   -------------	*/
+/*   ll_ get_token	*/
+/*   --------------	*/
+private	int	ll_get_token( char * result )
 {
 	int	quote=0;
 	int	c;
@@ -2784,6 +3124,23 @@ private	int	get_token( char * result )
 				break;
 			}
 		}
+		else if ( c == '.' )
+		{
+			*(result+nb) = 0;
+			switch ( check_value_type( result ) )
+			{
+			case	_FLOAT_VALUE	:
+				unget_byte(c);
+				return( nb );
+			case	_INTEGER_VALUE	:
+				*(result+nb) = c;
+				nb++;
+				continue;
+			default		:
+				unget_byte(c);
+				return( nb );
+			}
+		}
 		else if (!( token_legal(c) ))
 		{
 			unget_byte(c);
@@ -2796,6 +3153,49 @@ private	int	get_token( char * result )
 	}
 	*(result+nb) = 0;
 	return(nb);
+}
+
+
+/*	-----------	*/
+/*	hex_integer	*/
+/*	-----------	*/
+private	int	hex_integer( char * buffer )
+{
+	int	c;
+	int	v=0;
+	while ((c = *(buffer++)) != 0)
+	{
+		if (( c >= '0' ) && ( c <= '9' ))
+			v = ((v * 16) + ( c - '0' ));
+		else if (( c >= 'A' ) && ( c <= 'F' ))
+			v = ((v * 16) + (( c - 'A') + 10 ));
+		else if (( c >= 'a' ) && ( c <= 'f' ))
+			v = ((v * 16) + (( c - 'a') + 10 ));
+		else	break;
+	}
+	return( v );
+}
+
+/*   ---------	*/
+/*   get_token	*/
+/*   ---------	*/
+private	int	get_token( char * buffer )
+{
+	int	nb;
+	int	v;
+	if (!( nb = ll_get_token( buffer ) ))
+		return( nb );
+	else if ( *buffer != '0' )
+		return( nb );
+	else if ( *(buffer+1) != 'x' )
+		return( nb );
+	else
+	{
+		v = hex_integer( (buffer + 2) );
+		sprintf(buffer,"%u",v);
+		return( strlen( buffer ) );
+	}
+
 }
 
 /*   ---------------- */
@@ -4324,6 +4724,48 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		else if ( c == '*' )
 		{	
 			iptr->evaluate = mul_operation;
+			/* ------------------------------- */
+			/* compile the affectation operand */
+			/* the result will be on the stack */
+			/* ------------------------------- */
+			if (!( compile_cordscript_instruction( cptr, (level+1) ) ))
+			{
+				return( liberate_cordscript_instruction( iptr ) );
+			}
+			else	break;
+			
+		}
+		else if ( c == '&' )
+		{	
+			iptr->evaluate = and_operation;
+			/* ------------------------------- */
+			/* compile the affectation operand */
+			/* the result will be on the stack */
+			/* ------------------------------- */
+			if (!( compile_cordscript_instruction( cptr, (level+1) ) ))
+			{
+				return( liberate_cordscript_instruction( iptr ) );
+			}
+			else	break;
+			
+		}
+		else if ( c == '|' )
+		{	
+			iptr->evaluate = or_operation;
+			/* ------------------------------- */
+			/* compile the affectation operand */
+			/* the result will be on the stack */
+			/* ------------------------------- */
+			if (!( compile_cordscript_instruction( cptr, (level+1) ) ))
+			{
+				return( liberate_cordscript_instruction( iptr ) );
+			}
+			else	break;
+			
+		}
+		else if ( c == '^' )
+		{	
+			iptr->evaluate = xor_operation;
 			/* ------------------------------- */
 			/* compile the affectation operand */
 			/* the result will be on the stack */
