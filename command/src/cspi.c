@@ -1589,14 +1589,18 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 	double	v=0.0;
 	char	buffer[256];
 	char 	format[256];
-	if ( check_value_type( source->value ) == _FLOAT_VALUE )
+	switch ( check_value_type( source->value ) )
 	{
+	case	_FLOAT_VALUE	:
+	case	_INTEGER_VALUE	:
 		sscanf(source->value,"%lf",&v);
 		sprintf(format,"%c.%uf",0x0025,(size ? ( size->value ? atoi( size->value ) : 0 ) : 0));
 		sprintf(buffer,format,v);
 		push_value( iptr->context, string_value( buffer ) );
+		break;
+	default	:
+		push_value( iptr->context, string_value( source->value ) );
 	}
-	else 	push_value( iptr->context, string_value( source->value ) );
 	return;
 }
 
