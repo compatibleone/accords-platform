@@ -51,6 +51,9 @@ AC_SUBST([CFLAGS_UUID], ["-I/usr/include/uuid"])
 if test "$(uname -s)" = 'Linux' ; then
 	AC_SUBST([LDFLAGS_UUID], ["-luuid"])
 fi
+if test "$(uname -s)" = 'OpenBSD' ; then
+	AC_SUBST([LDFLAGS_UUID], ["-le2fs-uuid"])
+fi
 
 # Checks for pthread.
 AC_CHECK_HEADERS([pthread.h], [
