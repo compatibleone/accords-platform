@@ -1,3 +1,9 @@
+compatibleone-accords (0.20121218-1) unstable; urgency=low
+
+  * New upstream code + more doc + sync all binary packages.
+
+ -- Vincent Renardias <vincent@renardias.com>  Tue, 18 Dec 2012 14:43:00 +0200
+
 compatibleone-accords (0.20121214-1) unstable; urgency=low
 
   * Several bug fixes regarding cosacs.

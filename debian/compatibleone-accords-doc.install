@@ -1,2 +1,7 @@
 #DOCS#
-usr/share/doc/compatibleone-accords/*
+usr/share/doc/compatibleone-accords/*.xsd
+usr/share/doc/compatibleone-accords/AccordsParserV1.02.pdf
+usr/share/doc/compatibleone-accords/AccordsPlatformv1.3.pdf
+usr/share/doc/compatibleone-accords/CompatibleOne-in-ten-points.pdf
+usr/share/doc/compatibleone-accords/CordsReferenceManualV2.12.pdf
+
