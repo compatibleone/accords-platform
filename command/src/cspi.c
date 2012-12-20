@@ -4488,6 +4488,85 @@ private	struct cordscript_instruction * compile_cordscript_return( struct cordsc
 	else	return((struct cordscript_instruction *) 0);
 }
 
+#define	_MAX_KEYWORDS	17
+#define	_KEYWORD_HASH	57
+
+struct	cordscript_language	
+{
+	char	*	keyword;
+	struct cordscript_instruction * (*compile)(struct cordscript_context * cptr);
+	int		hashcode;
+}	FunctionTable[_MAX_KEYWORDS]=
+{
+	{ "if" ,
+	 compile_cordscript_if, -1 } ,
+	{ "else" ,
+	 compile_cordscript_else, -1 } ,
+	{ "while" ,
+	 compile_cordscript_while, -1 } ,
+	{ "for" ,
+	 compile_cordscript_for, -1 } ,
+	{ "foreach" ,
+	 compile_cordscript_foreach, -1 } ,
+	{ "forboth" ,
+	 compile_cordscript_forboth, -1 } ,
+	{ "try" ,
+	 compile_cordscript_try, -1 } ,
+	{ "catch" ,
+	 compile_cordscript_catch, -1 } ,
+	{ "throw" ,
+	 compile_cordscript_throw, -1 } ,
+	{ "switch" ,
+	 compile_cordscript_switch, -1 } ,
+	{ "case" ,
+	 compile_cordscript_case, -1 } ,
+	{ "default" ,
+	 compile_cordscript_default, -1 } ,
+	{ "break" ,
+	 compile_cordscript_break, -1 } ,
+	{ "continue" ,
+	 compile_cordscript_continue, -1 } ,
+	{ "return" ,
+	 compile_cordscript_return, -1 } ,
+	{ "function" ,
+	 compile_cordscript_function, -1 },
+	{ "include", 
+	 compile_cordscript_include, -1 }
+};
+int	prepare_function_table=1;
+
+private	int	keyword_hash( char  * sptr )
+{
+	int	r=0;
+	while ( *sptr ) r += *(sptr++);
+	return(( r % _KEYWORD_HASH ));
+}
+
+private	int	compile_cordscript_keyword( struct cordscript_context * cptr, char * token )
+{
+	int	i;
+	int	h;
+	h = keyword_hash( token );
+	if ( prepare_function_table )
+	{
+		for ( i=0; i < _MAX_KEYWORDS; i++ )
+			FunctionTable[i].hashcode = keyword_hash( FunctionTable[i].keyword );
+		prepare_function_table=0;
+	}
+	for ( i=0; i < _MAX_KEYWORDS; i++ )
+	{
+		if ( FunctionTable[i].hashcode != h )
+
+			continue;
+		else if (!( strcmp( FunctionTable[i].keyword, token ) ))
+		{
+			(*FunctionTable[i].compile)( cptr );
+			return( 1 );
+		}
+	}
+	return( 0 );
+}
+
 /*   -----------------	*/
 /*   start_instruction	*/
 /*   -----------------	*/
@@ -4495,40 +4574,8 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 {
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_value * fptr;
-	if (!( strcmp( token, "if" ) ))
-		return( compile_cordscript_if( cptr ) );
-	else if (!( strcmp( token, "else" ) ))
-		return( compile_cordscript_else( cptr ) );
-	else if (!( strcmp( token, "while" ) ))
-		return( compile_cordscript_while( cptr ) );
-	else if (!( strcmp( token, "for" ) ))
-		return( compile_cordscript_for( cptr ) );
-	else if (!( strcmp( token, "foreach" ) ))
-		return( compile_cordscript_foreach( cptr ) );
-	else if (!( strcmp( token, "forboth" ) ))
-		return( compile_cordscript_forboth( cptr ) );
-	else if (!( strcmp( token, "try" ) ))
-		return( compile_cordscript_try( cptr ) );
-	else if (!( strcmp( token, "catch" ) ))
-		return( compile_cordscript_catch( cptr ) );
-	else if (!( strcmp( token, "throw" ) ))
-		return( compile_cordscript_throw( cptr ) );
-	else if (!( strcmp( token, "switch" ) ))
-		return( compile_cordscript_switch( cptr ) );
-	else if (!( strcmp( token, "case" ) ))
-		return( compile_cordscript_case( cptr ) );
-	else if (!( strcmp( token, "default" ) ))
-		return( compile_cordscript_default( cptr ) );
-	else if (!( strcmp( token, "break" ) ))
-		return( compile_cordscript_break( cptr ) );
-	else if (!( strcmp( token, "continue" ) ))
-		return( compile_cordscript_continue( cptr ) );
-	else if (!( strcmp( token, "return" ) ))
-		return( compile_cordscript_return( cptr ) );
-	else if (!( strcmp( token, "function" ) ))
-		return( compile_cordscript_function( cptr ) );
-	else if (!( strcmp( token, "include" ) ))
-		return( compile_cordscript_include( cptr ) );
+	if ( compile_cordscript_keyword( cptr, token ) )
+		return( (struct cordscript_instruction *) 0);
 	else if (( fptr = resolve_function( token, cptr )) !=(struct cordscript_value *) 0)
 		return( compile_cordscript_call( cptr, fptr ) );
 	else if (!( iptr = allocate_cordscript_instruction( push_operation )))
