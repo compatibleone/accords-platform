@@ -325,9 +325,15 @@ echo "</agreement>" >> sla-$name.xml
 
 _co_resolver() {
     if [ -z "$tls" ]; then
-	testresolver --publisher "$publisher" $*
+        why=$(testresolver --publisher "$publisher" $*)
     else
-	testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+        why=$(testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*)
+    fi
+    if [ -z "$why" -o $UID -ne 0 ]; then
+        echo $why
+    else
+        wport=$(echo $why|awk -F ":" '{print $3}')
+        echo "$why    ( "$(netstat -anp | grep $wport| awk -F "/" '{print $2}') ")"
     fi
 }
 
