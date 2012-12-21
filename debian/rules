@@ -81,6 +81,7 @@ install: build
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
 	cp manifests/on_config.xml `pwd`/debian/tmp/etc/accords/
+	cp debian/any.xml `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/accords/
 	cp Certificates.crt `pwd`/debian/tmp/etc/cosacs/
 	cp `pwd`/debian/tmp/usr/bin/cosacs `pwd`/debian/tmp/usr/bin/cosacs-client

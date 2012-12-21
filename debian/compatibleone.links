@@ -13,3 +13,4 @@
 /etc/accords/publication.xml /var/lib/accords/publication.xml
 /etc/accords/slamtest.xml /var/lib/accords/slamtest.xml
 /etc/accords/accords.ini /var/lib/accords/accords.ini
+/etc/accords/any.xml /var/lib/accords/any.xml
