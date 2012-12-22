@@ -2479,6 +2479,7 @@ private	void	pop_instruction( struct cordscript_context * cptr )
 /*	-------------------	*/
 private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscript_value * sptr )
 {
+	int	quote=0;
 	int	c;
 	char *	mptr;
 	char *	vptr;
@@ -2502,8 +2503,16 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 
 	for ( vptr=mptr; *vptr != 0; vptr++ )
 	{
-		if (( *vptr == ']' )
-		||  ( *vptr == ',' ))
+		if (!( c = *vptr ))
+			break;
+		else if ( quote )
+		{
+			if ( c == quote )
+				quote=0;
+		}
+		else if ((( c = *vptr) == '"' ) || ( c == 0x0025 ))
+			quote = c;
+		else if (( c == ']' ) ||  ( c == ',' ))
 			break;
 	}
 	c = *vptr;
@@ -2541,6 +2550,7 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 /*	----------------------	*/
 private	int	crop_structure_element( struct cordscript_value * nptr, struct cordscript_value * rptr, struct cordscript_value * sptr )
 {
+	int	quote=0;
 	int	c;
 	char *	mptr;
 	char *	vptr;
@@ -2565,8 +2575,16 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 
 	for ( vptr=mptr; *vptr != 0; vptr++ )
 	{
-		if (( *vptr == '}' )
-		||  ( *vptr == ',' ))
+		if (!( c = *vptr ))
+			break;
+		else if ( quote )
+		{
+			if ( c == quote )
+				quote=0;
+		}
+		else if ((( c = *vptr) == '"' ) || ( c == 0x0025 ))
+			quote = c;
+		else if (( c == '}' ) ||  ( c == ',' ))
 			break;
 	}
 	c = *vptr;
