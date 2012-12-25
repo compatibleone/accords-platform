@@ -226,6 +226,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVER" ) ))
 			os_result( os_get_server( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "LIMITS" ) ))
+			os_result( os_get_limits( subscription ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			os_result( os_get_flavor( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
@@ -366,8 +368,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.03");
-	printf("\n   Beta Version 28/09/2012");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.04");
+	printf("\n   Beta Version 25/12/2012");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -382,6 +384,7 @@ private	int	os_banner()
 	printf("\n   GLANCE PUBLIC <id> ");
 	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");
+	printf("\n   GET LIMITS ");
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");

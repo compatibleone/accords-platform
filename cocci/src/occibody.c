@@ -509,6 +509,10 @@ public	char *	occi_html_body(
 				/* ---------------------------------------------------------- */
 				if (!( vptr ))
 					linkto=0;
+				else if (!( vptr = allocate_string( vptr ) ))
+					linkto = 0;
+				else if (!( vptr = occi_unquoted_value( vptr ) ))
+					linkto = 0;
 				else if ((!( strncmp( vptr, "http://", strlen( "http://" ) ) ))
 				     ||  (!( strncmp( vptr, "https://", strlen( "https://" ) ) )))
 					linkto=1;
@@ -531,6 +535,7 @@ public	char *	occi_html_body(
 				}
 				else	extra="";
 
+				if ( vptr ) liberate( vptr );
 				fprintf(h,"<td><input class=input %s type=text name='%s' value='%s'>\n",extra,name,vptr);
 
 				/* ---------------------------------------------------------- */

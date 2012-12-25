@@ -2078,6 +2078,38 @@ public	struct	os_response *	os_get_server	( struct os_subscription * sptr, char 
 
 
 /*	------------------------------------------------------------	*/
+/*			o s _ g e t _ l i m i t s 			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_limits( struct os_subscription * sptr )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/limits");
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+
+/*	------------------------------------------------------------	*/
 /*			o s _ g e t _ f l av o u r			*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_get_flavor(struct os_subscription * sptr,  char * id )

@@ -121,6 +121,7 @@ public	struct	os_response *	os_server_address(struct os_subscription *  sptr, ch
 public	struct	os_response *	os_create_security_group(struct os_subscription *  sptr,char * filename);
 public	struct	os_response *	os_create_security_rule(struct os_subscription *  sptr,char * filename);
 
+public	struct	os_response *	os_get_limits	(struct os_subscription *  sptr );
 public	struct	os_response *	os_get_server	(struct os_subscription *  sptr, char * id );
 public	struct	os_response *	os_get_flavor  (struct os_subscription *  sptr, char * id );
 public	struct	os_response *	os_get_image    (struct os_subscription *  sptr, char * id );
