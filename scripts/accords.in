@@ -330,7 +330,7 @@ _co_resolver() {
         why=$(testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*)
     fi
     if [ -z "$nebug" ]; then
-		nebug=
+	echo $why
     else
     if [ -z "$why" -o $UID -ne 0 ]; then
         echo $why
