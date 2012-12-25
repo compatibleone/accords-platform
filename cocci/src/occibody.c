@@ -535,8 +535,8 @@ public	char *	occi_html_body(
 				}
 				else	extra="";
 
-				if ( vptr ) liberate( vptr );
 				fprintf(h,"<td><input class=input %s type=text name='%s' value='%s'>\n",extra,name,vptr);
+				if ( vptr ) liberate( vptr );
 
 				/* ---------------------------------------------------------- */
 				/* detect the ID element value and store for eventual actions */
