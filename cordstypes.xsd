@@ -3,7 +3,7 @@
 	<xsd:complexType name="cordsManifest">
 		<xsd:sequence>
 			<xsd:element name="security" type="cordsSecurity" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="account" type="cordsAccount" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="account" type="cordsAccount" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="release" type="cordsRelease" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="interface" type="cordsInterface" minOccurs="0" maxOccurs="1"/>

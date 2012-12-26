@@ -2363,6 +2363,45 @@ private	int	cords_terminate_xsd(
 			else	return( status );
 		}
 
+		/* ---------------------------------------------------- */
+		/* ensure the presence of required minOccurs=1 elements */
+		/* ---------------------------------------------------- */
+		for ( 	eptr=first_xsd_element( wptr );
+			eptr != (struct xml_element *) 0;
+			eptr = eptr->next )
+		{
+			nptr = (char *) 0;
+			for (	aptr=eptr->firstatb;
+				aptr !=(struct xml_atribut *) 0;
+				aptr = aptr->next )
+			{
+				if (!( aptr->name ))
+					continue;
+				else if (!( strcmp( aptr->name, _XSD_NAME ) ))
+				{
+					if (!( nptr = allocate_string( aptr->value ) ))
+						continue;
+					else if (!( nptr = occi_unquoted_value( nptr ) ))
+						continue;
+				}
+				else if ( strcmp( aptr->name, _XSD_MINOCCURS ) )
+					continue;
+				else if (!( aptr->value ))
+					continue;
+				else if (!( vptr = occi_unquoted_value( aptr->value ) ))
+					continue;
+				else if (!( atoi( vptr )  ))
+					continue;
+				else if (!( fptr = document_element( dptr, nptr ) ))
+				{
+					sprintf(buffer,"missing required element \"%s\" (minOccurs=%s)",nptr,vptr);
+					return(cords_append_error(dptr,404,buffer));
+				}
+			}
+			if ( nptr )
+				nptr = liberate( nptr );
+		}
+
 		/* ------------------------------------- */
 		/* locate the first max occurs unbounded */
 		/* ------------------------------------- */
@@ -2833,6 +2872,47 @@ public	struct	xml_element * cords_document_parser(
 
 	}
 }
+
+/*	---------------------------------------------------	*/
+/*	 c o r d s _ c h e c k _ p a r s e r _ e r r o r s	*/
+/*	---------------------------------------------------	*/
+public	int	cords_check_parser_errors( char * filename )
+{
+	struct	xml_element *	document;
+	struct	xml_element *	eptr=(struct xml_element *) 0;
+	struct	xml_atribut *	aptr;
+
+	if (!( document = document_parse_file( filename ) ))
+	{
+		if ( check_verbose() )
+			printf("Cords Parser Error: * * * %s cannot be checked * * * \n",filename);
+		return(1);
+	}
+	else if (( eptr = document_element( document, _CORDS_ERROR )) != (struct xml_element *) 0)
+	{
+		if ( check_verbose() )
+			printf("Cords Parser Error: * * * errors in %s * * * \n",filename);
+		document = document_drop( document );  
+		return(1);
+	}
+	else if (( eptr = document_element( document, _CORDS_WARNING )) != (struct xml_element *) 0)
+	{
+		if ( check_verbose() )
+			printf("Cords Parser Error: * * * warnings or choices in %s * * * \n",filename);
+		document = document_drop( document );  
+		return(1);
+	}
+	else
+	{
+		/* -------------- */
+		/* ok all is well */
+		/* -------------- */
+		document = document_drop( document );  
+		return(0);
+	}
+
+}
+
 
 /*	---------------------------------------------------	*/
 /*		c o r d s _ d r o p _ d o c u m e n t 		*/

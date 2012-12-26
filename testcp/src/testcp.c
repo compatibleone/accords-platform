@@ -95,7 +95,7 @@ private	int	ll_test_cords_parser_operation( char * filename )
 			return( failure(4,"allocation","result filename"));
 	}
 	dptr = cords_serialise_document( dptr, Cp.result );
-	return( 0 );
+	return( cords_check_parser_errors( Cp.result ) );
 }
 
 /*	-----------------------------------------------------	*/
@@ -230,7 +230,7 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 private	int	test_cords_parser_banner(char * n)
 {
 	printf("\n   Cords Parser : Version 1.0.b.0.02 ");
-	printf("\n   Beta Version 13/06/2012 \n");
+	printf("\n   Beta Version 26/12/2012 \n");
 	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                dis-activate xsd validation ");
