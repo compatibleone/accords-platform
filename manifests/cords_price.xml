@@ -2,11 +2,11 @@
 <cords_price
  id="1f774d89-06d2-4b2d-8e1a-14f84ce82e48" name="service" operator="accords" description="standard accords service instance flatrate cost" currency="euros" fixed="yes" rate="10" units="" period="1" state="0" />
 <cords_price
- id="5c9da493-0811-4c4c-9172-aa09d6ee997a" name="openstack" operator="accords" description="standard accords openstack instance flatrate cost" currency="euros" fixed="yes" rate="20" units="" period="1" state="0" />
+ id="5c9da493-0811-4c4c-9172-aa09d6ee997a" name="openstack" operator="osprocci" description="standard accords openstack instance flatrate cost" currency="euros" fixed="yes" rate="20" units="" period="1" state="0" />
 <cords_price
- id="5c9da493-0812-4d4d-9173-aa09d6ee997a" name="opennebula" operator="accords" description="standard accords opennebula instance flatrate cost" currency="euros" fixed="yes" rate="18" units="" period="1" state="0" />
+ id="5c9da493-0812-4d4d-9173-aa09d6ee997a" name="opennebula" operator="onprocci" description="standard accords opennebula instance flatrate cost" currency="euros" fixed="yes" rate="18" units="" period="1" state="0" />
 <cords_price
- id="5c9da493-0813-4d4d-9174-aa09d6ee997a" name="windowsazure" operator="accords" description="standard accords windowsazure" currency="euros" fixed="yes" rate="15" units="" period="1" state="0" />
+ id="5c9da493-0813-4d4d-9174-aa09d6ee997a" name="windowsazure" operator="azprocci" description="standard accords windowsazure" currency="euros" fixed="yes" rate="15" units="" period="1" state="0" />
 <cords_price
  id="4de419c5-41a4-40ac-b8bf-e676bd5e651c" name="contract" operator="accords" description="standard accords contract instance flatrate cost" currency="euros" fixed="yes" rate="2" units="" period="1" state="0" />
 <cords_price
