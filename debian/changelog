@@ -2,6 +2,7 @@ compatibleone-accords (0.20130101-1) unstable; urgency=low
 
   * Upstream code update + .csp sample file.
   * Set dpkg-source 1.0 format.
+  * Update lib soname dep.
 
  -- Vincent Renardias <vincent@renardias.com>  Wed, 02 Jan 2013 10:24:36 +0100
 
