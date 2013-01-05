@@ -1,0 +1,11 @@
+// The standard HelloWorld program in Cordscript
+// (C) 2013 vrenardias@citypassenger.com
+//
+// To be run with "co-command run hello.csp" :
+//
+// # co-command run hello.csp 
+// Hello, World!
+// # 
+
+"Hello, World!".display();
+

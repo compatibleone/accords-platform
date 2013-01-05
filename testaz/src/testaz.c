@@ -447,8 +447,8 @@ private	int	az_command(int argc, char * argv[] )
 
 private	int	az_banner()
 {
-	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0b.0.01");
-	printf("\n   Beta Version 30/11/2012");
+	printf("\n   CO-OS : CompatibleOne Windows Azure Client Test : Version 1.0b.0.02");
+	printf("\n   Beta Version 29/12/2012");
 	printf("\n   Copyright (c) 2011,2012 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   General Options ");
@@ -458,7 +458,7 @@ private	int	az_banner()
 	printf("\n   --user           <username> ");
 	printf("\n   --password       <password> ");
 	printf("\n   --agent          <name>     ");
-	printf("\n   --hostingservice <name>     ");
+	printf("\n   --service        <name>     ");
 	printf("\n   --version        <value>    ");
 	printf("\n   AZURE Operations ");
 	printf("\n   Hosted Service Operations: HOST");
@@ -473,14 +473,15 @@ private	int	az_banner()
 	printf("\n          GET    NETWORK ");
 	printf("\n          DELETE NETWORK ");
 	printf("\n   Deployment and Role Operations: VM");
+	printf("\n       ( These ALL require the '--service <name>' option to have been specified )");
 	printf("\n          CREATE   VM <deployment> <role> <image> <media> <flavor> <network> <zone> <access_value> ");
 	printf("\n          START    VM <deployment> <role> ");
-	printf("\n          CAPTURE  VM <deployment> <role> <host> <label> <image> <option> ");
+	printf("\n          CAPTURE  VM <deployment> <role> <hostname> <newimagelabel> <newimagename> <options> ");
 	printf("\n          SHUTDOWN VM <deployment> <role> ");
 	printf("\n          RESTART  VM <deployment> <role> ");
-	printf("\n          LIST     VM <deployment>");
-	printf("\n          GET      VM <deployment> <role>");
-	printf("\n          DELETE VM <deployment> <role>");
+	printf("\n          LIST     VM <deployment>        ");
+	printf("\n          GET      VM <deployment> <role> ");
+	printf("\n          DELETE   VM <deployment> <role> ");
 	printf("\n   Affinity Group Operations: GROUP");
 	printf("\n          CREATE GROUP   <name> <description> <location>  ");
 	printf("\n          LIST   GROUP ");
