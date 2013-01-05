@@ -56,6 +56,8 @@ public	char *	default_publisher();
 public	char *	default_tls();
 public	char *	default_zone();
 public	char *	default_operator();
+public	char *	get_default_account();
+public	char *	get_default_account_id();
 
 #define	_CORDS_DEFAULT_PUBLISHER "http://publisher.compatibleone.fr:28001"
 #define	_DEFAULT_PUBLISHER default_publisher()

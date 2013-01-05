@@ -56,7 +56,6 @@ public	char *	default_publisher()	{	return(Cp.publisher);	}
 public	char *	default_tls()		{	return(Cp.tls);		}
 public	char *	default_operator()	{	return(Cp.operator);	}
 public	char *	default_zone()		{	return(Cp.zone);	}
-
 public	int 	failure( int v, char * mptr, char * aptr )
 {
 	printf("\ncords: error(%u): %s %s\n",v,(mptr ? mptr : "" ), (aptr ? aptr : "" ) );
@@ -170,6 +169,11 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 					Cp.accept = argv[argi++];
 					continue;
 				}
+				else if (!( strcmp( aptr, "account" ) ))
+				{
+					set_default_account( argv[argi++] );
+					continue;
+				}
 				else if (!( strcmp( aptr, "host" ) ))
 				{
 					Cp.host = argv[argi++];
@@ -229,9 +233,9 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.b.0.02 ");
-	printf("\n   Beta Version 26/12/2012 \n");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
+	printf("\n   Cords Parser : Version 1.0.c.0.01 ");
+	printf("\n   Beta Version 05/01/2013 \n");
+	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                dis-activate xsd validation ");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
@@ -239,6 +243,7 @@ private	int	test_cords_parser_banner(char * n)
 	printf("\n   --publisher <host>   specify the publisher hostname ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --agent <name>       specify the name of the agent ");
+	printf("\n   --account <name>     specify payment account name ");
 	printf("\n   --result <filename>  specify the output plan filename ");
 	printf("\n   --verbose            activate verbose messages ");
 	printf("\n   --debug              activate debug messages ");

@@ -4,11 +4,11 @@
 #include "cp.h"
 #include "csp.h"
 #include "cpxsd.h"
+#include "occi.h"
 
 private	int	force_update=0;
 
 public	void	set_force(int v) { force_update = v; }
-
 private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
 
 #include "cpxsd.c"
@@ -113,6 +113,29 @@ private	int	cords_append_choices( struct occi_response * rptr, struct xml_elemen
 	}
 }
 
+/*	-----------------------------------------	*/
+/*	c o r d s _ a c c o u n t _ r e q u e s t 	*/
+/*	-----------------------------------------	*/
+public	struct	occi_request *	cords_account_request( struct occi_client * cptr, char * category, int type )
+{
+	struct	occi_request *	qptr;
+	char		     *	aptr;
+
+	if (!( qptr = occi_create_request( cptr, category, type ) ))
+		return( qptr );
+	else if (( qptr->account = get_default_account_id()) != (char *) 0)
+		return( qptr );
+	else if (!( aptr = get_default_account() ))
+		return( occi_remove_request( qptr ) );
+	else if (!( qptr->account = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( occi_remove_request( qptr ) );
+	else
+	{
+		set_default_account_id( qptr->account );
+		return( qptr );
+	}
+}
+
 /*	-------------------------------------------------------------------	*/
 /*	c o r d s _ r e t r i e v e _ n a m e d _ i n s t a n c e _ l i s t	*/
 /*	-------------------------------------------------------------------	*/
@@ -149,7 +172,7 @@ public	struct	occi_response * cords_retrieve_named_instance_list(
 			sprintf(buffer,"%s/%s/",eptr->value,category);
 			if (!( kptr = occi_create_client( buffer, agent, tls ) ))
 				continue;
-			else if (!(qptr = occi_create_request( 
+			else if (!(qptr = cords_account_request( 
 					kptr, 
 					kptr->target->object, 
 					_OCCI_NORMAL )))
@@ -184,7 +207,7 @@ public	int	cords_delete_instance( char * uri, char * category, char * agent, cha
 		return( 27 );
 	}
 
-	else if (!(rptr = occi_create_request( cptr, category, _OCCI_NORMAL )))
+	else if (!(rptr = cords_account_request( cptr, category, _OCCI_NORMAL )))
 	{
 		cptr = occi_remove_client( cptr );
 		return( 27 );
@@ -247,7 +270,7 @@ public	struct	occi_response 	* cords_create_instance(
 		sprintf(buffer,"%s/%s/",eptr->value,category);
 		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
 			continue;
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else 
 		{
@@ -317,7 +340,7 @@ public	struct	occi_response * cords_retrieve_named_instance(
 			continue;
 		else if (!( kptr = occi_create_client( host, _CORDS_CONTRACT_AGENT, tls ) ))
 			continue;
-		else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+		else if (!( qptr = cords_account_request( kptr, kptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else if (!( zptr = occi_client_get( kptr, qptr ) ))
 		{
@@ -668,7 +691,7 @@ public	struct occi_response * cords_select_category(struct xml_element * documen
 		sprintf(buffer,"%s/%s/",eptr->value,document->name);
 		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
 			continue;
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else if (( document->firstatb ) 
 		     && (!(hptr = cords_request_header( rptr, document ))))
@@ -730,7 +753,7 @@ public	struct occi_response * cords_retrieve_category(
 		sprintf(buffer,"%s/%s/%s",eptr->value,document->name,id);
 		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
 			continue;
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else if (!( zptr = occi_client_get( cptr, rptr ) ))
 			continue;
@@ -782,7 +805,7 @@ public	struct occi_response * cords_resolve_category(
 		sprintf(buffer,"%s/%s/",eptr->value,document->name);
 		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
 			continue;
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
 		else if (!( fptr = cords_request_element( rptr, document->name, kptr ) ))
 			continue;
@@ -839,7 +862,7 @@ public	struct	occi_response 	* cords_create_category( struct xml_element * docum
 		sprintf(buffer,"%s/%s/",eptr->value,document->name);
 		if (!( cptr = occi_create_client( buffer, agent, tls ) ))
 			continue;
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 			continue;
 
 		else if (( document->firstatb ) 
@@ -884,7 +907,7 @@ public	struct	occi_response 	* cords_update_category(
 
 	if (!( cptr = occi_create_client( id, agent, tls ) ))
 		return((struct occi_response *) 0);
-	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+	else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return((struct occi_response *) 0);
 	else if (( document->firstatb ) 
 	     && (!(fptr = cords_request_header( rptr, document ))))
@@ -960,7 +983,7 @@ public	struct	occi_response * ll_cords_invoke_action( char * resource, char * ac
 	sprintf(actihost,"%s?action=%s",resource,action);
 	if (!( cptr = occi_create_client( actihost, agent, tls ) ))
 		return((struct occi_response *) 0);
-	else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+	else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return((struct occi_response *) 0);
 	else 	return( occi_client_post( cptr, rptr ) );
 }
@@ -1312,7 +1335,7 @@ private	int	cords_build_application_image( char * iptr, char * pptr, char * agen
 			liberate( pptr );
 			return(0);
 		}
-		else if (!(rptr = occi_create_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		{
 			liberate( pptr );
 			return(0);

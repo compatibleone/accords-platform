@@ -54,6 +54,8 @@ public	char *	default_tls()		{	return(Cb.tls);		}
 public	char *	default_operator()	{	return(Cb.operator);	}
 public	char *	default_zone()		{	return(Cb.zone);	}
 
+public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
+
 public	int 	failure( int v, char * mptr, char * aptr )
 {
 	printf("\ncords: error(%u): %s %s\n",v,(mptr ? mptr : "" ), (aptr ? aptr : "" ) );
@@ -90,6 +92,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 	char 	*	slav;
 	char  	*	manv;
 	char 	*	ihost;
+	char 	*	aptr;
 	struct	occi_client * kptr;
 	struct	occi_request* qptr;
 	struct	occi_element* dptr;
@@ -133,7 +136,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 	/* ------------------------------------------ */
 	if (!( kptr = occi_create_client( buffer, agent, default_tls() ) ))
 		return(546);
-	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	else if (!( qptr = cords_account_request( kptr, kptr->target->object, _OCCI_NORMAL )))
 	{
 		kptr = occi_remove_client( kptr );
 		return(550);
@@ -359,6 +362,11 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 					Cb.zone = argv[argi++];
 					continue;
 				}
+				else if (!( strcmp( aptr, "account" ) ))
+				{
+					set_default_account( argv[argi++] );
+					continue;
+				}
 				else if (!( strcmp( aptr, "operator" ) ))
 				{
 					Cb.operator = argv[argi++];
@@ -423,15 +431,16 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.a.0.04 ");
-	printf("\n   Beta Version 23/05/2012 \n");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
+	printf("\n   Cords Broker : Version 1.0.b.0.01 ");
+	printf("\n   Beta Version 05/01/2013 \n");
+	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
 	printf("\n   --host <host>        specify the publisher hostname ");
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --result <filename>  specify the output plan filename ");
+	printf("\n   --account <name>     specify payment account name ");
 	printf("\n   --zone <zone>        specify required provisioning zone ");
 	printf("\n   --operator <name>    specify required operator name ");
 	printf("\n   --security <type>    specify required security level");
@@ -454,4 +463,5 @@ public	int	main(int argc, char * argv[])
 
 
 #endif
+
 

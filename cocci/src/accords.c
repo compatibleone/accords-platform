@@ -23,10 +23,12 @@
 #include "document.h"
 #include "rest.h"
 
-private	struct	accords_configuration 	* configuration = (struct accords_configuration *) 0;
-private	char				* section 	= (char *) 0;
-private	char				* identity	= (char *) 0;
-private	char				* default_agent	= (char *) 0;
+private	struct	accords_configuration 	* configuration 	= (struct accords_configuration *) 0;
+private	char				* section 		= (char *) 0;
+private	char				* identity		= (char *) 0;
+private	char				* default_account	= (char *) 0;
+private	char				* default_account_id	= (char *) 0;
+private	char				* default_agent		= (char *) 0;
 
 /*	---------------------------------------------------------	*/
 /*			g e t _ i d e n t i t y				*/
@@ -60,6 +62,45 @@ public	int	set_default_agent(char * sptr)
 	else	return(0);	
 }
 	
+/*	---------------------------------------------------------	*/
+/*		s e t _ d e f a u l t _ a c c o u n t			*/
+/*	---------------------------------------------------------	*/
+public	int	set_default_account(char * sptr)
+{
+	if (!( default_account = allocate_string( sptr ) ))
+		return( 27 );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		g e t _ d e f a u l t _ a c c o u n t			*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_account()
+{
+	if (!( default_account ))
+		if ( set_default_account( "accords" ) != 0 )
+			return( (char *) 0 );
+	return( default_account );
+}
+
+/*	---------------------------------------------------------	*/
+/*		s e t _ d e f a u l t _ a c c o u n t _ i d 		*/
+/*	---------------------------------------------------------	*/
+public	int	set_default_account_id(char * sptr)
+{
+	if (!( default_account_id = allocate_string( sptr ) ))
+		return( 27 );
+	else	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		g e t _ d e f a u l t _ a c c o u n t _ i d 		*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_account_id()
+{
+	return( default_account_id );
+}
+
 /*	---------------------------------------------------------	*/
 /*	 a c c o r d s _ c o n f i g u r a t i o n _ o p t i o n 	*/
 /*	---------------------------------------------------------	*/
