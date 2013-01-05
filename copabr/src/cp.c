@@ -128,7 +128,7 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 	else if (!( aptr = get_default_account() ))
 		return( occi_remove_request( qptr ) );
 	else if (!( qptr->account = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		return( occi_remove_request( qptr ) );
+		return( qptr );
 	else
 	{
 		set_default_account_id( qptr->account );
