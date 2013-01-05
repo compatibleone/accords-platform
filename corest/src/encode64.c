@@ -3,7 +3,7 @@
 
 #include "encode64.h"
 
-int	EncodeBase64( char FAR * rptr, char FAR * sptr, int i )
+int	EncodeBase64( char * rptr, char * sptr, int i )
 {
 	int	j=0;
 	int	m=0;

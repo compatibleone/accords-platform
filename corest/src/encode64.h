@@ -1,13 +1,6 @@
 #ifndef	_encode64_h
 #define	_encode64_h
 
-#ifdef	UNIX
-#define FAR 
-#else
-#define	FAR far
-#endif
-
-
 static char Base64[64] =       {
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',

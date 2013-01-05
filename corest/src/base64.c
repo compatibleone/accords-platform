@@ -20,7 +20,7 @@ int DecodeBase64(
 			} b6;
 		} triochar;	
 
-	l = strlen((char FAR *)sInput);
+	l = strlen((char *)sInput);
 	l /= 4;
 	l *= 4;
 	*(sInput+l) = 0;

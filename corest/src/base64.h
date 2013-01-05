@@ -1,6 +1,5 @@
 #ifndef	_base64_h
 #define	_base64_h
-#define	FAR 
 #ifndef	BB64C
 #define	BB64C 100
 #endif
