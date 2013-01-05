@@ -34,12 +34,13 @@ struct exampleprocci * liberate_exampleprocci(struct exampleprocci * optr);
 private pthread_mutex_t list_exampleprocci_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * exampleprocci_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * exampleprocci_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_occiexampleprocci_node() { return( exampleprocci_first ); }
+public struct  occi_kind_node * occi_first_exampleprocci_node() { return( exampleprocci_first ); }
+public struct  occi_kind_node * occi_last_exampleprocci_node() { return( exampleprocci_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_occiexampleprocci_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_exampleprocci_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		exampleprocci_first = nptr->next;
@@ -51,9 +52,9 @@ private struct occi_kind_node * ll_drop_occiexampleprocci_node(struct occi_kind_
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_occiexampleprocci_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * drop_exampleprocci_node(struct occi_kind_node * nptr) {
 	pthread_mutex_lock( &list_exampleprocci_control );
-	nptr = ll_drop_occiexampleprocci_node( nptr );
+	nptr = ll_drop_exampleprocci_node( nptr );
 	pthread_mutex_unlock( &list_exampleprocci_control );
 	return(nptr);
 }
@@ -61,7 +62,7 @@ private struct occi_kind_node * drop_occiexampleprocci_node(struct occi_kind_nod
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_occiexampleprocci_node(char * id) {
+private struct occi_kind_node * ll_locate_exampleprocci_node(char * id) {
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	for ( nptr = exampleprocci_first;
@@ -73,10 +74,10 @@ private struct occi_kind_node * ll_locate_occiexampleprocci_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_occiexampleprocci_node(char * id) {
+private struct occi_kind_node * locate_exampleprocci_node(char * id) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_exampleprocci_control );
-	nptr = ll_locate_occiexampleprocci_node(id);
+	nptr = ll_locate_exampleprocci_node(id);
 	pthread_mutex_unlock( &list_exampleprocci_control );
 	return( nptr );
 }
@@ -84,7 +85,7 @@ private struct occi_kind_node * locate_occiexampleprocci_node(char * id) {
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_occiexampleprocci_node(int mode) {
+private struct occi_kind_node * ll_add_exampleprocci_node(int mode) {
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
@@ -105,10 +106,10 @@ private struct occi_kind_node * ll_add_occiexampleprocci_node(int mode) {
 			}
 		}
 }
-private struct occi_kind_node * add_occiexampleprocci_node(int mode) {
+private struct occi_kind_node * add_exampleprocci_node(int mode) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_exampleprocci_control );
-	nptr = ll_add_occiexampleprocci_node( mode );
+	nptr = ll_add_exampleprocci_node( mode );
 	pthread_mutex_unlock( &list_exampleprocci_control );
 	return(nptr);
 }
@@ -116,9 +117,9 @@ private struct occi_kind_node * add_occiexampleprocci_node(int mode) {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_occiexampleprocci_name="exampleprocci.xml";
-private void autoload_occiexampleprocci_nodes() {
-	char * fn=autosave_occiexampleprocci_name;	struct occi_kind_node * nptr;
+private char*autosave_exampleprocci_name="exampleprocci.xml";
+private void autoload_exampleprocci_nodes() {
+	char * fn=autosave_exampleprocci_name;	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
@@ -130,7 +131,7 @@ private void autoload_occiexampleprocci_nodes() {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
 			else if ( strcmp( vptr->name, "exampleprocci" ) ) continue;
-			else if (!( nptr = add_occiexampleprocci_node(0))) break;
+			else if (!( nptr = add_exampleprocci_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
@@ -191,11 +192,11 @@ private void autoload_occiexampleprocci_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_occiexampleprocci_name(char * fn) {
-	autosave_occiexampleprocci_name = fn;	return;
+public  void set_autosave_exampleprocci_name(char * fn) {
+	autosave_exampleprocci_name = fn;	return;
 }
-public  void autosave_occiexampleprocci_nodes() {
-	char * fn=autosave_occiexampleprocci_name;	struct occi_kind_node * nptr;
+public  void autosave_exampleprocci_nodes() {
+	char * fn=autosave_exampleprocci_name;	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	FILE * h;
 	pthread_mutex_lock( &list_exampleprocci_control );
@@ -293,7 +294,7 @@ public  void autosave_occiexampleprocci_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_occiexampleprocci_field(
+private void set_exampleprocci_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
 	struct exampleprocci * pptr;
@@ -357,14 +358,14 @@ private void set_occiexampleprocci_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct exampleprocci * filter_occiexampleprocci_info(
+private struct exampleprocci * filter_exampleprocci_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
 	struct exampleprocci * pptr;
 		if (!( pptr = allocate_exampleprocci()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_occiexampleprocci_field) ))
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_exampleprocci_field) ))
 		return( liberate_exampleprocci(pptr));
 	else	return( pptr );
 }
@@ -372,7 +373,7 @@ private struct exampleprocci * filter_occiexampleprocci_info(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_occiexampleprocci_filter(
+private int pass_exampleprocci_filter(
 	struct exampleprocci * pptr,struct exampleprocci * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
@@ -543,85 +544,85 @@ private int pass_occiexampleprocci_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * exampleprocci__response(
+private struct rest_response * exampleprocci_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
 	struct exampleprocci * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flavor=%s",optr->domain,optr->id,pptr->flavor);
+	sprintf(cptr->buffer,"%s.%s.flavor=%c%s%c",optr->domain,optr->id,0x0022,pptr->flavor,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.original=%s",optr->domain,optr->id,pptr->original);
+	sprintf(cptr->buffer,"%s.%s.original=%c%s%c",optr->domain,optr->id,0x0022,pptr->original,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	sprintf(cptr->buffer,"%s.%s.image=%c%s%c",optr->domain,optr->id,0x0022,pptr->image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	sprintf(cptr->buffer,"%s.%s.node=%c%s%c",optr->domain,optr->id,0x0022,pptr->node,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	sprintf(cptr->buffer,"%s.%s.price=%c%s%c",optr->domain,optr->id,0x0022,pptr->price,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
+	sprintf(cptr->buffer,"%s.%s.number=%c%s%c",optr->domain,optr->id,0x0022,pptr->number,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.rootpass=%s",optr->domain,optr->id,pptr->rootpass);
+	sprintf(cptr->buffer,"%s.%s.rootpass=%c%s%c",optr->domain,optr->id,0x0022,pptr->rootpass,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.reference=%s",optr->domain,optr->id,pptr->reference);
+	sprintf(cptr->buffer,"%s.%s.reference=%c%s%c",optr->domain,optr->id,0x0022,pptr->reference,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.network=%s",optr->domain,optr->id,pptr->network);
+	sprintf(cptr->buffer,"%s.%s.network=%c%s%c",optr->domain,optr->id,0x0022,pptr->network,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	sprintf(cptr->buffer,"%s.%s.access=%c%s%c",optr->domain,optr->id,0x0022,pptr->access,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.accessip=%s",optr->domain,optr->id,pptr->accessip);
+	sprintf(cptr->buffer,"%s.%s.accessip=%c%s%c",optr->domain,optr->id,0x0022,pptr->accessip,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.floating=%s",optr->domain,optr->id,pptr->floating);
+	sprintf(cptr->buffer,"%s.%s.floating=%c%s%c",optr->domain,optr->id,0x0022,pptr->floating,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.floatingid=%s",optr->domain,optr->id,pptr->floatingid);
+	sprintf(cptr->buffer,"%s.%s.floatingid=%c%s%c",optr->domain,optr->id,0x0022,pptr->floatingid,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
+	sprintf(cptr->buffer,"%s.%s.publicaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->publicaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	sprintf(cptr->buffer,"%s.%s.privateaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->privateaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.firewall=%s",optr->domain,optr->id,pptr->firewall);
+	sprintf(cptr->buffer,"%s.%s.firewall=%c%s%c",optr->domain,optr->id,0x0022,pptr->firewall,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.group=%s",optr->domain,optr->id,pptr->group);
+	sprintf(cptr->buffer,"%s.%s.group=%c%s%c",optr->domain,optr->id,0x0022,pptr->group,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.zone=%s",optr->domain,optr->id,pptr->zone);
+	sprintf(cptr->buffer,"%s.%s.zone=%c%s%c",optr->domain,optr->id,0x0022,pptr->zone,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
+	sprintf(cptr->buffer,"%s.%s.hostname=%c%s%c",optr->domain,optr->id,0x0022,pptr->hostname,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
+	sprintf(cptr->buffer,"%s.%s.when=%c%u%c",optr->domain,optr->id,0x0022,pptr->when,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -643,13 +644,13 @@ private struct rest_response * exampleprocci_get_item(
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
-	autosave_occiexampleprocci_nodes();
-	return( exampleprocci__response(optr,cptr,rptr,aptr,pptr));
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
+	autosave_exampleprocci_nodes();
+	return( exampleprocci_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
@@ -664,7 +665,7 @@ private struct rest_response * exampleprocci_post_link(
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	char * reqhost;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -683,7 +684,7 @@ private struct rest_response * exampleprocci_post_mixin(
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	char * reqhost;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -704,7 +705,7 @@ private struct rest_response * exampleprocci_post_action(
 	struct exampleprocci * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -732,14 +733,14 @@ private struct rest_response * exampleprocci_post_item(
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_occiexampleprocci_node(1)))
+	if (!( nptr = add_exampleprocci_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_occiexampleprocci_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_exampleprocci_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
-	autosave_occiexampleprocci_nodes();
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
+	autosave_exampleprocci_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -760,15 +761,15 @@ private struct rest_response * exampleprocci_put_item(
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_occiexampleprocci_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_exampleprocci_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
-	autosave_occiexampleprocci_nodes();
-	return( exampleprocci__response(optr,cptr,rptr,aptr,pptr));
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
+	autosave_exampleprocci_nodes();
+	return( exampleprocci_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
@@ -781,7 +782,7 @@ private struct rest_response * exampleprocci_head_item(
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -800,11 +801,11 @@ private struct rest_response * exampleprocci_delete_item(
 	struct occi_kind_node * nptr;
 	struct exampleprocci * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_occiexampleprocci_node(id)))
+	if (!( nptr = locate_exampleprocci_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
-	drop_occiexampleprocci_node( nptr );
-	autosave_occiexampleprocci_nodes();
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
+	drop_exampleprocci_node( nptr );
+	autosave_exampleprocci_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -824,14 +825,14 @@ private struct rest_response * exampleprocci_get_list(
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_occiexampleprocci_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_exampleprocci_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = exampleprocci_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_occiexampleprocci_filter( pptr, fptr ) ))
+		if (!( pass_exampleprocci_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -856,23 +857,23 @@ private struct rest_response * exampleprocci_delete_all(
 	struct exampleprocci * pptr;
 	struct exampleprocci * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_occiexampleprocci_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_exampleprocci_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	nptr=exampleprocci_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_occiexampleprocci_filter( pptr, fptr ) ))) {
+		||  (!( pass_exampleprocci_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
-			drop_occiexampleprocci_node( nptr );
+			drop_exampleprocci_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_occiexampleprocci_nodes();
+	autosave_exampleprocci_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -1015,6 +1016,19 @@ private void	redirect_occi_exampleprocci_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_exampleprocci(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_exampleprocci_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -1076,7 +1090,9 @@ public struct occi_category * occi_exampleprocci_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		autoload_occiexampleprocci_nodes();
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_exampleprocci)))
+			return( optr );
+		autoload_exampleprocci_nodes();
 		return(optr);
 	}
 
@@ -1085,7 +1101,7 @@ public struct occi_category * occi_exampleprocci_builder(char * a,char * b) {
 /*	----------------------------------------------------	*/
 /*	e x a m p l e p r o c c i _ o c c i _ h e a d e r s 	*/
 /*	----------------------------------------------------	*/
-public struct rest_header *  exampleprocci__headers(struct exampleprocci * sptr)
+public struct rest_header *  exampleprocci_occi_headers(struct exampleprocci * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;

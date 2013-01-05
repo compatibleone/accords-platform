@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occipaas_c_
@@ -552,79 +550,79 @@ private struct rest_response * paas_occi_response(
 	struct paas * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.environment=%s",optr->domain,optr->id,pptr->environment);
+	sprintf(cptr->buffer,"%s.%s.environment=%c%s%c",optr->domain,optr->id,0x0022,pptr->environment,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.application=%s",optr->domain,optr->id,pptr->application);
+	sprintf(cptr->buffer,"%s.%s.application=%c%s%c",optr->domain,optr->id,0x0022,pptr->application,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.topology=%s",optr->domain,optr->id,pptr->topology);
+	sprintf(cptr->buffer,"%s.%s.topology=%c%s%c",optr->domain,optr->id,0x0022,pptr->topology,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.artefact=%s",optr->domain,optr->id,pptr->artefact);
+	sprintf(cptr->buffer,"%s.%s.artefact=%c%s%c",optr->domain,optr->id,0x0022,pptr->artefact,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.version=%s",optr->domain,optr->id,pptr->version);
+	sprintf(cptr->buffer,"%s.%s.version=%c%s%c",optr->domain,optr->id,0x0022,pptr->version,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.instance=%s",optr->domain,optr->id,pptr->instance);
+	sprintf(cptr->buffer,"%s.%s.instance=%c%s%c",optr->domain,optr->id,0x0022,pptr->instance,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.node=%s",optr->domain,optr->id,pptr->node);
+	sprintf(cptr->buffer,"%s.%s.node=%c%s%c",optr->domain,optr->id,0x0022,pptr->node,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.price=%s",optr->domain,optr->id,pptr->price);
+	sprintf(cptr->buffer,"%s.%s.price=%c%s%c",optr->domain,optr->id,0x0022,pptr->price,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.number=%s",optr->domain,optr->id,pptr->number);
+	sprintf(cptr->buffer,"%s.%s.number=%c%s%c",optr->domain,optr->id,0x0022,pptr->number,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.rootpass=%s",optr->domain,optr->id,pptr->rootpass);
+	sprintf(cptr->buffer,"%s.%s.rootpass=%c%s%c",optr->domain,optr->id,0x0022,pptr->rootpass,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.reference=%s",optr->domain,optr->id,pptr->reference);
+	sprintf(cptr->buffer,"%s.%s.reference=%c%s%c",optr->domain,optr->id,0x0022,pptr->reference,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.access=%s",optr->domain,optr->id,pptr->access);
+	sprintf(cptr->buffer,"%s.%s.access=%c%s%c",optr->domain,optr->id,0x0022,pptr->access,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
+	sprintf(cptr->buffer,"%s.%s.publicaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->publicaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	sprintf(cptr->buffer,"%s.%s.privateaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->privateaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.zone=%s",optr->domain,optr->id,pptr->zone);
+	sprintf(cptr->buffer,"%s.%s.zone=%c%s%c",optr->domain,optr->id,0x0022,pptr->zone,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostname=%s",optr->domain,optr->id,pptr->hostname);
+	sprintf(cptr->buffer,"%s.%s.hostname=%c%s%c",optr->domain,optr->id,0x0022,pptr->hostname,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.workload=%s",optr->domain,optr->id,pptr->workload);
+	sprintf(cptr->buffer,"%s.%s.workload=%c%s%c",optr->domain,optr->id,0x0022,pptr->workload,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.agent=%s",optr->domain,optr->id,pptr->agent);
+	sprintf(cptr->buffer,"%s.%s.agent=%c%s%c",optr->domain,optr->id,0x0022,pptr->agent,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.when=%u",optr->domain,optr->id,pptr->when);
+	sprintf(cptr->buffer,"%s.%s.when=%c%u%c",optr->domain,optr->id,0x0022,pptr->when,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -650,7 +648,7 @@ private struct rest_response * paas_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_paas_nodes();
 	return( paas_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -741,7 +739,7 @@ private struct rest_response * paas_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_paas_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -769,7 +767,7 @@ private struct rest_response * paas_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_paas_nodes();
 	return( paas_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -805,7 +803,7 @@ private struct rest_response * paas_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_paas_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_paas_node( nptr );
 	autosave_paas_nodes();
 	if (!( occi_success( aptr ) ))
@@ -869,7 +867,7 @@ private struct rest_response * paas_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_paas_node( nptr );
 			nptr = sptr;
@@ -1018,6 +1016,19 @@ private void	redirect_occi_paas_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -1079,6 +1090,8 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas)))
+			return( optr );
 		autoload_paas_nodes();
 		return(optr);
 	}

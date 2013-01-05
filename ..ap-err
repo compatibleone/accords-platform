@@ -1,0 +1,151 @@
+-E: unknown option
+-E: unknown option
+hmac_sha2.c: In function `base_64':
+hmac_sha2.c:502: warning: assignment makes integer from pointer without a cast
+socket.c: In function `socket_connect':
+socket.c:183: warning: passing arg 2 of `bind' from incompatible pointer type
+socket.c: In function `socket_try_connect':
+socket.c:228: warning: passing arg 2 of `bind' from incompatible pointer type
+socket.c: In function `socket_listen':
+socket.c:348: warning: passing arg 2 of `bind' from incompatible pointer type
+ezvm.c:301: attention : initialisation d'un type pointeur incompatible
+ezvm.c:302: attention : initialisation d'un type pointeur incompatible
+ezvm.c:303: attention : initialisation d'un type pointeur incompatible
+ezvm.c:305: attention : initialisation d'un type pointeur incompatible
+cosacs.c:709: attention : initialisation d'un type pointeur incompatible
+cosacs.c:710: attention : initialisation d'un type pointeur incompatible
+cosacs.c:711: attention : initialisation d'un type pointeur incompatible
+cosacs.c:713: attention : initialisation d'un type pointeur incompatible
+cosacs.c:903: attention : initialisation d'un type pointeur incompatible
+cosacs.c:904: attention : initialisation d'un type pointeur incompatible
+cosacs.c:905: attention : initialisation d'un type pointeur incompatible
+cosacs.c:907: attention : initialisation d'un type pointeur incompatible
+coips.c:856: attention : initialisation d'un type pointeur incompatible
+coips.c:857: attention : initialisation d'un type pointeur incompatible
+coips.c:858: attention : initialisation d'un type pointeur incompatible
+coips.c:860: attention : initialisation d'un type pointeur incompatible
+In file included from slam.c:140:
+/home/c2/accords-platform/comons/src/comonsconnection.c:446: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:447: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:448: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:450: attention : initialisation d'un type pointeur incompatible
+paasprocci.c:209: attention : initialisation d'un type pointeur incompatible
+paasprocci.c:210: attention : initialisation d'un type pointeur incompatible
+paasprocci.c:211: attention : initialisation d'un type pointeur incompatible
+paasprocci.c:213: attention : initialisation d'un type pointeur incompatible
+example.c:210: attention : initialisation d'un type pointeur incompatible
+example.c:211: attention : initialisation d'un type pointeur incompatible
+example.c:212: attention : initialisation d'un type pointeur incompatible
+example.c:214: attention : initialisation d'un type pointeur incompatible
+In file included from cops.c:136:
+/home/c2/accords-platform/comons/src/comonsconnection.c:446: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:447: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:448: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:450: attention : initialisation d'un type pointeur incompatible
+In file included from cops.c:139:
+copsplacement.c:495: attention : initialisation d'un type pointeur incompatible
+copsplacement.c:496: attention : initialisation d'un type pointeur incompatible
+copsplacement.c:497: attention : initialisation d'un type pointeur incompatible
+copsplacement.c:499: attention : initialisation d'un type pointeur incompatible
+In file included from coees.c:136:
+/home/c2/accords-platform/comons/src/comonsconnection.c:446: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:447: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:448: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:450: attention : initialisation d'un type pointeur incompatible
+In file included from coobas.c:182:
+/home/c2/accords-platform/comons/src/comonsconnection.c:446: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:447: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:448: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:450: attention : initialisation d'un type pointeur incompatible
+coobas.c:679: attention : initialisation d'un type pointeur incompatible
+coobas.c:680: attention : initialisation d'un type pointeur incompatible
+coobas.c:681: attention : initialisation d'un type pointeur incompatible
+coobas.c:683: attention : initialisation d'un type pointeur incompatible
+coobas.c:748: attention : initialisation d'un type pointeur incompatible
+coobas.c:749: attention : initialisation d'un type pointeur incompatible
+coobas.c:750: attention : initialisation d'un type pointeur incompatible
+coobas.c:752: attention : initialisation d'un type pointeur incompatible
+In file included from comons.c:141:
+comonssession.c:222: attention : initialisation d'un type pointeur incompatible
+comonssession.c:223: attention : initialisation d'un type pointeur incompatible
+comonssession.c:224: attention : initialisation d'un type pointeur incompatible
+comonssession.c:226: attention : initialisation d'un type pointeur incompatible
+In file included from comons.c:142:
+comonsevent.c:66: attention : initialisation d'un type pointeur incompatible
+comonsevent.c:67: attention : initialisation d'un type pointeur incompatible
+comonsevent.c:68: attention : initialisation d'un type pointeur incompatible
+comonsevent.c:70: attention : initialisation d'un type pointeur incompatible
+In file included from comons.c:143:
+comonsmonitor.c:185: attention : initialisation d'un type pointeur incompatible
+comonsmonitor.c:186: attention : initialisation d'un type pointeur incompatible
+comonsmonitor.c:187: attention : initialisation d'un type pointeur incompatible
+comonsmonitor.c:189: attention : initialisation d'un type pointeur incompatible
+In file included from conets.c:149:
+conetsip.c:118: attention : initialisation d'un type pointeur incompatible
+conetsip.c:119: attention : initialisation d'un type pointeur incompatible
+conetsip.c:120: attention : initialisation d'un type pointeur incompatible
+conetsip.c:122: attention : initialisation d'un type pointeur incompatible
+In file included from conets.c:150:
+/home/c2/accords-platform/comons/src/comonsconnection.c:446: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:447: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:448: attention : initialisation d'un type pointeur incompatible
+/home/c2/accords-platform/comons/src/comonsconnection.c:450: attention : initialisation d'un type pointeur incompatible
+publisher.c:619: attention : initialisation d'un type pointeur incompatible
+publisher.c:620: attention : initialisation d'un type pointeur incompatible
+publisher.c:621: attention : initialisation d'un type pointeur incompatible
+publisher.c:623: attention : initialisation d'un type pointeur incompatible
+publisher.c:682: attention : initialisation d'un type pointeur incompatible
+publisher.c:683: attention : initialisation d'un type pointeur incompatible
+publisher.c:684: attention : initialisation d'un type pointeur incompatible
+publisher.c:686: attention : initialisation d'un type pointeur incompatible
+publisher.c:755: attention : initialisation d'un type pointeur incompatible
+publisher.c:756: attention : initialisation d'un type pointeur incompatible
+publisher.c:757: attention : initialisation d'un type pointeur incompatible
+publisher.c:759: attention : initialisation d'un type pointeur incompatible
+parser.c:204: attention : initialisation d'un type pointeur incompatible
+parser.c:205: attention : initialisation d'un type pointeur incompatible
+parser.c:206: attention : initialisation d'un type pointeur incompatible
+parser.c:208: attention : initialisation d'un type pointeur incompatible
+In file included from broker.c:139:
+brokerprovider.c:81: attention : initialisation d'un type pointeur incompatible
+brokerprovider.c:82: attention : initialisation d'un type pointeur incompatible
+brokerprovider.c:83: attention : initialisation d'un type pointeur incompatible
+brokerprovider.c:85: attention : initialisation d'un type pointeur incompatible
+In file included from broker.c:140:
+brokerservice.c:980: attention : initialisation d'un type pointeur incompatible
+brokerservice.c:981: attention : initialisation d'un type pointeur incompatible
+brokerservice.c:982: attention : initialisation d'un type pointeur incompatible
+brokerservice.c:984: attention : initialisation d'un type pointeur incompatible
+In file included from procci.c:136:
+proccicontract.c:887: attention : initialisation d'un type pointeur incompatible
+proccicontract.c:888: attention : initialisation d'un type pointeur incompatible
+proccicontract.c:889: attention : initialisation d'un type pointeur incompatible
+proccicontract.c:891: attention : initialisation d'un type pointeur incompatible
+In file included from osprocci.c:140:
+proccios.c:1832: attention : initialisation d'un type pointeur incompatible
+proccios.c:1833: attention : initialisation d'un type pointeur incompatible
+proccios.c:1834: attention : initialisation d'un type pointeur incompatible
+proccios.c:1836: attention : initialisation d'un type pointeur incompatible
+In file included from osocciprocci.c:151:
+occios.c:685: attention : initialisation d'un type pointeur incompatible
+occios.c:686: attention : initialisation d'un type pointeur incompatible
+occios.c:687: attention : initialisation d'un type pointeur incompatible
+occios.c:689: attention : initialisation d'un type pointeur incompatible
+In file included from onprocci.c:140:
+proccion.c:820: attention : initialisation d'un type pointeur incompatible
+proccion.c:821: attention : initialisation d'un type pointeur incompatible
+proccion.c:822: attention : initialisation d'un type pointeur incompatible
+proccion.c:824: attention : initialisation d'un type pointeur incompatible
+In file included from azprocci.c:140:
+procciaz.c:1118: attention : initialisation d'un type pointeur incompatible
+procciaz.c:1119: attention : initialisation d'un type pointeur incompatible
+procciaz.c:1120: attention : initialisation d'un type pointeur incompatible
+procciaz.c:1122: attention : initialisation d'un type pointeur incompatible
+In file included from proccidc.c:49,
+                 from dcprocci.c:140:
+dcmethod.c:80: attention : initialisation d'un type pointeur incompatible
+dcmethod.c:81: attention : initialisation d'un type pointeur incompatible
+dcmethod.c:82: attention : initialisation d'un type pointeur incompatible
+dcmethod.c:84: attention : initialisation d'un type pointeur incompatible
+-E: unknown option
+-E: unknown option

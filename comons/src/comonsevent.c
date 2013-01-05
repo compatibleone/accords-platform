@@ -4,7 +4,7 @@
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ e v e n t  			*/
 /*	-------------------------------------------	*/
-private	int	create_event(struct occi_category * optr, void * vptr)
+private	int	create_event(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_event * pptr;
@@ -22,7 +22,7 @@ private	int	create_event(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ e v e n t  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_event(struct occi_category * optr, void * vptr)
+private	int	retrieve_event(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_event * pptr;
@@ -36,7 +36,7 @@ private	int	retrieve_event(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ e v e n t  			*/
 /*	-------------------------------------------	*/
-private	int	update_event(struct occi_category * optr, void * vptr)
+private	int	update_event(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_event * pptr;
@@ -50,7 +50,7 @@ private	int	update_event(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ e v e n t	 	 	*/
 /*	-------------------------------------------	*/
-private	int	delete_event(struct occi_category * optr, void * vptr)
+private	int	delete_event(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_event * pptr;

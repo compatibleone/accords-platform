@@ -563,7 +563,7 @@ private struct rest_response * az_config_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_az_config_nodes();
 	return( az_config_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -654,7 +654,7 @@ private struct rest_response * az_config_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_az_config_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_az_config_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -682,7 +682,7 @@ private struct rest_response * az_config_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_az_config_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_az_config_nodes();
 	return( az_config_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -718,7 +718,7 @@ private struct rest_response * az_config_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_az_config_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_az_config_node( nptr );
 	autosave_az_config_nodes();
 	if (!( occi_success( aptr ) ))
@@ -782,7 +782,7 @@ private struct rest_response * az_config_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_az_config_node( nptr );
 			nptr = sptr;

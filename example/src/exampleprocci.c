@@ -284,4 +284,4 @@ public int rest_occi_exampleprocci(FILE * fh,struct exampleprocci * sptr,char * 
 
 }
 
-#endif	/* _exampleprocci_c_ */
+#endif	/* _exampleprocci_cexampleprocci_c_ */

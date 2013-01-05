@@ -197,7 +197,7 @@ private	struct rest_response * build_vm(
 /*	-------------------------------------------	*/
 /* 	   	   c r e a t e _ v m   			*/
 /*	-------------------------------------------	*/
-private	int	create_cords_vm(struct occi_category * optr, void * vptr)
+private	int	create_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	char 	buffer[2048];
 	struct	occi_element *	root=(struct occi_element *) 0;
@@ -252,7 +252,7 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	 	 r e t r i e v e _ v m   		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_cords_vm(struct occi_category * optr, void * vptr)
+private	int	retrieve_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;
@@ -266,7 +266,7 @@ private	int	retrieve_cords_vm(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	  	    u p d a t e _ v m   		*/
 /*	-------------------------------------------	*/
-private	int	update_cords_vm(struct occi_category * optr, void * vptr)
+private	int	update_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;
@@ -280,7 +280,7 @@ private	int	update_cords_vm(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	  	    d e l e t e _ v m  		 	*/
 /*	-------------------------------------------	*/
-private	int	delete_cords_vm(struct occi_category * optr, void * vptr)
+private	int	delete_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;

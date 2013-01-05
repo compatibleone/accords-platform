@@ -1,26 +1,31 @@
-/*-------------------------------------------------------------------------------*/
-/* ACCORDS PLATFORM                                                              */
-/* copyright 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>         */
-/*-------------------------------------------------------------------------------*/
-/* Licensed under the Apache License, Version 2.0 (the "License");             */
-/* you may not use this file except in compliance with the License.              */
-/* You may obtain a copy of the License at                                       */
-/*                                                                               */
-/*       http://www.apache.org/licenses/LICENSE-2.0                              */
-/*                                                                               */
-/* Unless required by applicable law or agreed to in writing, software           */
-/* distributed under the License is distributed on an "AS IS" BASIS,           */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
-/* See the License for the specific language governing permissions and           */
-/* limitations under the License.                                                */
-/*-------------------------------------------------------------------------------*/
-#ifndef _gw_c_
-#define _gw_c_
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
+#ifndef _occigw_c_
+#define _occigw_c_
 
 #include "gw.h"
 
-/*	--------------------------------	*/
-/*	--------------------------------	*/
+/*	--------------	*/
+/*	o c c i _ g w 	*/
+/*	--------------	*/
+
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
@@ -30,20 +35,21 @@ private pthread_mutex_t list_gw_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * gw_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * gw_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_gw_node() { return( gw_first ); }
+public struct  occi_kind_node * occi_last_gw_node() { return( gw_last ); }
 
 /*	----------------------------------------------	*/
-//	o c c i   c a t e g o r y   d r o p   n o d e 	
+/*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
 private struct occi_kind_node * ll_drop_gw_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
-		if (!( nptr->previous ))
-			gw_first = nptr->next;
-		else	nptr->previous->next = nptr->next;
-		if (!( nptr->next ))
-			gw_last = nptr->previous;
-		else	nptr->next->previous = nptr->previous;
-			liberate_occi_kind_node( nptr );
-	}
+	if (!( nptr->previous ))
+		gw_first = nptr->next;
+	else	nptr->previous->next = nptr->next;
+	if (!( nptr->next ))
+		gw_last = nptr->previous;
+	else	nptr->next->previous = nptr->previous;
+		liberate_occi_kind_node( nptr );
+		}
 	return((struct occi_kind_node *)0);
 }
 private struct occi_kind_node * drop_gw_node(struct occi_kind_node * nptr) {
@@ -54,7 +60,7 @@ private struct occi_kind_node * drop_gw_node(struct occi_kind_node * nptr) {
 }
 
 /*	--------------------------------------------------	*/
-//	o c c i   c a t e g o r y   l o c a t e   n o d e 	
+/*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
 private struct occi_kind_node * ll_locate_gw_node(char * id) {
 	struct occi_kind_node * nptr;
@@ -65,10 +71,9 @@ private struct occi_kind_node * ll_locate_gw_node(char * id) {
 		if (!( pptr = nptr->contents )) continue;
 		else if (!( pptr->id )) continue;
 		else if (!( strcmp(pptr->id,id) )) break;
-	}
+		}
 	return( nptr );
 }
-
 private struct occi_kind_node * locate_gw_node(char * id) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_gw_control );
@@ -78,7 +83,7 @@ private struct occi_kind_node * locate_gw_node(char * id) {
 }
 
 /*	--------------------------------------------	*/
-//	o c c i   c a t e g o r y   a d d   n o d e 	
+/*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
 private struct occi_kind_node * ll_add_gw_node(int mode) {
 	struct occi_kind_node * nptr;
@@ -92,16 +97,15 @@ private struct occi_kind_node * ll_add_gw_node(int mode) {
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
-		else{
+		else	{
 			if (!( nptr->previous = gw_last ))
 				gw_first = nptr;
 			else	nptr->previous->next = nptr;
 			gw_last = nptr;
 			return( nptr );
+			}
 		}
-	}
 }
-
 private struct occi_kind_node * add_gw_node(int mode) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_gw_control );
@@ -153,8 +157,8 @@ private void autoload_gw_nodes() {
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_string(aptr);
+			}
 		}
-	}
 	document = document_drop( document );
 	return;
 }
@@ -226,7 +230,7 @@ public  void autosave_gw_nodes() {
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
 private void set_gw_field(
-struct occi_category * cptr,void * optr, char * nptr, char * vptr)
+	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
 	struct gw * pptr;
 	char prefix[1024];
@@ -256,7 +260,7 @@ struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = allocate_string(vptr);
-	}
+		}
 	return;
 }
 
@@ -268,10 +272,10 @@ private struct gw * filter_gw_info(
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
 	struct gw * pptr;
-	if (!( pptr = allocate_gw()))
-	return( pptr );
+		if (!( pptr = allocate_gw()))
+		return( pptr );
 	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_gw_field) ))
-	return( liberate_gw(pptr));
+		return( liberate_gw(pptr));
 	else	return( pptr );
 }
 
@@ -285,85 +289,85 @@ private int pass_gw_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->name )
 	&&  (strlen( fptr->name ) != 0)) {
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->publicaddr )
 	&&  (strlen( fptr->publicaddr ) != 0)) {
 		if (!( pptr->publicaddr ))
 			return(0);
 		else if ( strcmp(pptr->publicaddr,fptr->publicaddr) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->privateaddr )
 	&&  (strlen( fptr->privateaddr ) != 0)) {
 		if (!( pptr->privateaddr ))
 			return(0);
 		else if ( strcmp(pptr->privateaddr,fptr->privateaddr) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->ethername )
 	&&  (strlen( fptr->ethername ) != 0)) {
 		if (!( pptr->ethername ))
 			return(0);
 		else if ( strcmp(pptr->ethername,fptr->ethername) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->intercloudGW )
 	&&  (strlen( fptr->intercloudGW ) != 0)) {
 		if (!( pptr->intercloudGW ))
 			return(0);
 		else if ( strcmp(pptr->intercloudGW,fptr->intercloudGW) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->contract )
 	&&  (strlen( fptr->contract ) != 0)) {
 		if (!( pptr->contract ))
 			return(0);
 		else if ( strcmp(pptr->contract,fptr->contract) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->provider_type )
 	&&  (strlen( fptr->provider_type ) != 0)) {
 		if (!( pptr->provider_type ))
 			return(0);
 		else if ( strcmp(pptr->provider_type,fptr->provider_type) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->provider_platform )
 	&&  (strlen( fptr->provider_platform ) != 0)) {
 		if (!( pptr->provider_platform ))
 			return(0);
 		else if ( strcmp(pptr->provider_platform,fptr->provider_platform) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->connection )
 	&&  (strlen( fptr->connection ) != 0)) {
 		if (!( pptr->connection ))
 			return(0);
 		else if ( strcmp(pptr->connection,fptr->connection) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->account )
 	&&  (strlen( fptr->account ) != 0)) {
 		if (!( pptr->account ))
 			return(0);
 		else if ( strcmp(pptr->account,fptr->account) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->state )
 	&&  (strlen( fptr->state ) != 0)) {
 		if (!( pptr->state ))
 			return(0);
 		else if ( strcmp(pptr->state,fptr->state) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	return(1);
 }
 
@@ -371,45 +375,45 @@ private int pass_gw_filter(
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
 private struct rest_response * gw_occi_response(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,
-struct gw * pptr)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,
+	struct gw * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.publicaddr=%s",optr->domain,optr->id,pptr->publicaddr);
+	sprintf(cptr->buffer,"%s.%s.publicaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->publicaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.privateaddr=%s",optr->domain,optr->id,pptr->privateaddr);
+	sprintf(cptr->buffer,"%s.%s.privateaddr=%c%s%c",optr->domain,optr->id,0x0022,pptr->privateaddr,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.ethername=%s",optr->domain,optr->id,pptr->ethername);
+	sprintf(cptr->buffer,"%s.%s.ethername=%c%s%c",optr->domain,optr->id,0x0022,pptr->ethername,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.intercloudGW=%s",optr->domain,optr->id,pptr->intercloudGW);
+	sprintf(cptr->buffer,"%s.%s.intercloudGW=%c%s%c",optr->domain,optr->id,0x0022,pptr->intercloudGW,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.contract=%s",optr->domain,optr->id,pptr->contract);
+	sprintf(cptr->buffer,"%s.%s.contract=%c%s%c",optr->domain,optr->id,0x0022,pptr->contract,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.provider_type=%s",optr->domain,optr->id,pptr->provider_type);
+	sprintf(cptr->buffer,"%s.%s.provider_type=%c%s%c",optr->domain,optr->id,0x0022,pptr->provider_type,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.provider_platform=%s",optr->domain,optr->id,pptr->provider_platform);
+	sprintf(cptr->buffer,"%s.%s.provider_platform=%c%s%c",optr->domain,optr->id,0x0022,pptr->provider_platform,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.connection=%s",optr->domain,optr->id,pptr->connection);
+	sprintf(cptr->buffer,"%s.%s.connection=%c%s%c",optr->domain,optr->id,0x0022,pptr->connection,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%s",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%s%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -423,8 +427,8 @@ struct gw * pptr)
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
 private struct rest_response * gw_get_item(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr, char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -435,7 +439,7 @@ struct rest_request * rptr, struct rest_response * aptr, char * id)
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_gw_nodes();
 	return( gw_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -463,8 +467,8 @@ private struct rest_response * gw_post_link(
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
 private struct rest_response * gw_post_mixin(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -482,8 +486,8 @@ struct rest_request * rptr, struct rest_response * aptr,char * id)
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
 private struct rest_response * gw_post_action(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -526,7 +530,7 @@ private struct rest_response * gw_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_gw_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_gw_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -554,7 +558,7 @@ private struct rest_response * gw_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_gw_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_gw_nodes();
 	return( gw_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -590,7 +594,7 @@ private struct rest_response * gw_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_gw_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_gw_node( nptr );
 	autosave_gw_nodes();
 	if (!( occi_success( aptr ) ))
@@ -654,7 +658,7 @@ private struct rest_response * gw_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_gw_node( nptr );
 			nptr = sptr;
@@ -679,7 +683,7 @@ private struct rest_response * occi_gw_get(void * vptr, struct rest_client * cpt
 	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
 		ctptr = "text/occi";
 	else	ctptr = hptr->value;
-	if (!( optr = vptr ))
+	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
@@ -790,9 +794,9 @@ private struct rest_response * occi_gw_delete(void * vptr, struct rest_client * 
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------------------------*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n       */
-/*	--------------------------------------------------------------------------------------*/
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
 private void	redirect_occi_gw_mt( struct rest_interface * iptr )
 {
 	iptr->get = occi_gw_get;
@@ -803,11 +807,24 @@ private void	redirect_occi_gw_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_gw(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_gw_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_gw */
-public struct occi_category * occi_cords_gw_builder(char * a,char * b) {
+public struct occi_category * occi_gw_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -838,14 +855,17 @@ public struct occi_category * occi_cords_gw_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_gw)))
+			return( optr );
 		autoload_gw_nodes();
-			return(optr);
+		return(optr);
 	}
+
 }
 
-/*	------------------------------------------------	*/
-/*	gw _ o c c i _ h e a d e r s 	*/
-/*	------------------------------------------------	*/
+/*	------------------------------	*/
+/*	g w _ o c c i _ h e a d e r s 	*/
+/*	------------------------------	*/
 public struct rest_header *  gw_occi_headers(struct gw * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
@@ -878,7 +898,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -889,7 +909,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -900,7 +920,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -911,7 +931,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -922,7 +942,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -933,7 +953,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -944,7 +964,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -955,7 +975,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -966,7 +986,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -977,7 +997,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -986,6 +1006,7 @@ public struct rest_header *  gw_occi_headers(struct gw * sptr)
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
+
 }
 
-#endif	/* _gw_c_ */
+#endif	/* _occigw_c_ */

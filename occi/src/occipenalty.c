@@ -334,34 +334,34 @@ private struct rest_response * cords_penalty_occi_response(
 	struct cords_penalty * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.agreement=%s",optr->domain,optr->id,pptr->agreement);
+	sprintf(cptr->buffer,"%s.%s.agreement=%c%s%c",optr->domain,optr->id,0x0022,pptr->agreement,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.contract=%s",optr->domain,optr->id,pptr->contract);
+	sprintf(cptr->buffer,"%s.%s.contract=%c%s%c",optr->domain,optr->id,0x0022,pptr->contract,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.control=%s",optr->domain,optr->id,pptr->control);
+	sprintf(cptr->buffer,"%s.%s.control=%c%s%c",optr->domain,optr->id,0x0022,pptr->control,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.data=%s",optr->domain,optr->id,pptr->data);
+	sprintf(cptr->buffer,"%s.%s.data=%c%s%c",optr->domain,optr->id,0x0022,pptr->data,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.sequence=%u",optr->domain,optr->id,pptr->sequence);
+	sprintf(cptr->buffer,"%s.%s.sequence=%c%u%c",optr->domain,optr->id,0x0022,pptr->sequence,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.timestamp=%u",optr->domain,optr->id,pptr->timestamp);
+	sprintf(cptr->buffer,"%s.%s.timestamp=%c%u%c",optr->domain,optr->id,0x0022,pptr->timestamp,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -387,7 +387,7 @@ private struct rest_response * cords_penalty_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_cords_penalty_nodes();
 	return( cords_penalty_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -478,7 +478,7 @@ private struct rest_response * cords_penalty_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_penalty_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_cords_penalty_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -506,7 +506,7 @@ private struct rest_response * cords_penalty_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_penalty_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_cords_penalty_nodes();
 	return( cords_penalty_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -542,7 +542,7 @@ private struct rest_response * cords_penalty_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_cords_penalty_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_cords_penalty_node( nptr );
 	autosave_cords_penalty_nodes();
 	if (!( occi_success( aptr ) ))
@@ -606,7 +606,7 @@ private struct rest_response * cords_penalty_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_cords_penalty_node( nptr );
 			nptr = sptr;

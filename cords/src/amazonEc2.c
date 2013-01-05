@@ -16,83 +16,85 @@
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
 
-/* pyaccordsSDK: this code has been gnerated by pyaccordsSDK            */
-
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _amazonEc2_c_
 #define _amazonEc2_c_
+
 #include "element.h"
+
 #include "amazonEc2.h"
 
-/*---------------------------------------------------------------------------------------*/
-/*                               Liberate_amazonEc2                                */
-/*---------------------------------------------------------------------------------------*/
+/*	------------------------------------	*/
+/*	l i b e r a t e _ a m a z o n E c 2 	*/
+/*	------------------------------------	*/
 public struct amazonEc2 * liberate_amazonEc2(struct amazonEc2 * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
-		if(sptr->id)
-			sptr->id = liberate(sptr->id);
-		if(sptr->name)
-			sptr->name = liberate(sptr->name);
-		if(sptr->flavor)
-			sptr->flavor = liberate(sptr->flavor);
-		if(sptr->image)
-			sptr->image = liberate(sptr->image);
-		if(sptr->original)
-			sptr->original = liberate(sptr->original);
-		if(sptr->profile)
-			sptr->profile = liberate(sptr->profile);
-		if(sptr->node)
-			sptr->node = liberate(sptr->node);
-		if(sptr->price)
-			sptr->price = liberate(sptr->price);
-		if(sptr->account)
-			sptr->account = liberate(sptr->account);
-		if(sptr->number)
-			sptr->number = liberate(sptr->number);
-		if(sptr->rootpass)
-			sptr->rootpass = liberate(sptr->rootpass);
-		if(sptr->reference)
-			sptr->reference = liberate(sptr->reference);
-		if(sptr->network)
-			sptr->network = liberate(sptr->network);
-		if(sptr->access)
-			sptr->access = liberate(sptr->access);
-		if(sptr->accessip)
-			sptr->accessip = liberate(sptr->accessip);
-		if(sptr->floating)
-			sptr->floating = liberate(sptr->floating);
-		if(sptr->floatingid)
-			sptr->floatingid = liberate(sptr->floatingid);
-		if(sptr->publicaddr)
-			sptr->publicaddr = liberate(sptr->publicaddr);
-		if(sptr->privateaddr)
-			sptr->privateaddr = liberate(sptr->privateaddr);
-		if(sptr->firewall)
-			sptr->firewall = liberate(sptr->firewall);
-		if(sptr->group)
-			sptr->group = liberate(sptr->group);
-		if(sptr->zone)
-			sptr->zone = liberate(sptr->zone);
-		if(sptr->hostname)
-			sptr->hostname = liberate(sptr->hostname);
-		if(sptr->workload)
-			sptr->workload = liberate(sptr->workload);
-		if(sptr->when)
-			sptr->when = liberate(sptr->when);
-		if(sptr->state)
-			sptr->state = liberate(sptr->state);
-		sptr = liberate(sptr);
+		if ( sptr->id )
+			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
+		if ( sptr->flavor )
+			 sptr->flavor = liberate(sptr->flavor);
+		if ( sptr->image )
+			 sptr->image = liberate(sptr->image);
+		if ( sptr->original )
+			 sptr->original = liberate(sptr->original);
+		if ( sptr->profile )
+			 sptr->profile = liberate(sptr->profile);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
+		if ( sptr->number )
+			 sptr->number = liberate(sptr->number);
+		if ( sptr->rootpass )
+			 sptr->rootpass = liberate(sptr->rootpass);
+		if ( sptr->reference )
+			 sptr->reference = liberate(sptr->reference);
+		if ( sptr->network )
+			 sptr->network = liberate(sptr->network);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
+		if ( sptr->accessip )
+			 sptr->accessip = liberate(sptr->accessip);
+		if ( sptr->floating )
+			 sptr->floating = liberate(sptr->floating);
+		if ( sptr->floatingid )
+			 sptr->floatingid = liberate(sptr->floatingid);
+		if ( sptr->publicaddr )
+			 sptr->publicaddr = liberate(sptr->publicaddr);
+		if ( sptr->privateaddr )
+			 sptr->privateaddr = liberate(sptr->privateaddr);
+		if ( sptr->firewall )
+			 sptr->firewall = liberate(sptr->firewall);
+		if ( sptr->group )
+			 sptr->group = liberate(sptr->group);
+		if ( sptr->zone )
+			 sptr->zone = liberate(sptr->zone);
+		if ( sptr->hostname )
+			 sptr->hostname = liberate(sptr->hostname);
+		if ( sptr->workload )
+			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->when )
+			 sptr->when = liberate(sptr->when);
+		if ( sptr->state )
+			 sptr->state = liberate(sptr->state);
+		sptr = liberate( sptr );
 	}
-	return((struct amazonEc2 * )0);
+	return((struct amazonEc2 *) 0);
+
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                            Reset_amazonEc2                                      */
-/*---------------------------------------------------------------------------------------*/
+/*	------------------------------	*/
+/*	r e s e t _ a m a z o n E c 2 	*/
+/*	------------------------------	*/
 public struct amazonEc2 * reset_amazonEc2(struct amazonEc2 * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
@@ -121,23 +123,24 @@ public struct amazonEc2 * reset_amazonEc2(struct amazonEc2 * sptr)
 		sptr->when = (char*) 0;
 		sptr->state = (char*) 0;
 	}
-	return (sptr);
+	return(sptr);
+
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                            Allocate_amazonEc2                                   */
-/*---------------------------------------------------------------------------------------*/
+/*	------------------------------------	*/
+/*	a l l o c a t e _ a m a z o n E c 2 	*/
+/*	------------------------------------	*/
 public struct amazonEc2 * allocate_amazonEc2()
 {
 	struct amazonEc2 * sptr;
 	if (!( sptr = allocate( sizeof( struct amazonEc2 ) ) ))
 		return( sptr );
-	else  return( reset_amazonEc2(sptr) );
+	else	return( reset_amazonEc2(sptr) );
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                             Xmlin_amazonEc2                                     */
-/*---------------------------------------------------------------------------------------*/
+/*	------------------------------	*/
+/*	x m l i n _ a m a z o n E c 2 	*/
+/*	------------------------------	*/
 public int xmlin_amazonEc2(struct amazonEc2 * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -251,11 +254,12 @@ public int xmlin_amazonEc2(struct amazonEc2 * sptr,struct xml_element * eptr)
 		}
 	}
 	return(0);
+
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                         Rest_occi_amazonEc2                                     */
-/*---------------------------------------------------------------------------------------*/
+/*	--------------------------------------	*/
+/*	r e s t _ o c c i _ a m a z o n E c 2 	*/
+/*	--------------------------------------	*/
 public int rest_occi_amazonEc2(FILE * fh,struct amazonEc2 * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
@@ -289,6 +293,7 @@ public int rest_occi_amazonEc2(FILE * fh,struct amazonEc2 * sptr,char * prefix, 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.when='%s'\r\n",prefix,nptr,(sptr->when?sptr->when:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%s'\r\n",prefix,nptr,(sptr->state?sptr->state:""));
 	return(0);
+
 }
 
-#endif
+#endif	/* _amazonEc2_camazonEc2_c_ */

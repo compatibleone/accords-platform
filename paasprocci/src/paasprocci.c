@@ -149,7 +149,7 @@ private	struct rest_extension * paasprocci_extension( void * v,struct rest_serve
 /*	-------------------------------------------	*/
 /* 	   	c r e a t e _ p a a s 		*/
 /*	-------------------------------------------	*/
-private	int	create_paas(struct occi_category * optr, void * vptr)
+private	int	create_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	paas * pptr;
@@ -163,7 +163,7 @@ private	int	create_paas(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	 	r e t r i e v e _ p a a s 	  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_paas(struct occi_category * optr, void * vptr)
+private	int	retrieve_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	paas * pptr;
@@ -177,7 +177,7 @@ private	int	retrieve_paas(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 		u p d a t e _ p a a s 		*/
 /*	-------------------------------------------	*/
-private	int	update_paas(struct occi_category * optr, void * vptr)
+private	int	update_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	paas * pptr;
@@ -191,7 +191,7 @@ private	int	update_paas(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 		d e l e t e  _ p a a s		*/
 /*	-------------------------------------------	*/
-private	int	delete_paas(struct occi_category * optr, void * vptr)
+private	int	delete_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	paas * pptr;

@@ -150,7 +150,7 @@ private	struct rest_extension * example_extension( void * v,struct rest_server *
 /*	-------------------------------------------	*/
 /* 	   c r e a t e _ e x a m p l e  		*/
 /*	-------------------------------------------	*/
-private	int	create_example(struct occi_category * optr, void * vptr)
+private	int	create_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	exampleprocci * pptr;
@@ -164,7 +164,7 @@ private	int	create_example(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	 r e t r i e v e _ e x a m p l e 	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_example(struct occi_category * optr, void * vptr)
+private	int	retrieve_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
@@ -178,7 +178,7 @@ private	int	retrieve_example(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	   u p d a t e _ e x a m p l e		*/
 /*	-------------------------------------------	*/
-private	int	update_example(struct occi_category * optr, void * vptr)
+private	int	update_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
@@ -192,7 +192,7 @@ private	int	update_example(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	   d e l e t e  _ e x a m p l e 		*/
 /*	-------------------------------------------	*/
-private	int	delete_example(struct occi_category * optr, void * vptr)
+private	int	delete_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	exampleprocci * pptr;

@@ -384,7 +384,7 @@ private	struct rest_response * choose_placement(
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ p l a c e m e n t  		*/
 /*	-------------------------------------------	*/
-private	int	create_placement(struct occi_category * optr, void * vptr)
+private	int	create_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_placement * pptr;
@@ -400,7 +400,7 @@ private	int	create_placement(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ p l a c e m e n t  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_placement(struct occi_category * optr, void * vptr)
+private	int	retrieve_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_placement * pptr;
@@ -414,7 +414,7 @@ private	int	retrieve_placement(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ p l a c e m e n t 	 	*/
 /*	-------------------------------------------	*/
-private	int	update_placement(struct occi_category * optr, void * vptr)
+private	int	update_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_placement * pptr;
@@ -479,7 +479,7 @@ private	int	delete_placement_quantities( struct cords_placement * pptr )
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ p l a c e m e n t  		*/
 /*	-------------------------------------------	*/
-private	int	delete_placement(struct occi_category * optr, void * vptr)
+private	int	delete_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_placement * pptr;

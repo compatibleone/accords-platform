@@ -761,7 +761,7 @@ private	struct	rest_response * revert_opennebula(
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ o p e n n e b u l a  	*/
 /*	-------------------------------------------	*/
-private	int	create_opennebula(struct occi_category * optr, void * vptr)
+private	int	create_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;
@@ -777,7 +777,7 @@ private	int	create_opennebula(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ o p e n n e b u l a  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_opennebula(struct occi_category * optr, void * vptr)
+private	int	retrieve_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;
@@ -791,7 +791,7 @@ private	int	retrieve_opennebula(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ o p e n n e b u l a  	*/
 /*	-------------------------------------------	*/
-private	int	update_opennebula(struct occi_category * optr, void * vptr)
+private	int	update_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;
@@ -805,7 +805,7 @@ private	int	update_opennebula(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ o p e n n e b u l a  	*/
 /*	-------------------------------------------	*/
-private	int	delete_opennebula(struct occi_category * optr, void * vptr)
+private	int	delete_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;

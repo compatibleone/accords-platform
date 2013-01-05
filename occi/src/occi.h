@@ -144,10 +144,10 @@ struct	occi_action_target
 
 struct	occi_interface
 {
-	int	(*create)  (struct occi_category * optr, void * vptr);
-	int	(*retrieve)(struct occi_category * optr, void * vptr);
-	int	(*update)  (struct occi_category * optr, void * vptr);
-	int	(*delete)  (struct occi_category * optr, void * vptr);
+	int	(*create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
 };
 
 public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title );

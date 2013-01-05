@@ -618,7 +618,7 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ i n v o i c e  		*/
 /*	-------------------------------------------	*/
-private	int	create_invoice(struct occi_category * optr, void * vptr)
+private	int	create_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
@@ -634,7 +634,7 @@ private	int	create_invoice(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ i n v o i c e  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_invoice(struct occi_category * optr, void * vptr)
+private	int	retrieve_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
@@ -648,7 +648,7 @@ private	int	retrieve_invoice(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ i n v o i c e 	 	*/
 /*	-------------------------------------------	*/
-private	int	update_invoice(struct occi_category * optr, void * vptr)
+private	int	update_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
@@ -664,7 +664,7 @@ private	int	update_invoice(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ i n v o i c e		*/
 /*	-------------------------------------------	*/
-private	int	delete_invoice(struct occi_category * optr, void * vptr)
+private	int	delete_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
@@ -685,7 +685,7 @@ private	struct	occi_interface	invoice_interface = {
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ t r a n s a c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	create_transaction(struct occi_category * optr, void * vptr)
+private	int	create_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;
@@ -705,7 +705,7 @@ private	int	create_transaction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ t r a n s a c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_transaction(struct occi_category * optr, void * vptr)
+private	int	retrieve_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;
@@ -719,7 +719,7 @@ private	int	retrieve_transaction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ t r a n s a c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	update_transaction(struct occi_category * optr, void * vptr)
+private	int	update_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;
@@ -733,7 +733,7 @@ private	int	update_transaction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ t r a n s a c t i o n	*/
 /*	-------------------------------------------	*/
-private	int	delete_transaction(struct occi_category * optr, void * vptr)
+private	int	delete_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;

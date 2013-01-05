@@ -134,7 +134,7 @@ private	struct rest_extension * parser_extension( void * v,struct rest_server * 
 /*	-------------------------------------------	*/
 /* 	     c r e a t e _ in s t r u c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	create_instruction(struct occi_category * optr, void * vptr)
+private	int	create_instruction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_instruction * pptr;
@@ -148,7 +148,7 @@ private	int	create_instruction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	   r e t r i e v e _ in s t r u c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_instruction(struct occi_category * optr, void * vptr)
+private	int	retrieve_instruction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_instruction * pptr;
@@ -162,7 +162,7 @@ private	int	retrieve_instruction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    u p d a t e _ in s t r u c t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	update_instruction(struct occi_category * optr, void * vptr)
+private	int	update_instruction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_instruction * pptr;
@@ -176,7 +176,7 @@ private	int	update_instruction(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	     d e l e t e _ in s t r u c t i o n	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_instruction(struct occi_category * optr, void * vptr)
+private	int	delete_instruction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node 		* nptr;
 	struct	cords_instruction 	* pptr;

@@ -475,7 +475,7 @@ private	int	master_create_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 /* 	    c r e a t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------	*/
-private	int	create_publication(struct occi_category * optr, void * vptr)
+private	int	create_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
 	struct	occi_kind_node * nptr;
@@ -520,7 +520,7 @@ private	int	master_retrieve_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 /* 	  r e t r i e v e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_publication(struct occi_category * optr, void * vptr)
+private	int	retrieve_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
@@ -565,7 +565,7 @@ private	int	master_update_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 /* 	    u p d a t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------	*/
-private	int	update_publication(struct occi_category * optr, void * vptr)
+private	int	update_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
@@ -604,7 +604,7 @@ private	int	master_delete_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 /* 	    d e l e t e _ p u b l i c a t i o n 	*/
 /*	-------------------------------------------	*/
-private	int	delete_publication(struct occi_category * optr, void * vptr)
+private	int	delete_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
@@ -625,7 +625,7 @@ private	struct	occi_interface	publication_interface = {
 /*	-------------------------------------------	*/
 /* 	    c r e a t e _ e n q u i r y 	*/
 /*	-------------------------------------------	*/
-private	int	create_enquiry(struct occi_category * optr, void * vptr)
+private	int	create_enquiry(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	enquiry * pptr;
@@ -639,7 +639,7 @@ private	int	create_enquiry(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	  r e t r i e v e _ e n q u i r y 	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_enquiry(struct occi_category * optr, void * vptr)
+private	int	retrieve_enquiry(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	enquiry * pptr;
@@ -653,7 +653,7 @@ private	int	retrieve_enquiry(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    u p d a t e _ e n q u i r y 	*/
 /*	-------------------------------------------	*/
-private	int	update_enquiry(struct occi_category * optr, void * vptr)
+private	int	update_enquiry(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	enquiry * pptr;
@@ -667,7 +667,7 @@ private	int	update_enquiry(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    d e l e t e _ e n q u i r y 	*/
 /*	-------------------------------------------	*/
-private	int	delete_enquiry(struct occi_category * optr, void * vptr)
+private	int	delete_enquiry(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	enquiry * pptr;
@@ -688,7 +688,7 @@ private	struct	occi_interface	enquiry_interface = {
 /*	-------------------------------------------	*/
 /* 	    c r e a t e _ a g e n c y 	*/
 /*	-------------------------------------------	*/
-private	int	create_agency(struct occi_category * optr, void * vptr)
+private	int	create_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;
@@ -708,7 +708,7 @@ private	int	create_agency(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	  r e t r i e v e _ a g e n c y 	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_agency(struct occi_category * optr, void * vptr)
+private	int	retrieve_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;
@@ -726,7 +726,7 @@ private	int	retrieve_agency(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    u p d a t e _ a g e n c y 	*/
 /*	-------------------------------------------	*/
-private	int	update_agency(struct occi_category * optr, void * vptr)
+private	int	update_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;
@@ -740,7 +740,7 @@ private	int	update_agency(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    d e l e t e _ a g e n c y 	*/
 /*	-------------------------------------------	*/
-private	int	delete_agency(struct occi_category * optr, void * vptr)
+private	int	delete_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;

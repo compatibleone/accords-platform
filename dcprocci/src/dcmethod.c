@@ -21,7 +21,7 @@
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ d e l t a c l o u d  	*/
 /*	-------------------------------------------	*/
-private	int	create_deltacloud(struct occi_category * optr, void * vptr)
+private	int	create_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;
@@ -37,7 +37,7 @@ private	int	create_deltacloud(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ d e l t a c l o u d  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_deltacloud(struct occi_category * optr, void * vptr)
+private	int	retrieve_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;
@@ -51,7 +51,7 @@ private	int	retrieve_deltacloud(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ d e l t a c l o u d  	*/
 /*	-------------------------------------------	*/
-private	int	update_deltacloud(struct occi_category * optr, void * vptr)
+private	int	update_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;
@@ -65,7 +65,7 @@ private	int	update_deltacloud(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ d e l t a c l o u d  	*/
 /*	-------------------------------------------	*/
-private	int	delete_deltacloud(struct occi_category * optr, void * vptr)
+private	int	delete_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;

@@ -1,22 +1,20 @@
-/* ------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                   */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
-/* --------------------------------------------------------------------*/
-/*  This is free software; you can redistribute it and/or modify it    */
-/*  under the terms of the GNU Lesser General Public License as        */
-/*  published by the Free Software Foundation; either version 2.1 of   */
-/*  the License, or (at your option) any later version.                */
-/*                                                                     */
-/*  This software is distributed in the hope that it will be useful,   */
-/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
-/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
-/*  Lesser General Public License for more details.                    */
-/*                                                                     */
-/*  You should have received a copy of the GNU Lesser General Public   */
-/*  License along with this software; if not, write to the Free        */
-/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
-/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
-/* --------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occipaas_application_environment_c_
@@ -334,31 +332,31 @@ private struct rest_response * paas_application_environment_occi_response(
 	struct paas_application_environment * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.uri=%s",optr->domain,optr->id,pptr->uri);
+	sprintf(cptr->buffer,"%s.%s.uri=%c%s%c",optr->domain,optr->id,0x0022,pptr->uri,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.paas_application_configuration_template=%s",optr->domain,optr->id,pptr->paas_application_configuration_template);
+	sprintf(cptr->buffer,"%s.%s.paas_application_configuration_template=%c%s%c",optr->domain,optr->id,0x0022,pptr->paas_application_configuration_template,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.date_created=%s",optr->domain,optr->id,pptr->date_created);
+	sprintf(cptr->buffer,"%s.%s.date_created=%c%s%c",optr->domain,optr->id,0x0022,pptr->date_created,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.date_updated=%s",optr->domain,optr->id,pptr->date_updated);
+	sprintf(cptr->buffer,"%s.%s.date_updated=%c%s%c",optr->domain,optr->id,0x0022,pptr->date_updated,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%s",optr->domain,optr->id,pptr->description);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.provider=%s",optr->domain,optr->id,pptr->provider);
+	sprintf(cptr->buffer,"%s.%s.provider=%c%s%c",optr->domain,optr->id,0x0022,pptr->provider,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -384,7 +382,7 @@ private struct rest_response * paas_application_environment_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_paas_application_environment_nodes();
 	return( paas_application_environment_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -475,7 +473,7 @@ private struct rest_response * paas_application_environment_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_application_environment_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_paas_application_environment_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -503,7 +501,7 @@ private struct rest_response * paas_application_environment_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_application_environment_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_paas_application_environment_nodes();
 	return( paas_application_environment_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -539,7 +537,7 @@ private struct rest_response * paas_application_environment_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_paas_application_environment_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_paas_application_environment_node( nptr );
 	autosave_paas_application_environment_nodes();
 	if (!( occi_success( aptr ) ))
@@ -603,7 +601,7 @@ private struct rest_response * paas_application_environment_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_paas_application_environment_node( nptr );
 			nptr = sptr;
@@ -752,6 +750,19 @@ private void	redirect_occi_paas_application_environment_mt( struct rest_interfac
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas_application_environment(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_application_environment_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -781,6 +792,8 @@ public struct occi_category * occi_paas_application_environment_builder(char * a
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_application_environment)))
+			return( optr );
 		autoload_paas_application_environment_nodes();
 		return(optr);
 	}

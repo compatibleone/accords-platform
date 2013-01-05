@@ -830,7 +830,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	create_contract(struct occi_category * optr, void * vptr)
+private	int	create_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
@@ -844,7 +844,7 @@ private	int	create_contract(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_contract(struct occi_category * optr, void * vptr)
+private	int	retrieve_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
@@ -858,7 +858,7 @@ private	int	retrieve_contract(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	update_contract(struct occi_category * optr, void * vptr)
+private	int	update_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
@@ -872,7 +872,7 @@ private	int	update_contract(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ c o n t r a c t	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_contract(struct occi_category * optr, void * vptr)
+private	int	delete_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;

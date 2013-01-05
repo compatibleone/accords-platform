@@ -1,71 +1,76 @@
-/*-------------------------------------------------------------------------------*/
-/* ACCORDS PLATFORM                                                              */
-/* copyright 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>         */
-/*-------------------------------------------------------------------------------*/
-/* Licensed under the Apache License, Version 2.0 (the "License");             */
-/* you may not use this file except in compliance with the License.              */
-/* You may obtain a copy of the License at                                       */
-/*                                                                               */
-/*       http://www.apache.org/licenses/LICENSE-2.0                              */
-/*                                                                               */
-/* Unless required by applicable law or agreed to in writing, software           */
-/* distributed under the License is distributed on an "AS IS" BASIS,           */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
-/* See the License for the specific language governing permissions and           */
-/* limitations under the License.                                                */
-/*-------------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _linkgw_c_
 #define _linkgw_c_
+
 #include "element.h"
+
 #include "linkgw.h"
 
-/*----------------------------------------------------------------------------------------*/
-/*                               Liberate_linkgw
-       *//*----------------------------------------------------------------------------------------*/
+/*	------------------------------	*/
+/*	l i b e r a t e _ l i n k g w 	*/
+/*	------------------------------	*/
 public struct linkgw * liberate_linkgw(struct linkgw * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
-		if(sptr->id)
-			sptr->id = liberate(sptr->id);
-		if(sptr->name)
-			sptr->name = liberate(sptr->name);
-		if(sptr->intercloudGW)
-			sptr->intercloudGW = liberate(sptr->intercloudGW);
-		if(sptr->account)
-			sptr->account = liberate(sptr->account);
-		if(sptr->gwsrc)
-			sptr->gwsrc = liberate(sptr->gwsrc);
-		if(sptr->gwdst)
-			sptr->gwdst = liberate(sptr->gwdst);
-		if(sptr->tunnelproto)
-			sptr->tunnelproto = liberate(sptr->tunnelproto);
-		if(sptr->addressgresrc)
-			sptr->addressgresrc = liberate(sptr->addressgresrc);
-		if(sptr->addressgredst)
-			sptr->addressgredst = liberate(sptr->addressgredst);
-		if(sptr->prefix)
-			sptr->prefix = liberate(sptr->prefix);
-		if(sptr->authenticationkey)
-			sptr->authenticationkey = liberate(sptr->authenticationkey);
-		if(sptr->endpointsrc)
-			sptr->endpointsrc = liberate(sptr->endpointsrc);
-		if(sptr->endpointdst)
-			sptr->endpointdst = liberate(sptr->endpointdst);
-		if(sptr->state)
-			sptr->state = liberate(sptr->state);
-		sptr = liberate(sptr);
+		if ( sptr->id )
+			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
+		if ( sptr->intercloudGW )
+			 sptr->intercloudGW = liberate(sptr->intercloudGW);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
+		if ( sptr->gwsrc )
+			 sptr->gwsrc = liberate(sptr->gwsrc);
+		if ( sptr->gwdst )
+			 sptr->gwdst = liberate(sptr->gwdst);
+		if ( sptr->tunnelproto )
+			 sptr->tunnelproto = liberate(sptr->tunnelproto);
+		if ( sptr->addressgresrc )
+			 sptr->addressgresrc = liberate(sptr->addressgresrc);
+		if ( sptr->addressgredst )
+			 sptr->addressgredst = liberate(sptr->addressgredst);
+		if ( sptr->prefix )
+			 sptr->prefix = liberate(sptr->prefix);
+		if ( sptr->authenticationkey )
+			 sptr->authenticationkey = liberate(sptr->authenticationkey);
+		if ( sptr->endpointsrc )
+			 sptr->endpointsrc = liberate(sptr->endpointsrc);
+		if ( sptr->endpointdst )
+			 sptr->endpointdst = liberate(sptr->endpointdst);
+		if ( sptr->state )
+			 sptr->state = liberate(sptr->state);
+		sptr = liberate( sptr );
 	}
-	return((struct linkgw * )0);
+	return((struct linkgw *) 0);
+
 }
 
-/*-----------------------------------------------------------------------------------------*/
-/*                            Reset_linkgw   */
-/*-----------------------------------------------------------------------------------------*/
+/*	------------------------	*/
+/*	r e s e t _ l i n k g w 	*/
+/*	------------------------	*/
 public struct linkgw * reset_linkgw(struct linkgw * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
@@ -82,23 +87,24 @@ public struct linkgw * reset_linkgw(struct linkgw * sptr)
 		sptr->endpointdst = (char*) 0;
 		sptr->state = (char*) 0;
 	}
-	return (sptr);
+	return(sptr);
+
 }
 
-/*-----------------------------------------------------------------------------------------*/
-/*                            Allocate_linkgw     */
-/*-----------------------------------------------------------------------------------------*/
+/*	------------------------------	*/
+/*	a l l o c a t e _ l i n k g w 	*/
+/*	------------------------------	*/
 public struct linkgw * allocate_linkgw()
 {
 	struct linkgw * sptr;
 	if (!( sptr = allocate( sizeof( struct linkgw ) ) ))
 		return( sptr );
-	else  return( reset_linkgw(sptr) );
+	else	return( reset_linkgw(sptr) );
 }
 
-/*------------------------------------------------------------------------------------------*/
-/*                             Xmlin_linkgw      */
-/*------------------------------------------------------------------------------------------*/
+/*	------------------------	*/
+/*	x m l i n _ l i n k g w 	*/
+/*	------------------------	*/
 public int xmlin_linkgw(struct linkgw * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -164,12 +170,13 @@ public int xmlin_linkgw(struct linkgw * sptr,struct xml_element * eptr)
 		}
 	}
 	return(0);
+
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                         Rest_occi_linkgw  */
-/*---------------------------------------------------------------------------------------*/
-public int rest_occi_linkgw(FILE * fh, struct linkgw * sptr,char * prefix, char * nptr)
+/*	--------------------------------	*/
+/*	r e s t _ o c c i _ l i n k g w 	*/
+/*	--------------------------------	*/
+public int rest_occi_linkgw(FILE * fh,struct linkgw * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -190,6 +197,7 @@ public int rest_occi_linkgw(FILE * fh, struct linkgw * sptr,char * prefix, char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.endpointdst='%s'\r\n",prefix,nptr,(sptr->endpointdst?sptr->endpointdst:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%s'\r\n",prefix,nptr,(sptr->state?sptr->state:""));
 	return(0);
+
 }
 
-#endif
+#endif	/* _linkgw_clinkgw_c_ */

@@ -648,7 +648,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ s c r i p t  		*/
 /*	-------------------------------------------	*/
-private	int	create_cords_script(struct occi_category * optr, void * vptr)
+private	int	create_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_script * pptr;
@@ -666,7 +666,7 @@ private	int	create_cords_script(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ s c r i p t  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_cords_script(struct occi_category * optr, void * vptr)
+private	int	retrieve_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_script * pptr;
@@ -680,7 +680,7 @@ private	int	retrieve_cords_script(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ s c r i p t 	 	*/
 /*	-------------------------------------------	*/
-private	int	update_cords_script(struct occi_category * optr, void * vptr)
+private	int	update_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_script * pptr;
@@ -694,7 +694,7 @@ private	int	update_cords_script(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ s c r i p t  		*/
 /*	-------------------------------------------	*/
-private	int	delete_cords_script(struct occi_category * optr, void * vptr)
+private	int	delete_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_script * pptr;
@@ -840,7 +840,7 @@ private	int	intercept_metadata( char * nptr, char * vptr )
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	create_metadata(struct occi_category * optr, void * vptr)
+private	int	create_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;
@@ -859,7 +859,7 @@ private	int	create_metadata(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_metadata(struct occi_category * optr, void * vptr)
+private	int	retrieve_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;
@@ -873,7 +873,7 @@ private	int	retrieve_metadata(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ c o n t r a c t  		*/
 /*	-------------------------------------------	*/
-private	int	update_metadata(struct occi_category * optr, void * vptr)
+private	int	update_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;
@@ -887,7 +887,7 @@ private	int	update_metadata(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ c o n t r a c t	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_metadata(struct occi_category * optr, void * vptr)
+private	int	delete_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;

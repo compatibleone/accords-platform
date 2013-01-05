@@ -126,7 +126,7 @@ private	struct rest_response * stop_monitor(
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ m o n i t o r  		*/
 /*	-------------------------------------------	*/
-private	int	create_monitor(struct occi_category * optr, void * vptr)
+private	int	create_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_monitor * pptr;
@@ -140,7 +140,7 @@ private	int	create_monitor(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ m o n i t o r  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_monitor(struct occi_category * optr, void * vptr)
+private	int	retrieve_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_monitor * pptr;
@@ -154,7 +154,7 @@ private	int	retrieve_monitor(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ m o n i t o r  		*/
 /*	-------------------------------------------	*/
-private	int	update_monitor(struct occi_category * optr, void * vptr)
+private	int	update_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_monitor * pptr;
@@ -168,7 +168,7 @@ private	int	update_monitor(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ m o n i t o r	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_monitor(struct occi_category * optr, void * vptr)
+private	int	delete_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_monitor * pptr;

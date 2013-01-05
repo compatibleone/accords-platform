@@ -1,26 +1,31 @@
-/*-------------------------------------------------------------------------------*/
-/* ACCORDS PLATFORM                                                              */
-/* copyright 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>         */
-/*-------------------------------------------------------------------------------*/
-/* Licensed under the Apache License, Version 2.0 (the "License");             */
-/* you may not use this file except in compliance with the License.              */
-/* You may obtain a copy of the License at                                       */
-/*                                                                               */
-/*       http://www.apache.org/licenses/LICENSE-2.0                              */
-/*                                                                               */
-/* Unless required by applicable law or agreed to in writing, software           */
-/* distributed under the License is distributed on an "AS IS" BASIS,           */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
-/* See the License for the specific language governing permissions and           */
-/* limitations under the License.                                                */
-/*-------------------------------------------------------------------------------*/
-#ifndef _linkgw_c_
-#define _linkgw_c_
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
+#ifndef _occilinkgw_c_
+#define _occilinkgw_c_
 
 #include "linkgw.h"
 
-/*	--------------------------------	*/
-/*	--------------------------------	*/
+/*	----------------------	*/
+/*	o c c i _ l i n k g w 	*/
+/*	----------------------	*/
+
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
@@ -30,20 +35,21 @@ private pthread_mutex_t list_linkgw_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * linkgw_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * linkgw_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_linkgw_node() { return( linkgw_first ); }
+public struct  occi_kind_node * occi_last_linkgw_node() { return( linkgw_last ); }
 
 /*	----------------------------------------------	*/
-//	o c c i   c a t e g o r y   d r o p   n o d e 	
+/*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
 private struct occi_kind_node * ll_drop_linkgw_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
-		if (!( nptr->previous ))
-			linkgw_first = nptr->next;
-		else	nptr->previous->next = nptr->next;
-		if (!( nptr->next ))
-			linkgw_last = nptr->previous;
-		else	nptr->next->previous = nptr->previous;
-			liberate_occi_kind_node( nptr );
-	}
+	if (!( nptr->previous ))
+		linkgw_first = nptr->next;
+	else	nptr->previous->next = nptr->next;
+	if (!( nptr->next ))
+		linkgw_last = nptr->previous;
+	else	nptr->next->previous = nptr->previous;
+		liberate_occi_kind_node( nptr );
+		}
 	return((struct occi_kind_node *)0);
 }
 private struct occi_kind_node * drop_linkgw_node(struct occi_kind_node * nptr) {
@@ -54,7 +60,7 @@ private struct occi_kind_node * drop_linkgw_node(struct occi_kind_node * nptr) {
 }
 
 /*	--------------------------------------------------	*/
-//	o c c i   c a t e g o r y   l o c a t e   n o d e 	
+/*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
 private struct occi_kind_node * ll_locate_linkgw_node(char * id) {
 	struct occi_kind_node * nptr;
@@ -65,10 +71,9 @@ private struct occi_kind_node * ll_locate_linkgw_node(char * id) {
 		if (!( pptr = nptr->contents )) continue;
 		else if (!( pptr->id )) continue;
 		else if (!( strcmp(pptr->id,id) )) break;
-	}
+		}
 	return( nptr );
 }
-
 private struct occi_kind_node * locate_linkgw_node(char * id) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_linkgw_control );
@@ -78,7 +83,7 @@ private struct occi_kind_node * locate_linkgw_node(char * id) {
 }
 
 /*	--------------------------------------------	*/
-//	o c c i   c a t e g o r y   a d d   n o d e 	
+/*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
 private struct occi_kind_node * ll_add_linkgw_node(int mode) {
 	struct occi_kind_node * nptr;
@@ -92,16 +97,15 @@ private struct occi_kind_node * ll_add_linkgw_node(int mode) {
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
-		else{
+		else	{
 			if (!( nptr->previous = linkgw_last ))
 				linkgw_first = nptr;
 			else	nptr->previous->next = nptr;
 			linkgw_last = nptr;
 			return( nptr );
+			}
 		}
-	}
 }
-
 private struct occi_kind_node * add_linkgw_node(int mode) {
 	struct occi_kind_node * nptr;
 	pthread_mutex_lock( &list_linkgw_control );
@@ -157,8 +161,8 @@ private void autoload_linkgw_nodes() {
 				pptr->endpointdst = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_string(aptr);
+			}
 		}
-	}
 	document = document_drop( document );
 	return;
 }
@@ -236,7 +240,7 @@ public  void autosave_linkgw_nodes() {
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
 private void set_linkgw_field(
-struct occi_category * cptr,void * optr, char * nptr, char * vptr)
+	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
 	struct linkgw * pptr;
 	char prefix[1024];
@@ -270,7 +274,7 @@ struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 			pptr->endpointdst = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = allocate_string(vptr);
-	}
+		}
 	return;
 }
 
@@ -282,10 +286,10 @@ private struct linkgw * filter_linkgw_info(
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
 	struct linkgw * pptr;
-	if (!( pptr = allocate_linkgw()))
-	return( pptr );
+		if (!( pptr = allocate_linkgw()))
+		return( pptr );
 	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_linkgw_field) ))
-	return( liberate_linkgw(pptr));
+		return( liberate_linkgw(pptr));
 	else	return( pptr );
 }
 
@@ -299,99 +303,99 @@ private int pass_linkgw_filter(
 		if (!( pptr->id ))
 			return(0);
 		else if ( strcmp(pptr->id,fptr->id) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->name )
 	&&  (strlen( fptr->name ) != 0)) {
 		if (!( pptr->name ))
 			return(0);
 		else if ( strcmp(pptr->name,fptr->name) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->intercloudGW )
 	&&  (strlen( fptr->intercloudGW ) != 0)) {
 		if (!( pptr->intercloudGW ))
 			return(0);
 		else if ( strcmp(pptr->intercloudGW,fptr->intercloudGW) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->account )
 	&&  (strlen( fptr->account ) != 0)) {
 		if (!( pptr->account ))
 			return(0);
 		else if ( strcmp(pptr->account,fptr->account) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->gwsrc )
 	&&  (strlen( fptr->gwsrc ) != 0)) {
 		if (!( pptr->gwsrc ))
 			return(0);
 		else if ( strcmp(pptr->gwsrc,fptr->gwsrc) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->gwdst )
 	&&  (strlen( fptr->gwdst ) != 0)) {
 		if (!( pptr->gwdst ))
 			return(0);
 		else if ( strcmp(pptr->gwdst,fptr->gwdst) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->tunnelproto )
 	&&  (strlen( fptr->tunnelproto ) != 0)) {
 		if (!( pptr->tunnelproto ))
 			return(0);
 		else if ( strcmp(pptr->tunnelproto,fptr->tunnelproto) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->addressgresrc )
 	&&  (strlen( fptr->addressgresrc ) != 0)) {
 		if (!( pptr->addressgresrc ))
 			return(0);
 		else if ( strcmp(pptr->addressgresrc,fptr->addressgresrc) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->addressgredst )
 	&&  (strlen( fptr->addressgredst ) != 0)) {
 		if (!( pptr->addressgredst ))
 			return(0);
 		else if ( strcmp(pptr->addressgredst,fptr->addressgredst) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->prefix )
 	&&  (strlen( fptr->prefix ) != 0)) {
 		if (!( pptr->prefix ))
 			return(0);
 		else if ( strcmp(pptr->prefix,fptr->prefix) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->authenticationkey )
 	&&  (strlen( fptr->authenticationkey ) != 0)) {
 		if (!( pptr->authenticationkey ))
 			return(0);
 		else if ( strcmp(pptr->authenticationkey,fptr->authenticationkey) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->endpointsrc )
 	&&  (strlen( fptr->endpointsrc ) != 0)) {
 		if (!( pptr->endpointsrc ))
 			return(0);
 		else if ( strcmp(pptr->endpointsrc,fptr->endpointsrc) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->endpointdst )
 	&&  (strlen( fptr->endpointdst ) != 0)) {
 		if (!( pptr->endpointdst ))
 			return(0);
 		else if ( strcmp(pptr->endpointdst,fptr->endpointdst) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	if (( fptr->state )
 	&&  (strlen( fptr->state ) != 0)) {
 		if (!( pptr->state ))
 			return(0);
 		else if ( strcmp(pptr->state,fptr->state) != 0)
-		return(0);
-	}
+			return(0);
+		}
 	return(1);
 }
 
@@ -399,51 +403,51 @@ private int pass_linkgw_filter(
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
 private struct rest_response * linkgw_occi_response(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,
-struct linkgw * pptr)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,
+	struct linkgw * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.intercloudGW=%s",optr->domain,optr->id,pptr->intercloudGW);
+	sprintf(cptr->buffer,"%s.%s.intercloudGW=%c%s%c",optr->domain,optr->id,0x0022,pptr->intercloudGW,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.account=%s",optr->domain,optr->id,pptr->account);
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.gwsrc=%s",optr->domain,optr->id,pptr->gwsrc);
+	sprintf(cptr->buffer,"%s.%s.gwsrc=%c%s%c",optr->domain,optr->id,0x0022,pptr->gwsrc,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.gwdst=%s",optr->domain,optr->id,pptr->gwdst);
+	sprintf(cptr->buffer,"%s.%s.gwdst=%c%s%c",optr->domain,optr->id,0x0022,pptr->gwdst,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.tunnelproto=%s",optr->domain,optr->id,pptr->tunnelproto);
+	sprintf(cptr->buffer,"%s.%s.tunnelproto=%c%s%c",optr->domain,optr->id,0x0022,pptr->tunnelproto,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.addressgresrc=%s",optr->domain,optr->id,pptr->addressgresrc);
+	sprintf(cptr->buffer,"%s.%s.addressgresrc=%c%s%c",optr->domain,optr->id,0x0022,pptr->addressgresrc,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.addressgredst=%s",optr->domain,optr->id,pptr->addressgredst);
+	sprintf(cptr->buffer,"%s.%s.addressgredst=%c%s%c",optr->domain,optr->id,0x0022,pptr->addressgredst,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.prefix=%s",optr->domain,optr->id,pptr->prefix);
+	sprintf(cptr->buffer,"%s.%s.prefix=%c%s%c",optr->domain,optr->id,0x0022,pptr->prefix,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.authenticationkey=%s",optr->domain,optr->id,pptr->authenticationkey);
+	sprintf(cptr->buffer,"%s.%s.authenticationkey=%c%s%c",optr->domain,optr->id,0x0022,pptr->authenticationkey,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.endpointsrc=%s",optr->domain,optr->id,pptr->endpointsrc);
+	sprintf(cptr->buffer,"%s.%s.endpointsrc=%c%s%c",optr->domain,optr->id,0x0022,pptr->endpointsrc,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.endpointdst=%s",optr->domain,optr->id,pptr->endpointdst);
+	sprintf(cptr->buffer,"%s.%s.endpointdst=%c%s%c",optr->domain,optr->id,0x0022,pptr->endpointdst,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%s",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%s%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -457,8 +461,8 @@ struct linkgw * pptr)
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
 private struct rest_response * linkgw_get_item(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr, char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -469,7 +473,7 @@ struct rest_request * rptr, struct rest_response * aptr, char * id)
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_linkgw_nodes();
 	return( linkgw_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -497,8 +501,8 @@ private struct rest_response * linkgw_post_link(
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
 private struct rest_response * linkgw_post_mixin(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -516,8 +520,8 @@ struct rest_request * rptr, struct rest_response * aptr,char * id)
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
 private struct rest_response * linkgw_post_action(
-struct occi_category * optr, struct rest_client * cptr,
-struct rest_request * rptr, struct rest_response * aptr,char * id)
+	struct occi_category * optr, struct rest_client * cptr,
+	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
@@ -560,7 +564,7 @@ private struct rest_response * linkgw_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_linkgw_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_linkgw_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -588,7 +592,7 @@ private struct rest_response * linkgw_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_linkgw_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_linkgw_nodes();
 	return( linkgw_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -624,7 +628,7 @@ private struct rest_response * linkgw_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_linkgw_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_linkgw_node( nptr );
 	autosave_linkgw_nodes();
 	if (!( occi_success( aptr ) ))
@@ -688,7 +692,7 @@ private struct rest_response * linkgw_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_linkgw_node( nptr );
 			nptr = sptr;
@@ -713,7 +717,7 @@ private struct rest_response * occi_linkgw_get(void * vptr, struct rest_client *
 	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
 		ctptr = "text/occi";
 	else	ctptr = hptr->value;
-	if (!( optr = vptr ))
+	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
@@ -824,9 +828,9 @@ private struct rest_response * occi_linkgw_delete(void * vptr, struct rest_clien
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------------------------*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n       */
-/*	--------------------------------------------------------------------------------------*/
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
 private void	redirect_occi_linkgw_mt( struct rest_interface * iptr )
 {
 	iptr->get = occi_linkgw_get;
@@ -837,11 +841,24 @@ private void	redirect_occi_linkgw_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_linkgw(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_linkgw_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_linkgw */
-public struct occi_category * occi_cords_linkgw_builder(char * a,char * b) {
+public struct occi_category * occi_linkgw_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
@@ -876,14 +893,17 @@ public struct occi_category * occi_cords_linkgw_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_linkgw)))
+			return( optr );
 		autoload_linkgw_nodes();
-			return(optr);
+		return(optr);
 	}
+
 }
 
-/*	------------------------------------------------	*/
-/*	linkgw _ o c c i _ h e a d e r s 	*/
-/*	------------------------------------------------	*/
+/*	--------------------------------------	*/
+/*	l i n k g w _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------	*/
 public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
@@ -916,7 +936,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -927,7 +947,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -938,7 +958,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -949,7 +969,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -960,7 +980,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -971,7 +991,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -982,7 +1002,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -993,7 +1013,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -1004,7 +1024,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -1015,7 +1035,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -1026,7 +1046,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -1037,7 +1057,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr = allocate_rest_header()))
 		return(first);
 		else	if (!( hptr->previous = last))
-		first = hptr;
+			first = hptr;
 		else	hptr->previous->next = hptr;
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
@@ -1046,6 +1066,7 @@ public struct rest_header *  linkgw_occi_headers(struct linkgw * sptr)
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
+
 }
 
-#endif	/* _linkgw_c_ */
+#endif	/* _occilinkgw_c_ */

@@ -794,7 +794,7 @@ private	struct rest_response * build_application(
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	create_cords_application(struct occi_category * optr, void * vptr)
+private	int	create_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_application * pptr;
@@ -813,7 +813,7 @@ private	int	create_cords_application(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	  r e t r i e v e _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_cords_application(struct occi_category * optr, void * vptr)
+private	int	retrieve_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_application * pptr;
@@ -827,7 +827,7 @@ private	int	retrieve_cords_application(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	update_cords_application(struct occi_category * optr, void * vptr)
+private	int	update_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_application * pptr;
@@ -841,7 +841,7 @@ private	int	update_cords_application(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ a p p l i c a t i o n  	*/
 /*	-------------------------------------------	*/
-private	int	delete_cords_application(struct occi_category * optr, void * vptr)
+private	int	delete_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_application * pptr;

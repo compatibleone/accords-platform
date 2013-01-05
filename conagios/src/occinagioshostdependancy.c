@@ -354,37 +354,37 @@ private struct rest_response * nagios_host_dependency_occi_response(
 	struct nagios_host_dependency * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.dependent_host_name=%s",optr->domain,optr->id,pptr->dependent_host_name);
+	sprintf(cptr->buffer,"%s.%s.dependent_host_name=%c%s%c",optr->domain,optr->id,0x0022,pptr->dependent_host_name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.dependent_hostgroup_name=%s",optr->domain,optr->id,pptr->dependent_hostgroup_name);
+	sprintf(cptr->buffer,"%s.%s.dependent_hostgroup_name=%c%s%c",optr->domain,optr->id,0x0022,pptr->dependent_hostgroup_name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.host_name=%s",optr->domain,optr->id,pptr->host_name);
+	sprintf(cptr->buffer,"%s.%s.host_name=%c%s%c",optr->domain,optr->id,0x0022,pptr->host_name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostgroup_name=%s",optr->domain,optr->id,pptr->hostgroup_name);
+	sprintf(cptr->buffer,"%s.%s.hostgroup_name=%c%s%c",optr->domain,optr->id,0x0022,pptr->hostgroup_name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.inherits_parent=%u",optr->domain,optr->id,pptr->inherits_parent);
+	sprintf(cptr->buffer,"%s.%s.inherits_parent=%c%u%c",optr->domain,optr->id,0x0022,pptr->inherits_parent,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.execution_failure_criteria=%s",optr->domain,optr->id,pptr->execution_failure_criteria);
+	sprintf(cptr->buffer,"%s.%s.execution_failure_criteria=%c%s%c",optr->domain,optr->id,0x0022,pptr->execution_failure_criteria,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notification_failure_criteria=%s",optr->domain,optr->id,pptr->notification_failure_criteria);
+	sprintf(cptr->buffer,"%s.%s.notification_failure_criteria=%c%s%c",optr->domain,optr->id,0x0022,pptr->notification_failure_criteria,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.dependency_period=%s",optr->domain,optr->id,pptr->dependency_period);
+	sprintf(cptr->buffer,"%s.%s.dependency_period=%c%s%c",optr->domain,optr->id,0x0022,pptr->dependency_period,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.status=%c%u%c",optr->domain,optr->id,0x0022,pptr->status,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -410,7 +410,7 @@ private struct rest_response * nagios_host_dependency_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_nagios_host_dependency_nodes();
 	return( nagios_host_dependency_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -501,7 +501,7 @@ private struct rest_response * nagios_host_dependency_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_nagios_host_dependency_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_nagios_host_dependency_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -529,7 +529,7 @@ private struct rest_response * nagios_host_dependency_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_nagios_host_dependency_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_nagios_host_dependency_nodes();
 	return( nagios_host_dependency_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -565,7 +565,7 @@ private struct rest_response * nagios_host_dependency_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_nagios_host_dependency_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_nagios_host_dependency_node( nptr );
 	autosave_nagios_host_dependency_nodes();
 	if (!( occi_success( aptr ) ))
@@ -629,7 +629,7 @@ private struct rest_response * nagios_host_dependency_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_nagios_host_dependency_node( nptr );
 			nptr = sptr;

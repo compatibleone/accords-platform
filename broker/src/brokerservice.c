@@ -917,7 +917,7 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ s e r v i c e  		*/
 /*	-------------------------------------------	*/
-private	int	create_service(struct occi_category * optr, void * vptr)
+private	int	create_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;
@@ -937,7 +937,7 @@ private	int	create_service(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ s e r v i c e  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_service(struct occi_category * optr, void * vptr)
+private	int	retrieve_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;
@@ -951,7 +951,7 @@ private	int	retrieve_service(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ s e r v i c e  		*/
 /*	-------------------------------------------	*/
-private	int	update_service(struct occi_category * optr, void * vptr)
+private	int	update_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;
@@ -965,7 +965,7 @@ private	int	update_service(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ s e r v i c e	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_service(struct occi_category * optr, void * vptr)
+private	int	delete_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;

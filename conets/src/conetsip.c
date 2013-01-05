@@ -21,7 +21,7 @@
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ i p a d d r e s s  		*/
 /*	-------------------------------------------	*/
-private	int	create_ipaddress(struct occi_category * optr, void * vptr)
+private	int	create_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_ipaddress * pptr;
@@ -75,7 +75,7 @@ private	int	create_ipaddress(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ i p a d d r e s s  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_ipaddress(struct occi_category * optr, void * vptr)
+private	int	retrieve_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_ipaddress * pptr;
@@ -89,7 +89,7 @@ private	int	retrieve_ipaddress(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ i p a d d r e s s 	 	*/
 /*	-------------------------------------------	*/
-private	int	update_ipaddress(struct occi_category * optr, void * vptr)
+private	int	update_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_ipaddress * pptr;
@@ -103,7 +103,7 @@ private	int	update_ipaddress(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ i p a d d r e s s  		*/
 /*	-------------------------------------------	*/
-private	int	delete_ipaddress(struct occi_category * optr, void * vptr)
+private	int	delete_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_ipaddress * pptr;

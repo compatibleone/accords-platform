@@ -400,52 +400,52 @@ private struct rest_response * nagios_contact_occi_response(
 	struct nagios_contact * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.alias=%s",optr->domain,optr->id,pptr->alias);
+	sprintf(cptr->buffer,"%s.%s.alias=%c%s%c",optr->domain,optr->id,0x0022,pptr->alias,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.host_notification_period=%s",optr->domain,optr->id,pptr->host_notification_period);
+	sprintf(cptr->buffer,"%s.%s.host_notification_period=%c%s%c",optr->domain,optr->id,0x0022,pptr->host_notification_period,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.service_notification_period=%s",optr->domain,optr->id,pptr->service_notification_period);
+	sprintf(cptr->buffer,"%s.%s.service_notification_period=%c%s%c",optr->domain,optr->id,0x0022,pptr->service_notification_period,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.host_notification_options=%s",optr->domain,optr->id,pptr->host_notification_options);
+	sprintf(cptr->buffer,"%s.%s.host_notification_options=%c%s%c",optr->domain,optr->id,0x0022,pptr->host_notification_options,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.service_notification_options=%s",optr->domain,optr->id,pptr->service_notification_options);
+	sprintf(cptr->buffer,"%s.%s.service_notification_options=%c%s%c",optr->domain,optr->id,0x0022,pptr->service_notification_options,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.email=%s",optr->domain,optr->id,pptr->email);
+	sprintf(cptr->buffer,"%s.%s.email=%c%s%c",optr->domain,optr->id,0x0022,pptr->email,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.pager=%s",optr->domain,optr->id,pptr->pager);
+	sprintf(cptr->buffer,"%s.%s.pager=%c%s%c",optr->domain,optr->id,0x0022,pptr->pager,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.addressx=%s",optr->domain,optr->id,pptr->addressx);
+	sprintf(cptr->buffer,"%s.%s.addressx=%c%s%c",optr->domain,optr->id,0x0022,pptr->addressx,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.host_notifications_enabled=%u",optr->domain,optr->id,pptr->host_notifications_enabled);
+	sprintf(cptr->buffer,"%s.%s.host_notifications_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->host_notifications_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.service_notifications_enabled=%u",optr->domain,optr->id,pptr->service_notifications_enabled);
+	sprintf(cptr->buffer,"%s.%s.service_notifications_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->service_notifications_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.can_submit_commands=%u",optr->domain,optr->id,pptr->can_submit_commands);
+	sprintf(cptr->buffer,"%s.%s.can_submit_commands=%c%u%c",optr->domain,optr->id,0x0022,pptr->can_submit_commands,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.retain_status_information=%u",optr->domain,optr->id,pptr->retain_status_information);
+	sprintf(cptr->buffer,"%s.%s.retain_status_information=%c%u%c",optr->domain,optr->id,0x0022,pptr->retain_status_information,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.retain_nonstatus_information=%u",optr->domain,optr->id,pptr->retain_nonstatus_information);
+	sprintf(cptr->buffer,"%s.%s.retain_nonstatus_information=%c%u%c",optr->domain,optr->id,0x0022,pptr->retain_nonstatus_information,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.status=%c%u%c",optr->domain,optr->id,0x0022,pptr->status,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -471,7 +471,7 @@ private struct rest_response * nagios_contact_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_nagios_contact_nodes();
 	return( nagios_contact_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -562,7 +562,7 @@ private struct rest_response * nagios_contact_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_nagios_contact_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_nagios_contact_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -590,7 +590,7 @@ private struct rest_response * nagios_contact_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_nagios_contact_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_nagios_contact_nodes();
 	return( nagios_contact_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -626,7 +626,7 @@ private struct rest_response * nagios_contact_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_nagios_contact_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_nagios_contact_node( nptr );
 	autosave_nagios_contact_nodes();
 	if (!( occi_success( aptr ) ))
@@ -690,7 +690,7 @@ private struct rest_response * nagios_contact_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_nagios_contact_node( nptr );
 			nptr = sptr;

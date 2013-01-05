@@ -1062,7 +1062,7 @@ private	struct	rest_response * revert_windowsazure(
 /*	-------------------------------------------	*/
 /* 	  c r e a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
-private	int	create_windowsazure(struct occi_category * optr, void * vptr)
+private	int	create_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;
@@ -1076,7 +1076,7 @@ private	int	create_windowsazure(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	 r e t r i e v e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
-private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
+private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;
@@ -1090,7 +1090,7 @@ private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	   u p d a t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
-private	int	update_windowsazure(struct occi_category * optr, void * vptr)
+private	int	update_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;
@@ -1103,7 +1103,7 @@ private	int	update_windowsazure(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	   d e l e t e _ w i n d o w s a z u r e  	*/
 /*	-------------------------------------------	*/
-private	int	delete_windowsazure(struct occi_category * optr, void * vptr)
+private	int	delete_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;

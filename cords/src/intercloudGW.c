@@ -1,55 +1,60 @@
-/*-------------------------------------------------------------------------------*/
-/* ACCORDS PLATFORM                                                              */
-/* copyright 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>         */
-/*-------------------------------------------------------------------------------*/
-/* Licensed under the Apache License, Version 2.0 (the "License");             */
-/* you may not use this file except in compliance with the License.              */
-/* You may obtain a copy of the License at                                       */
-/*                                                                               */
-/*       http://www.apache.org/licenses/LICENSE-2.0                              */
-/*                                                                               */
-/* Unless required by applicable law or agreed to in writing, software           */
-/* distributed under the License is distributed on an "AS IS" BASIS,           */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      */
-/* See the License for the specific language governing permissions and           */
-/* limitations under the License.                                                */
-/*-------------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _intercloudGW_c_
 #define _intercloudGW_c_
+
 #include "element.h"
+
 #include "intercloudGW.h"
 
-/*----------------------------------------------------------------------------------------*/
-/*                               Liberate_intercloudGW
-       *//*----------------------------------------------------------------------------------------*/
+/*	------------------------------------------	*/
+/*	l i b e r a t e _ i n t e r c l o u d G W 	*/
+/*	------------------------------------------	*/
 public struct intercloudGW * liberate_intercloudGW(struct intercloudGW * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
-		if(sptr->id)
-			sptr->id = liberate(sptr->id);
-		if(sptr->name)
-			sptr->name = liberate(sptr->name);
-		if(sptr->node)
-			sptr->node = liberate(sptr->node);
-		if(sptr->account)
-			sptr->account = liberate(sptr->account);
-		if(sptr->price)
-			sptr->price = liberate(sptr->price);
-		if(sptr->state)
-			sptr->state = liberate(sptr->state);
-		sptr = liberate(sptr);
+		if ( sptr->id )
+			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
+		if ( sptr->price )
+			 sptr->price = liberate(sptr->price);
+		if ( sptr->state )
+			 sptr->state = liberate(sptr->state);
+		sptr = liberate( sptr );
 	}
-	return((struct intercloudGW * )0);
+	return((struct intercloudGW *) 0);
+
 }
 
-/*-----------------------------------------------------------------------------------------*/
-/*                            Reset_intercloudGW   */
-/*-----------------------------------------------------------------------------------------*/
+/*	------------------------------------	*/
+/*	r e s e t _ i n t e r c l o u d G W 	*/
+/*	------------------------------------	*/
 public struct intercloudGW * reset_intercloudGW(struct intercloudGW * sptr)
 {
-	if( sptr )
+	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
@@ -58,23 +63,24 @@ public struct intercloudGW * reset_intercloudGW(struct intercloudGW * sptr)
 		sptr->price = (char*) 0;
 		sptr->state = (char*) 0;
 	}
-	return (sptr);
+	return(sptr);
+
 }
 
-/*-----------------------------------------------------------------------------------------*/
-/*                            Allocate_intercloudGW     */
-/*-----------------------------------------------------------------------------------------*/
+/*	------------------------------------------	*/
+/*	a l l o c a t e _ i n t e r c l o u d G W 	*/
+/*	------------------------------------------	*/
 public struct intercloudGW * allocate_intercloudGW()
 {
 	struct intercloudGW * sptr;
 	if (!( sptr = allocate( sizeof( struct intercloudGW ) ) ))
 		return( sptr );
-	else  return( reset_intercloudGW(sptr) );
+	else	return( reset_intercloudGW(sptr) );
 }
 
-/*------------------------------------------------------------------------------------------*/
-/*                             Xmlin_intercloudGW      */
-/*------------------------------------------------------------------------------------------*/
+/*	------------------------------------	*/
+/*	x m l i n _ i n t e r c l o u d G W 	*/
+/*	------------------------------------	*/
 public int xmlin_intercloudGW(struct intercloudGW * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
@@ -108,12 +114,13 @@ public int xmlin_intercloudGW(struct intercloudGW * sptr,struct xml_element * ep
 		}
 	}
 	return(0);
+
 }
 
-/*---------------------------------------------------------------------------------------*/
-/*                         Rest_occi_intercloudGW  */
-/*---------------------------------------------------------------------------------------*/
-public int rest_occi_intercloudGW(FILE * fh, struct intercloudGW * sptr,char * prefix, char * nptr)
+/*	--------------------------------------------	*/
+/*	r e s t _ o c c i _ i n t e r c l o u d G W 	*/
+/*	--------------------------------------------	*/
+public int rest_occi_intercloudGW(FILE * fh,struct intercloudGW * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -126,6 +133,7 @@ public int rest_occi_intercloudGW(FILE * fh, struct intercloudGW * sptr,char * p
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%s'\r\n",prefix,nptr,(sptr->state?sptr->state:""));
 	return(0);
+
 }
 
-#endif
+#endif	/* _intercloudGW_cintercloudGW_c_ */

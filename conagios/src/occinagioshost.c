@@ -696,136 +696,136 @@ private struct rest_response * nagios_host_occi_response(
 	struct nagios_host * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.alias=%s",optr->domain,optr->id,pptr->alias);
+	sprintf(cptr->buffer,"%s.%s.alias=%c%s%c",optr->domain,optr->id,0x0022,pptr->alias,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.display_name=%s",optr->domain,optr->id,pptr->display_name);
+	sprintf(cptr->buffer,"%s.%s.display_name=%c%s%c",optr->domain,optr->id,0x0022,pptr->display_name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.address=%s",optr->domain,optr->id,pptr->address);
+	sprintf(cptr->buffer,"%s.%s.address=%c%s%c",optr->domain,optr->id,0x0022,pptr->address,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.parents=%u",optr->domain,optr->id,pptr->parents);
+	sprintf(cptr->buffer,"%s.%s.parents=%c%u%c",optr->domain,optr->id,0x0022,pptr->parents,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.hostgroups=%u",optr->domain,optr->id,pptr->hostgroups);
+	sprintf(cptr->buffer,"%s.%s.hostgroups=%c%u%c",optr->domain,optr->id,0x0022,pptr->hostgroups,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.check_command=%s",optr->domain,optr->id,pptr->check_command);
+	sprintf(cptr->buffer,"%s.%s.check_command=%c%s%c",optr->domain,optr->id,0x0022,pptr->check_command,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.initial_state=%s",optr->domain,optr->id,pptr->initial_state);
+	sprintf(cptr->buffer,"%s.%s.initial_state=%c%s%c",optr->domain,optr->id,0x0022,pptr->initial_state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.max_check_attempts=%u",optr->domain,optr->id,pptr->max_check_attempts);
+	sprintf(cptr->buffer,"%s.%s.max_check_attempts=%c%u%c",optr->domain,optr->id,0x0022,pptr->max_check_attempts,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.check_interval=%u",optr->domain,optr->id,pptr->check_interval);
+	sprintf(cptr->buffer,"%s.%s.check_interval=%c%u%c",optr->domain,optr->id,0x0022,pptr->check_interval,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.retry_interval=%u",optr->domain,optr->id,pptr->retry_interval);
+	sprintf(cptr->buffer,"%s.%s.retry_interval=%c%u%c",optr->domain,optr->id,0x0022,pptr->retry_interval,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.active_checks_enabled=%u",optr->domain,optr->id,pptr->active_checks_enabled);
+	sprintf(cptr->buffer,"%s.%s.active_checks_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->active_checks_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.passive_checks_enabled=%u",optr->domain,optr->id,pptr->passive_checks_enabled);
+	sprintf(cptr->buffer,"%s.%s.passive_checks_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->passive_checks_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.check_period=%s",optr->domain,optr->id,pptr->check_period);
+	sprintf(cptr->buffer,"%s.%s.check_period=%c%s%c",optr->domain,optr->id,0x0022,pptr->check_period,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.obsess_over_host=%u",optr->domain,optr->id,pptr->obsess_over_host);
+	sprintf(cptr->buffer,"%s.%s.obsess_over_host=%c%u%c",optr->domain,optr->id,0x0022,pptr->obsess_over_host,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.check_freshness=%u",optr->domain,optr->id,pptr->check_freshness);
+	sprintf(cptr->buffer,"%s.%s.check_freshness=%c%u%c",optr->domain,optr->id,0x0022,pptr->check_freshness,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.freshness_threshold=%u",optr->domain,optr->id,pptr->freshness_threshold);
+	sprintf(cptr->buffer,"%s.%s.freshness_threshold=%c%u%c",optr->domain,optr->id,0x0022,pptr->freshness_threshold,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.event_handler=%s",optr->domain,optr->id,pptr->event_handler);
+	sprintf(cptr->buffer,"%s.%s.event_handler=%c%s%c",optr->domain,optr->id,0x0022,pptr->event_handler,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.event_handler_enabled=%u",optr->domain,optr->id,pptr->event_handler_enabled);
+	sprintf(cptr->buffer,"%s.%s.event_handler_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->event_handler_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.low_flap_threshold=%u",optr->domain,optr->id,pptr->low_flap_threshold);
+	sprintf(cptr->buffer,"%s.%s.low_flap_threshold=%c%u%c",optr->domain,optr->id,0x0022,pptr->low_flap_threshold,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.high_flap_threshold=%u",optr->domain,optr->id,pptr->high_flap_threshold);
+	sprintf(cptr->buffer,"%s.%s.high_flap_threshold=%c%u%c",optr->domain,optr->id,0x0022,pptr->high_flap_threshold,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flap_detection_enabled=%u",optr->domain,optr->id,pptr->flap_detection_enabled);
+	sprintf(cptr->buffer,"%s.%s.flap_detection_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->flap_detection_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.flap_detection_options=%s",optr->domain,optr->id,pptr->flap_detection_options);
+	sprintf(cptr->buffer,"%s.%s.flap_detection_options=%c%s%c",optr->domain,optr->id,0x0022,pptr->flap_detection_options,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.process_perf_data=%u",optr->domain,optr->id,pptr->process_perf_data);
+	sprintf(cptr->buffer,"%s.%s.process_perf_data=%c%u%c",optr->domain,optr->id,0x0022,pptr->process_perf_data,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.retain_status_information=%u",optr->domain,optr->id,pptr->retain_status_information);
+	sprintf(cptr->buffer,"%s.%s.retain_status_information=%c%u%c",optr->domain,optr->id,0x0022,pptr->retain_status_information,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.retain_nonstatus_information=%u",optr->domain,optr->id,pptr->retain_nonstatus_information);
+	sprintf(cptr->buffer,"%s.%s.retain_nonstatus_information=%c%u%c",optr->domain,optr->id,0x0022,pptr->retain_nonstatus_information,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.contacts=%u",optr->domain,optr->id,pptr->contacts);
+	sprintf(cptr->buffer,"%s.%s.contacts=%c%u%c",optr->domain,optr->id,0x0022,pptr->contacts,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.contact_groups=%u",optr->domain,optr->id,pptr->contact_groups);
+	sprintf(cptr->buffer,"%s.%s.contact_groups=%c%u%c",optr->domain,optr->id,0x0022,pptr->contact_groups,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notification_interval=%u",optr->domain,optr->id,pptr->notification_interval);
+	sprintf(cptr->buffer,"%s.%s.notification_interval=%c%u%c",optr->domain,optr->id,0x0022,pptr->notification_interval,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notification_period=%s",optr->domain,optr->id,pptr->notification_period);
+	sprintf(cptr->buffer,"%s.%s.notification_period=%c%s%c",optr->domain,optr->id,0x0022,pptr->notification_period,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notification_options=%s",optr->domain,optr->id,pptr->notification_options);
+	sprintf(cptr->buffer,"%s.%s.notification_options=%c%s%c",optr->domain,optr->id,0x0022,pptr->notification_options,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notifications_enabled=%u",optr->domain,optr->id,pptr->notifications_enabled);
+	sprintf(cptr->buffer,"%s.%s.notifications_enabled=%c%u%c",optr->domain,optr->id,0x0022,pptr->notifications_enabled,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.stalking_options=%s",optr->domain,optr->id,pptr->stalking_options);
+	sprintf(cptr->buffer,"%s.%s.stalking_options=%c%s%c",optr->domain,optr->id,0x0022,pptr->stalking_options,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notes=%s",optr->domain,optr->id,pptr->notes);
+	sprintf(cptr->buffer,"%s.%s.notes=%c%s%c",optr->domain,optr->id,0x0022,pptr->notes,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.notes_url=%s",optr->domain,optr->id,pptr->notes_url);
+	sprintf(cptr->buffer,"%s.%s.notes_url=%c%s%c",optr->domain,optr->id,0x0022,pptr->notes_url,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.action_url=%s",optr->domain,optr->id,pptr->action_url);
+	sprintf(cptr->buffer,"%s.%s.action_url=%c%s%c",optr->domain,optr->id,0x0022,pptr->action_url,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.icon_image=%s",optr->domain,optr->id,pptr->icon_image);
+	sprintf(cptr->buffer,"%s.%s.icon_image=%c%s%c",optr->domain,optr->id,0x0022,pptr->icon_image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.icon_image_alt=%s",optr->domain,optr->id,pptr->icon_image_alt);
+	sprintf(cptr->buffer,"%s.%s.icon_image_alt=%c%s%c",optr->domain,optr->id,0x0022,pptr->icon_image_alt,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.vrml_image=%s",optr->domain,optr->id,pptr->vrml_image);
+	sprintf(cptr->buffer,"%s.%s.vrml_image=%c%s%c",optr->domain,optr->id,0x0022,pptr->vrml_image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.statusmap_image=%s",optr->domain,optr->id,pptr->statusmap_image);
+	sprintf(cptr->buffer,"%s.%s.statusmap_image=%c%s%c",optr->domain,optr->id,0x0022,pptr->statusmap_image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.twod_coords=%s",optr->domain,optr->id,pptr->twod_coords);
+	sprintf(cptr->buffer,"%s.%s.twod_coords=%c%s%c",optr->domain,optr->id,0x0022,pptr->twod_coords,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.threed_coords=%s",optr->domain,optr->id,pptr->threed_coords);
+	sprintf(cptr->buffer,"%s.%s.threed_coords=%c%s%c",optr->domain,optr->id,0x0022,pptr->threed_coords,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%u",optr->domain,optr->id,pptr->status);
+	sprintf(cptr->buffer,"%s.%s.status=%c%u%c",optr->domain,optr->id,0x0022,pptr->status,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -851,7 +851,7 @@ private struct rest_response * nagios_host_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_nagios_host_nodes();
 	return( nagios_host_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -942,7 +942,7 @@ private struct rest_response * nagios_host_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_nagios_host_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_nagios_host_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -970,7 +970,7 @@ private struct rest_response * nagios_host_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_nagios_host_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_nagios_host_nodes();
 	return( nagios_host_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -1006,7 +1006,7 @@ private struct rest_response * nagios_host_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_nagios_host_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_nagios_host_node( nptr );
 	autosave_nagios_host_nodes();
 	if (!( occi_success( aptr ) ))
@@ -1070,7 +1070,7 @@ private struct rest_response * nagios_host_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_nagios_host_node( nptr );
 			nptr = sptr;

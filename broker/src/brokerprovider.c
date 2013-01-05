@@ -5,7 +5,7 @@
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ p r o v i d e r  		*/
 /*	-------------------------------------------	*/
-private	int	create_provider(struct occi_category * optr, void * vptr)
+private	int	create_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_provider * pptr;
@@ -38,7 +38,7 @@ private	int	create_provider(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	    r e t r i e v e _ p r o v i d e r  		*/
 /*	-------------------------------------------	*/
-private	int	retrieve_provider(struct occi_category * optr, void * vptr)
+private	int	retrieve_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_provider * pptr;
@@ -52,7 +52,7 @@ private	int	retrieve_provider(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      u p d a t e _ p r o v i d e r  		*/
 /*	-------------------------------------------	*/
-private	int	update_provider(struct occi_category * optr, void * vptr)
+private	int	update_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_provider * pptr;
@@ -66,7 +66,7 @@ private	int	update_provider(struct occi_category * optr, void * vptr)
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ p r o v i d e r	  	*/
 /*	-------------------------------------------	*/
-private	int	delete_provider(struct occi_category * optr, void * vptr)
+private	int	delete_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct	occi_kind_node * nptr;
 	struct	cords_provider * pptr;
