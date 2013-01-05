@@ -688,7 +688,7 @@ public	char * 	rest_request_host( struct rest_request * rptr )
 		return((char *) 0);
 	else if ( rptr->host )
 		return( rptr->host );
-	else if (!( hptr = rest_resolve_header( rptr->first, "Host" ) ))
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_HOST ) ))
 		return((char *) 0);
 	else if (!( hptr->value ))
 		return((char *) 0);
@@ -1018,7 +1018,7 @@ private	struct rest_response *	rest_ll_process_request(
 	/* --------------------------------------------------- */
 	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_HOST ) ))
 		return( rest_response_failure( cptr, 400, "Bad Request Expected Host" ) );
-	else if (!( hptr = rest_resolve_header( rptr->first, "Authorization" ) ))
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_AUTHORIZATION ) ))
 	{
 		if ( cptr->server->method.authorise )
 			return( rest_authentication_challenge( cptr, 401, "Not Authorised" ) );

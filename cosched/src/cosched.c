@@ -152,10 +152,13 @@ private	void	cosched_synchronise()
 /*	-------------------------------------------	*/
 private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
+	struct	rest_header * hptr;
 	struct	occi_response * zptr;
 	struct	occi_kind_node * nptr;
+	char	buffer[1024];
 	struct	cords_schedule * pptr;
 	char *	root;
+	char *	price;
 	char *	work;
 	char * wptr;
 	if (!( nptr = vptr ))
@@ -170,6 +173,18 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struc
 		return(0);
 	else 
 	{
+		/* -------------------------------------------- */
+		/* detect, collect and keep account information */
+		/* -------------------------------------------- */
+		if (!( rest_valid_string( pptr->account ) ))
+			if ((( hptr = rest_resolve_header( rptr->first, _OCCI_ACCOUNT )) != (struct rest_header *) 0)
+			&&   ( rest_valid_string( hptr->value ) != 0 ))
+				pptr->account = allocate_string( hptr->value );
+	
+
+		/* ----------------------------- */
+		/* process the scheduled request */
+		/* ----------------------------- */
 		pptr->requested = time((long *) 0);
 		work = root = wptr;
 		while ( *wptr )
@@ -198,6 +213,16 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struc
 			return(0);
 		else 
 		{
+			/* -------------------------------- */
+			/* detect and resolve missing price */
+			/* -------------------------------- */
+			if (!( rest_valid_string( pptr->price ) ))
+			{
+				sprintf(buffer,"schedule:action:%s",wptr);
+
+				pptr->price = occi_resolve_price( buffer, _CORDS_CONTRACT_AGENT, default_tls());
+			}
+
 			pptr->started = time((long *) 0);
 			if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			{
