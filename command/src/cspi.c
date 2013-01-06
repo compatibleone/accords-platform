@@ -2552,6 +2552,7 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 {
 	int	quote=0;
 	int	c;
+	int	cc;
 	char *	mptr;
 	char *	vptr;
 	char *	wptr;
@@ -2588,7 +2589,7 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 		else if (( c == '}' ) ||  ( c == ',' ))
 			break;
 	}
-	c = *vptr;
+	cc = *vptr;
 	*vptr = 0;
 
 	if ( nptr->value )
@@ -2627,7 +2628,7 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 	else if (!( rptr->value = occi_unquoted_value( rptr->value ) ))
 		return( 0 );
 	
-	if ( c == '}' )
+	if ( cc == '}' )
 	{
 		sptr->value = liberate( sptr->value );
 		return(1);
