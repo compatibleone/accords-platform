@@ -2583,7 +2583,7 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 			if ( c == quote )
 				quote=0;
 		}
-		else if ((( c = *vptr) == '"' ) || ( c == 0x0025 ))
+		else if (( c == '"' ) || ( c == 0x0025 ))
 			quote = c;
 		else if (( c == '}' ) ||  ( c == ',' ))
 			break;
@@ -2607,9 +2607,9 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 			if ( c == quote )
 				quote=0;
 		}
-		else if ((( c = *wptr) == '"' ) || ( c == 0x0025 ))
+		else if (( c == '"' ) || ( c == 0x0025 ))
 			quote = c;
-		else if (( c == '}' ) ||  ( c == ':' ))
+		else if ( c == ':' )
 			break;
 	}
 
