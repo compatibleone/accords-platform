@@ -2573,6 +2573,7 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 
 	while ( *mptr == ' ' ) mptr++;
 
+	quote=0;
 	for ( vptr=mptr; *vptr != 0; vptr++ )
 	{
 		if (!( c = *vptr ))
@@ -2596,9 +2597,21 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 	if ( rptr->value )
 		liberate( rptr->value );
 
+	quote=0;
 	for  ( wptr = mptr; *wptr != 0; wptr++ )
-		if ( *wptr == ':' )
+	{
+		if (!( c = *wptr ))
 			break;
+		else if ( quote )
+		{
+			if ( c == quote )
+				quote=0;
+		}
+		else if ((( c = *wptr) == '"' ) || ( c == 0x0025 ))
+			quote = c;
+		else if (( c == '}' ) ||  ( c == ':' ))
+			break;
+	}
 
 	if ( *wptr == ':' )
 		*(wptr++)=0;
