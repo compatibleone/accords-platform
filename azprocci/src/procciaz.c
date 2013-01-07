@@ -849,7 +849,11 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 		return(40);
 	else if ((status = check_windowsazure_operation( subscription, azptr )) != 200 )
 		return(56);
-	else	return(0);
+	else
+	{
+		delete_windowsazure_disk( pptr, subscription );
+		return(0);
+	}
 }
 
 /*	-------------------------------------------	*/

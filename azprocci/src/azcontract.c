@@ -830,6 +830,45 @@ public	int	create_windowsazure_contract(
 }
 
 /*	-----------------------------------------------------------------	*/
+/*		d e l e t e _ w i n d o w s a z u r e _ d i s k 		*/
+/*	-----------------------------------------------------------------	*/
+public	int	delete_windowsazure_disk(
+		struct windowsazure * pptr,
+		struct 	az_subscription * subscription )
+{
+	struct	az_response * azptr;
+	struct	xml_element * eptr;
+	struct	xml_element * dptr;
+	if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
+	&&  ( azptr->response )
+	&&  ( azptr->response->status == 200 )
+	&&  ((eptr = azptr->xmlroot) != (struct xml_element *) 0)
+	&&  ( eptr->name )
+	&&  (!( strcmp( eptr->name, "Disks" ) )))
+	{
+		for (	eptr = eptr->first;
+			eptr != (struct xml_element *) 0;
+			eptr = eptr->next )
+		{
+			if (!( dptr = document_element( eptr, "Name" ) ))
+				continue;
+			else if (!( dptr->value ))
+				continue;
+			else if ( strncmp( dptr->value, pptr->id, strlen( pptr->id ) ) != 0 )
+				continue;
+			else
+			{
+				if (( azptr = az_delete_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
+					check_windowsazure_operation( subscription, azptr );
+				return(1);
+			}
+		}
+	}
+	return(0);
+}
+
+
+/*	-----------------------------------------------------------------	*/
 /*		d e l e t e _ w i n d o w s a z u r e _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
 public	int	delete_windowsazure_contract(
@@ -852,41 +891,21 @@ public	int	delete_windowsazure_contract(
 		if ((subscription = use_windowsazure_configuration( pptr->profile )) != (struct az_subscription *) 0)
 		{
 
-		/* ------------------------- */
-		/* delete the hosted service */
-		/* ------------------------- */
-		if (( azptr = az_delete_hosted_service( subscription, pptr->hostedservice )) != (struct az_response *) 0)
-			check_windowsazure_operation( subscription,azptr );
-		pptr->hostedservice = liberate( pptr->hostedservice );
+			/* ------------------------- */
+			/* delete the hosted service */
+			/* ------------------------- */
+			if (( azptr = az_delete_hosted_service( subscription, pptr->hostedservice )) != (struct az_response *) 0)
+				check_windowsazure_operation( subscription,azptr );
 
-		/* ------------------------------------------------------------ */
-		/* scan list of disks to locate the OS storage disk for removal */
-		/* ------------------------------------------------------------ */
-		if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
-		&&  ( azptr->response )
-		&&  ( azptr->response->status == 200 )
-		&&  ((eptr = azptr->xmlroot) != (struct xml_element *) 0)
-		&&  ( eptr->name )
-		&&  (!( strcmp( eptr->name, "Disks" ) )))
-		{
-			for (	eptr = eptr->first;
-				eptr != (struct xml_element *) 0;
-				eptr = eptr->next )
-			{
-				if (!( dptr = document_element( eptr, "Name" ) ))
-					continue;
-				else if (!( dptr->value ))
-					continue;
-				else if ( strncmp( dptr->value, pptr->id, strlen( pptr->id ) ) != 0 )
-					continue;
-				else
-				{
-					if (( azptr = az_delete_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
-						check_windowsazure_operation( subscription, azptr );
-					break;
-				}
-			}
-		}
+			pptr->hostedservice = liberate( pptr->hostedservice );
+
+
+		
+			/* ------------------------------------------------------------ */
+			/* scan list of disks to locate the OS storage disk for removal */
+			/* ------------------------------------------------------------ */
+			delete_windowsazure_disk( pptr, subscription );
+
 		}
 	}
 
