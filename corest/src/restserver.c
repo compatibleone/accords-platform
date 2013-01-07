@@ -899,18 +899,18 @@ public	char *	rest_decode_html( char * sptr )
 		else
 		{
 			c = *(sptr++);
-			if ((c >= '0') && (x <= '9'))
+			if ((c >= '0') && (c <= '9'))
 				x = ((c - '0') * 16);
-			else if ((c >= 'a') && (x <= 'f'))
+			else if ((c >= 'a') && (c <= 'f'))
 				x = (((c - 'a') + 10) * 16);
-			else if ((c >= 'A') && (x <= 'F'))
+			else if ((c >= 'A') && (c <= 'F'))
 				x = (((c - 'A') + 10) * 16);
 			c = *(sptr++);
-			if ((c >= '0') && (x <= '9'))
+			if ((c >= '0') && (c <= '9'))
 				x += (c - '0');
-			else if ((c >= 'a') && (x <= 'f'))
+			else if ((c >= 'a') && (c <= 'f'))
 				x += ((c - 'a') + 10);
-			else if ((c >= 'A') && (x <= 'F'))
+			else if ((c >= 'A') && (c <= 'F'))
 				x += ((c - 'A') + 10);
 			*(wptr++) = x;
 		}
