@@ -33,10 +33,16 @@ public struct cords_algorithm * liberate_cords_algorithm(struct cords_algorithm 
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
+		if ( sptr->name )
+			 sptr->name = liberate(sptr->name);
 		if ( sptr->category )
 			 sptr->category = liberate(sptr->category);
-		if ( sptr->algorithm )
-			 sptr->algorithm = liberate(sptr->algorithm);
+		if ( sptr->description )
+			 sptr->description = liberate(sptr->description);
+		if ( sptr->type )
+			 sptr->type = liberate(sptr->type);
+		if ( sptr->expression )
+			 sptr->expression = liberate(sptr->expression);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_algorithm *) 0);
@@ -51,8 +57,11 @@ public struct cords_algorithm * reset_cords_algorithm(struct cords_algorithm * s
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
+		sptr->name = (char*) 0;
 		sptr->category = (char*) 0;
-		sptr->algorithm = (char*) 0;
+		sptr->description = (char*) 0;
+		sptr->type = (char*) 0;
+		sptr->expression = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -84,13 +93,25 @@ public int xmlin_cords_algorithm(struct cords_algorithm * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"name") ))
+		{
+			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"category") ))
 		{
 			if ( wptr->value ) { sptr->category = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"algorithm") ))
+		else if (!( strcmp(wptr->name,"description") ))
 		{
-			if ( wptr->value ) { sptr->algorithm = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"type") ))
+		{
+			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"expression") ))
+		{
+			if ( wptr->value ) { sptr->expression = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -111,8 +132,11 @@ public int rest_occi_cords_algorithm(FILE * fh,struct cords_algorithm * sptr,cha
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.category='%s'\r\n",prefix,nptr,(sptr->category?sptr->category:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.algorithm='%s'\r\n",prefix,nptr,(sptr->algorithm?sptr->algorithm:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.expression='%s'\r\n",prefix,nptr,(sptr->expression?sptr->expression:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

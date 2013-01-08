@@ -143,6 +143,8 @@ private void autoload_cords_quota_nodes() {
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "operator" )) != (struct xml_atribut *) 0)
 				pptr->operator = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "provision" )) != (struct xml_atribut *) 0)
+				pptr->provision = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
@@ -200,6 +202,9 @@ public  void autosave_cords_quota_nodes() {
 		fprintf(h," operator=%c",0x0022);
 		fprintf(h,"%s",(pptr->operator?pptr->operator:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," provision=%c",0x0022);
+		fprintf(h,"%s",(pptr->provision?pptr->provision:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," price=%c",0x0022);
 		fprintf(h,"%s",(pptr->price?pptr->price:""));
 		fprintf(h,"%c",0x0022);
@@ -256,6 +261,8 @@ private void set_cords_quota_field(
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "operator" ) ))
 			pptr->operator = allocate_string(vptr);
+		if (!( strcmp( nptr, "provision" ) ))
+			pptr->provision = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "zone" ) ))
@@ -333,6 +340,13 @@ private int pass_cords_quota_filter(
 		else if ( strcmp(pptr->operator,fptr->operator) != 0)
 			return(0);
 		}
+	if (( fptr->provision )
+	&&  (strlen( fptr->provision ) != 0)) {
+		if (!( pptr->provision ))
+			return(0);
+		else if ( strcmp(pptr->provision,fptr->provision) != 0)
+			return(0);
+		}
 	if (( fptr->price )
 	&&  (strlen( fptr->price ) != 0)) {
 		if (!( pptr->price ))
@@ -385,6 +399,9 @@ private struct rest_response * cords_quota_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.operator=%c%s%c",optr->domain,optr->id,0x0022,pptr->operator,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.provision=%c%s%c",optr->domain,optr->id,0x0022,pptr->provision,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.price=%c%s%c",optr->domain,optr->id,0x0022,pptr->price,0x0022);
@@ -839,6 +856,8 @@ public struct occi_category * occi_cords_quota_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "operator",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "provision",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "zone",0,0) ))
@@ -928,6 +947,17 @@ public struct rest_header *  cords_quota_occi_headers(struct cords_quota * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_quota.operator='%s'\r\n",(sptr->operator?sptr->operator:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_quota.provision='%s'\r\n",(sptr->provision?sptr->provision:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

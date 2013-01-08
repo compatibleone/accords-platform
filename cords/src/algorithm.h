@@ -4,8 +4,11 @@
 struct	cords_algorithm
 {
 	char	*	id;
+	char 	*	name;
 	char	*	category;
-	char	*	algorithm;
+	char 	*	description;
+	char 	*	type;
+	char	*	expression;
 	int		state;
 };
 

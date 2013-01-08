@@ -9,6 +9,7 @@ struct	cords_quota
 	char *	property;
 	char *	description;
 	char *	operator;
+	char *	provision;
 	char *	price;
 	char *	zone;
 	char *	opinion;

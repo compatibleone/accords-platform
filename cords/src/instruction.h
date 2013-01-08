@@ -13,7 +13,7 @@ struct	cords_instruction
 	char *	source;
 	char *	property;
 	char *	value;
-	int	status;
+	int	state;
 };
 
 
