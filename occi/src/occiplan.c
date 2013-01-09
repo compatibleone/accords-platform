@@ -139,10 +139,6 @@ private void autoload_cords_plan_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "manifest" )) != (struct xml_atribut *) 0)
 				pptr->manifest = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "validation" )) != (struct xml_atribut *) 0)
-				pptr->validation = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "tarification" )) != (struct xml_atribut *) 0)
-				pptr->tarification = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
 				pptr->access = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "created" )) != (struct xml_atribut *) 0)
@@ -184,12 +180,6 @@ public  void autosave_cords_plan_nodes() {
 		fprintf(h," manifest=%c",0x0022);
 		fprintf(h,"%s",(pptr->manifest?pptr->manifest:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," validation=%c",0x0022);
-		fprintf(h,"%s",(pptr->validation?pptr->validation:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," tarification=%c",0x0022);
-		fprintf(h,"%s",(pptr->tarification?pptr->tarification:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," access=%c",0x0022);
 		fprintf(h,"%s",(pptr->access?pptr->access:""));
 		fprintf(h,"%c",0x0022);
@@ -227,10 +217,6 @@ private void set_cords_plan_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "manifest" ) ))
 			pptr->manifest = allocate_string(vptr);
-		if (!( strcmp( nptr, "validation" ) ))
-			pptr->validation = allocate_string(vptr);
-		if (!( strcmp( nptr, "tarification" ) ))
-			pptr->tarification = allocate_string(vptr);
 		if (!( strcmp( nptr, "access" ) ))
 			pptr->access = allocate_string(vptr);
 		if (!( strcmp( nptr, "created" ) ))
@@ -284,20 +270,6 @@ private int pass_cords_plan_filter(
 		else if ( strcmp(pptr->manifest,fptr->manifest) != 0)
 			return(0);
 		}
-	if (( fptr->validation )
-	&&  (strlen( fptr->validation ) != 0)) {
-		if (!( pptr->validation ))
-			return(0);
-		else if ( strcmp(pptr->validation,fptr->validation) != 0)
-			return(0);
-		}
-	if (( fptr->tarification )
-	&&  (strlen( fptr->tarification ) != 0)) {
-		if (!( pptr->tarification ))
-			return(0);
-		else if ( strcmp(pptr->tarification,fptr->tarification) != 0)
-			return(0);
-		}
 	if (( fptr->access )
 	&&  (strlen( fptr->access ) != 0)) {
 		if (!( pptr->access ))
@@ -327,12 +299,6 @@ private struct rest_response * cords_plan_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.manifest=%c%s%c",optr->domain,optr->id,0x0022,pptr->manifest,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.validation=%c%s%c",optr->domain,optr->id,0x0022,pptr->validation,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.tarification=%c%s%c",optr->domain,optr->id,0x0022,pptr->tarification,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.access=%c%s%c",optr->domain,optr->id,0x0022,pptr->access,0x0022);
@@ -768,10 +734,6 @@ public struct occi_category * occi_cords_plan_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "manifest",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "validation",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "tarification",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "created",0,0) ))
@@ -829,28 +791,6 @@ public struct rest_header *  cords_plan_occi_headers(struct cords_plan * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_plan.manifest='%s'\r\n",(sptr->manifest?sptr->manifest:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_plan.validation='%s'\r\n",(sptr->validation?sptr->validation:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_plan.tarification='%s'\r\n",(sptr->tarification?sptr->tarification:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

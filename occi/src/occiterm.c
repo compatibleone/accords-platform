@@ -141,8 +141,6 @@ private void autoload_cords_term_nodes() {
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
 				pptr->type = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "identity" )) != (struct xml_atribut *) 0)
-				pptr->identity = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "manifest" )) != (struct xml_atribut *) 0)
 				pptr->manifest = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "provider" )) != (struct xml_atribut *) 0)
@@ -189,9 +187,6 @@ public  void autosave_cords_term_nodes() {
 		fprintf(h," type=%c",0x0022);
 		fprintf(h,"%s",(pptr->type?pptr->type:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," identity=%c",0x0022);
-		fprintf(h,"%s",(pptr->identity?pptr->identity:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," manifest=%c",0x0022);
 		fprintf(h,"%s",(pptr->manifest?pptr->manifest:""));
 		fprintf(h,"%c",0x0022);
@@ -234,8 +229,6 @@ private void set_cords_term_field(
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
 			pptr->type = allocate_string(vptr);
-		if (!( strcmp( nptr, "identity" ) ))
-			pptr->identity = allocate_string(vptr);
 		if (!( strcmp( nptr, "manifest" ) ))
 			pptr->manifest = allocate_string(vptr);
 		if (!( strcmp( nptr, "provider" ) ))
@@ -298,13 +291,6 @@ private int pass_cords_term_filter(
 		else if ( strcmp(pptr->type,fptr->type) != 0)
 			return(0);
 		}
-	if (( fptr->identity )
-	&&  (strlen( fptr->identity ) != 0)) {
-		if (!( pptr->identity ))
-			return(0);
-		else if ( strcmp(pptr->identity,fptr->identity) != 0)
-			return(0);
-		}
 	if (( fptr->manifest )
 	&&  (strlen( fptr->manifest ) != 0)) {
 		if (!( pptr->manifest ))
@@ -344,9 +330,6 @@ private struct rest_response * cords_term_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.type=%c%s%c",optr->domain,optr->id,0x0022,pptr->type,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.identity=%c%s%c",optr->domain,optr->id,0x0022,pptr->identity,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.manifest=%c%s%c",optr->domain,optr->id,0x0022,pptr->manifest,0x0022);
@@ -787,8 +770,6 @@ public struct occi_category * occi_cords_term_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "identity",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "manifest",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "provider",0,0) ))
@@ -859,17 +840,6 @@ public struct rest_header *  cords_term_occi_headers(struct cords_term * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_term.type='%s'\r\n",(sptr->type?sptr->type:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.cords_term.identity='%s'\r\n",(sptr->identity?sptr->identity:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

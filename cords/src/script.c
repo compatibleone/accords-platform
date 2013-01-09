@@ -37,10 +37,10 @@ public struct cords_script * liberate_cords_script(struct cords_script * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->syntax )
 			 sptr->syntax = liberate(sptr->syntax);
-		if ( sptr->identifier )
-			 sptr->identifier = liberate(sptr->identifier);
 		if ( sptr->nature )
 			 sptr->nature = liberate(sptr->nature);
+		if ( sptr->target )
+			 sptr->target = liberate(sptr->target);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_script *) 0);
@@ -58,8 +58,9 @@ public struct cords_script * reset_cords_script(struct cords_script * sptr)
 		sptr->state =  0;
 		sptr->name = (char*) 0;
 		sptr->syntax = (char*) 0;
-		sptr->identifier = (char*) 0;
 		sptr->nature = (char*) 0;
+		sptr->target = (char*) 0;
+		sptr->timestamp =  0;
 		sptr->result =  0;
 	}
 	return(sptr);
@@ -103,13 +104,17 @@ public int xmlin_cords_script(struct cords_script * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->syntax = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"identifier") ))
-		{
-			if ( wptr->value ) { sptr->identifier = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"nature") ))
 		{
 			if ( wptr->value ) { sptr->nature = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"target") ))
+		{
+			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"timestamp") ))
+		{
+			if ( wptr->value ) { sptr->timestamp = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"result") ))
 		{
@@ -133,8 +138,9 @@ public int rest_occi_cords_script(FILE * fh,struct cords_script * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.syntax='%s'\r\n",prefix,nptr,(sptr->syntax?sptr->syntax:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.identifier='%s'\r\n",prefix,nptr,(sptr->identifier?sptr->identifier:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.timestamp='%u'\r\n",prefix,nptr,sptr->timestamp);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.result='%u'\r\n",prefix,nptr,sptr->result);
 	return(0);
 

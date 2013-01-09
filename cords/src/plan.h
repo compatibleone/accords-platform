@@ -8,8 +8,6 @@ struct	cords_plan
 	char	*	id;
 	char	*	name;
 	char	*	manifest;
-	char	*	validation;
-	char	*	tarification;
 	char	*	access;
 	int		created;
 	int		services;

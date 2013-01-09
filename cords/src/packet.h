@@ -13,7 +13,7 @@ struct	cords_packet
 	char *	data;
 	int	sequence;
 	int	samples;
-	int	status;
+	int	state;
 };
 
 #endif

@@ -70,7 +70,7 @@ public struct cords_packet * reset_cords_packet(struct cords_packet * sptr)
 		sptr->data = (char*) 0;
 		sptr->sequence =  0;
 		sptr->samples =  0;
-		sptr->status =  0;
+		sptr->state =  0;
 	}
 	return(sptr);
 
@@ -137,9 +137,9 @@ public int xmlin_cords_packet(struct cords_packet * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->samples = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"status") ))
+		else if (!( strcmp(wptr->name,"state") ))
 		{
-			if ( wptr->value ) { sptr->status = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
 	}
 	return(0);
@@ -165,7 +165,7 @@ public int rest_occi_cords_packet(FILE * fh,struct cords_packet * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.data='%s'\r\n",prefix,nptr,(sptr->data?sptr->data:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.sequence='%u'\r\n",prefix,nptr,sptr->sequence);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.samples='%u'\r\n",prefix,nptr,sptr->samples);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.status='%u'\r\n",prefix,nptr,sptr->status);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }

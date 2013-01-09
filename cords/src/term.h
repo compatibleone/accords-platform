@@ -8,7 +8,6 @@ struct	cords_term
 	char *	name;	
 	char * 	description;
 	char * 	type;	
-	char *	identity;
 	char *	manifest;
 	char *	provider;
 	int	variables;

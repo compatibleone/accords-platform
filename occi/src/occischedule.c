@@ -135,8 +135,12 @@ private void autoload_cords_schedule_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
+				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "operation" )) != (struct xml_atribut *) 0)
 				pptr->operation = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "reference" )) != (struct xml_atribut *) 0)
+				pptr->reference = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
@@ -149,6 +153,8 @@ private void autoload_cords_schedule_nodes() {
 				pptr->started = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "completed" )) != (struct xml_atribut *) 0)
 				pptr->completed = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "duration" )) != (struct xml_atribut *) 0)
+				pptr->duration = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "priority" )) != (struct xml_atribut *) 0)
 				pptr->priority = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -180,8 +186,14 @@ public  void autosave_cords_schedule_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," name=%c",0x0022);
+		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," operation=%c",0x0022);
 		fprintf(h,"%s",(pptr->operation?pptr->operation:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," reference=%c",0x0022);
+		fprintf(h,"%s",(pptr->reference?pptr->reference:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
@@ -200,6 +212,9 @@ public  void autosave_cords_schedule_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," completed=%c",0x0022);
 		fprintf(h,"%u",pptr->completed);
+		fprintf(h,"%c",0x0022);
+		fprintf(h," duration=%c",0x0022);
+		fprintf(h,"%u",pptr->duration);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," priority=%c",0x0022);
 		fprintf(h,"%u",pptr->priority);
@@ -228,8 +243,12 @@ private void set_cords_schedule_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
+		if (!( strcmp( nptr, "name" ) ))
+			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "operation" ) ))
 			pptr->operation = allocate_string(vptr);
+		if (!( strcmp( nptr, "reference" ) ))
+			pptr->reference = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
 		if (!( strcmp( nptr, "price" ) ))
@@ -242,6 +261,8 @@ private void set_cords_schedule_field(
 			pptr->started = atoi(vptr);
 		if (!( strcmp( nptr, "completed" ) ))
 			pptr->completed = atoi(vptr);
+		if (!( strcmp( nptr, "duration" ) ))
+			pptr->duration = atoi(vptr);
 		if (!( strcmp( nptr, "priority" ) ))
 			pptr->priority = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -277,11 +298,25 @@ private int pass_cords_schedule_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
+	if (( fptr->name )
+	&&  (strlen( fptr->name ) != 0)) {
+		if (!( pptr->name ))
+			return(0);
+		else if ( strcmp(pptr->name,fptr->name) != 0)
+			return(0);
+		}
 	if (( fptr->operation )
 	&&  (strlen( fptr->operation ) != 0)) {
 		if (!( pptr->operation ))
 			return(0);
 		else if ( strcmp(pptr->operation,fptr->operation) != 0)
+			return(0);
+		}
+	if (( fptr->reference )
+	&&  (strlen( fptr->reference ) != 0)) {
+		if (!( pptr->reference ))
+			return(0);
+		else if ( strcmp(pptr->reference,fptr->reference) != 0)
 			return(0);
 		}
 	if (( fptr->account )
@@ -302,6 +337,7 @@ private int pass_cords_schedule_filter(
 	if (( fptr->expected ) && ( pptr->expected != fptr->expected )) return(0);
 	if (( fptr->started ) && ( pptr->started != fptr->started )) return(0);
 	if (( fptr->completed ) && ( pptr->completed != fptr->completed )) return(0);
+	if (( fptr->duration ) && ( pptr->duration != fptr->duration )) return(0);
 	if (( fptr->priority ) && ( pptr->priority != fptr->priority )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -319,7 +355,13 @@ private struct rest_response * cords_schedule_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.operation=%c%s%c",optr->domain,optr->id,0x0022,pptr->operation,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.reference=%c%s%c",optr->domain,optr->id,0x0022,pptr->reference,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
@@ -338,6 +380,9 @@ private struct rest_response * cords_schedule_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.completed=%c%u%c",optr->domain,optr->id,0x0022,pptr->completed,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.duration=%c%u%c",optr->domain,optr->id,0x0022,pptr->duration,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.priority=%c%u%c",optr->domain,optr->id,0x0022,pptr->priority,0x0022);
@@ -763,7 +808,11 @@ public struct occi_category * occi_cords_schedule_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_cords_schedule_mt(optr->interface);
+		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "operation",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "reference",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
 			return(optr);
@@ -776,6 +825,8 @@ public struct occi_category * occi_cords_schedule_builder(char * a,char * b) {
 		if (!( optr = occi_add_attribute(optr, "started",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "completed",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "duration",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "priority",0,0) ))
 			return(optr);
@@ -818,7 +869,29 @@ public struct rest_header *  cords_schedule_occi_headers(struct cords_schedule *
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.cords_schedule.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.cords_schedule.operation='%s'\r\n",(sptr->operation?sptr->operation:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.reference='%s'\r\n",(sptr->reference?sptr->reference:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -885,6 +958,17 @@ public struct rest_header *  cords_schedule_occi_headers(struct cords_schedule *
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_schedule.completed='%u'\r\n",sptr->completed);
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_schedule.duration='%u'\r\n",sptr->duration);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

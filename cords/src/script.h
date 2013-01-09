@@ -7,8 +7,9 @@ struct	cords_script
 	int	state;
 	char *	name;
 	char *	syntax;
-	char *	identifier;
 	char *	nature;
+	char * 	target;
+	int	timestamp;
 	int	result;
 };
 

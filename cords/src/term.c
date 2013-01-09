@@ -39,8 +39,6 @@ public struct cords_term * liberate_cords_term(struct cords_term * sptr)
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
-		if ( sptr->identity )
-			 sptr->identity = liberate(sptr->identity);
 		if ( sptr->manifest )
 			 sptr->manifest = liberate(sptr->manifest);
 		if ( sptr->provider )
@@ -62,7 +60,6 @@ public struct cords_term * reset_cords_term(struct cords_term * sptr)
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->type = (char*) 0;
-		sptr->identity = (char*) 0;
 		sptr->manifest = (char*) 0;
 		sptr->provider = (char*) 0;
 		sptr->variables =  0;
@@ -110,10 +107,6 @@ public int xmlin_cords_term(struct cords_term * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"identity") ))
-		{
-			if ( wptr->value ) { sptr->identity = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"manifest") ))
 		{
 			if ( wptr->value ) { sptr->manifest = allocate_string(wptr->value); }
@@ -152,7 +145,6 @@ public int rest_occi_cords_term(FILE * fh,struct cords_term * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.identity='%s'\r\n",prefix,nptr,(sptr->identity?sptr->identity:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.manifest='%s'\r\n",prefix,nptr,(sptr->manifest?sptr->manifest:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.provider='%s'\r\n",prefix,nptr,(sptr->provider?sptr->provider:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.variables='%u'\r\n",prefix,nptr,sptr->variables);

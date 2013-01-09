@@ -37,10 +37,6 @@ public struct cords_plan * liberate_cords_plan(struct cords_plan * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->manifest )
 			 sptr->manifest = liberate(sptr->manifest);
-		if ( sptr->validation )
-			 sptr->validation = liberate(sptr->validation);
-		if ( sptr->tarification )
-			 sptr->tarification = liberate(sptr->tarification);
 		if ( sptr->access )
 			 sptr->access = liberate(sptr->access);
 		sptr = liberate( sptr );
@@ -59,8 +55,6 @@ public struct cords_plan * reset_cords_plan(struct cords_plan * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->manifest = (char*) 0;
-		sptr->validation = (char*) 0;
-		sptr->tarification = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->created =  0;
 		sptr->services =  0;
@@ -103,14 +97,6 @@ public int xmlin_cords_plan(struct cords_plan * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->manifest = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"validation") ))
-		{
-			if ( wptr->value ) { sptr->validation = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"tarification") ))
-		{
-			if ( wptr->value ) { sptr->tarification = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"access") ))
 		{
 			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
@@ -144,8 +130,6 @@ public int rest_occi_cords_plan(FILE * fh,struct cords_plan * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.manifest='%s'\r\n",prefix,nptr,(sptr->manifest?sptr->manifest:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.validation='%s'\r\n",prefix,nptr,(sptr->validation?sptr->validation:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.tarification='%s'\r\n",prefix,nptr,(sptr->tarification?sptr->tarification:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.created='%u'\r\n",prefix,nptr,sptr->created);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.services='%u'\r\n",prefix,nptr,sptr->services);

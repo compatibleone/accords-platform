@@ -4,7 +4,6 @@
 struct	cords_system
 {
 	char *	id;
-	char *	nature;
 	char *	name;
 	char *	version;
 	char *	distribution;

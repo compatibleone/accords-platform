@@ -141,10 +141,12 @@ private void autoload_cords_script_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "syntax" )) != (struct xml_atribut *) 0)
 				pptr->syntax = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "identifier" )) != (struct xml_atribut *) 0)
-				pptr->identifier = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
 				pptr->nature = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "target" )) != (struct xml_atribut *) 0)
+				pptr->target = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "timestamp" )) != (struct xml_atribut *) 0)
+				pptr->timestamp = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "result" )) != (struct xml_atribut *) 0)
 				pptr->result = document_atribut_value(aptr);
 			}
@@ -183,11 +185,14 @@ public  void autosave_cords_script_nodes() {
 		fprintf(h," syntax=%c",0x0022);
 		fprintf(h,"%s",(pptr->syntax?pptr->syntax:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," identifier=%c",0x0022);
-		fprintf(h,"%s",(pptr->identifier?pptr->identifier:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," nature=%c",0x0022);
 		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," target=%c",0x0022);
+		fprintf(h,"%s",(pptr->target?pptr->target:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," timestamp=%c",0x0022);
+		fprintf(h,"%u",pptr->timestamp);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," result=%c",0x0022);
 		fprintf(h,"%u",pptr->result);
@@ -219,10 +224,12 @@ private void set_cords_script_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "syntax" ) ))
 			pptr->syntax = allocate_string(vptr);
-		if (!( strcmp( nptr, "identifier" ) ))
-			pptr->identifier = allocate_string(vptr);
 		if (!( strcmp( nptr, "nature" ) ))
 			pptr->nature = allocate_string(vptr);
+		if (!( strcmp( nptr, "target" ) ))
+			pptr->target = allocate_string(vptr);
+		if (!( strcmp( nptr, "timestamp" ) ))
+			pptr->timestamp = atoi(vptr);
 		if (!( strcmp( nptr, "result" ) ))
 			pptr->result = atoi(vptr);
 		}
@@ -271,13 +278,6 @@ private int pass_cords_script_filter(
 		else if ( strcmp(pptr->syntax,fptr->syntax) != 0)
 			return(0);
 		}
-	if (( fptr->identifier )
-	&&  (strlen( fptr->identifier ) != 0)) {
-		if (!( pptr->identifier ))
-			return(0);
-		else if ( strcmp(pptr->identifier,fptr->identifier) != 0)
-			return(0);
-		}
 	if (( fptr->nature )
 	&&  (strlen( fptr->nature ) != 0)) {
 		if (!( pptr->nature ))
@@ -285,6 +285,14 @@ private int pass_cords_script_filter(
 		else if ( strcmp(pptr->nature,fptr->nature) != 0)
 			return(0);
 		}
+	if (( fptr->target )
+	&&  (strlen( fptr->target ) != 0)) {
+		if (!( pptr->target ))
+			return(0);
+		else if ( strcmp(pptr->target,fptr->target) != 0)
+			return(0);
+		}
+	if (( fptr->timestamp ) && ( pptr->timestamp != fptr->timestamp )) return(0);
 	if (( fptr->result ) && ( pptr->result != fptr->result )) return(0);
 	return(1);
 }
@@ -310,10 +318,13 @@ private struct rest_response * cords_script_occi_response(
 	sprintf(cptr->buffer,"%s.%s.syntax=%c%s%c",optr->domain,optr->id,0x0022,pptr->syntax,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.identifier=%c%s%c",optr->domain,optr->id,0x0022,pptr->identifier,0x0022);
+	sprintf(cptr->buffer,"%s.%s.nature=%c%s%c",optr->domain,optr->id,0x0022,pptr->nature,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.nature=%c%s%c",optr->domain,optr->id,0x0022,pptr->nature,0x0022);
+	sprintf(cptr->buffer,"%s.%s.target=%c%s%c",optr->domain,optr->id,0x0022,pptr->target,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.timestamp=%c%u%c",optr->domain,optr->id,0x0022,pptr->timestamp,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.result=%c%u%c",optr->domain,optr->id,0x0022,pptr->result,0x0022);
@@ -742,9 +753,11 @@ public struct occi_category * occi_cords_script_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "syntax",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "identifier",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "target",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "timestamp",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "result",0,0) ))
 			return(optr);
@@ -818,7 +831,7 @@ public struct rest_header *  cords_script_occi_headers(struct cords_script * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_script.identifier='%s'\r\n",(sptr->identifier?sptr->identifier:""));
+	sprintf(buffer,"occi.cords_script.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -829,7 +842,18 @@ public struct rest_header *  cords_script_occi_headers(struct cords_script * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_script.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
+	sprintf(buffer,"occi.cords_script.target='%s'\r\n",(sptr->target?sptr->target:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_script.timestamp='%u'\r\n",sptr->timestamp);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

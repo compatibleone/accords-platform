@@ -153,8 +153,8 @@ private void autoload_cords_packet_nodes() {
 				pptr->sequence = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "samples" )) != (struct xml_atribut *) 0)
 				pptr->samples = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "status" )) != (struct xml_atribut *) 0)
-				pptr->status = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
+				pptr->state = document_atribut_value(aptr);
 			}
 		}
 	document = document_drop( document );
@@ -209,8 +209,8 @@ public  void autosave_cords_packet_nodes() {
 		fprintf(h," samples=%c",0x0022);
 		fprintf(h,"%u",pptr->samples);
 		fprintf(h,"%c",0x0022);
-		fprintf(h," status=%c",0x0022);
-		fprintf(h,"%u",pptr->status);
+		fprintf(h," state=%c",0x0022);
+		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
@@ -251,8 +251,8 @@ private void set_cords_packet_field(
 			pptr->sequence = atoi(vptr);
 		if (!( strcmp( nptr, "samples" ) ))
 			pptr->samples = atoi(vptr);
-		if (!( strcmp( nptr, "status" ) ))
-			pptr->status = atoi(vptr);
+		if (!( strcmp( nptr, "state" ) ))
+			pptr->state = atoi(vptr);
 		}
 	return;
 }
@@ -335,7 +335,7 @@ private int pass_cords_packet_filter(
 		}
 	if (( fptr->sequence ) && ( pptr->sequence != fptr->sequence )) return(0);
 	if (( fptr->samples ) && ( pptr->samples != fptr->samples )) return(0);
-	if (( fptr->status ) && ( pptr->status != fptr->status )) return(0);
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
 
@@ -378,7 +378,7 @@ private struct rest_response * cords_packet_occi_response(
 	sprintf(cptr->buffer,"%s.%s.samples=%c%u%c",optr->domain,optr->id,0x0022,pptr->samples,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.status=%c%u%c",optr->domain,optr->id,0x0022,pptr->status,0x0022);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -816,7 +816,7 @@ public struct occi_category * occi_cords_packet_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "samples",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_packet)))
 			return( optr );
@@ -954,7 +954,7 @@ public struct rest_header *  cords_packet_occi_headers(struct cords_packet * spt
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.cords_packet.status='%u'\r\n",sptr->status);
+	sprintf(buffer,"occi.cords_packet.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
