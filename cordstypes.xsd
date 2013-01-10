@@ -194,6 +194,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="size" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -210,6 +211,7 @@
 			type="xsd:string"
 			default="cordscript: vm.new(id.value,provider.value); vm.build();"/>
 		<xsd:attribute name="agent" type="xsd:string" default="cosacs"/>
+		<xsd:attribute name="price" type="xsd:string" />
 		<xsd:attribute name="packages" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
@@ -234,12 +236,13 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="version" type="xsd:string"/>
-		<xsd:attribute name="installation" type="xsd:string"/>
-		<xsd:attribute name="configuration" type="xsd:string"/>
-		<xsd:attribute name="distribution" type="xsd:string"/>
+		<xsd:attribute name="installation" type="xsd:string" default="#" />
+		<xsd:attribute name="configuration" type="xsd:string" default="#" />
+		<xsd:attribute name="distribution" type="xsd:string" default="none" />
+		<xsd:attribute name="mirrors" type="xsd:string" default="none" />
 		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="constraint" type="xsd:string"/>
-		<xsd:attribute name="requirement" type="xsd:string"/>
+		<xsd:attribute name="requirements" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
 		<xsd:attribute name="license" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
@@ -251,6 +254,11 @@
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="node" type="xsd:string"/>
+		<xsd:attribute name="provider" type="xsd:string"/>
+		<xsd:attribute name="profile" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
+		<xsd:attribute name="ports" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
@@ -261,6 +269,7 @@
 		<xsd:attribute name="from" type="xsd:string"/>
 		<xsd:attribute name="to" type="xsd:string"/>
 		<xsd:attribute name="range" type="xsd:string"/>
+		<xsd:attribute name="direction" type="xsd:string" default="inout"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
