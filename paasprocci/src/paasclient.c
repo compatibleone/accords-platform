@@ -228,7 +228,7 @@ public	struct paas_response * create_paas_application(char * artifact, char * de
 	/* POST /app */
 	char *	filename=(char *) 0;
 	FILE *	h;
-	if (!( filename = rest_temporary_filename(".xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return((struct paas_response *) 0 );
 	else if (!( h = fopen( filename, "w" )))
 	{
@@ -266,7 +266,7 @@ public	struct paas_response * create_paas_application_version(char * application
 	char *	filename=(char *) 0;
 	char 	uri[2048];
 	FILE *	h;
-	if (!( filename = rest_temporary_filename(".xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return((struct paas_response *) 0 );
 	else if (!( h = fopen( filename, "w" )))
 	{
@@ -295,7 +295,7 @@ public	struct paas_response * create_paas_application_instance(char * applicatio
 	char *	filename=(char *) 0;
 	char 	uri[2048];
 	FILE *	h;
-	if (!( filename = rest_temporary_filename(".xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return((struct paas_response *) 0 );
 	else if (!( h = fopen( filename, "w" )))
 	{
@@ -486,7 +486,7 @@ public	struct paas_response * create_paas_environment( char * environment )
 	/* POST /environment	*/
 	char *	filename=(char *) 0;
 	FILE *	h;
-	if (!( filename = rest_temporary_filename(".xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return((struct paas_response *) 0 );
 	else if (!( h = fopen( filename, "w" )))
 	{

@@ -195,13 +195,101 @@ private	int	terminate_paas_contract(int status, struct cords_paas_contract * cpt
 }
 
 /*	---------------------------------------------	*/
+/*	p a a s _ s e r i a l i s e _ m a n i f e s t	*/
+/*	---------------------------------------------	*/
+private	char *	paas_serialise_manifest( struct cords_paas_contract * contract )
+{
+	FILE *	h;
+	char *	vptr;
+	char *	filename;
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( filename );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<paas_manifest\n");
+
+		if (( vptr = occi_extract_atribut( contract->manifest.message, "occi", 
+			_CORDS_PAAS_MANIFEST, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+		fprintf(h,"\t>\n");
+
+		fprintf(h,"\t<paas_application\n");
+
+		if (( vptr = occi_extract_atribut( contract->application.message, "occi", 
+			_CORDS_PAAS_APPLICATION, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\t\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+		fprintf(h,"\t\t>\n");
+
+
+		fprintf(h,"\t\t<paas_version\n");
+
+		fprintf(h,"\t\t\t>\n");
+
+
+		fprintf(h,"\t\t\t<paas_deployable\n");
+
+		if (( vptr = occi_extract_atribut( contract->deployable.message, "occi", 
+			_CORDS_PAAS_DEPLOYABLE, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\t\t\t\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+		fprintf(h,"\t\t\t\t/>\n");
+
+
+		fprintf(h,"\t\t\t<paas_version_instance\n");
+
+		if (( vptr = occi_extract_atribut( contract->instance.message, "occi", 
+			_CORDS_PAAS_INSTANCE, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\t\t\t\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+
+		fprintf(h,"\t\t\t\t/>\n");
+
+		fprintf(h,"\t\t</paas_version>\n");
+
+
+		fprintf(h,"\t\t<paas_environment\n");
+
+		if (( vptr = occi_extract_atribut( contract->environment.message, "occi", 
+			_CORDS_PAAS_ENVIRONMENT, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\t\t\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+		fprintf(h,"\t\t\t/>\n");
+
+
+		fprintf(h,"\t\t<paas_configuration_template\n");
+
+		if (( vptr = occi_extract_atribut( contract->configuration.message, "occi", 
+			_CORDS_PAAS_CONFIGURATION, _CORDS_NAME )) != (char *) 0)
+			fprintf(h,"\t\t\tname=%c%s%c\n",0x0022,vptr,0x0022);
+
+		fprintf(h,"\t\t\t>\n");
+
+		fprintf(h,"\t\t</paas_configuration_template>\n");
+
+
+		fprintf(h,"\t</paas_application>\n");
+
+		fprintf(h,"</paas_manifest>\n");
+
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	---------------------------------------------	*/
 /* 	   c r e a t e _ p a a s _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
 public	int	create_paas_contract(
 		struct occi_category * optr,
 		struct paas * pptr)
 {
-
+	char 	*	requestfile;
      	struct  paas_response * rptr;
 	struct	occi_response * node;
 	char 	*	vptr;
@@ -234,73 +322,80 @@ public	int	create_paas_contract(
 	/* ---------------------------------------------------- */
 	/* recover the paas application linkage and description */
 	/* ---------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.manifest.message, "occi", 
 		_CORDS_PAAS_MANIFEST, _CORDS_PAAS_APPLICATION ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.application.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.application.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.application.message = occi_simple_get( contract.application.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
 
 	/* ------------------------------------------------ */
 	/* recover the paas version linkage and description */
 	/* ------------------------------------------------ */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.application.message, "occi", 
 		_CORDS_PAAS_APPLICATION, _CORDS_PAAS_VERSION ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.version.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.version.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.version.message = occi_simple_get( contract.version.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
 
 	/* ------------------------------------------------- */
 	/* recover the paas instance linkage and description */
 	/* ------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.version.message, "occi", 
 		_CORDS_PAAS_VERSION, _CORDS_PAAS_INSTANCE ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.instance.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.instance.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.instance.message = occi_simple_get( contract.instance.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
 
 	/* --------------------------------------------------- */
 	/* recover the paas deployable linkage and description */
 	/* --------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.version.message, "occi", 
 		_CORDS_PAAS_INSTANCE, _CORDS_PAAS_DEPLOYABLE ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.deployable.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.deployable.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.deployable.message = occi_simple_get( contract.deployable.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
 
 	/* ---------------------------------------------------- */
 	/* recover the paas environment linkage and description */
 	/* ---------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.application.message, "occi", 
 		_CORDS_PAAS_APPLICATION, _CORDS_PAAS_ENVIRONMENT ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.environment.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.environment.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.environment.message = occi_simple_get( contract.environment.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
 
 	/* ------------------------------------------------------ */
 	/* recover the paas configuration linkage and description */
 	/* ------------------------------------------------------ */
-	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+	else if (!( vptr = occi_extract_atribut( contract.application.message, "occi", 
 		_CORDS_PAAS_APPLICATION, _CORDS_PAAS_CONFIGURATION ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.configuration.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
-	else if (!( contract.configuration.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
+	else if (!( contract.configuration.message = occi_simple_get( contract.configuration.id, agent, tls ) ))
 		return( terminate_paas_contract( 1170, &contract ) );
+
+	/* ------------------------------------------------------- */
+	/* generate the XML request file that will be used for all */
+	/* API request calls to the intermediary "PAAS Interface"  */
+	/* ------------------------------------------------------- */
+	else if (!( requestfile = paas_serialise_manifest( &contract ) ))
+		return( terminate_paas_contract( 1171, &contract ) );
 
 	/* -------------------------------------------- */
 	/*	Create paas environment                 */
 	/* -------------------------------------------- */
-	if (!( rptr = create_paas_environment( pptr->environment )))
+	if (!( rptr = create_paas_environment( requestfile ) ))
 	{
           	return( terminate_paas_contract( 501, &contract ) );
 	}

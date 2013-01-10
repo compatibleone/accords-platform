@@ -80,7 +80,7 @@ public	char *	keystone_auth_message( char * user, char * password, char * tenant
 {
 	char *	filename;
 	FILE *	h;
-	if (!( filename = rest_temporary_filename(".xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename, "wa" ) ))
 		return( liberate( filename ) );

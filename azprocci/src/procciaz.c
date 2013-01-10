@@ -413,7 +413,7 @@ private	char *	build_windowsazure_firewall(struct az_subscription * subscription
 	/* ---------------------------------------------------- */
 	/* prepare the file containing the firewall description */
 	/* ---------------------------------------------------- */
-	if (!( filename = rest_temporary_filename( ".xml" )))
+	if (!( filename = rest_temporary_filename( "xml" )))
 		return( filename );
 	else if (!( h = az_start_endpoints( subscription, filename )))
 		return( liberate( filename ) );
