@@ -47,6 +47,8 @@ public struct cords_port * liberate_cords_port(struct cords_port * sptr)
 			 sptr->to = liberate(sptr->to);
 		if ( sptr->direction )
 			 sptr->direction = liberate(sptr->direction);
+		if ( sptr->target )
+			 sptr->target = liberate(sptr->target);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_port *) 0);
@@ -68,6 +70,7 @@ public struct cords_port * reset_cords_port(struct cords_port * sptr)
 		sptr->from = (char*) 0;
 		sptr->to = (char*) 0;
 		sptr->direction = (char*) 0;
+		sptr->target = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -127,6 +130,10 @@ public int xmlin_cords_port(struct cords_port * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->direction = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"target") ))
+		{
+			if ( wptr->value ) { sptr->target = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -153,6 +160,7 @@ public int rest_occi_cords_port(FILE * fh,struct cords_port * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.from='%s'\r\n",prefix,nptr,(sptr->from?sptr->from:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.to='%s'\r\n",prefix,nptr,(sptr->to?sptr->to:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.direction='%s'\r\n",prefix,nptr,(sptr->direction?sptr->direction:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.target='%s'\r\n",prefix,nptr,(sptr->target?sptr->target:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

@@ -12,6 +12,7 @@ struct	cords_port
 	char *	from;
 	char *	to;
 	char *	direction;
+	char *	target;
 	int	state;
 };
 
