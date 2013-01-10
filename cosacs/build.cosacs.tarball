@@ -11,6 +11,7 @@ cp /usr/local/lib/libcorest.so.0 ./libcorest.so.0
 cp /usr/local/lib/libcoxml.so.0 ./libcoxml.so.0
 cp /usr/local/lib/libpubocci.so.0 ./libpubocci.so.0
 cp /usr/local/lib/libcopabr.so.0 ./libcopabr.so.0
+cp /usr/local/lib/libcocarrier.so.0 ./libcocarrier.so.0
 echo "mv lib*.so.0 /usr/local/lib" >> install-cosacs
 echo "<accords>" > cosacs.xml
 echo "<cosacs " >> cosacs.xml
