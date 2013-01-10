@@ -147,6 +147,8 @@ private void autoload_cords_port_nodes() {
 				pptr->from = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "to" )) != (struct xml_atribut *) 0)
 				pptr->to = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "direction" )) != (struct xml_atribut *) 0)
+				pptr->direction = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -194,6 +196,9 @@ public  void autosave_cords_port_nodes() {
 		fprintf(h," to=%c",0x0022);
 		fprintf(h,"%s",(pptr->to?pptr->to:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," direction=%c",0x0022);
+		fprintf(h,"%s",(pptr->direction?pptr->direction:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -230,6 +235,8 @@ private void set_cords_port_field(
 			pptr->from = allocate_string(vptr);
 		if (!( strcmp( nptr, "to" ) ))
 			pptr->to = allocate_string(vptr);
+		if (!( strcmp( nptr, "direction" ) ))
+			pptr->direction = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -305,6 +312,13 @@ private int pass_cords_port_filter(
 		else if ( strcmp(pptr->to,fptr->to) != 0)
 			return(0);
 		}
+	if (( fptr->direction )
+	&&  (strlen( fptr->direction ) != 0)) {
+		if (!( pptr->direction ))
+			return(0);
+		else if ( strcmp(pptr->direction,fptr->direction) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -337,6 +351,9 @@ private struct rest_response * cords_port_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.to=%c%s%c",optr->domain,optr->id,0x0022,pptr->to,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.direction=%c%s%c",optr->domain,optr->id,0x0022,pptr->direction,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -771,6 +788,8 @@ public struct occi_category * occi_cords_port_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "to",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "direction",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_cords_port)))
@@ -866,6 +885,17 @@ public struct rest_header *  cords_port_occi_headers(struct cords_port * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_port.to='%s'\r\n",(sptr->to?sptr->to:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_port.direction='%s'\r\n",(sptr->direction?sptr->direction:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
