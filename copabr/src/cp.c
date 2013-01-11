@@ -133,7 +133,7 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 			{
 				if (( vptr = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() )) != (char *) 0)
 					set_default_account_id( vptr );
-				if (!( cptr = occi_redirect_client( hptr ) ))
+				if (!( cptr = occi_redirect_client( cptr, hptr ) ))
 					return((struct occi_request *) 0);
 				else	liberate( hptr );
 			}
