@@ -147,11 +147,9 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 		return( qptr );
 	else if (!( vptr ))
 		return( qptr );
-	else
-	{
-		qptr->account = vptr;
+	else if (!( qptr->account = allocate_string( vptr ) ))
 		return( qptr );
-	}
+	else	return( qptr );
 }
 
 /*	-------------------------------------------------------------------	*/
