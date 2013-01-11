@@ -152,7 +152,6 @@ _co_platform() {
     _co_run_serv coss "accords security services" 
     _co_run_serv comons "accords monitoring services"
     _co_run_serv coobas "accords accounting services"
-    _co_run_serv cool "accords elasticity services"
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
@@ -346,7 +345,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cool|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -354,7 +353,6 @@ _co_status() {
 	lsof -i | grep LISTEN | grep comons || true
 	lsof -i | grep LISTEN | grep conets || true
 	lsof -i | grep LISTEN | grep coobas || true
-	lsof -i | grep LISTEN | grep cool || true
 	lsof -i | grep LISTEN | grep cops || true
 	lsof -i | grep LISTEN | grep coees || true
 	lsof -i | grep LISTEN | grep parser || true
@@ -395,7 +393,6 @@ _co_stop() {
     _stop_service coees
     _stop_service cops
     _stop_service conets
-    _stop_service cool
     _stop_service coobas
     _stop_service comons
     _stop_service coss
@@ -433,10 +430,6 @@ _run_conets() {
 
 _run_coobas() {
     coobas --config $target CO-BAS/1.0
-}
-
-_run_cool() {
-    cool --config $target CO-OL/1.0
 }
 
 _run_cosacs() {
@@ -522,7 +515,6 @@ _make_security_files() {
 	_mksecs cops 1
 	_mksecs coees 1
 	_mksecs coobas 1
-	_mksecs cool 1
 	_mksecs conets 1
 	_mksecs broker 1
 	_mksecs ezvm 1
@@ -602,7 +594,6 @@ _accords_config() {
 		_mkcert cops
 		_mkcert coees
 		_mkcert coobas
-		_mkcert cool
 		_mkcert comons
 		_mkcert conets
 		_mkcert broker
@@ -654,7 +645,6 @@ _accords_config() {
     _mkcfg cops 
     _mkcfg conets 
     _mkcfg coobas 
-    _mkcfg cool
     _mkcfg parser 
     _mkcfg broker 
     _mkcfg procci 
@@ -1105,9 +1095,6 @@ case `basename $0` in
 	;;
     run-coobas)
 	_run_coobas $*
-	;;
-    run-cool)
-	_run_cool $*
 	;;
     run-coss)
 	_run_coss $*
