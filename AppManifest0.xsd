@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="paas_manifest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="paas_description"/>
+        <xs:element ref="paas_application"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_description" type="xs:string"/>
+  <xs:element name="paas_application">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="paas_version"/>
+        <xs:element ref="paas_environment"/>
+        <xs:element ref="paas_configuration_template"/>
+      </xs:sequence>
+      <xs:attribute name="date_created" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="description" use="required" type="xs:NCName"/>
+      <xs:attribute name="environement" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_version">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="paas_version_instance"/>
+      </xs:sequence>
+      <xs:attribute name="date_uptaded" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="description" use="required" type="xs:NCName"/>
+      <xs:attribute name="label" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_version_instance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="paas_deployable"/>
+      </xs:sequence>
+      <xs:attribute name="date_instantiated" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="default_instance" use="required" type="xs:boolean"/>
+      <xs:attribute name="description" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="state" use="required" type="xs:NCName"/>
+      <xs:attribute name="uri" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_deployable">
+    <xs:complexType>
+      <xs:attribute name="content_type" use="required" type="xs:NCName"/>
+      <xs:attribute name="location" use="required" type="xs:NCName"/>
+      <xs:attribute name="multitenancy_level" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_environment">
+    <xs:complexType>
+      <xs:attribute name="config_template" use="required" type="xs:NCName"/>
+      <xs:attribute name="date_created" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="date_uptaded" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="description" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="provider" use="required" type="xs:NCName"/>
+      <xs:attribute name="uri" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_configuration_template">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="paas_configuration_option"/>
+        <xs:element maxOccurs="unbounded" ref="paas_node"/>
+        <xs:element maxOccurs="unbounded" ref="paas_relation"/>
+      </xs:sequence>
+      <xs:attribute name="date_created" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="date_uptaded" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="description" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="uri" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_configuration_option">
+    <xs:complexType>
+      <xs:attribute name="change_severity" use="required"/>
+      <xs:attribute name="default_value" use="required"/>
+      <xs:attribute name="max_length" use="required"/>
+      <xs:attribute name="max_value" use="required"/>
+      <xs:attribute name="min_value" use="required"/>
+      <xs:attribute name="namespace" use="required"/>
+      <xs:attribute name="option_name" use="required"/>
+      <xs:attribute name="regex" use="required"/>
+      <xs:attribute name="user_defined" use="required"/>
+      <xs:attribute name="value" use="required"/>
+      <xs:attribute name="value_options" use="required"/>
+      <xs:attribute name="value_type" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_node">
+    <xs:complexType>
+      <xs:attribute name="content_type" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="provider" use="required" type="xs:NCName"/>
+      <xs:attribute name="version" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_relation">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="link"/>
+        <xs:element ref="paas_link"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:attribute name="expression" use="required"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="type" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="paas_link">
+    <xs:complexType>
+      <xs:attribute name="content-type" use="required" type="xs:NCName"/>
+      <xs:attribute name="expression" use="required"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

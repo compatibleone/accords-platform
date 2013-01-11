@@ -3,8 +3,8 @@
 	<xsd:complexType name="cordsManifest">
 		<xsd:sequence>
 			<xsd:element name="security" type="cordsSecurity" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="account" type="cordsAccount" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="account" type="cordsAccount" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="configuration" type="cordsConfiguration" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="release" type="cordsRelease" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="interface" type="cordsInterface" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="node" type="cordsNode" minOccurs="0" maxOccurs="unbounded"/>
@@ -41,7 +41,7 @@
 
 	<xsd:complexType name="cordsAccount">
 		<xsd:sequence>
-			<xsd:element name="user" type="cordsUser" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="user" type="cordsUser" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -255,9 +255,6 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="node" type="xsd:string"/>
-		<xsd:attribute name="network" type="xsd:string"/>
-		<xsd:attribute name="image" type="xsd:string"/>
-		<xsd:attribute name="description" type="xsd:string"/>
 		<xsd:attribute name="provider" type="xsd:string"/>
 		<xsd:attribute name="profile" type="xsd:string"/>
 		<xsd:attribute name="price" type="xsd:string"/>
@@ -273,7 +270,6 @@
 		<xsd:attribute name="to" type="xsd:string"/>
 		<xsd:attribute name="range" type="xsd:string"/>
 		<xsd:attribute name="direction" type="xsd:string" default="inout"/>
-		<xsd:attribute name="target" type="xsd:string" default="inout"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 

@@ -33,7 +33,7 @@
 
 	<xsd:complexType name="cordsQuota">
 		<xsd:sequence>
-			<xsd:element name="price" type="cordsPrice" minOccurs='1' maxOccurs='1'/>
+			<xsd:element name="price" type="cordsPrice" minOccurs='0' maxOccurs='1'/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -53,7 +53,7 @@
 
 	<xsd:complexType name="cordsProvider">
 		<xsd:sequence>
-			<xsd:element name="quota" type="cordsQuota" minOccurs='1' maxOccurs='unbounded'/>
+			<xsd:element name="quota" type="cordsQuota" minOccurs='0' maxOccurs='unbounded'/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>

@@ -15,7 +15,7 @@
 	<xsd:element name="agreement" type="cordsAgreement"/>
 
 	<xsd:complexType name="cordsAgreement">
-		<xsd:element name="terms" type="cordsTerms" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:element name="terms" type="cordsTerms" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
@@ -36,7 +36,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsTerms">
-		<xsd:element name="term" type="cordsTerm" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:element name="term" type="cordsTerm" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="type" type="xsd:string"/>
@@ -77,8 +77,8 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsGuarantee">
-		<xsd:element name="variable" type="cordsVariable" minOccurs="1" maxOccurs="1" />
-		<xsd:element name="business" type="cordsBusiness" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="1" />
+		<xsd:element name="business" type="cordsBusiness" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
