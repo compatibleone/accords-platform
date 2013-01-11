@@ -120,18 +120,26 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 {
 	struct	occi_request *	qptr;
 	char		     *	aptr;
+	char 		     *  vptr;
 
+	/* ----------------------------------------- */
+	/* attempt to resolve the account identifier */
+	/* ----------------------------------------- */
+	if (!( vptr = get_default_account_id()))
+		if (( vptr = get_default_account()) != (char *) 0)
+			if (( vptr = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() )) != (char *) 0)
+				set_default_account_id( vptr );
+
+	/* ------------------------------------------------- */
+	/* build and return request with eventual account id */
+	/* ------------------------------------------------- */
 	if (!( qptr = occi_create_request( cptr, category, type ) ))
 		return( qptr );
-	else if (( qptr->account = get_default_account_id()) != (char *) 0)
-		return( qptr );
-	else if (!( aptr = get_default_account() ))
-		return( occi_remove_request( qptr ) );
-	else if (!( qptr->account = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( vptr ))
 		return( qptr );
 	else
 	{
-		set_default_account_id( qptr->account );
+		qptr->account = vptr;
 		return( qptr );
 	}
 }
