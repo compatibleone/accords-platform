@@ -121,14 +121,24 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 	struct	occi_request *	qptr;
 	char		     *	aptr;
 	char 		     *  vptr;
-
+	char 		     *  hptr;
 	/* ----------------------------------------- */
 	/* attempt to resolve the account identifier */
 	/* ----------------------------------------- */
 	if (!( vptr = get_default_account_id()))
+	{
 		if (( aptr = get_default_account()) != (char *) 0)
-			if (( vptr = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() )) != (char *) 0)
-				set_default_account_id( vptr );
+		{
+			if ((hptr = allocate_string( cptr->host )) != (char *) 0)
+			{
+				if (( vptr = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() )) != (char *) 0)
+					set_default_account_id( vptr );
+				if (!( cptr = occi_redirect_host( hptr ) ))
+					return((struct occi_request *) 0);
+				else	liberate( hptr );
+			}
+		}
+	}
 
 	/* ------------------------------------------------- */
 	/* build and return request with eventual account id */
