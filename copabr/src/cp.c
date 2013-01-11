@@ -126,7 +126,7 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 	/* attempt to resolve the account identifier */
 	/* ----------------------------------------- */
 	if (!( vptr = get_default_account_id()))
-		if (( vptr = get_default_account()) != (char *) 0)
+		if (( aptr = get_default_account()) != (char *) 0)
 			if (( vptr = occi_resolve_account( aptr, _CORDS_CONTRACT_AGENT, default_tls() )) != (char *) 0)
 				set_default_account_id( vptr );
 
