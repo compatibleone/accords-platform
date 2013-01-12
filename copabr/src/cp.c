@@ -122,6 +122,9 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 	char		     *	aptr;
 	char 		     *  vptr;
 	char 		     *  hptr;
+#ifndef	_CORDS_ACCOUNT_REQUEST
+	return( occi_create_request( cptr, category, type ) );
+#else
 	/* ----------------------------------------- */
 	/* attempt to resolve the account identifier */
 	/* ----------------------------------------- */
@@ -150,6 +153,7 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 	else if (!( qptr->account = allocate_string( vptr ) ))
 		return( qptr );
 	else	return( qptr );
+#endif
 }
 
 /*	-------------------------------------------------------------------	*/
