@@ -1561,24 +1561,28 @@ private	void	date_operation( struct cordscript_instruction * iptr, struct cordsc
 	char 	buffer[256];
 	struct	tm * tptr;
 	time_t t;
-	if ((!( vptr ))
-	||  ( check_value_type( vptr->value ) != _INTEGER_VALUE ))
-		push_value( iptr->context, string_value( "" ) );
-	else
+	if ((!( vptr )) ||  ( check_value_type( vptr->value ) != _INTEGER_VALUE ))
 	{
-		t = (time_t) atoi( vptr->value );
-
-		if (!( tptr = localtime( &t )))
-			sprintf(buffer,"%u",t);
+		if (!( strcmp( vptr->value, "now" ) ))
+			t = (time_t) time((long *) 0);
 		else
 		{
-			sprintf(buffer,"%u/%u/%u %u:%u:%u",
-				tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900,
-				tptr->tm_hour, tptr->tm_min, tptr->tm_sec);
+			push_value( iptr->context, string_value( "" ) );
+			return;
 		}
-		push_value( iptr->context, string_value( buffer ) );
-		return;
 	}
+	else 	t = (time_t) atoi( vptr->value );
+
+	if (!( tptr = localtime( &t )))
+		sprintf(buffer,"%u",t);
+	else
+	{
+		sprintf(buffer,"%u/%u/%u %u:%u:%u",
+			tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900,
+			tptr->tm_hour, tptr->tm_min, tptr->tm_sec);
+	}
+	push_value( iptr->context, string_value( buffer ) );
+	return;
 }
 
 /*	----------------	*/
