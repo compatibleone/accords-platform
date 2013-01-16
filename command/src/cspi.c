@@ -4382,6 +4382,7 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 	struct	cordscript_instruction * iptr;
 	FILE 	*	h;
 	FILE 	*	hh;
+	int		c;
 	char	buffer[8192];
 
 	if (!( get_token( buffer ) ))
