@@ -3289,7 +3289,9 @@ private	struct	cordscript_value *	resolve_function( char * token, struct cordscr
 			else	vptr = vptr->next;
 		}
 	}
-	return( (struct cordscript_value *) 0 );
+	if (!( cptr->env ))
+		return( (struct cordscript_value *) 0 );
+	else	return( resolve_function( token, cptr->env ) );
 }
 
 /*   -------------------	*/
@@ -3576,6 +3578,7 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 	else if (!( cptr = allocate_cordscript_context() ))
 		return( compile_failure(2,"") );
 	{
+		cptr->env = kptr;
 		while (1)
 		{
 

@@ -85,6 +85,7 @@ struct	cordscript_context
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;
 	struct	cordscript_value * code;
+	struct	cordscript_context     * env;
 	struct	cordscript_instruction * cs;
 	struct	cordscript_instruction * ip;
 };
