@@ -675,14 +675,19 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 
 	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if ( default_tls() )
+	{
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	cordscript_interpreter( filename, argc, argv );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
-
+	if ( default_tls() )
+	{
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	}
 	return( status );
 
 }

@@ -12,6 +12,7 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 private	int	crop_structure_element( struct cordscript_value * nptr, struct cordscript_value * rptr, struct cordscript_value * sptr );
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
+private	void	check_line_end(struct cordscript_context * cptr, int level, int c);
 private	int	end_of_instruction=0;
 private	int	echo=0;
 private	int	abandon_compile=0;
@@ -3405,7 +3406,7 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 		add_operand( iptr, fptr );
 		add_operand( iptr, integer_value( operands ) );
 		add_instruction( cptr, iptr );
-		return( iptr );
+		return((struct cordscript_instruction *) 0);
 	}
 }
 
@@ -3418,7 +3419,9 @@ private	struct	cordscript_instruction * compile_cordscript_block(struct cordscri
 
 	while ((c = get_punctuation()) != '}' )
 	{
-		if ( c )
+		if ( c == ';' )
+			check_line_end(cptr, 0, c );
+		else if ( c )
 			unget_byte( c );
 			
 		compile_cordscript_instruction( cptr, 0 );
@@ -4611,16 +4614,19 @@ private	int	compile_cordscript_keyword( struct cordscript_context * cptr, char *
 /*   -----------------	*/
 private	struct cordscript_instruction * start_instruction( struct cordscript_context * cptr, char * token )
 {
+	int	c;
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_value * fptr;
 	if ( compile_cordscript_keyword( cptr, token ) )
 		return( (struct cordscript_instruction *) 0);
-/*
-	not to be done here
 	else if (( fptr = resolve_function( token, cptr )) !=(struct cordscript_value *) 0)
-		return( compile_cordscript_call( cptr, fptr ) );
-*/
-	else if (!( iptr = allocate_cordscript_instruction( push_operation )))
+	{
+		if (( c = get_punctuation()) != 0)
+			unget_byte(c);
+		if ( c == '(' )
+			return( compile_cordscript_call( cptr, fptr ) );
+	}
+	if (!( iptr = allocate_cordscript_instruction( push_operation )))
 		return( iptr );
 	else if (!( iptr->first = iptr->last = allocate_cordscript_operand( resolve_value( token, cptr ) )))
 		return( liberate_cordscript_instruction( iptr ) );
@@ -4912,6 +4918,7 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		{
 			if ( operands )
 				break;
+/*
 			else if ((fptr = resolve_function( iptr->first->value->value, cptr )) != (struct cordscript_value *) 0)
 			{
 				unget_byte(c);
@@ -4920,6 +4927,7 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 				check_line_end(cptr, level,c);
 				return( iptr );
 			}
+*/
 			else	iptr->evaluate = eval_operation;
 			/* --------------------------------- */
 			/* parameters to be stacked for eval */
