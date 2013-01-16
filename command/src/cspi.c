@@ -1679,7 +1679,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 
 		else if (!( strcmp( wptr->value, "length" ) ))
 		{
-			push_value( iptr->context, integer_value( ( vptr->value ? strlen( vptr->value ) : 0 ) ));
+			push_value( iptr->context, integer_value( ( rest_valid_string( vptr->value ) ? strlen( vptr->value ) : 0 ) ));
 		}
 
 		else if (!( strcmp( wptr->value, "round" ) ))
