@@ -4401,7 +4401,7 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 			if ((c = get_punctuation()) != 0)
 			{
 				if ( c == ';' )
-					check_line_end( cptr, c, 0 );
+					check_line_end( cptr, 0, c );
 				else	break;
 			}
 			if ( abandon_compile )
@@ -5050,6 +5050,7 @@ public struct cordscript_context	* compile_cordscript_file( char * expression, i
 	struct	cordscript_context * cptr;
 	struct	cordscript_value * vptr;
 	FILE 	*	h;
+	int		c;
 	char 	*	lptr;
 	int		argi;
 	char	buffer[8192];
@@ -5076,9 +5077,13 @@ public struct cordscript_context	* compile_cordscript_file( char * expression, i
 		while ( remove_white() )
 		{	
 			iptr = compile_cordscript_instruction( cptr, 0 );
-			if ( get_punctuation() != 0 )
-				break;
-			else if ( abandon_compile )
+			if (( c =  get_punctuation()) != 0 )
+			{
+				if ( c == ';' )
+					check_line_end( cptr, 0, cý );
+				else	break;
+			}
+			if ( abandon_compile )
 				break;
 		}
 		fclose(h);
