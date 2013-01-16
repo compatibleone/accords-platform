@@ -1725,7 +1725,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			if ( v & 2 )
 				echo = 1;
 			else	echo = 0;
-			if ( v & 3 )
+			if ( v & 4 )
 				trace = 1;
 			else	trace = 0;
 		}
