@@ -17,6 +17,15 @@ private	int	end_of_instruction=0;
 private	int	echo=0;
 private	int	abandon_compile=0;
 
+/*	---------------		*/
+/*	check_csp_debug		*/
+/*	---------------		*/
+private	int	trace=0;
+private	int	check_csp_debug()
+{
+	return( trace );
+}
+
 /*   ----------*/
 /*   show_value*/
 /*   ----------*/
@@ -362,7 +371,7 @@ private	struct	cordscript_value * pop_stack( struct cordscript_context * cptr )
 /*	-------------------------	*/
 private	struct	cordscript_instruction * no_operation( struct cordscript_instruction * iptr )
 {
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("no_operation();\n");
 
 	if (!( iptr ))
@@ -376,7 +385,7 @@ private	struct	cordscript_instruction * no_operation( struct cordscript_instruct
 private	struct	cordscript_instruction * pop_operation( struct cordscript_instruction * iptr )
 {
 	struct	cordscript_value * vptr;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("pop_operation();\n");
 
 
@@ -395,7 +404,7 @@ private	struct	cordscript_instruction * pop_operation( struct cordscript_instruc
 /*	-------------------------	*/
 private	struct	cordscript_instruction * push_operation( struct cordscript_instruction * iptr )
 {
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("push_operation();\n");
 
 	/* --------------------------------------- */
@@ -419,7 +428,7 @@ private	struct	cordscript_instruction * dup_operation( struct cordscript_instruc
 {
 	struct	cordscript_value * vptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("dup_operation();\n");
 
 	if (!( iptr ))
@@ -444,7 +453,7 @@ private	struct	cordscript_instruction * set_operation( struct cordscript_instruc
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("set_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -691,7 +700,7 @@ private	struct	cordscript_instruction * cat_operation( struct cordscript_instruc
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("cat_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -779,7 +788,7 @@ private	struct	cordscript_instruction * add_operation( struct cordscript_instruc
 	struct	cordscript_value * wptr;
 	int	value=0;
 	int	vt;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("add_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -842,7 +851,7 @@ private	struct	cordscript_instruction * sub_operation( struct cordscript_instruc
 	struct	cordscript_value * wptr;
 	int	vt;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("sub_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -882,7 +891,7 @@ private	struct	cordscript_instruction * mul_operation( struct cordscript_instruc
 	struct	cordscript_value * wptr;
 	int	vt;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("mul_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -925,7 +934,7 @@ private	struct	cordscript_instruction * and_operation( struct cordscript_instruc
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("and_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -963,7 +972,7 @@ private	struct	cordscript_instruction * or_operation( struct cordscript_instruct
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("or_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -1001,7 +1010,7 @@ private	struct	cordscript_instruction * xor_operation( struct cordscript_instruc
 	struct	cordscript_value * vptr;
 	struct	cordscript_value * wptr;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("xor_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -1041,7 +1050,7 @@ private	struct	cordscript_instruction * div_operation( struct cordscript_instruc
 	struct	cordscript_value * wptr;
 	int	vt;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("div_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -1085,7 +1094,7 @@ private	struct	cordscript_instruction * mod_operation( struct cordscript_instruc
 	struct	cordscript_value * wptr;
 	int	vt;
 	int	value=0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("mod_operation();\n");
 	
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -1295,7 +1304,7 @@ private	struct	cordscript_instruction * enter_operation( struct cordscript_instr
 {
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr=(struct	cordscript_value *) 0;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("enter_operation();\n");
 
 	if (((optr = iptr->first) != (struct cordscript_operand *) 0)
@@ -1318,7 +1327,7 @@ private	struct	cordscript_instruction * leave_operation( struct cordscript_instr
 	struct	cordscript_operand * optr;
 	struct	cordscript_value * vptr=(struct	cordscript_value *) 0;
 	struct	cordscript_exception * xptr;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("leave_operation();\n");
 
 	if (( xptr = exceptionheap ) != (struct cordscript_exception *) 0)
@@ -1634,7 +1643,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	int	count=0;
 	int	v;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("eval_operation();\n");
 
 	for ( argi=0; argi < 10; argi++ )
@@ -1716,6 +1725,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			if ( v & 2 )
 				echo = 1;
 			else	echo = 0;
+			if ( v & 3 )
+				trace = 1;
+			else	trace = 0;
 		}
 
 		/* --------------------------------------- */
@@ -2025,7 +2037,7 @@ private	struct	cordscript_instruction * jmp_operation( struct cordscript_instruc
 {
 	struct cordscript_operand * optr;
 	struct cordscript_value * vptr;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jmp_operation();\n");
 	if (!( iptr ))
 		return((struct cordscript_instruction *) 0);
@@ -2046,7 +2058,7 @@ private	struct	cordscript_instruction * jeq_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jeq_operation();\n");
 
 	/* ----------------------------- */
@@ -2116,7 +2128,7 @@ private	struct	cordscript_instruction * jne_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jne_operation();\n");
 
 	/* ----------------------------- */
@@ -2187,7 +2199,7 @@ private	struct	cordscript_instruction * jle_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jle_operation();\n");
 
 	/* ----------------------------- */
@@ -2255,7 +2267,7 @@ private	struct	cordscript_instruction * jls_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jls_operation();\n");
 
 	/* ----------------------------- */
@@ -2321,7 +2333,7 @@ private	struct	cordscript_instruction * jgr_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jgr_operation();\n");
 
 	/* ----------------------------- */
@@ -2387,7 +2399,7 @@ private	struct	cordscript_instruction * jge_operation( struct cordscript_instruc
 	struct cordscript_value * lptr;
 	struct cordscript_value * wptr;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("jge_operation();\n");
 
 	/* ----------------------------- */
@@ -2662,7 +2674,7 @@ private	struct	cordscript_instruction * each_operation( struct cordscript_instru
 	struct cordscript_value * tptr;
 	struct cordscript_value * sptr;
 	
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("each_operation();\n");
 	
 	/* ------------------------------------------------- */
@@ -2698,7 +2710,7 @@ private	struct	cordscript_instruction * both_operation( struct cordscript_instru
 	struct cordscript_value * tptr;
 	struct cordscript_value * sptr;
 	
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("both_operation();\n");
 	
 	/* ------------------------------------------------- */
@@ -2740,7 +2752,7 @@ private	struct	cordscript_instruction * call_operation( struct cordscript_instru
 	struct cordscript_value   * qptr;
 	int	parameters=0;
 
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("call_operation();\n");
 	if (( iptr ) 
 	&&  ((optr = iptr->first) != (struct cordscript_operand *) 0 ) 
@@ -2784,7 +2796,7 @@ private	struct	cordscript_instruction * call_operation( struct cordscript_instru
 private	struct	cordscript_instruction * ret_operation( struct cordscript_instruction * iptr )
 {
 	struct cordscript_context * cptr;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("ret_operation();\n");
 	if (!( iptr ))
 		return((struct cordscript_instruction *) 0);
@@ -2802,7 +2814,7 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 {
 	struct 	cordscript_context * cptr;
 	struct	cordscript_value * vptr;
-	if ( check_debug() )
+	if ( check_csp_debug() )
 		printf("retvalue_operation();\n");
 	if (!( iptr ))
 		return((struct cordscript_instruction *) 0);
