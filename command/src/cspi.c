@@ -4397,9 +4397,13 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 		while ( remove_white() )
 		{
 			iptr = compile_cordscript_instruction( cptr, 0 );
-			if ( get_punctuation() )
-				break;
-			else if ( abandon_compile )
+			if ((c = get_punctuation()) != 0)
+			{
+				if ( c == ';' )
+					check_line_end( cptr, c, 0 );
+				else	break;
+			}
+			if ( abandon_compile )
 				break;
 		}
 		h = initialise_file( hh );
