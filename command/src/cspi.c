@@ -4915,8 +4915,10 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 			else if ((fptr = resolve_function( iptr->first->value->value, cptr )) != (struct cordscript_value *) 0)
 			{
 				unget_byte(c);
-				liberate_cordscript_instruction( iptr );
-				return( compile_cordscript_call( cptr, fptr ) );		
+				iptr = liberate_cordscript_instruction( iptr );
+				compile_cordscript_call( cptr, fptr );
+				check_line_end(cptr, level,c);
+				return( iptr );
 			}
 			else	iptr->evaluate = eval_operation;
 			/* --------------------------------- */
