@@ -5080,7 +5080,7 @@ public struct cordscript_context	* compile_cordscript_file( char * expression, i
 			if (( c =  get_punctuation()) != 0 )
 			{
 				if ( c == ';' )
-					check_line_end( cptr, 0, cý );
+					check_line_end( cptr, 0, c );
 				else	break;
 			}
 			if ( abandon_compile )
