@@ -53,6 +53,8 @@ public struct cords_invoice * liberate_cords_invoice(struct cords_invoice * sptr
 			 sptr->rate = liberate(sptr->rate);
 		if ( sptr->document )
 			 sptr->document = liberate(sptr->document);
+		if ( sptr->processing )
+			 sptr->processing = liberate(sptr->processing);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_invoice *) 0);
@@ -77,6 +79,7 @@ public struct cords_invoice * reset_cords_invoice(struct cords_invoice * sptr)
 		sptr->reduction = (char*) 0;
 		sptr->rate = (char*) 0;
 		sptr->document = (char*) 0;
+		sptr->processing = (char*) 0;
 		sptr->transactions =  0;
 		sptr->state =  0;
 	}
@@ -149,6 +152,10 @@ public int xmlin_cords_invoice(struct cords_invoice * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->document = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"processing") ))
+		{
+			if ( wptr->value ) { sptr->processing = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"transactions") ))
 		{
 			if ( wptr->value ) { sptr->transactions = atoi(wptr->value); }
@@ -182,6 +189,7 @@ public int rest_occi_cords_invoice(FILE * fh,struct cords_invoice * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reduction='%s'\r\n",prefix,nptr,(sptr->reduction?sptr->reduction:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rate='%s'\r\n",prefix,nptr,(sptr->rate?sptr->rate:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.document='%s'\r\n",prefix,nptr,(sptr->document?sptr->document:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.processing='%s'\r\n",prefix,nptr,(sptr->processing?sptr->processing:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.transactions='%u'\r\n",prefix,nptr,sptr->transactions);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

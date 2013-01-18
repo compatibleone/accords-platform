@@ -43,6 +43,10 @@ public struct cords_account * liberate_cords_account(struct cords_account * sptr
 			 sptr->security = liberate(sptr->security);
 		if ( sptr->legal )
 			 sptr->legal = liberate(sptr->legal);
+		if ( sptr->nature )
+			 sptr->nature = liberate(sptr->nature);
+		if ( sptr->invoicing )
+			 sptr->invoicing = liberate(sptr->invoicing);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_account *) 0);
@@ -62,6 +66,8 @@ public struct cords_account * reset_cords_account(struct cords_account * sptr)
 		sptr->date = (char*) 0;
 		sptr->security = (char*) 0;
 		sptr->legal = (char*) 0;
+		sptr->nature = (char*) 0;
+		sptr->invoicing = (char*) 0;
 		sptr->users =  0;
 		sptr->state =  0;
 	}
@@ -114,6 +120,14 @@ public int xmlin_cords_account(struct cords_account * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->legal = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"nature") ))
+		{
+			if ( wptr->value ) { sptr->nature = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"invoicing") ))
+		{
+			if ( wptr->value ) { sptr->invoicing = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"users") ))
 		{
 			if ( wptr->value ) { sptr->users = atoi(wptr->value); }
@@ -142,6 +156,8 @@ public int rest_occi_cords_account(FILE * fh,struct cords_account * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.date='%s'\r\n",prefix,nptr,(sptr->date?sptr->date:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.security='%s'\r\n",prefix,nptr,(sptr->security?sptr->security:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.legal='%s'\r\n",prefix,nptr,(sptr->legal?sptr->legal:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.nature='%s'\r\n",prefix,nptr,(sptr->nature?sptr->nature:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.invoicing='%s'\r\n",prefix,nptr,(sptr->invoicing?sptr->invoicing:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.users='%u'\r\n",prefix,nptr,sptr->users);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

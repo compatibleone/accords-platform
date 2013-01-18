@@ -9,6 +9,8 @@ struct	cords_account
 	char *	date;
 	char *	security;
 	char *	legal;
+	char *	nature;
+	char *	invoicing;
 	int	users;
 	int	state;
 };

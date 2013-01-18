@@ -81,11 +81,13 @@ struct	cordscript_instruction
 
 struct	cordscript_context
 {
+	char *	name;
 	struct	cordscript_instruction * caller;
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;
 	struct	cordscript_value * code;
 	struct	cordscript_context     * env;
+	struct	cordscript_context     * next;
 	struct	cordscript_instruction * cs;
 	struct	cordscript_instruction * ip;
 };

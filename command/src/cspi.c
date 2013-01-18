@@ -3,8 +3,10 @@
 
 #include "cspi.h"
 
-private	struct	cordscript_label * labelheap=(struct cordscript_label *) 0;
-private	struct	cordscript_exception * exceptionheap=(struct cordscript_exception *) 0;
+private	struct	cordscript_label 	* labelheap=(struct cordscript_label *) 0;
+private	struct	cordscript_context	* classheap=(struct cordscript_context*) 0;
+private	struct	cordscript_value	* valueheap=(struct cordscript_value *) 0;
+private	struct	cordscript_exception 	* exceptionheap=(struct cordscript_exception *) 0;
 
 private	void	cut_operation( struct cordscript_instruction * iptr,  char * source, struct cordscript_value * separator );
 private	void	join_operation( struct cordscript_instruction * iptr,struct cordscript_value * source, struct cordscript_value * separator );
@@ -170,20 +172,22 @@ public struct cordscript_value * liberate_cordscript_value(struct cordscript_val
 public struct cordscript_value * allocate_cordscript_value(char * value, char * name)
 {
 	struct	cordscript_value * vptr;
-	values++;
-	if (!( vptr = allocate( sizeof( struct cordscript_value ) ) ))
+
+	if (( vptr = valueheap ) != (struct cordscript_value *) 0)
+		valueheap = vptr->next;
+	else if (!( vptr = allocate( sizeof( struct cordscript_value ) ) ))
 		return( vptr );
-	else
-	{
-		memset( vptr, 0, sizeof( struct cordscript_value ) );
-		if ( value )
-			if (!( vptr->value = allocate_string( value ) ))
-				return( liberate_cordscript_value( vptr ) );
-		if ( name )
-			if (!( vptr->name = allocate_string( name ) ))
-				return( liberate_cordscript_value( vptr ) );
-		return( vptr );
-	}
+	else	values++;
+
+	memset( vptr, 0, sizeof( struct cordscript_value ) );
+
+	if ( value )
+		if (!( vptr->value = allocate_string( value ) ))
+			return( liberate_cordscript_value( vptr ) );
+	if ( name )
+		if (!( vptr->name = allocate_string( name ) ))
+			return( liberate_cordscript_value( vptr ) );
+	return( vptr );
 }
 
 /*	----------------------	*/
@@ -209,11 +213,17 @@ private	struct cordscript_value * instruction_value( struct cordscript_instructi
 	}
 }
 
+/*	----------------------------------	*/
+/*		string_value			*/
+/*	----------------------------------	*/
 private	struct cordscript_value * string_value( char * sptr )
 {
 	return( allocate_cordscript_value( sptr, (char *) 0 ) );
 }
 
+/*	----------------------------------	*/
+/*		integer_value			*/
+/*	----------------------------------	*/
 private	struct cordscript_value * integer_value( int v )
 {
 	char	buffer[256];
@@ -221,11 +231,17 @@ private	struct cordscript_value * integer_value( int v )
 	return( string_value( buffer ) );
 }
 
+/*	----------------------------------	*/
+/*		null _ value			*/
+/*	----------------------------------	*/
 private	struct cordscript_value * null_value()
 {
 	return( allocate_cordscript_value( "", (char *) 0 ) );
 }
 
+/*	----------------------------------	*/
+/*		psuh_value			*/
+/*	----------------------------------	*/
 private	void	push_value( struct cordscript_context * cptr, struct cordscript_value * vptr )
 {
 	vptr->next = cptr->stack;
@@ -234,7 +250,7 @@ private	void	push_value( struct cordscript_context * cptr, struct cordscript_val
 }
 
 /*	----------------------------------	*/
-/*		allocate_cordscript_operand	*/
+/*	   allocate_cordscript_operand		*/
 /*	----------------------------------	*/
 private	int	operands=0;
 private	struct cordscript_operand * allocate_cordscript_operand( struct cordscript_value * vptr )
@@ -334,12 +350,32 @@ public struct cordscript_context * liberate_cordscript_context( struct cordscrip
 		{
 			xptr->cs = iptr->next;
 			iptr = liberate_cordscript_instruction( iptr );
+		if ( xptr->name )
+			liberate( xptr->name );
 		}
 		liberate( xptr );
 	}
 	return( (struct cordscript_context *) 0 );
 }
 
+/*	----------------------------------------	*/
+/*		unused_cordscript_value 		*/
+/*	----------------------------------------	*/
+private	void	unused_cordscript_value( struct cordscript_value * vptr )
+{
+	if ( vptr )
+	{
+		if ( vptr->value )
+		{
+			liberate( vptr->value );
+			vptr->value = (char *) 0;
+		}
+		vptr->next = valueheap;
+		valueheap  = vptr;
+	}
+	return;
+}
+	
 /*	----------	*/
 /*	drop_value	*/
 /*	----------	*/
@@ -347,7 +383,7 @@ private	void	drop_value( struct cordscript_value * vptr )
 {
 	if ( vptr )
 		if (!( vptr->name ))
-			liberate_cordscript_value( vptr );
+			unused_cordscript_value( vptr );
 	return;
 }
 
@@ -4375,6 +4411,78 @@ private	struct cordscript_instruction * compile_cordscript_switch( struct cordsc
 }			
 
 /*   --------------------------	*/
+/*    resolve_cordscript_class  */
+/*   --------------------------	*/
+private	struct cordscript_context * resolve_cordscript_class( char * nptr )
+{
+	struct	cordscript_context * cptr;
+	for (	cptr=classheap;
+		cptr != (struct cordscript_context *) 0;
+		cptr = cptr->next )
+	{
+		if (!( cptr->name ))
+			continue;
+		else if (!( strcmp( cptr->name, nptr ) ))
+			break;
+		else	continue;
+	}
+	return( cptr );
+}
+
+/*   --------------------------	*/
+/*    compile_cordscript_class  */
+/*   --------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_class( struct cordscript_context * cptr )
+{
+	struct	cordscript_context	* xptr;
+	int		c;
+	char	buffer[8192];
+
+	if (!( get_token( buffer ) ))
+		return((struct cordscript_instruction *) 0);
+	else if (!( xptr = resolve_cordscript_class( buffer ) ))
+	{
+		if (!( xptr = allocate_cordscript_context() ))
+			return((struct cordscript_instruction *) 0);
+		else if (!( xptr->name = allocate_string( buffer ) ))
+		{
+			xptr = liberate_cordscript_context( xptr );
+			return((struct cordscript_instruction *) 0);
+		}
+		else 
+		{
+			xptr->next = classheap;
+			classheap  = xptr;
+		}
+	}
+	if (( c = get_punctuation()) != '{' )
+		return((struct cordscript_instruction *) 0);
+	else
+	{
+		compile_cordscript_block( xptr );
+		return((struct cordscript_instruction *) 0);
+	}
+}
+
+/*   --------------------------	*/
+/*    compile_cordscript_public */
+/*   --------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_public( struct cordscript_context * cptr )
+{
+	struct	cordscript_instruction * iptr;
+	return((struct cordscript_instruction *) 0);
+}
+
+/*   --------------------------	*/
+/*   compile_cordscript_private */
+/*   --------------------------	*/
+private	struct cordscript_instruction * compile_cordscript_private( struct cordscript_context * cptr )
+{
+	struct	cordscript_instruction * iptr;
+	return((struct cordscript_instruction *) 0);
+}
+
+/*   --------------------------	*/
 /*   compile_cordscript_include */
 /*   --------------------------	*/
 private	struct cordscript_instruction * compile_cordscript_include( struct cordscript_context * cptr )
@@ -4547,7 +4655,7 @@ private	struct cordscript_instruction * compile_cordscript_return( struct cordsc
 	else	return((struct cordscript_instruction *) 0);
 }
 
-#define	_MAX_KEYWORDS	17
+#define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57
 
 struct	cordscript_language	
@@ -4590,7 +4698,13 @@ struct	cordscript_language
 	{ "function" ,
 	 compile_cordscript_function, -1 },
 	{ "include", 
-	 compile_cordscript_include, -1 }
+	 compile_cordscript_include, -1 },
+	{ "class", 
+	 compile_cordscript_class, -1 },
+	{ "public", 
+	 compile_cordscript_public, -1 },
+	{ "private", 
+	 compile_cordscript_private, -1 }
 };
 int	prepare_function_table=1;
 

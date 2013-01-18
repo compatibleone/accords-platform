@@ -145,6 +145,10 @@ private void autoload_cords_account_nodes() {
 				pptr->security = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "legal" )) != (struct xml_atribut *) 0)
 				pptr->legal = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "nature" )) != (struct xml_atribut *) 0)
+				pptr->nature = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "invoicing" )) != (struct xml_atribut *) 0)
+				pptr->invoicing = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "users" )) != (struct xml_atribut *) 0)
 				pptr->users = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -191,6 +195,12 @@ public  void autosave_cords_account_nodes() {
 		fprintf(h," legal=%c",0x0022);
 		fprintf(h,"%s",(pptr->legal?pptr->legal:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," nature=%c",0x0022);
+		fprintf(h,"%s",(pptr->nature?pptr->nature:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," invoicing=%c",0x0022);
+		fprintf(h,"%s",(pptr->invoicing?pptr->invoicing:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," users=%c",0x0022);
 		fprintf(h,"%u",pptr->users);
 		fprintf(h,"%c",0x0022);
@@ -228,6 +238,10 @@ private void set_cords_account_field(
 			pptr->security = allocate_string(vptr);
 		if (!( strcmp( nptr, "legal" ) ))
 			pptr->legal = allocate_string(vptr);
+		if (!( strcmp( nptr, "nature" ) ))
+			pptr->nature = allocate_string(vptr);
+		if (!( strcmp( nptr, "invoicing" ) ))
+			pptr->invoicing = allocate_string(vptr);
 		if (!( strcmp( nptr, "users" ) ))
 			pptr->users = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -298,6 +312,20 @@ private int pass_cords_account_filter(
 		else if ( strcmp(pptr->legal,fptr->legal) != 0)
 			return(0);
 		}
+	if (( fptr->nature )
+	&&  (strlen( fptr->nature ) != 0)) {
+		if (!( pptr->nature ))
+			return(0);
+		else if ( strcmp(pptr->nature,fptr->nature) != 0)
+			return(0);
+		}
+	if (( fptr->invoicing )
+	&&  (strlen( fptr->invoicing ) != 0)) {
+		if (!( pptr->invoicing ))
+			return(0);
+		else if ( strcmp(pptr->invoicing,fptr->invoicing) != 0)
+			return(0);
+		}
 	if (( fptr->users ) && ( pptr->users != fptr->users )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
@@ -328,6 +356,12 @@ private struct rest_response * cords_account_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.legal=%c%s%c",optr->domain,optr->id,0x0022,pptr->legal,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.nature=%c%s%c",optr->domain,optr->id,0x0022,pptr->nature,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.invoicing=%c%s%c",optr->domain,optr->id,0x0022,pptr->invoicing,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.users=%c%u%c",optr->domain,optr->id,0x0022,pptr->users,0x0022);
@@ -763,6 +797,10 @@ public struct occi_category * occi_cords_account_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "legal",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "nature",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "invoicing",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "users",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -849,6 +887,28 @@ public struct rest_header *  cords_account_occi_headers(struct cords_account * s
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_account.legal='%s'\r\n",(sptr->legal?sptr->legal:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_account.nature='%s'\r\n",(sptr->nature?sptr->nature:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_account.invoicing='%s'\r\n",(sptr->invoicing?sptr->invoicing:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
