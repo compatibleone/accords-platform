@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# (C) CityPassenger / Vincent Renardias <vrenardias@citypassenger.com>
+# (C) 2012,2013 CityPassenger / Vincent Renardias <vrenardias@citypassenger.com>
 
 # To rebuild from source, run "dpkg-buildpackage -b -rfakeroot" from the
 # main directory.
@@ -12,21 +12,8 @@ export DH_OPTIONS
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-# WARNING: MAKE SURE /usr/bin/javac POINTS TO SUN'S JDK (NOT OPENJDK)
+# WARNING: IF BUILDING PAPROCCI MAKE SURE /usr/bin/javac POINTS TO SUN'S JDK (NOT OPENJDK)
 JAVA_HOME ?= $(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
-
-#CFLAGS = -Wall -g
-#ifeq (Debian,$(shell lsb_release -s -i))
-#LDFLAGS=
-#else
-#LDFLAGS="-Wl,-z,defs"
-#endif
-
-#ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0 -g
-#else
-#	CFLAGS += -O2
-#endif
 
 configure:
 	./autogen.sh
@@ -41,10 +28,10 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 endif
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--enable-pyaccords \
-		--enable-testsuite \
 		--prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --libexecdir=\$${prefix}/lib  \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
-		#--enable-paprocci=$(JAVA_HOME) \
+		# --enable-paprocci=$(JAVA_HOME) \  # Disabled since last libocci API change.
+		# --enable-testsuite \
 
 build: build-stamp
 build-stamp: config.status
@@ -133,8 +120,8 @@ binary-arch: build install
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
 	for i in libcocarrier0 libcocci0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
-		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 0.20130101-1)") > debian/$$i.shlibs; \
-		dh_makeshlibs -p $$i -V "$$i (>= 0.20130101-1)"; \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 1.0-1)") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= 1.0-1)"; \
 	done
 	dh_shlibdeps -a
 	dh_gencontrol -a

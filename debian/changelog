@@ -1,3 +1,16 @@
+compatibleone-accords (1.0-1) unstable; urgency=low
+
+  * Bump up version number!
+  * Update solib deps accordingly.
+  * Include code for the current repository.
+  * Code / Comments clean-ups in debian/rules.
+  * Disable python testsuite (doesn't work and most likely won't be maintained).
+  * Wrote minimalist manpage for the cosacs client to shut up lintian.
+  * Declare compatibleone-accords and compatibleone-accords-dev as metapackages.
+  * Packages are now fully clean according to lintian (except the Python JDK).
+
+ -- Vincent Renardias <vincent@renardias.com>  Fri, 18 Jan 2013 14:01:40 +0100
+
 compatibleone-accords (0.20130101-1) unstable; urgency=low
 
   * Upstream code update + .csp sample file.

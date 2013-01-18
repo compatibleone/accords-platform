@@ -13,7 +13,7 @@ dist_coman7_DATA = accords.7 compatibleone.7
 dist_coman1_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	co-resolver.1 co-start.1 co-status.1 co-stop.1 azprocci.1 broker.1 \
 	coees.1 coips.1 comons.1 conagios.1 conets.1 coobas.1 cool.1 \
-	copaas.1 cops.1 cosacs.1 cosched.1 coss.1 dcprocci.1 ezvm.1 \
+	copaas.1 cops.1 cosacs.1 cosacs-client.1 cosched.1 coss.1 dcprocci.1 ezvm.1 \
 	fileserver.1 paasprocci.1 onprocci.1 osocciprocci.1 osprocci.1 \
 	paprocci.1 parser.1 procci.1 publisher.1 run-azprocci.1 run-broker.1 \
 	run-coees.1 run-coips.1 run-comons.1 run-conagios.1 run-conets.1 \

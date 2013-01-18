@@ -62,15 +62,15 @@ Description: CompatibleOne Accords platform Python bindings and interfaces
  This package contains CompatibleOne Accords platform Python bindings and
  interfaces to develop new components in Python.
 
-Package: compatibleone-accords-testsuite
-Section: devel
-Architecture: all
-Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev, python-psutil
-Description: CompatibleOne Accords platform (python testsuite)
- This package will run a set of tests to ensure that a minimal level of working
- parts is meet. It is useful during development to ensure that there is no
- regression.
-
+#Package: compatibleone-accords-testsuite
+#Section: devel
+#Architecture: all
+#Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev, python-psutil
+#Description: CompatibleOne Accords platform (python testsuite)
+# This package will run a set of tests to ensure that a minimal level of working
+# parts is meet. It is useful during development to ensure that there is no
+# regression.
+#
 Package: libcocarrier0
 Section: libs
 Architecture: any
@@ -489,18 +489,20 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
    - Remove the constraints of vendor lock-in
    - Provide a platform that the community can evolve rapidly and adapt
      according to their needs
+ ('compatibleone-accords' is a metapackage)
 
 Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
-Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-accords-testsuite, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
+Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
 Recommends: compatibleone-paprocci, compatibleone-nagios
-Description: CompatibleOne Accords Platform - All packages (development)
+Description: CompatibleOne Accords Platform - All packages (development environment)
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
  ACCORDS (Advanced Capabilities for CompatibleOne Resource Distribution
  Services), for the description and federation of different clouds comprising
  resources provisioned
+ ('compatibleone-accords' is a metapackage)
 
 Package: compatibleone-accords-doc
 Architecture: all
