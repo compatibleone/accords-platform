@@ -54,6 +54,7 @@ struct	cordscript_value
 	int	parameter;
 	struct	cordscript_instruction * code;
 	struct	cordscript_context * body;
+	struct	cordscript_context * object;
 	char *	value;
 };
 
@@ -82,6 +83,7 @@ struct	cordscript_instruction
 struct	cordscript_context
 {
 	char *	name;
+	int	instance;
 	struct	cordscript_instruction * caller;
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;

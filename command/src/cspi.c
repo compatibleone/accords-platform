@@ -341,18 +341,21 @@ public struct cordscript_context * liberate_cordscript_context( struct cordscrip
 			xptr->data = vptr->next;
 			vptr = liberate_cordscript_value( vptr );
 		}
-		while ((vptr = xptr->code) != (struct cordscript_value *) 0)
+		if (!( xptr->instance ))
 		{
-			xptr->code = vptr->next;
-			vptr = liberate_cordscript_function( vptr );
+			while ((vptr = xptr->code) != (struct cordscript_value *) 0)
+			{
+				xptr->code = vptr->next;
+				vptr = liberate_cordscript_function( vptr );
+			}
+			while ((iptr = xptr->cs) != (struct cordscript_instruction *) 0)
+			{
+				xptr->cs = iptr->next;
+				iptr = liberate_cordscript_instruction( iptr );
+			}
 		}
-		while ((iptr = xptr->cs) != (struct cordscript_instruction *) 0)
-		{
-			xptr->cs = iptr->next;
-			iptr = liberate_cordscript_instruction( iptr );
 		if ( xptr->name )
 			liberate( xptr->name );
-		}
 		liberate( xptr );
 	}
 	return( (struct cordscript_context *) 0 );
@@ -4409,6 +4412,41 @@ private	struct cordscript_instruction * compile_cordscript_switch( struct cordsc
 		return((struct cordscript_instruction *) 0);
 	}
 }			
+
+/*   --------------------------	*/
+/*    resolve_cordscript_class  */
+/*   --------------------------	*/
+private	struct cordscript_context * copy_cordscript_class( struct cordscript_context * cptr )
+{
+	struct	cordscript_context * xptr;
+	struct	cordscript_value   * vptr;
+	struct	cordscript_value   * wptr;
+
+	if (!( xptr = allocate_cordscript_context() ))
+		return((struct cordscript_context *) 0);
+	else if (!( xptr->name = allocate_string( cptr->name ) ))
+		return( liberate_cordscript_context( xptr ) );
+	else
+	{
+		xptr->instance=1;
+		xptr->code = cptr->code;
+		xptr->cs   = cptr->cs;
+		xptr->ip   = cptr->cs;
+		for (	vptr = cptr->data;
+			vptr != (struct cordscript_value *) 0;
+			vptr = vptr->next )
+		{
+			if (!( wptr = allocate_cordscript_value( vptr->name, vptr->value ) ))
+				break;
+			else
+			{
+				wptr->next = xptr->data;
+				xptr->data = wptr;
+			}
+		}
+		return( cptr );
+	}
+}
 
 /*   --------------------------	*/
 /*    resolve_cordscript_class  */
