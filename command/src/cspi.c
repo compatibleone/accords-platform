@@ -386,6 +386,11 @@ private	void	unused_cordscript_value( struct cordscript_value * vptr )
 {
 	if ( vptr )
 	{
+		if ( vptr->object )
+		{
+			liberate_cordscript_context( vptr->object );
+			vptr->object = (struct cordscript_context *) 0;
+		}
 		if ( vptr->value )
 		{
 			liberate( vptr->value );
@@ -518,9 +523,17 @@ private	struct	cordscript_instruction * set_operation( struct cordscript_instruc
 	{
 		if ((wptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
 		{
+			if ( vptr->object )
+				vptr->object = liberate_cordscript_context( vptr->object );
 			if ( vptr->value )
-				liberate( vptr->value );
-			if ( wptr->value )
+				vptr->value = liberate( vptr->value );
+
+			if ( wptr->object )
+			{
+				vptr->object = wptr->object;
+				wptr->object = (struct cordscript_context *) 0;
+			}
+			else if ( wptr->value )
 				vptr->value = allocate_string( wptr->value );
 			else	vptr->value = allocate_string( "" );
 
@@ -1674,6 +1687,27 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 	}
 	return;
 }
+/*	----------------	*/
+/*	method_operation	*/
+/*	----------------	*/
+private	struct	cordscript_instruction * method_operation( struct cordscript_context * cptr, char * nptr, struct cordscript_value * argv[] )
+{
+	struct	cordscript_value * fptr;
+	for (	fptr=cptr->code;
+		fptr != (struct cordscript_value *) 0;
+		fptr = fptr->next )
+	{
+		if (!( fptr->name ))
+			continue;
+		else if (!( strcmp( fptr->name, nptr ) ))
+			break;
+	}
+	if (!( fptr ))
+		return( (struct cordscript_instruction *) 0 );
+	else if (!( fptr->body ))
+		return( (struct cordscript_instruction *) 0 );
+	else	return( fptr->body->cs );
+}
 
 private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 {
@@ -1734,6 +1768,7 @@ private	struct cordscript_instruction * eval_next( struct cordscript_instruction
 /*	---------------		*/
 private	struct	cordscript_instruction * eval_operation( struct cordscript_instruction * iptr )
 {
+	struct	cordscript_instruction	* jptr;
 	struct	cordscript_context 	* xptr;
 	struct	cordscript_value 	* vptr;
 	struct	cordscript_value 	* nptr;
@@ -1786,6 +1821,16 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 			}
 		}
+
+		/* ----------------------------- */
+		/* check if subject is an object */
+		/* ----------------------------- */
+		if ( vptr->object )
+			if ((jptr = method_operation( 
+				vptr->object, 
+				wptr->value , 
+				argv )) != (struct cordscript_instruction *) 0)
+				return( jptr );
 
 		/* ---------------------------------- */
 		/* detect internal function on object */
