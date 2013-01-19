@@ -1769,6 +1769,16 @@ private	struct cordscript_instruction * eval_next( struct cordscript_instruction
 	else	return( iptr->next );
 }
 
+private	void	implicite_construction( struct cordscript_context * cptr )
+{
+	struct	cordscript_instruction * iptr;
+	for (	iptr = cptr->ip = cptr->cs;
+		iptr != (struct cordscript_instruction *) 0;
+		iptr->context=cptr, iptr = (*iptr->evaluate)( iptr  ) );
+	return;
+}
+
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
@@ -1891,6 +1901,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				break;
 			else
 			{
+				implicite_construction( xptr );
 				push_value( iptr->context, object_value( xptr ) );
 				return( eval_next( iptr ) );
 			}
@@ -4598,6 +4609,7 @@ private	struct cordscript_context * resolve_cordscript_class( char * nptr )
 /*   --------------------------	*/
 private	struct cordscript_instruction * compile_cordscript_class( struct cordscript_context * cptr )
 {
+	struct	cordscript_instruction 	* iptr;
 	struct	cordscript_context	* xptr;
 	int		c;
 	char	buffer[8192];
@@ -4624,7 +4636,13 @@ private	struct cordscript_instruction * compile_cordscript_class( struct cordscr
 	else
 	{
 		compile_cordscript_block( xptr );
-		return((struct cordscript_instruction *) 0);
+		if (!( iptr = allocate_cordscript_instruction( ret_operation ) ))
+			return( iptr );
+		else
+		{
+			add_instruction( xptr, iptr );
+			return((struct cordscript_instruction *) 0);
+		}
 	}
 }
 
