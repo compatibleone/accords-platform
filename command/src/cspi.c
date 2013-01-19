@@ -15,6 +15,9 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 private	struct cordscript_instruction * handle_else( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	void	check_line_end(struct cordscript_context * cptr, int level, int c);
+private	struct cordscript_context * copy_cordscript_class( struct cordscript_context * cptr );
+private	struct cordscript_context * resolve_cordscript_class( char * nptr );
+
 private	int	end_of_instruction=0;
 private	int	echo=0;
 private	int	abandon_compile=0;
@@ -209,6 +212,21 @@ private	struct cordscript_value * instruction_value( struct cordscript_instructi
 	else
 	{
 		vptr->code = iptr;
+		return( vptr );
+	}
+}
+
+/*   -----------------	*/
+/*      object_value	*/
+/*   -----------------	*/
+private	struct cordscript_value * object_value( struct cordscript_context * iptr )
+{
+ 	struct	cordscript_value * vptr;
+	if (!( vptr = allocate_cordscript_value( (char *) 0, (char *) 0) ))
+		return(vptr);
+	else
+	{
+		vptr->object = iptr;
 		return( vptr );
 	}
 }
@@ -1657,20 +1675,75 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 	return;
 }
 
+private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
+{
+	{	"display" , 	_DISPLAY_FUNCTION,	-1 },
+	{	"wait" ,	_WAIT_FUNCTION,		-1 },
+	{	"length",	_LENGTH_FUNCTION,	-1 },
+	{	"round",	_ROUND_FUNCTION,	-1 },
+	{	"member",	_MEMBER_FUNCTION,	-1 },
+	{	"date",		_DATE_FUNCTION,		-1 },
+	{	"cut",		_CUT_FUNCTION,		-1 },
+	{	"join",		_JOIN_FUNCTION,		-1 },
+	{	"debug",	_DEBUG_FUNCTION,	-1 },
+	{	"new",		_NEW_FUNCTION,		-1 }
+};
+
+int	prepare_hashcodes=3;
+
+private	int	keyword_hash( char  * sptr )
+{
+	int	r=0;
+	while ( *sptr ) r += *(sptr++);
+	return(( r % _KEYWORD_HASH ));
+}
+
+private	int	resolve_language_function( char * token )
+{
+	int	i;
+	int	h;
+	h = keyword_hash( token );
+	if ( prepare_hashcodes & 2 )
+	{
+		for ( i=0; i < _MAX_FUNCTIONS; i++ )
+			Functions[i].hashcode = keyword_hash( Functions[i].keyword );
+		prepare_hashcodes &= ~2;
+	}
+	for ( i=0; i < _MAX_FUNCTIONS; i++ )
+	{
+		if ( Functions[i].hashcode != h )
+			continue;
+		else if (!( strcmp( Functions[i].keyword, token ) ))
+			return(Functions[i].value);
+	}
+	return( -1 );
+}
+
+/*	---------	*/
+/*	eval_next	*/
+/*	---------	*/
+private	struct cordscript_instruction * eval_next( struct cordscript_instruction * iptr )
+{
+	if (!( iptr ))
+		return( (struct cordscript_instruction *) 0);
+	else	return( iptr->next );
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
 private	struct	cordscript_instruction * eval_operation( struct cordscript_instruction * iptr )
 {
-	struct	cordscript_value * vptr;
-	struct	cordscript_value * nptr;
-	struct	cordscript_value * wptr;
-	struct	cordscript_operand * optr;
-	struct	occi_element * dptr=(struct occi_element *) 0;
-	struct	occi_response* zptr=(struct occi_response *) 0;
-	struct	cordscript_value * 	argv[10];
-	int				argc=0;
-	int				argi=0;
+	struct	cordscript_context 	* xptr;
+	struct	cordscript_value 	* vptr;
+	struct	cordscript_value 	* nptr;
+	struct	cordscript_value 	* wptr;
+	struct	cordscript_operand 	* optr;
+	struct	occi_element 		* dptr=(struct occi_element *) 0;
+	struct	occi_response		* zptr=(struct occi_response *) 0;
+	struct	cordscript_value 	* argv[10];
+	int	argc=0;
+	int	argi=0;
 	char	vbuffer[_MAX_VALUE];
 	char *	ihost;
 	char *	evalue=(char *) 0;
@@ -1714,49 +1787,38 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			}
 		}
 
-		if (!( strcmp( wptr->value, "display" ) ))
+		/* ---------------------------------- */
+		/* detect internal function on object */
+		/* ---------------------------------- */
+		switch ( resolve_language_function( wptr->value ) )
 		{
+		case	_DISPLAY_FUNCTION	:
 			if ( vptr->value )
 				printf("%s\n",vptr->value);
-		}
-		else if (!( strcmp( wptr->value, "wait" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_WAIT_FUNCTION		:
 			if ( vptr->value )
 				sleep( atoi(vptr->value) );
-		}
-
-		else if (!( strcmp( wptr->value, "length" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_LENGTH_FUNCTION	:
 			push_value( iptr->context, integer_value( ( rest_valid_string( vptr->value ) ? strlen( vptr->value ) : 0 ) ));
-		}
-
-		else if (!( strcmp( wptr->value, "round" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_ROUND_FUNCTION		:
 			round_operation( iptr, vptr, argv[0] );
-		}
-
-		else if (!( strcmp( wptr->value, "member" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_MEMBER_FUNCTION	:
 			member_operation( iptr, vptr, argv[0] );
-		}
-
-		else if (!( strcmp( wptr->value, "date" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_DATE_FUNCTION		:
 			date_operation( iptr, vptr );
-		}
-
-		else if (!( strcmp( wptr->value, "cut" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_CUT_FUNCTION		:
 			cut_operation( iptr, vptr->value, argv[0] );
-		}
-
-		else if (!( strcmp( wptr->value, "join" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_JOIN_FUNCTION		:
 			join_operation( iptr, vptr, argv[0] );
-		}
-
-		else if (!( strcmp( wptr->value, "debug" ) ))
-		{
+			return( eval_next( iptr ) );
+		case	_DEBUG_FUNCTION		:
 			v = atoi( vptr->value );
 			if ( v & 1 )
 				rest_show_request( 1 );
@@ -1767,12 +1829,25 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			if ( v & 4 )
 				trace = 1;
 			else	trace = 0;
+			return( eval_next( iptr ) );
+		case	_NEW_FUNCTION		:
+			if (!( vptr->value ))
+				break;
+			else if (!( xptr = resolve_cordscript_class( vptr->value ) ))
+				break;
+			else if (!( xptr = copy_cordscript_class( xptr ) ))
+				break;
+			else
+			{
+				push_value( iptr->context, object_value( xptr ) );
+				return( eval_next( iptr ) );
+			}
 		}
 
 		/* --------------------------------------- */
 		/* check for a universal unique identifier */
 		/* --------------------------------------- */
-		else if (!( evalue = evaluation_value( vptr->value ) ))
+		if (!( evalue = evaluation_value( vptr->value ) ))
 			push_value( iptr->context, string_value("[error]") );
 
 		else if (!( strncmp( evalue, "http", strlen("http" ) ) ))
@@ -2064,10 +2139,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 
 	if ( evalue )
 		evalue = liberate( evalue );
-	if (!( iptr ))
-		return( (struct cordscript_instruction *) 0);
-	else	return( iptr->next );
+	return( eval_next( iptr ) );
 }
+
 
 /*	-------------------------	*/
 /*		jmp_operation		*/
@@ -4693,15 +4767,7 @@ private	struct cordscript_instruction * compile_cordscript_return( struct cordsc
 	else	return((struct cordscript_instruction *) 0);
 }
 
-#define	_MAX_KEYWORDS	20
-#define	_KEYWORD_HASH	57
-
-struct	cordscript_language	
-{
-	char	*	keyword;
-	struct cordscript_instruction * (*compile)(struct cordscript_context * cptr);
-	int		hashcode;
-}	FunctionTable[_MAX_KEYWORDS]=
+private	struct cordscript_language Keywords[_MAX_KEYWORDS]=
 {
 	{ "if" ,
 	 compile_cordscript_if, -1 } ,
@@ -4744,34 +4810,26 @@ struct	cordscript_language
 	{ "private", 
 	 compile_cordscript_private, -1 }
 };
-int	prepare_function_table=1;
-
-private	int	keyword_hash( char  * sptr )
-{
-	int	r=0;
-	while ( *sptr ) r += *(sptr++);
-	return(( r % _KEYWORD_HASH ));
-}
 
 private	int	compile_cordscript_keyword( struct cordscript_context * cptr, char * token )
 {
 	int	i;
 	int	h;
 	h = keyword_hash( token );
-	if ( prepare_function_table )
+	if ( prepare_hashcodes & 1 )
 	{
 		for ( i=0; i < _MAX_KEYWORDS; i++ )
-			FunctionTable[i].hashcode = keyword_hash( FunctionTable[i].keyword );
-		prepare_function_table=0;
+			Keywords[i].hashcode = keyword_hash( Keywords[i].keyword );
+		prepare_hashcodes &= ~1;
 	}
 	for ( i=0; i < _MAX_KEYWORDS; i++ )
 	{
-		if ( FunctionTable[i].hashcode != h )
+		if ( Keywords[i].hashcode != h )
 
 			continue;
-		else if (!( strcmp( FunctionTable[i].keyword, token ) ))
+		else if (!( strcmp( Keywords[i].keyword, token ) ))
 		{
-			(*FunctionTable[i].compile)( cptr );
+			(*Keywords[i].compile)( cptr );
 			return( 1 );
 		}
 	}

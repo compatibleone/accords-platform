@@ -36,8 +36,37 @@
 #define	_TRY_LABEL	7
 #define	_CATCH_LABEL	8
 
+#define	_DISPLAY_FUNCTION	0
+#define	_WAIT_FUNCTION		1
+#define	_LENGTH_FUNCTION	2
+#define	_ROUND_FUNCTION		3
+#define	_MEMBER_FUNCTION	4
+#define	_DATE_FUNCTION		5
+#define	_CUT_FUNCTION		6
+#define	_JOIN_FUNCTION		7
+#define	_DEBUG_FUNCTION		8
+#define	_NEW_FUNCTION		9
+#define	_MAX_FUNCTIONS		10
+
+#define	_MAX_KEYWORDS	20
+#define	_KEYWORD_HASH	57
+
 struct	cordscript_context;
 struct	cordscript_instruction;
+
+struct	cordscript_language_function
+{
+	char *	keyword;
+	int	value;
+	int	hashcode;
+}; 
+
+struct	cordscript_language	
+{
+	char	*	keyword;
+	struct cordscript_instruction * (*compile)(struct cordscript_context * cptr);
+	int		hashcode;
+};
 
 struct	cordscript_label
 {
