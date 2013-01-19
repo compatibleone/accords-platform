@@ -1690,8 +1690,9 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 /*	----------------	*/
 /*	method_operation	*/
 /*	----------------	*/
-private	struct	cordscript_instruction * method_operation( struct cordscript_context * cptr, char * nptr, struct cordscript_value * argv[] )
+private	struct	cordscript_instruction * method_operation( struct cordscript_instruction * iptr, struct cordscript_context * cptr, char * nptr, struct cordscript_value * argv[] )
 {
+	struct	cordscript_context * bptr;
 	struct	cordscript_value * fptr;
 	for (	fptr=cptr->code;
 		fptr != (struct cordscript_value *) 0;
@@ -1704,9 +1705,14 @@ private	struct	cordscript_instruction * method_operation( struct cordscript_cont
 	}
 	if (!( fptr ))
 		return( (struct cordscript_instruction *) 0 );
-	else if (!( fptr->body ))
+	else if (!( bptr = fptr->body ))
 		return( (struct cordscript_instruction *) 0 );
-	else	return( fptr->body->cs );
+	else	
+	{
+		bptr->caller = iptr->next;
+		return((bptr->ip = bptr->cs));
+
+	}
 }
 
 private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
@@ -1826,7 +1832,8 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* check if subject is an object */
 		/* ----------------------------- */
 		if ( vptr->object )
-			if ((jptr = method_operation( 
+			if ((jptr = method_operation(
+				iptr,
 				vptr->object, 
 				wptr->value , 
 				argv )) != (struct cordscript_instruction *) 0)
