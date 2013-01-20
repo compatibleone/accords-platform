@@ -1687,10 +1687,29 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 	}
 	return;
 }
+
+/*	--------------------	*/
+/*	resolve_class_method	*/
+/*	--------------------	*/
+private	struct	cordscript_value *	resolve_class_method( struct cordscript_context * cptr, char * name )
+{
+	struct	cordscript_value  * fptr;
+	for (	fptr=cptr->code;
+		fptr != (struct cordscript_value *) 0;
+		fptr = fptr->next )
+	{
+		if (!( fptr->name ))
+			continue;
+		else if (!( strcmp( fptr->name, name ) ))
+			break;
+	}
+	return( fptr );
+}
+
 /*	----------------	*/
 /*	method_operation	*/
 /*	----------------	*/
-private	struct	cordscript_instruction * method_operation( 
+private	struct cordscript_instruction * method_operation( 
 	struct cordscript_instruction * iptr, 
 	struct cordscript_context * cptr, char * name,
 	struct cordscript_operand * optr )
@@ -1704,17 +1723,7 @@ private	struct	cordscript_instruction * method_operation(
 
 	if ( check_csp_debug() )
 		printf("method_operation();\n");
-
-	for (	fptr=cptr->code;
-		fptr != (struct cordscript_value *) 0;
-		fptr = fptr->next )
-	{
-		if (!( fptr->name ))
-			continue;
-		else if (!( strcmp( fptr->name, name ) ))
-			break;
-	}
-	if (!( fptr ))
+	if (!( fptr = resolve_class_method( cptr, name ) ))
 		return( (struct cordscript_instruction *) 0 );
 	else if (!( bptr = fptr->body ))
 		return( (struct cordscript_instruction *) 0 );
@@ -1804,15 +1813,21 @@ private	int	resolve_language_function( char * token )
 private	struct cordscript_instruction * eval_next( struct cordscript_instruction * iptr, struct	cordscript_value * argv[10]  )
 {
 	int	i;
-	for (i=0; i < 10; i++ )
-		if ( argv[i] )
-			drop_value( argv[i] );
+
+	if ( argv )
+	{
+		for (i=0; i < 10; i++ )
+			if ( argv[i] )
+				drop_value( argv[i] );
+	}
 
 	if (!( iptr ))
 		return( (struct cordscript_instruction *) 0);
 	else	return( iptr->next );
 }
-
+/*	----------------------		*/
+/*	implicite_construction		*/
+/*	----------------------		*/
 private	void	implicite_construction( struct cordscript_context * cptr )
 {
 	struct	cordscript_instruction * iptr;
@@ -1822,6 +1837,26 @@ private	void	implicite_construction( struct cordscript_context * cptr )
 		iptr != (struct cordscript_instruction *) 0;
 		iptr->context=cptr, iptr = (*iptr->evaluate)( iptr  ) );
 	return;
+}
+
+/*	----------------------		*/
+/*	explicite_construction		*/
+/*	----------------------		*/
+private	struct cordscript_instruction * explicite_construction( 
+	struct cordscript_instruction * iptr,
+	struct cordscript_context * cptr, 
+	struct cordscript_operand * optr )
+{
+	if (!( cptr ))
+		return((struct cordscript_instruction *) 0);
+	else if (!( cptr->name ))
+		return((struct cordscript_instruction *) 0);
+	else
+	{
+		if ( check_csp_debug() )
+			printf("explicte_construction();\n");
+		return( method_operation( iptr, cptr, cptr->name, optr ) );
+	}
 }
 
 
@@ -1870,12 +1905,32 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* check if subject is an object */
 		/* ----------------------------- */
 		if ((xptr = vptr->object ) != (struct	cordscript_context *) 0) 
+		{
 			if ((jptr = method_operation(
 				iptr,
 				xptr,
 				wptr->value , 
 				optr->next )) != (struct cordscript_instruction *) 0)
 				return( jptr );
+		}
+
+		/* ---------------------- */
+		/* check if method is new */
+		/* ---------------------- */
+		else if (!( strcmp( wptr->value, "new" ) ))
+		{
+			if ((  vptr->value != (char *) 0 )
+			&&  (( xptr = resolve_cordscript_class( vptr->value )) != (struct cordscript_context *) 0)
+			&&  (( xptr = copy_cordscript_class( xptr )) != (struct cordscript_context *) 0))
+			{
+				implicite_construction( xptr );
+				jptr = explicite_construction( iptr, xptr, optr->next  );
+				push_value( iptr->context, object_value( xptr ) );
+				if (!( jptr ))
+					return( eval_next( iptr, (struct cordscript_value **) 0 ) );
+				else	return( jptr );
+			}
+		}
 
 		/* ------------------------- */
 		/* check for pushed operands */
