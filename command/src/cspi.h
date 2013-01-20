@@ -113,6 +113,7 @@ struct	cordscript_context
 {
 	char *	name;
 	int	instance;
+	int	nature;
 	struct	cordscript_instruction * caller;
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;

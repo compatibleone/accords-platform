@@ -1694,6 +1694,10 @@ private	struct	cordscript_instruction * method_operation( struct cordscript_inst
 {
 	struct	cordscript_context * bptr;
 	struct	cordscript_value * fptr;
+
+	if ( check_csp_debug() )
+		printf("method_operation();\n");
+
 	for (	fptr=cptr->code;
 		fptr != (struct cordscript_value *) 0;
 		fptr = fptr->next )
@@ -1772,6 +1776,8 @@ private	struct cordscript_instruction * eval_next( struct cordscript_instruction
 private	void	implicite_construction( struct cordscript_context * cptr )
 {
 	struct	cordscript_instruction * iptr;
+	if ( check_csp_debug() )
+		printf("implicte_construction();\n");
 	for (	iptr = cptr->ip = cptr->cs;
 		iptr != (struct cordscript_instruction *) 0;
 		iptr->context=cptr, iptr = (*iptr->evaluate)( iptr  ) );
@@ -3440,7 +3446,7 @@ private	int	get_token( char * buffer )
 /*   ---------------- */
 /*   resolve_variable */
 /*   ---------------- */
-private	struct	cordscript_value *	resolve_variable( char * token, struct cordscript_context * cptr )
+private	struct	cordscript_value *	locate_variable( char * token, struct cordscript_context * cptr )
 {
 	struct	cordscript_value * vptr;
 	if ((vptr = cptr->data) != (struct cordscript_value *) 0)
@@ -3453,7 +3459,22 @@ private	struct	cordscript_value *	resolve_variable( char * token, struct cordscr
 			else	vptr = vptr->next;
 		}
 	}
-	if (!( vptr = allocate_cordscript_value( "", token ) ))
+	if (!( cptr->nature ))
+		return((struct cordscript_value *) 0);
+	else if (!( cptr->env ))
+		return((struct cordscript_value *) 0);
+	else	return( locate_variable( token, cptr->env ) );
+}
+
+/*   ---------------- */
+/*   resolve_variable */
+/*   ---------------- */
+private	struct	cordscript_value *	resolve_variable( char * token, struct cordscript_context * cptr )
+{
+	struct	cordscript_value * vptr;
+	if ((vptr = locate_variable( token, cptr )) != (struct cordscript_value *) 0)
+		return( vptr );
+	else if (!( vptr = allocate_cordscript_value( "", token ) ))
 		return( vptr );
 	else
 	{
@@ -3462,6 +3483,7 @@ private	struct	cordscript_value *	resolve_variable( char * token, struct cordscr
 		return( vptr );
 	}
 }
+
 /*   ---------------- */
 /*   resolve_function */
 /*   ---------------- */
@@ -3741,6 +3763,21 @@ private	struct cordscript_instruction * compile_cordscript_if( struct cordscript
 	}
 }
 
+/*	---------------------	*/
+/*	append_default_return	*/
+/*	---------------------	*/
+private	struct	cordscript_instruction * compile_default_return( struct cordscript_context * xptr )
+{
+	struct	cordscript_instruction * iptr;
+	if (!( iptr = allocate_cordscript_instruction( ret_operation ) ))
+		return( iptr );
+	else
+	{
+		add_instruction( xptr, iptr );
+		return( iptr );
+	}
+}
+
 /*   -----------------------	*/
 /*   compile_cordscript_else	*/
 /*   -----------------------	*/
@@ -3807,7 +3844,11 @@ private	struct cordscript_instruction * compile_cordscript_function( struct cord
 		}
 		else
 		{
+			cptr->nature = 1;
+			cptr->env = kptr;
 			compile_cordscript_block( cptr );
+			compile_default_return( cptr );
+			cptr->env = (struct cordscript_context *) 0;
 			return((struct cordscript_instruction *) 0);
 		}
 	}
@@ -4636,13 +4677,8 @@ private	struct cordscript_instruction * compile_cordscript_class( struct cordscr
 	else
 	{
 		compile_cordscript_block( xptr );
-		if (!( iptr = allocate_cordscript_instruction( ret_operation ) ))
-			return( iptr );
-		else
-		{
-			add_instruction( xptr, iptr );
-			return((struct cordscript_instruction *) 0);
-		}
+		compile_default_return( xptr );
+		return((struct cordscript_instruction *) 0);
 	}
 }
 
