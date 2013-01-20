@@ -131,6 +131,9 @@ endif
 if ENABLE_TESTON
 SUBDIRS += teston
 endif
+if ENABLE_TESTHDFS
+SUBDIRS += testhdfs
+endif
 if ENABLE_TESTCP
 SUBDIRS += testcp
 endif

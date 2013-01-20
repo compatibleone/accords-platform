@@ -476,6 +476,13 @@ AC_ARG_ENABLE([teston],
       [enable_teston=yes])
 AM_CONDITIONAL([ENABLE_TESTON], [test "$enable_teston" = "yes"])
 
+AC_ARG_ENABLE([testhdfs],
+      [AS_HELP_STRING([--disable-testhdfs],
+		      [Disable testhdfs @<:@default=enable@:>@])],
+      [],
+      [enable_testhdfs=yes])
+AM_CONDITIONAL([ENABLE_TESTHDFS], [test "$enable_testhdfs" = "yes"])
+
 AC_ARG_ENABLE([testcp],
       [AS_HELP_STRING([--disable-testcp],
 		      [Disable testcp @<:@default=enable@:>@])],
@@ -571,6 +578,7 @@ AC_CONFIG_FILES([command/Makefile command/src/Makefile])
 AC_CONFIG_FILES([testdc/Makefile testdc/src/Makefile])
 AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
 AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
+AC_CONFIG_FILES([testhdfs/Makefile testhdfs/src/Makefile])
 AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
 AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
 AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
@@ -632,6 +640,7 @@ echo "    - command                  : $enable_command"
 echo "    - testos                   : $enable_testos"
 echo "    - testdc                   : $enable_testdc"
 echo "    - teston                   : $enable_teston"
+echo "    - testhdfs                 : $enable_testhdfs"
 echo "    - testcp                   : $enable_testcp"
 echo "    - testcb                   : $enable_testcb"
 echo "    - testaz                   : $enable_testaz"

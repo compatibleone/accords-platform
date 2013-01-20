@@ -540,6 +540,7 @@ _make_security_files() {
 	_mksect testcb 1
 	_mksect teston 1
 	_mksect testos 1
+	_mksect testhdfs 1
 	_mksect testresolver 1
 	_mksect command 1
 }
@@ -619,6 +620,7 @@ _accords_config() {
 		_mkcert testcp
 		_mkcert testcb
 		_mkcert testos
+		_mkcert testhdfs
 		_mkcert testpa
 		_mkcert teston
 		_mkcert testresolver
