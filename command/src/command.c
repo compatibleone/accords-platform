@@ -27,6 +27,7 @@
 
 private	int	verbose=0;
 private	int	debug=0;
+private	int	noauth=0;
 
 private	char *	agent="CO-COMMAND/1.0";
 private	char *	publisher="http://127.0.0.1:8086";
@@ -95,13 +96,19 @@ private	int	cords_service_action( char * id, char * action )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( noauth ))
+	{
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	status = ll_cords_service_action( id, action );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	if (!( noauth ))
+	{
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	}
 
 	return( status );
 }
@@ -141,13 +148,19 @@ private	int	cords_service_delete( char * id )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( noauth ))
+	{
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	status = ll_cords_service_delete( id );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	if (!( noauth ))
+	{
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	}
 
 	return( status );
 }
@@ -483,13 +496,19 @@ private	int	cords_invoice_action( char * account, char * other )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( noauth ))
+	{
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	status = ll_invoice_operation( account, other );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	if (!( noauth ))
+	{
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	}
 
 	return( status );
 }
@@ -596,13 +615,19 @@ private	int	command_transaction( char * account, char * price, char * reference,
 	{
 		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-			return(403);
-		else 	(void) occi_client_authentication( auth );
+		if (!( noauth ))
+		{
+			if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+				return(403);
+			else 	(void) occi_client_authentication( auth );
+		}
 
 		status = ll_command_transaction( account ,price, reference, action, description );
 
-		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+		if (!( noauth ))
+		{
+			(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+		}
 
 		return( status );
 
@@ -645,9 +670,12 @@ private	int	invoke_action( char * action, char * instance )
 	{
 		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-			return(403);
-		else 	(void) occi_client_authentication( auth );
+		if (!( noauth ))
+		{
+			if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+				return(403);
+			else 	(void) occi_client_authentication( auth );
+		}
 
 		if (!( zptr =  cords_invoke_action( instance, action, agent, default_tls() ) ))
 			status = 501;
@@ -657,7 +685,10 @@ private	int	invoke_action( char * action, char * instance )
 			status = 0;
 		}
 		
-		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+		if (!( noauth ))
+		{
+			(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+		}
 
 		return( status );
 
@@ -675,13 +706,19 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 
 	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( noauth ))
+	{
+		if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	cordscript_interpreter( filename, argc, argv );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	if (!( noauth ))
+	{
+		(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
+	}
 
 	return( status );
 
@@ -738,6 +775,8 @@ private	int	operation( int argc, char * argv[] )
 					verbose = 1;
 				else if (!( strcmp( aptr, "debug" ) ))
 					debug = 1;
+				else if (!( strcmp( aptr, "noauth" ) ))
+					noauth = 1;
 				else if (!( strcmp( aptr, "tls" ) ))
 					tls = argv[argi++];
 				else if (!( strcmp( aptr, "publisher" ) ))
@@ -782,6 +821,7 @@ private	int	banner()
 	printf("\n         --agent     <agent>          specify agent identity ");
 	printf("\n         --tls       <security>       specify security configuration ");
 	printf("\n         --verbose                    activate verbose messages");
+	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }

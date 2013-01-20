@@ -1801,8 +1801,13 @@ private	int	resolve_language_function( char * token )
 /*	---------	*/
 /*	eval_next	*/
 /*	---------	*/
-private	struct cordscript_instruction * eval_next( struct cordscript_instruction * iptr )
+private	struct cordscript_instruction * eval_next( struct cordscript_instruction * iptr, struct	cordscript_value * argv[10]  )
 {
+	int	i;
+	for (i=0; i < 10; i++ )
+		if ( argv[i] )
+			drop_value( argv[i] );
+
 	if (!( iptr ))
 		return( (struct cordscript_instruction *) 0);
 	else	return( iptr->next );
@@ -1898,29 +1903,29 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		case	_DISPLAY_FUNCTION	:
 			if ( vptr->value )
 				printf("%s\n",vptr->value);
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_WAIT_FUNCTION		:
 			if ( vptr->value )
 				sleep( atoi(vptr->value) );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_LENGTH_FUNCTION	:
 			push_value( iptr->context, integer_value( ( rest_valid_string( vptr->value ) ? strlen( vptr->value ) : 0 ) ));
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_ROUND_FUNCTION		:
 			round_operation( iptr, vptr, argv[0] );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_MEMBER_FUNCTION	:
 			member_operation( iptr, vptr, argv[0] );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_DATE_FUNCTION		:
 			date_operation( iptr, vptr );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_CUT_FUNCTION		:
 			cut_operation( iptr, vptr->value, argv[0] );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_JOIN_FUNCTION		:
 			join_operation( iptr, vptr, argv[0] );
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_DEBUG_FUNCTION		:
 			v = atoi( vptr->value );
 			if ( v & 1 )
@@ -1932,7 +1937,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			if ( v & 4 )
 				trace = 1;
 			else	trace = 0;
-			return( eval_next( iptr ) );
+			return( eval_next( iptr, argv ) );
 		case	_NEW_FUNCTION		:
 			if (!( vptr->value ))
 				break;
@@ -1944,7 +1949,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			{
 				implicite_construction( xptr );
 				push_value( iptr->context, object_value( xptr ) );
-				return( eval_next( iptr ) );
+				return( eval_next( iptr, argv ) );
 			}
 		}
 
@@ -2243,7 +2248,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 
 	if ( evalue )
 		evalue = liberate( evalue );
-	return( eval_next( iptr ) );
+	return( eval_next( iptr, argv ) );
 }
 
 
