@@ -1690,10 +1690,17 @@ private	void	round_operation( struct cordscript_instruction * iptr, struct cords
 /*	----------------	*/
 /*	method_operation	*/
 /*	----------------	*/
-private	struct	cordscript_instruction * method_operation( struct cordscript_instruction * iptr, struct cordscript_context * cptr, char * nptr, struct cordscript_value * argv[] )
+private	struct	cordscript_instruction * method_operation( 
+	struct cordscript_instruction * iptr, 
+	struct cordscript_context * cptr, char * name,
+	struct cordscript_operand * optr )
 {
 	struct	cordscript_context * bptr;
-	struct	cordscript_value * fptr;
+	struct	cordscript_value  * fptr;
+	struct	cordscript_value  * nptr;
+	struct cordscript_value   * pptr;
+	struct cordscript_value   * qptr;
+	int	parameters;
 
 	if ( check_csp_debug() )
 		printf("method_operation();\n");
@@ -1704,7 +1711,7 @@ private	struct	cordscript_instruction * method_operation( struct cordscript_inst
 	{
 		if (!( fptr->name ))
 			continue;
-		else if (!( strcmp( fptr->name, nptr ) ))
+		else if (!( strcmp( fptr->name, name ) ))
 			break;
 	}
 	if (!( fptr ))
@@ -1713,9 +1720,37 @@ private	struct	cordscript_instruction * method_operation( struct cordscript_inst
 		return( (struct cordscript_instruction *) 0 );
 	else	
 	{
+		/* ------------------------------- */
+		/* check for and handle parameters */
+		/* ------------------------------- */
+		if (( optr )
+		&&  ((nptr = optr->value ) != (struct cordscript_value *) 0)
+		&&  ((parameters = (nptr->value ? atoi(nptr->value) : 0 )) != 0))
+		{
+			for (	pptr=bptr->data;
+				pptr != (struct cordscript_value *) 0;
+				pptr = pptr->next )
+			{
+				if ( pptr->parameter == parameters )
+				{
+					if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+					{
+						if ( pptr->value )
+							pptr->value = liberate( pptr->value );
+						if ( qptr->value )
+							pptr->value = allocate_string( qptr->value );
+						drop_value( qptr );
+					}
+					parameters--;
+				}
+			}
+		}
+
+		/* ------------------------ */
+		/* activate the method code */
+		/* ------------------------ */
 		bptr->caller = iptr->next;
 		return((bptr->ip = bptr->cs));
-
 	}
 }
 
@@ -1826,6 +1861,17 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	&&  ((optr = optr->next)  != (struct cordscript_operand *) 0)
 	&&  ((wptr = optr->value) != (struct cordscript_value   *) 0))
 	{
+		/* ----------------------------- */
+		/* check if subject is an object */
+		/* ----------------------------- */
+		if ((xptr = vptr->object ) != (struct	cordscript_context *) 0) 
+			if ((jptr = method_operation(
+				iptr,
+				xptr,
+				wptr->value , 
+				optr->next )) != (struct cordscript_instruction *) 0)
+				return( jptr );
+
 		/* ------------------------- */
 		/* check for pushed operands */
 		/* ------------------------- */
@@ -1843,17 +1889,6 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				}
 			}
 		}
-
-		/* ----------------------------- */
-		/* check if subject is an object */
-		/* ----------------------------- */
-		if ( vptr->object )
-			if ((jptr = method_operation(
-				iptr,
-				vptr->object, 
-				wptr->value , 
-				argv )) != (struct cordscript_instruction *) 0)
-				return( jptr );
 
 		/* ---------------------------------- */
 		/* detect internal function on object */
@@ -5251,16 +5286,6 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 		{
 			if ( operands )
 				break;
-/*
-			else if ((fptr = resolve_function( iptr->first->value->value, cptr )) != (struct cordscript_value *) 0)
-			{
-				unget_byte(c);
-				iptr = liberate_cordscript_instruction( iptr );
-				compile_cordscript_call( cptr, fptr );
-				check_line_end(cptr, level,c);
-				return( iptr );
-			}
-*/
 			else	iptr->evaluate = eval_operation;
 			/* --------------------------------- */
 			/* parameters to be stacked for eval */
