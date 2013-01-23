@@ -824,7 +824,7 @@ private	int	banner()
 	printf("\n         --tls       <security>       specify security configuration ");
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
-	printf("\n         --echo                       activate source echo \n");
+	printf("\n         --echo                       activate source echo ");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
