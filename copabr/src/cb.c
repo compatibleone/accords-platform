@@ -2072,7 +2072,7 @@ private	char *	cords_resolve_provider(
 	else if (!( strcasecmp(value,_CORDS_ANY) ))
 	{
 		if ( selector->provider )
-			return( selector->provider );
+			return( allocate_string( selector->provider ) );
 		else	return( cords_research_provider(defaut,agent, tls) );
 	}
 	else
