@@ -5,6 +5,9 @@
 
 extern	int	check_debug();
 
+#define	_MAX_ADDRESS_SIZE	6
+#define	_SOCKADDR_TYPE		sockaddr_in6
+
 private	pthread_mutex_t socket_control = PTHREAD_MUTEX_INITIALIZER;
 
 private	_socket_type=AF_INET;
@@ -33,6 +36,16 @@ public	void	set_socket_ipv4()
 public	int	get_socket_type()
 {
 	return( _socket_type );
+}
+
+/*	------------------------------------------	*/
+/*	     g e t _ a d d r e s s _ s i z e 		*/
+/*	------------------------------------------	*/
+public	int	get_address_size()
+{
+	if ( _socket_type == AF_INET6 )
+		return( 6 );
+	else	return( 4 );
 }
 
 /*	------------------------------------------	*/
@@ -167,7 +180,7 @@ public	int	socket_create( int a, int b, int c )
 /*	------------------------------------------	*/
 public	int	socket_connect( int h, char * u,int port )
 {
-	unsigned  char tempxfer[4];
+	unsigned  char tempxfer[_MAX_ADDRESS_SIZE];
 	char *	wptr;
 	struct  hostent *hp=(struct hostent *) 0;
 	struct sockaddr_in address;
@@ -190,8 +203,8 @@ public	int	socket_connect( int h, char * u,int port )
 	else 	
 	{
 		server.sin_family = get_socket_type();
-		memcpy(tempxfer, hp->h_addr_list[0],4);
-		memcpy(&server.sin_addr.s_addr,tempxfer,4);
+		memcpy(tempxfer, hp->h_addr_list[0],get_address_size());
+		memcpy(&server.sin_addr.s_addr,tempxfer,get_address_size());
 		server.sin_port = htons(port);
 
 		if ( connect( h, 
@@ -212,7 +225,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 	int	lerrno;
 	int	status=0;
 	void *	vptr;
-	unsigned  char tempxfer[4];
+	unsigned  char tempxfer[_MAX_ADDRESS_SIZE];
 	char *	wptr;
 	struct  hostent *hp=(struct hostent *) 0;
 	struct sockaddr_in address;
@@ -237,8 +250,8 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 		sprintf(buffer,"attempting to connect to cosacs: %s",u);
 		rest_log_message( buffer );
 		server.sin_family = get_socket_type();
-		memcpy(tempxfer, hp->h_addr_list[0],4);
-		memcpy(&server.sin_addr.s_addr,tempxfer,4);
+		memcpy(tempxfer, hp->h_addr_list[0],get_address_size());
+		memcpy(&server.sin_addr.s_addr,tempxfer,get_address_size());
 		server.sin_port = htons(port);
 		/* ---------------------------- */
 		/* set the socket polling alarm */
@@ -333,7 +346,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 /*	------------------------------------------	*/
 public	int	socket_listen( int h, int port, int max )
 {
-	unsigned  char tempxfer[4];
+	unsigned  char tempxfer[_MAX_ADDRESS_SIZE];
 	char *	wptr;
 	struct  hostent *hp=(struct hostent *) 0;
 	struct sockaddr_in address;
