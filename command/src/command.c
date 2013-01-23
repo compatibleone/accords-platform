@@ -777,6 +777,8 @@ private	int	operation( int argc, char * argv[] )
 					debug = 1;
 				else if (!( strcmp( aptr, "noauth" ) ))
 					noauth = 1;
+				else if (!( strcmp( aptr, "echo") ))
+					csp_set_echo(1);
 				else if (!( strcmp( aptr, "tls" ) ))
 					tls = argv[argi++];
 				else if (!( strcmp( aptr, "publisher" ) ))
@@ -822,6 +824,7 @@ private	int	banner()
 	printf("\n         --tls       <security>       specify security configuration ");
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
+	printf("\n         --echo                       activate source echo \n");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
