@@ -48,6 +48,7 @@
 		<xsd:attribute name="reserved" type="xsd:integer"/>
 		<xsd:attribute name="consumed" type="xsd:integer"/>
 		<xsd:attribute name="granularity" type="xsd:integer" default="1" />
+		<xsd:attribute name="units" type="xsd:string" default="U" />
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
