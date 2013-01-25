@@ -837,7 +837,9 @@ private	struct cops_solution * validate_cops_quota(
 				continue;
 			else if (!( strcmp( iptr->name, qptr->property ) ))
 			{
-				if (!(required = rest_normalise_value( iptr->value, units[0] ) ))
+				if (!( required = rest_normalise_value( iptr->value, units[0] ) ))
+					required = granularity;
+				if (!( required = rest_reduced_value( required, units[0] ) ))
 					required = granularity;
 				if ( granularity > 1 )
 					required = (((required / granularity) * granularity) + ( required % granularity ? granularity : 0 ));

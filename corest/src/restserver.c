@@ -148,6 +148,30 @@ public	int	rest_normalise_value( char * sptr, int normal )
 	return( value * factor );
 }
 
+/*	---------------------------------------------------	*/
+/*		r e s t _ r e d u c e d _ v a l u e 		*/
+/*	---------------------------------------------------	*/
+public	int	rest_reduced_value( int value , int normal )
+{
+	int	factor=1;
+
+	if ( normal == 'T' )
+		factor = 1000000000;
+	else if ( normal == 'G' )
+		factor = 1000000;
+	else if ( normal == 'M' )
+		factor = 1000;
+	else if ( normal == 'K' )
+		factor = 1;
+	else if ( normal == 'U' )
+		factor = 1;
+	else if ( normal == 0x0025 )
+		factor = 1;
+	else	factor = 1;
+
+	return( value / factor );
+}
+
 /*	------------------------------------------------	*/
 /*		r e s t _ h t t p _ p r e f i x 		*/
 /*	------------------------------------------------	*/
