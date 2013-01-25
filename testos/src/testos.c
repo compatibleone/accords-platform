@@ -78,13 +78,14 @@ private	int	os_result( struct os_response * rptr )
 	else	return( failure(99,"no","result") );
 }
 
-private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 )
+private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7, char * p8 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "OS-CLIENT/1.0";
 	char	*	nomfic;
 	char	*	personality="";
 	char	*	resource=_CORDS_LAUNCH_CFG;
+	struct os_subscription * target=(struct os_subscription *) 0;
 
 	if (!( p1 ))
 		return( failure( 30,"p1", "required") );
@@ -220,6 +221,19 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5 
 		else	return( failure(33, p1, p2 ) );
 		return(0);
 	}
+	else if (!( strcasecmp(p1,"COPY" ) ))
+	{
+		if (!( p2 ))
+			return( failure(33, "missing", "parameter" ));
+		else if (!( strcasecmp( p2, "GLANCE" ) ))
+		{
+			if (!(target = os_initialise_client( p6, p7, p5, p4, "GlanceCopy", subscription->Os.version, subscription->Os.tls )))
+				return( failure(99, p6, p7 ) );
+			else 	os_result( os_copy_glance( subscription,p3,target ) );
+		}
+		else	return( failure(33, p1, p2 ) );
+		return(0);
+	}
 	else if (!( strcasecmp(p1,"GET" ) ))
 	{
 		if (!( p2 ))
@@ -315,7 +329,10 @@ private	int	os_command(int argc, char * argv[] )
 					( argi < argc ? argv[argi] : (char *) 0 ),
 					( (argi+1) < argc ? argv[argi+1] : (char *) 0 ),
 					( (argi+2) < argc ? argv[argi+2] : (char *) 0 ),
-					( (argi+3) < argc ? argv[argi+3] : (char *) 0 ) ) );
+					( (argi+3) < argc ? argv[argi+3] : (char *) 0 ),
+					( (argi+4) < argc ? argv[argi+4] : (char *) 0 ),
+					( (argi+5) < argc ? argv[argi+5] : (char *) 0 ),
+					( (argi+6) < argc ? argv[argi+6] : (char *) 0 ) ) );
 		}
 		else if (  *(++aptr) == '-' )
 		{
@@ -368,9 +385,9 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.04");
-	printf("\n   Beta Version 25/12/2012");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue ");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.05");
+	printf("\n   Beta Version 25/01/2013");
+	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
@@ -388,6 +405,7 @@ private	int	os_banner()
 	printf("\n   ADDRESS ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
+	printf("\n   COPY   [ GLANCE ] <id> <host> <tenant> <user> <password>");
 	printf("\n   HEAD   [ GLANCE ] <id> ");
 	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");

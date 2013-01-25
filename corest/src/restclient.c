@@ -1131,6 +1131,17 @@ public	struct	rest_response * rest_client_put_request(
 
 }
 
+/*	---------------------------------------------------	*/
+/*	  r e s t _ c l i e n t _ c o p y _ r e q u e s t 	*/
+/*	---------------------------------------------------	*/
+public	struct	rest_response * 
+	rest_client_copy_request(
+		char * target1, char * tls1, char * nptr1, struct rest_header * hptr1,
+		char * target2, char * tls2, char * nptr2, struct rest_header * hptr2 )
+{
+	return((struct rest_response *) 0);
+}
+
 #endif	/* _restclient_c */
 	/* ------------- */
 
