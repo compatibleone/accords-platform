@@ -66,6 +66,10 @@ AC_DEFINE([UNIX])
 AC_DEFINE([unix])
 AC_DEFINE([CONE])
 
+# Some targets requires rpm
+AC_CHECK_PROG([HAVE_RPM],[rpm],[yes],[no])
+AM_CONDITIONAL([ENABLE_RPM],[test "$HAVE_RPM" = "yes"])
+
 # Variables missing from some versions of autoconf
 abs_top_srcdir=$(pwd)/${top_srcdir}
 AC_SUBST([abs_top_srcdir])
@@ -635,7 +639,7 @@ echo "    - testosocci               : $enable_testosocci"
 echo "    - onprocci                 : $enable_onprocci"
 echo "    - azprocci                 : $enable_azprocci"
 echo "    - paprocci                 : $enable_paprocci"
-echo "       - JDK used              : $paprocci_jdk"
+echo "    - JDK used                 : $paprocci_jdk"
 echo "    - command                  : $enable_command"
 echo "    - testos                   : $enable_testos"
 echo "    - testdc                   : $enable_testdc"
