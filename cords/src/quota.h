@@ -13,6 +13,7 @@ struct	cords_quota
 	char *	price;
 	char *	zone;
 	char *	opinion;
+	char *	units;
 	int	ceiling;
 	int	offered;
 	int	reserved;
