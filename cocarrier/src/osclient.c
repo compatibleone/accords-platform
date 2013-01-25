@@ -196,6 +196,56 @@ public	struct	os_response *
 }
 
 /*	------------------------------------------------------------	*/
+/*		 o s _ c l i e n t _ c o p y _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response * 
+	os_client_copy_request(
+		char * target1, char * tls1, char * nptr1, struct rest_header * hptr1,
+		char * target2, char * tls2, char * nptr2, struct rest_header * hptr2 )
+{
+	struct	rest_response * rptr;
+	struct	rest_header   * copy1=(struct rest_header *) 0;
+	struct	rest_header   * copy2=(struct rest_header *) 0;
+
+	if (( hptr1 )
+	&&  (!( copy1 = rest_duplicate_headers( hptr1 ) )))
+		return((struct os_response *) 0);
+
+	if (( hptr2 )
+	&&  (!( copy2 = rest_duplicate_headers( hptr2 ) )))
+		return((struct os_response *) 0);
+
+	while (( rptr = rest_client_copy_request( 
+			target1, tls1, nptr1, hptr1, 
+			target2, tls2, nptr2, hptr2
+			)) != (struct rest_response *) 0)
+	{
+		if (!( os_client_rate_limited( rptr ) ))
+			break;
+		if ( copy1 )
+		{
+			if (!( hptr1 = rest_duplicate_headers( copy1 ) ))
+				return((struct os_response *) 0);
+		}
+		if ( copy2 )
+		{
+			if (!( hptr2 = rest_duplicate_headers( copy2 ) ))
+				return((struct os_response *) 0);
+		}
+	}			
+
+	if (( hptr1 )
+	&&  ( copy1 ))
+		copy1 = liberate_rest_headers( copy1 );
+
+	if (( hptr2 )
+	&&  ( copy2 ))
+		copy2 = liberate_rest_headers( copy2 );
+
+	return( os_check( rptr ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*	      o s _ c l i e n t _ d e l e t e _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response * 
@@ -1513,7 +1563,12 @@ public	char * os_create_server_request(
 		}
 		else if (!( strcmp( subptr->Os.version, "v1.1" ) ))
 		{
-			fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
+			/* ----------------------------------- */
+			/* check if full uri has been provided */
+			/* ----------------------------------- */
+			if (!( strncmp( image, "http", strlen("http") ) ))
+				fprintf(h,"\timageRef=%c%s%c\n",0x0022,image,0x0022);
+			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
 		if ( rest_valid_string( address ) )
@@ -2244,6 +2299,61 @@ public	struct	os_response *	os_post_glance	(struct os_subscription * sptr,  char
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c o p y _ g l an c e 			*/
+/*	------------------------------------------------------------	*/
+/*	performs a GLANCE to GLANCE copy of an OpenStack Images from	*/
+/*	one platform as defined by the first subscription to another 	*/
+/*	that is defined by the second subscription			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_copy_glance	(struct os_subscription * sptr,  char * id, struct os_subscription * tptr )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	suptr;
+	char	sbuffer[1024];
+	char 			*	snptr;
+	struct	rest_header 	*	shptr=(struct rest_header * ) 0;
+	struct	url		*	tuptr;
+	char	tbuffer[1024];
+	char 			*	tnptr;
+	struct	rest_header 	*	thptr=(struct rest_header * ) 0;
+	sprintf(sbuffer,"/images/%s",id);
+	sprintf(tbuffer,"/images/");
+	if (!( shptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( suptr = analyse_url( sptr->KeyStone.glance )))
+		return( rptr );
+	else if (!( suptr = validate_url( suptr ) ))
+		return( rptr );
+	else if (!( snptr = serialise_url( suptr, sbuffer ) ))
+	{
+		suptr = liberate_url( suptr );
+		return( rptr );
+	}
+	if (!( thptr = os_authenticate(tptr) ))
+		return( rptr );
+	else if (!( tuptr = analyse_url( tptr->KeyStone.glance )))
+		return( rptr );
+	else if (!( tuptr = validate_url( tuptr ) ))
+		return( rptr );
+	else if (!( tnptr = serialise_url( tuptr, sbuffer ) ))
+	{
+		tuptr = liberate_url( tuptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_copy_request( 
+		snptr, sptr->Os.tls, sptr->Os.agent, shptr,
+		tnptr, tptr->Os.tls, tptr->Os.agent, thptr ) ))
+	{
+		suptr = liberate_url( suptr );
+		liberate( snptr );
+		tuptr = liberate_url( tuptr );
+		liberate( tnptr );
 		return( rptr );
 	}
 	else	return( rptr );
