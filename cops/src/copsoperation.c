@@ -734,6 +734,7 @@ private	struct cops_solution * validate_cops_quota(
 				struct cords_placement * pptr, 
 				struct rest_header * hptr )
 {
+	char	buffer[1024];
 	struct	rest_header  * iptr;
 	struct	occi_element * eptr;
 	struct	occi_element * dptr;
@@ -810,6 +811,8 @@ private	struct cops_solution * validate_cops_quota(
 			yptr = occi_remove_response( yptr );
 			continue;
 		}
+		else if (!( rest_valid_string( dptr->value ) ))
+			granularity = 1;
 		else if (!( granularity = atoi( dptr->value ) ))
 			granularity = 1;
 
@@ -834,13 +837,18 @@ private	struct cops_solution * validate_cops_quota(
 				continue;
 			else if (!( strcmp( iptr->name, qptr->property ) ))
 			{
-				if ((required = rest_normalise_value( iptr->value, units[0] )) < granularity)
+				if (!(required = rest_normalise_value( iptr->value, units[0] ) ))
 					required = granularity;
+				if ( granularity > 1 )
+					required = (((required / granularity) * granularity) + ( required % granularity ? granularity : 0 ));
 				if ((offered - reserved) >= required )
 					qptr->quantity = required;
 				else if (!( Coptions.overbooking ))
 					return( liberate_cops_solution( sptr ) );
 				else	qptr->quantity = required;
+				sprintf(buffer,"QUOTA: %s offered=%u, reserved=%u, consumed=%u, required=%u, granularity=%u units=%s",
+					qptr->property,offered,reserved,consumed,required,granularity, units);
+				rest_log_message( buffer );
 				break;
 			}
 		}
