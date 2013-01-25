@@ -1,3 +1,11 @@
+compatibleone-accords (1.0-2) unstable; urgency=low
+
+  * Upstream code of jan 23rd.
+  * Include selftest.csp cordscript.
+  * Remove occurences of paprocci in current build.
+
+ -- Vincent <vincent@vincent>  Wed, 23 Jan 2013 14:58:01 +0100
+
 compatibleone-accords (1.0-1) unstable; urgency=low
 
   * Bump up version number!
