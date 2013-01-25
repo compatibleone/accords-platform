@@ -170,6 +170,9 @@ testcp/Makefile.in
 testcp/src/Makefile.in
 testcp/src/testcp
 testdc/src/testdc
+testhdfs/src/testhdfs
+testhdfs/src/Makefile.in
+testhdfs/Makefile.in
 teston/Makefile.in
 teston/src/Makefile.in
 teston/src/teston

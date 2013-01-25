@@ -19,8 +19,17 @@ private	struct cordscript_context * copy_cordscript_class( struct cordscript_con
 private	struct cordscript_context * resolve_cordscript_class( char * nptr );
 
 private	int	end_of_instruction=0;
-private	int	echo=0;
 private	int	abandon_compile=0;
+
+/*	--------------		*/
+/*	 csp_set_echo 		*/
+/*	--------------		*/
+private	int	echo=0;
+public	void	csp_set_echo( int v )
+{
+	echo = v;
+	return;
+}
 
 /*	---------------		*/
 /*	check_csp_debug		*/

@@ -1,0 +1,32 @@
+// (C) 2013 Vincent@Renardias.com
+// List all available categories in text mode
+
+if ( $1.length() == 0 ) {
+ $1 = "publication";
+}
+
+"Accords Platform Category List
+".display();
+
+$list = $1.list();
+
+foreach ( $list as $item )
+{
+ $item.display();
+ $i = $item.get();
+ foreach ( $i as $r )
+ {
+  forboth ( $r as $n and $v )
+  {
+   $m = "  "#$n#"->"#$v#"</tr>";
+    // XXX FIXME: as of 2013/01/23, && don't work in conditions and 'switch' statement segfaults co-command.
+    if ($n == "occi.publication.who" )     { $m="     Who: "#$v; $m.display(); }
+    if ($n == "occi.publication.what" )    { $m="    What: "#$v; $m.display(); }
+    if ($n == "occi.publication.uptime" )  { $m="  Uptime: "#$v; $m.display(); }
+    if ($n == "occi.publication.why" )     { $m="     Why: "#$v; $m.display(); }
+   }
+  }
+  " ".display();
+ }
+}
+"</table></div></body></html>".display();
