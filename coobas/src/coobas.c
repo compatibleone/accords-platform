@@ -529,6 +529,7 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	struct	occi_element  * eptr;
 	struct	occi_element  * fptr;
 	char	buffer[1024];
+	char	reference[2048];
 
 	/* -------------------------------------- */
 	/* allocate the invoice document filename */
@@ -540,6 +541,8 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		pptr->total = liberate( pptr->total );
 
 	sprintf(buffer,"rest/%s.htm",pptr->id);
+
+	sprintf(reference,"%s/%s/%s",CooBas.identity,_CORDS_INVOICE,pptr->id);
 
 	if (!( pptr->document = allocate_string( buffer ) ))
 		return(0);
@@ -566,6 +569,9 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	/* for each of the transactions */
 	/* ---------------------------- */
 	pptr->transactions=0;
+
+	if (( xptr = occi_delete_links( reference, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		xptr = occi_remove_response( xptr );
 
 	for (	eptr=xptr->first;
 		eptr != (struct occi_element *) 0;
@@ -600,7 +606,11 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		}
 		else	
 		{
+			if ((xptr = occi_create_link( reference, host, _CORDS_CONTRACT_AGENT, default_tls())) != (struct occi_response *) 0)
+				xptr = occi_remove_response( xptr );
+
 			invoice_document_transaction( h, pptr, host, yptr, price, zptr );
+
 			yptr = occi_remove_response( yptr );
 			zptr = occi_remove_response( zptr );
 			continue;
@@ -655,6 +665,8 @@ private	int	update_invoice(struct occi_category * optr, void * vptr,struct rest_
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
+		return(0);
+	else if ( pptr->state > 0 )
 		return(0);
 	else if (!( rest_valid_string( pptr->account ) ))
 		return( 0 ); 
