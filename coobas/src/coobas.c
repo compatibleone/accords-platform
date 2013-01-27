@@ -196,7 +196,7 @@ private	char * transaction_date( int tt )
 	else
 	{
 		sprintf(buffer,"%u/%u/%u",
-			tptr->tm_mday, tptr->tm_mon,tptr->tm_year+1900);
+			tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900);
 	}
 	return( allocate_string( buffer ) );
 }
@@ -523,6 +523,7 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	char *	host;
 	char *	price;
 	FILE *	h;
+	struct	occi_response * xxptr;
 	struct	occi_response * xptr;
 	struct	occi_response * yptr;
 	struct	occi_response * zptr;
@@ -570,8 +571,8 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	/* ---------------------------- */
 	pptr->transactions=0;
 
-	if (( xptr = occi_delete_links( reference, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		xptr = occi_remove_response( xptr );
+	if (( xxptr = occi_delete_links( reference, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		xxptr = occi_remove_response( xxptr );
 
 	for (	eptr=xptr->first;
 		eptr != (struct occi_element *) 0;
@@ -606,8 +607,8 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		}
 		else	
 		{
-			if ((xptr = occi_create_link( reference, host, _CORDS_CONTRACT_AGENT, default_tls())) != (struct occi_response *) 0)
-				xptr = occi_remove_response( xptr );
+			if ((xxptr = occi_create_link( reference, host, _CORDS_CONTRACT_AGENT, default_tls())) != (struct occi_response *) 0)
+				xxptr = occi_remove_response( xxptr );
 
 			invoice_document_transaction( h, pptr, host, yptr, price, zptr );
 
