@@ -734,20 +734,25 @@ private	struct cops_solution * validate_cops_quota(
 				struct cords_placement * pptr, 
 				struct rest_header * hptr )
 {
+	char	buffer[1024];
 	struct	rest_header  * iptr;
 	struct	occi_element * eptr;
 	struct	occi_element * dptr;
 	struct	occi_response * yptr;
 	struct	cops_quota * qptr;
-	int	offered;
-	int	reserved;
-	int	consumed;
+	int	offered=0;
+	int	reserved=0;
+	int	consumed=0;
+	int	granularity=0;
+	int	required=0;
+	char 	units[32];
 	char *	vptr;
 	for (	eptr=cords_first_link( zptr );
 		eptr != (struct occi_element *) 0;
 		eptr = cords_next_link( eptr ) )
 	{
-		offered=reserved=consumed=0;
+		required=granularity=offered=reserved=consumed=0;
+		strcpy(units,"U");
 		if (!( eptr->value ))
 			continue;
 		else if (!( vptr =  occi_unquoted_link( eptr->value ) ))
@@ -801,6 +806,22 @@ private	struct cops_solution * validate_cops_quota(
 		}
 		else	consumed = atoi( dptr->value );
 
+		if (!( dptr = occi_locate_element( yptr->first, "occi.quota.granularity" ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( rest_valid_string( dptr->value ) ))
+			granularity = 1;
+		else if (!( granularity = atoi( dptr->value ) ))
+			granularity = 1;
+
+		if (!( dptr = occi_locate_element( yptr->first, "occi.quota.units" ) ))
+			strcpy(units,"U");
+		else if (!( rest_valid_string( dptr->value ) ))
+			strcpy(units,"U");
+		else	strcpy(units,dptr->value);
+
 		yptr = occi_remove_response( yptr );
 
 		/* ------------------------------------- */
@@ -816,11 +837,20 @@ private	struct cops_solution * validate_cops_quota(
 				continue;
 			else if (!( strcmp( iptr->name, qptr->property ) ))
 			{
-				if ((offered - reserved) >= atoi(iptr->value))
-					qptr->quantity = atoi(iptr->value);
+				if (!( required = rest_normalise_value( iptr->value, units[0] ) ))
+					required = granularity;
+				if (!( required = rest_reduced_value( required, units[0] ) ))
+					required = granularity;
+				if ( granularity > 1 )
+					required = (((required / granularity) * granularity) + ( required % granularity ? granularity : 0 ));
+				if ((offered - reserved) >= required )
+					qptr->quantity = required;
 				else if (!( Coptions.overbooking ))
 					return( liberate_cops_solution( sptr ) );
-				else	qptr->quantity = atoi(iptr->value);
+				else	qptr->quantity = required;
+				sprintf(buffer,"QUOTA: %s offered=%u, reserved=%u, consumed=%u, required=%u, granularity=%u units=%s",
+					qptr->property,offered,reserved,consumed,required,granularity, units);
+				rest_log_message( buffer );
 				break;
 			}
 		}

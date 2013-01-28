@@ -161,6 +161,7 @@ endif
 
 EXTRA_DIST = README INSTALL NEWS ChangeLog Certificates.crt coips.xml slamtest.xml manifest.xsd cords.xsd slam.xsd cordstypes.xsd compatibleone.spec.in accounts.xml
 
+if ENABLE_RPM
 ACCORDS_SPEC=compatibleone.spec
 PAPROCCI_SPEC=compatibleone-paprocci-java.spec
 PAARCH=compatibleone-paprocci-java-$(VERSION)
@@ -214,3 +215,4 @@ dist-srpm: dist-gzip $(ACCORDS_SPEC) paprocci-srpm
 	cp $(PAPROCCI_SRCS) $(SOURCE_DIR)
 	rpmbuild -bs $(SPEC_DIR)/$(ACCORDS_SPEC)
 	rpmbuild -bs $(SPEC_DIR)/$(PAPROCCI_SPEC)
+endif # ENABLE_RPM

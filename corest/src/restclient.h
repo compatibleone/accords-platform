@@ -33,6 +33,14 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr );
 
 /*	---	*/
+/*	COPY	*/
+/*	---	*/
+public	struct	rest_response * 
+	rest_client_copy_request(
+		char * target1, char * tls1, char * nptr1, struct rest_header * hptr1,
+		char * target2, char * tls2, char * nptr2, struct rest_header * hptr2 );
+
+/*	---	*/
 /*	TRY	*/
 /*	---	*/
 public	struct	rest_response * 

@@ -490,14 +490,24 @@ public	int	create_openstack_contract(
 	else if (!( contract.system.message = occi_simple_get( contract.system.id, agent, tls ) ))
 		return( terminate_openstack_contract( 1185, &contract ) );
 
-	/* ------------------------------------------------------ */
-	/* retrieve detailled list of images and resolve contract */
-	/* ------------------------------------------------------ */
-	else if (!( contract.images = os_list_image_details(subptr) ))
-		return( terminate_openstack_contract( 1186, &contract ) );
-	else if (!( pptr->image = resolve_contract_image( subptr, &contract ) ))
-		return( terminate_openstack_contract( 1187, &contract ) );
-	else if (!( pptr->original = allocate_string( pptr->image ) ))
+	/* --------------------------------------------------- */
+	/* check if a valid image identifier has been provided */
+	/* --------------------------------------------------- */
+	if (!( rest_valid_string( pptr->image ) ))
+	{
+		/* ------------------------------------------------------ */
+		/* retrieve detailled list of images and resolve contract */
+		/* ------------------------------------------------------ */
+		if (!( contract.images = os_list_image_details(subptr) ))
+			return( terminate_openstack_contract( 1186, &contract ) );
+		else if (!( pptr->image = resolve_contract_image( subptr, &contract ) ))
+			return( terminate_openstack_contract( 1187, &contract ) );
+	}
+
+	/* --------------------------------------- */
+	/* duplicate the original image identifier */
+	/* --------------------------------------- */
+	if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_openstack_contract( 1188, &contract ) );
 	{
 		/* ----------------------------------------------- */

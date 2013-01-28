@@ -49,6 +49,8 @@ public struct cords_quota * liberate_cords_quota(struct cords_quota * sptr)
 			 sptr->zone = liberate(sptr->zone);
 		if ( sptr->opinion )
 			 sptr->opinion = liberate(sptr->opinion);
+		if ( sptr->units )
+			 sptr->units = liberate(sptr->units);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_quota *) 0);
@@ -71,6 +73,7 @@ public struct cords_quota * reset_cords_quota(struct cords_quota * sptr)
 		sptr->price = (char*) 0;
 		sptr->zone = (char*) 0;
 		sptr->opinion = (char*) 0;
+		sptr->units = (char*) 0;
 		sptr->ceiling =  0;
 		sptr->offered =  0;
 		sptr->reserved =  0;
@@ -139,6 +142,10 @@ public int xmlin_cords_quota(struct cords_quota * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->opinion = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"units") ))
+		{
+			if ( wptr->value ) { sptr->units = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"ceiling") ))
 		{
 			if ( wptr->value ) { sptr->ceiling = atoi(wptr->value); }
@@ -186,6 +193,7 @@ public int rest_occi_cords_quota(FILE * fh,struct cords_quota * sptr,char * pref
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.zone='%s'\r\n",prefix,nptr,(sptr->zone?sptr->zone:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.opinion='%s'\r\n",prefix,nptr,(sptr->opinion?sptr->opinion:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.units='%s'\r\n",prefix,nptr,(sptr->units?sptr->units:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.ceiling='%u'\r\n",prefix,nptr,sptr->ceiling);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.offered='%u'\r\n",prefix,nptr,sptr->offered);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reserved='%u'\r\n",prefix,nptr,sptr->reserved);

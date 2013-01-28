@@ -127,9 +127,9 @@ private	void	coobas_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.05");
-	printf("\n   Beta Version : 25/05/2012");
-	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Ordering, Billing and Accounting COOBAS : Version 1.0a.0.06");
+	printf("\n   Beta Version : 27/01/2013");
+	printf("\n   Copyright (c) 2012, 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -196,7 +196,7 @@ private	char * transaction_date( int tt )
 	else
 	{
 		sprintf(buffer,"%u/%u/%u",
-			tptr->tm_mday, tptr->tm_mon,tptr->tm_year+1900);
+			tptr->tm_mday, tptr->tm_mon+1,tptr->tm_year+1900);
 	}
 	return( allocate_string( buffer ) );
 }
@@ -523,12 +523,14 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	char *	host;
 	char *	price;
 	FILE *	h;
+	struct	occi_response * xxptr;
 	struct	occi_response * xptr;
 	struct	occi_response * yptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_element  * fptr;
 	char	buffer[1024];
+	char	reference[2048];
 
 	/* -------------------------------------- */
 	/* allocate the invoice document filename */
@@ -540,6 +542,8 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		pptr->total = liberate( pptr->total );
 
 	sprintf(buffer,"rest/%s.htm",pptr->id);
+
+	sprintf(reference,"%s/%s/%s",CooBas.identity,_CORDS_INVOICE,pptr->id);
 
 	if (!( pptr->document = allocate_string( buffer ) ))
 		return(0);
@@ -566,6 +570,9 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	/* for each of the transactions */
 	/* ---------------------------- */
 	pptr->transactions=0;
+
+	if (( xxptr = occi_delete_links( reference, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		xxptr = occi_remove_response( xxptr );
 
 	for (	eptr=xptr->first;
 		eptr != (struct occi_element *) 0;
@@ -600,7 +607,11 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 		}
 		else	
 		{
+			if ((xxptr = occi_create_link( reference, host, _CORDS_CONTRACT_AGENT, default_tls())) != (struct occi_response *) 0)
+				xxptr = occi_remove_response( xxptr );
+
 			invoice_document_transaction( h, pptr, host, yptr, price, zptr );
+
 			yptr = occi_remove_response( yptr );
 			zptr = occi_remove_response( zptr );
 			continue;
@@ -626,7 +637,7 @@ private	int	create_invoice(struct occi_category * optr, void * vptr,struct rest_
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( pptr->account ))
+	else if (!( rest_valid_string( pptr->account ) ))
 		return( 0 ); 
 	else 	return( process_invoice_transactions( pptr ) );
 }
@@ -656,7 +667,9 @@ private	int	update_invoice(struct occi_category * optr, void * vptr,struct rest_
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( pptr->account ))
+	else if ( pptr->state > 0 )
+		return(0);
+	else if (!( rest_valid_string( pptr->account ) ))
 		return( 0 ); 
 	else 	return( process_invoice_transactions( pptr ) );
 }
@@ -838,6 +851,75 @@ private	struct rest_response * process_invoice(
 }
 
 /*	------------------------------------------------------------------	*/
+/*		c l o s e _ i n v o i c e _ t r a n s a c t i o n s		*/
+/*	------------------------------------------------------------------	*/
+private	int	close_invoice_transactions( struct cords_invoice * pptr )
+{
+	struct	occi_link_node	* nptr;
+	struct	cords_xlink	* lptr;
+	char 			* wptr;
+	struct	occi_element 	* gptr;
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	char 			buffer[4096];
+
+	/* ----------------------------------------------------- */
+	/* for all defined contract nodes of the current service */
+	/* ----------------------------------------------------- */
+	for (	nptr=occi_first_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else	liberate( wptr );
+
+		/* --------------------------------------------------- */
+		/* launch / invoke the required action on the contract */
+		/* --------------------------------------------------- */
+		if (!( zptr = occi_simple_get( lptr->target, _CORDS_SERVICE_AGENT, default_tls() ) ))
+			continue;
+		/* --------------------------------------- */
+		/* retrieve the instruction value property */
+		/* --------------------------------------- */
+		else if (!(gptr = occi_locate_element(zptr->first,"occi.transaction.account" )))
+			zptr = occi_remove_response ( zptr );
+		else
+		{
+			/* -------------------------------------------- */
+			/* store the new value of the instruction value */
+			/* -------------------------------------------- */
+			if (!( wptr = allocate_string( gptr->value ) ))
+				continue;
+			else if (!( wptr = occi_unquoted_value( wptr ) ))
+				continue;
+			else	sprintf(buffer,"(%s)",wptr);
+			wptr = liberate( wptr );
+			if ( gptr->value ) gptr->value = liberate( gptr->value );
+			gptr->value = allocate_string( buffer );
+
+			if (!( yptr = occi_simple_put( lptr->target, zptr->first, _CORDS_SERVICE_AGENT, default_tls() ) ))
+				continue;
+			else	yptr = occi_remove_response( yptr );
+			zptr = occi_remove_response( zptr );
+		}
+	}
+
+}
+
+
+/*	------------------------------------------------------------------	*/
 /*			    c l o s e _ i n v o i c e				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * close_invoice(
@@ -856,6 +938,7 @@ private	struct rest_response * close_invoice(
 	{
 		pptr->state = 1;
 		autosave_cords_invoice_nodes();
+		close_invoice_transactions( pptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
