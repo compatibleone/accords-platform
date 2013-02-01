@@ -118,6 +118,7 @@
 			type="xsd:string"
 			default="any"
 			/>
+		<xsd:attribute name="operator" type="xsd:string" default="any"/>
 		<xsd:attribute name="profile" type="xsd:string"/>
 		<xsd:attribute 	
 			name="access" 

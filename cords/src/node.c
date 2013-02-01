@@ -55,6 +55,8 @@ public struct cords_node * liberate_cords_node(struct cords_node * sptr)
 			 sptr->type = liberate(sptr->type);
 		if ( sptr->firewall )
 			 sptr->firewall = liberate(sptr->firewall);
+		if ( sptr->operator )
+			 sptr->operator = liberate(sptr->operator);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_node *) 0);
@@ -80,6 +82,7 @@ public struct cords_node * reset_cords_node(struct cords_node * sptr)
 		sptr->scope = (char*) 0;
 		sptr->type = (char*) 0;
 		sptr->firewall = (char*) 0;
+		sptr->operator = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -155,6 +158,10 @@ public int xmlin_cords_node(struct cords_node * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"operator") ))
+		{
+			if ( wptr->value ) { sptr->operator = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -185,6 +192,7 @@ public int rest_occi_cords_node(FILE * fh,struct cords_node * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.operator='%s'\r\n",prefix,nptr,(sptr->operator?sptr->operator:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

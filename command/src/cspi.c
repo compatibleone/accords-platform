@@ -581,7 +581,9 @@ private	char *	add_array( char * aptr, char * hptr, char * vptr )
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
+			if ( *(aptr+1) != 0 )
+				sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
+			else 	sprintf(rptr,"%s%s%s",aptr,hptr,vptr);
 			aptr = liberate( aptr );
 			return( rptr );
 		}
@@ -614,7 +616,7 @@ private	char *	add_structure( char * aptr, char * hptr, char * vptr )
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"{%s%s",hptr,vptr);
+			sprintf(rptr,"{%s:%s",hptr,vptr);
 			return( rptr );
 		}
 	}
@@ -626,7 +628,9 @@ private	char *	add_structure( char * aptr, char * hptr, char * vptr )
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
+			if (!( *(aptr+1) ))
+				sprintf(rptr,"%s%s%s",aptr,hptr,vptr);
+			else	sprintf(rptr,"%s,%s%s",aptr,hptr,vptr);
 			aptr = liberate( aptr );
 			return( rptr );
 		}
@@ -640,7 +644,7 @@ private	char *	close_structure( char * aptr )
 {
 	if (!( aptr ))
 		return( aptr );
-	else if ( *aptr != '[' )
+	else if ( *aptr != '{' )
 		return( aptr );
 	else 	return( strcat( aptr, "}" ) );
 }
