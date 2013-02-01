@@ -135,9 +135,10 @@ public struct cordscript_value 		* liberate_cordscript_value(struct cordscript_v
 public struct cordscript_instruction	* liberate_cordscript_instruction(struct cordscript_instruction * iptr); 
 public struct cordscript_context	* liberate_cordscript_context( struct cordscript_context * xptr );
 
-public struct cordscript_context	* compile_cordscript_string( char * expression );
+public struct cordscript_context	* compile_cordscript_string( char * expression, int argc, char * argv[]  );
 public struct cordscript_context	* compile_cordscript_file( char * expression, int argc, char * argv[] );
 public struct cordscript_value 		* execute_cordscript( struct cordscript_context * cptr );
+public char *				  evaluate_cordscript( char * expression, int argc, char * argv[] );
 
 #endif	/* _cspi_h */
 

@@ -3178,6 +3178,14 @@ private	int	initialise_line( char * sptr )
 	return( strlen( linebuffer ) ); 		
 }
 
+private	int	terminate_line()
+{
+	ungotc = 0;
+	ungot_token = (char *) 0;
+	linebuffer  = (char *) 0;
+	return(0);
+}
+
 /*   	---------------		*/
 /*	initialise_file		*/
 /*   	----------------	*/
@@ -5430,27 +5438,52 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 /*   ------------------------------- */
 private	struct	cordscript_context * compile_cordscript_instructions( struct cordscript_context * cptr, char * buffer )
 {
+	int	c;
 	struct	cordscript_instruction * iptr;
 
 	if (!( initialise_line( buffer ) ))
 	   return( cptr );
 
 	while ( remove_white() )
-		  iptr = compile_cordscript_instruction( cptr, 0 );
-
+	{	
+		iptr = compile_cordscript_instruction( cptr, 0 );
+		if (( c =  get_punctuation()) != 0 )
+		{
+			if ( c == ';' )
+				check_line_end( cptr, 0, c );
+			else	break;
+		}
+		if ( abandon_compile )
+			break;
+	}
+	terminate_line();
 	return( cptr );
 }
 
 /*   ------------------------- */
 /*   compile_cordscript_string */
 /*   ------------------------- */
-public struct cordscript_context * compile_cordscript_string( char * expression )
+public struct cordscript_context * compile_cordscript_string( char * expression, int argc, char * argv[] )
 {
 	struct	cordscript_context * cptr;
+	int	argi;
+	struct	cordscript_value * vptr;
+	char	buffer[8192];
 	if (!( cptr = allocate_cordscript_context() ))
 		return( cptr );
 	else
 	{
+		for ( argi=0; argi < argc; argi++ )
+		{
+			sprintf(buffer,"$%u",argi+1);
+			if (!( argv[argi] ))
+				break;
+			else if (!( vptr = resolve_variable( buffer, cptr )))
+				break;
+			else if (!( vptr->value = allocate_string( argv[argi] )))
+				break;
+			else	continue;
+		}
 		return( compile_cordscript_instructions( cptr, expression ) );
 	}
 }
@@ -5568,6 +5601,36 @@ public struct cordscript_value 	* execute_cordscript( struct  cordscript_context
 		else	return( pop_stack( cptr ) );
 	}
 }
+
+/*	------------------	*/
+/*	evaluate_cordscript	*/
+/*	------------------	*/
+public	char *	evaluate_cordscript( char * expression, int argc, char * argv[] )
+{
+	struct	cordscript_context * cptr;
+	struct	cordscript_value   * vptr;
+	char *	rptr;
+	if (!( expression ))
+		return( expression );
+	else if (!( cptr = compile_cordscript_string( expression, argc, argv ) ))
+		return((char *) 0);
+	else if (!( vptr = execute_cordscript( cptr ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
+	else if (!( rptr = allocate_string( vptr->value ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
+	else
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return( rptr );
+	}
+}
+
 
 /*   ----------- */
 /*   interpreter */
