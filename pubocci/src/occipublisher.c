@@ -627,8 +627,9 @@ public	int	unpublish_occi_category(
 	struct	occi_response * aptr;
 	struct	occi_publication * pptr;
 	char *	uri;
-	char	username[256];
-	sprintf(username,"%s%u",user,item);
+	char	username[1024];
+
+	sprintf(username,"%s",user);
 
 	if (!( pptr = occi_locate_publication( category )))
 		return( 78 );
@@ -784,7 +785,7 @@ private	struct 	rest_response * process_occi_transaction(
 /*	      p u b l i s h _ o c c i _ c a t e g o r y 		*/
 /*	---------------------------------------------------------	*/
 public	int	publish_occi_category( 
-		int item,
+		int	item,
 		char * user,	char * password,
 		char * url,	char * agent, 
 		struct occi_category * category,
@@ -798,7 +799,7 @@ public	int	publish_occi_category(
 	struct	occi_response * aptr;
 	struct	occi_publication * pptr;
 	char 	*	uri;
-	char	username[256];
+	char	username[1024];
 	
 	/* ------------------------------------------------------------------------ */
 	/* resolve an eventual price for the provision of instances of the category */
@@ -824,7 +825,7 @@ public	int	publish_occi_category(
 	/* ------------------------------------- */
 	/* generate a user identification string */
 	/* ------------------------------------- */
-	sprintf(username,"%s%u",user,item);
+	sprintf(username,"%s",user);
 
 	/* --------------------------------------- */
 	/* create the provider uri for publication */
