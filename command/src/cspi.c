@@ -616,7 +616,7 @@ private	char *	add_structure( char * aptr, char * hptr, char * vptr )
 			return( rptr );
 		else
 		{
-			sprintf(rptr,"{%s:%s",hptr,vptr);
+			sprintf(rptr,"{%s%s",hptr,vptr);
 			return( rptr );
 		}
 	}
@@ -4611,6 +4611,7 @@ private	struct cordscript_instruction * compile_cordscript_case( struct cordscri
 	}
 	else
 	{
+		optr = (struct cordscript_instruction *) 0;
 		/* ----------------------------------------- */
 		/* otherwise its the first case expression : */
 		/* ----------------------------------------- */
