@@ -859,6 +859,11 @@ private	struct	occi_interface	cords_application_interface = {
 	delete_cords_application
 	};
 
+#include "saas.h"
+#include "saas.c"
+#include "occisaas.c"
+
+
 /*	------------------------------------------------------------------	*/
 /*			c o i p s _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -880,6 +885,13 @@ private	int	coips_operation( char * nptr )
 
 	if (!( optr = occi_add_action( optr,_CORDS_BUILD,"",build_application)))
 		return( 28 );
+
+	if (!( optr = occi_cords_saas_builder( Coips.domain, "saas" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	rest_initialise_log(Coips.monitor);
 

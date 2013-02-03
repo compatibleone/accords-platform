@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = coips
-EXTRA_DIST = coips.h
+EXTRA_DIST = coips.h saas.h saas.c occisaas.c
 
 coips_SOURCES = coips.c
 coips_LDFLAGS = $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LD_PUBOCCI) $(LD_COPABR)
