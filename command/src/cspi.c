@@ -3732,7 +3732,7 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 		add_operand( iptr, fptr );
 		add_operand( iptr, integer_value( operands ) );
 		add_instruction( cptr, iptr );
-		return((struct cordscript_instruction *) 0);
+		return( iptr );
 	}
 }
 
