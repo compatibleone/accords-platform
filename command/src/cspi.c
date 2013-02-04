@@ -4984,6 +4984,7 @@ private	struct cordscript_instruction * compile_cordscript_return( struct cordsc
 			else
 			{
 				add_instruction( cptr, iptr );
+				check_line_end(cptr, 0, c );
 				return((struct cordscript_instruction *) 0);
 			}			
 		}
