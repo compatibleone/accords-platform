@@ -3734,7 +3734,7 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 		add_instruction( cptr, iptr );
 		if ( level )
 			return( iptr );
-		else 	return((struct cordscript_instruction *) 0;
+		else 	return((struct cordscript_instruction *) 0);
 	}
 }
 
