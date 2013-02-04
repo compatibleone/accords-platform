@@ -3689,7 +3689,7 @@ private	struct	cordscript_instruction	* compile_failure( int type, char * operan
 /*   -----------------------	*/
 /*   compile_cordscript_call 	*/
 /*   -----------------------	*/
-private	struct	cordscript_instruction * compile_cordscript_call(struct cordscript_context * cptr, struct cordscript_value * fptr )
+private	struct	cordscript_instruction * compile_cordscript_call(struct cordscript_context * cptr, struct cordscript_value * fptr, int level )
 {
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_instruction * jptr;
@@ -3732,7 +3732,9 @@ private	struct	cordscript_instruction * compile_cordscript_call(struct cordscrip
 		add_operand( iptr, fptr );
 		add_operand( iptr, integer_value( operands ) );
 		add_instruction( cptr, iptr );
-		return( iptr );
+		if ( level )
+			return( iptr );
+		else 	return((struct cordscript_instruction *) 0;
 	}
 }
 
@@ -5062,7 +5064,7 @@ private	int	compile_cordscript_keyword( struct cordscript_context * cptr, char *
 /*   -----------------	*/
 /*   start_instruction	*/
 /*   -----------------	*/
-private	struct cordscript_instruction * start_instruction( struct cordscript_context * cptr, char * token )
+private	struct cordscript_instruction * start_instruction( struct cordscript_context * cptr, char * token, int level )
 {
 	int	c;
 	struct	cordscript_instruction * iptr;
@@ -5074,7 +5076,7 @@ private	struct cordscript_instruction * start_instruction( struct cordscript_con
 		if (( c = get_punctuation()) != 0)
 			unget_byte(c);
 		if ( c == '(' )
-			return( compile_cordscript_call( cptr, fptr ) );
+			return( compile_cordscript_call( cptr, fptr, level ) );
 	}
 	if (!( iptr = allocate_cordscript_instruction( push_operation )))
 		return( iptr );
@@ -5182,7 +5184,7 @@ private	struct	cordscript_instruction * compile_cordscript_instruction( struct c
 	{
 	 	return( (struct cordscript_instruction *) 0 );
    	}
-	else if (!( iptr = start_instruction( cptr, token )))
+	else if (!( iptr = start_instruction( cptr, token, level )))
 	{
 		 return( iptr );
    	}
