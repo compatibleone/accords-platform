@@ -54,6 +54,7 @@ public	char *	default_publisher()	{	return(Slam.publisher);		}
 public	char *	default_operator()	{	return(Slam.operator);		}
 public	char *	default_tls()		{	return(Slam.tls);		}
 public	char *	default_zone()		{	return(Slam.zone);		}
+public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -85,9 +86,9 @@ private	void	slam_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.03");
-	printf("\n   Beta Version : 23/08/2012");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.04");
+	printf("\n   Beta Version : 04/02/2013");
+	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -142,6 +143,139 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 #include "penalty.c"
 #include "occipenalty.c"
 
+/*	-------------------------------------------	*/
+/* 	    i n s t a n c e _ a g r e e m e n t		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * instance_agreement(
+		struct occi_category 	* optr, 
+		struct rest_client 	* cptr, 
+		struct rest_request 	* rptr, 
+		struct rest_response 	* aptr, 
+		void * vptr )
+{
+	struct	occi_element  	* dptr;
+	struct	occi_element  	* eptr;
+	struct	occi_client 	* kptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_agreement * pptr;
+	struct	occi_request 	* qptr;
+	struct	occi_response 	* xptr;
+	struct	occi_response 	* yptr;
+	char *	manifest;
+	char *	wptr;
+	char *	ihost;
+	char	buffer[2048];
+	char	self[2048];
+
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else if (!( ihost = occi_resolve_category_provider( _CORDS_SERVICE, _CORDS_CONTRACT, default_tls() ) ))
+		return( rest_html_response( aptr, 478, "Service Failure" ) );
+	else
+	{
+		sprintf(self, "%s%s%s",Slam.identity,_CORDS_AGREEMENT,pptr->id);
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_SERVICE);
+		liberate( ihost );
+	}
+
+	/* ----------------------------- */
+	/* retrieve manifest description */
+	/* ----------------------------- */
+	for (	nptr=occi_first_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+
+		/* ------------------------- */
+		/* retrieve the terms record */
+		/* ------------------------- */
+		if (!( yptr = occi_simple_get( lptr->target, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			return( rest_html_response( aptr, 908, "Occi Client Failure" ) );
+		else if (!( vptr = occi_extract_atribut( yptr, Slam.domain, _CORDS_TERMS, _CORDS_TYPE )))
+			yptr = occi_remove_response( yptr );
+		else if ( strcmp( vptr, _CORDS_SERVICES ) != 0)
+			yptr = occi_remove_response( yptr );
+		else
+		{
+			for (	eptr = cords_first_link( yptr );
+				eptr != (struct occi_element *) 0;
+				eptr = cords_next_link( eptr ))
+			{
+				if (!( eptr->value ))
+					continue;
+				else if (!( xptr = occi_simple_get( eptr->value, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+					continue;
+				else if (!( manifest = occi_extract_atribut( xptr, Slam.domain, _CORDS_TERM, _CORDS_MANIFEST )))
+				{
+					xptr = occi_remove_response( xptr );
+					continue;
+				}
+				else if (!( manifest = allocate_string( manifest ) ))
+				{
+					xptr = occi_remove_response( xptr );
+					continue;
+				}
+				else
+				{
+					xptr = occi_remove_response( xptr );
+					break;
+				}
+			}
+			yptr = occi_remove_response( yptr );
+			if (!( manifest ))
+				continue;
+			else	break;
+		}
+	}
+
+	/* ------------------------------------------ */
+	/* create the SLA controlled service instance */
+	/* ------------------------------------------ */
+	if (!( kptr = occi_create_client( buffer, _CORDS_CONTRACT, default_tls() ) ))
+		return( rest_html_response( aptr, 546, "Client Creation Failure" ) );
+
+	else if (!( qptr = cords_account_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return( rest_html_response( aptr, 550, "Accords Account Failure" ) );
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.service.plan"  	, "none" ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.manifest"   	, manifest ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.name"   	, pptr->name ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.sla"  		, self   ) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( rest_html_response( aptr, 550, "Occi Instance Failure" ) );
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return( rest_html_response( aptr, 552, "Occi Post Failure" ) );
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		kptr = occi_remove_client( kptr );
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
 /*	------------------------------------------------------------------	*/
 /*			s l a m _ o p e r a t i o n				*/
 /*	------------------------------------------------------------------	*/
@@ -160,6 +294,9 @@ private	int	slam_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback  = (void *) 0;
+
+	if (!( optr = occi_add_action( optr,_CORDS_INSTANCE,"",instance_agreement)))
+		return( 27 );
 
 	if (!( optr = occi_cords_terms_builder( Slam.domain, _CORDS_TERMS ) ))
 		return( 27 );
