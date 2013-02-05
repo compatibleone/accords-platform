@@ -30,6 +30,7 @@
 #include "cp.h"
 #include "cb.h"
 #include "occibody.h"
+#include "cspi.h"
 #include <time.h>
 
 struct	accords_configuration CooBas = {
@@ -56,6 +57,7 @@ struct	accords_configuration CooBas = {
 /*	----------------------------------------	*/
 private	struct	invoice_information 
 {
+	int	scripting;
 	float	taxrate;
 	char *	transaction;
 	char *	description;
@@ -73,6 +75,7 @@ private	struct	invoice_information
 } 
 Invoice = 
 {
+	1,		/* activates use of scripting */
 	18.60,
 	"Transaction",
 	"Description",
@@ -516,6 +519,33 @@ private	void	invoice_document_transaction(
 }
 
 /*	------------------------------------------------------------------	*/
+/*	  s c r i p t e d _ t r a n s a c t i o n _ p r o c e s s i n g		*/
+/*	------------------------------------------------------------------	*/
+private	int	scripted_transaction_processing( char * reference, struct cords_invoice * pptr )
+{
+	char *	argv[10];
+	int	argc=0;
+	char *	result;
+	if (!( rest_valid_string( pptr->processing ) ))
+		return( 0 );
+	else
+	{
+		argv[argc++] = "coobas.invoice";
+		argv[argc++] = reference;
+		argv[argc++] = pptr->account;
+		argv[argc++] = default_publisher();
+		argv[argc++] = default_operator();
+		argv[argc++] = default_tls();
+		argv[argc] = (char *) 0;
+		if (!( result = evaluate_cordscript( pptr->processing, argc, argv )))
+			return( 0 );
+		else if (!( pptr->grandtotal = allocate_string( result ) ))
+			return( 0 );
+		else	return( 0 );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
 /*	     p r o c e s s _ i n v o i c e _ t r a n s a c t i o n s		*/
 /*	------------------------------------------------------------------	*/
 private	int	process_invoice_transactions( struct cords_invoice * pptr )
@@ -623,7 +653,15 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 	/* -------------------------------------------- */
 	xptr = occi_remove_response( xptr );
 	close_invoice_document( h, pptr );
-	return(0);
+
+	/* -------------------------------------------------- */
+	/* detect and perform scripted transaction processing */
+	/* -------------------------------------------------- */
+	if (!( rest_valid_string( pptr->processing ) ))
+		return( 0 );
+	else if (!( Invoice.scripting ))
+		return( 0 );
+	else	return( scripted_transaction_processing( reference, pptr ) );
 }
 
 /*	-------------------------------------------	*/

@@ -4,6 +4,7 @@
 #define	_CONTROL_SIGNAL SIGKILL
 
 #include "cb.h"
+#include "cspi.h"
 
 /*	---------------------------------------------------	*/
 /*	     p u r g e _ c o n t r o l _ p a c k e t s		*/
@@ -72,10 +73,49 @@ private	void	purge_control_packets(struct cords_control * pptr, char * packets, 
 	}
 }
 
+
+/*	------------------------------------------------------------------	*/
+/*	      s c r i p t e d _ b u s i n e s s _ p r o c e s s i n g		*/
+/*	------------------------------------------------------------------	*/
+private	int	scripted_business_processing( 
+		struct cords_control * pptr,
+		char * expression,
+		char * nature, 
+		char * packet )
+
+{
+	char *	argv[10];
+	int	argc=0;
+	char *	result;
+	char 	buffer[2048];
+	if (!( rest_valid_string( expression ) ))
+		return( 0 );
+	else
+	{
+		/* ----------------------------------------------------------------------- */
+		/* CORDSCRIPT: CALLER, CONTROLID, NATURE, PACKET, PUBLISHER, OPERATOR, TLS */
+		/* ----------------------------------------------------------------------- */
+		sprintf(buffer,"%s/%s/%s",get_identity(), _CORDS_CONTROL, pptr->id);
+		argv[argc++] = "slam.control";
+		argv[argc++] = buffer;
+		argv[argc++] = nature;
+		argv[argc++] = packet;
+		argv[argc++] = default_publisher();
+		argv[argc++] = default_operator();
+		argv[argc++] = default_tls();
+		argv[argc] = (char *) 0;
+		if (!( result = evaluate_cordscript( expression, argc, argv )))
+			return( 0 );
+		else	return( atoi( result ) );
+	}
+}
+
+
 /*	--------------------------------------------------------	*/
 /*	      e x e c u t e _ b u s i n e s s _ v a l u e  		*/
 /*	--------------------------------------------------------	*/
-private	void	execute_business_value( 
+private	int	execute_business_value( 
+		struct cords_control * pptr,
 		char * expression,
 		char * nature, 
 		struct occi_response * guarantee,
@@ -86,21 +126,24 @@ private	void	execute_business_value(
 		int sequence )
 {
 	char 	buffer[4096];
-	if (!( expression ))
-		return;
+	if (!( rest_valid_string( expression ) ))
+		return(0);
 	else if (!( strncasecmp( expression, "cordscript:", strlen("cordscript:")  ) ))
 	{
+		expression += strlen("cordscript:");
 		sprintf(buffer,"sla %s seq=%u",nature,sequence);
 		rest_log_message( buffer );
 		rest_log_message( expression );
-		return;
+		scripted_business_processing( pptr, expression, nature, packetid );
+		return(0);
 	}
 	else
 	{
 		sprintf(buffer,"sla %s seq=%u ",nature,sequence);
 		rest_log_message( buffer );
 		rest_log_message( expression );
-		return;
+		scripted_business_processing( pptr, expression, nature, packetid );
+		return(0);
 	}
 
 }
@@ -108,7 +151,7 @@ private	void	execute_business_value(
 /*	--------------------------------------------------------	*/
 /*		i n v o k e _ b u s i n e s s _ v a l u e s 		*/
 /*	--------------------------------------------------------	*/
-private	void	invoke_business_values( char * nature, struct cords_control * pptr, char * packet, struct occi_response * message, char * data, int sequence )
+private	int	invoke_business_values( char * nature, struct cords_control * pptr, char * packet, struct occi_response * message, char * data, int sequence )
 {
 	struct	occi_response 	* zptr;
 	struct	occi_response 	* yptr;
@@ -172,7 +215,7 @@ private	void	invoke_business_values( char * nature, struct cords_control * pptr,
 				/* we now have a business value expression */
 				/* of the right kind that needs evaluated  */
 				/* --------------------------------------- */
-				execute_business_value( dptr->value, nature, zptr, yptr, packet, message, data, sequence );
+				execute_business_value( pptr, dptr->value, nature, zptr, yptr, packet, message, data, sequence );
 				yptr = occi_remove_response( yptr );
 				liberate( sptr );
 				continue;

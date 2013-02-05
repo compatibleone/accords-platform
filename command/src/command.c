@@ -59,7 +59,7 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
-#include "cspi.c"
+#include "cspi.h"
 
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
@@ -800,9 +800,9 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.03");
-	printf("\n   Beta Version : 09/11/2012 ");
-	printf("\n   Copyright (c) 2011,2012 Iain James Marshall ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.04");
+	printf("\n   Beta Version : 05/02/2013 ");
+	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> START       <service_file> ");
 	printf("\n         command <options> RESTART     <service_file> ");

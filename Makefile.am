@@ -32,6 +32,9 @@ endif
 if ENABLE_COPABR
 SUBDIRS += copabr
 endif
+if ENABLE_COCSPI
+SUBDIRS += cocspi
+endif
 if ENABLE_PUBOCCI
 SUBDIRS += pubocci
 endif
@@ -216,3 +219,5 @@ dist-srpm: dist-gzip $(ACCORDS_SPEC) paprocci-srpm
 	rpmbuild -bs $(SPEC_DIR)/$(ACCORDS_SPEC)
 	rpmbuild -bs $(SPEC_DIR)/$(PAPROCCI_SPEC)
 endif # ENABLE_RPM
+
+

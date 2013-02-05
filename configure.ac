@@ -142,6 +142,15 @@ AM_CONDITIONAL([ENABLE_COPABR], [test "$enable_copabr" = "yes"])
 AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr/src])
 AC_SUBST([LD_COPABR], ["-L\${abs_top_builddir}/copabr/src -lcopabr"])
 
+AC_ARG_ENABLE([cocspi],
+      [AS_HELP_STRING([--disable-cocspi],
+		      [Disable cocspi @<:@default=enable@:>@])],
+      [],
+      [enable_cocspi=yes])
+AM_CONDITIONAL([ENABLE_COCSPI], [test "$enable_cocspi" = "yes"])
+AC_SUBST([CFLAGS_COCSPI], [-I\${abs_top_srcdir}/cocspi/src])
+AC_SUBST([LD_COCSPI], ["-L\${abs_top_builddir}/cocspi/src -lcocspi"])
+
 AC_ARG_ENABLE([pubocci],
       [AS_HELP_STRING([--disable-pubocci],
 		      [Disable pubocci @<:@default=enable@:>@])],
@@ -549,6 +558,7 @@ AC_CONFIG_FILES([corest/Makefile corest/src/Makefile])
 AC_CONFIG_FILES([cocci/Makefile cocci/src/Makefile])
 AC_CONFIG_FILES([cocarrier/Makefile cocarrier/src/Makefile])
 AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
+AC_CONFIG_FILES([cocspi/Makefile cocspi/src/Makefile])
 AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
 AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
 AC_CONFIG_FILES([ezvm/Makefile ezvm/src/Makefile])
@@ -611,6 +621,7 @@ echo "    - cocci                    : $enable_cocci"
 echo "    - cocarrier                : $enable_cocarrier"
 echo "    - pubocci                  : $enable_pubocci"
 echo "    - copabr                   : $enable_copabr"
+echo "    - cocspi                   : $enable_cocspi"
 echo "    - coss                     : $enable_coss"
 echo "    - ezvm                     : $enable_ezvm"
 echo "    - cops                     : $enable_cops"

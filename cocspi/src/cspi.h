@@ -1,6 +1,13 @@
 #ifndef	_cspi_h
 #define	_cspi_h
 
+#include "standard.h"
+#include "allocate.h"
+#include "rest.h"
+#include "cp.h"
+#include "cordslang.h"
+#include "occiresolver.h"
+
 #ifndef	public
 #define	public
 #endif
