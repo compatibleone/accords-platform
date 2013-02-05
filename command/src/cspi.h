@@ -46,7 +46,8 @@
 #define	_JOIN_FUNCTION		7
 #define	_DEBUG_FUNCTION		8
 #define	_NEW_FUNCTION		9
-#define	_MAX_FUNCTIONS		10
+#define	_OPEN_FUNCTION		10
+#define	_MAX_FUNCTIONS		11
 
 #define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57

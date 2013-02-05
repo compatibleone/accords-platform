@@ -21,6 +21,28 @@ private	struct cordscript_context * resolve_cordscript_class( char * nptr );
 private	int	end_of_instruction=0;
 private	int	abandon_compile=0;
 
+private	FILE *	ScriptOutput=(FILE *) 0;
+
+private	void	CloseScriptOutput()
+{
+	if ( ScriptOutput )
+	{
+		fclose( ScriptOutput );
+		ScriptOutput = (FILE *) 0;
+	}
+}
+
+private	int	OpenScriptOutput( char * nptr )
+{
+	if ( ScriptOutput )
+		CloseScriptOutput();
+	if (!( rest_valid_string( nptr ) ))
+		return( 0 );
+	else if (!( ScriptOutput = fopen( nptr, "w" ) ))
+		return( 0 );
+	else	return(1);
+}
+
 /*	--------------		*/
 /*	 csp_set_echo 		*/
 /*	--------------		*/
@@ -1787,7 +1809,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"cut",		_CUT_FUNCTION,		-1 },
 	{	"join",		_JOIN_FUNCTION,		-1 },
 	{	"debug",	_DEBUG_FUNCTION,	-1 },
-	{	"new",		_NEW_FUNCTION,		-1 }
+	{	"new",		_NEW_FUNCTION,		-1 },
+	{	"open",		_OPEN_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -1968,9 +1991,16 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* ---------------------------------- */
 		switch ( resolve_language_function( wptr->value ) )
 		{
+		case	_OPEN_FUNCTION		:
+			OpenScriptOutput( vptr->value );
+			return( eval_next( iptr, argv ) );
 		case	_DISPLAY_FUNCTION	:
 			if ( vptr->value )
-				printf("%s\n",vptr->value);
+			{
+				if ( ScriptOutput )
+					fprintf(ScriptOutput,"%s\n",vptr->value);
+				else	printf("%s\n",vptr->value);
+			}
 			return( eval_next( iptr, argv ) );
 		case	_WAIT_FUNCTION		:
 			if ( vptr->value )
