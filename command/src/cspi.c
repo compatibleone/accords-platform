@@ -5568,6 +5568,7 @@ public struct cordscript_context	* compile_cordscript_file( char * expression, i
 				break;
 		}
 		fclose(h);
+		CloseScriptOutput();
 		return( cptr );
 	}
 
