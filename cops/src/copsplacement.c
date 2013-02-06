@@ -212,7 +212,7 @@ private	int	evaluate_algorithm_script( struct cords_placement * pptr, char * alg
 /*	------------------------------------------------------------	*/
 /*	this placement makes use of the scripted algorithm placement	*/
 /*	------------------------------------------------------------	*/
-private	int	use_scripted_algorithm=0;
+private	int	use_scripted_algorithm=1;
 private	int	algorithm_based_placement(
 		struct occi_category * optr, 
 		struct cords_placement * pptr,
