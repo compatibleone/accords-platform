@@ -1,6 +1,8 @@
 #ifndef	_copsplacement_c
 #define	_copsplacement_c
 
+#include "cspi.h"
+
 /*	-----------------------------------------------------------	*/
 /*			s e l e c t _ p l a c e m e n t			*/
 /*	-----------------------------------------------------------	*/
@@ -164,7 +166,7 @@ private	int	score_based_placement(
 /*	------------------------------------------------------------	*/
 /*		q u o t a _ b a s e d _ p l a c e m e n t		*/
 /*	------------------------------------------------------------	*/
-/*	this placement makes use of the new provider quota algorithm
+/*	this placement makes use of the new provider quota algorithm	*/
 /*	------------------------------------------------------------	*/
 private	int	quota_based_placement(
 		struct occi_category * optr, 
@@ -175,6 +177,81 @@ private	int	quota_based_placement(
 	if (!( pptr->solution = resolve_cops_solution( pptr ) ))
 		return( 30 );
 	else	return( 0  );
+}
+
+/*	------------------------------------------------------------	*/
+/*	     e v a l u a t e _ a l g o r i t h m _ s c r i p t 		*/
+/*	------------------------------------------------------------	*/
+private	int	evaluate_algorithm_script( struct cords_placement * pptr, char * algorithm )
+{
+	char *	argv[10];
+	int	argc=0;
+	char *	result;
+	char	reference[1024];
+	if (!( rest_valid_string( algorithm ) ))
+		return( 0 );
+	else
+	{
+		sprintf(reference,"%s/%s/%s",Cops.identity,_CORDS_PLACEMENT,pptr->id);
+		argv[argc++] = "cops.algorithm";
+		argv[argc++] = reference;
+		argv[argc++] = default_publisher();
+		argv[argc++] = default_operator();
+		argv[argc++] = default_tls();
+		argv[argc] = (char *) 0;
+		if (!( result = evaluate_cordscript( algorithm, argc, argv )))
+			return( 0 );
+		else if (!( pptr->solution = allocate_string( result ) ))
+			return( 0 );
+		else	return( 0 );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	     a l g o r i t h m _ b a s e d _ p l a c e m e n t		*/
+/*	------------------------------------------------------------	*/
+/*	this placement makes use of the scripted algorithm placement	*/
+/*	------------------------------------------------------------	*/
+private	int	use_scripted_algorithm=0;
+private	int	algorithm_based_placement(
+		struct occi_category * optr, 
+		struct cords_placement * pptr,
+		char * agent,
+		char * tls )
+{
+	struct	occi_element  * header;
+	struct	occi_element  * eptr;
+	struct	occi_response * yptr;
+	struct	occi_response * uptr;
+	char *	tptr=(char *) 0;
+	char *	vptr=(char *) 0;
+
+	if (!( use_scripted_algorithm ))
+		return( 55 );
+	else if (!( rest_valid_string( pptr->algorithm ) ))
+		return( 118 );
+	if (!( yptr = cords_retrieve_named_instance_list( _CORDS_ALGORITHM, "occi.algorithm.name", pptr->algorithm, agent,tls ) ))
+		return( 404 );
+	else if (!( uptr = cords_retrieve_named_instance( yptr, agent, tls )))
+		return( 404 );
+	else
+	{
+		for (	eptr = uptr->first;
+			eptr != (struct occi_element *) 0;
+			eptr = eptr->next )
+		{
+			if ( strcmp( eptr->name, "occi.algorithm.expression"  ) != 0)
+				continue;
+			else
+			{
+				evaluate_algorithm_script( pptr, eptr->value );
+				yptr = occi_remove_response( yptr );
+				uptr = occi_remove_response( uptr );
+				return( 0 );
+			}
+		}
+		return( 48 );
+	}
 }
 
 /*	--------------------------------------------------	*/
@@ -214,6 +291,8 @@ private	int	create_placement_solution(
 	/* -------------------------------------------------- */
 	if (!( strncmp( pptr->algorithm, "quota", strlen( "quota" ) ) ))
 		return( quota_based_placement( optr, pptr, agent, tls ) );
+	else if (!( algorithm_based_placement( optr, pptr, agent, tls ) ))
+		return( 0 );
 	else if (!( strcmp( pptr->algorithm, "default" ) ))
 		return( default_placement( optr, pptr, agent, tls ) );
 	else if (!( strcmp( pptr->algorithm, "price" ) ))
