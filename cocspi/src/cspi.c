@@ -4858,6 +4858,8 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 	FILE 	*	h;
 	FILE 	*	hh;
 	int		c;
+	char 	*	holdline=(char *) 0;
+	int		holdungotc=0;
 	char	buffer[8192];
 
 	if (!( get_token( buffer ) ))
@@ -4868,7 +4870,16 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 	{
 		if ( check_verbose() ) { printf("include file: %s\n",buffer); }
 
-		hh = initialise_file( h );
+		/* ------------------------------ */
+		/* save and establish new context */
+		/* ------------------------------ */
+		if (!( hh = initialise_file( h )))
+		{
+			holdline = linebuffer;
+			linebuffer = (char *) 0;
+		}
+		holdungotc = ungotc;
+		ungotc = 0;
 
 		while ( remove_white() )
 		{
@@ -4882,7 +4893,15 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 			if ( abandon_compile )
 				break;
 		}
-		h = initialise_file( hh );
+		/* ------------------------------ */
+		/* restore previous input context */
+		/* ------------------------------ */
+		if (!( hh ))
+			linebuffer = holdline;
+		else	h = initialise_file( hh );
+
+		ungotc = holdungotc;
+
 		fclose(h);
 		return((struct cordscript_instruction *) 0);
 	}
