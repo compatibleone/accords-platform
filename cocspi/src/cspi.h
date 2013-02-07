@@ -126,6 +126,7 @@ struct	cordscript_context
 	struct	cordscript_value * stack;
 	struct	cordscript_value * data;
 	struct	cordscript_value * code;
+	struct	cordscript_value * returnvalue;
 	struct	cordscript_context     * env;
 	struct	cordscript_context     * next;
 	struct	cordscript_instruction * cs;

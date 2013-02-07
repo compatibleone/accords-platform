@@ -3143,7 +3143,12 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 	else if (!( cptr = iptr->context ))
 		return((struct cordscript_instruction *) 0);
 	else if (!( iptr = cptr->caller ))
+	{
+		/* no caller is a script return */
+		/* ---------------------------- */
+		cptr->returnvalue = vptr;
 		return((struct cordscript_instruction *) 0);
+	}
 	else
 	{
 		push_value( iptr->context, vptr );
@@ -4873,11 +4878,9 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 		/* ------------------------------ */
 		/* save and establish new context */
 		/* ------------------------------ */
-		if (!( hh = initialise_file( h )))
-		{
-			holdline = linebuffer;
-			linebuffer = (char *) 0;
-		}
+		hh = initialise_file( h );
+		holdline = linebuffer;
+		linebuffer = (char *) 0;
 		holdungotc = ungotc;
 		ungotc = 0;
 
@@ -4896,13 +4899,11 @@ private	struct cordscript_instruction * compile_cordscript_include( struct cords
 		/* ------------------------------ */
 		/* restore previous input context */
 		/* ------------------------------ */
-		if (!( hh ))
-			linebuffer = holdline;
-		else	h = initialise_file( hh );
-
+		h = initialise_file( hh );
+		linebuffer = holdline;
 		ungotc = holdungotc;
-
 		fclose(h);
+
 		return((struct cordscript_instruction *) 0);
 	}
 }			
@@ -5650,7 +5651,9 @@ public struct cordscript_value 	* execute_cordscript( struct  cordscript_context
 			iptr != (struct cordscript_instruction *) 0;
 			iptr = (*iptr->evaluate)( iptr  ) );
 
-		if (!( cptr->stack ))
+		if ( cptr->returnvalue )
+			return( cptr->returnvalue );
+		else if (!( cptr->stack ))
 			return((struct cordscript_value *) 0);
 		else	return( pop_stack( cptr ) );
 	}
