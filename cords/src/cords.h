@@ -24,6 +24,7 @@
 #include "firewall.h"
 #include "import.h"
 #include "storage.h"
+#include "volume.h"
 #include "infrastructure.h"
 #include "package.h"
 #include "packet.h"

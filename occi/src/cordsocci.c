@@ -57,6 +57,7 @@
 #include "occirequirement.c"
 #include "occisecurity.c"
 #include "occistorage.c"
+#include "occivolume.c"
 #include "occisystem.c"
 #include "occitarif.c"
 #include "occitransaction.c"

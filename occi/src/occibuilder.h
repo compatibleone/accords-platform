@@ -68,6 +68,7 @@ public struct occi_category * occi_cords_manifest_builder(char *a,char * b);
 public struct occi_category * occi_cords_requirement_builder(char *a,char * b);
 public struct occi_category * occi_cords_security_builder(char *a,char * b);
 public struct occi_category * occi_cords_storage_builder(char *a,char * b);
+public struct occi_category * occi_cords_volume_builder(char *a,char * b);
 public struct occi_category * occi_cords_system_builder(char *a,char * b);
 public struct occi_category * occi_cords_transaction_builder(char *a,char * b);
 public struct occi_category * occi_cords_tarif_builder(char *a,char * b);

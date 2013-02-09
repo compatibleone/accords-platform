@@ -26,6 +26,7 @@
 #include "port.c"
 #include "firewall.c"
 #include "storage.c"
+#include "volume.c"
 #include "security.c"
 #include "authorise.c"
 #include "package.c"
