@@ -2862,9 +2862,9 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 		}
 		else if ((( c = *vptr) == '"' ) || ( c == 0x0025 ))
 			quote = c;
-		else if ( *c == '{' )
+		else if ( c == '{' )
 			quote = '}';
-		else if ( *c == '[' )
+		else if ( c == '[' )
 			quote = ']';
 		else if (( c == ']' ) ||  ( c == ',' ))
 			break;
