@@ -882,6 +882,11 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 
 	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )))
 		return(( eptr->isactive = 0 ));
+	else if ( cords_check_invocation( yptr, (struct rest_response *) 0 ) != 0 )
+	{
+		yptr = occi_remove_response( yptr );
+		return(( eptr->isactive = 0 ));
+	}
 	else 
 	{
 		yptr = occi_remove_response( yptr );

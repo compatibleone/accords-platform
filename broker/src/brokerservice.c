@@ -192,6 +192,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	struct	cords_xlink	* lptr;
 	char			* mptr;
 	char 			* wptr;
+	int			status=0;
 	FILE *			  h;
 	char			buffer[1024];
 
@@ -256,9 +257,15 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 		/* --------------------------------------------------- */
 		if (!( flags & _INHIBIT_AUTOSTART ))
 		{
-			if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+			if (!(zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )))
+				status = 118;
+			else
+			{
+				status = cords_check_invocation( zptr, (struct html_response *) 0 );
 				zptr = occi_remove_response( zptr );
+			}
 		}
+		else	status = 0;
 
 		if ( pptr->contracts++ ) fprintf(h,",\n" );
 
@@ -320,7 +327,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 		fclose(h);
 	}
 
-	return(0);
+	return(status);
 }
 
 
@@ -350,6 +357,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	struct	cords_xlink	* lptr;
 	char			* mptr;
 	char 			* wptr;
+	int			status;
 	FILE *			  h;
 	char			buffer[1024];
 
@@ -393,8 +401,13 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
 
-		if ((zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		if (!(zptr = cords_invoke_action( lptr->target, action, _CORDS_SERVICE_AGENT, default_tls() )))
+			status = 118;
+		else
+		{
+			status = cords_check_invocation( zptr, (struct html_response *) 0 );
 			zptr = occi_remove_response( zptr );
+		}
 
 		if ( pptr->contracts++ ) fprintf(h,",\n" );
 
@@ -452,7 +465,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 		fclose(h);
 	}
 
-	return(0);
+	return(status);
 }
 
 /*	-------------------------------------------	*/

@@ -60,6 +60,12 @@ private	struct	rest_response * instance_plan(
 		service = liberate( service );
 	 	return( rest_html_response( aptr, 517, "START FAILURE" ) );
 	}
+	else if ( cords_check_invocation( zptr, aptr ) )
+	{
+		zptr = occi_remove_response( zptr );
+		service = liberate( service );
+	 	return( rest_html_response( aptr, aptr->status, aptr->message ) );
+	}
 	else
 	{
 		/* ------------------------------------------------ */

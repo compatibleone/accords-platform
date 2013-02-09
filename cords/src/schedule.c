@@ -43,6 +43,8 @@ public struct cords_schedule * liberate_cords_schedule(struct cords_schedule * s
 			 sptr->account = liberate(sptr->account);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
+		if ( sptr->message )
+			 sptr->message = liberate(sptr->message);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_schedule *) 0);
@@ -68,6 +70,8 @@ public struct cords_schedule * reset_cords_schedule(struct cords_schedule * sptr
 		sptr->completed =  0;
 		sptr->duration =  0;
 		sptr->priority =  0;
+		sptr->response =  0;
+		sptr->message = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -143,6 +147,14 @@ public int xmlin_cords_schedule(struct cords_schedule * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->priority = atoi(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"response") ))
+		{
+			if ( wptr->value ) { sptr->response = atoi(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"message") ))
+		{
+			if ( wptr->value ) { sptr->message = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -173,6 +185,8 @@ public int rest_occi_cords_schedule(FILE * fh,struct cords_schedule * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.completed='%u'\r\n",prefix,nptr,sptr->completed);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.duration='%u'\r\n",prefix,nptr,sptr->duration);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.priority='%u'\r\n",prefix,nptr,sptr->priority);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.response='%u'\r\n",prefix,nptr,sptr->response);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.message='%s'\r\n",prefix,nptr,(sptr->message?sptr->message:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

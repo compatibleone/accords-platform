@@ -227,6 +227,8 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struc
 			if (!( zptr = ll_cords_invoke_action( root, wptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			{
 				pptr->completed = time((long *) 0);
+				pptr->response  = -1;
+				pptr->message   = allocate_string("invocation failure");
 				root = liberate( root );
 				return(0);
 			}
@@ -234,6 +236,8 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struc
 			{
 				pptr->completed = time((long *) 0);
 				pptr->state++;
+				pptr->response = zptr->response->status;
+				pptr->message  = allocate_string( zptr->response->message );
 				zptr = occi_remove_response( zptr );
 				return(0);
 			}

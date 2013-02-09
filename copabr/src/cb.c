@@ -1679,6 +1679,11 @@ private	char *	cords_cops_operation(
 							buffer, 
 							_CORDS_CHOOSE, agent, tls ) ))
 						continue;
+					else if ( cords_check_invocation( yptr, (struct rest_response *) 0 ) != 0)
+					{
+						yptr = occi_remove_response( yptr );
+						continue;
+					}
 					else	yptr = occi_remove_response( yptr );
 				}
 
@@ -3246,6 +3251,7 @@ private	int	cords_instance_plan(
 {
 	struct	xml_atribut *	aptr;
 	struct	occi_response * zptr;
+	int	status;
 
 	if (!( zptr =  occi_create_link( plan, instance, agent, tls ) ))
 		return(914);
@@ -3253,6 +3259,11 @@ private	int	cords_instance_plan(
 
 	if (!( zptr =  cords_invoke_action( instance, _CORDS_START, agent, tls ) ))
 		return(915);
+	else if (( status = cords_check_invocation( zptr, (struct rest_response *) 0 )) != 0)
+	{
+		zptr = occi_remove_response( zptr );
+		return( status );
+	}
 	else	zptr = occi_remove_response( zptr );
 
 	if (!( aptr = document_add_atribut( document, "instance", instance )))

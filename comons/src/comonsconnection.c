@@ -254,6 +254,11 @@ private	struct rest_response * start_connection(
 				liberate( wptr );
 				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 801, "Probe Start Failure" ) );
+				else if ( cords_check_invocation( zptr, aptr ) != 0 )
+				{
+					zptr = occi_remove_response( zptr );
+					return( rest_html_response( aptr, aptr->status, aptr->message ) );
+				}
 				else
 				{
 					zptr = occi_remove_response( zptr );
@@ -267,6 +272,11 @@ private	struct rest_response * start_connection(
 		{
 			if (!(zptr = cords_invoke_action( pptr->monitor, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
 				return( rest_html_response( aptr, 801, "Monitor Start Failure" ) );
+			else if ( cords_check_invocation( zptr, aptr ) != 0 )
+			{
+				zptr = occi_remove_response( zptr );
+				return( rest_html_response( aptr, aptr->status, aptr->message ) );
+			}
 			else
 			{
 				zptr = occi_remove_response( zptr );
@@ -290,6 +300,7 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 	struct	cords_xlink	* lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
+	int	status;
 	char *	wptr;
 	char	buffer[2048];
 
@@ -318,6 +329,11 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 			liberate( wptr );
 			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
 				return( 801 );
+			else if ((status = cords_check_invocation( zptr, (struct rest_response *) 0 )) != 0 )
+			{
+				zptr = occi_remove_response( zptr );
+				return( status );
+			}
 			else
 			{
 				zptr = occi_remove_response( zptr );
@@ -342,6 +358,11 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 	{
 		if (!(zptr = cords_invoke_action( pptr->monitor, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
 			return( 801 );
+		else if ((status = cords_check_invocation( zptr, (struct rest_response *) 0 )) != 0 )
+		{
+			zptr = occi_remove_response( zptr );
+			return( status );
+		}
 		else
 		{
 			zptr = occi_remove_response( zptr );

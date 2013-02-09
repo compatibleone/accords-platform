@@ -1082,6 +1082,28 @@ public	struct	occi_response * cords_invoke_action( char * resource, char * actio
 		return( cords_schedule_action( resource, action, agent, tls ) );
 	else	return( ll_cords_invoke_action( resource, action, agent, tls ) );
 }
+
+/*	---------------------------------------------------	*/	
+/*	    c o r d s _ c h e c k _ i n v o c a t i o n		*/
+/*	---------------------------------------------------	*/	
+public	int	cords_check_invocation( struct	occi_response * zptr, struct rest_response * aptr )
+{
+	if (!( zptr ))
+		return( 118 );
+	else if (!( zptr->response ))
+		return( 119 );
+	else if ( zptr->response->status < 300 )
+		return( 0 );
+	else if (!( aptr ))
+		return( zptr->response->status );
+	else 
+	{
+		aptr->status = zptr->response->status;
+		if ( zptr->response->message )
+			aptr->message = allocate_string( zptr->response->message );
+		return( zptr->response->status );
+	}
+}
  
 /*	---------------------------------------------------	*/
 /*		c o r d s _ r e m o v e _ l i n k s		*/

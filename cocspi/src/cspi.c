@@ -1875,6 +1875,18 @@ private	void	implicite_construction( struct cordscript_context * cptr )
 	return;
 }
 
+/*	------------------------	*/
+/*	throw_evaluation_failure	*/
+/*	------------------------	*/
+/*	TODO: this needs to be 		*/
+/*	completed.			*/
+/*	------------------------	*/
+private	void	throw_evaluation_failure( char * aptr, char * mptr )
+{
+	return;
+}
+
+
 /*	----------------------		*/
 /*	explicite_construction		*/
 /*	----------------------		*/
@@ -2227,7 +2239,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				/* ------------------------ */
 				if (( zptr = ll_cords_invoke_action( evalue, wptr->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
-				
+				else	throw_evaluation_failure( evalue, wptr->value );				
 			}
 		}
 		/* --------------------------------------- */
@@ -2340,6 +2352,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			/* ------------------------ */
 			if (( zptr = ll_cords_invoke_action( sptr, wptr->value, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				zptr = occi_remove_response( zptr );
+			else	throw_evaluation_failure( evalue, wptr->value );				
 				
 		}
 	}

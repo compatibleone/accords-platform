@@ -45,6 +45,11 @@ private	struct rest_response * start_monitor(
 				liberate( wptr );
 				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 801, "Control Start Failure" ) );
+				else if ( cords_check_invocation( zptr, aptr ) != 0 )
+				{
+					zptr = occi_remove_response( zptr );
+					return( rest_html_response( aptr, aptr->status, aptr->message ) );
+				}
 				else 	zptr = occi_remove_response( zptr );
 			}
 		}

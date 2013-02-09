@@ -15,6 +15,8 @@ struct	cords_schedule
 	int	completed;
 	int	duration;
 	int 	priority;
+	int	response;
+	char *	message;
 	int	state;
 };
 
