@@ -278,16 +278,19 @@ private	char *	resolve_windowsazure_network( struct cords_az_contract * cptr )
 /*	-----------------------------------------------------------------	*/
 /*		    b u i l d _ a z u r e _ m e d i a l i n k 			*/
 /*	-----------------------------------------------------------------	*/
-private	int	build_windowsazure_medialink( struct windowsazure * pptr )
+public	int	build_windowsazure_medialink( struct windowsazure * pptr )
 {
 	char 	buffer[2048];
 	if (!( rest_valid_string( pptr->storageaccount ) ))
 		return( 118 );
 	else
 	{
-		sprintf(buffer,"https://%s.blob.core.windows.net/vhds/%s.vhd",
+		if ( pptr->media )
+			pptr->media = liberate( pptr->media );
+		sprintf(buffer,"https://%s.blob.core.windows.net/vhds/%s-%u.vhd",
 			pptr->storageaccount,
-			pptr->id );
+			pptr->id,
+			++pptr->iteration );
 		if (!( pptr->media = allocate_string( buffer ) ))
 			return( 27 );
 		else	return( 0 );
@@ -703,12 +706,6 @@ public	int	create_windowsazure_contract(
 		return( terminate_windowsazure_contract( status, &contract ) );
 
 	/* ------------------------------------------ */
-	/* Build the Media Link for the Image Storage */
-	/* ------------------------------------------ */
-	else if ((status = build_windowsazure_medialink( pptr )) != 0)
-		return( terminate_windowsazure_contract( status, &contract ) );
-
-	/* ------------------------------------------ */
 	/* Resolve the required Hosted Service Entity */
 	/* ------------------------------------------ */
 	else if ((status = resolve_windowsazure_service( &contract, pptr, cfptr )) != 0)
@@ -839,6 +836,8 @@ public	int	delete_windowsazure_disk(
 	struct	az_response * azptr;
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
+	char 	diskid[1024];
+
 	if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
 	&&  ( azptr->response )
 	&&  ( azptr->response->status == 200 )
@@ -846,15 +845,16 @@ public	int	delete_windowsazure_disk(
 	&&  ( eptr->name )
 	&&  (!( strcmp( eptr->name, "Disks" ) )))
 	{
+		sprintf(diskid,"%s-%u",pptr->id,pptr->iteration);
 		for (	eptr = eptr->first;
 			eptr != (struct xml_element *) 0;
 			eptr = eptr->next )
 		{
-			if (!( dptr = document_element( eptr, "Name" ) ))
+			if (!( dptr = document_element( eptr, "MediaLink" ) ))
 				continue;
 			else if (!( dptr->value ))
 				continue;
-			else if ( strncmp( dptr->value, pptr->id, strlen( pptr->id ) ) != 0 )
+			else if ( strncmp( dptr->value, pptr->media, strlen( pptr->media ) ) != 0 )
 				continue;
 			else
 			{

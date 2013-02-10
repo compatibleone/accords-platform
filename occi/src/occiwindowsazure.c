@@ -177,6 +177,8 @@ private void autoload_windowsazure_nodes() {
 				pptr->hostedservice = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "storageaccount" )) != (struct xml_atribut *) 0)
 				pptr->storageaccount = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "iteration" )) != (struct xml_atribut *) 0)
+				pptr->iteration = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "media" )) != (struct xml_atribut *) 0)
@@ -281,6 +283,9 @@ public  void autosave_windowsazure_nodes() {
 		fprintf(h," storageaccount=%c",0x0022);
 		fprintf(h,"%s",(pptr->storageaccount?pptr->storageaccount:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," iteration=%c",0x0022);
+		fprintf(h,"%u",pptr->iteration);
+		fprintf(h,"%c",0x0022);
 		fprintf(h," image=%c",0x0022);
 		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
@@ -365,6 +370,8 @@ private void set_windowsazure_field(
 			pptr->hostedservice = allocate_string(vptr);
 		if (!( strcmp( nptr, "storageaccount" ) ))
 			pptr->storageaccount = allocate_string(vptr);
+		if (!( strcmp( nptr, "iteration" ) ))
+			pptr->iteration = atoi(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "media" ) ))
@@ -557,6 +564,7 @@ private int pass_windowsazure_filter(
 		else if ( strcmp(pptr->storageaccount,fptr->storageaccount) != 0)
 			return(0);
 		}
+	if (( fptr->iteration ) && ( pptr->iteration != fptr->iteration )) return(0);
 	if (( fptr->image )
 	&&  (strlen( fptr->image ) != 0)) {
 		if (!( pptr->image ))
@@ -670,6 +678,9 @@ private struct rest_response * windowsazure_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.storageaccount=%c%s%c",optr->domain,optr->id,0x0022,pptr->storageaccount,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.iteration=%c%u%c",optr->domain,optr->id,0x0022,pptr->iteration,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.image=%c%s%c",optr->domain,optr->id,0x0022,pptr->image,0x0022);
@@ -1152,6 +1163,8 @@ public struct occi_category * occi_windowsazure_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "storageaccount",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "iteration",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "media",0,0) ))
@@ -1424,6 +1437,17 @@ public struct rest_header *  windowsazure_occi_headers(struct windowsazure * spt
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.windowsazure.storageaccount='%s'\r\n",(sptr->storageaccount?sptr->storageaccount:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.windowsazure.iteration='%u'\r\n",sptr->iteration);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

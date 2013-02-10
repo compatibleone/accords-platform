@@ -476,6 +476,7 @@ private	struct	rest_response * start_windowsazure(
 	struct	az_subscription * subscription=(struct az_subscription *) 0;
 	struct	windowsazure * pptr;
 	int	status;
+	char 	* mnptr;
 	char	* filename;
 	char	reference[512];
 	char	buffer[2048];
@@ -490,6 +491,13 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Hosted Service Failure" ) );
 	else if (!(filename = build_windowsazure_firewall( subscription, pptr )))
 		return( rest_html_response( aptr, 888, "WINDOWS AZURE Firewall Failure" ) );
+
+	/* ------------------------------------------ */
+	/* Build the Media Link for the Image Storage */
+	/* ------------------------------------------ */
+	else if ((status = build_windowsazure_medialink( pptr )) != 0)
+		return( rest_html_response( aptr, 888, "WINDOWS AZURE Media Name Failure" ) );
+
 	else if (!( filename = az_create_vm_request(
 		subscription,
 		pptr->id,  pptr->name,
@@ -497,6 +505,7 @@ private	struct	rest_response * start_windowsazure(
 		pptr->publicnetwork,
 		(char *) 0, 0, filename )))
 		return( rest_html_response( aptr, 500, "Error Creating WINDOWS AZURE VM Request" ) );
+
 	else if (!( azptr = az_create_vm( subscription,filename ) ))
 		return( rest_html_response( aptr, 501, "Error Creating WINDOWS AZURE VM" ) );
 	else if (!( azptr->response ))

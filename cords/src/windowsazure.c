@@ -120,6 +120,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->group = (char*) 0;
 		sptr->hostedservice = (char*) 0;
 		sptr->storageaccount = (char*) 0;
+		sptr->iteration =  0;
 		sptr->image = (char*) 0;
 		sptr->media = (char*) 0;
 		sptr->flavor = (char*) 0;
@@ -241,6 +242,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		{
 			if ( wptr->value ) { sptr->storageaccount = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"iteration") ))
+		{
+			if ( wptr->value ) { sptr->iteration = atoi(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"image") ))
 		{
 			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
@@ -305,6 +310,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.group='%s'\r\n",prefix,nptr,(sptr->group?sptr->group:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostedservice='%s'\r\n",prefix,nptr,(sptr->hostedservice?sptr->hostedservice:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.storageaccount='%s'\r\n",prefix,nptr,(sptr->storageaccount?sptr->storageaccount:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.iteration='%u'\r\n",prefix,nptr,sptr->iteration);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.media='%s'\r\n",prefix,nptr,(sptr->media?sptr->media:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));

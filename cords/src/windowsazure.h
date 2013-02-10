@@ -31,6 +31,7 @@ struct	windowsazure
 	char *	group;
 	char *	hostedservice;
 	char *	storageaccount;
+	int	iteration;
 
 	char *	image;
 	char *	media;
