@@ -1,0 +1,216 @@
+class	pricecalculator
+{
+	$started="";
+	$duration=0;
+	$period=0;
+
+	$transaction="";
+	$priceid="";
+	$reference="";
+	$description;
+	$timestamp="";
+	$datestring="";
+	$source="";
+		
+	$price="";
+	$fixed="";
+	$rate="";
+	$what="";
+	$quantity=1;
+	$total=0;
+	$grandtotal=0;
+	$start="";
+	$units="";
+
+	public function getUnits()
+	{
+		return( $units );
+	}
+
+	public function getGrandTotal()
+	{
+		return( $grandtotal );
+	}
+
+	public function getTotal()
+	{
+		return( $total );
+	}
+
+	public function getValue()
+	{
+		return( $what );
+	}
+
+	public function getRate()
+	{
+		return( $rate );
+	}
+
+	public function getQuantity()
+	{
+		return( $quantity );
+	}
+
+	public function getStart()
+	{
+		return( $start.date() );
+	}
+
+	public function Reset()
+	{
+		$started = [];
+		$total=0;
+		$grandtotal=0;
+	}
+
+	public function LoadTransaction( $tid )
+	{
+		$transaction = $tid.get();
+		$priceid  = $transaction["occi.transaction.price"];
+		$reference = $transaction["occi.transaction.reference"];
+		$description = $transaction["occi.transaction.description"];
+		$timestamp = $transaction["occi.transaction.when"];
+		$datestring = $timestamp.date();
+		$source = $transaction["occi.transaction.source"];
+	}
+
+	public	function LoadPrice()
+	{
+		$price = $priceid.get();
+		$fixed = $price["occi.price.fixed"];
+		$rate  = $price["occi.price.rate"];
+		$units = "units";
+		$what  = 0;
+		$quantity=1;
+	}
+
+	public	function CalculatePeriod()
+	{
+		$ppn   = $price["occi.price.period"];
+		$units = $ppn;
+		switch ( $ppn )
+		{
+		case	"year"	:
+		case	"annee"	:
+			$period = 60 * 24 * 365;
+			break;
+		case	"month"	:
+		case	"mois"	:
+			$period = 60 * 24 * 30;
+			break;
+		case	"week"	:
+		case	"semaine"	:
+			$period = 60 * 24 * 7;
+			break;
+		case	"day"	:
+		case	"jour"	:
+			$period = 60 * 24;
+			break;
+		case	"hour"	:
+		case	"heure"	:
+			$period = 60;
+			break;
+		case	"minute":
+			$period = 1;
+			break;
+		default	:
+			$period = 60;
+			break;
+		}
+	}
+
+	public function RateAndDuration()
+	{
+		if ( $duration > 0 )
+		{
+			if ( $duration < $period )
+			{
+				$quantity = 1;
+			}
+			else
+			{
+				$minutes = $duration / $period;
+				if ( $minutes < $period )
+				{
+					$quantity = 1;
+				}
+				else
+				{
+					$quantity = $minutes / $period;
+				}
+			}
+			/* -------------------------- */
+			/* calculate price for period */
+			/* -------------------------- */
+			$what = $rate * $quantity;
+			$what = $what.round(2);
+		}
+	}
+
+	public	function StartTransaction()
+	{
+		$temp = '{"'#$reference#'":"'#$timestamp#'"}';
+		$started = $started + $temp;
+		$duration = 0;
+		$quantity = 0;
+	}
+	
+	public	function StopTransaction()
+	{
+		$start    = "";
+		$quantity = 0;
+		$duration = 0;
+		$running = $started;
+		foreach ( $running as $vm )
+		{
+			forboth ( $vm as $vd and $vt )
+			{
+				if ( $vd == $reference )
+				{
+					$duration = $timestamp - $vt;
+					$start = $vt;
+				}
+			}
+		}
+		RateAndDuration();
+	}
+
+	public	function Calculate()
+	{
+		if ( $fixed == "true" )
+		{
+			$units = " ";
+			$what = $rate;
+			$quantity = 1;
+		}
+		else
+		{
+			if ( $description == "action=start" )
+			{	StartTransaction();	}
+			else
+			{
+				if ( $description == "action=stop" )
+				{	StopTransaction();	}
+				else
+				{
+					$what = $rate * $quantity;
+				}
+			}
+		}
+	}
+
+	public	function SubTotal()
+	{
+		$total = $total + $what;
+		$total = $total.round(2);
+	}
+
+	public	function GrandTotal()
+	{
+		$grandtotal = $grandtotal + $total;
+		$grandtotal = $grandtotal.round(2);
+		$total = 0;
+	}
+
+}

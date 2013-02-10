@@ -1,0 +1,134 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-account.txt							 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the details of the account identified by the first command line parameter   	         */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+	HtmlHeader("Accords Platform Account",$1);
+
+	$what     = $2;
+	$baseurl  = "/accords/dashboard.php";
+	$accounts = account.list('occi.account.name="'#$what#'"');
+
+	foreach ( $accounts as $aid )
+	{
+
+		/* ---------------------------------- */
+		/* display the account record details */
+		/* ---------------------------------- */
+		$account = $aid.get();
+		"<tr><td colspan=5><b>Account Information</b></td></tr>".display();
+		$m = "<tr><td colspan=5 class=title>"#$aid#"</tr>";
+		$m.display();
+		$safty = $account;
+		$item=0;
+		foreach ( $account as $tuple )
+		{
+			forboth ( $tuple as $n and $v )
+			{
+				if ( $n != "link" )
+				{
+					if ( $item == 0 )
+					{
+						$item = 1 ;
+						$prefix = "<tr>";
+					}
+					else
+					{
+						$item = 0;
+						$prefix = " ";
+					}
+					$p = $n / ".";
+					$n = $p[2];
+					$m = $prefix#"<th><div align=right>"#$n#"&nbsp;</div><td><input type=text name="#$n#" value='"#$v#"'>";
+					$m.display();
+				}
+			}
+		}
+
+		/* ------------------------------------ */
+		/* display the list of authorized users */
+		/* ------------------------------------ */
+		"<tr><td colspan=5><b>Authorized Users</b></td></tr>".display();
+		"<tr><td class=title>Name<td class=title>Role<td colspan=2 class=title>Email<td class=title>Password</tr>".display();
+		foreach ( $safty as $tuple )
+		{
+			forboth ( $tuple as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$user = $v.get();
+					$n = $user["occi.user.name"];
+					$m = "<tr><td>"#$n;
+					$n = $user["occi.user.role"];
+					$m = $m#"<td>"#$n;
+					$n = $user["occi.user.email"];
+					if ( $n.length() > 0 )
+					{	$m = $m#"<td colspan=2>"#$n;	}
+					else
+					{	$m = $m#"<td colspan=2>&nbsp;";	}
+					$n = $user["occi.user.password"];
+					if ( $n.length() > 0 )
+					{	$m = $m#"<td>"#$n#"</tr>";	}
+					else
+					{	$m = $m#"<td>&nbsp;</tr>";	}
+					$m.display();
+				}
+			}
+		}
+
+		$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newuser.txt&option="#$what#"'>Add a New Account User</a></th></tr>";
+		$m.display();
+
+		/* ----------------------------- */
+		/* display the list of manifests */
+		/* ----------------------------- */
+		include "csp-manifestlist.txt";
+
+		ManifestList( 'occi.manifest.account="'#$aid#'"');
+
+		/* ------------------------------ */
+		/* display the list of agreements */
+		/* ------------------------------ */
+		include "csp-agreementlist.txt";
+
+		AgreementList( 'occi.agreement.initiator="'#$aid#'"');
+
+		$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>";
+		$m.display();
+
+		/* -------------------------------------- */
+		/* display the list of instanced services */
+		/* -------------------------------------- */
+		include "csp-instancelist.txt";
+
+		InstanceList('occi.service.account="'#$aid#'"');
+ 
+		/* ---------------------------- */
+		/* display the list of invoices */
+		/* ---------------------------- */
+		include "csp-invoicelist.txt";
+
+		InvoiceList('occi.invoice.account="'#$aid#'"');
+ 
+		$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$what#"'>Process Transactions</a></th></tr>";
+		$m.display();
+
+
+	}
+
+
+	HtmlFooter();
+

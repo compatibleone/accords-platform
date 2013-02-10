@@ -1,0 +1,14 @@
+	/* ----------------------------------------------------------------- */
+	/* this widget display a form select control allowing role selection */
+	/* ----------------------------------------------------------------- */
+function	SelectRole($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+	"<option value='user'>any</option>".display();
+	"<option value='admin'>admin</option>".display();
+	"<option value='guest'>guest</option>".display();
+	"</select>".display();
+}
+
+

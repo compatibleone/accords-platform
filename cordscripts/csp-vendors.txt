@@ -1,0 +1,19 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-vendors.txt						         */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of vendors declared within the accords platform for the provisioning of resources      */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-vendorlist.txt";
+
+	HtmlHeader("Accords Platform Vendors",$1);
+
+	"<tr><td colspan=6>".display();
+	VendorList( " " );
+	"</td></tr>".display();
+
+	"<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newvendor.txt&option=yes'>Create Vendor Account</a></th></tr>".display();
+	
+	HtmlFooter();
+

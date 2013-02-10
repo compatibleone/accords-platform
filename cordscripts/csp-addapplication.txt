@@ -1,0 +1,71 @@
+
+	$s = {};
+	$a = $2 / "=";
+	$v = $a[1];
+	if ( $v.length() > 0 )
+	{
+
+		/* resolve the account identifier */
+		/* ------------------------------ */
+		$accountname = $v;
+		$alist = account.list( 'occi.account.name="'#$v#'"' );
+		$aid = $alist[0];
+		
+		$a = $5 / "=";
+		$n = $a[0];
+		$v = $a[1];
+
+
+		/* resolve the manifest identifier */
+		/* ------------------------------- */
+		$mlist = manifest.list( 'occi.manifest.name="'#$v#'"' );
+		$mid = $mlist[0];
+		
+		$a = $6 / "=";
+		$n = $a[0];
+		$v = $a[1];
+
+
+		/* resolve the agreement template identifier */
+		/* ----------------------------------------- */
+		if ( $v != "none" )
+		{
+			$tlist = agreement.list( 'occi.agreement.name="'#$v#'"' );
+			$tid = $tlist[0];
+		}
+		else
+		{
+			$tid = $v;
+		}
+
+		$s = {};
+		$d = '"occi.saas.vendor":"'#$accountname#'"';
+		$s = $s + $d;
+
+		$d = '"occi.saas.manifest":"'#$mid#'"';
+		$s = $s + $d;
+
+		$d = '"occi.saas.template":"'#$tid#'"';
+		$s = $s + $d;
+
+		$a = $3 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		$d = '"occi.saas.name":"'#$v#'"';
+		$s = $s + $d;
+
+		$a = $4 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		$d = '"occi.saas.description":"'#$v#'"';
+		$s = $s + $d;
+
+		$appid = saas.post( $s );
+
+
+	}
+
+	$2 = $1;
+	include "csp-applications.txt";
+
+

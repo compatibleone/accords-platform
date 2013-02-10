@@ -1,0 +1,27 @@
+function	CustomerHeader($title,$account)
+{
+	$when = "now".date();
+	$m = "<html><head><title>"#$title#"</title></head>";
+	$m.display();
+	$m = "<body><div align=center class=whiteframe><table width='100%' border=1><tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";
+	$m.display();
+	"<tr>".display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-account.txt&ouput=HTML&option="#$account#"'>Account</a>";
+	$m.display();
+	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML'>Applications</a>".display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
+	$m.display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
+	$m.display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML&option="#$account#"'>Invoices</a>";
+	$m.display();
+	"</tr><tr><th colspan=6>&nbsp</tr><tr><td colspan=6><div align=center><table width='100%'>".display();
+	return;
+}
+
+
+function	CustomerFooter()
+{
+	"</table></div></td></tr></table></div></body></html>".display();
+	return;
+}

@@ -1,0 +1,110 @@
+	include "csp-header.txt";
+	include "csp-pricecalculator.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=6>&nbsp;</td></tr>".display();
+		"<tr><td colspan=6 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=6>&nbsp;</td></tr>".display();
+		return;
+	}
+
+	$pc = pricecalculator.new();
+	$pc.Reset();
+
+	HtmlHeader("Accords Platform Invoice and Transactions",$1);
+
+	$what = $2;
+
+	$invoice = $what.get();
+
+	SectionHeader("Invoice Details");
+
+	"<tr><td colspan=3 class=title>Invoice<td colspan=3 class=title>Account</tr>".display();
+	"<tr><td><b>Number</b>".display();
+	$v = $invoice["occi.core.id"];
+	$m = "<td colspan=2><input type=text name=id readonly value='"#$v#"'>";
+	$m.display();
+ 
+	"<td><b>Number</b>".display();
+	$aid = $invoice["occi.invoice.account"];
+	$account = $aid.get();
+	$v = $account["occi.core.id"];
+	$m = "<td colspan=2><input type=text name=id readonly value='"#$v#"'>";
+	$m.display();
+	
+	"<tr><td><b>Date</b>".display();
+	$when = $invoice["occi.invoice.date"];
+	$m = "<td colspan=2><input type=text name=id readonly value='"#$when#"'>";
+	$m.display();
+
+	"<td><b>Name</b>".display();
+	$v = $account["occi.account.name"];
+	$m = "<td colspan=2><input type=text name=id readonly value='"#$v#"'>";
+	$m.display();
+
+	SectionHeader("Transactions");
+
+	"<tr><td class=title>Qty<td class=title>Rate<td class=title>Description<td class=title>From<td class=title>Till<td class=title>Price</tr>".display();
+
+	foreach ( $invoice as $tuple )
+	{
+		forboth ( $tuple as $n and $v )
+		{
+			if ( $n == "link" )
+			{
+				$transaction = $v.get();
+				$source = $transaction["occi.transaction.source"];
+				$stamp  = $transaction["occi.transaction.when"];
+				$when   = $stamp.date();
+				$desc   = $transaction["occi.transaction.description"];
+				$action = $desc / "=";
+				$action = $action[1];
+				$msg    = $source#" "#$action;
+
+				$pc.LoadTransaction( $v );
+				$pc.LoadPrice();
+				$pc.CalculatePeriod();
+				$pc.RateAndDuration();
+				$pc.Calculate();
+
+				if ( $desc != "action=start" )
+				{
+					$rate   = $pc.getRate();
+					$rate   = $rate.round(2);
+					$qty    = $pc.getQuantity();
+					$units  = $pc.getUnits();
+					if ( $units.length() == 0 ) { $units = " "; } 
+					if ( $units == "1" ) { $units = " "; }
+					$value  = $pc.getValue();
+					$value  = $value.round(2);
+					$start  = $pc.getStart();
+					$stop   = $when;
+					$m = "<tr><td>"#$qty#" "#$units#"<td><div align=right>"#$rate#"</div><td>"#$msg#"<td>"#$start#"<td>"#$stop#"<td><div align=right>"#$value#"</div></tr>";
+					$m.display();
+					$pc.SubTotal();
+				}
+
+			}
+		}
+	}
+
+	SectionHeader("Totals and Tax");
+
+	$value = $pc.getTotal();
+	$pc.GrandTotal();
+	$m = "<tr><td colspan=4>&nbsp;<td>Total<td><div align=right>"#$value#"</div></tr>";
+	$m.display();
+	$taxe = $value * 18.60;
+	$taxe = $taxe / 100;
+	$taxe = $taxe.round(2);
+	$m = "<tr><td colspan=4>&nbsp;<td>VAT<td><div align=right>"#$taxe#"</div></tr>";
+	$m.display();
+	$value = $value + $taxe;
+	$value = $value.round(2);
+	$m = "<tr><td colspan=4>&nbsp;<td>Total inc VAT<td><div align=right>"#$value#"</div></tr>";
+	$m.display();
+
+	HtmlFooter();

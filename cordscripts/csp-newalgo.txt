@@ -1,0 +1,48 @@
+
+	$account  = $1;
+	$algoname = $2;
+	$algoscript = $3;
+	$algocat    = $4;
+
+	$s = {};
+
+	$f = '"occi.algorithm.name":"'#$algoname#'"';
+	$s = $s + $f;
+
+	$f = '"occi.algorithm.category":"'#$algocat#'"';
+	$s = $s + $f;
+
+	$f = '"occi.algorithm.description":"balanced provider scripted placement algorithm"';
+	$s = $s + $f;
+
+	$f = '"occi.algorithm.type":"cordscript"';
+	$s = $s + $f;
+
+	$f = '"occi.algorithm.expression":"include ';
+	$f = $f#"'"#$algoscript#"';"#'"';
+	$s = $s + $f;
+
+
+	$algoid = algorithm.post( $s );
+
+	$record = $algoid.get();
+
+
+	"<table><tr><th colspan=2>Create Algorithm</th></tr>".display();
+	$m = "<tr><td>"#$algoname#"<td>"#$algoscript#"</tr>";
+	$m.display();
+
+	foreach ( $record as $tuple )
+	{
+		forboth ( $tuple as $name and $value )
+		{
+			$m = "<tr><td>"#$name#"<td>"#$value#"</tr>";
+			$m.display();
+		}
+	}
+
+	"</table>".display();
+
+
+
+	

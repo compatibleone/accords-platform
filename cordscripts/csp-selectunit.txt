@@ -1,0 +1,20 @@
+	/* ----------------------------------------------------------------- */
+	/* this widget display a form select control allowing unit selection */
+	/* ----------------------------------------------------------------- */
+function	SelectUnit($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+	"<option value='U'>Unit</option>".display();
+	"<option value='G'>Giga</option>".display();
+	"<option value='T'>Tera</option>".display();
+	"<option value='P'>Peta</option>".display();
+	"<option value='Y'>Yoda</option>".display();
+	"<option value='Z'>Zeta</option>".display();
+	"<option value='M'>Mega</option>".display();
+	"<option value='K'>Kilo</option>".display();
+	"</select>".display();
+}
+
+
+

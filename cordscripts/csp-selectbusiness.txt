@@ -1,0 +1,15 @@
+	/* ---------------------------------------------------------------------- */
+	/* this widget display a form select control allowing business selection */
+	/* ---------------------------------------------------------------------- */
+function	SelectBusiness($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+	"<option value='none'>none</option>".display();
+	"<option value='penalty'>penalty</option>".display();
+	"<option value='reward'>reward</option>".display();
+	"</select>".display();
+}
+
+
+

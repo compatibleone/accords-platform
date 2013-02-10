@@ -1,0 +1,16 @@
+function	ProviderMenu($account)
+{
+	$m = "<body><div align=center class=whiteframe><table width='100%' border=1><tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";
+	$m.display();
+	"<tr>".display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-provider.txt&ouput=HTML&option="#$account#"'>Account</a>";
+	$m.display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
+	$m.display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-quotas.txt&ouput=HTML&option="#$account#"'>Quota</a>";
+	$m.display();
+	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-sales.txt&ouput=HTML&option="#$account#"'>Sales</a>";
+	$m.display();
+	return;
+}
+

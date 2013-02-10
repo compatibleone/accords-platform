@@ -1,0 +1,43 @@
+
+function ApplicationList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$applications = saas.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=4><b>Applications</b></td></tr>".display();
+	"<tr><td class=title>Name<td class=title>Vendor<td class=title>Manifest<td class=title>Description</tr>".display();
+
+	foreach ( $applications as $mid )
+	{
+		$application = $mid.get();
+		$id       	= $application["occi.core.id"];
+		$name     	= $application["occi.saas.name"];
+		$mid  	 	= $application["occi.saas.manifest"];
+		$manifest       = $mid.get();
+		$mname 		= $manifest["occi.manifest.name"];
+		$description    = $application["occi.saas.description"];
+		
+		$url = $baseurl#"?action=compile&script=csp-application.txt&output=HTML&option="#$name;
+		$m = "<tr><td><a href='"#$url#"'>"#$name#"</a>";
+		$m.display();
+
+		$aname    = $application["occi.saas.vendor"];
+
+		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HTML&option="#$aname;
+		$m = "<td><a href='"#$url#"'>"#$aname#"</a>";
+		$m.display();
+
+		$url = $baseurl#"?action=compile&script=csp-manifest.txt&output=HTML&option="#$mname;
+		$m = "<td><a href='"#$url#"'>"#$mname#"</a>";
+		$m.display();
+
+		$url = $baseurl#"?action=compile&script=csp-application.txt&output=HTML&option="#$description;
+		$m = "<td><a href='"#$url#"'>"#$description#"</a></tr>";
+		$m.display();
+
+	}
+	"</table>".display();
+	return;
+
+}

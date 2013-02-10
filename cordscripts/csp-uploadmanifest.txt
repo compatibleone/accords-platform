@@ -1,0 +1,8 @@
+
+function UploadManifest($pn)
+{
+	$m = "<input type=file name='"#$pn#"' class=upload value='upload manifest'>";
+	$m.display();
+}
+
+	

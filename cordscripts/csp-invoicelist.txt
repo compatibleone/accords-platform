@@ -1,0 +1,44 @@
+
+function InvoiceList( $selection )
+{
+	/* ---------------------------- */
+	/* display the list of invoices */
+	/* ---------------------------- */
+	"<table width='100%'><tr><td class=section colspan=6><b>Invoices</b></td></tr>".display();
+	$baseurl ="/accords/dashboard.php";
+
+	"<tr><td class=title>Invoice<td class=title>Account<td class=title>Transactions<td class=title>Date<td class=title>Total<td class=title>State</tr>".display();
+	$invoices = invoice.list($selection);
+	foreach ( $invoices as $iid )
+	{
+		$invoice = $iid.get();
+			$id   = $invoice["occi.core.id"];
+			$istate = $invoice["occi.invoice.state"];
+		if ( $istate == 0 )
+		{	$state = "open";	}
+		else
+		{
+			if ( $istate == 1 )
+			{	$state = "closed"; 	}
+			else
+			{	$state = "paid";	}
+		}
+		$w    = $invoice["occi.invoice.date"];
+		$when = $w.date();
+		$total= $invoice["occi.invoice.total"];
+		$aid  = $invoice["occi.invoice.account"];
+		$account = $aid.get();
+		$aname   = $account["occi.account.name"];
+		$url = $baseurl#"?action=compile&script=csp-invoice.txt&output=HML&option="#$iid;
+		$tran = $invoice["occi.invoice.transactions"];
+		$sm = "<tr><td><a href='"#$url#"'>"#$id#"</a>";
+		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HML&option="#$aname;
+		$sm = $sm#"<td><a href='"#$url#"'>"#$aname#"</a>";
+		$sm = $sm#"<td>"#$tran#"<td>"#$when#"<td>"#$total;
+		$sm = $sm#"<td>"#$state#"</tr>";
+		$sm.display();
+	}
+	"</table>".display();
+	return;
+}
+

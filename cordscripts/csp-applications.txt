@@ -1,0 +1,20 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-applications.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the list of applications parsed into the system allowing access for inspection of each   */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-applicationlist.txt";
+
+	HtmlHeader("Accords Platform Applications",$1);
+
+	$account = $2;
+
+	"<tr><td colspan=6>".display();
+	ApplicationList( 'occi.saas.vendor="'#$account#'"' );
+	"</td></tr>".display();
+
+	"<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newsaas.txt'>Create a new Application</a></th></tr>".display();
+	
+	HtmlFooter();

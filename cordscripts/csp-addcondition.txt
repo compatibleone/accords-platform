@@ -1,0 +1,90 @@
+function CreateCondition( $t, $n, $v )
+	{
+		if ( $v != "any" )
+		{
+			$s = {};
+			$p = '"occi.variable.property":"occi.placement.'#$n#'"';
+			$s = $s + $p;
+			$p = '"occi.variable.value":"'#$v#'"';
+			$s = $s + $p;
+			$vid = variable.post( $s );
+			$s = {};
+			$p = '"occi.term.name":":'#$n#'"';
+			$s = $s + $p;
+			$tid = term.post($s);
+			$tid.link( $vid );
+			$t.link( $tid );
+		}
+	}
+
+	function LocateConditions( $a )
+	{
+		foreach ( $a as $tuple )
+		{
+			forboth ( $tuple as $name and $value )
+			{
+				if ( $name == "link" )
+				{
+					$tsid  = $value;
+					$terms = $tsid.get();
+					$type  = $terms["occi.terms.type"];
+
+					if ( $type == "conditions" )
+					{
+						return( $tsid );
+					}
+				}
+			}
+		}
+		return( "" );
+	}
+
+	$s = {};
+	$a = $2 / "=";
+	$v = $a[1];
+	if ( $v.length() > 0 )
+	{
+
+		$agrid = $v;
+		$agreement = $agrid.get();
+
+		$termsid = LocateConditions( $agreement );
+
+		if ( $termsid.length() > 0 )
+		{
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+	
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+
+			$a = $7 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+
+			$a = $8 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			CreateCondition( $termsid, $n, $v );
+		}
+	}
+
+	$2 = $1;
+	include "csp-updatesla.txt";
+
+

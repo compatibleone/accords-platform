@@ -1,0 +1,37 @@
+
+function InstanceList( $selection )
+{
+	$baseurl ="/accords/dashboard.php";
+	"<table width='100%'><tr><td class=section colspan=5><b>Service Instances</b></td></tr>".display();
+	"<tr><td class=title>Service<td class=title>Sla<td class=title>Manifest<td class=title>Date<td colspan=2 class=title>Action</tr>".display();
+	$services = service.list($selection);
+	foreach ( $services as $sid )
+	{
+		$service = $sid.get();
+		$id   = $service["occi.core.id"];
+		$a    = $service["occi.service.sla"];
+		$sl   = $a.get();
+		$sla  = $sl["occi.agreement.name"];
+		$m    = $service["occi.service.manifest"];
+		$ml   = $m.get();
+		$man  = $ml["occi.manifest.name"];
+		$w    = $service["occi.service.when"];
+		$when = $w.date();
+		$state = $service["occi.service.state"];
+		$sm = "<tr><td><img src=bluecloud.png>"#$id;
+		$sm = $sm#"<td>"#$sla#"<td><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-manifest.txt&option="#m#"'>"#$man#"</a><td>"#$when#"<td>";
+		$sm.display();
+		if ( $state != 0 )
+		{
+			$sm = "<td colspan=2><a href='"#$baseurl#"?action=stopservice&service=service/"#$id#"'><img width=64 height=64 src='stop.png'></a>";
+		}
+		else
+		{
+			$sm = "<td colspan=2><a href='"#$baseurl#"?action=startservice&service=service/"#$id#"'><img width=64 height=64 src='start.png'></a>";
+		}
+		$sm.display();
+	}
+	"</table>".display();
+	return;
+}
+

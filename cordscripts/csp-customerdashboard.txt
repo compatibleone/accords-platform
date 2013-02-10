@@ -1,0 +1,19 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-customerdashboard.txt					 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the initial customer dashboard or home page							 */     */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-customerheader.txt";
+
+	$account = $1;
+
+	"Account".display();
+	$account.display();
+
+	CustomerHeader("Welcome to CloudPort",$account);
+
+
+	
+	CustomerFooter();
+

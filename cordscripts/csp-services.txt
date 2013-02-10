@@ -1,0 +1,108 @@
+	/* ------------------------------------------------------------------ */
+	/* csp-services.txt						      */
+	/* ------------------------------------------------------------------ */
+	/* this script will generate the service and contract management list */
+	/* and provides information about the state of the services and their */
+	/* contracts. The command line parameter allows an action name to be  */
+	/* passed to the script to be applied to all contracts of all service */
+	/* ------------------------------------------------------------------ */
+
+
+	include "csp-header.txt";
+
+
+	HtmlHeader("Accords Platform Service Contract List",$1);
+
+	$who    = $1
+	$what   = $2;
+
+	if ( $what != "all" )
+	{
+		$accounts = account.list('occi.account.name="'#$what#'"');
+		$account  = $accounts[0];
+		$selector = 'occi.service.account="'#$account#'"';
+	}
+	else
+	{
+		$selector = " ";
+	}
+
+	$action = $3;
+
+	$baseurl = "/accords/dashboard.php";
+
+	$list = service.list($selector);
+	
+	"<table width='100%'><tr><td class=section colspan=5><b>Services</b></td></tr>".display();
+	"<tr><th width='20%' class=title>Service<th width='20%' class=title>Account".display();
+	"<th width='20%' class=title>Contract<th width='20%' class=title>Host<th width='20%' class=title>State</tr>".display();
+	
+	foreach ( $list as $service )
+	{
+		if ( $action.length() > 0)
+		{
+			$service.$action();
+		}
+
+		$srec   = $service.get();
+		$sid    = $srec["occi.core.id"];
+		$sac    = $srec["occi.service.account"];
+		$acrec  = $sac.get();
+		$acname = $acrec['occi.account.name'];
+
+		$filter = "occi.contract.parentservice="#$service;
+		$contracts = contract.count( $filter );
+		$sm = "<tr><td rowspan="#$contracts#"><img src=bluecloud.png>";
+		$url = $baseurl#"?action=compile&output=HTML&script=csp-service.txt&option="#$sid;
+		$sm = $sm#"<a href='"#$url#"'>"#$sid#"</a>";
+		$sm = $sm#"<td rowspan="#$contracts#">";
+		$url = $baseurl#"?action=compile&output=HTML&script=csp-account.txt&option="#$acname;
+		$sm = $sm#"<a href='"#$url#"'>"#$acname#"</a>";
+		$contracts = contract.list( $filter );
+		foreach ( $contracts as $contract )
+		{
+			$sm.display();
+			$record = $contract.get();
+			$cname=$record["occi.contract.name"];
+
+			$chost=$record["occi.contract.hostname"];
+			$ctime=$record["occi.contract.when"];
+			$cdate=$ctime.date();
+			$cprov=$record["occi.contract.profile"];
+			
+			$m = "<td><a href='"#$contract#"'>";
+			$m.display();
+
+			$cname.display();	
+			"(".display();
+			$cprov.display();
+			")</a>".display();
+			if ( $chost.length() > 0 )
+			{
+				$n = "<td>"#$chost#"<br>"#$cdate;
+				$n.display();
+				$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+				$n.display();
+				$n = "<input type=submit name=action class=action value='stop service'></form>";
+				$n.display();
+			}
+			else
+			{
+				"<td>&nbsp;".display();
+				$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+				$n.display();
+				$n = "<input type=submit name=action class=action value='start service'></form>";
+				$n.display();
+			}
+			$sm ="<tr>";
+		}
+
+	}
+	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$who#"'>Process Transactions</a></th></tr>";
+	$m.display();
+	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" start'>Start All Services</a></th></tr>";
+	$m.display();
+	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" stop'>Stop All Services</a></th></tr>";
+	$m.display();
+
+	HtmlFooter();

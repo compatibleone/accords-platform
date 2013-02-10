@@ -1,0 +1,24 @@
+	/* ----------------------------------------------------------------- */
+	/* this widget display a form select control allowing plan selection */
+	/* ----------------------------------------------------------------- */
+function	SelectPlan($pn)
+{
+
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+
+	$list = plan.list();
+
+	foreach ( $list as $mid )
+	{
+		$plan = $mid.get();
+		$name = $plan["occi.plan.name"]
+		$m = "<option value='"#$name#"'>"#$name#"</option>";
+		$m.display();
+	}
+
+	"</select>".display();
+}
+
+
+

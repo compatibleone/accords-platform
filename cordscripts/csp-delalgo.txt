@@ -1,0 +1,10 @@
+
+	$r = algorithm.list();
+
+	foreach ( $r as $i )
+	{
+		$m = $i#".delete();<br>";
+		$m.display();
+		$i.delete();
+	}
+

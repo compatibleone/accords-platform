@@ -1,0 +1,54 @@
+	include "csp-header.txt";
+
+	include "csp-selectrole.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("New Account User",$1);
+
+	$what = $2;
+	
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Addition of a New User to an Existing Customer Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to add a new user to the list of users declared for an existing customer account. <p>".display();
+
+
+	SectionHeader("The Account ");
+
+	$m = "<tr><td><b>Account Name</b><td><input type=text name=account readonly value='"#$what#"'>";
+ 	$m.display();
+
+	SectionHeader("The User Information");
+
+	"<tr><td><b>User Name</b><td><input type=text name='username' value=''>".display();
+
+	"<td><b>Role</b><td>".display();
+	SelectRole("role");
+
+	"<tr><td><b>Password</b><td><input type=password name='type' value='' >".display();
+
+	"<td><b>Email</b><td><input type=text name='mail' value='' >".display();
+
+	SectionHeader("Account User Confirmation");
+
+	"<tr><td><td colspan=2> Finally you must submit the description of the user for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add account user'><td>".display();
+
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+
+	HtmlFooter();
+
+

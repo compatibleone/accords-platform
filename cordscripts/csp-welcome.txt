@@ -1,0 +1,8 @@
+	include "csp-header.txt";
+
+
+	HtmlHeader("Welcome to the Accords Dashboard",$1);
+
+
+	HtmlFooter();
+

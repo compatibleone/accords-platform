@@ -1,0 +1,102 @@
+
+	function CreateTerms( $nature )
+	{	
+		$s = {};
+
+		$p = '"occi.terms.name":"'#$agreementname#':'#$nature#'"';
+		$s = $s + $p;
+
+		$p = '"occi.terms.type":"'#$nature#'"';
+		$s = $s + $p;
+
+		$p = '"occi.terms.terms":"1"';
+		$s = $s + $p;
+	
+		$tsid = terms.post( $s );
+
+		return( $tsid );
+	}
+
+
+	$s = {};
+	$a = $2 / "=";
+	$v = $a[1];
+	if ( $v.length() > 0 )
+	{
+		$agreementname = $v;
+
+		$p = '"occi.agreement.name":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $3 / "=";
+		$v = $a[1];
+		$p = '"occi.agreement.description":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $4 / "=";
+		$v = $a[1];
+		$accounts = account.list('occi.account.name="'#$v#'"');
+		$v        = $accounts[0];
+		$p = '"occi.agreement.initiator":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $5 / "=";
+		$v = $a[1];
+		$accounts = account.list('occi.account.name="'#$v#'"');
+		$v        = $accounts[0];
+		$p = '"occi.agreement.responder":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $6 / "=";
+		$v = $a[1];
+		$p = '"occi.agreement.initiation":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $7 / "=";
+		$v = $a[1];
+		$p = '"occi.agreement.expiration":"'#$v#'"';	
+		$s = $s + $p;
+	
+		$a = $8 / "=";
+		$v = $a[1];
+		$p = '"occi.agreement.templatename":"'#$v#'"';
+		$s = $s + $p;
+
+		$p = '"occi.agreement.terms":"1"';
+		$s = $s + $p;
+
+		$a = $9 / "=";
+		$v = $a[1];
+		$manifestname = $v;
+
+		$newid = agreement.post( $s );
+		$agreement = $newid.get();
+		
+		if ( $manifestname.length() > 0 )
+		{
+			$s = {};
+			$p = '"occi.term.name":"'#$agreementname#':service"';
+			$s = $s + $p;
+
+			$manifests = manifest.list( 'occi.manifest.name="'#$manifestname#'"');
+			$mid = $manifests[0];
+			$p = '"occi.term.manifest":"'#$mid#'"';
+			$s = $s + $p;
+			$tid  = term.post( $s );
+
+			$tsid = CreateTerms("services");
+			$tsid.link( $tid );
+			$newid.link( $tsid );
+
+			$tsid = CreateTerms("conditions");
+			$newid.link( $tsid );
+
+			$tsid = CreateTerms("guarantees");
+			$newid.link( $tsid );
+		}
+	}
+
+	$2 = $newid;
+	include "csp-updatesla.txt";
+
+

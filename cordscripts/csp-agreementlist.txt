@@ -1,0 +1,48 @@
+function AgreementList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$agreements = agreement.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=6><b>Service Level Agreements</b></td></tr>".display();
+	"<tr><td class=title>Name<td class=title>Initiator<td class=title>Responder<td class=title>Expires<td class=title>Terms<td class=title>Action</tr>".display();
+
+	foreach ( $agreements as $mid )
+	{
+		$agreement = $mid.get();
+		$id       = $agreement["occi.core.id"];
+		$name     = $agreement["occi.agreement.name"];
+		$zone     = $agreement["occi.agreement.zone"];
+		$expires  = $agreement["occi.agreement.expiration"];
+		$termss   = $agreement["occi.agreement.termss"];
+
+		$url = $baseurl#"?action=compile&script=csp-agreement.txt&output=HTML&option="#$name;
+		$m = "<tr><td><a href='"#$url#"'>"#$name#"</a>";
+		$m.display();
+
+		$a        = $agreement["occi.agreement.initiator"];
+		$account  = $a.get();
+		$aname    = $account["occi.account.name"];
+
+		$a        = $agreement["occi.agreement.responder"];
+		$account  = $a.get();
+		$rname    = $account["occi.account.name"];
+
+		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HTML&option="#$aname;
+		$m = "<td><a href='"#$url#"'>"#$aname#"</a>";
+		$m.display();
+
+		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HTML&option="#$rname;
+		$m = "<td><a href='"#$url#"'>"#$rname#"</a>";
+		$m.display();
+		
+		$m = "<td>"#$expires#"<td>"#$termss#"</td>";
+		$m.display();
+		$m = "<td><a href='"#$baseurl#"?action=createservice&upload=plan_sla-"#$name#".xml'><img width=64 height=64 src='service.png'></a>";
+		$m.display();
+	}
+	"</table>".display();
+	return;
+
+}
+

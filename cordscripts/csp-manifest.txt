@@ -1,0 +1,597 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-manifest.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script restitutes an XML representation of a parsed manifest from the distributed OCCI knowladge base    */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	function PortList( $r )
+	{
+		/* ----------------------------------------------------------------- */
+		/* this function generates the list of ports of a network or package */
+		/* ----------------------------------------------------------------- */
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$port = $v.get();
+					$m = "&lt;port";
+					$n = $port["occi.port.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $port["occi.user.from"];
+					if ( $n == "(null)" ) { $n = ""; }
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' from="'#$n#'"';
+					}
+					$n = $port["occi.port.to"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' to="'#$n#'"';
+					}
+					$n = $port["occi.port.protocol"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' protocol="'#$n#'"';
+					}
+					$n = $port["occi.port.direction"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' direction="'#$n#'"';
+					}
+					$n = $port["occi.port.range"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' range="'#$n#'"';
+					}
+					$m = $m#"/>";
+					$m.display();
+				}
+			}
+		}
+		return;
+	}
+
+	function PackageList( $r )
+	{
+		/* -------------------------------------------------------- */
+		/* this function generates the list of packages of an image */
+		/* -------------------------------------------------------- */
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$package = $v.get();
+					$m = "&lt;package";
+					$n = $package["occi.package.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $package["occi.user.installation"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' installation="'#$n#'"';
+					}
+					$n = $package["occi.package.configuration"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' configuration="'#$n#'"';
+					}
+					$m = $m#">";
+					$m.display();
+					PortList($v);
+					"&lt;/package>".display();
+				}
+			}
+		}
+		return;
+	}
+
+	function VolumeList( $r )
+	{
+		/* -------------------------------------------------------- */
+		/* this function generates the list of volumes of a storage */
+		/* -------------------------------------------------------- */
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$volume = $v.get();
+					$m = "&lt;volume";
+					$n = $volume["occi.volume.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $volume["occi.user.type"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' type="'#$n#'"';
+					}
+					$n = $volume["occi.volume.url"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' url="'#$n#'"';
+					}
+					$m = $m#"/>";
+					$m.display();
+				}
+			}
+		}
+		return;
+	}	
+
+	function Infrastructure( $id )
+	{
+		/* ------------------------------------------------------------ */
+		/* this function generates the infrastructure element of a node */
+		/* ------------------------------------------------------------ */
+		$r = $id.get();
+		$m = "&lt;infrastructure";
+		$n = $r["occi.infrastructure.name"];
+		if ( $n.length() > 0 )
+		{
+			$m = $m#' name="'#$n#'"';
+		}
+		$m = $m#"/&gt;";
+		$m.display();
+		$sid = $r["occi.infrastructure.compute"];
+		if ( $sid.length() > 0 )
+		{
+			$compute = $sid.get();
+			$m = "&lt;compute";
+			$n = $compute["occi.compute.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$n = $compute["occi.compute.cores"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' cores="'#$n#'"';
+			}
+			$n = $compute["occi.compute.speed"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' speed="'#$n#'"';
+			}
+			$n = $compute["occi.compute.memory"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' memory="'#$n#'"';
+			}
+			$n = $compute["occi.compute.architecture"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' architecture="'#$n#'"';
+			}
+			$n = $compute["occi.compute.hostname"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' hostname="'#$n#'"';
+			}
+			$m = $m#"/&gt;";
+			$m.display();
+		}
+		else
+		{
+			"&lt;compute/&gt;".display();
+		}
+		$sid = $r["occi.infrastructure.storage"];
+		if ( $sid.length() > 0 )
+		{
+			$storage = $sid.get();
+			$m = "&lt;storage";
+			$n = $storage["occi.storage.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$n = $storage["occi.storage.size"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' size="'#$n#'"';
+			}
+			$m = $m#"/&gt;";
+			$m.display();
+		}
+		else
+		{
+			"&lt;storage&gt;".display();
+		}
+		VolumeList($r);
+		"&lt;/storage&gt;".display();
+		$sid = $r["occi.infrastructure.network"];
+		if ( $sid.length() > 0 )
+		{
+			$network = $sid.get();
+			$m = "&lt;network";
+			$n = $network["occi.network.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$n = $network["occi.network.label"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' label="'#$n#'"';
+			}
+			$n = $network["occi.network.vlan"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' vlan="'#$n#'"';
+			}
+			$m = $m#"&gt;";
+			$m.display();
+		}
+		else
+		{
+			"&lt;network&gt;".display();
+		}
+		PortList($network);
+		"&lt;/network&gt;".display();
+		"&lt;/infrastructure&gt;".display();
+		return;
+	}
+
+	function Image( $id )
+	{
+		/* --------------------------------------------------- */
+		/* this function generates the image element of a node */
+		/* --------------------------------------------------- */
+		$r = $id.get();
+		$m = "&lt;image";
+		$n = $r["occi.image.name"];
+		if ( $n.length() > 0 )
+		{
+			$m = $m#' name="'#$n#'"';
+		}
+		$n = $r["occi.image.agent"];
+		if ( $n.length() > 0 )
+		{
+			$m = $m#' agent="'#$n#'"';
+		}
+		$m = $m#"/&gt;";
+		$m.display();
+		$sid = $r["occi.image.system"];
+		if ( $sid.length() > 0 )
+		{
+			$system = $sid.get();
+			$m = "&lt;system";
+			$n = $system["occi.system.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$n = $system["occi.system.version"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' version="'#$n#'"';
+			}
+			$m = $m#"/&gt;";
+			$m.display();
+		}
+		else
+		{
+			"&lt;system/&gt;".display();
+		}
+		PackageList($r);
+		"&lt;/image&gt;".display();
+		return;
+	}
+
+	function NodeList( $manifest )
+	{
+		/* ------------------------------------------------- */
+		/* this function generates the list of node elements */
+		/* ------------------------------------------------- */
+		$r = $manifest;
+
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$simple=1;
+					$node = $v.get();
+					$m = "&lt;node";
+					$n = $node["occi.node.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $node["occi.node.type"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' type="'#$n#'"';
+						if( $n != "simple" )
+						{
+							$simple=0;
+						}
+					}
+					if ( $simple == 0 )
+					{
+						$n = $node["occi.node.category"];
+						if ( $n.length() > 0 )
+						{
+							$m = $m#' category="'#$n#'"';
+						}
+					}
+					$n = $node["occi.node.access"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' access="'#$n#'"';
+					}
+					$n = $node["occi.node.scope"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' scope="'#$n#'"';
+					}
+					$n = $node["occi.node.provider"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' provider="'#$n#'"';
+					}
+					if ( $simple > 0 )
+					{
+						$m = $m#"&gt;";
+						$m.display();
+						$n = $node["occi.node.infrastructure"];
+						if ( $n.length() > 0 )
+						{
+							Infrastructure($n);
+						}
+						$n = $node["occi.node.image"];
+						if ( $n.length() > 0 )
+						{
+							Image($n);
+						}
+						"&lt;/node&gt;".display();
+					}
+					else
+					{
+						$m = $m#"/&gt;";
+						$m.display();
+					}
+				}
+			}
+		}
+		return;
+	}
+
+	function ActionList( $r )
+	{
+		/* --------------------------------------------------- */
+		/* this function generates the list of action elements */
+		/* of a configuration, release or an interface element */
+		/* --------------------------------------------------- */
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$action = $v.get();
+					$m = "&lt;action";
+					$n = $action["occi.action.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $action["occi.action.type"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' type="'#$n#'"';
+					}
+					$n = $action["occi.action.expression"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' expression="'#$n#'"';
+					}
+					$m = $m#"/&gt;";
+					$m.display();
+				}
+			}
+		}
+		return;
+	}
+
+
+	function UserList( $r )
+	{
+		/* ------------------------------------------------- */
+		/* this function generates the list of user elements */
+		/* of an account element of the manifest             */
+		/* ------------------------------------------------- */
+		foreach ( $r as $i )
+		{
+			forboth ( $i as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$user = $v.get();
+					$m = "&lt;user";
+					$n = $user["occi.user.name"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' name="'#$n#'"';
+					}
+					$n = $user["occi.user.role"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' role="'#$n#'"';
+					}
+					$n = $user["occi.user.email"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' email="'#$n#'"';
+					}
+					$m = $m#"/&gt;";
+					$m.display();
+				}
+			}
+		}
+		return;
+	}
+
+	function RestituteManifest( $manid )
+	{
+		/* ---------------------------------- */
+		/* retrieve manifest and start output */
+		/* ---------------------------------- */
+		$manifest = $manid.get();
+		$n = $manifest["occi.manifest.name"];
+		$m = '&lt;manifest name="'#$n#'" xmlns="http://www.compatibleone.fr/schemes/manifest.xsd"&gt;';
+		$m.display();
+
+		/* --------------------------------- */
+		/* restitute the collection of nodes */
+		/* --------------------------------- */
+		NodeList( $manifest );
+
+		/* ----------------------------------- */
+		/* restitute the configuration actions */
+		/* ----------------------------------- */
+		$i = $manifest["occi.manifest.configuration"];
+		if ( $i.length() > 0 )
+		{
+			$r = $i.get();
+			$m = "&lt;configuration";
+			$n = $r["occi.configuration.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$m = $m#"&gt;";
+			$m.display();
+			ActionList($r);
+			$m = "&lt;/configuration&gt;";
+			$m.display();
+		}
+
+		/* ----------------------------- */
+		/* restitute the release actions */
+		/* ----------------------------- */
+		$i = $manifest["occi.manifest.release"];
+		if ( $i.length() > 0 )
+		{
+			$r = $i.get();
+			$m = "&lt;release";
+			$n = $r["occi.release.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$m = $m#"&gt;";
+			$m.display();
+			ActionList($r);
+			$m = "&lt;/release&gt;";
+			$m.display();
+		}
+
+		/* ------------------------------- */
+		/* restitute the interface actions */
+		/* ------------------------------- */
+		$i = $manifest["occi.manifest.interface"];
+		if ( $i.length() > 0 )
+		{
+			$r = $i.get();
+			$m = "&lt;interface";
+			$n = $r["occi.interface.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $#' name="'#$n#'"';
+			}
+			$m = $m#"&gt;";
+			$m.display();
+			ActionList($r);
+			$m = "&lt;/interface&gt;";
+			$m.display();
+		}
+
+		/* --------------------------------- */
+		/* restitute the account information */
+		/* --------------------------------- */
+		$i = $manifest["occi.manifest.account"];
+		if ( $i.length() > 0 )
+		{
+			$r = $i.get();
+			$m = "&lt;account";
+			$n = $r["occi.account.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$m = $m#"&gt;";
+			$m.display();
+			UserList($r);
+			$m = "&lt;/account&gt;";
+			$m.display();
+		}
+
+		/* ---------------------------------- */
+		/* restitute the security information */
+		/* ---------------------------------- */
+		$i = $manifest["occi.manifest.security"];
+		if ( $i.length() > 0 )
+		{
+			$r = $i.get();
+			$m = "&lt;security";
+			$n = $r["occi.security.name"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' name="'#$n#'"';
+			}
+			$n = $r["occi.security.nature"];
+			if ( $n.length() > 0 )
+			{
+				$m = $m#' nature="'#$n#'"';
+			}
+			$m = $m#"/&gt;";
+			$m.display();
+		}
+
+		"&lt;/manifest&gt;".display();
+		return;
+	}
+
+
+	/* ------------------------------------ */
+	/* the main body of this script is here */
+	/* ------------------------------------ */
+
+	include "csp-header.txt";
+
+	HtmlHeader("Accords Platform Manifest Restitution",$1);
+
+	$what = $2;
+	$selector  = '{"occi.manifest.name":"'#$what#'"}';
+	$manifests = manifest.list($selector);
+	foreach ( $manifests as $mid )
+	{
+
+		$m = "<tr><td class=title><div align=left><b>"#$mid#"</b></div></td></tr>";
+		$m.display();
+
+		"<tr><td><code><pre>".display();
+
+		RestituteManifest( $mid );
+
+		"</pre></code></td></tr>".display();
+	}
+
+
+	"<tr><th><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailled Transactions List</a></th></tr>".display();
+	"<tr><th><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
+
+	HtmlFooter();

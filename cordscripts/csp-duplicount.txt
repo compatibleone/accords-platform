@@ -1,0 +1,52 @@
+	include "csp-header.txt";
+
+	function DuplicateConfiguration( $provision, $source, $target , $req)
+	{
+		$newitem = "";
+		$items = $provision.list('occi.'#$provision#'.name="'#$source#'"');
+		foreach ( $items as $item )
+		{
+			$record = $item.get();
+			foreach ( $record as $tuple )
+			{
+				forboth ( $tuple as $n and $v )
+				{
+					if ( $n == "occi.core.id" )
+					{
+						$n =" ";
+					}
+					else
+					{
+						$nn = "occi."#$provision#".name";
+						if ( $n == $nn )
+						{	$v = $target;	}
+						$r = '"'#$n#'":"'#$v#'"';
+						if ( $req.length() > 0 )
+						{
+							$req = $req#","#$r;
+						}
+						else
+						{
+							$req = $r;
+						}
+					}
+				}
+			}
+			$req = "{"#$req#"}";
+			"<tr><th>".display();
+			$newitem = $provision.post( $req );
+			$newitem.display();
+		}
+	}
+
+
+	HtmlHeader("Provider Account Duplication"); 
+
+	$s       = $1;
+	$t       = $2;
+	DuplicateConfiguration( "openstack_configuration", $s, $t," " );
+	DuplicateConfiguration( "opennebula_configuration", $s, $t, " " );
+	DuplicateConfiguration( "windowsazure_configuration", $s, $t, " " );
+	
+
+	HtmlFooter();

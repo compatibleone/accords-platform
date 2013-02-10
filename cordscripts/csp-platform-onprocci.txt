@@ -1,0 +1,53 @@
+<manifest xmlns="http://www.compatibleone.fr/schemes/manifest.xsd" name="accords:onprocci">
+<node name="onprocci" access="public" scope="normal" type="simple" provider="opennebula">
+	<infrastructure name="accords:component">
+		<compute name="accords:component" architecture="x86_64" cores="1" memory="1G" speed="1G"/>
+		<storage name="accords:component" size="10G"/>
+		<network name="compatibleone" label="ethernet" vlan="100M">
+			<port name="ssh" protocol="tcp" from="22" to="22"/>
+			<port name="http" protocol="tcp" from="80" to="80"/>
+			<port name="https" protocol="tcp" from="443" to="443"/>
+			<port name="cosacs" protocol="tcp" from="8286" to="8286"/>
+			<port name="publisher" protocol="tcp" from="8086" to="8086" range="0.0.0.0/0"/>
+			<port name="platform1" protocol="tcp" from="8087" to="8087" range="0.0.0.0/0"/>
+			<port name="platform2" protocol="tcp" from="8088" to="8088" range="0.0.0.0/0"/>
+			<port name="platform3" protocol="tcp" from="8089" to="8089" range="0.0.0.0/0"/>
+			<port name="platform4" protocol="tcp" from="8090" to="8090" range="0.0.0.0/0"/>
+			<port name="platform5" protocol="tcp" from="8091" to="8091" range="0.0.0.0/0"/>
+			<port name="platform6" protocol="tcp" from="8092" to="8092" range="0.0.0.0/0"/>
+			<port name="platform7" protocol="tcp" from="8093" to="8093" range="0.0.0.0/0"/>
+			<port name="platform8" protocol="tcp" from="8094" to="8094" range="0.0.0.0/0"/>
+			<port name="platform9" protocol="tcp" from="8095" to="8095" range="0.0.0.0/0"/>
+			<port name="platforma" protocol="tcp" from="8096" to="8096" range="0.0.0.0/0"/>
+			<port name="platformb" protocol="tcp" from="8097" to="8097" range="0.0.0.0/0"/>
+			<port name="platformc" protocol="tcp" from="8098" to="8098" range="0.0.0.0/0"/>
+			<port name="platformd" protocol="tcp" from="8099" to="8099" range="0.0.0.0/0"/>
+			<port name="platforme" protocol="tcp" from="8100" to="8100" range="0.0.0.0/0"/>
+			<port name="platformf" protocol="tcp" from="8101" to="8101" range="0.0.0.0/0"/>
+			<port name="platformg" protocol="tcp" from="8102" to="8102" range="0.0.0.0/0"/>
+			<port name="platformh" protocol="tcp" from="8103" to="8103" range="0.0.0.0/0"/>
+			<port name="platformj" protocol="tcp" from="8104" to="8104" range="0.0.0.0/0"/>
+			<port name="platformk" protocol="tcp" from="8105" to="8105" range="0.0.0.0/0"/>
+			<port name="platforml" protocol="tcp" from="8106" to="8106" range="0.0.0.0/0"/>
+			<port name="platformm" protocol="tcp" from="8107" to="8107" range="0.0.0.0/0"/>
+			<port name="platformn" protocol="tcp" from="8108" to="8108" range="0.0.0.0/0"/>
+			<port name="platformo" protocol="tcp" from="8109" to="8109" range="0.0.0.0/0"/>
+		</network>
+	</infrastructure>
+	<image name="ubuntu:onprocci">
+		<system name="ubuntu_with_cosacs"/>
+	</image>
+</node>
+<configuration name="ubuntu:onprocci">
+	<action expression="onprocci.system('wget http://www.compatibleone.fr/accords-platform/ubuntu/platform-tools');"/>
+	<action expression="onprocci.system('bash platform-tools');"/>
+	<action expression="onprocci.system('wget http://www.compatibleone.fr/accords-platform/ubuntu/platform-onprocci');"/>
+	<action expression="onprocci.fork('bash platform-onprocci');"/>
+</configuration>
+<release name="ubuntu:onprocci">
+	<action expression="onprocci.kill('onprocci');"/>
+	<action expression="onprocci.system('sleep 2');"/>
+</release>
+<security name="accords:security"/>
+<account name="accords"/>
+</manifest>

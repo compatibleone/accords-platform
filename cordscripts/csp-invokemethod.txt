@@ -1,0 +1,17 @@
+
+	include "csp-header.txt";
+
+	HtmlHeader("Object Action Invocation",$1);
+
+	$object = $2;
+	$action = $3;
+
+	$m = "<tr><td class=title>Object<td>"#$object#"</tr>";
+	$m.display();
+	$m = "<tr><td class=title>Action<td>"#$action#"</tr>";
+	$m.display();
+
+	$object.action();
+
+	HtmlFooter();
+

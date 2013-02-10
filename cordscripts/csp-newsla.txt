@@ -1,0 +1,96 @@
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+	include "csp-selectmanifest.txt";
+	include "csp-selectprovider.txt";
+	include "csp-selectmetric.txt";
+	include "csp-selectalgorithm.txt";
+	include "csp-selectzone.txt";
+	include "csp-selectrating.txt";
+	include "csp-selectsecurity.txt";
+	include "csp-selectenergy.txt";
+	include "csp-selectcondition.txt";
+	include "csp-selectbusiness.txt";
+	include "csp-selectagreement.txt";
+	include "csp-uploadmanifest.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("Service Level Agreement Creation : Phase 1",$1);
+
+	'<tr><td><form method=POST action="dashboard.php">'.display();
+	
+	"<table name=afterform width='100%'>".display();
+	"<tr><td colspan=4><h3>Creation of a Customer or End User Service Level Agreement</h3></td></tr>".display();
+	"<tr><td colspan=4>This document leads you through the ten steps comprising the work flow that need to be completed for the creation of a customer or 'end user' service level agreement.<p>".display();
+	"Such an an agreement is engaged between the customer and the platform operator concerning a description of service, its placement conditions and eventual business valued guarantees.<p>".display();
+
+	SectionHeader("The Agreement Context");
+
+	"<tr><td colspan=2>1) Specify the name of the service level agreement for identification".display();
+	"<td colspan=2>2) Provide a user readable description about the agreement".display();
+	"<tr><td><b>Name<b><td><input type=text name=name value=''>".display();
+	"<td><b>Description</b><td><input type=text name=desc value=''>".display();
+
+	$who = $2;
+
+	"<tr><td colspan=2>3) Here you must select the account name of the initiater and customer of the agreement".display();
+	"<td colspan=2>4) The responder account will be then account of the platform operator".display();
+	"<tr><td><b>Initiator</b><td>".display();
+	if ( $who.length() > 0 )
+	{
+		$m = "<input type=text name='init' value='"#$who#"' readonly>";
+		$m.display();
+	}
+	else
+	{
+		SelectAccount("init");
+	}
+
+	"<td><b>Responder</b><td><input type=text readonly name='resp' value='accords'>".display();
+
+	"<tr><td colspan=2>5) Here you must specify the required starting date and time for the validity of the agreement.".display();
+	"<td colspan=2>6) Here you must specify the required expiry date and time for the validity of the agreement.".display();
+	"<tr><td><b>Valid From</b><td>".display();
+	$m = "<input type=text name='from' value='now'>";
+	$m.display();
+	"<td><b>Expires</b><td>".display();
+	$m = "<input type=text name='expire' value='never'>";
+	$m.display();
+
+	"<tr><td colspan=4>7) Here you may select a template agreement which will provide the default conditions".display();
+	"<tr><td><b>Template</b><td colspan=3>".display();
+
+	SelectTemplate("temp");
+
+	SectionHeader("The Agreement Subject");
+
+	"<tr><td colspan=2>8) Here you should select a manifest from the list of manifests to provide the technical description of the service to which this agreement will apply.".display();
+	"<td colspan=2>9) If you need to upload a technical description manifest providing the service description then you my do so here.".display();
+	"<tr><td><b>Manifest</b><td>".display();
+	SelectManifest("manifest");
+	"<td><b>Upload</b><td>".display();
+	UploadManifest("document");
+
+	SectionHeader("The Agreement Acceptance");
+
+	"<tr><td><td colspan=2>10) Before moving to the second phase, you must submit the description of the service level agreement for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='create sla'><td>".display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+	'</form></td></tr>'.display();
+
+	HtmlFooter();
+

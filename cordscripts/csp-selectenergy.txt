@@ -1,0 +1,20 @@
+	/* ------------------------------------------------------------------- */
+	/* this widget display a form select control allowing energy selection */
+	/* ------------------------------------------------------------------- */
+function	SelectEnergy($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+	"<option value='any'>any</option>".display();
+	$list = energy.list();
+
+	foreach ( $list as $mid )
+	{
+		$user = $mid.get();
+		$name = $user["occi.energy.name"]
+		$m = "<option value='"#$name#"'>"#$name#"</option>";
+		$m.display();
+	}
+
+	"</select>".display();
+}

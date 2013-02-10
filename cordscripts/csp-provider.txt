@@ -1,0 +1,95 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-provider.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the collection of information about a single provider defined by the second parameter    */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+	HtmlHeader("Provider Account",$1);
+
+	$providers = provider.list('occi.provider.name="'#$2#'"');
+	$pid = $providers[0];
+	if ( $pid.length() > 0 )
+	{
+		$provider = $pid.get();
+		$o = $provider["occi.provider.operator"];
+		$c = $provider["occi.provider.category"];
+		$i = $provider["occi.provider.identity"];
+		$z = $provider["occi.provider.zone"];
+		$s = $provider["occi.provider.security"];
+		$m = "<tr><th class=title colspan=3>"#$pid#"</th></tr>";
+		$m.display();
+		$m = "<tr><td class=label><div align=left><b>Operator</b></div><td colspan=2><div=left><input type=text readonly value='"#$o#"'></div></td>";
+		$m.display();
+		$m = "<tr><td class=label><div align=left><b>Provision</b></div><td colspan=2><div=left><input type=text readonly value='"#$c#"'></div></td>";
+		$m.display();
+		$m = "<tr><td class=label><div align=left><b>Security</b></div><td colspan=2><div=left><input type=text readonly value='"#$s#"'></div></td>";
+		$m.display();
+		$m = "<tr><td class=label><div align=left><b>Zone</b></div><td colspan=2><div=left><input type=text readonly value='"#$z#"'></div></td>";
+		$m.display();
+		$qcount=0;
+		foreach ( $provider as $tuple )
+		{
+			forboth ( $tuple as $n and $qid )
+			{
+				if ( $n == "link" )
+				{
+					$quota = $qid.get();
+					if ( $qcount == 0 )
+					{
+						"<tr><td class=label><div align=left><b>Quota</b></div></td><td colspan=2><div align=center>".display();
+						"<table width='100%'><tr><th class=title>property<th class=title>offered<th class=title>reserved<th class=title>consumed</tr>".display();
+						$qcount = $qcount + 1;
+					}
+					$q = $quota["occi.quota.property"];
+					$m = "<tr><th>"#$q;
+					$q = $quota["occi.quota.offered"];
+					$m = $m#"<th>"#$q;
+					$q = $quota["occi.quota.reserved"];
+					$m = $m#"<th>"#$q;
+					$q = $quota["occi.quota.consumed"];
+					$m = $m#"</div><th>"#$q;
+					$m.display();
+				}
+			}
+		}
+		if ( $qcount > 0 )
+		{
+			"</table></div></td></tr>".display();
+		}
+
+		$placements = placement.list('occi.placement.solution="'#$i#'"');
+		foreach ( $placements as $plid )
+		{
+			$placement = $plid.get();
+			$id = $placement["occi.core.id"];
+			$cc = contract.list('occi.contract.placement="'#$plid#'"');
+			$con = $cc[0];
+			$conrec = $con.get();
+			$constate = $conrec["occi.contract.state"];
+			if ( $constate > 0 ) { $constate = "Started"; } else { $constate = " "; }
+			$m = "<tr><td class=label><div align=left><b>Placement</b></div></td><td colspan=2><div align=left><input type=text readonly value='"#$id#"'></div></tr>";
+			$m.display();
+			$m = "<tr><td class=label><div align=left><b>Contract</b</div><td colspan=2>"#$con#"</tr>";
+			$m.display();
+			$m = "<tr><td class=label><div align=left><b>State</b</div><td colspan=2>"#$constate#"</tr>";
+			$m.display();
+			$quantlist = quantity.list('occi.quantity.placement="'#$plid#'"');
+			foreach ( $quantlist as $quantitem )
+			{
+				$quantrec = $quantitem.get();
+				$quantprop = $quantrec["occi.quantity.property"];
+				$quantval  = $quantrec["occi.quantity.value"];
+				$m = "<tr><td>"#$quantprop#"<td colspan=2>"#$quantval#"</tr>";
+				$m.display();
+			}
+		}			
+	}		
+
+
+
+	HtmlFooter();
+
+
+

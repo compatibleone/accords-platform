@@ -1,0 +1,58 @@
+
+include "csp-customermenu.txt";
+include "csp-vendormenu.txt";
+include "csp-providermenu.txt";
+include "csp-operatormenu.txt";
+
+function	HtmlHeader($title,$accountname)
+{
+	$when = "now".date();
+	$m = "<html><head><title>"#$title#"</title></head>";
+	$m.display();
+	$m = "<body><div align=center class=whiteframe><table width='100%' border=1><tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";
+	$m.display();
+	if ( $accountname.length() > 0 )
+	{
+		$account = user.list('occi.user.name="'#$accountname#'"');
+		$aid = $account[0];
+		$account = $aid.get();
+	}
+	if ( $account.length() > 0)
+	{
+		$accountrole = $account["occi.user.role"];
+		switch ( $accountrole )
+		{
+		case	"user"	:
+			CustomerMenu($accountname);
+			break;
+		case	"provider"	:
+			ProviderMenu($âccountname);
+			break;
+		case	"vendor"	:
+			VendorMenu($accountname);
+			break;
+		case	"operator"	:
+			OperatorMenu($accountname);
+			break;
+		}
+	}
+	else
+	{
+		"<tr>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML'>Accounts</a>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-providers.txt&ouput=HTML'>Providers</a>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-manifests.txt&ouput=HTML'>Manifests</a>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML'>Agreements</a>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
+		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
+	}
+	"</tr><tr><th colspan=6>&nbsp</tr><tr><td colspan=6><div align=center><table width='100%'>".display();
+	return;
+}
+
+
+function	HtmlFooter()
+{
+	"</table></div></td></tr></table></div></body></html>".display();
+	return;
+}

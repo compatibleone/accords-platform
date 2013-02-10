@@ -1,0 +1,72 @@
+include "csp-header.txt";
+
+	HtmlHeader("Accords Platform Scheduling",$1);
+
+	$list = schedule.list();
+
+	"<tr><td class=title>UUID<td class=title>Status<td class=title>Started<td class=title>Duration<td class=title>Graph</tr>".display();
+
+	$jobs = [];
+	$max  = 0;
+
+	foreach ( $list as $id )
+	{
+		$schedule = $id.get();
+
+		$operation = $schedule["occi.schedule.operation"];
+
+		$a = $operation / "?";
+	
+		$url      = $a[0];
+		$action   = $a[1];
+		$start    = $schedule["occi.schedule.started"];
+		$start    = $start.date();
+		$duration = $schedule["occi.schedule.duration"];
+		$status   = $schedule["occi.schedule.response"];
+		$message  = $schedule["occi.schedule.message"];
+		$a = $url / "/";
+
+		$url = $a[2];
+
+		if ( $action == "action=start" )
+		{
+			switch ( $url )
+			{
+			case	"openstack"	:
+			case	"opennebula"	:
+			case	"windowsazure"	:
+				$s = "{}";
+				$d = '"url":"'#$url#'"';
+				$s = $s + $d;
+				$d = '"status":"'#$status#' '#$message#'"';
+				$s = $s + $d;
+				$d = '"start":"'#$start#'"';
+				$s = $s + $d;
+				$d = '"duration":"'#$duration#'s"';
+				$s = $s + $d;
+				if ( $duration > $max )
+				{ 	$max = $duration;	}
+				$jobs = $jobs + $s;
+			}
+		}
+	}
+	
+	foreach ( $jobs as $job )
+	{
+		"<tr>".display();
+		forboth ( $job as $name and $value )
+		{
+			if ( $name == "duration" ) { $duration = $value; }
+			$m = "<td>"#$value;
+			$m.display();
+		}
+		$duration = $duration.round(1);
+		$ratio = $duration / $max;
+		$width = 100 * $ratio;
+		$width = $width.round(0);
+		$m = "<td><image height='20' width='"#$width#"%' src='blue.png'></tr>";
+		$m.display();
+	}
+
+
+	HtmlFooter();

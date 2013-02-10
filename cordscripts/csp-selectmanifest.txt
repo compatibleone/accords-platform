@@ -1,0 +1,23 @@
+	/* --------------------------------------------------------------------- */
+	/* this widget display a form select control allowing manifest selection */
+	/* --------------------------------------------------------------------- */
+
+function SelectManifest($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+
+	$list = manifest.list();
+
+	foreach ( $list as $mid )
+	{
+		$manifest = $mid.get();
+		$name = $manifest["occi.manifest.name"]
+		$m = "<option value='"#$name#"'>"#$name#"</option>";
+		$m.display();
+	}
+
+	"</select>".display();
+
+}
+

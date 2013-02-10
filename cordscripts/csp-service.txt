@@ -1,0 +1,48 @@
+	include "csp-header.txt";
+
+
+	HtmlHeader("Accords Platform Service and Contracts",$1);
+
+	$sid = $2;
+
+	$services = service.get('"occi.core.id="'#$sid#'"');
+	$service  = $services[0];
+
+	if ($service.length() > 0 )
+	{
+		$record = $service.get();
+		foreach ( $record as $tuple )
+		{
+			forboth ( $tuple as $name and $value )
+			{
+				if ( $name != "link" )
+				{
+					if ( $name == "state" )
+					{	$state = $value; 	}
+					
+					$m = "<tr><td><div align=right>"#$name#"</div><td><input type=text name="#$name#" value='"#$value#"'></tr>";
+					$m.display();
+				}
+				else
+				{
+					$m = "<tr><td><div align=right>Contract</div>";
+					$m.display();
+					$contract = $value.get();
+					$n = $contract["occi.contract.name"];
+					$m = "<td><b>"#$n#"</b></tr>";
+					$m.display();
+				}
+			}
+		}
+		if ( $state > 0 )
+		{
+			"<tr><td><div align=right>Action</div><td><input type=submit class=action name=action value='stop service'></tr>".display();
+		}
+		else
+		{
+			"<tr><td><div align=right>Action</div><td><input type=submit class=action name=action value='start service'></tr>".display();
+		}
+	}
+
+	HtmlFooter();
+

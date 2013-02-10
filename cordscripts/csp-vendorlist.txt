@@ -1,0 +1,39 @@
+function vendorList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$vendors = vendor.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=3><b>vendors</b></td></tr>".display();
+	"<tr><td class=title>Operator<td class=title>Description<td class=title>Zone</tr>".display();
+
+	foreach ( $vendors as $mid )
+	{
+		$vendor = $mid.get();
+		$operator    = $vendor["occi.vendor.operator"];
+		$description = $vendor["occi.vendor.description"];
+		$zone        = $vendor["occi.vendor.zone"];
+		"<tr>".display();	
+	
+		$url = $baseurl#"?action=compile&script=csp-vendor.txt&output=HTML&option="#$operator;
+		$m = "<td><a href='"#$url#"'>"#$operator#"</a>";
+		$m.display();
+
+		$m = "<td>"#$description;
+		$m.display();	
+	
+
+		if ( $zone.length() > 0 )
+		{	$m = "<td>"#$zone;	}
+		else
+		{	$m = "<td>europe";	}
+		$m.display();
+
+
+		"</tr>".display();		
+	}
+
+	"</table>".display();
+	return;
+
+}

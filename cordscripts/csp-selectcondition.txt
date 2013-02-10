@@ -1,0 +1,19 @@
+	/* ---------------------------------------------------------------------- */
+	/* this widget display a form select control allowing condition selection */
+	/* ---------------------------------------------------------------------- */
+function	SelectCondition($pn)
+{
+	$m = "<select name='"#$pn#"'>";
+	$m.display();
+	"<option value='eq'>equal</option>".display();
+	"<option value='ne'>not equal</option>".display();
+	"<option value='gr'>greater</option>".display();
+	"<option value='le'>not greater</option>".display();
+	"<option value='ls'>less</option>".display();
+	"<option value='ge'>not less</option>".display();
+
+	"</select>".display();
+}
+
+
+

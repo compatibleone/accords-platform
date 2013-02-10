@@ -1,0 +1,16 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-sales.txt						         */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of sales declared within the accords platform for the provisioning of resources      */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-vendorlist.txt";
+
+	HtmlHeader("Accords Platform Provider Sales",$1);
+
+	"<tr><td colspan=6>".display();
+	salesList( " " );
+	"</td></tr>".display();
+	HtmlFooter();
+

@@ -1,0 +1,38 @@
+
+include "csp-header.txt";
+
+HtmlHeader("Accords Platform Category List",$1);
+
+if ( $2.length() == 0 )
+{
+	$2 = "publication";
+}
+"<html><head><title>Accords Platform Category List</title></head>".display();
+"<body><div align=center><table><tr><th colspan=2><h1>Accords Platform Category List</h1></tr>".display();
+$m = "<tr><th colspan=2><h2>"#$2#"</h2></tr>";
+$m.display();
+
+$list = $2.list();
+foreach ( $list as $item )
+{
+	$m = "<tr><th colspan=2 class='title'>"#$item#"</tr>";
+	$m.display();
+	$i = $item.get();
+	foreach ( $i as $r )
+	{
+		forboth ( $r as $n and $v )
+		{
+			if ( $n != "link" )
+			{
+				$m = "<tr><th>"#$n#"<td>"#$v#"</tr>";
+			}
+			else
+			{
+				$m = "<tr><th>&nbsp;<td>"#$v#"</tr>";
+			}
+			$m.display();
+		}
+	}
+}
+"</table></div></body></html>".display();
+

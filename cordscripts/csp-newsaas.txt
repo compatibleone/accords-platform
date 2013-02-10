@@ -1,0 +1,67 @@
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+	include "csp-selectmanifest.txt";
+	include "csp-selectagreement.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("New Application",$1);
+
+	$what = $2;
+	
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Addition of a New Application to an Existing Vendor Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to add a new application to the list of applications offered by the vendor for use by customer accounts. <p>".display();
+
+	SectionHeader("The Account");
+
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+
+	"<tr><td><b>Vendor Account Name</b><td>".display();
+	if ( $what.length() > 0 )
+	{
+		$m = "<input type=text name=vendor readonly value='"#$what#"'>";
+		$m.display();
+	}
+	else
+	{
+		SelectAccount("vendor");
+	}
+
+	SectionHeader("The Application");
+
+	"<tr><td><b>Application Name</b><td><input type=text name='appname' value=''>".display();
+
+	"<td><b>Manifest</b><td>".display();
+	SelectManifest("manifest");
+
+	"<tr><td><b>Description</b><td><input type=text name='desc' value='' >".display();
+
+	"<td><b>Agreement Template</b><td>".display();
+	SelectTemplate("sla");
+
+	SectionHeader("Aplication Confirmation");
+
+	"<tr><td><td colspan=2> Finally you must submit the description of the application for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add application'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+
+	HtmlFooter();
+
+

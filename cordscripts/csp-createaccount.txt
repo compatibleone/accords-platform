@@ -1,0 +1,109 @@
+	/* ---------------------------------------------------------- */
+	/* csp-create-account.txt 				      */
+	/* ---------------------------------------------------------- */
+	/* creation of a customer account and associated primary user */
+	/* ---------------------------------------------------------- */
+
+
+	$s = {};
+
+	$doit=0;
+
+	if ( $2.length() > 0 )
+	{
+		$a = $2 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "name" )
+		{
+			$doit=1;
+			$i = '"occi.account.name":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+	if ( $3.length() > 0 )
+	{
+		$a = $3 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "type" )
+		{
+			$i = '"occi.account.type":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+	if ( $4.length() > 0 )
+	{
+		$a = $4 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "number" )
+		{
+			$i = '"occi.account.number":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+	if ( $5.length() > 0 )
+	{
+		$a = $5 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "script" )
+		{
+			$i = '"occi.account.script":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+
+	if ( $doit > 0 )
+	{
+
+		$aid = account.post( $s );
+
+		$s = {};
+
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.user.name":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+		if ( $7.length() > 0 )
+		{
+			$a = $7 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "pass" )
+			{
+				$i = '"occi.user.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+		if ( $8.length() > 0 )
+		{
+			$a = $8 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "mail" )
+			{
+				$i = '"occi.user.email":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+
+		$i = '"occi.user.role":"admin"';
+		$s = $s + $i;
+		$uid = user.post( $s );
+
+		$aid.link( $uid );
+	}
+
+	$2 = $1;
+	include "csp-accounts.txt";
+

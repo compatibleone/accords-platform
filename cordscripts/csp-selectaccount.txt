@@ -1,0 +1,22 @@
+	/* -------------------------------------------------------------------- */
+	/* this widget display a form select control allowing account selection */
+	/* -------------------------------------------------------------------- */
+
+function SelectAccount($pn)
+{
+	$m = "<select name='"#$pn#"'account'>";
+	$m.display();
+
+	$list = account.list();
+
+	foreach ( $list as $mid )
+	{
+		$account = $mid.get();
+		$name = $account["occi.account.name"]
+		$m = "<option value='"#$name#"'>"#$name#"</option>";
+		$m.display();
+	}
+
+	"</select>".display();
+}
+

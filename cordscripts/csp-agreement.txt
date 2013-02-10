@@ -1,0 +1,324 @@
+	include "csp-header.txt";
+
+	function BusinessValue( $v )
+	{
+		$bv = $v.get();
+		$m = "&lt;business";
+		$sn = $bv["occi.business.name"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' name="'#$sn#'"';
+		}
+		$sn = $bv["occi.business.nature"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' nature="'#$sn#'"';
+		}
+		$sn = $bv["occi.business.type"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' type="'#$sn#'"';
+		}
+		$sn = $bv["occi.business.expression"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' expression="'#$sn#'"';
+		}
+		$m = $m#"/&gt;";
+		$m.display();
+	}
+
+	function ServiceVariable( $v )
+	{
+		$sg = $v.get();
+		$m = "&lt;variable";
+		$sn = $sg["occi.variable.name"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' name="'#$sn#'"';
+		}
+		$sn = $sg["occi.variable.scope"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' scope="'#$sn#'"';
+		}
+		$sn = $sg["occi.variable.property"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' property="'#$sn#'"';
+		}
+		$sn = $sg["occi.variable.condition"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' condition="'#$sn#'"';
+		}
+		$sn = $sg["occi.variable.value"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' value="'#$sn#'"';
+		}
+		$m = $m#"/&gt;";
+		$m.display();
+	}	
+
+	function ServiceGuarantee( $g )
+	{
+		$sg = $g.get();
+		$m = "&lt;guarantee";
+		$sn = $sg["occi.guarantee.name"];
+		if ( $sn.length() > 0 )
+		{
+			$sm = $sm#' name="'#$sn#'"';
+		}
+		$sn = $sg["occi.guarantee.scope"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' scope="'#$sn#'"';
+		}
+		$sn = $sg["occi.guarantee.obligated"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' obligated="'#$sn#'"';
+		}
+		$sn = $sg["occi.guarantee.importance"];
+		if ( $sn.length() > 0 )
+		{
+			$m = $m#' importance="'#$sn#'"';
+		}
+		$m = $m#"&gt;";
+		$m.display();
+		$sn = $sg["occi.guarantee.variable"];
+		if ( $sn.length() > 0 )
+		{
+			ServiceVariable($sn);
+		}
+		foreach ( $sg as $bvi )
+		{
+			forboth ( $bvi as $bvn and $bvv )
+			{
+				if ( $bvn =="link" )
+				{
+					BusinessValue( $bvv );
+				}
+			}
+		}
+		"&lt;/guarantee&gt;".display();
+	}
+
+	function ServiceTerms( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$st = $ttv.get();
+					$sm = "&lt;term";
+					$sn = $st["occi.term.name"];
+					if ( $sn.length() > 0 )
+					{
+						$sm = $sm#' name="'#$sn#'"';
+					}
+					$sm = $sm#"&gt;";
+					$sm.display();
+					$smi = $st["occi.term.manifest"];
+					if ( $smi.length() > 0 )
+					{
+						$smm = $smi.get();
+						$sm = "&lt;manifest";
+						$smn = $smm["occi.manifest.name"];
+						if ( $smn.length() > 0 )
+						{
+							$sm = $sm#' name="'#$smn#'"';
+						}
+						$sm = $sm#"/&gt;";
+						$sm.display();
+					}
+					$spi = $st["occi.term.provider"];
+					if ( $spi.length() > 0 )
+					{
+						$spm = $spi.get();
+						$sm = "&lt;provider";
+						$spn = $spm["occi.provider.name"];
+						if ( $spn.length() > 0 )
+						{
+							$sm = $sm#' name="'#$spn#'"';
+						}
+						$sm = $sm#"/&gt;";
+						$sm.display();
+					}
+					"&lt;/term&gt;".display();
+				}
+			}
+		 }
+	}
+
+	function ConditionTerms( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$st = $ttv.get();
+					$sm = "&lt;term";
+					$sn = $st["occi.term.name"];
+					if ( $sn.length() > 0 )
+					{
+						$sm = $sm#' name="'#$sn#'"';
+					}
+					$sm = $sm#"&gt;";
+					$sm.display();
+					foreach ( $st as $stt )
+					{
+						forboth ( $stt as $stn and $stv )
+						{
+							if ( $stn == "link" )
+							{
+								ServiceVariable( $stv );
+							}
+						}
+					}			
+					"&lt;/term&gt;".display();
+				}
+			}
+		 }
+	}
+
+	function GuaranteeTerms( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$st = $ttv.get();
+					$sm = "&lt;term";
+					$sn = $st["occi.term.name"];
+					if ( $sn.length() > 0 )
+					{
+						$sm = $sm#' name="'#$sn#'"';
+					}
+					$sm = $sm#"&gt;";
+					$sm.display();
+					foreach ( $st as $stt )
+					{
+						forboth ( $stt as $stn and $stv )
+						{
+							if ( $stn == "link" )
+							{
+								ServiceGuarantee( $stv );
+							}
+						}
+					}			
+					"&lt;/term&gt;".display();
+				}
+			}
+		 }
+	}
+
+	HtmlHeader("Accords Platform Service Level Agreement",$1);
+
+	$what = $2;
+
+	$agreements = agreement.list('occi.agreement.name="'#$what#'"');
+
+
+
+	foreach ( $agreements as $aid )
+	{
+		$m = "<table width='100%'><tr><td class=title><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-updatesla.txt&option="#$aid#"'>"#$aid#"</a></td></tr>";
+		$m.display();
+		"<tr><td><code><pre>".display();
+		$agreement = $aid.get();
+
+		$n = $agreement["occi.agreement.name"];
+		$m = '&lt;agreement name="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.initiator"];
+		$acc = $n.get();
+		$n = $acc["occi.account.name"];
+		$m = ' initiator="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.responder"];
+		$acc = $n.get();
+		$n = $acc["occi.account.name"];
+		$m = ' responder="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.description"];
+		$m = ' description="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.initiation"];
+		$m = ' initiation="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.expiration"];
+		$m = ' expiration="'#$n#'"';
+		$m.display();
+
+		$n = $agreement["occi.agreement.templatename"];
+		if( $n.length() > 0 )
+		{
+			$m = ' templatename="'#$n#'"';
+			$m.display();
+		}
+		"&gt;".display();
+		foreach ( $agreement as $tuple )
+		{
+			forboth ( $tuple as $n and $v )
+			{
+				if ( $n == "link" )
+				{
+					$tm = "&lt;terms";
+					$terms = $v.get();
+					$tn = $terms["occi.terms.name"];
+					if ( $tn.length() > 0 )
+					{
+						$tm = $tm#' name="'#$tn#'"';
+					}
+					$tn = $terms["occi.terms.type"];
+					if ( $tn.length() > 0 )
+					{
+						$tm = $tm#' type="'#$tn#'"';
+					}
+					$tm = $tm#"&gt;";
+					$tm.display();
+					switch ( $tn )
+					{
+					case	"services"	:
+						ServiceTerms($terms);
+						break;
+					case	"conditions"	:
+						ConditionTerms($terms);
+						break;
+					case	"guarantees"	:
+						GuaranteeTerms($terms);
+						break;
+					}						
+					"&lt;/terms&gt;".display();
+				}
+			}
+		}
+
+		"&lt;/agreement&gt;".display();	
+		"</pre></code></td></tr>".dislpay();	
+
+		$m = "<tr><td class=title><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-invokemethod.txt&option="#$aid#" instance'>"#$aid#".instance</a></td></tr>";
+		$m.display();
+
+	}
+
+
+	HtmlFooter();
+
+

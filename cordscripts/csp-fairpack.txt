@@ -1,0 +1,40 @@
+
+	/* this script is intended to be called in the context of the placement algorithm  */
+	/* this is identified by the value of the second parameter 'caller' with the value */
+	/* of 'cops.algorithm'. If this is true then the command line parameters will be   */
+	/*  1) caller, 2) placement, 3) publisher, 4) operator, 5) tls 		   	   */
+
+	$caller = $1;
+	$result ="";
+
+	if ( $caller != "cops.algorithm" )
+	{
+		$m = "incorrect caller context, "#$caller#", should be cops.algorithm";
+ 		$m.display();
+	}
+	else
+	{
+		$plid = $2;
+		$placement = $plid.get();
+		$node = $placement["occi.placement.node"];
+		$provider = $placement["occi.placement.provider"];
+		$selector = 'occi.provider.category="'#$provider#'"';
+		$nbpro    = provider.count( $selector );
+		if ( $nbpro > 0 )
+		{
+			$plist = provider.list($selector);
+			if ( $nbpro > 1 )
+			{
+				$result = $plist[0];
+			}
+			else
+			{
+				$result = $plist[0];
+			}		
+			$record = $result.get();
+			$result = $record["occi.provider.identity"];
+		}
+	}
+	return( $result );
+
+

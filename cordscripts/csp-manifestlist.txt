@@ -1,0 +1,56 @@
+
+function ManifestList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$manifests = manifest.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=5><b>Manifests</b></td></tr>".display();
+	"<tr><td class=title>Name<td class=title>Account<td class=title>Zone<td class=title>Access<td class=title>Nodes</tr>".display();
+
+	foreach ( $manifests as $mid )
+	{
+		$manifest = $mid.get();
+		$id       = $manifest["occi.core.id"];
+		$name     = $manifest["occi.manifest.name"];
+		$zone     = $manifest["occi.manifest.zone"];
+		$nodes    = $manifest["occi.manifest.nodes"];
+		
+		$url = $baseurl#"?action=compile&script=csp-manifest.txt&output=HTML&option="#$name;
+		$m = "<tr><td><a href='"#$url#"'>"#$name#"</a>";
+		$m.display();
+
+		$a        = $manifest["occi.manifest.account"];
+		$account  = $a.get();
+		$aname    = $account["occi.account.name"];
+
+		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HTML&option="#$aname;
+		$m = "<td><a href='"#$url#"'>"#$aname#"</a>";
+		$m.display();
+
+		if ( $zone.length() > 0 )
+		{
+			$m = "<td>"#$zone;
+		}
+		else
+		{
+			$m = "<td>europe";
+		}
+		$m.display();
+
+		$s        = $manifest["occi.manifest.security"];
+		$security = $s.get();
+		$access   = $security["occi.security.nature"];
+		if ( $access.length() == 0 )
+		{
+			$access = "public";
+		}
+		$url = $baseurl#"?action=compile&script=csp-security.txt&output=HTML&option="#$s;
+		$m = "<td><a href='"#$url#"'>"#$access#"</a><td>"#$nodes#"</tr>";
+		$m.display();
+	}
+	"</table>".display();
+	return;
+
+}
+

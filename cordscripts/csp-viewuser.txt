@@ -1,0 +1,64 @@
+
+	include "csp-header.txt";
+
+	HtmlHeader("User Account Information",$1);
+
+	$users = user.list('occi.user.name="'#$2#'"');
+
+	$uid = $users[0];
+
+	$record = $uid.get();
+
+	/* ------------------------------------------ */
+	/* display user record attribute value fields */
+	/* ------------------------------------------ */
+
+	"<table width='100%'>".display();
+
+	foreach ( $record as $attribute )
+	{
+		forboth ( $attribute as $name and $value )
+		{
+			$a = $name / ".";
+			$n = $a[2];
+			if ( $n == "name" ) { $uname = $name; }
+			$m = "<tr><th><div align=right>"#$n#"</div><th><input name='"#$n#"' type=text value='"#$value#"'></th></tr>";
+			$m.display();
+		}
+	}
+
+	"</table><p>".display();
+
+	/* ------------------------------------------------------------------- */
+	/* display list of provider subscription records for this user account */
+	/* ------------------------------------------------------------------- */
+
+	"<table width='100%'>".display();
+	"<tr><td class=title>Category<td class=title>Operator<td class=title>Host<td class=title>Version</tr>".display();
+
+	$plist = provider.list();
+
+	foreach ( $plist as $pid )
+	{
+		$provider = $id.get();
+		$pcat     = $provider["occi.provider.category"];
+		$pcat     = $pcat#"_configuration";
+		$psel     = "occi."#$pcat#".name";
+		$conflist = $pcat.list($psel#'="'#$uname#'"');
+		$profid   = $conflist[0];
+		$profile  = $profid.get();
+		$m = "<tr><td>"#$pcat;
+		$m = $m#"<td>"#$provider["occi.provider.operator"];
+		$psel     = "occi."#$pcat#".host";
+		$m = $m#"<td>"#$profile[$psel];
+		$psel     = "occi."#$pcat#".version";
+		$m = $m#"<td>"#$provile[$psel];
+		$m = $m#"</tr>";
+		$m.display();
+	}
+}
+	"</table><p>".display();
+
+	
+	HtmlFooter();
+	

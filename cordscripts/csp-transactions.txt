@@ -1,0 +1,176 @@
+	// -----------------------------------------------
+	// Transaction Processing Example using Cordscript
+	// -----------------------------------------------
+
+	include "csp-header.txt";
+
+	HtmlHeader("Accords Platform Invoices and Transactions",$1);
+	$what = $2;
+	if ( $what == "any" ) { $what = " "; }
+	$detail = $3;
+	$grandtotal = 0;
+	$totals = [];
+	$accounts = account.list('occi.account.name="'#$what#'"');
+	foreach ( $accounts as $account )
+	{
+		// --------------------------------------------
+		// collect account information and transactions
+		// for each account in the array of account ids
+		// --------------------------------------------
+		$account_info = $account.get();
+		$account_name = $account_info["occi.account.name"];
+		if ( $account_name != "none" )
+		{
+			/* ------------------------------------------------------ */
+			/* collect the list of transactions for the named account */
+			/* ------------------------------------------------------ */
+			$howmany = transaction.count( "occi.transaction.account="#$account );
+			if ( $howmany > 0 )
+			{
+				$invoice = invoice.post( "occi.invoice.account="#$account );
+			}
+			if ( $invoice.length() > 0 )
+			{
+			$transactions = transaction.list("occi.transaction.account="#$account);
+			$total = 0;
+			$items = 0;
+			$started = [];
+			foreach ( $transactions as $tid )
+			{
+				$transaction = $tid.get();
+				$pid  = $transaction["occi.transaction.price"];
+				$pref = $transaction["occi.transaction.reference"];
+				$pdsc = $transaction["occi.transaction.description"];
+				$pwhn = $transaction["occi.transaction.when"];
+				$pdat = $pwhn.date();
+				$psrc = $transaction["occi.transaction.source"];
+				/* ------------------------------------------- */
+				/* collect the price information and calculate */
+				/* ------------------------------------------- */
+				if ( $pid != "none" )
+				{
+					$price = $pid.get();
+					$pfix  = $price["occi.price.fixed"];
+					$pval  = $price["occi.price.rate"];
+					$what  = 0;
+					$hours = 0;
+					/* ------------------ */
+					/* detect fixed price */
+					/* ------------------ */
+					if ( $pfix == "yes" )
+					{
+						$what = $pval;
+					}
+					else
+					{
+						/* -------------------------------------- */
+						/* otherwise collect start and stop times */
+						/* -------------------------------------- */
+						if ( $pdsc == "action=start" )
+						{
+							$temp = '{"'#$pref#'":"'#$pwhn#'"}';
+							$started = $started + $temp;
+						}
+						else 
+						{
+							if ( $pdsc == "action=stop" )
+							{
+								$duration = 0;
+								$running = $started;
+								foreach ( $running as $vm )
+								{
+									forboth ( $vm as $vd and $vt )
+									{
+										if ( $vd == $pref )
+										{
+											$duration = $pwhn - $vt;
+										}
+									}
+								}
+								$ppn   = $price["occi.price.period"];
+								switch ( $ppn )
+								{
+								case	"year"	:
+								case	"annee"	:
+									$period = 60 * 24 * 365;
+									break;
+								case	"month"	:
+								case	"mois"	:
+									$period = 60 * 24 * 30;
+									break;
+								case	"week"	:
+								case	"semaine"	:
+									$period = 60 * 24 * 7;
+									break;
+								case	"day"	:
+								case	"jour"	:
+									$period = 60 * 24;
+									break;
+								case	"hour"	:
+								case	"heure"	:
+									$period = 60;
+									break;
+								case	"minute":
+									$period = 1;
+									break;
+								default	:
+									$period = 60;
+									break;
+								}
+								if ( $duration > 0 )
+								{
+									$minutes = $duration / $period;
+									if ( $minutes < $period )
+									{
+										$hours = 1;
+									}
+									else
+									{
+										$hours = $minutes / $period;
+									}
+									/* -------------------------- */
+									/* calculate price for period */
+									/* -------------------------- */
+									$what = $pval * $hours;
+								}
+							}
+						}
+					}
+					if ( $what > 0 )
+					{
+						$what = $what.round(2);
+						if ( $detail == "yes" )
+						{
+							$message = "<tr><th>"#$pval#" * "#$hours#"&nbsp;<th>"#$psrc#" "#$pdat#"<th>"#$what#"</tr>";
+							$message.display();
+						}
+						$total = $total + $what;
+						$total = $total.round(2);
+						$items = $items + 1;
+					}
+				}
+					
+			}
+			/* ------------------------------------------------- */
+			/* generate output information if transactions found */
+			/* ------------------------------------------------- */
+			if ( $items > 0 )
+			{
+				$message = "<tr><th><img src=blueusers.png>"#$account_name#"<th style='padding-right:1cm;'><div align=right>"#$items#"</div><th style='padding-right:1cm;'><div align=right>"#$total#"</div></tr>";
+				$message.display();
+				$grandtotal = $grandtotal + $total;
+				$grandtotal = $grandtotal.round(2);
+				$allitems = $allitems + $items;
+			}
+				$invoice.close();
+			}
+		}
+	}
+	/* -------------------------------------------------- */
+	/* generate the grand total and close the output page */
+	/* -------------------------------------------------- */
+	$message = "<tr><th class=title>Grand Total<th class=title>"#$allitems#"<th class=title>"#$grandtotal#"</th>"#"</tr>";
+	$message.display();
+
+	HtmlFooter();
+

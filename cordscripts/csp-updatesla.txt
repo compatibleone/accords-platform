@@ -1,0 +1,136 @@
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+	include "csp-selectmanifest.txt";
+	include "csp-selectprovider.txt";
+	include "csp-selectmetric.txt";
+	include "csp-selectalgorithm.txt";
+	include "csp-selectzone.txt";
+	include "csp-selectrating.txt";
+	include "csp-selectsecurity.txt";
+	include "csp-selectenergy.txt";
+	include "csp-selectcondition.txt";
+	include "csp-selectbusiness.txt";
+	include "csp-selectagreement.txt";
+	include "csp-uploadmanifest.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("Service Level Agreement Creation Phase 2",$1);
+
+	"<table name=afterform width='100%'>".display();
+	"<tr><td colspan=4><h3>Addition of Conditions or Guarantees to an existing Customer or End User Service Level Agreement</h3></td></tr>".display();
+	"<tr><td colspan=4>This document leads you through the steps allowing addition of conditions or guarantee terms to an existing customer or 'end user' service level agreement.<p>".display();
+	"Conditions will govern the placement of the resources whilst guarantees, supported by business values, will be monitoring during the duration of deployment of the service.<p>".display();
+
+	SectionHeader("The Agreement Context");
+
+	$what = $2;
+
+	/* ----------------------------------------- */
+	/* retrieve and display the agreement header */
+	/* ----------------------------------------- */
+	$agreement = $what.get();
+	$name      = $agreement["occi.agreement.name"];
+	$desc      = $agreement["occi.agreement.description"];
+	$who       = $agreement["occi.agreement.initiator"];
+	$resp      = $agreement["occi.agreement.responder"];
+	$from      = $agreement["occi.agreement.initiation"];
+	$till      = $agreement["occi.agreement.expiration"];
+	$template  = $agreement["occi.agreement.templatename"];
+
+	$m = "<tr><td><b>Name<b><td><input type=text name='name' value='"#$name#"' readonly>";
+	$m.display();
+
+	$m = "<td><b>Description</b><td><input type=text name='desc' value='"#$desc#"' readonly>";
+	$m.display();
+	
+
+	"<tr><td><b>Initiator</b><td>".display();
+	$m = "<input type=text name='init' value='"#$who#"' readonly>";
+	$m.display();
+
+	"<td><b>Responder</b><td>".display();
+	$m = "<input type=text readonly name='resp' value='"#$resp#"'>";
+	$m.display();
+
+	"<tr><td><b>Valid From</b><td>".display();
+	$m = "<input type=text name='from' value='"#$from#"'>";
+	$m.display();
+	"<td><b>Expires</b><td>".display();
+	$m = "<input type=text name='expire' value='"#$till#"'>";
+	$m.display();
+
+	"<tr><td><b>Template</b><td colspan=3>".display();
+	$m = "<input type=text name='template' readonly value='"#$template#"'>";
+	$m.display();
+
+	SectionHeader("The Agreement Conditions");
+	
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+	
+	$m = "<input type=hidden name='id' value='"#$what#"'>";
+	$m.display();
+
+	"<tr><td colspan=4> Here you may add placement conditions to be respected for the placement of the service.".display();
+	" This may be expressed in terms of geographical, security, reputation or technical constraints.".display();
+
+	"<tr><td><b>Algorithm</b><td>".display();
+	SelectAlgorithm("algo");
+	"<td><b>Provider</b><td>".display();
+	SelectProvider("provider");
+	"<tr><td><b>Zone</b><td>".display();
+	SelectZone("zone");
+	"<td><b>Rating</b><td>".display();
+	SelectRating("rating");
+	"<tr><td><b>Security</b><td>".display();
+	SelectSecurity("security");
+	"<td><b>Energy</b><td>".display();
+	SelectEnergy("energy");
+
+	"<tr><td><td colspan=2>You may submit the description of the conditions for processing and addition to the agreement.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add condition'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+
+	SectionHeader("The Agreement Guarantees");
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+
+	$m = "<input type=hidden name='id' value='"#$what#"'>";
+	$m.display();
+
+	"<tr><td colspan=4>Here you may specify the guarantees that are to be respected by either the customer or the service provider where relevent.".display();
+	"You will need to select a metric and then define the corresponding condition and value that is to enforced. A business value may be defined providing an expression describing the required behaviour.".display();
+	"<tr><td><b>Metric</b><td>".display();
+	SelectMetric("gm");
+	"<td><b>Obligated</b><td><select name=oblig><option value='provider'>provider</option><option value='consumer'>consumer</option></select>".display();
+	"<tr><td><b>Condition</b><td>".display();
+	SelectCondition("gc");
+	"<td><b>Value</b><td><input type=text name='gv' value=''>".display();
+	"<tr><td><b>Business Value</b><td>".display();
+	SelectBusiness("gbv");
+	"<td><b>Expression</b><td><input type=text name='gbx' value=''>".display();
+
+	"<tr><td><td colspan=2>You may define and submit guarantee terms for processing and addition to the agreement.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add guarantee'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+
+	HtmlFooter();
+

@@ -1,0 +1,57 @@
+function ProviderList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$providers = provider.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=6><b>Providers</b></td></tr>".display();
+	"<tr><td class=title>Operator<td class=title>Provision<td class=title>Identity<td class=title>Zone<td class=title>Security<td class=title>Quota</tr>".display();
+
+	foreach ( $providers as $mid )
+	{
+		$provider = $mid.get();
+		$operator = $provider["occi.provider.operator"];
+		$category = $provider["occi.provider.category"];
+		$identity = $provider["occi.provider.identity"];
+		$security = $provider["occi.provider.security"];
+		$zone     = $provider["occi.provider.zone"];
+		$quotas   = $provider["occi.provider.quotas"];
+
+		"<tr>".display();	
+	
+		$url = $baseurl#"?action=compile&script=csp-provider.txt&output=HTML&option="#$operator;
+		$m = "<td><a href='"#$url#"'>"#$operator#"</a>";
+		$m.display();
+
+	
+		$url = $baseurl#"?action=compile&script=csp-occilist.txt&output=HTML&option="#$category;
+		$m = "<td><a href='"#$url#"'>"#$category#"</a>";
+		$m.display();
+
+	
+		$url = $identity#"/"#$category#"/";
+		$m = "<td><a href='"#$url#"'>"#$category#"</a>";
+		$m.display();
+
+		if ( $zone.length() > 0 )
+		{	$m = "<td>"#$zone;	}
+		else
+		{	$m = "<td>europe";	}
+		$m.display();
+
+		if ( $security.length() == 0 )
+		{	$access = "public";	}
+		$m = "<td>"#$security;
+		$m.display();
+
+		$url = $baseurl#"?action=compile&script=csp-provider.txt&output=HTML&option="#$operator;
+		$m = "<td><a href='"#$url#"'>"#$quotas#"</a>";
+		$m.display();
+
+		"</tr>".display();		
+	}
+
+	"</table>".display();
+	return;
+
+}

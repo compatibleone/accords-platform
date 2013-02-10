@@ -1,0 +1,38 @@
+
+
+"<html><head><title>Accords Platform DataBase List</title></head>".display();
+"<body><div align=center><table><tr><th colspan=2><h1>Accords Platform Database List</h1></tr>".display();
+
+$catlist = publication.list();
+
+foreach ( $catlist as $catid )
+{
+	$catrec = $catid.get();
+
+	$category = $catrec['occi.publication.what'];
+	
+	$m = "<tr><th colspan=2><h2>"#$category#"</h2></tr>";
+	$m.display();
+
+	$list = $category.list();
+	foreach ( $list as $item )
+	{
+		$m = "<tr><th colspan=2 class='title'>"#$item#"</tr>";
+		$m.display();
+		$i = $item.get();
+		foreach ( $i as $r )
+		{
+			forboth ( $r as $n and $v )
+			{
+				$m = "<tr><th>"#$n#"<td>"#$v#"</tr>";
+				if ( $n != "link" )
+				{
+					$m.display();
+				}
+			}
+		}
+	}
+}
+
+"</table></div></body></html>".display();
+

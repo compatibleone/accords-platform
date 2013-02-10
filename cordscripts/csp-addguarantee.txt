@@ -1,0 +1,103 @@
+
+	function LocateGuarantees( $a )
+	{
+		foreach ( $a as $tuple )
+		{
+			forboth ( $tuple as $name and $value )
+			{
+				if ( $name == "link" )
+				{
+
+					$tsid  = $value;
+					$terms = $tsid.get();
+					$type  = $terms["occi.terms.type"];
+
+					if ( $type == "guarantees" )
+					{
+						return( $tsid );
+					}
+				}
+			}
+		}
+		return( "" );
+	}
+
+	$a = $2 / "=";
+	$v = $a[1];
+	if ( $v.length() > 0 )
+	{
+
+		$agrid = $v;
+		$agreement = $agrid.get();
+		$agreementname = $agreement["occi.agreement.name"];
+
+		$s = {};
+		$a = $3 / "=";
+		$v = $a[1];
+		$p = '"occi.variable.property":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $4 / "=";
+		$v = $a[1];
+		$p = '"occi.variable.condition":"'#$v#'"';
+		$s = $s + $p;
+
+		$a = $5 / "=";
+		$v = $a[1];
+		$p = '"occi.variable.value":"'#$v#'"';
+		$s = $s + $p;
+
+		$vid = variable.post( $s );
+
+		$s = {};
+		$a = $7 / "=";
+		$v = $a[1];
+		$p = '"occi.business.nature":"'#$v#'"';	
+		$s = $s + $p;
+	
+		$a = $8 / "=";
+		$v = $a[1];
+		$p = '"occi.business.expression":"'#$v#'"';
+		$s = $s + $p;
+
+
+		$bid = business.post( $s );
+
+		$s = {};
+		$a = $6 / "=";
+		$v = $a[1];
+		$p = '"occi.guarantee.obligated":"'#$v#'"';
+		$s = $s + $p;
+		$p = '"occi.guarantee.scope":"default"'"';
+		$s = $s + $p;
+		$p = '"occi.guarantee.importance":"normal'"';
+		$s = $s + $p;
+		$p = '"occi.guarantee.variable":"'#$vid#'"';
+		$s = $s + $p;
+
+
+		$gid = guarantee.post( $s );
+
+		$gid.link( $bid );
+
+		$garid = LocateGuarantees( $agreement );
+
+		if ( $garid.length() > 0 )
+		{
+
+			/* ------------------------- */
+			/* create the guarantee term */
+			/* ------------------------- */
+			$s = {};
+			$p = '"occi.term.name":"'#$agreementname#':guarantees"';
+			$s = $s + $p;
+			$tid = term.post( $s );
+			$tid.link( $gid );
+			$garid.link( $tid );
+		}
+	}
+
+	$2 = $agrid;
+
+	include "csp-updatesla.txt";
+
