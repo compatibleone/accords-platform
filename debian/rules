@@ -63,7 +63,7 @@ install: build
 	mkdir -p `pwd`/debian/tmp/etc/default/ `pwd`/debian/tmp/etc/accords/ `pwd`/debian/tmp/usr/share/doc/compatibleone-accords `pwd`/debian/tmp/var/lib/accords `pwd`/debian/tmp/etc/cosacs/
 	cp debian/config-cosacs.xml `pwd`/debian/tmp/etc/cosacs/
 	cp *.xsd `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
-	cp debian/co-docs/* debian/*.csp debian/CompatibleOne-Howto.txt `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
+	cp -r cordscripts debian/co-docs/* debian/*.csp debian/CompatibleOne-Howto.txt `pwd`/debian/tmp/usr/share/doc/compatibleone-accords
 	cp manifests/openssl.cnf `pwd`/debian/tmp/etc/accords/
 	cp manifests/os_config.xml `pwd`/debian/tmp/etc/accords/
 	cp paprocci/pa_config.xml `pwd`/debian/tmp/etc/accords/
@@ -119,9 +119,9 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
-	for i in libcocarrier0 libcocci0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
-		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 1.0-1)") > debian/$$i.shlibs; \
-		dh_makeshlibs -p $$i -V "$$i (>= 1.0-1)"; \
+	for i in libcocarrier0 libcocci0 libcocspi0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 1.0-3)") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= 1.0-3)"; \
 	done
 	dh_shlibdeps -a
 	dh_gencontrol -a

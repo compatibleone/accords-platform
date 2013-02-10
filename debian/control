@@ -169,6 +169,20 @@ Depends: libocci0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
+Package: libcocspi0
+Section: libs
+Architecture: any
+Depends: compatibleone-base (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform (Base Library: cocspi)
+ CompatibleOne Accords platform base dynamic libraries and Files
+
+Package: libcocspi-dev
+Section: libdevel
+Architecture: any
+Depends: libcocspi0 (= ${binary:Version})
+Description: compatibleOne Accords Platform (development files)
+ CompatibleOne Accords development files; For developpers only.
+
 Package: libpubocci0
 Section: libs
 Architecture: any
