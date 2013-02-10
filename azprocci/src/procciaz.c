@@ -489,7 +489,13 @@ private	struct	rest_response * start_windowsazure(
 		return( rest_html_response( aptr, status, "WINDOWS AZURE Configuration Not Found" ) );
 	else if ((status = az_initialise_service( subscription, pptr->hostedservice)) != 0)
 		return( rest_html_response( aptr, 800 + status, "WINDOWS AZURE Hosted Service Failure" ) );
-	else if (!(filename = build_windowsazure_firewall( subscription, pptr )))
+	/* ------------------------------------------------------------------- */
+	/* delete a previous disk just in case it didnt happen during the stop */
+	/* ------------------------------------------------------------------- */
+	else if ( pptr->iteration )
+		delete_windowsazure_disk( pptr, subscription );
+	
+	if (!(filename = build_windowsazure_firewall( subscription, pptr )))
 		return( rest_html_response( aptr, 888, "WINDOWS AZURE Firewall Failure" ) );
 
 	/* ------------------------------------------ */
