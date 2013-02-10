@@ -836,7 +836,6 @@ public	int	delete_windowsazure_disk(
 	struct	az_response * azptr;
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
-	char 	diskid[1024];
 
 	if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
 	&&  ( azptr->response )
@@ -845,7 +844,6 @@ public	int	delete_windowsazure_disk(
 	&&  ( eptr->name )
 	&&  (!( strcmp( eptr->name, "Disks" ) )))
 	{
-		sprintf(diskid,"%s-%u",pptr->id,pptr->iteration);
 		for (	eptr = eptr->first;
 			eptr != (struct xml_element *) 0;
 			eptr = eptr->next )
@@ -855,6 +853,10 @@ public	int	delete_windowsazure_disk(
 			else if (!( dptr->value ))
 				continue;
 			else if ( strncmp( dptr->value, pptr->media, strlen( pptr->media ) ) != 0 )
+				continue;
+			if (!( dptr = document_element( eptr, "Name" ) ))
+				continue;
+			else if (!( dptr->value ))
 				continue;
 			else
 			{
