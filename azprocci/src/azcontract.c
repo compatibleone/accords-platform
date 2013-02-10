@@ -834,9 +834,11 @@ public	int	delete_windowsazure_disk(
 		struct 	az_subscription * subscription )
 {
 	struct	az_response * azptr;
+	struct	az_response * bzptr;
 	struct	xml_element * eptr;
 	struct	xml_element * dptr;
-
+	struct	xml_element * fptr;
+	
 	if ((( azptr = az_list_os_disks(subscription)) != (struct az_response *) 0)
 	&&  ( azptr->response )
 	&&  ( azptr->response->status == 200 )
@@ -854,18 +856,34 @@ public	int	delete_windowsazure_disk(
 				continue;
 			else if ( strncmp( dptr->value, pptr->media, strlen( pptr->media ) ) != 0 )
 				continue;
-			if (!( dptr = document_element( eptr, "Name" ) ))
+			else if (!( dptr = document_element( eptr, "Name" ) ))
 				continue;
 			else if (!( dptr->value ))
 				continue;
-			else
+			else 
 			{
-				if (( azptr = az_delete_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
-					check_windowsazure_operation( subscription, azptr );
+				if (( fptr = document_element( eptr, "AttachedTo" )) != (struct xml_element *) 0)
+				{
+					while ((bzptr = az_get_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
+					{
+						if (!( fptr = document_element( bzptr->xmlroot, "AttachedTo" )))
+							break;
+						else
+						{
+							sleep(5);
+							bzptr = liberate_az_response( bzptr );
+						}
+					}
+					if ( bzptr ) bzptr = liberate_az_response( bzptr );
+				}
+				if (( bzptr = az_delete_os_disk( subscription, dptr->value )) != (struct az_response *) 0)
+					check_windowsazure_operation( subscription, bzptr );
+				azptr = liberate_az_response( azptr );
 				return(1);
 			}
 		}
 	}
+	azptr = liberate_az_response( azptr );
 	return(0);
 }
 
