@@ -17,17 +17,17 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _paas_relation_c_
-#define _paas_relation_c_
+#ifndef _paas_environment_link_c_
+#define _paas_environment_link_c_
 
 #include "element.h"
 
-#include "paas_relation.h"
+#include "paas_environment_link.h"
 
-/*	--------------------------------------------	*/
-/*	l i b e r a t e _ p a a s _ r e l a t i o n 	*/
-/*	--------------------------------------------	*/
-public struct paas_relation * liberate_paas_relation(struct paas_relation * sptr)
+/*	------------------------------------------------------------	*/
+/*	l i b e r a t e _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	------------------------------------------------------------	*/
+public struct paas_environment_link * liberate_paas_environment_link(struct paas_environment_link * sptr)
 {
 	if ( sptr )
 	{
@@ -35,42 +35,45 @@ public struct paas_relation * liberate_paas_relation(struct paas_relation * sptr
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->script )
+			 sptr->script = liberate(sptr->script);
 		sptr = liberate( sptr );
 	}
-	return((struct paas_relation *) 0);
+	return((struct paas_environment_link *) 0);
 
 }
 
-/*	--------------------------------------	*/
-/*	r e s e t _ p a a s _ r e l a t i o n 	*/
-/*	--------------------------------------	*/
-public struct paas_relation * reset_paas_relation(struct paas_relation * sptr)
+/*	------------------------------------------------------	*/
+/*	r e s e t _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	------------------------------------------------------	*/
+public struct paas_environment_link * reset_paas_environment_link(struct paas_environment_link * sptr)
 {
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->script = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
 
 }
 
-/*	--------------------------------------------	*/
-/*	a l l o c a t e _ p a a s _ r e l a t i o n 	*/
-/*	--------------------------------------------	*/
-public struct paas_relation * allocate_paas_relation()
+/*	------------------------------------------------------------	*/
+/*	a l l o c a t e _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	------------------------------------------------------------	*/
+public struct paas_environment_link * allocate_paas_environment_link()
 {
-	struct paas_relation * sptr;
-	if (!( sptr = allocate( sizeof( struct paas_relation ) ) ))
+	struct paas_environment_link * sptr;
+	if (!( sptr = allocate( sizeof( struct paas_environment_link ) ) ))
 		return( sptr );
-	else	return( reset_paas_relation(sptr) );
+	else	return( reset_paas_environment_link(sptr) );
 }
 
-/*	--------------------------------------	*/
-/*	x m l i n _ p a a s _ r e l a t i o n 	*/
-/*	--------------------------------------	*/
-public int xmlin_paas_relation(struct paas_relation * sptr,struct xml_element * eptr)
+/*	------------------------------------------------------	*/
+/*	x m l i n _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	------------------------------------------------------	*/
+public int xmlin_paas_environment_link(struct paas_environment_link * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -85,6 +88,10 @@ public int xmlin_paas_relation(struct paas_relation * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"script") ))
+		{
+			if ( wptr->value ) { sptr->script = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -94,10 +101,10 @@ public int xmlin_paas_relation(struct paas_relation * sptr,struct xml_element * 
 
 }
 
-/*	----------------------------------------------	*/
-/*	r e s t _ o c c i _ p a a s _ r e l a t i o n 	*/
-/*	----------------------------------------------	*/
-public int rest_occi_paas_relation(FILE * fh,struct paas_relation * sptr,char * prefix, char * nptr)
+/*	--------------------------------------------------------------	*/
+/*	r e s t _ o c c i _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	--------------------------------------------------------------	*/
+public int rest_occi_paas_environment_link(FILE * fh,struct paas_environment_link * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -105,9 +112,10 @@ public int rest_occi_paas_relation(FILE * fh,struct paas_relation * sptr,char * 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.script='%s'\r\n",prefix,nptr,(sptr->script?sptr->script:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 
 }
 
-#endif	/* _paas_relation_cpaas_relation_c_ */
+#endif	/* _paas_environment_link_cpaas_environment_link_c_ */

@@ -37,10 +37,8 @@ public struct paas_application_version * liberate_paas_application_version(struc
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->label )
 			 sptr->label = liberate(sptr->label);
-		if ( sptr->date_updated )
-			 sptr->date_updated = liberate(sptr->date_updated);
-		if ( sptr->description )
-			 sptr->description = liberate(sptr->description);
+		if ( sptr->paas_application_version_instance )
+			 sptr->paas_application_version_instance = liberate(sptr->paas_application_version_instance);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_application_version *) 0);
@@ -57,8 +55,7 @@ public struct paas_application_version * reset_paas_application_version(struct p
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->label = (char*) 0;
-		sptr->date_updated = (char*) 0;
-		sptr->description = (char*) 0;
+		sptr->paas_application_version_instance = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -98,13 +95,9 @@ public int xmlin_paas_application_version(struct paas_application_version * sptr
 		{
 			if ( wptr->value ) { sptr->label = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"date_updated") ))
+		else if (!( strcmp(wptr->name,"paas_application_version_instance") ))
 		{
-			if ( wptr->value ) { sptr->date_updated = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"description") ))
-		{
-			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->paas_application_version_instance = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -127,8 +120,7 @@ public int rest_occi_paas_application_version(FILE * fh,struct paas_application_
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.label='%s'\r\n",prefix,nptr,(sptr->label?sptr->label:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_updated='%s'\r\n",prefix,nptr,(sptr->date_updated?sptr->date_updated:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.paas_application_version_instance='%s'\r\n",prefix,nptr,(sptr->paas_application_version_instance?sptr->paas_application_version_instance:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

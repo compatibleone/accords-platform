@@ -137,10 +137,10 @@ private void autoload_paas_application_deployable_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "content_type" )) != (struct xml_atribut *) 0)
-				pptr->content_type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "location" )) != (struct xml_atribut *) 0)
 				pptr->location = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "content_type" )) != (struct xml_atribut *) 0)
+				pptr->content_type = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "multitenancy_level" )) != (struct xml_atribut *) 0)
 				pptr->multitenancy_level = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -175,11 +175,11 @@ public  void autosave_paas_application_deployable_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," content_type=%c",0x0022);
-		fprintf(h,"%s",(pptr->content_type?pptr->content_type:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," location=%c",0x0022);
 		fprintf(h,"%s",(pptr->location?pptr->location:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," content_type=%c",0x0022);
+		fprintf(h,"%s",(pptr->content_type?pptr->content_type:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," multitenancy_level=%c",0x0022);
 		fprintf(h,"%s",(pptr->multitenancy_level?pptr->multitenancy_level:""));
@@ -210,10 +210,10 @@ private void set_paas_application_deployable_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "content_type" ) ))
-			pptr->content_type = allocate_string(vptr);
 		if (!( strcmp( nptr, "location" ) ))
 			pptr->location = allocate_string(vptr);
+		if (!( strcmp( nptr, "content_type" ) ))
+			pptr->content_type = allocate_string(vptr);
 		if (!( strcmp( nptr, "multitenancy_level" ) ))
 			pptr->multitenancy_level = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -256,18 +256,18 @@ private int pass_paas_application_deployable_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->content_type )
-	&&  (strlen( fptr->content_type ) != 0)) {
-		if (!( pptr->content_type ))
-			return(0);
-		else if ( strcmp(pptr->content_type,fptr->content_type) != 0)
-			return(0);
-		}
 	if (( fptr->location )
 	&&  (strlen( fptr->location ) != 0)) {
 		if (!( pptr->location ))
 			return(0);
 		else if ( strcmp(pptr->location,fptr->location) != 0)
+			return(0);
+		}
+	if (( fptr->content_type )
+	&&  (strlen( fptr->content_type ) != 0)) {
+		if (!( pptr->content_type ))
+			return(0);
+		else if ( strcmp(pptr->content_type,fptr->content_type) != 0)
 			return(0);
 		}
 	if (( fptr->multitenancy_level )
@@ -296,10 +296,10 @@ private struct rest_response * paas_application_deployable_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.content_type=%c%s%c",optr->domain,optr->id,0x0022,pptr->content_type,0x0022);
+	sprintf(cptr->buffer,"%s.%s.location=%c%s%c",optr->domain,optr->id,0x0022,pptr->location,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.location=%c%s%c",optr->domain,optr->id,0x0022,pptr->location,0x0022);
+	sprintf(cptr->buffer,"%s.%s.content_type=%c%s%c",optr->domain,optr->id,0x0022,pptr->content_type,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.multitenancy_level=%c%s%c",optr->domain,optr->id,0x0022,pptr->multitenancy_level,0x0022);
@@ -727,9 +727,9 @@ public struct occi_category * occi_paas_application_deployable_builder(char * a,
 		redirect_occi_paas_application_deployable_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "content_type",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "location",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "content_type",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "multitenancy_level",0,0) ))
 			return(optr);
@@ -783,7 +783,7 @@ public struct rest_header *  paas_application_deployable_occi_headers(struct paa
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application_deployable.content_type='%s'\r\n",(sptr->content_type?sptr->content_type:""));
+	sprintf(buffer,"occi.paas_application_deployable.location='%s'\r\n",(sptr->location?sptr->location:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -794,7 +794,7 @@ public struct rest_header *  paas_application_deployable_occi_headers(struct paa
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application_deployable.location='%s'\r\n",(sptr->location?sptr->location:""));
+	sprintf(buffer,"occi.paas_application_deployable.content_type='%s'\r\n",(sptr->content_type?sptr->content_type:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

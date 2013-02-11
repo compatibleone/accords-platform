@@ -17,55 +17,55 @@
 /* -------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _occipaas_relation_c_
-#define _occipaas_relation_c_
+#ifndef _occipaas_environment_link_c_
+#define _occipaas_environment_link_c_
 
-#include "paas_relation.h"
+#include "paas_environment_link.h"
 
-/*	------------------------------------	*/
-/*	o c c i _ p a a s _ r e l a t i o n 	*/
-/*	------------------------------------	*/
+/*	----------------------------------------------------	*/
+/*	o c c i _ p a a s _ e n v i r o n m e n t _ l i n k 	*/
+/*	----------------------------------------------------	*/
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct paas_relation * allocate_paas_relation();
-struct paas_relation * liberate_paas_relation(struct paas_relation * optr);
-private pthread_mutex_t list_paas_relation_control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * paas_relation_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * paas_relation_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_paas_relation_node() { return( paas_relation_first ); }
-public struct  occi_kind_node * occi_last_paas_relation_node() { return( paas_relation_last ); }
+struct paas_environment_link * allocate_paas_environment_link();
+struct paas_environment_link * liberate_paas_environment_link(struct paas_environment_link * optr);
+private pthread_mutex_t list_paas_environment_link_control=PTHREAD_MUTEX_INITIALIZER;
+private struct occi_kind_node * paas_environment_link_first = (struct occi_kind_node *) 0;
+private struct occi_kind_node * paas_environment_link_last  = (struct occi_kind_node *) 0;
+public struct  occi_kind_node * occi_first_paas_environment_link_node() { return( paas_environment_link_first ); }
+public struct  occi_kind_node * occi_last_paas_environment_link_node() { return( paas_environment_link_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_paas_relation_node(struct occi_kind_node * nptr) {
+private struct occi_kind_node * ll_drop_paas_environment_link_node(struct occi_kind_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		paas_relation_first = nptr->next;
+		paas_environment_link_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		paas_relation_last = nptr->previous;
+		paas_environment_link_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_kind_node( nptr );
 		}
 	return((struct occi_kind_node *)0);
 }
-private struct occi_kind_node * drop_paas_relation_node(struct occi_kind_node * nptr) {
-	pthread_mutex_lock( &list_paas_relation_control );
-	nptr = ll_drop_paas_relation_node( nptr );
-	pthread_mutex_unlock( &list_paas_relation_control );
+private struct occi_kind_node * drop_paas_environment_link_node(struct occi_kind_node * nptr) {
+	pthread_mutex_lock( &list_paas_environment_link_control );
+	nptr = ll_drop_paas_environment_link_node( nptr );
+	pthread_mutex_unlock( &list_paas_environment_link_control );
 	return(nptr);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_paas_relation_node(char * id) {
+private struct occi_kind_node * ll_locate_paas_environment_link_node(char * id) {
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
-	for ( nptr = paas_relation_first;
+	struct paas_environment_link * pptr;
+	for ( nptr = paas_environment_link_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
@@ -74,69 +74,71 @@ private struct occi_kind_node * ll_locate_paas_relation_node(char * id) {
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_paas_relation_node(char * id) {
+private struct occi_kind_node * locate_paas_environment_link_node(char * id) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_paas_relation_control );
-	nptr = ll_locate_paas_relation_node(id);
-	pthread_mutex_unlock( &list_paas_relation_control );
+	pthread_mutex_lock( &list_paas_environment_link_control );
+	nptr = ll_locate_paas_environment_link_node(id);
+	pthread_mutex_unlock( &list_paas_environment_link_control );
 	return( nptr );
 }
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_paas_relation_node(int mode) {
+private struct occi_kind_node * ll_add_paas_environment_link_node(int mode) {
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	if (!( nptr = allocate_occi_kind_node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_paas_relation()))
+		if (!( nptr->contents = allocate_paas_environment_link()))
 			return( liberate_occi_kind_node(nptr) );
 		if (!( pptr = nptr->contents ))
 			return( liberate_occi_kind_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
 			return( liberate_occi_kind_node(nptr) );
 		else	{
-			if (!( nptr->previous = paas_relation_last ))
-				paas_relation_first = nptr;
+			if (!( nptr->previous = paas_environment_link_last ))
+				paas_environment_link_first = nptr;
 			else	nptr->previous->next = nptr;
-			paas_relation_last = nptr;
+			paas_environment_link_last = nptr;
 			return( nptr );
 			}
 		}
 }
-private struct occi_kind_node * add_paas_relation_node(int mode) {
+private struct occi_kind_node * add_paas_environment_link_node(int mode) {
 	struct occi_kind_node * nptr;
-	pthread_mutex_lock( &list_paas_relation_control );
-	nptr = ll_add_paas_relation_node( mode );
-	pthread_mutex_unlock( &list_paas_relation_control );
+	pthread_mutex_lock( &list_paas_environment_link_control );
+	nptr = ll_add_paas_environment_link_node( mode );
+	pthread_mutex_unlock( &list_paas_environment_link_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_paas_relation_name="paas_relation.xml";
-private void autoload_paas_relation_nodes() {
-	char * fn=autosave_paas_relation_name;	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+private char*autosave_paas_environment_link_name="paas_environment_link.xml";
+private void autoload_paas_environment_link_nodes() {
+	char * fn=autosave_paas_environment_link_name;	struct occi_kind_node * nptr;
+	struct paas_environment_link * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"paas_relations")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"paas_environment_links")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "paas_relation" ) ) continue;
-			else if (!( nptr = add_paas_relation_node(0))) break;
+			else if ( strcmp( vptr->name, "paas_environment_link" ) ) continue;
+			else if (!( nptr = add_paas_environment_link_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "script" )) != (struct xml_atribut *) 0)
+				pptr->script = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -148,46 +150,49 @@ private void autoload_paas_relation_nodes() {
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_paas_relation_name(char * fn) {
-	autosave_paas_relation_name = fn;	return;
+public  void set_autosave_paas_environment_link_name(char * fn) {
+	autosave_paas_environment_link_name = fn;	return;
 }
-public  void autosave_paas_relation_nodes() {
-	char * fn=autosave_paas_relation_name;	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+public  void autosave_paas_environment_link_nodes() {
+	char * fn=autosave_paas_environment_link_name;	struct occi_kind_node * nptr;
+	struct paas_environment_link * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_paas_relation_control );
+	pthread_mutex_lock( &list_paas_environment_link_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<paas_relations>\n");
-	for ( nptr = paas_relation_first;
+	fprintf(h,"<paas_environment_links>\n");
+	for ( nptr = paas_environment_link_first;
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<paas_relation\n");
+		fprintf(h,"<paas_environment_link\n");
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," script=%c",0x0022);
+		fprintf(h,"%s",(pptr->script?pptr->script:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</paas_relations>\n");
+	fprintf(h,"</paas_environment_links>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_paas_relation_control );
+	pthread_mutex_unlock( &list_paas_environment_link_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_paas_relation_field(
+private void set_paas_environment_link_field(
 	struct occi_category * cptr,void * optr, char * nptr, char * vptr)
 {
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	char prefix[1024];
 	if (!( pptr = optr )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -195,6 +200,8 @@ private void set_paas_relation_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "script" ) ))
+			pptr->script = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -204,23 +211,23 @@ private void set_paas_relation_field(
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private struct paas_relation * filter_paas_relation_info(
+private struct paas_environment_link * filter_paas_environment_link_info(
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	struct paas_relation * pptr;
-		if (!( pptr = allocate_paas_relation()))
+	struct paas_environment_link * pptr;
+		if (!( pptr = allocate_paas_environment_link()))
 		return( pptr );
-	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_paas_relation_field) ))
-		return( liberate_paas_relation(pptr));
+	else if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_paas_environment_link_field) ))
+		return( liberate_paas_environment_link(pptr));
 	else	return( pptr );
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_paas_relation_filter(
-	struct paas_relation * pptr,struct paas_relation * fptr) {
+private int pass_paas_environment_link_filter(
+	struct paas_environment_link * pptr,struct paas_environment_link * fptr) {
 	if (( fptr->id )
 	&&  (strlen( fptr->id ) != 0)) {
 		if (!( pptr->id ))
@@ -235,6 +242,13 @@ private int pass_paas_relation_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
+	if (( fptr->script )
+	&&  (strlen( fptr->script ) != 0)) {
+		if (!( pptr->script ))
+			return(0);
+		else if ( strcmp(pptr->script,fptr->script) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -242,16 +256,19 @@ private int pass_paas_relation_filter(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_occi_response(
+private struct rest_response * paas_environment_link_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct paas_relation * pptr)
+	struct paas_environment_link * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.script=%c%s%c",optr->domain,optr->id,0x0022,pptr->script,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -267,37 +284,37 @@ private struct rest_response * paas_relation_occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_get_item(
+private struct rest_response * paas_environment_link_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
-	autosave_paas_relation_nodes();
-	return( paas_relation_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_paas_environment_link_nodes();
+	return( paas_environment_link_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_post_link(
+private struct rest_response * paas_environment_link_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	char * reqhost;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -307,16 +324,16 @@ private struct rest_response * paas_relation_post_link(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_post_mixin(
+private struct rest_response * paas_environment_link_post_mixin(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	char * reqhost;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -326,7 +343,7 @@ private struct rest_response * paas_relation_post_mixin(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_post_action(
+private struct rest_response * paas_environment_link_post_action(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -334,10 +351,10 @@ private struct rest_response * paas_relation_post_action(
 	struct occi_interface * iptr;
 	struct occi_action * fptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	char * reqhost;
 	char * mptr;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -353,26 +370,26 @@ private struct rest_response * paas_relation_post_action(
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_post_item(
+private struct rest_response * paas_environment_link_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	char * reqhost;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	if (!( nptr = add_paas_relation_node(1)))
+	if (!( nptr = add_paas_environment_link_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_relation_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_paas_environment_link_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
-	autosave_paas_relation_nodes();
+	autosave_paas_environment_link_nodes();
 	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -384,37 +401,37 @@ private struct rest_response * paas_relation_post_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_put_item(
+private struct rest_response * paas_environment_link_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_relation_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_paas_environment_link_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
-	autosave_paas_relation_nodes();
-	return( paas_relation_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_paas_environment_link_nodes();
+	return( paas_environment_link_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_head_item(
+private struct rest_response * paas_environment_link_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
-	if (!( nptr = locate_paas_relation_node(id)))
+	struct paas_environment_link * pptr;
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -424,20 +441,20 @@ private struct rest_response * paas_relation_head_item(
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_delete_item(
+private struct rest_response * paas_environment_link_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
-	struct paas_relation * pptr;
+	struct paas_environment_link * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_paas_relation_node(id)))
+	if (!( nptr = locate_paas_environment_link_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
-	drop_paas_relation_node( nptr );
-	autosave_paas_relation_nodes();
+	drop_paas_environment_link_node( nptr );
+	autosave_paas_environment_link_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -446,25 +463,25 @@ private struct rest_response * paas_relation_delete_item(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_get_list(
+private struct rest_response * paas_environment_link_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
 	struct occi_kind_node * sptr;
-	struct paas_relation * pptr;
-	struct paas_relation * fptr;
+	struct paas_environment_link * pptr;
+	struct paas_environment_link * fptr;
 	char * reqhost;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_paas_relation_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_paas_environment_link_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = paas_relation_first;
+	for ( sptr = paas_environment_link_first;
 		sptr != (struct occi_kind_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_paas_relation_filter( pptr, fptr ) ))
+		if (!( pass_paas_environment_link_filter( pptr, fptr ) ))
 			continue;
 		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
@@ -478,7 +495,7 @@ private struct rest_response * paas_relation_get_list(
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * paas_relation_delete_all(
+private struct rest_response * paas_environment_link_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -486,26 +503,26 @@ private struct rest_response * paas_relation_delete_all(
 	struct occi_interface * iptr;
 	struct occi_kind_node * nptr;
 	struct occi_kind_node * sptr;
-	struct paas_relation * pptr;
-	struct paas_relation * fptr;
+	struct paas_environment_link * pptr;
+	struct paas_environment_link * fptr;
 	iptr = optr->callback;
-	if (!( fptr = filter_paas_relation_info( optr, rptr, aptr ) ))
+	if (!( fptr = filter_paas_environment_link_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=paas_relation_first;
+	nptr=paas_environment_link_first;
 	while (nptr != (struct occi_kind_node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_paas_relation_filter( pptr, fptr ) ))) {
+		||  (!( pass_paas_environment_link_filter( pptr, fptr ) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
-			drop_paas_relation_node( nptr );
+			drop_paas_environment_link_node( nptr );
 			nptr = sptr;
 			}
 		}
-	autosave_paas_relation_nodes();
+	autosave_paas_environment_link_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -514,7 +531,7 @@ private struct rest_response * paas_relation_delete_all(
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_relation_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_environment_link_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -529,16 +546,16 @@ private struct rest_response * occi_paas_relation_get(void * vptr, struct rest_c
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( paas_relation_get_list( optr, cptr, rptr, aptr ) );
+		return( paas_environment_link_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_relation_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_relation_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_environment_link_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -553,14 +570,14 @@ private struct rest_response * occi_paas_relation_head(void * vptr, struct rest_
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_relation_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_relation_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_environment_link_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -575,24 +592,24 @@ private struct rest_response * occi_paas_relation_post(void * vptr, struct rest_
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( paas_relation_post_item( optr, cptr, rptr, aptr ) );
+		return( paas_environment_link_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( paas_relation_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( paas_relation_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( paas_relation_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_relation_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_environment_link_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -607,14 +624,14 @@ private struct rest_response * occi_paas_relation_put(void * vptr, struct rest_c
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_relation_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_paas_relation_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_paas_environment_link_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -629,67 +646,69 @@ private struct rest_response * occi_paas_relation_delete(void * vptr, struct res
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( paas_relation_delete_all( optr, cptr, rptr, aptr ) );
+		return( paas_environment_link_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( paas_relation_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( paas_environment_link_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_paas_relation_mt( struct rest_interface * iptr )
+private void	redirect_occi_paas_environment_link_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_paas_relation_get;
-	iptr->post = occi_paas_relation_post;
-	iptr->put = occi_paas_relation_put;
-	iptr->delete = occi_paas_relation_delete;
-	iptr->head = occi_paas_relation_head;
+	iptr->get = occi_paas_environment_link_get;
+	iptr->post = occi_paas_environment_link_post;
+	iptr->put = occi_paas_environment_link_put;
+	iptr->delete = occi_paas_environment_link_delete;
+	iptr->head = occi_paas_environment_link_head;
 	return;
 }
 
 /*	------------------------------------	*/
 /*	c r u d   d e l e t e   a c t i o n 	*/
 /*	------------------------------------	*/
-private struct rest_response * delete_action_paas_relation(struct occi_category * optr, 
+private struct rest_response * delete_action_paas_environment_link(struct occi_category * optr, 
 struct rest_client * cptr,  
 struct rest_request * rptr,  
 struct rest_response * aptr,  
 void * vptr )
 {
 	aptr = liberate_rest_response( aptr );
-	return( occi_paas_relation_delete(optr,cptr,rptr));
+	return( occi_paas_environment_link_delete(optr,cptr,rptr));
 }
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_paas_relation */
-public struct occi_category * occi_paas_relation_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_paas_environment_link */
+public struct occi_category * occi_paas_environment_link_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
-	char * f="CompatibleOne OCCI resource paas_relation";
+	char * f="CompatibleOne OCCI resource paas_environment_link";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_paas_relation_mt(optr->interface);
+		redirect_occi_paas_environment_link_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "script",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_relation)))
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_environment_link)))
 			return( optr );
-		autoload_paas_relation_nodes();
+		autoload_paas_environment_link_nodes();
 		return(optr);
 	}
 
 }
 
-/*	----------------------------------------------------	*/
-/*	p a a s _ r e l a t i o n _ o c c i _ h e a d e r s 	*/
-/*	----------------------------------------------------	*/
-public struct rest_header *  paas_relation_occi_headers(struct paas_relation * sptr)
+/*	--------------------------------------------------------------------	*/
+/*	p a a s _ e n v i r o n m e n t _ l i n k _ o c c i _ h e a d e r s 	*/
+/*	--------------------------------------------------------------------	*/
+public struct rest_header *  paas_environment_link_occi_headers(struct paas_environment_link * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -704,7 +723,7 @@ public struct rest_header *  paas_relation_occi_headers(struct paas_relation * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"paas_relation; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+	sprintf(buffer,"paas_environment_link; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -715,7 +734,7 @@ public struct rest_header *  paas_relation_occi_headers(struct paas_relation * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_relation.name='%s'\r\n",(sptr->name?sptr->name:""));
+	sprintf(buffer,"occi.paas_environment_link.name='%s'\r\n",(sptr->name?sptr->name:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -726,11 +745,22 @@ public struct rest_header *  paas_relation_occi_headers(struct paas_relation * s
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_relation.state='%u'\r\n",sptr->state);
+	sprintf(buffer,"occi.paas_environment_link.script='%s'\r\n",(sptr->script?sptr->script:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_environment_link.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	return(first);
 
 }
 
-#endif	/* _occipaas_relation_c_ */
+#endif	/* _occipaas_environment_link_c_ */

@@ -53,29 +53,32 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
-#include "copaas.h"
-#include "paas_application.c"
-#include "paas_configuration_option.c"
-#include "paas_application_configuration_template.c"
 #include "paas_application_deployable.c"
-#include "paas_application_environment.c"
-#include "paas_link.c"
+#include "paas_application.c"
 #include "paas_application_manifest.c"
-#include "paas_relation.c"
-#include "paas_node.c"
 #include "paas_application_version.c"
 #include "paas_application_version_instance.c"
-#include "occipaas_application.c"
-#include "occipaas_configuration_option.c"
-#include "occipaas_application_configuration_template.c"
+#include "paas_environment_configuration.c"
+#include "paas_environment.c"
+#include "paas_environment_link.c"
+#include "paas_environment_node.c"
+#include "paas_environment_relation.c"
+#include "paas_environment_template.c"
+#include "paas_environment_variable.c"
+
 #include "occipaas_application_deployable.c"
-#include "occipaas_application_environment.c"
-#include "occipaas_link.c"
+#include "occipaas_application.c"
 #include "occipaas_application_manifest.c"
-#include "occipaas_relation.c"
-#include "occipaas_node.c"
 #include "occipaas_application_version.c"
 #include "occipaas_application_version_instance.c"
+#include "occipaas_environment_configuration.c"
+#include "occipaas_environment.c"
+#include "occipaas_environment_link.c"
+#include "occipaas_environment_node.c"
+#include "occipaas_environment_relation.c"
+#include "occipaas_environment_template.c"
+#include "occipaas_environment_variable.c"
+
 
 /*	---------------------------------------------------------------	*/  
 /*	c o p a a s _ c o n f i g u r a t i o n				*/
@@ -97,9 +100,9 @@ private	void	copaas_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	copaas_banner()
 {
-	printf("\n   CompatibleOne Generic CoPaas Service : Version 1.0a.0.01");
-	printf("\n   Beta Version : 26/07/2012 ");
-	printf("\n   Copyright (c) 2012 Iain James Marshall, Mohamed Mohamed, Sami Yangui");
+	printf("\n   CompatibleOne Generic CoPaas Service : Version 2.0a.0.01");
+	printf("\n   Beta Version : 10/02/2013 ");
+	printf("\n   Copyright (c) 2013 Iain James Marshall, Mohamed Mohamed, Sami Yangui");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -180,14 +183,14 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_link_builder( CoPaas.domain, "paas_link" ) ))
+	if (!( optr = occi_paas_environment_link_builder( CoPaas.domain, "paas_environment_link" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_application_environment_builder( CoPaas.domain, "paas_application_environment" ) ))
+	if (!( optr = occi_paas_environment_builder( CoPaas.domain, "paas_environment" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -201,7 +204,7 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_node_builder( CoPaas.domain, "paas_node" ) ))
+	if (!( optr = occi_paas_environment_node_builder( CoPaas.domain, "paas_environment_node" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -215,7 +218,14 @@ private	int	copaas_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_paas_relation_builder( CoPaas.domain, "paas_relation" ) ))
+	if (!( optr = occi_paas_environment_variable_builder( CoPaas.domain, "paas_environment_variable" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_paas_environment_relation_builder( CoPaas.domain, "paas_environment_relation" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -230,7 +240,7 @@ private	int	copaas_operation( char * nptr )
 	last = optr;
 
 
-	if (!( optr = occi_paas_configuration_option_builder( CoPaas.domain, "paas_configuration_option" ) ))
+	if (!( optr = occi_paas_environment_configuration_builder( CoPaas.domain, "paas_environment_configuration" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -238,7 +248,7 @@ private	int	copaas_operation( char * nptr )
 	last = optr;
 
 
-	if (!( optr = occi_paas_application_configuration_template_builder( CoPaas.domain, "paas_application_configuration_template" ) ))
+	if (!( optr = occi_paas_environment_template_builder( CoPaas.domain, "paas_environment_template" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

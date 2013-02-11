@@ -35,14 +35,10 @@ public struct paas_application_version_instance * liberate_paas_application_vers
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->date_instantiated )
-			 sptr->date_instantiated = liberate(sptr->date_instantiated);
-		if ( sptr->description )
-			 sptr->description = liberate(sptr->description);
 		if ( sptr->default_instance )
 			 sptr->default_instance = liberate(sptr->default_instance);
-		if ( sptr->uri )
-			 sptr->uri = liberate(sptr->uri);
+		if ( sptr->initial_stat )
+			 sptr->initial_stat = liberate(sptr->initial_stat);
 		sptr = liberate( sptr );
 	}
 	return((struct paas_application_version_instance *) 0);
@@ -58,10 +54,8 @@ public struct paas_application_version_instance * reset_paas_application_version
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
-		sptr->date_instantiated = (char*) 0;
-		sptr->description = (char*) 0;
 		sptr->default_instance = (char*) 0;
-		sptr->uri = (char*) 0;
+		sptr->initial_stat = (char*) 0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -97,21 +91,13 @@ public int xmlin_paas_application_version_instance(struct paas_application_versi
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"date_instantiated") ))
-		{
-			if ( wptr->value ) { sptr->date_instantiated = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"description") ))
-		{
-			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"default_instance") ))
 		{
 			if ( wptr->value ) { sptr->default_instance = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"uri") ))
+		else if (!( strcmp(wptr->name,"initial_stat") ))
 		{
-			if ( wptr->value ) { sptr->uri = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->initial_stat = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -133,10 +119,8 @@ public int rest_occi_paas_application_version_instance(FILE * fh,struct paas_app
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.date_instantiated='%s'\r\n",prefix,nptr,(sptr->date_instantiated?sptr->date_instantiated:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.default_instance='%s'\r\n",prefix,nptr,(sptr->default_instance?sptr->default_instance:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.uri='%s'\r\n",prefix,nptr,(sptr->uri?sptr->uri:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.initial_stat='%s'\r\n",prefix,nptr,(sptr->initial_stat?sptr->initial_stat:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

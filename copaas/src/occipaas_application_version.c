@@ -139,10 +139,8 @@ private void autoload_paas_application_version_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "label" )) != (struct xml_atribut *) 0)
 				pptr->label = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "date_updated" )) != (struct xml_atribut *) 0)
-				pptr->date_updated = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
-				pptr->description = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application_version_instance" )) != (struct xml_atribut *) 0)
+				pptr->paas_application_version_instance = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -178,11 +176,8 @@ public  void autosave_paas_application_version_nodes() {
 		fprintf(h," label=%c",0x0022);
 		fprintf(h,"%s",(pptr->label?pptr->label:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," date_updated=%c",0x0022);
-		fprintf(h,"%s",(pptr->date_updated?pptr->date_updated:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," description=%c",0x0022);
-		fprintf(h,"%s",(pptr->description?pptr->description:""));
+		fprintf(h," paas_application_version_instance=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application_version_instance?pptr->paas_application_version_instance:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -212,10 +207,8 @@ private void set_paas_application_version_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "label" ) ))
 			pptr->label = allocate_string(vptr);
-		if (!( strcmp( nptr, "date_updated" ) ))
-			pptr->date_updated = allocate_string(vptr);
-		if (!( strcmp( nptr, "description" ) ))
-			pptr->description = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application_version_instance" ) ))
+			pptr->paas_application_version_instance = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -263,18 +256,11 @@ private int pass_paas_application_version_filter(
 		else if ( strcmp(pptr->label,fptr->label) != 0)
 			return(0);
 		}
-	if (( fptr->date_updated )
-	&&  (strlen( fptr->date_updated ) != 0)) {
-		if (!( pptr->date_updated ))
+	if (( fptr->paas_application_version_instance )
+	&&  (strlen( fptr->paas_application_version_instance ) != 0)) {
+		if (!( pptr->paas_application_version_instance ))
 			return(0);
-		else if ( strcmp(pptr->date_updated,fptr->date_updated) != 0)
-			return(0);
-		}
-	if (( fptr->description )
-	&&  (strlen( fptr->description ) != 0)) {
-		if (!( pptr->description ))
-			return(0);
-		else if ( strcmp(pptr->description,fptr->description) != 0)
+		else if ( strcmp(pptr->paas_application_version_instance,fptr->paas_application_version_instance) != 0)
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
@@ -299,10 +285,7 @@ private struct rest_response * paas_application_version_occi_response(
 	sprintf(cptr->buffer,"%s.%s.label=%c%s%c",optr->domain,optr->id,0x0022,pptr->label,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.date_updated=%c%s%c",optr->domain,optr->id,0x0022,pptr->date_updated,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
+	sprintf(cptr->buffer,"%s.%s.paas_application_version_instance=%c%s%c",optr->domain,optr->id,0x0022,pptr->paas_application_version_instance,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -729,9 +712,7 @@ public struct occi_category * occi_paas_application_version_builder(char * a,cha
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "label",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "date_updated",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "paas_application_version_instance",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -794,18 +775,7 @@ public struct rest_header *  paas_application_version_occi_headers(struct paas_a
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas_application_version.date_updated='%s'\r\n",(sptr->date_updated?sptr->date_updated:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas_application_version.description='%s'\r\n",(sptr->description?sptr->description:""));
+	sprintf(buffer,"occi.paas_application_version.paas_application_version_instance='%s'\r\n",(sptr->paas_application_version_instance?sptr->paas_application_version_instance:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
