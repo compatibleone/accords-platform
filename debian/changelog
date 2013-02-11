@@ -1,7 +1,7 @@
 compatibleone-accords (1.0-3) unstable; urgency=low
 
-  * Upstream update.
-  * Add libcocspi0 and libcocspi-dev packages.
+  * Upstream update (tree SHA: 241c9598da5dfb52118f80e2e73c3fd9866bbad7)
+  * Add libcocspi0 and libcocspi-dev packages (+bump up solib deps).
 
  -- Vincent <vincent@vincent>  Mon, 11 Feb 2013 14:58:01 +0100
 
