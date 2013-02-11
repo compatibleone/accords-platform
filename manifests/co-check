@@ -131,17 +131,18 @@ function verification()
 	check	windowsazure	azprocci
 
 	check	paas					paasprocci
-	check	paas_application			copass
-	check	paas_application_deployable		copass
-	check	paas_link				copass
-	check	paas_application_environment		copass
-	check	paas_application_manifest		copass
-	check	paas_node				copass
-	check	paas_application_version		copass
-	check	paas_relation				copass
-	check	paas_application_version_instance	copass
-	check	paas_configuration_option		copass
-	check	paas_application_configuration_template	copass
+	check	paas_application_deployable		copaas
+	check	paas_application			copaas
+	check	paas_application_manifest		copaas
+	check	paas_application_version		copaas
+	check	paas_application_version_instance	copaas
+	check	paas_environment_configuration		copaas
+	check	paas_environment			copaas
+	check	paas_environment_link			copaas
+	check	paas_environment_node			copaas
+	check	paas_environment_relation		copaas
+	check	paas_environment_template		copaas
+	check	paas_environment_variable		copaas
 
 }
 
