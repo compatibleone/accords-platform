@@ -126,22 +126,23 @@ function verification()
 	check	control		slam
 	check	penalty		slam
 
-	check	openstack	osprocci
-	check	opennebula	onprocci
-	check	windowsazure	azprocci
+	check	openstack		osprocci
+	check	opennebula		onprocci
+	check	windowsazure		azprocci
 
-	check	paas				paasprocci
-        check   paas_application                        copaas
-        check   paas_application_deployable             copaas
-        check   paas_link                               copaas
-        check   paas_application_environment            copaas
-        check   paas_application_manifest               copaas
-        check   paas_node                               copaas
-        check   paas_application_version                copaas
-        check   paas_relation                           copaas
-        check   paas_application_version_instance       copaas
-        check   paas_configuration_option               copaas
-        check   paas_application_configuration_template copaas
+	check	paas					paasprocci
+	check	paas_application_deployable		copaas
+	check	paas_application			copaas
+	check	paas_application_manifest		copaas
+	check	paas_application_version		copaas
+	check	paas_application_version_instance	copaas
+	check	paas_environment_configuration		copaas
+	check	paas_environment			copaas
+	check	paas_environment_link			copaas
+	check	paas_environment_node			copaas
+	check	paas_environment_relation		copaas
+	check	paas_environment_template		copaas
+	check	paas_environment_variable		copaas
 }
 
 if [ -z "$verbose" ]; then
