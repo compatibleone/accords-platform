@@ -16,6 +16,7 @@ private	struct cordscript_instruction * handle_else( struct cordscript_context *
 private	struct cordscript_instruction * handle_catch( struct cordscript_context * cptr,struct cordscript_label * lptr );
 private	void	check_line_end(struct cordscript_context * cptr, int level, int c);
 private	struct cordscript_context * copy_cordscript_class( struct cordscript_context * cptr );
+private	struct cordscript_context * copy_cordscript_function( struct cordscript_context * cptr );
 private	struct cordscript_context * resolve_cordscript_class( char * nptr );
 
 private	int	end_of_instruction=0;
@@ -1771,25 +1772,29 @@ private	struct cordscript_instruction * method_operation(
 		&&  ((nptr = optr->value ) != (struct cordscript_value *) 0)
 		&&  ((parameters = (nptr->value ? atoi(nptr->value) : 0 )) != 0))
 		{
-			for (	pptr=bptr->data;
-				pptr != (struct cordscript_value *) 0;
-				pptr = pptr->next )
+			if (!( bptr = copy_cordscript_function( bptr )))
+				return((struct cordscript_instruction *) 0);
+			else
 			{
-				if ( pptr->parameter == parameters )
+				for (	pptr=bptr->data;
+					pptr != (struct cordscript_value *) 0;
+					pptr = pptr->next )
 				{
-					if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+					if ( pptr->parameter == parameters )
 					{
-						if ( pptr->value )
-							pptr->value = liberate( pptr->value );
-						if ( qptr->value )
-							pptr->value = allocate_string( qptr->value );
-						drop_value( qptr );
+						if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+						{
+							if ( pptr->value )
+								pptr->value = liberate( pptr->value );
+							if ( qptr->value )
+								pptr->value = allocate_string( qptr->value );
+							drop_value( qptr );
+						}
+						parameters--;
 					}
-					parameters--;
 				}
 			}
 		}
-
 		/* ------------------------ */
 		/* activate the method code */
 		/* ------------------------ */
@@ -3103,21 +3108,26 @@ private	struct	cordscript_instruction * call_operation( struct cordscript_instru
 		&&  ((nptr = optr->value) != (struct cordscript_value *) 0)
 		&&  ((parameters = (nptr->value ? atoi(nptr->value) : 0 )) != 0))
 		{
-			for (	pptr=bptr->data;
-				pptr != (struct cordscript_value *) 0;
-				pptr = pptr->next )
+			if (!( bptr = copy_cordscript_function( bptr )))
+				return((struct cordscript_instruction *) 0);
+			else
 			{
-				if ( pptr->parameter == parameters )
+				for (	pptr=bptr->data;
+					pptr != (struct cordscript_value *) 0;
+					pptr = pptr->next )
 				{
-					if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+					if ( pptr->parameter == parameters )
 					{
-						if ( pptr->value )
-							pptr->value = liberate( pptr->value );
-						if ( qptr->value )
-							pptr->value = allocate_string( qptr->value );
-						drop_value( qptr );
+						if (( qptr = pop_stack( iptr->context )) != (struct cordscript_value *) 0)
+						{
+							if ( pptr->value )
+								pptr->value = liberate( pptr->value );
+							if ( qptr->value )
+								pptr->value = allocate_string( qptr->value );
+							drop_value( qptr );
+						}
+						parameters--;
 					}
-					parameters--;
 				}
 			}
 		}
@@ -3139,9 +3149,14 @@ private	struct	cordscript_instruction * ret_operation( struct cordscript_instruc
 		return((struct cordscript_instruction *) 0);
 	else if (!( cptr = iptr->context ))
 		return((struct cordscript_instruction *) 0);
-	else if (!( iptr = cptr->caller ))
-		return((struct cordscript_instruction *) 0);
-	else	return( iptr );
+	else
+	{
+		iptr = cptr->caller;
+		cptr = liberate_cordscript_context( cptr );
+		if ( iptr )
+			return((struct cordscript_instruction *) 0);
+		else	return( iptr );
+	}
 }
 
 /*	-------------------------	*/
@@ -3168,6 +3183,7 @@ private	struct	cordscript_instruction * retvalue_operation( struct cordscript_in
 	}
 	else
 	{
+		cptr = liberate_cordscript_context( cptr );
 		push_value( iptr->context, vptr );
 		return(iptr);
 	}
@@ -4761,6 +4777,41 @@ private	struct cordscript_instruction * compile_cordscript_switch( struct cordsc
 		return((struct cordscript_instruction *) 0);
 	}
 }			
+
+/*   ---------------------------- */
+/*    resolve_cordscript_function */
+/*   ---------------------------- */
+private	struct cordscript_context * copy_cordscript_function( struct cordscript_context * cptr )
+{
+	struct	cordscript_context * xptr;
+	struct	cordscript_value   * vptr;
+	struct	cordscript_value   * wptr;
+
+	if (!( xptr = allocate_cordscript_context() ))
+		return((struct cordscript_context *) 0);
+	else if (!( xptr->name = allocate_string( cptr->name ) ))
+		return( liberate_cordscript_context( xptr ) );
+	else
+	{
+		xptr->instance=1;
+		xptr->code = cptr->code;
+		xptr->cs   = cptr->cs;
+		xptr->ip   = cptr->cs;
+		for (	vptr = cptr->data;
+			vptr != (struct cordscript_value *) 0;
+			vptr = vptr->next )
+		{
+			if (!( wptr = allocate_cordscript_value( vptr->name, vptr->value ) ))
+				break;
+			else
+			{
+				wptr->next = xptr->data;
+				xptr->data = wptr;
+			}
+		}
+		return( cptr );
+	}
+}
 
 /*   --------------------------	*/
 /*    resolve_cordscript_class  */
