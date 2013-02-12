@@ -77,6 +77,8 @@ debian/libcocarrier-dev/
 debian/libcocarrier0/
 debian/libcocci-dev/
 debian/libcocci0/
+debian/libcocspi-dev/
+debian/libcocspi0/
 debian/libcopabr-dev/
 debian/libcopabr0/
 debian/libcords-dev/
