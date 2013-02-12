@@ -37,18 +37,12 @@ public struct paas * liberate_paas(struct paas * sptr)
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->environment )
 			 sptr->environment = liberate(sptr->environment);
+		if ( sptr->envfile )
+			 sptr->envfile = liberate(sptr->envfile);
 		if ( sptr->application )
 			 sptr->application = liberate(sptr->application);
-		if ( sptr->topology )
-			 sptr->topology = liberate(sptr->topology);
-		if ( sptr->description )
-			 sptr->description = liberate(sptr->description);
-		if ( sptr->artefact )
-			 sptr->artefact = liberate(sptr->artefact);
-		if ( sptr->version )
-			 sptr->version = liberate(sptr->version);
-		if ( sptr->instance )
-			 sptr->instance = liberate(sptr->instance);
+		if ( sptr->appfile )
+			 sptr->appfile = liberate(sptr->appfile);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
 		if ( sptr->node )
@@ -57,6 +51,8 @@ public struct paas * liberate_paas(struct paas * sptr)
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->account )
 			 sptr->account = liberate(sptr->account);
+		if ( sptr->authorization )
+			 sptr->authorization = liberate(sptr->authorization);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
 		if ( sptr->rootpass )
@@ -93,16 +89,14 @@ public struct paas * reset_paas(struct paas * sptr)
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->environment = (char*) 0;
+		sptr->envfile = (char*) 0;
 		sptr->application = (char*) 0;
-		sptr->topology = (char*) 0;
-		sptr->description = (char*) 0;
-		sptr->artefact = (char*) 0;
-		sptr->version = (char*) 0;
-		sptr->instance = (char*) 0;
+		sptr->appfile = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->account = (char*) 0;
+		sptr->authorization = (char*) 0;
 		sptr->number = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->reference = (char*) 0;
@@ -153,29 +147,17 @@ public int xmlin_paas(struct paas * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->environment = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"envfile") ))
+		{
+			if ( wptr->value ) { sptr->envfile = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"application") ))
 		{
 			if ( wptr->value ) { sptr->application = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"topology") ))
+		else if (!( strcmp(wptr->name,"appfile") ))
 		{
-			if ( wptr->value ) { sptr->topology = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"description") ))
-		{
-			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"artefact") ))
-		{
-			if ( wptr->value ) { sptr->artefact = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"version") ))
-		{
-			if ( wptr->value ) { sptr->version = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"instance") ))
-		{
-			if ( wptr->value ) { sptr->instance = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->appfile = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"profile") ))
 		{
@@ -192,6 +174,10 @@ public int xmlin_paas(struct paas * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"account") ))
 		{
 			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"authorization") ))
+		{
+			if ( wptr->value ) { sptr->authorization = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"number") ))
 		{
@@ -258,16 +244,14 @@ public int rest_occi_paas(FILE * fh,struct paas * sptr,char * prefix, char * npt
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.environment='%s'\r\n",prefix,nptr,(sptr->environment?sptr->environment:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.envfile='%s'\r\n",prefix,nptr,(sptr->envfile?sptr->envfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.application='%s'\r\n",prefix,nptr,(sptr->application?sptr->application:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.topology='%s'\r\n",prefix,nptr,(sptr->topology?sptr->topology:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.artefact='%s'\r\n",prefix,nptr,(sptr->artefact?sptr->artefact:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.version='%s'\r\n",prefix,nptr,(sptr->version?sptr->version:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.instance='%s'\r\n",prefix,nptr,(sptr->instance?sptr->instance:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.appfile='%s'\r\n",prefix,nptr,(sptr->appfile?sptr->appfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.authorization='%s'\r\n",prefix,nptr,(sptr->authorization?sptr->authorization:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.reference='%s'\r\n",prefix,nptr,(sptr->reference?sptr->reference:""));

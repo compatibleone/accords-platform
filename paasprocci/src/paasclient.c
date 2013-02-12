@@ -184,11 +184,11 @@ private	struct	rest_response * paas_put_request( char * url, char * filename )
 /*	-----------------------------------------	*/
 /*	Start an application version instance		*/
 /*	-----------------------------------------	*/
-public	struct paas_response * start_paas_application(char * application, char * version, char * instance)
+public	struct paas_response * start_paas_application(char * application )
 {
 	/* POST /app/{appId}/version/{versionId}/instance/{instanceId}/action/start */
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s/instance/%s/action/start",application, version, instance);
+	sprintf(uri,"/app/%s/action/start",application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -206,11 +206,11 @@ public	struct	paas_response * get_paas_task( char * task )
 /*	-----------------------------------------	*/
 /*	Stop an application version instance		*/
 /*	-----------------------------------------	*/
-public	struct paas_response * stop_paas_application(char * application, char * version, char * instance)
+public	struct paas_response * stop_paas_application(char * application)
 {
-	/* POST /app/{appId}/version/{versionId}/instance/{instanceId}/action/stop */
+	/* POST /app/{appId}/action/stop */
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s/instance/%s/action/stop",application, version, instance);
+	sprintf(uri,"/app/%s/action/stop",application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 /*	-----------------------------------------	*/
@@ -223,28 +223,12 @@ public	struct paas_response * stop_paas_application(char * application, char * v
 /*	- Description					*/
 /*	-Multi-tenant (yes/no).				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * create_paas_application(char * artifact, char * description, char * version )
+public	struct paas_response * create_paas_application(char * environment, char* filename )
 {
 	/* POST /app */
-	char *	filename=(char *) 0;
-	FILE *	h;
-	if (!( filename = rest_temporary_filename("xml")))
-		return((struct paas_response *) 0 );
-	else if (!( h = fopen( filename, "w" )))
-	{
-		liberate( filename );
-		return((struct paas_response *) 0 );
-	}
-	else
-	{
-		fprintf(h,"<application name=%c%s%c description=%c%s%c version=%c%s%c/>\n",
-			0x0022,artifact,0x0022,
-			0x0022,description,0x0022,
-			0x0022,version,0x0022
-			);		
-		fclose(h);
-		return( paas_result( paas_post_request( "/app", filename ) ));
-	}
+	char	buffer[2048];
+	sprintf(buffer,"/env/%s/app",environment);
+	return( paas_result( paas_post_request( buffer, filename ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -454,12 +438,12 @@ public	struct paas_response * stop_paas_environment(char * environment)
 /*	Deploy an application instance on an 		*/
 /*	available environment				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * deploy_paas_application( char * environment, char * application, char * version, char * instance )
+public	struct paas_response * deploy_paas_application( char * environment, char * application )
 {
-	/* POST /environment/{envId}/action/deploy/app/{appId}/version/{versionId}/instance/{instanceId} */
+	/* POST /environment/{envId}/action/deploy/app/{appId} */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/deploy/app/%s/version/%s/instance/%s",
-		environment,application,version, instance);
+	sprintf(uri,"/environment/%s/action/deploy/app/%s",
+		environment,application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -467,12 +451,12 @@ public	struct paas_response * deploy_paas_application( char * environment, char 
 /*	Undeploy an application instance on an 		*/
 /*	available environment				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * undeploy_paas_application( char * environment, char * application, char * version, char * instance )
+public	struct paas_response * undeploy_paas_application( char * environment, char * application)
 {
-	/* POST /environment/{envId}/action/undeploy/app/{appId}/version/{versionId}/instance/{instanceId} */
+	/* POST /environment/{envId}/action/undeploy/app/{appId} */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/undeploy/app/%s/version/%s/instance/%s",
-		environment,application,version, instance);
+	sprintf(uri,"/environment/%s/action/undeploy/app/%s",
+		environment,application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 

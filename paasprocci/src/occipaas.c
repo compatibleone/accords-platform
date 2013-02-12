@@ -139,18 +139,12 @@ private void autoload_paas_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "environment" )) != (struct xml_atribut *) 0)
 				pptr->environment = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "envfile" )) != (struct xml_atribut *) 0)
+				pptr->envfile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
 				pptr->application = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "topology" )) != (struct xml_atribut *) 0)
-				pptr->topology = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
-				pptr->description = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "artefact" )) != (struct xml_atribut *) 0)
-				pptr->artefact = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "version" )) != (struct xml_atribut *) 0)
-				pptr->version = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "instance" )) != (struct xml_atribut *) 0)
-				pptr->instance = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "appfile" )) != (struct xml_atribut *) 0)
+				pptr->appfile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
@@ -159,6 +153,8 @@ private void autoload_paas_nodes() {
 				pptr->price = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
 				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "authorization" )) != (struct xml_atribut *) 0)
+				pptr->authorization = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "number" )) != (struct xml_atribut *) 0)
 				pptr->number = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "rootpass" )) != (struct xml_atribut *) 0)
@@ -216,23 +212,14 @@ public  void autosave_paas_nodes() {
 		fprintf(h," environment=%c",0x0022);
 		fprintf(h,"%s",(pptr->environment?pptr->environment:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," envfile=%c",0x0022);
+		fprintf(h,"%s",(pptr->envfile?pptr->envfile:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," application=%c",0x0022);
 		fprintf(h,"%s",(pptr->application?pptr->application:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," topology=%c",0x0022);
-		fprintf(h,"%s",(pptr->topology?pptr->topology:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," description=%c",0x0022);
-		fprintf(h,"%s",(pptr->description?pptr->description:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," artefact=%c",0x0022);
-		fprintf(h,"%s",(pptr->artefact?pptr->artefact:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," version=%c",0x0022);
-		fprintf(h,"%s",(pptr->version?pptr->version:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," instance=%c",0x0022);
-		fprintf(h,"%s",(pptr->instance?pptr->instance:""));
+		fprintf(h," appfile=%c",0x0022);
+		fprintf(h,"%s",(pptr->appfile?pptr->appfile:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
@@ -245,6 +232,9 @@ public  void autosave_paas_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," account=%c",0x0022);
 		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," authorization=%c",0x0022);
+		fprintf(h,"%s",(pptr->authorization?pptr->authorization:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," number=%c",0x0022);
 		fprintf(h,"%s",(pptr->number?pptr->number:""));
@@ -307,18 +297,12 @@ private void set_paas_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "environment" ) ))
 			pptr->environment = allocate_string(vptr);
+		if (!( strcmp( nptr, "envfile" ) ))
+			pptr->envfile = allocate_string(vptr);
 		if (!( strcmp( nptr, "application" ) ))
 			pptr->application = allocate_string(vptr);
-		if (!( strcmp( nptr, "topology" ) ))
-			pptr->topology = allocate_string(vptr);
-		if (!( strcmp( nptr, "description" ) ))
-			pptr->description = allocate_string(vptr);
-		if (!( strcmp( nptr, "artefact" ) ))
-			pptr->artefact = allocate_string(vptr);
-		if (!( strcmp( nptr, "version" ) ))
-			pptr->version = allocate_string(vptr);
-		if (!( strcmp( nptr, "instance" ) ))
-			pptr->instance = allocate_string(vptr);
+		if (!( strcmp( nptr, "appfile" ) ))
+			pptr->appfile = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
@@ -327,6 +311,8 @@ private void set_paas_field(
 			pptr->price = allocate_string(vptr);
 		if (!( strcmp( nptr, "account" ) ))
 			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "authorization" ) ))
+			pptr->authorization = allocate_string(vptr);
 		if (!( strcmp( nptr, "number" ) ))
 			pptr->number = allocate_string(vptr);
 		if (!( strcmp( nptr, "rootpass" ) ))
@@ -396,6 +382,13 @@ private int pass_paas_filter(
 		else if ( strcmp(pptr->environment,fptr->environment) != 0)
 			return(0);
 		}
+	if (( fptr->envfile )
+	&&  (strlen( fptr->envfile ) != 0)) {
+		if (!( pptr->envfile ))
+			return(0);
+		else if ( strcmp(pptr->envfile,fptr->envfile) != 0)
+			return(0);
+		}
 	if (( fptr->application )
 	&&  (strlen( fptr->application ) != 0)) {
 		if (!( pptr->application ))
@@ -403,39 +396,11 @@ private int pass_paas_filter(
 		else if ( strcmp(pptr->application,fptr->application) != 0)
 			return(0);
 		}
-	if (( fptr->topology )
-	&&  (strlen( fptr->topology ) != 0)) {
-		if (!( pptr->topology ))
+	if (( fptr->appfile )
+	&&  (strlen( fptr->appfile ) != 0)) {
+		if (!( pptr->appfile ))
 			return(0);
-		else if ( strcmp(pptr->topology,fptr->topology) != 0)
-			return(0);
-		}
-	if (( fptr->description )
-	&&  (strlen( fptr->description ) != 0)) {
-		if (!( pptr->description ))
-			return(0);
-		else if ( strcmp(pptr->description,fptr->description) != 0)
-			return(0);
-		}
-	if (( fptr->artefact )
-	&&  (strlen( fptr->artefact ) != 0)) {
-		if (!( pptr->artefact ))
-			return(0);
-		else if ( strcmp(pptr->artefact,fptr->artefact) != 0)
-			return(0);
-		}
-	if (( fptr->version )
-	&&  (strlen( fptr->version ) != 0)) {
-		if (!( pptr->version ))
-			return(0);
-		else if ( strcmp(pptr->version,fptr->version) != 0)
-			return(0);
-		}
-	if (( fptr->instance )
-	&&  (strlen( fptr->instance ) != 0)) {
-		if (!( pptr->instance ))
-			return(0);
-		else if ( strcmp(pptr->instance,fptr->instance) != 0)
+		else if ( strcmp(pptr->appfile,fptr->appfile) != 0)
 			return(0);
 		}
 	if (( fptr->profile )
@@ -464,6 +429,13 @@ private int pass_paas_filter(
 		if (!( pptr->account ))
 			return(0);
 		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
+	if (( fptr->authorization )
+	&&  (strlen( fptr->authorization ) != 0)) {
+		if (!( pptr->authorization ))
+			return(0);
+		else if ( strcmp(pptr->authorization,fptr->authorization) != 0)
 			return(0);
 		}
 	if (( fptr->number )
@@ -559,22 +531,13 @@ private struct rest_response * paas_occi_response(
 	sprintf(cptr->buffer,"%s.%s.environment=%c%s%c",optr->domain,optr->id,0x0022,pptr->environment,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.envfile=%c%s%c",optr->domain,optr->id,0x0022,pptr->envfile,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.application=%c%s%c",optr->domain,optr->id,0x0022,pptr->application,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.topology=%c%s%c",optr->domain,optr->id,0x0022,pptr->topology,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.artefact=%c%s%c",optr->domain,optr->id,0x0022,pptr->artefact,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.version=%c%s%c",optr->domain,optr->id,0x0022,pptr->version,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.instance=%c%s%c",optr->domain,optr->id,0x0022,pptr->instance,0x0022);
+	sprintf(cptr->buffer,"%s.%s.appfile=%c%s%c",optr->domain,optr->id,0x0022,pptr->appfile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
@@ -587,6 +550,9 @@ private struct rest_response * paas_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.authorization=%c%s%c",optr->domain,optr->id,0x0022,pptr->authorization,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.number=%c%s%c",optr->domain,optr->id,0x0022,pptr->number,0x0022);
@@ -1046,17 +1012,11 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "environment",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "envfile",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "topology",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "artefact",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "version",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "instance",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "appfile",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
@@ -1065,6 +1025,8 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "authorization",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "number",0,0) ))
 			return(optr);
@@ -1149,6 +1111,17 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.paas.envfile='%s'\r\n",(sptr->envfile?sptr->envfile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.paas.application='%s'\r\n",(sptr->application?sptr->application:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1160,51 +1133,7 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.paas.topology='%s'\r\n",(sptr->topology?sptr->topology:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas.description='%s'\r\n",(sptr->description?sptr->description:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas.artefact='%s'\r\n",(sptr->artefact?sptr->artefact:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas.version='%s'\r\n",(sptr->version?sptr->version:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.paas.instance='%s'\r\n",(sptr->instance?sptr->instance:""));
+	sprintf(buffer,"occi.paas.appfile='%s'\r\n",(sptr->appfile?sptr->appfile:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1249,6 +1178,17 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.authorization='%s'\r\n",(sptr->authorization?sptr->authorization:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

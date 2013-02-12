@@ -8,17 +8,16 @@ struct	paas
 
 	char *	name;
 	char *	environment;
+	char *	envfile;
 	char *	application;
-	char *	topology;
-	char *	description;
-	char *	artefact;
-	char *	version;
-	char *	instance;
+	char *	appfile;
+
 	char *	profile;
 
 	char *	node;
 	char *	price;
 	char *	account;
+	char *	authorization;
 
 	char *	number;
 	char *	rootpass;
