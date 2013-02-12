@@ -25,7 +25,7 @@ struct	cords_paas_contract
 	struct	cords_vector	environment;
 };
 
-#define	_CORDS_PAAS_MANIFEST		"paas_manifest"
+#define	_CORDS_PAAS_MANIFEST		"paas_application_manifest"
 #define	_CORDS_PAAS_APPLICATION		"paas_application"
 #define	_CORDS_PAAS_ENVIRONMENT		"paas_environment"
 
@@ -270,10 +270,12 @@ public	int	create_paas_contract(
 	char 	*	requestfile;
      	struct  paas_response * rptr;
 	struct	occi_response * node;
+	struct	occi_response * yptr;
 	char 	*	vptr;
 	char	*	agent=_CORDS_CONTRACT_AGENT;
 	char 	*	tls=default_tls();
 	struct	cords_paas_contract	contract;
+
 	memset( &contract, 0, sizeof( struct cords_paas_contract ));
 
 	/* ---------------------------- */
@@ -295,18 +297,24 @@ public	int	create_paas_contract(
 	else if (!( contract.manifest.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
 	else if (!( contract.manifest.message = occi_simple_get( contract.manifest.id, agent, tls ) ))
-		return( terminate_paas_contract( 1170, &contract ) );
+	{
+		if (!( yptr = cords_retrieve_named_instance_list( _CORDS_PAAS_MANIFEST, "occi.paas_application_manifest.name", contract.manifest.id, agent,tls ) ))
+			return( terminate_paas_contract( 1404, &contract ) );
+		else if (!( contract.application.message = cords_retrieve_named_instance( yptr, agent, tls )))
+			return( terminate_paas_contract( 1404, &contract ) );
+		else	yptr = occi_remove_response( yptr );
+	}
 
 	/* ---------------------------------------------------- */
 	/* recover the paas application linkage and description */
 	/* ---------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.manifest.message, "occi", 
+	if (!( vptr = occi_extract_atribut( contract.manifest.message, "occi", 
 		_CORDS_PAAS_MANIFEST, _CORDS_PAAS_APPLICATION ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.application.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
 	else if (!( contract.application.message = occi_simple_get( contract.application.id, agent, tls ) ))
-		return( terminate_paas_contract( 1170, &contract ) );
+		return( terminate_paas_contract( 1404, &contract ) );
 
 	/* ---------------------------------------------------- */
 	/* recover the paas environment linkage and description */
