@@ -2271,6 +2271,16 @@ private	struct	xml_element * 	cords_instance_abstract_contract(
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
 	}
+
+	/* --------------------------------------------------- */
+	/* add the important extended category definiton infos */ 
+	/* --------------------------------------------------- */
+	else if (!( aptr = document_add_atribut( document, _CORDS_CATEGORY, App->category ) ))
+	{
+		cords_terminate_instance_node( App );
+		return((struct xml_element *) 0);
+	}
+
 	/* --------------------------------------- */
 	/* attempt to add the provider information */
 	/* --------------------------------------- */

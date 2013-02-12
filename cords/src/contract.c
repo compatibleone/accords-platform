@@ -61,6 +61,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->scope = liberate(sptr->scope);
 		if ( sptr->type )
 			 sptr->type = liberate(sptr->type);
+		if ( sptr->category )
+			 sptr->category = liberate(sptr->category);
 		if ( sptr->service )
 			 sptr->service = liberate(sptr->service);
 		if ( sptr->firewall )
@@ -99,6 +101,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->session = (char*) 0;
 		sptr->scope = (char*) 0;
 		sptr->type = (char*) 0;
+		sptr->category = (char*) 0;
 		sptr->service = (char*) 0;
 		sptr->firewall = (char*) 0;
 		sptr->placement = (char*) 0;
@@ -198,6 +201,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		{
 			if ( wptr->value ) { sptr->type = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"category") ))
+		{
+			if ( wptr->value ) { sptr->category = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"service") ))
 		{
 			if ( wptr->value ) { sptr->service = allocate_string(wptr->value); }
@@ -279,6 +286,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.session='%s'\r\n",prefix,nptr,(sptr->session?sptr->session:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.scope='%s'\r\n",prefix,nptr,(sptr->scope?sptr->scope:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.category='%s'\r\n",prefix,nptr,(sptr->category?sptr->category:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.service='%s'\r\n",prefix,nptr,(sptr->service?sptr->service:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.placement='%s'\r\n",prefix,nptr,(sptr->placement?sptr->placement:""));

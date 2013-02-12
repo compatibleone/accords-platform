@@ -19,6 +19,7 @@ struct	cords_contract
 	char *	session;
 	char *	scope;
 	char *	type;
+	char *	category;
 	char *	service;
 	char *	firewall;
 	char *	placement;
