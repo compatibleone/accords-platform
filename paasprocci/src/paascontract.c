@@ -319,8 +319,8 @@ public	int	create_paas_contract(
 	/* ---------------------------------------------------- */
 	/* recover the paas environment linkage and description */
 	/* ---------------------------------------------------- */
-	else if (!( vptr = occi_extract_atribut( contract.application.message, "occi", 
-		_CORDS_PAAS_APPLICATION, _CORDS_PAAS_ENVIRONMENT ) ))
+	else if (!( vptr = occi_extract_atribut( contract.manifest.message, "occi", 
+		_CORDS_PAAS_MANIFEST, _CORDS_PAAS_ENVIRONMENT ) ))
 		return( terminate_paas_contract( 1127, &contract ) );
 	else if (!( contract.environment.id = allocate_string( vptr ) ))
 		return(terminate_paas_contract( 118, &contract ));
