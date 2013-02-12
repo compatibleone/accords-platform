@@ -482,7 +482,7 @@ Description: CompatibleOne Accords Platform - SLA Manager
 Package: compatibleone-accords
 Architecture: all
 Section: net
-Depends: compatibleone, compatibleone-base, compatibleone-azprocci, compatibleone-broker, compatibleone-cool, compatibleone-coees, compatibleone-copaas, compatibleone-cops, compatibleone-coips, compatibleone-comons, compatibleone-conets, compatibleone-coobas, compatibleone-cosacs, compatibleone-cosched, compatibleone-coss, compatibleone-dcprocci, compatibleone-ezvm, compatibleone-fileserver, compatibleone-onprocci, compatibleone-osocciprocci, compatibleone-osprocci, compatibleone-procci, compatibleone-publisher, compatibleone-paasprocci, compatibleone-slam, compatibleone-accords-doc
+Depends: compatibleone (>= ${binary:Version}),  compatibleone-base (>= ${binary:Version}),  compatibleone-azprocci (>= ${binary:Version}),  compatibleone-broker (>= ${binary:Version}),  compatibleone-cool (>= ${binary:Version}),  compatibleone-coees (>= ${binary:Version}),  compatibleone-copaas (>= ${binary:Version}),  compatibleone-cops (>= ${binary:Version}),  compatibleone-coips (>= ${binary:Version}),  compatibleone-comons (>= ${binary:Version}),  compatibleone-conets (>= ${binary:Version}),  compatibleone-coobas (>= ${binary:Version}),  compatibleone-cosacs (>= ${binary:Version}),  compatibleone-cosched (>= ${binary:Version}),  compatibleone-coss (>= ${binary:Version}),  compatibleone-dcprocci (>= ${binary:Version}),  compatibleone-ezvm (>= ${binary:Version}),  compatibleone-fileserver (>= ${binary:Version}),  compatibleone-onprocci (>= ${binary:Version}),  compatibleone-osocciprocci (>= ${binary:Version}),  compatibleone-osprocci (>= ${binary:Version}),  compatibleone-procci (>= ${binary:Version}),  compatibleone-publisher (>= ${binary:Version}),  compatibleone-paasprocci (>= ${binary:Version}),  compatibleone-slam (>= ${binary:Version}),  compatibleone-accords-doc
 Recommends: compatibleone-nagios
 #Recommends: compatibleone-paprocci, compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (runtime)
@@ -509,8 +509,9 @@ Description: CompatibleOne Accords Platform - All packages (runtime)
 Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
-Depends: compatibleone, compatibleone-accords, python-compatibleone-accords, compatibleone-nagios, libcocarrier-dev, libcocci-dev, libcopabr-dev, libcords-dev, libcorest-dev, libcoxml-dev, libocci-dev, libpubocci-dev
-Recommends: compatibleone-paprocci, compatibleone-nagios
+Depends: compatibleone (>= ${binary:Version}), compatibleone-accords (>= ${binary:Version}), python-compatibleone-accords (>= ${binary:Version}), libcocarrier-dev (>= ${binary:Version}), libcocci-dev (>= ${binary:Version}), libcopabr-dev (>= ${binary:Version}), libcords-dev (>= ${binary:Version}), libcorest-dev (>= ${binary:Version}), libcoxml-dev (>= ${binary:Version}), libocci-dev (>= ${binary:Version}), libpubocci-dev (>= ${binary:Version}), libcocspi-dev (>= ${binary:Version})
+#Recommends: compatibleone-paprocci, compatibleone-nagios
+Recommends: compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development environment)
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
