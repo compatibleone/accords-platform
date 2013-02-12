@@ -232,111 +232,12 @@ public	struct paas_response * create_paas_application(char * environment, char* 
 }
 
 /*	-----------------------------------------	*/
-/*	Creates a new version with either a file 	*/
-/*	in attachment   				*/
-/*	(Content-Type: multipart/form-data). 		*/
-/*	or a url. 					*/
-/*	The supported artefacts are ear, bundle, 	*/
-/*	war, ejbjar or a zip (war dir).			*/
-/*	A Cloud Application Version Descriptor must 	*/
-/*	be provided.					*/
-/*	- Artefact					*/
-/*	- Description					*/
-/*	- VersionLabel					*/
-/*	-----------------------------------------	*/
-public	struct paas_response * create_paas_application_version(char * application, char * artifact, char * description, char * version )
-{
-	/* POST /app/{appId}/version */
-	char *	filename=(char *) 0;
-	char 	uri[2048];
-	FILE *	h;
-	if (!( filename = rest_temporary_filename("xml")))
-		return((struct paas_response *) 0 );
-	else if (!( h = fopen( filename, "w" )))
-	{
-		liberate( filename );
-		return((struct paas_response *) 0 );
-	}
-	else
-	{
-		fprintf(h,"<application_version name=%c%s%c description=%c%s%c version=%c%s%c label=%c%s%c/>\n",artifact,description,version,application);		
-		fclose(h);
-		sprintf(uri,"/app/%s/version",application);	
-		return( paas_result( paas_post_request( uri, filename ) ));
-	}
-}
-
-/*	-----------------------------------------	*/
-/*	Creates a new application version instance.	*/
-/*	A Cloud Application Version Instance Descriptor	*/
-/*	must be provided.				*/
-/*	- Deployable topology mapping			*/
-/*	- Environment uri				*/
-/*	-----------------------------------------	*/
-public	struct paas_response * create_paas_application_instance(char * application, char * version, char * topology, char * environment )
-{
-	/* POST /app/{appId}/version/{versionId}/instance */
-	char *	filename=(char *) 0;
-	char 	uri[2048];
-	FILE *	h;
-	if (!( filename = rest_temporary_filename("xml")))
-		return((struct paas_response *) 0 );
-	else if (!( h = fopen( filename, "w" )))
-	{
-		liberate( filename );
-		return((struct paas_response *) 0 );
-	}
-	else
-	{
-		fprintf(h,"<application_version_instance>\n");		
-		fprintf(h,"</application_version_instance>\n");		
-		fclose(h);
-		sprintf(uri,"/app/%s/version/%s/instance",application,version);	
-		return( paas_result( paas_post_request( uri, filename ) ));
-	}
-}
-
-/*	-----------------------------------------	*/
 /*	List applications				*/
 /*	-----------------------------------------	*/
 public	struct paas_response * list_paas_applications()
 {
 	/* GET /app/ */
 	return( paas_result( paas_get_request( "/app/" ) ));
-}
-
-/*	-----------------------------------------	*/
-/*	List application versions			*/
-/*	-----------------------------------------	*/
-public	struct paas_response * list_paas_application_versions(char * application)
-{
-	/* GET /app/{appId}/version */
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version",application);	
-	return( paas_result( paas_get_request( uri ) ));
-}
-
-/*	-----------------------------------------	*/
-/*	List application version instances		*/
-/*	-----------------------------------------	*/
-public	struct paas_response * list_paas_application_version_instances(char * application,char * version)
-{
-	/* GET /app/{appId}/version/{versionId} */
-
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s",application,version);	
-	return( paas_result( paas_get_request( uri ) ));
-}
-
-/*	-----------------------------------------	*/
-/*	List application version artefacts		*/
-/*	-----------------------------------------	*/
-public	struct paas_response * list_paas_application_version_artefacts(char * application,char * version)
-{
-	/* GET /artefact/{appId}/{versionId}		*/
-	char 	uri[2048];
-	sprintf(uri,"/artefact/%s/%s",application,version);	
-	return( paas_result( paas_get_request( uri ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -351,28 +252,6 @@ public	struct paas_response * get_paas_application(char * application)
 }
 
 /*	-----------------------------------------	*/
-/*	Describe application version			*/
-/*	-----------------------------------------	*/
-public	struct paas_response * get_paas_application_version(char * application,char * version)
-{
-	/* GET /app/{appId}/version/{versionid}		*/
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s",application,version);
-	return( paas_result( paas_get_request( uri ) ));
-}
-
-/*	-----------------------------------------	*/
-/*	Describe application version instance		*/
-/*	-----------------------------------------	*/
-public	struct paas_response * get_paas_application_version_instance(char * application,char * version,char * instance)
-{
-	/* GET /app/{appId}/version/{versionId}/instance/{instanceId}	*/
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s/instance/%s",application,version,instance);
-	return( paas_result( paas_get_request( uri ) ));
-}
-
-/*	-----------------------------------------	*/
 /*	Delete application.				*/
 /*	Removes all existing versions			*/
 /*	-----------------------------------------	*/
@@ -381,29 +260,6 @@ public	struct paas_response * delete_paas_application(char * application)
 	/* DELETE /app/{appId} */
 	char 	uri[2048];
 	sprintf(uri,"/app/%s",application);
-	return( paas_result( paas_delete_request( uri ) ));
-}
-
-/*	-----------------------------------------	*/
-/*	Delete application version			*/
-/*	-----------------------------------------	*/
-public	struct paas_response * delete_paas_application_version(char * application,char * version)
-{
-	/* DELETE /app/{appId}/version/{versionId}	*/
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s",application,version);
-	return( paas_result( paas_delete_request( uri ) ));
-}
-
-
-/*	-----------------------------------------	*/
-/*	 Delete application version instance		*/
-/*	-----------------------------------------	*/
-public	struct paas_response * delete_paas_application_version_instance(char * application,char * version,char * instance)
-{
-	/* DELETE /app/{appId}/version/{versionId}/instance/{instanceId} */
-	char 	uri[2048];
-	sprintf(uri,"/app/%s/version/%s/instance/%s",application,version);
 	return( paas_result( paas_delete_request( uri ) ));
 }
 
