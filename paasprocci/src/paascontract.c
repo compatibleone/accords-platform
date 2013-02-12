@@ -300,7 +300,7 @@ public	int	create_paas_contract(
 	{
 		if (!( yptr = cords_retrieve_named_instance_list( _CORDS_PAAS_MANIFEST, "occi.paas_application_manifest.name", contract.manifest.id, agent,tls ) ))
 			return( terminate_paas_contract( 1404, &contract ) );
-		else if (!( contract.application.message = cords_retrieve_named_instance( yptr, agent, tls )))
+		else if (!( contract.manifest.message = cords_retrieve_named_instance( yptr, agent, tls )))
 			return( terminate_paas_contract( 1404, &contract ) );
 		else	yptr = occi_remove_response( yptr );
 	}
