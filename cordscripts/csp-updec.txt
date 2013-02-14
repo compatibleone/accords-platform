@@ -1,0 +1,73 @@
+	/* ----------------------------------------------------------- */
+	/* csp-updec.txt 				      	       */
+	/* ----------------------------------------------------------- */
+	/* update of amazonec2 subscription information for an account */
+	/* ----------------------------------------------------------- */
+
+
+	$s = {};
+
+	if ( $2.length() > 0 )
+	{
+		$a = $2 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "name" )
+		{
+			$i = '"occi.amazonec2.name":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+
+	if ( $3.length() > 0 )
+	{
+		$a = $3 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "host" )
+		{
+			$i = '"occi.amazonec2.host":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+
+	if ( $4.length() > 0 )
+	{
+		$a = $4 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "tenent" )
+		{
+			$i = '"occi.amazonec2.namespace":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+
+	if ( $5.length() > 0 )
+	{
+		$a = $5 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "user" )
+		{
+			$i = '"occi.amazonec2.username":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}
+
+	if ( $6.length() > 0 )
+	{
+		$a = $6 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "password" )
+		{
+			$i = '"occi.amazonec2.password":"'#$v#'"';
+			$s = $s + $i;
+		}
+	}	
+	$aid = amazonec2.post( $s );
+
+	$2 = $1;
+	include "csp-account.txt";
+

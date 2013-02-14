@@ -1,0 +1,11 @@
+	include "csp-header.txt";
+
+	include "csp-subscriptionlist.txt";
+
+	HtmlHeader("Test Subscriptions",$1 );
+
+	SubscriptionList("demo1");
+
+	HtmlFooter();
+
+

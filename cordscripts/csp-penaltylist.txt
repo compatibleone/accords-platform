@@ -1,0 +1,52 @@
+
+function PenaltyList( $selection )
+{
+	$baseurl ="/accords/dashboard.php";
+	"<table width='100%'><tr><td class=section colspan=5><b>penalties</b></td></tr>".display();
+	"<tr><td class=title>Date<td class=title>Account<td class=title>Contract<td class=title>Agreement<td class=title>Sequence<td class=title>Condition</tr>".display();
+	$penaltys = penalty.list($selection);
+	foreach ( $penaltys as $sid )
+	{
+		$penalty = $sid.get();
+		$when     = $penalty["occi.penalty.timestamp"];
+
+		if ( $when > 0 )
+		{
+			$data     = $penalty["occi.penalty.data"];
+			$data     = "%"#$data;
+			$d        = $data / "%";
+			$data     = $d[0]
+
+			$when     = $when.date();
+
+			$accid    = $penalty["occi.penalty.account"];
+			$account  = $accid.get();
+			$accname  = $account["occi.account.name"];
+	
+			$agrid    = $penalty["occi.penalty.agreement"];
+			$agreement= $agrid.get();
+			$agrname  = $agreement["occi.agreement.name"];
+
+			$conid    = $penalty["occi.penalty.contract"];
+			$contract = $conid.get();
+			$conname  = $contract["occi.contract.name"];
+
+			$konid    = $penalty["occi.penalty.control"];
+			$kontrol  = $konid.get();
+			$control  = $kontrol["occi.control.property"];
+			$condition= $kontrol["occi.control.condition"];
+
+			$when     = $penalty["occi.penalty.timestamp"];
+			$when     = $when.date();
+
+			$number   = $penalty["occi.penalty.sequence"];
+
+			$m = "<tr><td>"#$when#"<td>"#$accname#"<td>"#$conname#"<td>"#$agrname#"<td>"#$number;
+			$m = $m#"<td>"#$control#" "#$condition#" "#$data#"</tr>";
+			$m.display();
+		}
+	}
+	"</table>".display();
+	return;
+}
+

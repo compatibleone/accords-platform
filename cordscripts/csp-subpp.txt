@@ -1,0 +1,64 @@
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("PAAS PROCCI Subscription",$1);
+
+	$what = $2;
+	
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Addition or modification of the PAAS PROCCI Subscription for an Existing Customer Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to add or modify the PAAS PROCCI subscription record  of an existing customer account allowing provisioning through the interface.<p>".display();
+
+	SectionHeader("The Account");
+
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+
+	"<tr><td><b>Customer Account Name</b><td>".display();
+	if ( $what.length() > 0 )
+	{
+		$m = "<input type=text name=name readonly value='"#$what#"'>";
+		$m.display();
+	}
+	else
+	{
+		SelectAccount("name");
+	}
+
+	SectionHeader("The Subscription");
+
+	"<tr><td><b>Host</b><td><input type=text name='host' value=''>".display();
+
+	"<td><b>Tenent</b><td><input type=text name='tenent' value=''>".display();
+	
+	"<tr><td><b>User</b><td><input type=text name='user' value='' >".display();
+
+	"<td><b>Password</b><td><input type=password name='password' value=''>".display();
+
+
+	SectionHeader("Subscription Confirmation");
+
+	"<tr><td><td colspan=2> Finally you must submit the subscription information for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add pp subscription'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+
+	HtmlFooter();
+
+

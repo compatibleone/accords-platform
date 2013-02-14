@@ -4,7 +4,7 @@ include "csp-header.txt";
 
 	$list = schedule.list();
 
-	"<tr><td class=title>UUID<td class=title>Status<td class=title>Started<td class=title>Duration<td class=title>Graph</tr>".display();
+	"<tr><td class=title>Category<td class=title>Status<td class=title>Started<td class=title>Duration<td class=title>Graph</tr>".display();
 
 	$jobs = [];
 	$max  = 0;
@@ -56,7 +56,21 @@ include "csp-header.txt";
 		"<tr>".display();
 		forboth ( $job as $name and $value )
 		{
-			if ( $name == "duration" ) { $duration = $value; }
+			if ( $name == "duration" ) 
+			{ 
+				$duration = $value;
+				$minutes = $duration / 60;
+				$seconds = $duration -  $minutes * 60;
+				$hours   = $minutes / 60;
+				$minutes = $minutes - $hours * 60;
+				$days    = $hours / 24;
+				$hours   = $hours - $days * 24;
+				$value = " ";
+				if ( $days > 0 )    { $value = $value#$days#"d ";    }
+				if ( $hours > 0 )   { $value = $value#$hours#"h ";   }
+				if ( $minutes > 0 ) { $value = $value#$minutes#"m "; }
+				if ( $seconds > 0 ) { $value = $value#$seconds#"s "; }
+			}
 			$m = "<td>"#$value;
 			$m.display();
 		}
@@ -68,5 +82,6 @@ include "csp-header.txt";
 		$m.display();
 	}
 
+	"<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-jobs.txt'>All Jobs</a></th></tr>".display();
 
 	HtmlFooter();

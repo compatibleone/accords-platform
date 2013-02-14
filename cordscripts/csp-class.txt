@@ -1,0 +1,49 @@
+
+	class one 
+	{
+		public	$v=0;
+		public function a()
+		{
+			$v=1;
+			"a) inside doit at last".display();
+			return;
+		}
+		public function b()
+		{
+			$v.display();
+			"b) inside doit at last".display();
+			return;
+		}
+		public function c()
+		{
+			
+			"c) inside doit at last".display();
+			return;
+		}
+	}
+
+	"<h2>test of class definition, instanciation and usage</h2>".display();
+
+	"<p><table>".display();
+
+	"<tr><th>class one {<br> function a(){ ... }<br> function b() { ... }<br> function c() { ... }<br>}<td>class definition worked it would seem".display();
+
+	$o = one.new();
+
+	"<tr><th>$o = one.new();<td>class instanciation worked too it would seem".display();
+
+
+	"<tr><th>$o.a();<br>$o.b();<br>$o.c();<td>".display();
+	
+
+	$o.a();
+	$o.b();
+	$o.c();
+
+	"<br>class method invocation worked also it would seem".display();
+	
+	"</table><p>".display();
+
+
+
+

@@ -33,6 +33,7 @@
 		$m = "<tr><td colspan=5 class=title>"#$aid#"</tr>";
 		$m.display();
 		$safty = $account;
+		$aname = $account["occi.account.name"];
 		$item=0;
 		foreach ( $account as $tuple )
 		{
@@ -109,6 +110,13 @@
 		$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>";
 		$m.display();
 
+		/* --------------------------------- */
+		/* display the list of subscriptions */
+		/* --------------------------------- */
+		include "csp-subscriptionlist.txt";
+
+		SubscriptionList($aname);
+ 
 		/* -------------------------------------- */
 		/* display the list of instanced services */
 		/* -------------------------------------- */

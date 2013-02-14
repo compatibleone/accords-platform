@@ -1,0 +1,97 @@
+
+function SubscriptionList( $aname )
+{
+	$baseurl ="/accords/dashboard.php";
+	"<table width='100%'><tr><td class=section colspan=5><b>Subscription Information</b></td></tr>".display();
+	"<tr><td class=title>Provision<td class=title>Tenent<td class=title>User<td class=title>Password<td colspan=2 class=title>Host</tr>".display();
+	$providers = provider.list();
+	foreach ( $providers as $sid )
+	{
+		$service = $sid.get();
+		$category = $service["occi.provider.category"];
+		$host = ""; $user = ""; $pass = "";
+		switch ( $category )
+		{
+		case	"openstack"	:
+			$record = openstack_configuration.list('occi.openstack_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.openstack_configuration.host"];
+			$user = $record["occi.openstack_configuration.user"];
+			$pass = $record["occi.openstack_configuration.password"];
+			$what = $record["occi.openstack_configuration.namespace"];
+			$script = "csp-subos.txt";
+			break;
+
+		case	"opennebula"	:
+			$record = opennebula_configuration.list('occi.opennebula_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.opennebula_configuration.host"];
+			$user = $record["occi.opennebula_configuration.user"];
+			$pass = $record["occi.opennebula_configuration.password"];
+			$what = $record["occi.opennebula_configuration.namespace"];
+			$script = "csp-subon.txt";
+			break;
+
+		case	"windowsazure"	:
+			$record = windowsazure_configuration.list('occi.windowsazure_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.windowsazure_configuration.host"];
+			$user = $record["occi.windowsazure_configuration.user"];
+			$pass = $record["occi.windowsazure_configuration.password"];
+			$what = $record["occi.windowsazure_configuration.subscription"];
+			$script = "csp-subaz.txt";
+			break;
+
+		case	"amazonec2"	:
+			$record = amazonec2_configuration.list('occi.amazonec2_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.amazonec2_configuration.host"];
+			$user = $record["occi.amazonec2_configuration.user"];
+			$pass = $record["occi.amazonec2_configuration.password"];
+			$script = "csp-subec.txt";
+			break;
+
+		case	"paas"		:
+			$record = paas_configuration.list('occi.paas_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.paas_configuration.host"];
+			$user = $record["occi.paas_configuration.user"];
+			$pass = $record["occi.paas_configuration.password"];
+			$script = "csp-subpp.txt";
+
+			break;
+
+		case	"proactive"		:
+			$record = proactive_configuration.list('occi.proactive_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.proactive_configuration.host"];
+			$user = $record["occi.proactive_configuration.user"];
+			$pass = $record["occi.proactive_configuration.password"];
+			$script = "csp-subpa.txt";
+
+			break;
+
+		default			:
+			$host = ""; 
+			$user = ""; 
+			$pass = "";
+
+		}
+		$m = "<tr><td><a href='"#$baseurl#"?action=compile&script="#$script#"&output=HTML&option="#$aname#"'>"#$category#"</a>";
+		$m = $m#"<td>"#$what;
+		$m = $m#"<td>"#$user;
+		$m = $m#"<td>"#$pass;
+		$m = $m#"<td>"#$host#"</tr>";
+		$m.display();
+
+	}
+	"</table>".display();
+	return;
+}
+

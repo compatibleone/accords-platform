@@ -1,0 +1,38 @@
+	include "csp-header.txt";
+
+	HtmlHeader("Accords Platform Raw Job Scheduling",$1);
+
+	$list = schedule.list();
+
+	"<tr><td class=title>Category<td class=title>Action<td class=title>Status Message<td class=title>Started<td class=title>Duration<td class=title>Graph</tr>".display();
+
+	foreach ( $list as $id )
+	{
+		$schedule = $id.get();
+
+		$operation = $schedule["occi.schedule.operation"];
+
+		$a = $operation / "?";
+	
+		$url      = $a[0];
+		$action   = $a[1];
+		$start    = $schedule["occi.schedule.started"];
+		$start    = $start.date();
+		$duration = $schedule["occi.schedule.duration"];
+		$status   = $schedule["occi.schedule.response"];
+		$message  = $schedule["occi.schedule.message"];
+		$a = $url / "/";
+
+		$url = $a[2];
+
+		$m = "<tr><td>"#$url#"<td>"#$action#"<td>"#$status#" "#$message#"<td>"#$start#"<td>"#$duration#"<td>";
+		$m = $m#"<img height=20 width="#$duration#" src='blue.png'></tr>";
+		$m.display();
+
+	}
+
+	"<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-scheduling.txt'>Provisioning Operations</a></th></tr>".display();
+
+	HtmlFooter();
+
+

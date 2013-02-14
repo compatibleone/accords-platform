@@ -1,0 +1,8 @@
+
+	function Hello($who)
+	{
+		"Hello".display();
+		$who.display();
+		return;
+	}
+

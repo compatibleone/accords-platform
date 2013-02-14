@@ -1,0 +1,24 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-penalties.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of penalties incurred by customer and operator accounts     				 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-penaltylist.txt";
+
+	HtmlHeader("Accords Platform Penalties",$1);
+
+	$what = $2;
+
+	
+	"<tr><td colspan=6>".display();
+	PenaltyList( " " );
+	"</td></tr>".display();
+
+	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#"'>Process Transactions</a></th></tr>";
+	$m.display();
+	
+	HtmlFooter();
+
+
