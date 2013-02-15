@@ -3,7 +3,7 @@ function PenaltyList( $selection )
 {
 	$baseurl ="/accords/dashboard.php";
 	"<table width='100%'><tr><td class=section colspan=5><b>penalties</b></td></tr>".display();
-	"<tr><td class=title>Date<td class=title>Account<td class=title>Contract<td class=title>Agreement<td class=title>Sequence<td class=title>Condition</tr>".display();
+	"<tr><td class=title>Date<td class=title>Account<td class=title>Contract<td class=title>Agreement<td class=title>Sequence<td class=title>Fault Condition</tr>".display();
 	$penaltys = penalty.list($selection);
 	foreach ( $penaltys as $sid )
 	{
@@ -43,7 +43,7 @@ function PenaltyList( $selection )
 			$number   = $penalty["occi.penalty.sequence"];
 
 			$m = "<tr><td>"#$when#"<td>"#$accname#"<td>"#$conname#"<td>"#$agrname#"<td>"#$number;
-			$m = $m#"<td>"#$control#" "#$condition#" "#$value#" : "#$data#"</tr>";
+			$m = $m#"<td>"#$control#" not '"#$condition#"' "#$value#" : "#$data#"</tr>";
 			$m.display();
 		}
 	}

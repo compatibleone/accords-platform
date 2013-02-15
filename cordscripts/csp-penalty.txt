@@ -8,14 +8,22 @@
 
 		$a = '"occi.penalty.name":"scripted"';
 		$s = $s + $a;
-		$a = '"occi.penalty.control":"'#$1#'"';
+		$a = '"occi.penalty.control":"'#$2#'"';
 		$s = $s + $a;
-		$a = '"occi.penalty.nature":"'#$2#'"';
+		$a = '"occi.penalty.nature":"'#$3#'"';
 		$s = $s + $a;
-		$a = '"occi.penalty.packet":"'#$3#'"';
+		$a = '"occi.penalty.packet":"'#$4#'"';
 		$s = $s + $a;
-		$when = "now".date();
-		$a = '"occi.penalty.timestamp":"'#$when#'"';
+
+		$packet = $4.get();
+		$v = $packet["occi.packet.sequence"];
+		$a = '"occi.penalty.sequence":"'#$v#'"';
+		$s = $s + $a;
+		$v = $packet["occi.packet.data"];
+		$a = '"occi.penalty.data":"'#$v#'"';
+		$s = $s + $a;
+		$v = $packet["occi.packet.start"];
+		$a = '"occi.penalty.timestamp":"'#$v#'"';
 		$s = $s + $a;
 
 		$id = penalty.post( $s );

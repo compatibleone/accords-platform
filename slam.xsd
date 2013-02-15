@@ -65,6 +65,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsVariable">
+		<xsd:choice>
+			<xsd:element name="metric" type="cordsMetric" minOccurs="0" maxOccurs="1"/>
+		</xsd:choice>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="property" type="xsd:string"/>
