@@ -135,7 +135,7 @@ private	int	execute_business_value(
 		rest_log_message( buffer );
 		rest_log_message( expression );
 		scripted_business_processing( pptr, expression, nature, packetid );
-		return(0);
+		return(1);
 	}
 	else
 	{
@@ -143,7 +143,7 @@ private	int	execute_business_value(
 		rest_log_message( buffer );
 		rest_log_message( expression );
 		scripted_business_processing( pptr, expression, nature, packetid );
-		return(0);
+		return(1);
 	}
 
 }
@@ -157,6 +157,7 @@ private	int	invoke_business_values( char * nature, struct cords_control * pptr, 
 	struct	occi_response 	* yptr;
 	struct	occi_element 	* eptr;
 	struct	occi_element 	* dptr;
+	int	items=0;
 	char *	sptr;
 
 	/* ----------------------------------------------------- */
@@ -164,9 +165,9 @@ private	int	invoke_business_values( char * nature, struct cords_control * pptr, 
 	/* guarantee indicated by the control reference property */
 	/* ----------------------------------------------------- */
 	if (!( rest_valid_string( pptr->reference )))
-		return;
+		return(0);
 	else if (!( zptr = occi_simple_get( pptr->reference, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		return;
+		return(0);
 	else
 	{
 		/* ----------------------------------- */
@@ -215,13 +216,13 @@ private	int	invoke_business_values( char * nature, struct cords_control * pptr, 
 				/* we now have a business value expression */
 				/* of the right kind that needs evaluated  */
 				/* --------------------------------------- */
-				execute_business_value( pptr, dptr->value, nature, zptr, yptr, packet, message, data, sequence );
+				items += execute_business_value( pptr, dptr->value, nature, zptr, yptr, packet, message, data, sequence );
 				yptr = occi_remove_response( yptr );
 				liberate( sptr );
 				continue;
 			}
 		}
-		return;
+		return(items);
 	}
 }
 
@@ -238,20 +239,20 @@ private	void	issue_control_reward( struct cords_control * pptr, char * packet, s
 	/* ---------------------------------------------- */
 	/* invoke the business values of the penalty type */
 	/* ---------------------------------------------- */
-	invoke_business_values( _CORDS_REWARD, pptr, packet, message, data, sequence );
+	if (!( invoke_business_values( _CORDS_REWARD, pptr, packet, message, data, sequence ) ))
+	{
+		/* ------------------------ */
+		/* simply delete the packet */
+		/* ------------------------ */
+		if ((zptr = occi_simple_delete( packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
-	/* ------------------------ */
-	/* simply delete the packet */
-	/* ------------------------ */
-	if ((zptr = occi_simple_delete( packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
-
-	/* ------------------------ */
-	/* - delete link from probe */
-	/* ------------------------ */
-	if ((zptr = occi_delete_link( pptr->probe, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
-
+		/* ------------------------ */
+		/* - delete link from probe */
+		/* ------------------------ */
+		if ((zptr = occi_delete_link( pptr->probe, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	}
 	message = occi_remove_response( message );
 	return;
 }
@@ -277,60 +278,62 @@ private	void	issue_control_penalty( struct cords_control * pptr, char * packet, 
 	/* ---------------------------------------------- */
 	/* invoke the business values of the penalty type */
 	/* ---------------------------------------------- */
-	invoke_business_values( _CORDS_PENALTY, pptr, packet, message, data, sequence );
-
-	/* --------------------------------------------------------------------- */
-	/* create a penalty category instance to show the arrival of the penalty */
-	/* --------------------------------------------------------------------- */
-	if ((!( dptr = occi_create_element(       "occi.penalty.account",    	pptr->account	) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.agreement",  	pptr->agreement	) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.contract",	pptr->contract	) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.control", 	buffer		) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.sequence", 	what		) ))
-	||  (!( dptr = occi_append_element( dptr, "occi.penalty.data", 		data		) )))
+	if (!( invoke_business_values( _CORDS_PENALTY, pptr, packet, message, data, sequence ) ))
 	{
-		message = occi_remove_response( message );
-		return;
-	}
-	else if (!( zptr = occi_simple_post( penalty, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-	{
-		message = occi_remove_response( message );
-		return;
-	}
-	else if (!( ihost = occi_extract_location( zptr ) ))
-	{
-		zptr = occi_remove_response( zptr );
-		message = occi_remove_response( message );
-		return;
-	}
-	else if (!( ihost = allocate_string( ihost ) ))
-	{
-		zptr = occi_remove_response( zptr );
-		message = occi_remove_response( message );
-		return;
-	}
-	else	zptr = occi_remove_response( zptr );
 
-	/* ------------------------ */
-	/* - delete link from probe */
-	/* ------------------------ */
-	if ((zptr = occi_delete_link( pptr->probe, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
+		/* --------------------------------------------------------------------- */
+		/* create a penalty category instance to show the arrival of the penalty */
+		/* --------------------------------------------------------------------- */
+		if ((!( dptr = occi_create_element(       "occi.penalty.account",    	pptr->account	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.agreement",  	pptr->agreement	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.contract",	pptr->contract	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.control", 	buffer		) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.timestamp", 	now		) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.sequence", 	what		) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.penalty.data", 		data		) )))
+		{
+			message = occi_remove_response( message );
+			return;
+		}
+		else if (!( zptr = occi_simple_post( penalty, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			message = occi_remove_response( message );
+			return;
+		}
+		else if (!( ihost = occi_extract_location( zptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			message = occi_remove_response( message );
+			return;
+		}
+		else if (!( ihost = allocate_string( ihost ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			message = occi_remove_response( message );
+			return;
+		}
+		else	zptr = occi_remove_response( zptr );
 
-	/* ------------------------ */
-	/* simply delete the packet */
-	/* ------------------------ */
-	if ((zptr = occi_simple_delete( packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
+		/* ------------------------ */
+		/* - delete link from probe */
+		/* ------------------------ */
+		if ((zptr = occi_delete_link( pptr->probe, packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
-	/* ------------------------ */
-	/* - create link to control */
-	/* ------------------------ */
-	if ((zptr = occi_create_link( buffer, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-		zptr = occi_remove_response( zptr );
+		/* ------------------------ */
+		/* simply delete the packet */
+		/* ------------------------ */
+		if ((zptr = occi_simple_delete( packet, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	
+		/* ------------------------ */
+		/* - create link to control */
+		/* ------------------------ */
+		if ((zptr = occi_create_link( buffer, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
 
-	ihost = liberate( ihost );
+		ihost = liberate( ihost );
+	}
 	message = occi_remove_response( message );
 	return;
 }
