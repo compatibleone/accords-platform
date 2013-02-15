@@ -1937,8 +1937,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	if ( check_csp_debug() )
 		printf("eval_operation();\n");
 
-	for ( argi=0; argi < 10; argi++ )
-		argv[argi] = (struct cordscript_value *) 0;
+	memset( &argv, 0, 10 * sizeof( struct cordscript_value * ));
 
 	/* ----------------------------------- */
 	/* detect nature of evaluation operand */
