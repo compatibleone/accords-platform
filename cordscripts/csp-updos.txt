@@ -72,7 +72,7 @@
 		$cid  = $list[0];
 		if ( $cid.length() > 0 )
 		{
-			$cid.put( $s );
+			$result = $cid.put( $s );
 		}
 		else
 		{
@@ -81,5 +81,5 @@
 	}
 
 	$2 = $1;
-	include "csp-account.txt";
+	include "csp-subscriptions.txt";
 

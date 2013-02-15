@@ -20,56 +20,66 @@
 		}
 	
 	
-	if ( $3.length() > 0 )
-	{
-		$a = $3 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "host" )
+		if ( $3.length() > 0 )
 		{
-			$i = '"occi.paas_configuration.host":"'#$v#'"';
-			$s = $s + $i;
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.paas_configuration.host":"'#$v#'"';
+				$s = $s + $i;
+			}
 		}
-	}
 
-	if ( $4.length() > 0 )
-	{
-		$a = $4 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "tenent" )
+		if ( $4.length() > 0 )
 		{
-			$i = '"occi.paas_configuration.namespace":"'#$v#'"';
-			$s = $s + $i;
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "tenent" )
+			{
+				$i = '"occi.paas_configuration.namespace":"'#$v#'"';
+				$s = $s + $i;
+			}
 		}
-	}
+	
+		if ( $5.length() > 0 )
+		{
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.paas_configuration.user":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+		
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "password" )
+			{
+				$i = '"occi.paas_configuration.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}	
 
-	if ( $5.length() > 0 )
-	{
-		$a = $5 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "user" )
+		$list = paas_configuration.list( $un );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
 		{
-			$i = '"occi.paas_configuration.username":"'#$v#'"';
-			$s = $s + $i;
+			$result = $cid.put( $s );
 		}
-	}
-
-	if ( $6.length() > 0 )
-	{
-		$a = $6 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "password" )
+		else
 		{
-			$i = '"occi.paas_configuration.password":"'#$v#'"';
-			$s = $s + $i;
+			$aid = paas_configuration.post( $s );
 		}
-	}	
-	$aid = paas_configuration.post( $s );
 	}
 
 	$2 = $1;
-	include "csp-account.txt";
+	include "csp-subscriptions.txt";
 

@@ -1,11 +1,12 @@
 	/* ----------------------------------------------------------- */
-	/* csp-updec.txt 				      	       */
+	/* csp-updos.txt 				      	       */
 	/* ----------------------------------------------------------- */
-	/* update of amazonec2 subscription information for an account */
+	/* update of proactive subscription information for an account */
 	/* ----------------------------------------------------------- */
 
 
 	$s = {};
+
 
 	if ( $2.length() > 0 )
 	{
@@ -14,10 +15,10 @@
 		$v = $a[1];
 		if ( $n == "name" )
 		{
-			$un = '"occi.ec2config.name":"'#$v#'"';
+			$un = '"occi.proactive_configuration.name":"'#$v#'"';
 			$s = $s + $un;
 		}
-	
+
 
 		if ( $3.length() > 0 )
 		{
@@ -26,11 +27,11 @@
 			$v = $a[1];
 			if ( $n == "host" )
 			{
-				$i = '"occi.ec2config.host":"'#$v#'"';
+				$i = '"occi.proactive_configuration.host":"'#$v#'"';
 				$s = $s + $i;
 			}
 		}
-	
+
 		if ( $4.length() > 0 )
 		{
 			$a = $4 / "=";
@@ -38,11 +39,11 @@
 			$v = $a[1];
 			if ( $n == "tenent" )
 			{
-				$i = '"occi.ec2config.namespace":"'#$v#'"';
+				$i = '"occi.proactive_configuration.namespace":"'#$v#'"';
 				$s = $s + $i;
 			}
 		}
-	
+
 		if ( $5.length() > 0 )
 		{
 			$a = $5 / "=";
@@ -50,11 +51,11 @@
 			$v = $a[1];
 			if ( $n == "user" )
 			{
-				$i = '"occi.ec2config.user":"'#$v#'"';
+				$i = '"occi.proactive_configuration.user":"'#$v#'"';
 				$s = $s + $i;
 			}
 		}
-	
+
 		if ( $6.length() > 0 )
 		{
 			$a = $6 / "=";
@@ -62,12 +63,12 @@
 			$v = $a[1];
 			if ( $n == "password" )
 			{
-				$i = '"occi.amazonec2_configuration.password":"'#$v#'"';
+				$i = '"occi.proactive_configuration.password":"'#$v#'"';
 				$s = $s + $i;
 			}
-		}	
+		}
 
-		$list = amazonec2_configuration.list( $un );
+		$list = proactive_configuration.list( $un );
 		$cid  = $list[0];
 		if ( $cid.length() > 0 )
 		{
@@ -75,7 +76,7 @@
 		}
 		else
 		{
-			$aid = amazonec2_configuration.post( $s );
+			$aid = proactive_configuration.post( $s );
 		}
 	}
 

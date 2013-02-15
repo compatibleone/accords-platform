@@ -9,7 +9,7 @@ function	HtmlHeader($title,$accountname)
 	$when = "now".date();
 	$m = "<html><head><title>"#$title#"</title></head>";
 	$m.display();
-	$m = "<body><div align=center class=whiteframe><table width='100%' border=1><tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";
+	$m = "<body><div align=center class=whiteframe><table width='100%' border=1>";
 	$m.display();
 	if ( $accountname.length() > 0 )
 	{
@@ -46,7 +46,10 @@ function	HtmlHeader($title,$accountname)
 		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
 		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
 	}
-	"</tr><tr><th colspan=6>&nbsp</tr><tr><td colspan=6><div align=center><table width='100%'>".display();
+	"</tr><tr><th colspan=6>&nbsp</tr>".display();
+	$m = "<tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";
+	$m.display();
+	"<tr><td colspan=6><div align=center><table width='100%'>".display();
 	return;
 }
 

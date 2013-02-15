@@ -16,6 +16,25 @@
 	HtmlHeader("OpenNebula Subscription",$1);
 
 	$what = $2;
+
+	$un = '"occi.opennebula_configuration.name":"'#$what#'"';
+	$list = opennebula_configuration.list( $un );
+	$cid  = $list[0];
+	if ( $cid.length() > 0 )
+	{
+		$record = $cid.get();
+		$sname = $record["occi.opennebula_configuration.user"];
+		$spass = $record["occi.opennebula_configuration.password"];
+		$shost = $record["occi.opennebula_configuration.host"];
+		$smore = $record["occi.opennebula_configuration.namespace"];
+	}
+	else
+	{
+		$sname = "";
+		$spass = "";
+		$shost = "";
+		$smore = "";
+	}
 	
 	"<table width='100%'>".display();
 	"<tr><td colspan=4><h3>Addition or modification of the OpenNebula Subscription for an Existing Customer Account</h3></td></tr>".display();
@@ -25,26 +44,38 @@
 
 	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
 
-	"<tr><td><b>Customer Account Name</b><td>".display();
 	if ( $what.length() > 0 )
 	{
+		"<tr><td colspan=2>This is your customer account name.".display(); 
+		"<tr><td><b>Customer Account Name</b><td>".display();
 		$m = "<input type=text name=name readonly value='"#$what#"'>";
 		$m.display();
 	}
 	else
 	{
+		"<tr><td colspan=2>Here you should select the customer account name for which the subscription is to be created or modified.".display(); 
+		"<tr><td><b>Customer Account Name</b><td>".display();
 		SelectAccount("name");
 	}
 
 	SectionHeader("The Subscription");
 
-	"<tr><td><b>Host</b><td><input type=text name='host' value=''>".display();
+	"<tr><td colspan=2>Here you should specify the URL of the provisioning platform. This must include the service prefix, the host name,".display(); 
+	"the service port and any other information such as version number.".display(); 
+	"<td colspan=2>Here you should specify the tenent information of your subscription account.".display(); 
 
-	"<td><b>Tenent</b><td><input type=text name='tenent' value=''>".display();
+	$m = "<tr><td><b>Host</b><td><input type=text name='host' value='"#$shost#"'>";
+	$m.display();
+
+	$m = "<td><b>Tenent</b><td><input type=text name='tenent' value='"#$smore#"'>";
+	$m.display();
 	
-	"<tr><td><b>User</b><td><input type=text name='user' value='' >".display();
+	"<tr><td colspan=4>Here you must specify the authentication credentials of the subscription account comprising user name and password.".display();
+	$m = "<tr><td><b>User</b><td><input type=text name='user' value='"#$sname#"' >";
+	$m.display();
 
-	"<td><b>Password</b><td><input type=password name='password' value=''>".display();
+	$m = "<td><b>Password</b><td><input type=password name='password' value='"#$spass#"'>";
+	$m.display();
 
 
 	SectionHeader("Subscription Confirmation");
@@ -56,6 +87,10 @@
 	'</table></form></td></tr>'.display();
 
 	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+
+	$m = "<tr><th colspan=4><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-subscriptions.txt&option="#$what#"'>List of Subscriptions</a></th></tr>";
+	$m.display();
+
 	"</table>".display();
 
 

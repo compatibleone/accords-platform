@@ -1,0 +1,26 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-subscriptions.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of subscriptions available for use by customer and operator accounts 			 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-subscriptionlist.txt";
+
+	HtmlHeader("Accords Platform Subscriptions",$1);
+
+	$what = $2;
+
+	
+	"<tr><td colspan=6>".display();
+
+	SubscriptionList($what);
+ 
+	"</td></tr>".display();
+
+	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-account.txt&option="#$what#"'>Account Information</a></th></tr>";
+	$m.display();
+	
+	HtmlFooter();
+
+

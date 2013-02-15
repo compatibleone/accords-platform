@@ -49,9 +49,10 @@ function SubscriptionList( $aname )
 			$record = amazonec2_configuration.list('occi.amazonec2_configuration.name="'#$aname#'"');
 			$rid = $record[0];
 			$record = $rid.get();
-			$host = $record["occi.amazonec2_configuration.host"];
-			$user = $record["occi.amazonec2_configuration.user"];
-			$pass = $record["occi.amazonec2_configuration.password"];
+			$host = $record["occi.ec2_configuration.host"];
+			$user = $record["occi.ec2_configuration.user"];
+			$pass = $record["occi.ec2_configuration.password"];
+			$what = $record["occi.ec2_configuration.namespace"];
 			$script = "csp-subec.txt";
 			break;
 
@@ -62,6 +63,7 @@ function SubscriptionList( $aname )
 			$host = $record["occi.paas_configuration.host"];
 			$user = $record["occi.paas_configuration.user"];
 			$pass = $record["occi.paas_configuration.password"];
+			$what = $record["occi.paas_configuration.namespace"];
 			$script = "csp-subpp.txt";
 
 			break;
@@ -73,6 +75,7 @@ function SubscriptionList( $aname )
 			$host = $record["occi.proactive_configuration.host"];
 			$user = $record["occi.proactive_configuration.user"];
 			$pass = $record["occi.proactive_configuration.password"];
+			$what = $record["occi.proactive_configuration.namespace"];
 			$script = "csp-subpa.txt";
 
 			break;
@@ -83,6 +86,7 @@ function SubscriptionList( $aname )
 			$host = $record["occi.deltacloud_configuration.host"];
 			$user = $record["occi.deltacloud_configuration.user"];
 			$pass = $record["occi.deltacloud_configuration.password"];
+			$what = $record["occi.deltacloud_configuration.namespace"];
 			$script = "csp-subdc.txt";
 
 			break;
