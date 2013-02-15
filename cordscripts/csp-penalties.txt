@@ -16,7 +16,7 @@
 	PenaltyList( " " );
 	"</td></tr>".display();
 
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#"'>Process Transactions</a></th></tr>";
+	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#"'>Deployed Services</a></th></tr>";
 	$m.display();
 	
 	HtmlFooter();

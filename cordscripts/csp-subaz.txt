@@ -40,7 +40,7 @@
 
 	"<tr><td><b>Host</b><td><input type=text name='host' value=''>".display();
 
-	"<td><b>Tenent</b><td><input type=text name='tenent' value=''>".display();
+	"<td><b>Subscription</b><td><input type=text name='tenent' value=''>".display();
 	
 	"<tr><td><b>User</b><td><input type=text name='user' value='' >".display();
 

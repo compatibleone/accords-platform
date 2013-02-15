@@ -17,6 +17,25 @@
 
 	$what = $2;
 	
+	$un = '"occi.openstack_configuration.name":"'#$what#'"';
+	$list = openstack_configuration.list( $un );
+	$cid  = $list[0];
+	if ( $cid.length() > 0 )
+	{
+		$record = $cid.get();
+		$sname = $record["occi.openstack_configuration.user"];
+		$spass = $record["occi.openstack_configuration.password"];
+		$shost = $record["occi.openstack_configuration.host"];
+		$smore = $record["occi.openstack_configuration.namespace"];
+	}
+	else
+	{
+		$sname = "";
+		$spass = "";
+		$shost = "";
+		$smore = "";
+	}
+
 	"<table width='100%'>".display();
 	"<tr><td colspan=4><h3>Addition or modification of the OpenStack Subscription for an Existing Customer Account</h3></td></tr>".display();
 	"<tr><td colspan=4>This document allows you to add or modify the OpenStack subscription record  of an existing customer account allowing provisioning through the interface.<p>".display();
@@ -38,13 +57,17 @@
 
 	SectionHeader("The Subscription");
 
-	"<tr><td><b>Host</b><td><input type=text name='host' value=''>".display();
+	$m = "<tr><td><b>Host</b><td><input type=text name='host' value='"#$shost#"'>"
+	$m.display();
 
-	"<td><b>Tenent</b><td><input type=text name='tenent' value=''>".display();
+	$m = "<td><b>Tenent</b><td><input type=text name='tenent' value='"#$smore#"'>";
+	$m.display();
 	
-	"<tr><td><b>User</b><td><input type=text name='user' value='' >".display();
+	$m = "<tr><td><b>User</b><td><input type=text name='user' value='"#$sname#"'>";
+	$m.display();
 
-	"<td><b>Password</b><td><input type=password name='password' value=''>".display();
+	$m = "<td><b>Password</b><td><input type=text name='password' value='"#$spass#"'>";
+	$m.display();
 
 
 	SectionHeader("Subscription Confirmation");

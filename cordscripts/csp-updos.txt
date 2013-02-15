@@ -7,6 +7,7 @@
 
 	$s = {};
 
+
 	if ( $2.length() > 0 )
 	{
 		$a = $2 / "=";
@@ -14,59 +15,70 @@
 		$v = $a[1];
 		if ( $n == "name" )
 		{
-			$i = '"occi.openstack.name":"'#$v#'"';
-			$s = $s + $i;
+			$un = '"occi.openstack_configuration.name":"'#$v#'"';
+			$s = $s + $un;
+		}
+
+
+		if ( $3.length() > 0 )
+		{
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.openstack_configuration.host":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $4.length() > 0 )
+		{
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "tenent" )
+			{
+				$i = '"occi.openstack_configuration.namespace":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $5.length() > 0 )
+		{
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.openstack_configuration.user":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "password" )
+			{
+				$i = '"occi.openstack_configuration.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		$list = openstack_configuration.list( $un );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
+		{
+			$cid.put( $s );
+		}
+		else
+		{
+			$aid = openstack_configuration.post( $s );
 		}
 	}
-
-	if ( $3.length() > 0 )
-	{
-		$a = $3 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "host" )
-		{
-			$i = '"occi.openstack.host":"'#$v#'"';
-			$s = $s + $i;
-		}
-	}
-
-	if ( $4.length() > 0 )
-	{
-		$a = $4 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "tenent" )
-		{
-			$i = '"occi.openstack.namespace":"'#$v#'"';
-			$s = $s + $i;
-		}
-	}
-
-	if ( $5.length() > 0 )
-	{
-		$a = $5 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "user" )
-		{
-			$i = '"occi.openstack.username":"'#$v#'"';
-			$s = $s + $i;
-		}
-	}
-
-	if ( $6.length() > 0 )
-	{
-		$a = $6 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "password" )
-		{
-			$i = '"occi.openstack.password":"'#$v#'"';
-			$s = $s + $i;
-		}
-	}	
-	$aid = openstack.post( $s );
 
 	$2 = $1;
 	include "csp-account.txt";

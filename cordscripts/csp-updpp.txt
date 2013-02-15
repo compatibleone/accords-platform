@@ -7,6 +7,7 @@
 
 	$s = {};
 
+	
 	if ( $2.length() > 0 )
 	{
 		$a = $2 / "=";
@@ -14,11 +15,11 @@
 		$v = $a[1];
 		if ( $n == "name" )
 		{
-			$i = '"occi.paas.name":"'#$v#'"';
+			$i = '"occi.paas_configuration.name":"'#$v#'"';
 			$s = $s + $i;
 		}
-	}
-
+	
+	
 	if ( $3.length() > 0 )
 	{
 		$a = $3 / "=";
@@ -26,7 +27,7 @@
 		$v = $a[1];
 		if ( $n == "host" )
 		{
-			$i = '"occi.paas.host":"'#$v#'"';
+			$i = '"occi.paas_configuration.host":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -38,7 +39,7 @@
 		$v = $a[1];
 		if ( $n == "tenent" )
 		{
-			$i = '"occi.paas.namespace":"'#$v#'"';
+			$i = '"occi.paas_configuration.namespace":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -50,7 +51,7 @@
 		$v = $a[1];
 		if ( $n == "user" )
 		{
-			$i = '"occi.paas.username":"'#$v#'"';
+			$i = '"occi.paas_configuration.username":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -62,11 +63,12 @@
 		$v = $a[1];
 		if ( $n == "password" )
 		{
-			$i = '"occi.paas.password":"'#$v#'"';
+			$i = '"occi.paas_configuration.password":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}	
-	$aid = paas.post( $s );
+	$aid = paas_configuration.post( $s );
+	}
 
 	$2 = $1;
 	include "csp-account.txt";

@@ -1,0 +1,22 @@
+
+	if ( $1 == "slam.control" )
+	{
+		$s ={};
+
+		$a = '"occi.penalty.name":"scripted"';
+		$s = $s + $a;
+		$a = '"occi.penalty.control":"'#$1#'"';
+		$s = $s + $a;
+		$a = '"occi.penalty.nature":"'#$2#'"';
+		$s = $s + $a;
+		$a = '"occi.penalty.packet":"'#$3#'"';
+		$s = $s + $a;
+		$when = "now".date();
+		$a = '"occi.penalty.timestamp":"'#$when#'"';
+		$s = $s + $a;
+
+		$id = penalty.post( $s );
+
+	}
+
+

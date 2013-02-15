@@ -14,59 +14,70 @@
 		$v = $a[1];
 		if ( $n == "name" )
 		{
-			$i = '"occi.opennebula.name":"'#$v#'"';
-			$s = $s + $i;
+			$un = '"occi.opennebula_configuration.name":"'#$v#'"';
+			$s = $s + $un;
 		}
-	}
 
-	if ( $3.length() > 0 )
-	{
-		$a = $3 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "host" )
-		{
-			$i = '"occi.opennebula.host":"'#$v#'"';
-			$s = $s + $i;
-		}
-	}
 
-	if ( $4.length() > 0 )
-	{
-		$a = $4 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "tenent" )
+		if ( $3.length() > 0 )
 		{
-			$i = '"occi.opennebula.namespace":"'#$v#'"';
-			$s = $s + $i;
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.opennebula_configuration.host":"'#$v#'"';
+				$s = $s + $i;
+			}
 		}
-	}
 
-	if ( $5.length() > 0 )
-	{
-		$a = $5 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "user" )
+		if ( $4.length() > 0 )
 		{
-			$i = '"occi.opennebula.username":"'#$v#'"';
-			$s = $s + $i;
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "tenent" )
+			{
+				$i = '"occi.opennebula_configuration.namespace":"'#$v#'"';
+				$s = $s + $i;
+			}
 		}
-	}
 
-	if ( $6.length() > 0 )
-	{
-		$a = $6 / "=";
-		$n = $a[0];
-		$v = $a[1];
-		if ( $n == "password" )
+		if ( $5.length() > 0 )
 		{
-			$i = '"occi.opennebula.password":"'#$v#'"';
-			$s = $s + $i;
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.opennebula_configuration.username":"'#$v#'"';
+				$s = $s + $i;
+			}
 		}
-	}	
-	$aid = opennebula.post( $s );
+	
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "password" )
+			{
+				$i = '"occi.opennebula_configuration.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		$list = opennebula_configuration.list( $un );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
+		{
+			$cid.put( $s );
+		}
+		else
+		{
+			$aid = opennebula_configuration.post( $s );
+		}	
+	}
 
 	$2 = $1;
 	include "csp-account.txt";

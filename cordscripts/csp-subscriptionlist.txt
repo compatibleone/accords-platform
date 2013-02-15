@@ -9,7 +9,7 @@ function SubscriptionList( $aname )
 	{
 		$service = $sid.get();
 		$category = $service["occi.provider.category"];
-		$host = ""; $user = ""; $pass = "";
+		$host = ""; $user = ""; $pass = ""; $what = "";
 		switch ( $category )
 		{
 		case	"openstack"	:
@@ -76,11 +76,22 @@ function SubscriptionList( $aname )
 			$script = "csp-subpa.txt";
 
 			break;
+		case	"deltacloud"		:
+			$record = deltacloud_configuration.list('occi.deltacloud_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.deltacloud_configuration.host"];
+			$user = $record["occi.deltacloud_configuration.user"];
+			$pass = $record["occi.deltacloud_configuration.password"];
+			$script = "csp-subdc.txt";
+
+			break;
 
 		default			:
 			$host = ""; 
 			$user = ""; 
 			$pass = "";
+			$what = "";
 
 		}
 		$m = "<tr><td><a href='"#$baseurl#"?action=compile&script="#$script#"&output=HTML&option="#$aname#"'>"#$category#"</a>";

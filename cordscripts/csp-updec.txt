@@ -14,10 +14,10 @@
 		$v = $a[1];
 		if ( $n == "name" )
 		{
-			$i = '"occi.amazonec2.name":"'#$v#'"';
+			$i = '"occi.amazonec2_configuration.name":"'#$v#'"';
 			$s = $s + $i;
 		}
-	}
+	
 
 	if ( $3.length() > 0 )
 	{
@@ -26,7 +26,7 @@
 		$v = $a[1];
 		if ( $n == "host" )
 		{
-			$i = '"occi.amazonec2.host":"'#$v#'"';
+			$i = '"occi.amazonec2_configuration.host":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -38,7 +38,7 @@
 		$v = $a[1];
 		if ( $n == "tenent" )
 		{
-			$i = '"occi.amazonec2.namespace":"'#$v#'"';
+			$i = '"occi.amazonec2_configuration.namespace":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -50,7 +50,7 @@
 		$v = $a[1];
 		if ( $n == "user" )
 		{
-			$i = '"occi.amazonec2.username":"'#$v#'"';
+			$i = '"occi.amazonec2_configuration.username":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}
@@ -62,11 +62,12 @@
 		$v = $a[1];
 		if ( $n == "password" )
 		{
-			$i = '"occi.amazonec2.password":"'#$v#'"';
+			$i = '"occi.amazonec2_configuration.password":"'#$v#'"';
 			$s = $s + $i;
 		}
 	}	
-	$aid = amazonec2.post( $s );
+	$aid = amazonec2_configuration.post( $s );
+	}
 
 	$2 = $1;
 	include "csp-account.txt";

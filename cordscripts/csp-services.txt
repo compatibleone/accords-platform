@@ -98,7 +98,9 @@
 		}
 
 	}
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$who#"'>Process Transactions</a></th></tr>";
+	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-penalties.txt&option="#$what#"'>Incurred Penalties</a></th></tr>";
+	$m.display();
+	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$who#"'>Process Transactions</a></th></tr>";
 	$m.display();
 	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" start'>Start All Services</a></th></tr>";
 	$m.display();

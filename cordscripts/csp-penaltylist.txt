@@ -35,6 +35,7 @@ function PenaltyList( $selection )
 			$kontrol  = $konid.get();
 			$control  = $kontrol["occi.control.property"];
 			$condition= $kontrol["occi.control.condition"];
+			$value    = $kontrol["occi.control.objective"];
 
 			$when     = $penalty["occi.penalty.timestamp"];
 			$when     = $when.date();
@@ -42,7 +43,7 @@ function PenaltyList( $selection )
 			$number   = $penalty["occi.penalty.sequence"];
 
 			$m = "<tr><td>"#$when#"<td>"#$accname#"<td>"#$conname#"<td>"#$agrname#"<td>"#$number;
-			$m = $m#"<td>"#$control#" "#$condition#" "#$data#"</tr>";
+			$m = $m#"<td>"#$control#" "#$condition#" "#$value#" : "#$data#"</tr>";
 			$m.display();
 		}
 	}
