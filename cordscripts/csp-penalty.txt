@@ -8,6 +8,20 @@
 
 		$a = '"occi.penalty.name":"scripted"';
 		$s = $s + $a;
+
+		$control = $2.get();
+		$v = $control["occi.control.account"];
+		$a = '"occi.penalty.account":"'#$v#'"';
+		$s = $s + $a;
+
+		$v = $control["occi.control.agreement"];
+		$a = '"occi.penalty.agreement":"'#$v#'"';
+		$s = $s + $a;
+
+		$v = $control["occi.control.contract"];
+		$a = '"occi.penalty.contract":"'#$v#'"';
+		$s = $s + $a;
+
 		$a = '"occi.penalty.control":"'#$2#'"';
 		$s = $s + $a;
 		$a = '"occi.penalty.nature":"'#$3#'"';
