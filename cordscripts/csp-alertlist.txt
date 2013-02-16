@@ -1,0 +1,24 @@
+
+function AlertList( $selection )
+{
+	$baseurl ="/accords/dashboard.php";
+	"<table width='100%'><tr><td class=section colspan=5><b>alerts</b></td></tr>".display();
+	"<tr><td class=title>Date<td class=title>Source<td class=title>Subject<td class=title>Nature<td class=title>Status".display();
+	$alerts = alert.list($selection);
+	foreach ( $alerts as $sid )
+	{
+		$alert 	 = $sid.get();
+		$when    = $alert["occi.alert.created"];
+		$when 	 = $when.date();
+		$source  = $alert["occi.alert.source"];
+		$subject = $alert["occi.alert.subject"];
+		$nature  = $alert["occi.alert.nature"];
+		$status  = $alert["occi.alert.status"];
+
+		$m = "<tr><td>"#$when#"<td>"#$source#"<td>"#$subject#"<td>"#$nature#"<td>"#$status#"</tr>";
+		$m.display();
+	}
+	"</table>".display();
+	return;
+}
+

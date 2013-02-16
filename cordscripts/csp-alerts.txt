@@ -1,0 +1,22 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-alerts.txt						 	 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of alerts that occured during provisioning 						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-alertlist.txt";
+
+	HtmlHeader("Accords Platform Alerts",$1);
+
+	$what = $2;
+
+	
+	"<tr><td colspan=6>".display();
+	AlertList( " " );
+	"</td></tr>".display();
+
+	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-scheduling.txt&option="#$what#"'>Scheduling</a></th></tr>";
+	$m.display();
+	
+	HtmlFooter();
