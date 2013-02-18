@@ -1,0 +1,1 @@
+/usr/local/bin/command --tls security/commandTls.xml --publisher  $1 $2 $3 $4 

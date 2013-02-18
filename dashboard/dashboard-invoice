@@ -1,0 +1,1 @@
+/usr/local/bin/command --tls security/commandTls.xml --publisher  invoice $1 

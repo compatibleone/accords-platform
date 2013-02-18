@@ -1,0 +1,1 @@
+/usr/local/bin/testcp --tls security/testcpTls.xml --publisher  $1 $2 $3 $4

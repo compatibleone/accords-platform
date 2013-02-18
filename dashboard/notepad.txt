@@ -1,0 +1,49 @@
+
+
+	case	"create provider"	:
+
+		$args = "";
+		compile_script( "csp-createprovider.txt", $this->page, $args );
+		break;
+
+	case	"create user account"	:
+
+		$args = "name=".$_REQUEST['name']." type=".$_REQUEST['type']." number=".$_REQUEST['number']." script=".$_REQUEST['script'];
+		$args = $args." user=".$_REQUEST['username']." pass=".$_REQUEST['password']." mail=".$_REQUEST['mail'];
+		$args = $args." os=".$_REQUEST['openstack']." on=".$_REQUEST['opennebula']." az=".$_REQUEST['windowsazure'];
+		compile_script( "csp-createaccount.txt", $this->page, $args );
+		break;
+
+	case	"add account user"		:
+
+		$args = "name=".$_REQUEST['name'];
+		$args = $args." user=".$_REQUEST['username']." pass=".$_REQUEST['password']." mail=".$_REQUEST['mail']." role=".$_REQUEST['role'];
+		compile_script( "csp-adduser.txt", $this->page, $args );
+		break;
+
+	case	"create sla"		:
+
+		$args = "name=".$_REQUEST['name']." desc=".$_REQUEST['desc']." init=".$_REQUEST['init']." resp=".$_REQUEST['resp'];
+		$args = $args." from=".$_REQUEST['from']." expire=".$_REQUEST['expire'];
+		compile_script( "csp-createsla.txt", $this->page, $args );
+		break;
+
+	case	"add condition"		:
+
+		$args = "name=".$_REQUEST['name'];
+		$args = "algo=".$_REQUEST['algo']." security=".$_REQUEST['security']." energy=".$_REQUEST['energy'];
+		$args = $args." provider=".$_REQUEST['provider']." zone=".$_REQUEST['zone']." rating=".$_REQUEST['rating'];
+		compile_script( "csp-addcondition.txt", $this->page, $args );
+		break;
+
+	case	"add guarantee"		:
+		$args = "name=".$_REQUEST['name'];
+		$args = $args." gm=".$_REQUEST["gm"];
+		$args = $args." ob=".$_REQUEST["oblig"];
+		$args = $args." gc=".$_REQUEST["gc"];
+		$args = $args." gv=".$_REQUEST["gv"];
+		$args = $args." gbv=".$_REQUEST["gbv"];
+		$args = $args." gbx=".$_REQUEST["gbx"];
+		compile_script( "csp-addguarantee.txt", $this->page, $args );
+		break;
+
