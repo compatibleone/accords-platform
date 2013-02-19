@@ -1,3 +1,11 @@
+compatibleone-accords (1.0-4) unstable; urgency=low
+
+  * Add new package compatibleone-dashboard (more work needed).
+  * Clean-up control file, start adding the php dashboard
+  * Replace hardwired emails.
+
+ -- Vincent <vincent@renardias.com>  Tue, 19 Feb 2013 11:15:37 +0100
+
 compatibleone-accords (1.0-3) unstable; urgency=low
 
   * Upstream update (tree SHA: a5c42c620e43d7a698c35e725cb7cf7fbba61181)

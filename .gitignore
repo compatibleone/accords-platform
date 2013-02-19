@@ -57,6 +57,7 @@ debian/compatibleone-cops/
 debian/compatibleone-cosacs/
 debian/compatibleone-cosched/
 debian/compatibleone-coss/
+debian/compatibleone-bashboard/
 debian/compatibleone-dcprocci/
 debian/compatibleone-example/
 debian/compatibleone-ezvm/
