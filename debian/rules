@@ -15,6 +15,9 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 # WARNING: IF BUILDING PAPROCCI MAKE SURE /usr/bin/javac POINTS TO SUN'S JDK (NOT OPENJDK)
 JAVA_HOME ?= $(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
+#DEBIAN_VERSION ?= 1.0-4
+DEBIAN_VERSION ?= $(shell debian/getversion)
+
 configure:
 	./autogen.sh
 
@@ -88,6 +91,8 @@ install: build
 	rm -f `find debian/tmp/ -name \*.pyc`
 	mkdir -p debian/tmp/var/www/compatibleone-dashboard
 	cp dashboard/* debian/tmp/var/www/compatibleone-dashboard
+	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
+		debian/tmp/var/www/compatibleone-dashboard/dashboard-*
 
 # Build architecture independant packages.
 
@@ -126,8 +131,8 @@ binary-arch: build install
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
 	for i in libcocarrier0 libcocci0 libcocspi0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
-		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= 1.0-3)") > debian/$$i.shlibs; \
-		dh_makeshlibs -p $$i -V "$$i (>= 1.0-3)"; \
+		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= $(DEBIAN_VERSION))") > debian/$$i.shlibs; \
+		dh_makeshlibs -p $$i -V "$$i (>= $(DEBIAN_VERSION))"; \
 	done
 	dh_shlibdeps -a
 	dh_gencontrol -a
