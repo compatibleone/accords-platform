@@ -3,7 +3,6 @@ Section: net
 Priority: extra
 Maintainer: Vincent Renardias <vrenardias@citypassenger.com>
 Build-Depends: debhelper (>= 7.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev, python-dev
-#Build-Depends: debhelper (>= 7.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev, curl, python-dev, compatibleone-paprocci-java, sun-java6-jdk, ant
 Standards-Version: 3.9.2
 Homepage: http://www.compatibleone.org/
 
@@ -62,15 +61,6 @@ Description: CompatibleOne Accords platform Python bindings and interfaces
  This package contains CompatibleOne Accords platform Python bindings and
  interfaces to develop new components in Python.
 
-#Package: compatibleone-accords-testsuite
-#Section: devel
-#Architecture: all
-#Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev, python-psutil
-#Description: CompatibleOne Accords platform (python testsuite)
-# This package will run a set of tests to ensure that a minimal level of working
-# parts is meet. It is useful during development to ensure that there is no
-# regression.
-#
 Package: libcocarrier0
 Section: libs
 Architecture: any
@@ -376,13 +366,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - PaaS Services subsystem
  CompatibleOne Accords Platform - PaaS Services subsystem package
 
-#Package: compatibleone-example
-#Section: net
-#Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
-#Description: CompatibleOne Accords Platform - Example OCCI subsystem
-# CompatibleOne Accords Platform - Example OCCI subsystem package
-#
 Package: compatibleone-ezvm
 Section: net
 Architecture: any
@@ -431,13 +414,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
  CompatibleOne Accords Platform - Open Stack Procci subsystem package
 
-#Package: compatibleone-paprocci
-#Section: net
-#Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
-#Description: CompatibleOne Accords Platform - ProActive Procci subsystem
-# CompatibleOne Accords Platform - ProActive Procci subsystem package.
-
 Package: compatibleone-procci
 Section: net
 Architecture: any
@@ -471,20 +447,18 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - SLA Manager
  Service Level Agreement for the CompatibleOne Accords Platform
 
-#Package: compatibleone-testosocci
-#Section: net
-#Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
-#Description: CompatibleOne Accords Platform - Open Stack inspection tool
-# This command line tool allows inspection of the Open Stack platform
-# resources that are available or have been provisioned using the following command line syntax
-#
+Package: compatibleone-dashboard
+Section: net
+Architecture: any
+Depends: compatibleone (>= ${binary:Version}), libapache2-mod-php5 | php5-cgi | php5, apache2 | httpd
+Description: CompatibleOne Accords Platform - Dashboard
+ Web-based dashboard for the CompatibleOne Accords Platform
+
 Package: compatibleone-accords
 Architecture: all
 Section: net
 Depends: compatibleone (>= ${binary:Version}),  compatibleone-base (>= ${binary:Version}),  compatibleone-azprocci (>= ${binary:Version}),  compatibleone-broker (>= ${binary:Version}),  compatibleone-cool (>= ${binary:Version}),  compatibleone-coees (>= ${binary:Version}),  compatibleone-copaas (>= ${binary:Version}),  compatibleone-cops (>= ${binary:Version}),  compatibleone-coips (>= ${binary:Version}),  compatibleone-comons (>= ${binary:Version}),  compatibleone-conets (>= ${binary:Version}),  compatibleone-coobas (>= ${binary:Version}),  compatibleone-cosacs (>= ${binary:Version}),  compatibleone-cosched (>= ${binary:Version}),  compatibleone-coss (>= ${binary:Version}),  compatibleone-dcprocci (>= ${binary:Version}),  compatibleone-ezvm (>= ${binary:Version}),  compatibleone-fileserver (>= ${binary:Version}),  compatibleone-onprocci (>= ${binary:Version}),  compatibleone-osocciprocci (>= ${binary:Version}),  compatibleone-osprocci (>= ${binary:Version}),  compatibleone-procci (>= ${binary:Version}),  compatibleone-publisher (>= ${binary:Version}),  compatibleone-paasprocci (>= ${binary:Version}),  compatibleone-slam (>= ${binary:Version}),  compatibleone-accords-doc
-Recommends: compatibleone-nagios
-#Recommends: compatibleone-paprocci, compatibleone-nagios
+Recommends: compatibleone-nagios, compatibleone-dashboard
 Description: CompatibleOne Accords Platform - All packages (runtime)
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,
@@ -510,8 +484,7 @@ Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
 Depends: compatibleone (>= ${binary:Version}), compatibleone-accords (>= ${binary:Version}), python-compatibleone-accords (>= ${binary:Version}), libcocarrier-dev (>= ${binary:Version}), libcocci-dev (>= ${binary:Version}), libcopabr-dev (>= ${binary:Version}), libcords-dev (>= ${binary:Version}), libcorest-dev (>= ${binary:Version}), libcoxml-dev (>= ${binary:Version}), libocci-dev (>= ${binary:Version}), libpubocci-dev (>= ${binary:Version}), libcocspi-dev (>= ${binary:Version})
-#Recommends: compatibleone-paprocci, compatibleone-nagios
-Recommends: compatibleone-nagios
+Recommends: compatibleone-nagios, compatibleone-dashboard
 Description: CompatibleOne Accords Platform - All packages (development environment)
  CompatibleOne is an open source project which provides a model, CORDS
  (CompatibleOne Resource Description Schema), and a platform,

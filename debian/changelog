@@ -1,9 +1,9 @@
 compatibleone-accords (1.0-3) unstable; urgency=low
 
-  * Upstream update (tree SHA: 241c9598da5dfb52118f80e2e73c3fd9866bbad7)
+  * Upstream update (tree SHA: a5c42c620e43d7a698c35e725cb7cf7fbba61181)
   * Add libcocspi0 and libcocspi-dev packages (+bump up solib deps).
 
- -- Vincent <vincent@vincent>  Mon, 11 Feb 2013 14:58:01 +0100
+ -- Vincent <vincent@renardias.com>  Wed, 13 Feb 2013 12:18:57 +0100
 
 compatibleone-accords (1.0-2) unstable; urgency=low
 
@@ -11,7 +11,7 @@ compatibleone-accords (1.0-2) unstable; urgency=low
   * Include selftest.csp cordscript.
   * Remove occurences of paprocci in current build.
 
- -- Vincent <vincent@vincent>  Wed, 23 Jan 2013 14:58:01 +0100
+ -- Vincent <vincent@renardias.com>  Wed, 23 Jan 2013 14:58:01 +0100
 
 compatibleone-accords (1.0-1) unstable; urgency=low
 

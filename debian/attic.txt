@@ -1,0 +1,43 @@
+
+### Temporarily disabled stuff or older configs stored here to avoid clutering the actual config files.
+
+#Build-Depends: debhelper (>= 7.0.0), autoconf, automake, libtool, libssl-dev, uuid-dev, curl, python-dev, compatibleone-paprocci-java, sun-java6-jdk, ant
+#Package: compatibleone-accords-testsuite
+#Section: devel
+#Architecture: all
+#Depends: ${misc:Depends}, compatibleone (>= ${binary:Version}), python-unittest2, python-dev, python-psutil
+#Description: CompatibleOne Accords platform (python testsuite)
+# This package will run a set of tests to ensure that a minimal level of working
+# parts is meet. It is useful during development to ensure that there is no
+# regression.
+#
+#Package: compatibleone-coidms
+#Section: net
+#Architecture: all
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), python-compatibleone-accords
+#Description: CompatibleOne Accords Platform - COIDMS subsystem
+# IDentity Management subsystem for the CompatibleOne Accords Platform
+#
+#Package: compatibleone-example
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+#Description: CompatibleOne Accords Platform - Example OCCI subsystem
+# CompatibleOne Accords Platform - Example OCCI subsystem package
+#
+#Package: compatibleone-paprocci
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}), sun-java6-bin, compatibleone-paprocci-java
+#Description: CompatibleOne Accords Platform - ProActive Procci subsystem
+# CompatibleOne Accords Platform - ProActive Procci subsystem package.
+#Package: compatibleone-testosocci
+#Section: net
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+#Description: CompatibleOne Accords Platform - Open Stack inspection tool
+# This command line tool allows inspection of the Open Stack platform
+# resources that are available or have been provisioned using the following command line syntax
+#
+#Recommends: compatibleone-paprocci, compatibleone-nagios
+#Recommends: compatibleone-paprocci, compatibleone-nagios
