@@ -81,9 +81,8 @@ install: build
 	cp manifests/style.css `pwd`/debian/tmp/etc/cosacs
 	cp debian/cosacs.default `pwd`/debian/tmp/etc/default/cosacs
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
-	sed -i  -e 's/jamie@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g' \
-		-e 's/admin@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g' \
-		-e 's/fabio@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g'  debian/tmp/etc/accords/cords_user.xml
+	sed -i  -e 's/\(jamie\|fabio\|admin\)@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g' \
+		debian/tmp/etc/accords/cords_user.xml
 	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc debian/tmp/usr/lib/python2.7/cocarrier
 	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
