@@ -480,7 +480,7 @@ public	struct	rest_request * rest_client_request(
 		return( liberate_rest_request( rptr ) );
 	else if (!( hptr->name = allocate_string( _HTTP_HOST ) ))
 		return( liberate_rest_request( rptr ) );
-	else if (!( hptr->value = serialise_url_host_port( uptr ) ))
+	else if (!( hptr->value = allocate_string( uptr->host ) ))
 		return( liberate_rest_request( rptr ) );
 	else if (!( hptr = add_rest_header( rptr ) ))
 		return( liberate_rest_request( rptr ) );

@@ -10,6 +10,7 @@ struct	rest_request
 	char			* parameters;
 	char			* version;
 	int			type;
+	int			port;
 	char			* body;
 	char			* host;
 };

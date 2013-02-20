@@ -65,6 +65,7 @@ public struct rest_request * reset_rest_request(struct rest_request * sptr)
 		sptr->parameters = (char*) 0;
 		sptr->version = (char*) 0;
 		sptr->type =  0;
+		sptr->port =  0;
 		sptr->body = (char*) 0;
 		sptr->host = (char*) 0;
 	}

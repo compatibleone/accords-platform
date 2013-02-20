@@ -1,22 +1,6 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
-#ifndef _appliance_c_
-#define _appliance_c_
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
+#ifndef _occiappliance_c_
+#define _occiappliance_c_
 
 #include "appliance.h"
 
@@ -33,6 +17,7 @@ private pthread_mutex_t list_cords_appliance_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_kind_node * cords_appliance_first = (struct occi_kind_node *) 0;
 private struct occi_kind_node * cords_appliance_last  = (struct occi_kind_node *) 0;
 public struct  occi_kind_node * occi_first_cords_appliance_node() { return( cords_appliance_first ); }
+public struct  occi_kind_node * occi_last_cords_appliance_node() { return( cords_appliance_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -301,25 +286,25 @@ private struct rest_response * cords_appliance_occi_response(
 	struct cords_appliance * pptr)
 {
 	struct rest_header * hptr;
-	sprintf(cptr->buffer,"occi.core.id=%s",pptr->id);
+	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%s",optr->domain,optr->id,pptr->name);
+	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.carrier=%s",optr->domain,optr->id,pptr->carrier);
+	sprintf(cptr->buffer,"%s.%s.carrier=%c%s%c",optr->domain,optr->id,0x0022,pptr->carrier,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.profile=%s",optr->domain,optr->id,pptr->profile);
+	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.infrastructure=%s",optr->domain,optr->id,pptr->infrastructure);
+	sprintf(cptr->buffer,"%s.%s.infrastructure=%c%s%c",optr->domain,optr->id,0x0022,pptr->infrastructure,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.image=%s",optr->domain,optr->id,pptr->image);
+	sprintf(cptr->buffer,"%s.%s.image=%c%s%c",optr->domain,optr->id,0x0022,pptr->image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.state=%u",optr->domain,optr->id,pptr->state);
+	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	if ( occi_render_links( aptr, pptr->id ) != 0)
@@ -345,7 +330,7 @@ private struct rest_response * cords_appliance_get_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);
+	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
 	autosave_cords_appliance_nodes();
 	return( cords_appliance_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -427,18 +412,20 @@ private struct rest_response * cords_appliance_post_item(
 	struct occi_kind_node * nptr;
 	struct cords_appliance * pptr;
 	char * reqhost;
+	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else reqport = rptr->port;
 	if (!( nptr = add_cords_appliance_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_appliance_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);
+	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_cords_appliance_nodes();
-	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -464,7 +451,7 @@ private struct rest_response * cords_appliance_put_item(
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_appliance_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);
+	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
 	autosave_cords_appliance_nodes();
 	return( cords_appliance_occi_response(optr,cptr,rptr,aptr,pptr));
 }
@@ -500,7 +487,7 @@ private struct rest_response * cords_appliance_delete_item(
 	iptr = optr->callback;
 	if (!( nptr = locate_cords_appliance_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);
+	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
 	drop_cords_appliance_node( nptr );
 	autosave_cords_appliance_nodes();
 	if (!( occi_success( aptr ) ))
@@ -520,9 +507,11 @@ private struct rest_response * cords_appliance_get_list(
 	struct cords_appliance * pptr;
 	struct cords_appliance * fptr;
 	char * reqhost;
+	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_cords_appliance_info( optr, rptr, aptr ) ))
+	else reqport = rptr->port;
+	if (!( fptr = filter_cords_appliance_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = cords_appliance_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -531,7 +520,7 @@ private struct rest_response * cords_appliance_get_list(
 			continue;
 		if (!( pass_cords_appliance_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -564,7 +553,7 @@ private struct rest_response * cords_appliance_delete_all(
 			continue;
 			}
 		else	{
-			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }
+			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
 			drop_cords_appliance_node( nptr );
 			nptr = sptr;
@@ -700,20 +689,18 @@ private struct rest_response * occi_cords_appliance_delete(void * vptr, struct r
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   t a b l e 	*/
-/*	--------------------------------------------------------------------	*/
-private struct rest_interface occi_cords_appliance_mt = {
-	(void*) 0,
-	(void*) 0,
-	(void*) 0,
-	occi_cords_appliance_get,
-	occi_cords_appliance_post,
-	occi_cords_appliance_put,
-	occi_cords_appliance_delete,
-	occi_cords_appliance_head,
-	(void*) 0
-	};
+/*	--------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
+/*	--------------------------------------------------------------------------------	*/
+private void	redirect_occi_cords_appliance_mt( struct rest_interface * iptr )
+{
+	iptr->get = occi_cords_appliance_get;
+	iptr->post = occi_cords_appliance_post;
+	iptr->put = occi_cords_appliance_put;
+	iptr->delete = occi_cords_appliance_delete;
+	iptr->head = occi_cords_appliance_head;
+	return;
+}
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -727,7 +714,7 @@ public struct occi_category * occi_cords_appliance_builder(char * a,char * b) {
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		optr->interface = &occi_cords_appliance_mt;
+		redirect_occi_cords_appliance_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "carrier",0,0) ))
@@ -837,4 +824,4 @@ public struct rest_header *  cords_appliance_occi_headers(struct cords_appliance
 
 }
 
-#endif	/* _appliance_c_ */
+#endif	/* _occiappliance_c_ */

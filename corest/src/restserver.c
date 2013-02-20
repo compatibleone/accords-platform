@@ -1578,13 +1578,15 @@ private	struct rest_response *	rest_consume_response_body(
 /*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ r e q u e s t		*/
 /*	------------------------------------------------	*/
-private	struct rest_request *	rest_consume_request( struct rest_client * cptr )
+private	struct rest_request *	rest_consume_request( struct rest_client * cptr, int port )
 {
 	struct	rest_request * 	rptr;
 
 	if (!( rptr = allocate_rest_request() ))
 		return( rptr );
-	else if (!( rptr = rest_consume_command( cptr, rptr )))
+	else	rptr->port = port;
+
+	if (!( rptr = rest_consume_command( cptr, rptr )))
 		return( rptr );
 	else if (!( rptr = rest_parse_object( cptr, rptr )))
 		return( rptr );
@@ -1773,7 +1775,7 @@ private	void	rest_detach_client( struct rest_client * cptr )
 /*	------------------------------------------------	*/
 /*	     r e s t _ a c c e p t _ m e s s a g e		*/
 /*	------------------------------------------------	*/
-private	int	rest_accept_message( struct rest_client * cptr )
+private	int	rest_accept_message( struct rest_client * cptr, int port )
 {
 	struct	rest_request *	rptr;
 #ifdef	_REST_THREAD_WORKER
@@ -1792,7 +1794,7 @@ private	int	rest_accept_message( struct rest_client * cptr )
 	/* ----------------------------------- */
 	/* otherwise it may be an HTTP request */ 
 	/* ----------------------------------- */
-	if (!( rptr = rest_consume_request( cptr ) ))
+	if (!( rptr = rest_consume_request( cptr, port ) ))
 	{
 		rest_drop_client( cptr );
 		return(0);
@@ -2236,7 +2238,7 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 			else if ( sptr->active )
 			{
 				rest_log_debug( "server: accept message" );
-				if (!( rest_accept_message( sptr->active ) ))
+				if (!( rest_accept_message( sptr->active, port ) ))
 					continue;
 				else	break;
 			}
