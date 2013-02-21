@@ -14,8 +14,10 @@
 /* See the License for the specific language governing permissions and           */
 /* limitations under the License.                                                */
 /*-------------------------------------------------------------------------------*/
-#include "../../occi/src/occi.h"
+#include "occi.h"
 #include "ctools.h"
+#include "pytools.h"
+#include "ec2config.h"
 #include <Python.h>
 
 //            category current action  
@@ -29,134 +31,138 @@ struct rest_response * current_ec2config(
 	struct ec2config * pptr;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
-	char status[1024];
+	int  status = 0;
 	char message[1024];
         char srcdir[1024];
 	char * response;
 	char * token;
-	FILE * exp_file;
-	listcc restResponse;
-	PyObject *main_module, *global_dict, *cbFunc, *result;
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
+        listcc restResponse;
 
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else{
-		if(!(pptr->name))strcpy(sendstr," ");
-		else if(pptr->name[0]=='\0') strcpy(sendstr," ");
-		else strcpy(sendstr,pptr->name);
-		if(!(pptr->description)){
+		
+		if(!(strValid(pptr->id))) strcpy(sendstr," ");
+		else strcpy(sendstr,pptr->id);
+
+		if(!(strValid(pptr->name))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
-		else if(pptr->description[0]=='\0'){
+		else strConcat(sendstr,pptr->name,',');
+
+		if(!(strValid(pptr->description))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->description,',');
-		if(!(pptr->accesskey)){
+
+		if(!(strValid(pptr->user))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
-		else if(pptr->accesskey[0]=='\0'){
+		else strConcat(sendstr,pptr->user,',');
+
+		if(!(strValid(pptr->password))){
+			strcpy(strtmp," ");
+			strConcat(sendstr,strtmp,',');
+		}
+		else strConcat(sendstr,pptr->password,',');
+
+		if(!(strValid(pptr->accesskey))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->accesskey,',');
-		if(!(pptr->secretkey)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->secretkey[0]=='\0'){
+
+		if(!(strValid(pptr->secretkey))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->secretkey,',');
-		if(!(pptr->authenticate)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->authenticate[0]=='\0'){
+
+		if(!(strValid(pptr->authenticate))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->authenticate,',');
-		if(!(pptr->agent)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->agent[0]=='\0'){
+
+		if(!(strValid(pptr->agent))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->agent,',');
-		if(!(pptr->host)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->host[0]=='\0'){
+
+		if(!(strValid(pptr->host))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->host,',');
-		if(!(pptr->version)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->version[0]=='\0'){
+
+		
+		if(!(strValid(pptr->version))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->version,',');
-		if(!(pptr->namespace)){
+		
+		if(!(strValid(pptr->location))){
 			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
+                	strConcat(sendstr,strtmp,',');
 		}
-		else if(pptr->namespace[0]=='\0'){
+		else strConcat(sendstr,pptr->location,',');
+
+		if(!(strValid(pptr->namespace))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->namespace,',');
-		if(!(pptr->base)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->base[0]=='\0'){
+
+		if(!(strValid(pptr->base))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->base,',');
-		if(!(pptr->tls)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->tls[0]=='\0'){
+
+		if(!(strValid(pptr->tls))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->tls,',');
-		if(!(pptr->current)){
-			strcpy(strtmp," ");
-			strConcat(sendstr,strtmp,',');
-		}
-		else if(pptr->current[0]=='\0'){
+
+		if(!(strValid(pptr->current))){
 			strcpy(strtmp," ");
 			strConcat(sendstr,strtmp,',');
 		}
 		else strConcat(sendstr,pptr->current,',');
-		//           python interface
-                sprintf(srcdir,"%s/pyaccords/pysrc/ec2configAct.py",PYPATH);
-		exp_file = fopen(srcdir, "r");
-		if(!exp_file) printf("error in ec2configAction.c ec2config.py :No such file or directory\n");
-		Py_Initialize();
-		PyRun_SimpleFile(exp_file,srcdir);
-		main_module = PyImport_AddModule("__main__");
-		global_dict = PyModule_GetDict(main_module);
-		cbFunc = PyDict_GetItemString(global_dict,"current");
-		if(!cbFunc) printf("error in ec2configAction.c :no python function\n");
-		result=PyObject_CallFunction(cbFunc,"s",sendstr);
-		response=PyString_AsString( result );
-		Py_Finalize();
 
+		//           python interface
+		sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+		pythr = Py_NewInterpreter();
+		python_path(srcdir);
+		pName = PyString_FromString("ec2configAct");
+		if(pName == NULL) printf("erro: in ec2configAct.py no such file name\n");
+		else pModule = PyImport_Import(pName);
+		if(pModule == NULL) printf("error: failed to load ec2configAct module\n");
+		else pDict = PyModule_GetDict(pModule);
+		if(pDict == NULL) printf("error: failed to load dict name in ec2configAct module\n");
+		else pFunc = PyDict_GetItemString(pDict,"current");
+		if(pFunc == NULL) printf("error: failed to load start function in ec2configAct module\n");
+		else result=PyObject_CallFunction(pFunc,"s",sendstr);
+	
+		if (!result || PyErr_Occurred());
+        	{
+       			PyErr_Print();
+       			return (rest_html_response( aptr, 404, "Invalid Action" ) );
+       		}
+
+		response=allocate_string(PyString_AsString( result ));
+		Py_DECREF(pModule);
+		Py_DECREF(pName);
+		Py_EndInterpreter(pythr);
+	
 		resetListe(&restResponse);
 		token= strtok(response,",");
 		for(; token != NULL ;)
@@ -166,7 +172,7 @@ struct rest_response * current_ec2config(
 		}
 		elemm *pelem = restResponse.first;
 		if(pelem){
-			strcpy(status , pelem->value);
+				status = atoi(pelem->value);
 		pelem = pelem->next;
 		}
 		if(pelem){
@@ -179,7 +185,7 @@ struct rest_response * current_ec2config(
 
 char * ec2config_getname(int a)
 {
-  char action[256];
+  static char action[256];
   
   switch (a)
   {

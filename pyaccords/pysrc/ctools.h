@@ -39,7 +39,7 @@ void addFronte(listcc *l, char *val);
 void liberateListe(listcc *l);
 
 void strConcat(char str1[], char str2[],char c);
-
+int strValid( char * vptr );
 
 
 #endif

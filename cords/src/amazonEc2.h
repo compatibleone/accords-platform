@@ -18,8 +18,8 @@ struct amazonEc2
 	char * network;
 	char * access;
 	char * accessip;
-	char * floating;
-	char * floatingid;
+	char * keypair;
+	char * placementgroup;
 	char * publicaddr;
 	char * privateaddr;
 	char * firewall;
@@ -27,8 +27,9 @@ struct amazonEc2
 	char * zone;
 	char * hostname;
 	char * workload;
-	char * when;
-	char * state;
+        char * agent;
+	int  when;
+	int  state;
 };
 
 #endif

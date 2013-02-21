@@ -18,13 +18,13 @@
 #define	_COMPONENT_c
  
 #include "standard.h"
-#include "broker.h"
 #include "rest.h"
 #include "occi.h"
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "accords.h"
 #include "list.h"
 #include "../../pyaccords/pysrc/crudinterf.h"
 #include "../../pyaccords/pysrc/categaction.h"
@@ -41,9 +41,11 @@ public	char *	default_publisher();
 public	char *	default_operator();	
 public	char *	default_tls();	
 public	char *	default_zone();
+public  char *  default_agent();
 public	int	failure( int e, char * m1, char * m2 );
 private	int banner();
 private	struct rest_server * module_initialise(  void * v,struct rest_server * sptr );
+private char * defaultagent = (char*) 0;
 
 void fillInAccordsConfiguration(struct accords_configuration *componentModule, char *moduleName)
 {
@@ -67,7 +69,8 @@ void fillInAccordsConfiguration(struct accords_configuration *componentModule, c
         componentModule->chatport=8000;                        /* xmpp chat host prot                  */
         componentModule->domain="domain";                      /* category domain                      */
         componentModule->config=configFile;                    /* configuration file                   */
-        componentModule->zone="europe";
+        componentModule->zone="europe";                        /* host location                        */
+	componentModule->storage="storage";                    /* data storage                         */
         componentModule->firstcat=(struct occi_category *) 0;
         componentModule->lastcat=(struct  occi_category *) 0;
 
@@ -103,6 +106,12 @@ public	char *	default_zone()
    return(moduleConfig.zone);		
 }
 
+public char * default_agent()
+{
+	return(defaultagent);
+}
+
+
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -123,8 +132,8 @@ public	int	failure( int e, char * m1, char * m2 )
 private	int banner()
 {
 	printf("\n   CompatibleOne Elasticity Services COES : Version 1.0a.0.03");
-	printf("\n   Beta Version : 28/11/2011");
-	printf("\n   Copyright (c) 2011 Iain James Marshall, Prologue");
+	printf("\n   Beta Version : 02/01/2013");
+	printf("\n   Copyright (c) 2013 Hamid Medjahed, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -297,6 +306,9 @@ private	int	module_operation(
         char packetfile[256];
         char *actionName;
         int categoryAccess = 0;
+    
+        defaultagent = allocate_string( nptr );
+	set_default_agent(defaultagent);
 
         elem *pelem = categoryName.first;      
         sprintf(xlinkModule,"links_%s.xml",moduleName);
@@ -305,9 +317,7 @@ private	int	module_operation(
         sprintf(packetfile,"packet_%s.xml",moduleName); 
 
         while(pelem)
-        {       
-          
-      
+        {        
 	  if (!( optr = callocciCategoryBuilder( pelem->value,componentModule->domain,pelem->value) ))
 		   return( 27 );
 	  else if (!( optr->previous = last ))

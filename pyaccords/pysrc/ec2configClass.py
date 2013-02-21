@@ -17,16 +17,20 @@
 
 class Cec2config:
 	"""Class to define the ec2config category structure"""
-	def __init__( self,name,description,accesskey,secretkey,authenticate,agent,host,version,namespace,base,tls,current ):
+	def __init__( self,Id,name,description,user,password,accesskey,secretkey,authenticate,agent,host,version,location,namespace,base,tls,current):
 		"""Constructor of the class"""
+		self.Id = Id
 		self.name = name
 		self.description = description
+		self.user = user
+		self.password = password
 		self.accesskey = accesskey
 		self.secretkey = secretkey
 		self.authenticate = authenticate
 		self.agent = agent
 		self.host = host
 		self.version = version
+		self.location = location
 		self.namespace = namespace
 		self.base = base
 		self.tls = tls

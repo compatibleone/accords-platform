@@ -15,12 +15,14 @@
 /* limitations under the License.                                                */
 /*-------------------------------------------------------------------------------*/
 
-#include "../../occi/src/occi.h"
+#include "occi.h"
 #include "ctools.h"
+#include "ec2config.h"
+#include "pytools.h"
 #include "listcateg.h"
 #include <Python.h>
 
-private int ec2config_create(struct occi_category * optr, void * vptr)
+private int ec2config_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
@@ -29,130 +31,134 @@ private int ec2config_create(struct occi_category * optr, void * vptr)
         char srcdir[1024];
 	char * response;
 	char * token;
-	FILE * exp_file;
 	listcc categoryAtr;
-	PyObject*    main_module, * global_dict, * cbFunc, *result;
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
 
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
+	
+	if(!(strValid(pptr->id))) strcpy(sendstr," ");
+	else strcpy(sendstr,pptr->id);
 
-	if(!(pptr->name)) strcpy(sendstr," ");
-	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
-	else strcpy(sendstr,pptr->name);
-	if(!(pptr->description)){
+	if(!(strValid(pptr->name))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->description[0]=='\0'){
+	else strConcat(sendstr,pptr->name,',');
+
+	if(!(strValid(pptr->description))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->description,',');
-	if(!(pptr->accesskey)){
+
+	if(!(strValid(pptr->user))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->accesskey[0]=='\0'){
+	else strConcat(sendstr,pptr->user,',');
+
+	if(!(strValid(pptr->password))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->password,',');
+
+	if(!(strValid(pptr->accesskey))){
+		strcpy(strtmp," ");
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->accesskey,',');
-	if(!(pptr->secretkey)){
+
+	if(!(strValid(pptr->secretkey))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->secretkey[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->secretkey,',');
-	if(!(pptr->authenticate)){
+
+	if(!(strValid(pptr->authenticate))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->authenticate[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->authenticate,',');
-	if(!(pptr->agent)){
+
+	if(!(strValid(pptr->agent))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->agent[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->agent,',');
-	if(!(pptr->host)){
+
+	if(!(strValid(pptr->host))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->host[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->host,',');
-	if(!(pptr->version)){
+
+	
+	if(!(strValid(pptr->version))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->version[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->version,',');
-	if(!(pptr->namespace)){
+
+	if(!(strValid(pptr->location))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->namespace[0]=='\0'){
+	else strConcat(sendstr,pptr->location,',');
+
+	if(!(strValid(pptr->namespace))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->namespace,',');
-	if(!(pptr->base)){
+
+	if(!(strValid(pptr->base))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->base[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->base,',');
-	if(!(pptr->tls)){
+
+	if(!(strValid(pptr->tls))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->tls[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->tls,',');
-	if(!(pptr->current)){
+
+	if(!(strValid(pptr->current))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->current[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->current,',');
+
 	//           python interface
-        sprintf(srcdir,"%s/pyaccords/pysrc/ec2config.py",PYPATH);
-	exp_file = fopen(PYPATH, "r");
-	if(!exp_file) printf("error in ec2configInterface.c ec2config.py :No such file or directory\n");
-	Py_Initialize();
-	PyRun_SimpleFile(exp_file,PYPATH);
-	main_module = PyImport_AddModule("__main__");
-	global_dict = PyModule_GetDict(main_module);
-	cbFunc = PyDict_GetItemString(global_dict,"create");
-	if(!cbFunc) printf("error in ec2configInterface.c :no python function\n");
-	result=PyObject_CallFunction(cbFunc,"s",sendstr);
-	response=PyString_AsString( result );
-	Py_Finalize();
+	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	pythr = Py_NewInterpreter();
+	python_path(srcdir);
+	pName = PyString_FromString("ec2config");
+	if(pName == NULL) printf("erro: in ec2config.py no such file name\n");
+	else pModule = PyImport_Import(pName);
+	if(pModule == NULL) printf("error: failed to load amazonEc2 module\n");
+	else pDict = PyModule_GetDict(pModule);
+	if(pDict == NULL) printf("error: failed to load dict name in amazonEc2 module\n");
+	else pFunc = PyDict_GetItemString(pDict,"create");
+	if(pFunc == NULL) printf("error: failed to load create function in ec2config module\n");
+	else result=PyObject_CallFunction(pFunc,"s",sendstr);
+	
+	if (!result || PyErr_Occurred())
+        {
+       		PyErr_Print();
+       		return (0);
+       	}
+
+	response=allocate_string(PyString_AsString( result ));
+
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_EndInterpreter(pythr);
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -163,11 +169,23 @@ private int ec2config_create(struct occi_category * optr, void * vptr)
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
+		pptr->id = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
 		pptr->name = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->description = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->user = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->password = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -192,6 +210,10 @@ private int ec2config_create(struct occi_category * optr, void * vptr)
 	}
 	if(pelem){
 		pptr->version = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->location = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -213,7 +235,7 @@ private int ec2config_create(struct occi_category * optr, void * vptr)
 }
 
 
-private int ec2config_retrieve(struct occi_category * optr, void * vptr)
+private int ec2config_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
@@ -222,130 +244,133 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr)
         char srcdir[1024];
 	char * response;
 	char * token;
-	FILE * exp_file;
 	listcc categoryAtr;
-	PyObject*    main_module, * global_dict, * cbFunc, *result;
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
 
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
 
-	if(!(pptr->name)) strcpy(sendstr," ");
-	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
-	else strcpy(sendstr,pptr->name);
-	if(!(pptr->description)){
+	if(!(strValid(pptr->id))) strcpy(sendstr," ");
+	else strcpy(sendstr,pptr->id);
+
+	if(!(strValid(pptr->name))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->description[0]=='\0'){
+	else strConcat(sendstr,pptr->name,',');
+
+	if(!(strValid(pptr->description))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->description,',');
-	if(!(pptr->accesskey)){
+
+	if(!(strValid(pptr->user))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->accesskey[0]=='\0'){
+	else strConcat(sendstr,pptr->user,',');
+
+	if(!(strValid(pptr->password))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->password,',');
+
+	if(!(strValid(pptr->accesskey))){
+		strcpy(strtmp," ");
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->accesskey,',');
-	if(!(pptr->secretkey)){
+
+	if(!(strValid(pptr->secretkey))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->secretkey[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->secretkey,',');
-	if(!(pptr->authenticate)){
+
+	if(!(strValid(pptr->authenticate))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->authenticate[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->authenticate,',');
-	if(!(pptr->agent)){
+
+	if(!(strValid(pptr->agent))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->agent[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->agent,',');
-	if(!(pptr->host)){
+
+	if(!(strValid(pptr->host))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->host[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->host,',');
-	if(!(pptr->version)){
+
+	
+	if(!(strValid(pptr->version))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->version[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->version,',');
-	if(!(pptr->namespace)){
+	
+	if(!(strValid(pptr->location))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->namespace[0]=='\0'){
+	else strConcat(sendstr,pptr->location,',');
+
+	if(!(strValid(pptr->namespace))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->namespace,',');
-	if(!(pptr->base)){
+
+	if(!(strValid(pptr->base))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->base[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->base,',');
-	if(!(pptr->tls)){
+
+	if(!(strValid(pptr->tls))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->tls[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->tls,',');
-	if(!(pptr->current)){
+
+	if(!(strValid(pptr->current))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->current[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->current,',');
+ 	
 	//           python interface
-        sprintf(srcdir,"%s/pyaccords/pysrc/ec2config.py",PYPATH);
-	exp_file = fopen(srcdir, "r");
-	if(!exp_file) printf("error in ec2configInterface.c ec2config.py :No such file or directory\n");
-	Py_Initialize();
-	PyRun_SimpleFile(exp_file,srcdir);
-	main_module = PyImport_AddModule("__main__");
-	global_dict = PyModule_GetDict(main_module);
-	cbFunc = PyDict_GetItemString(global_dict,"retrieve");
-	if(!cbFunc) printf("error in ec2configInterface.c :no python function\n");
-	result=PyObject_CallFunction(cbFunc,"s",sendstr);
-	response=PyString_AsString( result );
-	Py_Finalize();
+	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	pythr = Py_NewInterpreter();
+	python_path(srcdir);
+	pName = PyString_FromString("ec2config");
+	if(pName == NULL) printf("erro: in ec2config.py no such file name\n");
+	else pModule = PyImport_Import(pName);
+	if(pModule == NULL) printf("error: failed to load ec2config module\n");
+	else pDict = PyModule_GetDict(pModule);
+	if(pDict == NULL) printf("error: failed to load dict name in ec2config module\n");
+	else pFunc = PyDict_GetItemString(pDict,"retrieve");
+	if(pFunc == NULL) printf("error: failed to load retrieve function in ec2config module\n");
+	else result=PyObject_CallFunction(pFunc,"s",sendstr);
+	if (!result || PyErr_Occurred())
+        {
+       		PyErr_Print();
+       		return (0);
+       	}
+
+	response=allocate_string(PyString_AsString( result ));
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_EndInterpreter(pythr);
+	
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -356,11 +381,23 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr)
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
+		pptr->id = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
 		pptr->name = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->description = pelem->value;
+		pelem = pelem->next;
+	}
+        if(pelem){
+	        pptr->user = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+  		pptr->password = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -385,6 +422,10 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr)
 	}
 	if(pelem){
 		pptr->version = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->location = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -406,7 +447,7 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr)
 }
 
 
-private int ec2config_update(struct occi_category * optr, void * vptr)
+private int ec2config_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
@@ -415,130 +456,133 @@ private int ec2config_update(struct occi_category * optr, void * vptr)
         char srcdir[1024];
 	char * response;
 	char * token;
-	FILE * exp_file;
 	listcc categoryAtr;
-	PyObject*    main_module, * global_dict, * cbFunc, *result;
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
 
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
+	
+	if(!(strValid(pptr->id))) strcpy(sendstr," ");
+	else strcpy(sendstr,pptr->id);
 
-	if(!(pptr->name)) strcpy(sendstr," ");
-	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
-	else strcpy(sendstr,pptr->name);
-	if(!(pptr->description)){
+	if(!(strValid(pptr->name))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->description[0]=='\0'){
+	else strConcat(sendstr,pptr->name,',');
+
+	if(!(strValid(pptr->description))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->description,',');
-	if(!(pptr->accesskey)){
+
+	if(!(strValid(pptr->user))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->accesskey[0]=='\0'){
+	else strConcat(sendstr,pptr->user,',');
+
+	if(!(strValid(pptr->password))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->password,',');
+
+	if(!(strValid(pptr->accesskey))){
+		strcpy(strtmp," ");
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->accesskey,',');
-	if(!(pptr->secretkey)){
+
+	if(!(strValid(pptr->secretkey))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->secretkey[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->secretkey,',');
-	if(!(pptr->authenticate)){
+
+	if(!(strValid(pptr->authenticate))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->authenticate[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->authenticate,',');
-	if(!(pptr->agent)){
+
+	if(!(strValid(pptr->agent))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->agent[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->agent,',');
-	if(!(pptr->host)){
+
+	if(!(strValid(pptr->host))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->host[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->host,',');
-	if(!(pptr->version)){
+
+	
+	if(!(strValid(pptr->version))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->version[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->version,',');
-	if(!(pptr->namespace)){
+	
+	if(!(strValid(pptr->location))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->namespace[0]=='\0'){
+	else strConcat(sendstr,pptr->location,',');
+
+	if(!(strValid(pptr->namespace))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->namespace,',');
-	if(!(pptr->base)){
+
+	if(!(strValid(pptr->base))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->base[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->base,',');
-	if(!(pptr->tls)){
+
+	if(!(strValid(pptr->tls))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->tls[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->tls,',');
-	if(!(pptr->current)){
+
+	if(!(strValid(pptr->current))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->current[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->current,',');
+
 	//           python interface
-        sprintf(srcdir,"%s/pyaccords/pysrc/ec2config.py",PYPATH);
-	exp_file = fopen(srcdir, "r");
-	if(!exp_file) printf("error in ec2configInterface.c ec2config.py :No such file or directory\n");
-	Py_Initialize();
-	PyRun_SimpleFile(exp_file,srcdir);
-	main_module = PyImport_AddModule("__main__");
-	global_dict = PyModule_GetDict(main_module);
-	cbFunc = PyDict_GetItemString(global_dict,"update");
-	if(!cbFunc) printf("error in ec2configInterface.c :no python function\n");
-	result=PyObject_CallFunction(cbFunc,"s",sendstr);
-	response=PyString_AsString( result );
-	Py_Finalize();
+	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	pythr = Py_NewInterpreter();
+	python_path(srcdir);
+	pName = PyString_FromString("ec2config");
+	if(pName == NULL) printf("erro: in ec2config.py no such file name\n");
+	else pModule = PyImport_Import(pName);
+	if(pModule == NULL) printf("error: failed to load amazonEc2 module\n");
+	else pDict = PyModule_GetDict(pModule);
+	if(pDict == NULL) printf("error: failed to load dict name in ec2config module\n");
+	else pFunc = PyDict_GetItemString(pDict,"delete");
+	if(pFunc == NULL) printf("error: failed to load update function in ec2config module\n");
+	else result=PyObject_CallFunction(pFunc,"s",sendstr);
+	
+	if (!result || PyErr_Occurred())
+        {
+       		PyErr_Print();
+       		return (0);
+       	}
+
+	response=allocate_string(PyString_AsString( result ));
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_EndInterpreter(pythr);
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -549,11 +593,23 @@ private int ec2config_update(struct occi_category * optr, void * vptr)
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
+		pptr->id = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
 		pptr->name = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->description = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->user = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->password = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -578,6 +634,10 @@ private int ec2config_update(struct occi_category * optr, void * vptr)
 	}
 	if(pelem){
 		pptr->version = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->location = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -599,7 +659,7 @@ private int ec2config_update(struct occi_category * optr, void * vptr)
 }
 
 
-private int ec2config_delete(struct occi_category * optr, void * vptr)
+private int ec2config_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
@@ -608,130 +668,133 @@ private int ec2config_delete(struct occi_category * optr, void * vptr)
         char srcdir[1024];
 	char * response;
 	char * token;
-	FILE * exp_file;
 	listcc categoryAtr;
-	PyObject*    main_module, * global_dict, * cbFunc, *result;
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
 
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
+	
+	if(!(strValid(pptr->id))) strcpy(sendstr," ");
+	else strcpy(sendstr,pptr->id);
 
-	if(!(pptr->name)) strcpy(sendstr," ");
-	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
-	else strcpy(sendstr,pptr->name);
-	if(!(pptr->description)){
+	if(!(strValid(pptr->name))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->description[0]=='\0'){
+	else strConcat(sendstr,pptr->name,',');
+
+	if(!(strValid(pptr->description))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->description,',');
-	if(!(pptr->accesskey)){
+
+	if(!(strValid(pptr->user))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->accesskey[0]=='\0'){
+	else strConcat(sendstr,pptr->user,',');
+
+	if(!(strValid(pptr->password))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->password,',');
+
+	if(!(strValid(pptr->accesskey))){
+		strcpy(strtmp," ");
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->accesskey,',');
-	if(!(pptr->secretkey)){
+
+	if(!(strValid(pptr->secretkey))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->secretkey[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->secretkey,',');
-	if(!(pptr->authenticate)){
+
+	if(!(strValid(pptr->authenticate))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->authenticate[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->authenticate,',');
-	if(!(pptr->agent)){
+
+	if(!(strValid(pptr->agent))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->agent[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->agent,',');
-	if(!(pptr->host)){
+
+	if(!(strValid(pptr->host))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->host[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->host,',');
-	if(!(pptr->version)){
+
+	
+	if(!(strValid(pptr->version))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->version[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->version,',');
-	if(!(pptr->namespace)){
+	
+	if(!(strValid(pptr->location))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
-	else if(pptr->namespace[0]=='\0'){
+	else strConcat(sendstr,pptr->location,',');
+
+	if(!(strValid(pptr->namespace))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->namespace,',');
-	if(!(pptr->base)){
+
+	if(!(strValid(pptr->base))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->base[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->base,',');
-	if(!(pptr->tls)){
+
+	if(!(strValid(pptr->tls))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->tls[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->tls,',');
-	if(!(pptr->current)){
+
+	if(!(strValid(pptr->current))){
 		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
-	}
-	else if(pptr->current[0]=='\0'){
-		strcpy(strtmp," ");
-		strConcat(sendstr,strtmp,',');
+                strConcat(sendstr,strtmp,',');
 	}
 	else strConcat(sendstr,pptr->current,',');
+
 	//           python interface
-        sprintf(srcdir,"%s/pyaccords/pysrc/ec2config.py",PYPATH);
-	exp_file = fopen(srcdir, "r");
-	if(!exp_file) printf("error in ec2configInterface.c ec2config.py :No such file or directory\n");
-	Py_Initialize();
-	PyRun_SimpleFile(exp_file,srcdir);
-	main_module = PyImport_AddModule("__main__");
-	global_dict = PyModule_GetDict(main_module);
-	cbFunc = PyDict_GetItemString(global_dict,"delete");
-	if(!cbFunc) printf("error in ec2configInterface.c :no python function\n");
-	result=PyObject_CallFunction(cbFunc,"s",sendstr);
-	response=PyString_AsString( result );
-	Py_Finalize();
+	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	pythr = Py_NewInterpreter();
+	python_path(srcdir);
+	pName = PyString_FromString("ec2config");
+	if(pName == NULL) printf("erro: in ec2config.py no such file name\n");
+	else pModule = PyImport_Import(pName);
+	if(pModule == NULL) printf("error: failed to load ec2config module\n");
+	else pDict = PyModule_GetDict(pModule);
+	if(pDict == NULL) printf("error: failed to load dict name in ec2config module\n");
+	else pFunc = PyDict_GetItemString(pDict,"delete");
+	if(pFunc == NULL) printf("error: failed to load delete function in ec2config module\n");
+	else result=PyObject_CallFunction(pFunc,"s",sendstr);
+	
+	if (!result || PyErr_Occurred())
+        {
+       		PyErr_Print();
+       		return (0);
+       	}
+
+	response=allocate_string(PyString_AsString( result ));
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_EndInterpreter(pythr);
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -741,12 +804,24 @@ private int ec2config_delete(struct occi_category * optr, void * vptr)
 		token=strtok(NULL, ",");
 	}
 	elemm *pelem = categoryAtr.first;
+        if(pelem){
+		pptr->id = pelem->value;
+		pelem = pelem->next;
+	}
 	if(pelem){
 		pptr->name = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->description = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->user = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->password = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -771,6 +846,10 @@ private int ec2config_delete(struct occi_category * optr, void * vptr)
 	}
 	if(pelem){
 		pptr->version = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->location = pelem->value;
 		pelem = pelem->next;
 	}
 	if(pelem){
