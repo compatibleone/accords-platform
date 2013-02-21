@@ -80,3 +80,18 @@ void liberateListe(listcc *l)
    l->first = NULL;
    l->last = NULL;
 }
+
+/*-----------------------------------------------------------------------------*/
+int strValid( char * vptr )
+{
+        if (!( vptr ))
+                return( 0 );
+        else if (!( strlen( vptr ) ))
+                return( 0 );
+        else if (!( strcmp( vptr, "(null)" ) ))
+                return( 0 );
+        else if (!( strcmp( vptr, "(none)" ) ))
+                return( 0 );
+        else    return( 1 );
+}
+
