@@ -1,4 +1,6 @@
 <?php
+require_once("dashboard.inc");
+global $configdir;
 
 class user_role extends role
 {
@@ -21,28 +23,28 @@ class user_role extends role
 	{
 		$this->page->tabpage = $t;
 
-		$tabimage1 = "tabsla.png";
-		$tabimage2 = "tabprovisioning.png";
-		$tabimage3 = "tabfinancial.png";
-		$tabimage4 = "tabscript.png";
-		$tabimage5 = "tabmenu.png";
+		$tabimage1 = "imgs/tabsla.png";
+		$tabimage2 = "imgs/tabprovisioning.png";
+		$tabimage3 = "imgs/tabfinancial.png";
+		$tabimage4 = "imgs/tabscript.png";
+		$tabimage5 = "imgs/tabmenu.png";
 
 		switch ( $this->page->tabpage )
 		{
 		case	5 :
-			$tabimage5 = "actmenu.png";
+			$tabimage5 = "imgs/actmenu.png";
 			break;
 		case	4 :
-			$tabimage4 = "actscript.png";
+			$tabimage4 = "imgs/actscript.png";
 			break;
 		case	3 :
-			$tabimage3 = "actfinancial.png";
+			$tabimage3 = "imgs/actfinancial.png";
 			break;
 		case	2 :
-			$tabimage2 = "actprovisioning.png";
+			$tabimage2 = "imgs/actprovisioning.png";
 			break;
 		case	1 :
-			$tabimage1 = "actsla.png";
+			$tabimage1 = "imgs/actsla.png";
 			break;
 		}
 
@@ -340,7 +342,7 @@ class user_role extends role
 		if ( $this->page->account != "" )
 		{
 			$a = array();
-			exec("grep manifest -m1 plan_sla-*.xml | cut -f 1 -d :",&$a);
+			exec("grep manifest -m1 $configdir/plan_sla-*.xml | cut -f 1 -d :",&$a);
 			foreach ($a as $l )
 			{
 				if ( $mode == "all" )
@@ -350,7 +352,7 @@ class user_role extends role
 				else
 				{
 					$b = array();
-					exec("grep ".$this->page->account." ".$l,&$b);
+					exec("grep ".$this->page->account." ".$configdir."/".$l,&$b);
 					foreach ($b as $m )
 					{
 						print "<option value='".$l."'>".$l."</option>\n";
@@ -366,7 +368,7 @@ class user_role extends role
 		{
 		case	"4"	:
 			$this->page->comment("This page gives access to the Accords Platform Script Upload and Execution Operations");
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local cordscript document for upload, compile and execution";
 			print "<th colspan=4>\n";
 			require "compile.php";
@@ -375,11 +377,11 @@ class user_role extends role
 		case	"1"	:
 			$this->page->comment("This page gives access to the Accords Platform Manifest and Service Level Agreement Parsing Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local manifest document for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "upload.php";
-			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='agreement.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='imgs/agreement.png'></a></th>\n";
 			print "<th class=description>Use this option to create a service level agreement for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "sla.php";
@@ -388,7 +390,7 @@ class user_role extends role
 		case	"2"	:
 			$this->page->comment("This page gives access to Accords Platform Service Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='broker.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
 			print "<th class=description>Use this option to broker and launch a service instance from a selected provisioning plan.";
 			print "<th colspan=4>";
 			print "<form action='dashboard.php' method='POST'>\n";
@@ -403,7 +405,7 @@ class user_role extends role
 			print "</form></tr>";
 			print "</tr>\n";
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='stop.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
 	print "<th class=description>Use this option to terminate an active service instance and release all deployed resources. The service may be restarted using the appropriate service maintenance operation.";
 	print "<th colspan=4>";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -411,7 +413,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -423,7 +425,7 @@ class user_role extends role
 	print "</table></div>\n";
 	print "</form></tr>";
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='start.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
 	print "<th class=description>Use this option to restart a terminated service instance and deploy all provisioned resources.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -431,7 +433,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -443,7 +445,7 @@ class user_role extends role
 	print "</form><p>\n";
 			$this->page->separator();
 
-	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='check2.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='imgs/check2.png'></a></th>\n";
 	print "<th class=description>Use this option to snapshot or save the state of the machine images of the contracts of a service.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -451,7 +453,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -466,7 +468,7 @@ class user_role extends role
 		case	"3"	:
 			$this->page->comment("This page gives access to the Accords Platform Account Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='invoice.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/invoice.png'></a></th>\n";
 			print "<th class=description>Use this option to collect the transactions for a specifed account and generate the invoice.";
 			print "<p>This option also permits the selection of a particular invoice for consultation, update processing or closure.";
 			print "<th colspan=4>\n";
@@ -475,7 +477,7 @@ class user_role extends role
 			print "<table width='100%'>";
 			print "<tr><td>Account<td><select style='width: 50mm;' name='account'>\n";
 			$a = array();
-			exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -490,7 +492,7 @@ class user_role extends role
 			print "<table width='100%'>";
 			print "<tr><td>Invoice<td><select style='width: 50mm;' name='invoice'>\n";
 			$a = array();
-			exec("grep document cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep document $configdir/cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";

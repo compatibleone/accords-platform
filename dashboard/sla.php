@@ -1,4 +1,6 @@
 <?php
+require_once("dashboard.inc");
+global $configdir;
 
 	print "<form method=\"POST\" action=\"dashboard.php\">\n";
 
@@ -16,7 +18,7 @@
 	print "<tr><td>Account</td>";
 	print "<td><select style='width: 50mm;' name=slaaccount>\n";
 	$a = array();
-	exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -28,7 +30,7 @@
 
 	print "<tr><td>Manifest</td><td><select style='width: 50mm;' name=slaservice>\n";
 	$a = array();
-	exec("grep name cords_manifest.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_manifest.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -53,7 +55,7 @@
 	print "<select style='width: 50mm;' name=slaprovider>\n";
 	print "<option value=any>any</option>\n";
 	$a = array();
-	exec("grep name cords_provider.xml | cut -f 5 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_provider.xml | cut -f 5 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -102,7 +104,7 @@
 	print "<select style='width: 50mm;' name=gp1>\n";
 	print "<option value=none>none</option>\n";
 	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -137,7 +139,7 @@
 	print "<select style='width: 50mm;' name=gp2>\n";
 	print "<option value=none>none</option>\n";
 	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -172,7 +174,7 @@
 	print "<select style='width: 50mm;' name=gp3>\n";
 	print "<option value=none>none</option>\n";
 	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )
@@ -207,7 +209,7 @@
 	print "<select style='width: 50mm;' name=gp4>\n";
 	print "<option value=none>none</option>\n";
 	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )

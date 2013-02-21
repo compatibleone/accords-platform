@@ -1,4 +1,6 @@
 <?php
+require_once("dashboard.inc");
+global $configdir;
 
 class	page_manager
 {
@@ -32,9 +34,10 @@ class	page_manager
 	/* --------------- */
 	public	function set_user( $u )
 	{
+		global $configdir;
 		$this->user = $u;
 		$a = array();
-		exec( "grep name cords_account.xml | grep jamie | cut -f 2 -d = | cut -f 2 -d '\"'",&$a);
+		exec( "grep name $configdir/cords_account.xml | grep jamie | cut -f 2 -d = | cut -f 2 -d '\"'",&$a);
 		$this->account = $a[0];
 	}
 
@@ -180,7 +183,7 @@ class	page_manager
 		}
 		print "<table width='98%'><tr><th class=category><div align=center><p>\n";
 		print "<table width='98%'>\n";
-		print "<tr><th class=banner colspan=6><div align=left><img src='banner.png'></div>\n";
+		print "<tr><th class=banner colspan=6><div align=left><img src='imgs/banner.png'></div>\n";
 	}
 
 	/*	---------------------------	*/
@@ -194,7 +197,7 @@ class	page_manager
 			for ( $i=0; $i < strlen( $n ); $i += 1 )
 			{
 				$c = substr( $n,$i, 1);
-				print "<img width='40' height='48' src='".$c."-icon.png'>\n";
+				print "<img width='40' height='48' src='imgs/".$c."-icon.png'>\n";
 			}
 		}
 		else	{	print $n;	}
@@ -226,7 +229,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='".$n.".png'>";
+		print "<img width=128 height=158 src='imgs/".$n.".png'>";
 		print "</a></th>";
 		print "<td class='category'>";
 		print "<table><tr><td class='category'>&nbsp;</td><tr>\n";
@@ -244,7 +247,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='".$n.".png'>";
+		print "<img width=128 height=158 src='imgs/".$n.".png'>";
 		print "</a></th><td class='value'>";
 		$v = exec("./dashboard-stat.sh cords_".$n);
 		$this->display_number($v);
@@ -258,7 +261,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='".$n.".png'>";
+		print "<img width=128 height=158 src='imgs/".$n.".png'>";
 		print "</a></th>";
 		print "<td class='category'>";
 		print "<table><tr><td class='category'>&nbsp;</td><tr>\n";
@@ -274,14 +277,14 @@ class	page_manager
 	/*	---------------------------------	*/
 	function functions()
 	{
-		print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='start.png'></a></th>\n";
+		print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
 		print "<th class=description>Use this option to access the service management functions";
-		print "<th class=category><a href=\"dashboard.php?action=check\"><img width='128' height='158' src='check.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=check\"><img width='128' height='158' src='imgs/check.png'></a></th>\n";
 		print "<th class=description>Use this option to verify the integrity of the complete collection of Accords Platform category managers.";
-		print "<th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='stop.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
 		print "<th class=description>Use this option to access the service management functions";
 		$this->separator();
-		print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+		print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
 		print "<th class=description>Use this option to select a manifest document for upload or create a service level agreement. <p>The resulting documents will then be parsed into the Accords Platform OCCI database";
 		print "<th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='broker.png'></a></th>\n";
 		print "<th class=description>Use this option to select a provisioning plan, resulting from the parsing of an uploaded manifest or service level agreement. <p>The provisioning plan will then be used to broker a service instance and deploy the corresponding cloud resources.";
@@ -406,7 +409,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Plan<td><select style='width: 50mm;' name='upload'>\n";
 			$a = array();
-			exec("ls plan_sla-*.xml",&$a);
+			exec("ls $configdir/plan_sla-*.xml",&$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -428,7 +431,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Account<td><select style='width: 50mm;' name='account'>\n";
 			$a = array();
-			exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -443,7 +446,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Invoice<td><select style='width: 50mm;' name='invoice'>\n";
 			$a = array();
-			exec("grep document cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep document $configdir/cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";

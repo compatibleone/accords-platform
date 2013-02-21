@@ -8,6 +8,7 @@ require_once( "services.php"    );
 require_once( "pagemanager.php" );
 require_once( "stdform.php"  	);
 require_once( "roles.php"    	);
+global $configdir;
 
 $pageman = new page_manager;
 
@@ -246,7 +247,8 @@ function user_login( $n, $p )
 	$qn = "\"".$n."\"";
 	$qp = "\"".$p."\"";
 	$a = array();
-	exec("grep name cords_user.xml",&$a);
+	global $configdir;
+	exec("grep name $configdir/cords_user.xml",&$a);
 	foreach ($a as $l )
 	{
 		$un = "";

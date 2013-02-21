@@ -1,4 +1,6 @@
 <?php
+require_once("dashboard.inc");
+global $configdir;
 
 class admin_role extends role
 {
@@ -18,7 +20,7 @@ class admin_role extends role
 	private function services()
 	{
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='stop.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
 	print "<th class=description>Use this option to terminate an active service instance and release all deployed resources. The service may be restarted using the appropriate service maintenance operation.";
 	print "<th colspan=4>";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -26,7 +28,7 @@ class admin_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -39,7 +41,7 @@ class admin_role extends role
 	print "</form></tr>";
 
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='start.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
 	print "<th class=description>Use this option to restart a terminated service instance and deploy all provisioned resources.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -47,7 +49,7 @@ class admin_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -59,7 +61,7 @@ class admin_role extends role
 	print "</form><p>\n";
 
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='check2.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='imgs/check2.png'></a></th>\n";
 	print "<th class=description>Use this option to snapshot or save the state of the machine images of the contracts of a service.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -67,7 +69,7 @@ class admin_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t $configdir/service/*",&$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -86,31 +88,31 @@ class admin_role extends role
 	function display_tabs( $t )
 	{
 		$this->page->tabpage = $t;
-		$tabimage1 = "tabdashboard.png";
-		$tabimage2 = "tabprovisioning.png";
-		$tabimage3 = "tabsla.png";
-		$tabimage4 = "tabproviders.png";
-		$tabimage5 = "tabmonitoring.png";
-		$tabimage6 = "tabfinancial.png";
+		$tabimage1 = "imgs/tabdashboard.png";
+		$tabimage2 = "imgs/tabprovisioning.png";
+		$tabimage3 = "imgs/tabsla.png";
+		$tabimage4 = "imgs/tabproviders.png";
+		$tabimage5 = "imgs/tabmonitoring.png";
+		$tabimage6 = "imgs/tabfinancial.png";
 		switch ( $this->page->tabpage )
 		{
 		case	1 :
-			$tabimage1 = "actdashboard.png";
+			$tabimage1 = "imgs/actdashboard.png";
 			break;
 		case	2 :
-			$tabimage2 = "actprovisioning.png";
+			$tabimage2 = "imgs/actprovisioning.png";
 			break;
 		case	3 :
-			$tabimage3 = "actsla.png";
+			$tabimage3 = "imgs/actsla.png";
 			break;
 		case	4 :
-			$tabimage4 = "actproviders.png";
+			$tabimage4 = "imgs/actproviders.png";
 			break;	
 		case	5 :
-			$tabimage5 = "actmonitoring.png";
+			$tabimage5 = "imgs/actmonitoring.png";
 			break;
 		case	6 :
-			$tabimage6 = "actfinancial.png";
+			$tabimage6 = "imgs/actfinancial.png";
 			break;
 		}
 

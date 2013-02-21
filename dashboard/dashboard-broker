@@ -1,1 +1,2 @@
-/usr/local/bin/testcb --tls security/testcbTls.xml --publisher  $1 $2 $3 $4
+source dashboard.sh
+cd $ACCORDS_BASE && /usr/bin/testcb --publisher  $1 $2 $3 $4

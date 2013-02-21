@@ -39,22 +39,26 @@ echo "\$dashboard_timer=\"${dashboard_timer}\";" >> dashboard.inc
 echo "\$log_timer=\"${log_timer}\";" >> dashboard.inc
 echo "\$dashboard_number=\"${dashboard_number}\";" >> dashboard.inc
 
+configdir=`pwd`
+echo "\$configdir=\"$configdir\";" >> dashboard.inc
+echo "export ACCORDS_BASE=$configdir" > dashboard.sh
+
 # ---------------------------------------------------
 # the publisher information for the parser and broker
 # ---------------------------------------------------
 var=`grep publisher accords.xml | tail -n 1 | cut -f 2 -d =`
 echo "\$publisher=$var;" >> dashboard.inc
 
-echo "/usr/local/bin/testcp --tls security/testcpTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-parser
+echo "/usr/bin/testcp --tls security/testcpTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-parser
 chmod uog+x dashboard-parser
 
-echo "/usr/local/bin/testcb --tls security/testcbTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-broker
+echo "/usr/bin/testcb --tls security/testcbTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-broker
 chmod uog+x dashboard-broker
 
-echo "/usr/local/bin/command --tls security/commandTls.xml --publisher $var invoice \$1 " > ./dashboard-invoice
+echo "/usr/bin/command --tls security/commandTls.xml --publisher $var invoice \$1 " > ./dashboard-invoice
 chmod uog+x dashboard-invoice
 
-echo "/usr/local/bin/command --tls security/commandTls.xml --publisher $var \$* " > ./dashboard-command
+echo "/usr/bin/command --tls security/commandTls.xml --publisher $var \$* " > ./dashboard-command
 chmod uog+x dashboard-command
 
 chmod uog+rw . rest service co-log

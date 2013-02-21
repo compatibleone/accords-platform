@@ -88,10 +88,12 @@ install: build
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
 	cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
 	rm -f `find debian/tmp/ -name \*.pyc`
-	mkdir -p debian/tmp/var/www/compatibleone-dashboard
-	cp dashboard/* debian/tmp/var/www/compatibleone-dashboard
+	mkdir -p debian/tmp/var/www/accords
+	cp -r cordscripts/*.txt debian/tmp/var/www/accords
+	cp -r dashboard/* debian/tmp/var/www/accords
+	rm -f debian/tmp/var/www/accords/dashboard.inc debian/tmp/var/www/accords/dashboard.sh
 	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
-		debian/tmp/var/www/compatibleone-dashboard/dashboard-*
+		debian/tmp/var/www/accords/dashboard-*
 
 # Build architecture independant packages.
 

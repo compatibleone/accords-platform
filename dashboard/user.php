@@ -1,4 +1,6 @@
 <?php
+require_once("dashboard.inc");
+global $configdir;
 
 	print "<form method=\"POST\" action=\"dashboard.php\">\n";
 
@@ -20,7 +22,7 @@
 
 	print "<tr><td>Account</td><td><select name=\"account\">\n";
 	$a = array();
-	exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
 	foreach ($a as $l )
 	{
 		if ( $l != "" )

@@ -1,1 +1,2 @@
-/usr/local/bin/command --tls security/commandTls.xml --publisher  invoice $1 
+source dashboard.sh
+cd $ACCORDS_BASE && /usr/bin/command --publisher  invoice $1 

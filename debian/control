@@ -449,8 +449,9 @@ Description: CompatibleOne Accords Platform - SLA Manager
 
 Package: compatibleone-dashboard
 Section: net
-Architecture: any
-Depends: compatibleone (>= ${binary:Version}), libapache2-mod-php5 | php5-cgi | php5, apache2 | httpd
+Architecture: all
+Depends: libapache2-mod-php5 | php5-cgi | php5, apache2 | httpd
+Pre-Depends: compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Dashboard
  Web-based dashboard for the CompatibleOne Accords Platform
 
