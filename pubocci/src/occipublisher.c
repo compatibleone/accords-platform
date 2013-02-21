@@ -448,7 +448,7 @@ private	char * 	cords_provider_publication(
 	/* ---------------------------------------------------- */
 	else if ( rest_valid_string( default_tls() ) != 0 )
 	{
-		rest_log_message("An Account and SLA is required for provider",agent);
+		rest_log_message("An Account and SLA is required for provider");
 		return((char *) 0);
 	}
 	/* ---------------------------------- */
