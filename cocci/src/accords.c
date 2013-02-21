@@ -23,12 +23,13 @@
 #include "document.h"
 #include "rest.h"
 
-private	struct	accords_configuration 	* configuration 	= (struct accords_configuration *) 0;
-private	char				* section 		= (char *) 0;
-private	char				* identity		= (char *) 0;
-private	char				* default_account	= (char *) 0;
-private	char				* default_account_id	= (char *) 0;
-private	char				* default_agent		= (char *) 0;
+private	struct	accords_configuration 	* configuration 		= (struct accords_configuration *) 0;
+private	char				* section 			= (char *) 0;
+private	char				* identity			= (char *) 0;
+private	char				* default_account		= (char *) 0;
+private	char				* default_account_id		= (char *) 0;
+private	char				* default_agent			= (char *) 0;
+private	char				* default_operator_profile	= (char *) 0;
 
 /*	---------------------------------------------------------	*/
 /*			g e t _ i d e n t i t y				*/
@@ -99,6 +100,28 @@ public	int	set_default_account_id(char * sptr)
 public	char *	get_default_account_id()
 {
 	return( default_account_id );
+}
+
+/*	---------------------------------------------------------	*/
+/*		s e t _ o p e r a t o r _ p r o f i l e 		*/
+/*	---------------------------------------------------------	*/
+public	void	set_operator_profile(char * sptr)
+{
+	if ( default_operator_profile )
+		default_operator_profile = liberate( default_operator_profile );
+	if ( sptr )
+		default_operator_profile = allocate_string( sptr );
+	return;
+}
+
+/*	---------------------------------------------------------	*/
+/*		g e t _ o p e r a t o r _ p r o f i l e 		*/
+/*	---------------------------------------------------------	*/
+public	char * get_operator_profile()
+{
+	if (!( default_operator_profile ))
+		set_operator_profile( "accords" );
+	return( default_operator_profile );
 }
 
 /*	---------------------------------------------------------	*/

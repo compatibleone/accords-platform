@@ -48,10 +48,10 @@ private	struct	az_config * resolve_az_configuration( char * sptr )
 }
 
 
-/*	--------------------------------------------------------	*/
-/* 	 u s e _ w i n d o w s a z u r e _ c o n f i g u r a t i o n 		*/
-/*	--------------------------------------------------------	*/
-private	struct az_subscription * use_windowsazure_configuration( char * sptr )
+/*	-----------------------------------------------------------------	*/
+/* 	l l _ u s e _ w i n d o w s a z u r e _ c o n f i g u r a t i o n	*/
+/*	-----------------------------------------------------------------	*/
+private	struct az_subscription * ll_use_windowsazure_configuration( char * sptr )
 {
 	struct	az_subscription * subptr=(struct az_subscription *) 0;
 	struct	az_config * pptr;
@@ -72,8 +72,21 @@ private	struct az_subscription * use_windowsazure_configuration( char * sptr )
 	else	return( subptr );
 }
 
+/*	-----------------------------------------------------------------	*/
+/* 	   u s e _ w i n d o w s a z u r e _ c o n f i g u r a t i o n		*/
+/*	-----------------------------------------------------------------	*/
+private	struct az_subscription * use_windowsazure_configuration( char * sptr )
+{
+	struct	az_subscription * subptr=(struct az_subscription *) 0;
+	if ((subptr = ll_use_windowsazure_configuration( sptr )) != (struct az_subscription *) 0)
+		return( subptr );
+	else if (!( sptr = get_operator_profile() ))
+		return( subptr );
+	else 	return( ll_use_windowsazure_configuration( sptr ) );
+}
+
 /*	--------------------------------------------------------	*/
-/* 	       r e s e t _ w i n d o w s a z u r e _ s e r v e r		*/
+/* 	       r e s e t _ w i n d o w s a z u r e _ s e r v e r	*/
 /*	--------------------------------------------------------	*/
 private	int	reset_windowsazure_server( struct windowsazure * pptr )
 {

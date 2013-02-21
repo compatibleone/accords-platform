@@ -220,10 +220,10 @@ private	char *	openstack_instructions( char * contract, char * result, char * na
 
 
 
-/*	--------------------------------------------------------	*/
-/* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
-/*	--------------------------------------------------------	*/
-private	struct os_subscription * use_openstack_configuration( char * sptr )
+/*	------------------------------------------------------------	*/
+/* 	l l _ u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 	*/
+/*	------------------------------------------------------------	*/
+private	struct os_subscription * ll_use_openstack_configuration( char * sptr )
 {
 	struct	os_config * pptr;
 
@@ -234,6 +234,20 @@ private	struct os_subscription * use_openstack_configuration( char * sptr )
 			pptr->user, pptr->password, pptr->namespace,
 			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
 }
+
+/*	--------------------------------------------------------	*/
+/* 	 u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 		*/
+/*	--------------------------------------------------------	*/
+private	struct os_subscription * use_openstack_configuration( char * nptr )
+{
+	struct	os_subscription * sptr;
+	if (( sptr = ll_use_openstack_configuration( nptr )) != (struct os_subscription *) 0)
+		return( sptr );
+	else if (!( nptr = get_operator_profile() ))
+		return( sptr );
+	else 	return( ll_use_openstack_configuration( nptr ) );
+}
+
 
 /*	--------------------------------------------------------	*/
 /* 	       r e s e t _ o p e n s t a c k _ s e r v e r		*/

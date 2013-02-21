@@ -131,10 +131,10 @@ private	int	resolve_on_addresses( struct on_response * yptr, struct opennebula *
 }
 
 
-/*	--------------------------------------------------------	*/
-/* 	u s e _ o p e n n e b u l a _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------------	*/
-private	int	use_opennebula_configuration( char * sptr )
+/*	-------------------------------------------------------------	*/
+/* 	l l _ u s e _ o p e n n e b u l a _ c o n f i g u r a t i o n 	*/
+/*	-------------------------------------------------------------	*/
+private	int	ll_use_opennebula_configuration( char * sptr )
 {
 	struct	on_config * pptr;
 
@@ -144,6 +144,19 @@ private	int	use_opennebula_configuration( char * sptr )
 	else 	return( on_initialise_client( 
 			pptr->user, pptr->password, 
 			pptr->host, _CORDS_OS_AGENT, pptr->version, pptr->tls ));
+}
+
+/*	--------------------------------------------------------	*/
+/* 	u s e _ o p e n n e b u l a _ c o n f i g u r a t i o n 	*/
+/*	--------------------------------------------------------	*/
+private	int	use_opennebula_configuration( char * sptr )
+{
+	int	status;
+	if ((status = ll_use_opennebula_configuration( sptr )) != 404 )
+		return( status );
+	else if (!( sptr = get_operator_profile()))
+		return( 404 );
+	else	return( use_opennebula_configuration( sptr ) );
 }
 
 /*	--------------------------------------------------------	*/

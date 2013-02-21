@@ -39,6 +39,7 @@ public	char *	occi_http_link( struct occi_category * optr, char * target, char *
 public	char *	get_identity();
 public	char * 	get_default_agent();
 public	int	set_default_agent( char * nptr);
+public	char *	get_operator_profile();
 
 
 #define	_CORDS_SERVICE_AGENT 	get_default_agent()

@@ -26,10 +26,10 @@ private	struct	dc_config * resolve_deltacloud_configuration( char * sptr )
 	return((struct dc_config *) 0);
 }
 
-/*	--------------------------------------------------------	*/
-/* 	u s e _ d e l t a c l o u d _ c o n f i g u r a t i o n 	*/
-/*	--------------------------------------------------------	*/
-private	struct	dc_config * use_deltacloud_configuration( char * sptr )
+/*	-------------------------------------------------------------	*/
+/* 	l l _ u s e _ d e l t a c l o u d _ c o n f i g u r a t i o n 	*/
+/*	-------------------------------------------------------------	*/
+private	struct	dc_config * ll_use_deltacloud_configuration( char * sptr )
 {
 	struct	dc_config * pptr;
 
@@ -43,6 +43,20 @@ private	struct	dc_config * use_deltacloud_configuration( char * sptr )
 		return( pptr );
 	else	return( pptr );
 }
+
+/*	--------------------------------------------------------	*/
+/* 	u s e _ d e l t a c l o u d _ c o n f i g u r a t i o n 	*/
+/*	--------------------------------------------------------	*/
+private	struct	dc_config * use_deltacloud_configuration( char * sptr )
+{
+	struct	dc_config * pptr;
+	if (( pptr = ll_use_deltacloud_configuration( sptr )) != (struct dc_config *) 0)
+		return( pptr );
+	else if (!( sptr = get_operator_profile() ))
+		return( pptr );
+	else	return( use_deltacloud_configuration( sptr ) );
+}
+
 
 #include "dcaction.c"
 #include "dccontract.c"
