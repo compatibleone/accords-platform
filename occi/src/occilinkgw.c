@@ -831,7 +831,7 @@ private void	redirect_occi_linkgw_mt( struct rest_interface * iptr )
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
 /* occi category rest instance builder for : occi_linkgw */
-public struct occi_category * occi_linkgw_builder(char * a,char * b) {
+public struct occi_category * occi_cords_linkgw_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="kind";
 	char * e="http://scheme.ogf.org/occi/resource#";
