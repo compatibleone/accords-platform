@@ -190,6 +190,7 @@ Description: compatibleOne Accords Platform (development files)
 Package: compatibleone-azprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Azur Procci subsystem
  CompatibleOne Accords Platform - Azur Procci subsystem package
@@ -348,6 +349,7 @@ Description: CompatibleOne Accords Platform - COSS subsystem
 Package: compatibleone-dcprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem package
@@ -355,6 +357,7 @@ Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - PaaS Procci subsystem
  CompatibleOne Accords Platform - PaaS Procci subsystem package
@@ -396,6 +399,7 @@ Description: CompatibleOne Accords Platform - Nagios subsystem
 Package: compatibleone-onprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Nebula Procci subsystem
  CompatibleOne Accords Platform - Open Nebula Procci subsystem package
@@ -403,6 +407,7 @@ Description: CompatibleOne Accords Platform - Open Nebula Procci subsystem
 Package: compatibleone-osocciprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
  CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem package
@@ -410,6 +415,7 @@ Description: CompatibleOne Accords Platform - Open Stack OCCI Procci subsystem
 Package: compatibleone-osprocci
 Section: net
 Architecture: any
+Provides: compatibleone-cloud-provider
 Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Open Stack Procci subsystem
  CompatibleOne Accords Platform - Open Stack Procci subsystem package
@@ -451,7 +457,7 @@ Package: compatibleone-dashboard
 Section: net
 Architecture: all
 Depends: libapache2-mod-php5 | php5-cgi | php5, apache2 | httpd
-Pre-Depends: compatibleone (>= ${binary:Version})
+Pre-Depends: compatibleone-accords (>= ${binary:Version})
 Description: CompatibleOne Accords Platform - Dashboard
  Web-based dashboard for the CompatibleOne Accords Platform
 

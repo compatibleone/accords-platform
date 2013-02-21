@@ -4,7 +4,7 @@ compatibleone-accords (1.0-4) unstable; urgency=low
   * Clean-up control file, start adding the php dashboard
   * Replace hardwired emails.
 
- -- Vincent <vincent@renardias.com>  Tue, 19 Feb 2013 11:15:37 +0100
+ -- Vincent <vincent@renardias.com>  Thu, 21 Feb 2013 18:49:00 +0100
 
 compatibleone-accords (1.0-3) unstable; urgency=low
 

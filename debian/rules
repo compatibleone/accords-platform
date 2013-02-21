@@ -91,6 +91,7 @@ install: build
 	mkdir -p debian/tmp/var/www/accords
 	cp -r cordscripts/*.txt debian/tmp/var/www/accords
 	cp -r dashboard/* debian/tmp/var/www/accords
+	chmod 755 debian/tmp/var/www/accords/*.sh
 	rm -f debian/tmp/var/www/accords/dashboard.inc debian/tmp/var/www/accords/dashboard.sh
 	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
 		debian/tmp/var/www/accords/dashboard-*
