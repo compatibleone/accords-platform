@@ -66,5 +66,7 @@
 <cords_user
  id="4903596a-4668-4abe-8d08-2dccdd2ff6e3" name="fabio" password="cuimhne" role="user" email="fabio@compatibleone.fr" account="fabio" authorization="" when="0" state="0" />
 <cords_user
+ id="4903596a-4668-4abe-8d08-2dccdd2ff6e4" name="vincent" password="vincent" role="user" email="vrenardias@citypassenger.com" account="vincent" authorization="" when="0" state="0" />
+<cords_user
  id="4903596a-acco-4abe-8d08-2dccdd2ff6e3" name="accords" password="platform" role="operator" email="fabio@compatibleone.fr" account="fabio" authorization="" when="0" state="0" />
 </cords_users>

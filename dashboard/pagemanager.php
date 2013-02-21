@@ -286,9 +286,9 @@ class	page_manager
 		$this->separator();
 		print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
 		print "<th class=description>Use this option to select a manifest document for upload or create a service level agreement. <p>The resulting documents will then be parsed into the Accords Platform OCCI database";
-		print "<th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='broker.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
 		print "<th class=description>Use this option to select a provisioning plan, resulting from the parsing of an uploaded manifest or service level agreement. <p>The provisioning plan will then be used to broker a service instance and deploy the corresponding cloud resources.";
-		print "<th class=category><a href=\"dashboard.php?action=log\"><img width='128' height='158' src='inspect.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=log\"><img width='128' height='158' src='imgs/inspect.png'></a></th>\n";
 		print "<th class=description>Use this option to inspect the accords platform log file.";
 	}
 
@@ -388,11 +388,11 @@ class	page_manager
 		case	"7"	:
 			$this->comment("This page gives access to the Accords Platform Parsing Operations");
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local manifest document for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "upload.php";
-			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='agreement.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='imgs/agreement.png'></a></th>\n";
 			print "<th class=description>Use this option to create a service level agreement for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "sla.php";
@@ -401,7 +401,7 @@ class	page_manager
 		case	"8"	:
 			$this->comment("This page gives access to the Accords Platform Brokering and Invoice Operations");
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='broker.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
 			print "<th class=description>Use this option to broker and launch a service instance from a selected provisioning plan.";
 			print "<th colspan=4>";
 			print "<form action='dashboard.php' method='POST'>\n";
@@ -422,7 +422,7 @@ class	page_manager
 			print "</tr>\n";
 
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='invoice.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/invoice.png'></a></th>\n";
 			print "<th class=description>Use this option to collect the transactions for a specifed account and generate the invoice.";
 			print "<p>This option also permits the selection of a particular invoice for consultation, update processing or closure.";
 			print "<th colspan=4>\n";
