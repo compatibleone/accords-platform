@@ -1,2 +1,2 @@
 source dashboard.sh
-cd $ACCORDS_BASE && /usr/bin/command --publisher  invoice $1 
+cd $ACCORDS_BASE && /usr/local/bin/command --publisher  invoice $1 

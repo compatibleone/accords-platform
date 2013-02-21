@@ -1,2 +1,2 @@
 source dashboard.sh
-cd $ACCORDS_BASE && /usr/bin/testcp --publisher  $1 $2 $3 $4
+cd $ACCORDS_BASE && /usr/local/bin/testcp --publisher  $1 $2 $3 $4

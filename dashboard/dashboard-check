@@ -27,7 +27,7 @@ function failure()
 		echo "------------------------------------------"
 		level=1
 		sleep 1
-		/usr/bin/run-$2 &
+		/usr/local/bin/run-$2 &
 		sleep 5
 		echo "Rechecking $1 $2                          " 
 		echo "------------------------------------------"
@@ -57,7 +57,7 @@ function failure()
 
 function check()
 {
-v=`/usr/bin/co-resolver $1`
+v=`/usr/local/bin/co-resolver $1`
 
 if [ -z "$v" ]; then
 	failure $1 $2 

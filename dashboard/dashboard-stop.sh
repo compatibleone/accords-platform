@@ -111,119 +111,119 @@ _co_start() {
 #       The basic accords platform components
 # ---------------------------------------------------
     echo "Starting accords publication services"
-    /usr/bin/run-publisher &
+    /usr/local/bin/run-publisher &
     sleep $tempo
 
     echo "Starting accords file services"
-    /usr/bin/run-fileserver &
+    /usr/local/bin/run-fileserver &
     sleep $tempo
     
     echo "Starting accords security services"
-    /usr/bin/run-coss &
+    /usr/local/bin/run-coss &
     sleep $tempo
 
     echo "Starting accords monitoring services"
-    /usr/bin/run-comons &
+    /usr/local/bin/run-comons &
     sleep $tempo
     
     echo "Starting accords accounting services"
-    /usr/bin/run-coobas &
+    /usr/local/bin/run-coobas &
     sleep $tempo
     
     echo "Starting accords scheduling services"
-    /usr/bin/run-cosched &
+    /usr/local/bin/run-cosched &
     sleep $tempo
 
     echo "Starting accords networking services"
-    /usr/bin/run-conets &
+    /usr/local/bin/run-conets &
     sleep $tempo
 
     echo "Starting accords placement services"
-    /usr/bin/run-cops &
+    /usr/local/bin/run-cops &
     sleep $tempo
     
     echo "Starting accords energy efficiency services"
-    /usr/bin/run-coees &
+    /usr/local/bin/run-coees &
     sleep $tempo
     
     echo "Starting accords image storage services"
-    /usr/bin/run-ezvm &
+    /usr/local/bin/run-ezvm &
     sleep $tempo
 
     echo "Starting accords image production services"
-    /usr/bin/run-coips &
+    /usr/local/bin/run-coips &
     sleep $tempo
 
     echo "Starting accords sla services"
-    /usr/bin/run-slam &
+    /usr/local/bin/run-slam &
     sleep $tempo
 
     echo "Starting accords paas services"
-    /usr/bin/run-copaas &
+    /usr/local/bin/run-copaas &
     sleep $tempo
 
     echo "Starting accords parser services"
-    /usr/bin/run-parser &
+    /usr/local/bin/run-parser &
     sleep $tempo
 
     echo "Starting accords broker services"
-    /usr/bin/run-broker &
+    /usr/local/bin/run-broker &
     sleep $tempo
 
     echo "Starting accords procci services"
-    /usr/bin/run-procci &
+    /usr/local/bin/run-procci &
     sleep $tempo
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
     sleep 5
-    /usr/bin/co-parser accounts
-    /usr/bin/co-parser metrics
-    /usr/bin/co-parser coips
+    /usr/local/bin/co-parser accounts
+    /usr/local/bin/co-parser metrics
+    /usr/local/bin/co-parser coips
 # ---------------------------------------------------
 #    The accords platform provisioning components
 # ---------------------------------------------------
     echo "Starting accords open stack services"
-    /usr/bin/co-provider osprocci accords 30 10 1000 30 30
-    /usr/bin/co-parser quota-osprocci
-    /usr/bin/co-parser sla-osprocci
-    /usr/bin/run-osprocci &
+    /usr/local/bin/co-provider osprocci accords 30 10 1000 30 30
+    /usr/local/bin/co-parser quota-osprocci
+    /usr/local/bin/co-parser sla-osprocci
+    /usr/local/bin/run-osprocci &
     sleep $tempo
 
     echo "Starting accords open nebula services"
-    /usr/bin/co-provider onprocci accords 20 20 1000 20 20   
-    /usr/bin/co-parser quota-onprocci
-    /usr/bin/co-parser sla-onprocci
-    /usr/bin/run-onprocci &
+    /usr/local/bin/co-provider onprocci accords 20 20 1000 20 20   
+    /usr/local/bin/co-parser quota-onprocci
+    /usr/local/bin/co-parser sla-onprocci
+    /usr/local/bin/run-onprocci &
     sleep $tempo
     
     echo "Starting accords proactive services"
-    /usr/bin/co-provider paprocci accords 5 5 500 5 5
-    /usr/bin/co-parser quota-paprocci
-    /usr/bin/co-parser sla-paprocci
-    /usr/bin/run-paprocci &
+    /usr/local/bin/co-provider paprocci accords 5 5 500 5 5
+    /usr/local/bin/co-parser quota-paprocci
+    /usr/local/bin/co-parser sla-paprocci
+    /usr/local/bin/run-paprocci &
     sleep $tempo
 
     echo "Starting accords windows azure services"
-    /usr/bin/co-provider azprocci accords 10 10 1000 10 10
-    /usr/bin/co-parser quota-azprocci
-    /usr/bin/co-parser sla-azprocci
-    /usr/bin/run-azprocci &
+    /usr/local/bin/co-provider azprocci accords 10 10 1000 10 10
+    /usr/local/bin/co-parser quota-azprocci
+    /usr/local/bin/co-parser sla-azprocci
+    /usr/local/bin/run-azprocci &
     sleep $tempo
 
     echo "Starting accords delta cloud services"
-    /usr/bin/co-provider dcprocci accords 1 1 1000 1 1
-    /usr/bin/co-parser quota-dcprocci
-    /usr/bin/co-parser sla-dcprocci
-    /usr/bin/run-dcprocci &
+    /usr/local/bin/co-provider dcprocci accords 1 1 1000 1 1
+    /usr/local/bin/co-parser quota-dcprocci
+    /usr/local/bin/co-parser sla-dcprocci
+    /usr/local/bin/run-dcprocci &
     sleep $tempo
 
     echo "Starting accords jpaas procci services"
-    /usr/bin/co-provider jpaasprocci accords 10 10 1000 10 10
-    /usr/bin/co-parser quota-jpaasprocci
-    /usr/bin/co-parser sla-jpaasprocci
-    /usr/bin/run-jpaasprocci &
+    /usr/local/bin/co-provider jpaasprocci accords 10 10 1000 10 10
+    /usr/local/bin/co-parser quota-jpaasprocci
+    /usr/local/bin/co-parser sla-jpaasprocci
+    /usr/local/bin/run-jpaasprocci &
     sleep $tempo
 
 # ---------------------------------------------------
@@ -231,47 +231,47 @@ _co_start() {
 #    not currently being used by an active platform
 # ---------------------------------------------------
 #    echo "Starting accords occi open stack services"
-#    /usr/bin/run-osocciprocci &
+#    /usr/local/bin/run-osocciprocci &
 #    sleep $tempo
 # ---------------------------------------------------
 #    echo "Starting accords test occi open stack server"
-#    /usr/bin/run-testosocci &
+#    /usr/local/bin/run-testosocci &
 #    sleep $tempo
 # ---------------------------------------------------
 #    echo "Starting accords procci example"
-#    /usr/bin/run-example &
+#    /usr/local/bin/run-example &
 #    sleep $tempo
 # ---------------------------------------------------
 
     echo "Starting accords software configuration services"
-    /usr/bin/run-cosacs &
+    /usr/local/bin/run-cosacs &
     sleep $tempo
 
     echo "ACCORDS ready"
-    /usr/bin/co-status
+    /usr/local/bin/co-status
 }
 
 _co_broker() {
     if [ -z "$tls" ]; then
-	/usr/bin/testcb --publisher "$publisher" --verbose plan_$1.xml
+	/usr/local/bin/testcb --publisher "$publisher" --verbose plan_$1.xml
     else
-	/usr/bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+	/usr/local/bin/testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
     fi
 } 
 
 _co_command() {
     if [ -z "$tls" ]; then
-	/usr/bin/command --publisher "$publisher" $*
+	/usr/local/bin/command --publisher "$publisher" $*
     else
-	/usr/bin/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
+	/usr/local/bin/command --tls $secdir/commandTls.xml --publisher "$publisher" $*
     fi
 }
 
 _co_parser() {
     if [ -z "$tls" ]; then
-	/usr/bin/testcp --publisher "$publisher" --verbose $2 $1.xml
+	/usr/local/bin/testcp --publisher "$publisher" --verbose $2 $1.xml
     else
-	/usr/bin/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
+	/usr/local/bin/testcp --tls $secdir/testcpTls.xml --publisher "$publisher" --verbose $2 $1.xml
     fi
 }
 
@@ -347,9 +347,9 @@ echo "</agreement>" >> sla-$name.xml
 
 _co_resolver() {
     if [ -z "$tls" ]; then
-	/usr/bin/testresolver --publisher "$publisher" $*
+	/usr/local/bin/testresolver --publisher "$publisher" $*
     else
-	/usr/bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
+	/usr/local/bin/testresolver --tls security/testresolverTls.xml --publisher "$publisher" $*
     fi
 }
 
@@ -411,59 +411,59 @@ _co_stop() {
 }
 
 _run_azprocci() {
-    /usr/bin/azprocci --config $target CO-AZPROCCI/1.0
+    /usr/local/bin/azprocci --config $target CO-AZPROCCI/1.0
 } 
 
 _run_broker() {
-    /usr/bin/broker --config $target CO-BROKER/1.0
+    /usr/local/bin/broker --config $target CO-BROKER/1.0
 } 
 
 _run_cops() {
-    /usr/bin/cops --config $target CO-ES/1.0
+    /usr/local/bin/cops --config $target CO-ES/1.0
 } 
 
 _run_coees() {
-    /usr/bin/coees --config $target CO-EES/1.0
+    /usr/local/bin/coees --config $target CO-EES/1.0
 } 
 
 _run_comons() {
-    /usr/bin/comons --config $target CO-MONS/1.0
+    /usr/local/bin/comons --config $target CO-MONS/1.0
 }
 
 _run_conets() {
-    /usr/bin/conets --config $target CO-NETS/1.0
+    /usr/local/bin/conets --config $target CO-NETS/1.0
 }
 
 _run_coobas() {
-    /usr/bin/coobas --config $target CO-BAS/1.0
+    /usr/local/bin/coobas --config $target CO-BAS/1.0
 }
 
 _run_cosacs() {
-    /usr/bin/cosacs --config $target CO-SACS/1.0
+    /usr/local/bin/cosacs --config $target CO-SACS/1.0
 }
 
 _run_coss() {
-    /usr/bin/coss --config $target CO-SS/1.0
+    /usr/local/bin/coss --config $target CO-SS/1.0
 }
 
 _run_ezvm() {
-    /usr/bin/ezvm --config $target CO-EZVM/1.0
+    /usr/local/bin/ezvm --config $target CO-EZVM/1.0
 }
 
 _run_coips() {
-    /usr/bin/coips --config $target CO-IPS/1.0
+    /usr/local/bin/coips --config $target CO-IPS/1.0
 }
 
 _run_fileserver() {
-    /usr/bin/fileserver --config $target CO-FS/1.0
+    /usr/local/bin/fileserver --config $target CO-FS/1.0
 }
 
 _run_onprocci() {
-    /usr/bin/onprocci --config $target CO-ONPROCCI/1.0
+    /usr/local/bin/onprocci --config $target CO-ONPROCCI/1.0
 }
 
 _run_osprocci() {
-    /usr/bin/osprocci --config $target CO-OSPROCCI/1.0
+    /usr/local/bin/osprocci --config $target CO-OSPROCCI/1.0
 }
 
 _run_paprocci() {
@@ -471,50 +471,50 @@ _run_paprocci() {
 }
 
 _run_osocciprocci() {
-    /usr/bin/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
+    /usr/local/bin/osocciprocci --config $target CO-OSOCCIPROCCI/1.0
 }
 
 _run_testosocci() {
-    /usr/bin/testosocci --config $target CO-TESTOSOCCI/1.0
+    /usr/local/bin/testosocci --config $target CO-TESTOSOCCI/1.0
 }
 
 _run_slam() {
-    /usr/bin/slam --config $target CO-SLAM/1.0
+    /usr/local/bin/slam --config $target CO-SLAM/1.0
 }
 
 _run_copaas() {
-    /usr/bin/copaas --config $target CO-PAAS/1.0
+    /usr/local/bin/copaas --config $target CO-PAAS/1.0
 }
 
 _run_jpaasprocci() {
-    /usr/bin/jpaasprocci --config $target CO-JPAASPROCCI/1.0
+    /usr/local/bin/jpaasprocci --config $target CO-JPAASPROCCI/1.0
 }
 
 _run_example() {
-    /usr/bin/example --config $target CO-EXAMPLE/1.0
+    /usr/local/bin/example --config $target CO-EXAMPLE/1.0
 }
 
 _run_dcprocci() {
-    /usr/bin/dcprocci --config $target CO-DCPROCCI/1.0
+    /usr/local/bin/dcprocci --config $target CO-DCPROCCI/1.0
 }
 
 _run_parser() {
-    /usr/bin/parser --config $target CO-PARSER/1.0
+    /usr/local/bin/parser --config $target CO-PARSER/1.0
 }
 
 _run_procci() {
-    /usr/bin/procci --config $target CO-PROCCI/1.0
+    /usr/local/bin/procci --config $target CO-PROCCI/1.0
 }
 _run_cosched() {
-    /usr/bin/cosched --config $target CO-SCHED/1.0
+    /usr/local/bin/cosched --config $target CO-SCHED/1.0
 }
  
 _run_publisher() {
-    /usr/bin/publisher --config $target CO-PUB/1.0
+    /usr/local/bin/publisher --config $target CO-PUB/1.0
 }
 
 _run_fileserver() {
-    /usr/bin/fileserver --config $target CO-FS/1.0
+    /usr/local/bin/fileserver --config $target CO-FS/1.0
 }
 
 _make_security_files() {
