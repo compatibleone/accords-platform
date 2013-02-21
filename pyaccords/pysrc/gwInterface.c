@@ -20,7 +20,7 @@
 #include <Python.h>
 #include "pytools.h"
 
-private int gw_create(struct occi_category * optr, void * vptr)
+private int gw_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct gw * pptr;
@@ -205,7 +205,7 @@ private int gw_create(struct occi_category * optr, void * vptr)
 }
 
 
-private int gw_retrieve(struct occi_category * optr, void * vptr)
+private int gw_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct gw * pptr;
@@ -390,7 +390,7 @@ private int gw_retrieve(struct occi_category * optr, void * vptr)
 }
 
 
-private int gw_update(struct occi_category * optr, void * vptr)
+private int gw_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct gw * pptr;
@@ -575,7 +575,7 @@ private int gw_update(struct occi_category * optr, void * vptr)
 }
 
 
-private int gw_delete(struct occi_category * optr, void * vptr)
+private int gw_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
 	struct occi_kind_node * nptr;
 	struct gw * pptr;
