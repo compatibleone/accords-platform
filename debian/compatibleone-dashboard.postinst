@@ -2,9 +2,9 @@
 set -e
 
 if [ "$1" = "configure" ] || [ "$1" = "triggered" ] || [ "$1" = "upgrade" ] ; then
-	if [ ! -e /var/www/accords/dashboard.inc ] ; then
-		cd /var/lib/accords && /var/www/accords/dashboard-init-unsafe.sh > /dev/null 2>&1
-		mv -f /var/lib/accords/dashboard.inc /var/lib/accords/dashboard.sh /var/www/accords
+	if [ ! -e /usr/share/accords/dashboard.inc ] ; then
+		cd /var/lib/accords && /usr/share/accords/dashboard-init-unsafe.sh > /dev/null 2>&1
+		mv -f /var/lib/accords/dashboard.inc /var/lib/accords/dashboard.sh /usr/share/accords
 	fi
 fi
 

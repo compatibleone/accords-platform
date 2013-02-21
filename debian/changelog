@@ -1,3 +1,9 @@
+compatibleone-accords (1.0-5) unstable; urgency=low
+
+  * Upstream update.
+
+ -- Vincent <vincent@renardias.com>  Thu, 21 Feb 2013 22:17:00 +0100
+
 compatibleone-accords (1.0-4) unstable; urgency=low
 
   * Add new package compatibleone-dashboard (more work needed).

@@ -83,18 +83,19 @@ install: build
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 	sed -i  -e 's/\(jamie\|fabio\|admin\)@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g' \
 		debian/tmp/etc/accords/cords_user.xml
-	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc debian/tmp/usr/lib/python2.7/cocarrier
+	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc #debian/tmp/usr/lib/python2.7/cocarrier
 	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
-	cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
+	#cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
 	rm -f `find debian/tmp/ -name \*.pyc`
-	mkdir -p debian/tmp/var/www/accords
-	cp -r cordscripts/*.txt debian/tmp/var/www/accords
-	cp -r dashboard/* debian/tmp/var/www/accords
-	chmod 755 debian/tmp/var/www/accords/*.sh
-	rm -f debian/tmp/var/www/accords/dashboard.inc debian/tmp/var/www/accords/dashboard.sh
+	mkdir -p debian/tmp/usr/share/accords
+	cp -r cordscripts/*.txt debian/tmp/usr/share/accords
+	cp -r dashboard/* debian/tmp/usr/share/accords
+	chmod 755 debian/tmp/usr/share/accords/*.sh
+	chmod 644 debian/tmp/usr/share/accords/imgs/*
+	rm -f debian/tmp/usr/share/accords/dashboard.inc debian/tmp/usr/share/accords/dashboard.sh
 	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
-		debian/tmp/var/www/accords/dashboard-*
+		debian/tmp/usr/share/accords/dashboard-*
 
 # Build architecture independant packages.
 
