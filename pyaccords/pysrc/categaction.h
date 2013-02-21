@@ -8,7 +8,6 @@ struct{
 }occiCategoryAction_map[]={
 	{"amazonEc2_start", start_amazonEc2},
 	{"amazonEc2_stop", stop_amazonEc2},
-	{"amazonEc2_save", save_amazonEc2},
 	{"amazonEc2_snapshot", snapshot_amazonEc2},
 	{"amazonEc2_suspend", suspend_amazonEc2},
 	{"amazonEc2_restart", restart_amazonEc2},
