@@ -56,7 +56,6 @@ from amazonEc2Class import *
 
 def amazonEc2_create(amazonEc2):
 	"""Implement here your function"""
-        
 	return amazonEc2
 
 def amazonEc2_retrieve(amazonEc2):
