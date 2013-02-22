@@ -16,7 +16,7 @@ aliases = \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas run-conagios \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-osocciprocci run-dcprocci run-slam \
-	run-cosacs run-copaas run-paasprocci accords-config run-cool
+	run-cosacs run-copaas run-paasprocci run-ec2procci accords-config run-cool
 
 
 EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
@@ -46,6 +46,9 @@ all-local: $(scripts)
 
 install-exec-local: accords.in Makefile accords.init co-check.in
 	mkdir -p $(DESTDIR)$(bindir)
+	mkdir -p $(DESTDIR)$(bindir)/ec2procci
+	cp -f $(srcdir)/ec2procci/ec2procci.py $(DESTDIR)$(bindir)/ec2procci/
+	echo 'export PYTHON_ACCORDS_PATH='$(DESTDIR)$(bindir)/ec2procci/ > /etc/profile.d/accords_python_path.sh
 	srcdir=''; \
 	  test -f ./co-check.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}co-check.in >$(DESTDIR)$(bindir)/co-check
@@ -67,6 +70,8 @@ uninstall-local:
 	rm -f $(DESTDIR)$(bindir)/co-check
 	rm -f $(DESTDIR)$(sysconfdir)/init.d/compatibleone
 	rm -f $(DESTDIR)$(sysconfdir)/default/accords
+	rm -rf $(DESTDIR)$(bindir)/ec2procci/
+	rm -f /etc/profile.d/accords_python_path.sh
 
 accords: accords.in
 accords: Makefile
