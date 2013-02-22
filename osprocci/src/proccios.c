@@ -1016,8 +1016,6 @@ private	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 		return(0);
 	else if (( rulegroup = resolve_openstack_firewall( subptr,pptr )) != (char *) 0)
 	{
-		if ( pptr->group ) pptr->group = liberate( pptr->group );
-		pptr->group = allocate_string( rulegroup );
 		return( 0 );
 	}
 	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
