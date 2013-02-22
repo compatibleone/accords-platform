@@ -621,9 +621,11 @@ private struct rest_response * ec2config_post_item(
 	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
 	char * reqhost;
+	int reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else reqport = rptr->port;
 	if (!( nptr = add_ec2config_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -632,7 +634,7 @@ private struct rest_response * ec2config_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_ec2config_nodes();
-	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -714,9 +716,11 @@ private struct rest_response * ec2config_get_list(
 	struct ec2config * pptr;
 	struct ec2config * fptr;
 	char * reqhost;
+	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_ec2config_info( optr, rptr, aptr ) ))
+	else reqport = rptr->port;
+	if (!( fptr = filter_ec2config_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = ec2config_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -725,7 +729,7 @@ private struct rest_response * ec2config_get_list(
 			continue;
 		if (!( pass_ec2config_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -907,19 +911,6 @@ private void	redirect_occi_ec2config_mt( struct rest_interface * iptr )
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_ec2config(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_ec2config_delete(optr,cptr,rptr));
-}
-
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -963,8 +954,6 @@ public struct occi_category * occi_cords_ec2config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_ec2config)))
-			return( optr );
 		autoload_ec2config_nodes();
 		return(optr);
 	}
