@@ -213,6 +213,7 @@ _co_provision()
     _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
     _co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
     _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
+    _co_run_prov ec2procci accords "accords amazonEc2 services" 10 10 1000 10 10
     _co_run_prov dcprocci accords "accords delta cloud services" 1 1 1000 1 1
     _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
     _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
@@ -379,6 +380,7 @@ _co_stop() {
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service dcprocci
+    _stop_service ec2procci
     _stop_service osprocci
     _stop_service paprocci
     _stop_service azprocci
@@ -460,6 +462,14 @@ _run_osprocci() {
     osprocci --config $target CO-OSPROCCI/1.0
 }
 
+_run_ec2procci(){
+    if [ -z $PYTHON_ACCORDS_PATH ]; then
+	. /etc/profile
+    fi
+    python ${PYTHON_ACCORDS_PATH}/ec2procci.py --config $target CO-EC2PROCCI/1.0 &
+    echo $! > ~/.ec2procci.pid
+}
+
 _run_paprocci() {
     JDK=$(readlink -f /usr/bin/java| sed "s:/jre/bin/java::") LD_LIBRARY_PATH=$JDK/jre/lib/i386/client:$JDK/jre/lib/i386 paprocci --config $target CO-PAPROCCI/1.0
 }
@@ -528,6 +538,7 @@ _make_security_files() {
 	_mksecs osocciprocci 1
 	_mksecs onprocci 1
 	_mksecs azprocci 1
+	_mksecs ec2procci 1
 	_mksecs dcprocci 1
 	_mksecs slam 1
 	_mksecs copaas 1
@@ -610,6 +621,7 @@ _accords_config() {
 		_mkcert onprocci
 		_mkcert paprocci
 		_mkcert azprocci
+		_mkcert ec2procci
 		_mkcert dcprocci
 		_mkcert slam
 		_mkcert copaas
@@ -655,6 +667,7 @@ _accords_config() {
     _mkpro osocciprocci  
     _mkpro onprocci
     _mkpro azprocci
+    _mkpro ec2procci
     _mkpro dcprocci
     _mkcfg fileserver
     _mkcfg ezvm
@@ -699,6 +712,11 @@ _stop_service() {
     else
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
+    fi
+    if [ -f ~/.${service}.pid ]; then
+	servicepid=`cat ~/.${service}.pid`
+	kill $servicepid
+	rm -f  ~/.${service}.pid
     fi
     sleep $tempo
 }
@@ -1079,6 +1097,9 @@ case `basename $0` in
 	;;
     run-azprocci) 
 	_run_azprocci $*
+	;;
+    run-ec2procci)
+	_run_ec2procci $*
 	;;
     run-broker)
 	_run_broker $*
