@@ -1,3 +1,4 @@
+#!/bin/bash
 source dashboard.sh
 cat $ACCORDS_BASE/co-log 
 

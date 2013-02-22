@@ -1,3 +1,4 @@
+#!/bin/bash
 source dashboard.sh
 cd $ACCORDS_BASE && /usr/local/bin/command --tls security/testcbTls.xml --publisher https://192.168.2.7:8086 invoice $1 
 

@@ -1,6 +1,7 @@
 compatibleone-accords (1.0-5) unstable; urgency=low
 
   * Upstream update.
+  * Fix dashboard scripts.
 
  -- Vincent <vincent@renardias.com>  Thu, 21 Feb 2013 22:17:00 +0100
 

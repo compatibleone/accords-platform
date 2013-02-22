@@ -88,14 +88,13 @@ install: build
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
 	#cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
 	rm -f `find debian/tmp/ -name \*.pyc`
-	mkdir -p debian/tmp/usr/share/accords
-	cp -r cordscripts/*.txt debian/tmp/usr/share/accords
-	cp -r dashboard/* debian/tmp/usr/share/accords
-	chmod 755 debian/tmp/usr/share/accords/*.sh
-	chmod 644 debian/tmp/usr/share/accords/imgs/*
-	rm -f debian/tmp/usr/share/accords/dashboard.inc debian/tmp/usr/share/accords/dashboard.sh
+	cp -r cordscripts/*.txt debian/tmp/var/lib/accords
+	cp -r dashboard/* debian/tmp/var/lib/accords
+	chmod 755 `grep -l \#\!\/bin debian/tmp/var/lib/accords/*`
+	chmod 644 debian/tmp/var/lib/accords/imgs/*
+	rm -f debian/tmp/var/lib/accords/dashboard.inc debian/tmp/var/lib/accords/dashboard.sh
 	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
-		debian/tmp/usr/share/accords/dashboard-*
+		debian/tmp/var/lib/accords/dashboard-*
 
 # Build architecture independant packages.
 
