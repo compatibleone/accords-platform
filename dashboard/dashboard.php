@@ -1,7 +1,7 @@
 <?php
 
 require_once( "dashboard.inc"	);
-require_once( "cedexis.inc"  	);
+/* require_once( "cedexis.inc"  	); */
 require_once( "platform.php"  	);
 require_once( "invoice.php"   	);
 require_once( "services.php"    );

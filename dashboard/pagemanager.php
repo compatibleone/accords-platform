@@ -476,7 +476,7 @@ class	page_manager
 		print "<div class=tiny>".$this->copyright[1]."</div>\n";
 		print "</th></tr>\n";
 		print "</table></div></table><p></div></div><p>\n";
-		cedexis_radar("01-11403");
+		/*cedexis_radar("01-11403");*/
 		print "</body></html>\n";
 	}
 	
