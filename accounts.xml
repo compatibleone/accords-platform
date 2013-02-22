@@ -11,7 +11,7 @@
 <account name="paprocci"><user name="operator" role="admin"/></account>
 <account name="paasprocci"><user name="operator" role="admin"/></account>
 <account name="pcprocci"><user name="operator" role="admin"/></account>
-<account name="ecprocci"><user name="operator" role="admin"/></account>
+<account name="ec2procci"><user name="operator" role="admin"/></account>
 
 </import>
 
