@@ -47,8 +47,9 @@ all-local: $(scripts)
 install-exec-local: accords.in Makefile accords.init co-check.in
 	mkdir -p $(DESTDIR)$(bindir)
 	mkdir -p $(DESTDIR)$(bindir)/ec2procci
+	mkdir -p $(DESTDIR)/etc/profile.d
 	cp -f $(srcdir)/ec2procci/ec2procci.py $(DESTDIR)$(bindir)/ec2procci/
-	echo 'export PYTHON_ACCORDS_PATH='$(DESTDIR)$(bindir)/ec2procci/ > /etc/profile.d/accords_python_path.sh
+	echo 'export PYTHON_ACCORDS_PATH='$(bindir)/ec2procci/ > $(DESTDIR)/etc/profile.d/accords_python_path.sh
 	srcdir=''; \
 	  test -f ./co-check.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}co-check.in >$(DESTDIR)$(bindir)/co-check
