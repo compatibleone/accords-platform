@@ -787,10 +787,12 @@ private	int	nova_access_address( struct os_subscription * subptr, struct opensta
 /*	--------------------------------------------------------------------	*/
 /*			o s _ u s e _ c o n e t s				*/
 /*	--------------------------------------------------------------------	*/
-private	int	os_use_conets( struct openstack * pptr )
+private	int	os_use_conets( struct os_subscription * subptr )
 {
 	char *	version;
-	if (!( version = resolve_openstack_version( pptr->profile ) ))
+	if (!( subptr ))
+		return( 1 );
+	else if (!( version = subptr->Os.version ))
 		return( 1 );
 	else if (!( strcmp( version, "v1.0" ) ))
 		return( 1 );
@@ -806,7 +808,7 @@ private	int	os_resolve_access_address(  struct os_subscription * subptr, struct 
 {
 	if (!( pptr ))
 		return( 0 );
-	else if ( os_use_conets( pptr ) )
+	else if ( os_use_conets( subptr ) )
 		return( conets_access_address( pptr ) );
 	else	return( nova_access_address(subptr, pptr ) );
 }
