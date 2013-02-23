@@ -685,7 +685,7 @@ public	int	create_windowsazure_contract(
 	if (!(subscription = use_windowsazure_configuration( pptr->profile )))
 		return( terminate_windowsazure_contract( status, &contract ) );
 
-	else if (!( cfptr = resolve_az_configuration( pptr->profile )))
+	else if (!( cfptr = solve_az_configuration( pptr->profile )))
 		return( terminate_windowsazure_contract( 404, &contract ) );
 
 	else

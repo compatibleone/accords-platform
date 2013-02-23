@@ -47,6 +47,15 @@ private	struct	az_config * resolve_az_configuration( char * sptr )
 	return((struct az_config *) 0);
 }
 
+private	struct	az_config * solve_az_configuration( char * sptr )
+{
+	struct	az_config * cptr;
+	if ((cptr = resolve_az_configuration( sptr )) != (struct az_config *) 0)
+		return( cptr );
+	else if (!( sptr = get_operator_profile() ))
+		return( cptr );
+	else 	return( resolve_az_configuration( sptr ) );
+}
 
 /*	-----------------------------------------------------------------	*/
 /* 	l l _ u s e _ w i n d o w s a z u r e _ c o n f i g u r a t i o n	*/
