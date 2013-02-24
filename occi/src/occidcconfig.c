@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occidcconfig_c_
 #define _occidcconfig_c_
@@ -514,11 +532,9 @@ private struct rest_response * dc_config_post_item(
 	struct occi_kind_node * nptr;
 	struct dc_config * pptr;
 	char * reqhost;
-	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
 	if (!( nptr = add_dc_config_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -527,7 +543,7 @@ private struct rest_response * dc_config_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_dc_config_nodes();
-	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -609,11 +625,9 @@ private struct rest_response * dc_config_get_list(
 	struct dc_config * pptr;
 	struct dc_config * fptr;
 	char * reqhost;
-	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
-	if (!( fptr = filter_dc_config_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_dc_config_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = dc_config_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -622,7 +636,7 @@ private struct rest_response * dc_config_get_list(
 			continue;
 		if (!( pass_dc_config_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -804,6 +818,19 @@ private void	redirect_occi_dc_config_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_dc_config(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_dc_config_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -841,6 +868,8 @@ public struct occi_category * occi_dc_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_dc_config)))
+			return( optr );
 		autoload_dc_config_nodes();
 		return(optr);
 	}

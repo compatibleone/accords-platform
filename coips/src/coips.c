@@ -499,7 +499,7 @@ private	char *	update_ezvm_image( char * contract, struct cords_application * ap
 
 	if (!( zptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
 		result = (char *) 0;
-	else if (!( vptr = occi_extract_atribut( zptr, "occi", _CORDS_CONTRACT, "workload" )))
+	else if (!( vptr = occi_extract_atribut( zptr, "occi", _CORDS_CONTRACT, "blob" )))
 		result = (char *) 0;
 	else if (!( aptr->url = allocate_string( vptr ) ))
 		result = (char *) 0;

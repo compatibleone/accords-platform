@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _windowsazure_c_
 #define _windowsazure_c_
@@ -37,6 +55,8 @@ public struct windowsazure * liberate_windowsazure(struct windowsazure * sptr)
 			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->blob )
+			 sptr->blob = liberate(sptr->blob);
 		if ( sptr->node )
 			 sptr->node = liberate(sptr->node);
 		if ( sptr->architecture )
@@ -92,6 +112,7 @@ public struct windowsazure * reset_windowsazure(struct windowsazure * sptr)
 		sptr->firewall = (char*) 0;
 		sptr->hostname = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->blob = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->architecture = (char*) 0;
 		sptr->driver = (char*) 0;
@@ -183,6 +204,10 @@ public int xmlin_windowsazure(struct windowsazure * sptr,struct xml_element * ep
 		else if (!( strcmp(wptr->name,"workload") ))
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"blob") ))
+		{
+			if ( wptr->value ) { sptr->blob = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"node") ))
 		{
@@ -282,6 +307,7 @@ public int rest_occi_windowsazure(FILE * fh,struct windowsazure * sptr,char * pr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.blob='%s'\r\n",prefix,nptr,(sptr->blob?sptr->blob:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.architecture='%s'\r\n",prefix,nptr,(sptr->architecture?sptr->architecture:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.driver='%s'\r\n",prefix,nptr,(sptr->driver?sptr->driver:""));

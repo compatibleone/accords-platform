@@ -13,6 +13,7 @@ struct	cords_contract
 	char *	hostname;
 	char *	rootpass;
 	char *	workload;
+	char *	blob;
 	char *	price;
 	char *	access;
 	char *	common;

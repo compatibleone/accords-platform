@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _deltacloud_c_
 #define _deltacloud_c_
@@ -49,6 +67,8 @@ public struct deltacloud * liberate_deltacloud(struct deltacloud * sptr)
 			 sptr->floatingid = liberate(sptr->floatingid);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->blob )
+			 sptr->blob = liberate(sptr->blob);
 		if ( sptr->publicaddr )
 			 sptr->publicaddr = liberate(sptr->publicaddr);
 		if ( sptr->privateaddr )
@@ -92,6 +112,7 @@ public struct deltacloud * reset_deltacloud(struct deltacloud * sptr)
 		sptr->floating = (char*) 0;
 		sptr->floatingid = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->blob = (char*) 0;
 		sptr->publicaddr = (char*) 0;
 		sptr->privateaddr = (char*) 0;
 		sptr->firewall = (char*) 0;
@@ -198,6 +219,10 @@ public int xmlin_deltacloud(struct deltacloud * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"blob") ))
+		{
+			if ( wptr->value ) { sptr->blob = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"publicaddr") ))
 		{
 			if ( wptr->value ) { sptr->publicaddr = allocate_string(wptr->value); }
@@ -262,6 +287,7 @@ public int rest_occi_deltacloud(FILE * fh,struct deltacloud * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floating='%s'\r\n",prefix,nptr,(sptr->floating?sptr->floating:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.floatingid='%s'\r\n",prefix,nptr,(sptr->floatingid?sptr->floatingid:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.blob='%s'\r\n",prefix,nptr,(sptr->blob?sptr->blob:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.publicaddr='%s'\r\n",prefix,nptr,(sptr->publicaddr?sptr->publicaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.privateaddr='%s'\r\n",prefix,nptr,(sptr->privateaddr?sptr->privateaddr:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));

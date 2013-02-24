@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occinagiosservicedependancy_c_
 #define _occinagiosservicedependancy_c_
@@ -508,11 +526,9 @@ private struct rest_response * nagios_service_dependency_post_item(
 	struct occi_kind_node * nptr;
 	struct nagios_service_dependency * pptr;
 	char * reqhost;
-	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
 	if (!( nptr = add_nagios_service_dependency_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -521,7 +537,7 @@ private struct rest_response * nagios_service_dependency_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_nagios_service_dependency_nodes();
-	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -603,11 +619,9 @@ private struct rest_response * nagios_service_dependency_get_list(
 	struct nagios_service_dependency * pptr;
 	struct nagios_service_dependency * fptr;
 	char * reqhost;
-	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
-	if (!( fptr = filter_nagios_service_dependency_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_nagios_service_dependency_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = nagios_service_dependency_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -616,7 +630,7 @@ private struct rest_response * nagios_service_dependency_get_list(
 			continue;
 		if (!( pass_nagios_service_dependency_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -798,6 +812,19 @@ private void	redirect_occi_nagios_service_dependency_mt( struct rest_interface *
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_nagios_service_dependency(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_nagios_service_dependency_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -835,6 +862,8 @@ public struct occi_category * occi_nagios_service_dependency_builder(char * a,ch
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "status",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_nagios_service_dependency)))
+			return( optr );
 		autoload_nagios_service_dependency_nodes();
 		return(optr);
 	}

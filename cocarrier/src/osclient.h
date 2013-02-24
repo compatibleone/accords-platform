@@ -152,6 +152,7 @@ public	struct	os_response *	os_delete_security_group(struct os_subscription *  s
 public	struct	os_response *	os_delete_security_rule(struct os_subscription *  sptr, char * id );
 
 public	char *	os_build_image_reference(struct os_subscription *  sptr, char * nptr );
+public	char *	os_build_glance_reference(struct os_subscription *  sptr, char * nptr );
 public	char *	os_build_flavor_reference(struct os_subscription *  sptr, char * nptr );
 public	struct os_response * liberate_os_response(struct os_response * rptr );	
 

@@ -1501,6 +1501,25 @@ public	char *	os_build_image_reference(struct os_subscription * sptr, char * npt
 }
 
 /*	------------------------------------------------------------	*/
+/*	    o s _ b u i l d _ g l a n c e _ r e f e r e n c e		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_build_glance_reference(struct os_subscription * sptr, char * nptr )
+{
+	char	buffer[4096];
+	if (!( nptr ))
+		return( nptr );
+	else if (!( strncmp( nptr, sptr->Os.base, strlen( sptr->Os.base ) ) ))
+		return( allocate_string( nptr ) );
+	else if (!( strncmp( nptr, "http", strlen( "http" ) ) ))
+		return( allocate_string( nptr ) );
+	else
+	{
+		sprintf(buffer,"%s/images/%s",sptr->KeyStone.glance,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*	    o s _ b u i l d _ f l a v o r _ r e f e r e n c e		*/
 /*	------------------------------------------------------------	*/
 public	char *	os_build_flavor_reference(struct os_subscription * sptr, char * nptr )

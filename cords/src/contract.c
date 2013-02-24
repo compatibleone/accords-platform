@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _contract_c_
 #define _contract_c_
@@ -31,6 +49,8 @@ public struct cords_contract * liberate_cords_contract(struct cords_contract * s
 			 sptr->rootpass = liberate(sptr->rootpass);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
+		if ( sptr->blob )
+			 sptr->blob = liberate(sptr->blob);
 		if ( sptr->price )
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->access )
@@ -77,6 +97,7 @@ public struct cords_contract * reset_cords_contract(struct cords_contract * sptr
 		sptr->hostname = (char*) 0;
 		sptr->rootpass = (char*) 0;
 		sptr->workload = (char*) 0;
+		sptr->blob = (char*) 0;
 		sptr->price = (char*) 0;
 		sptr->access = (char*) 0;
 		sptr->common = (char*) 0;
@@ -158,6 +179,10 @@ public int xmlin_cords_contract(struct cords_contract * sptr,struct xml_element 
 		else if (!( strcmp(wptr->name,"workload") ))
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"blob") ))
+		{
+			if ( wptr->value ) { sptr->blob = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"price") ))
 		{
@@ -262,6 +287,7 @@ public int rest_occi_cords_contract(FILE * fh,struct cords_contract * sptr,char 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.rootpass='%s'\r\n",prefix,nptr,(sptr->rootpass?sptr->rootpass:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.blob='%s'\r\n",prefix,nptr,(sptr->blob?sptr->blob:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.common='%s'\r\n",prefix,nptr,(sptr->common?sptr->common:""));

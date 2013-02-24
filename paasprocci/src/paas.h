@@ -31,6 +31,7 @@ struct	paas
 	char *	zone;
 	char *	hostname;
 	char *	workload;
+	char *	blob;
 
 	char *	agent;
 

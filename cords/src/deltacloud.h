@@ -27,6 +27,7 @@ struct	deltacloud
 	char *	floating;
 	char *	floatingid;
 	char *	workload;
+	char *	blob;
 
 	char *	publicaddr;
 	char *	privateaddr;

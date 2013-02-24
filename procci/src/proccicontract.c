@@ -75,6 +75,12 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 			if (!( pptr->workload = occi_unquoted_value( fptr->value ) ))
 				return( 400 );
 		}
+		else if (!( strcmp( sptr,"blob" ) ))
+		{
+			if ( pptr->blob ) pptr->blob = liberate( pptr->blob );
+			if (!( pptr->blob = occi_unquoted_value( fptr->value ) ))
+				return( 400 );
+		}
 	}
 	return( 0 );
 }
@@ -573,10 +579,12 @@ private	void	reset_contract( struct cords_contract * pptr )
 	if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
 	if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
 	if (pptr->workload ) pptr->workload  = liberate( pptr->workload  );
+	if (pptr->blob ) pptr->blob  = liberate( pptr->blob  );
 	pptr->reference = allocate_string("");
 	pptr->rootpass  = allocate_string("");
 	pptr->hostname  = allocate_string("");
 	pptr->workload  = allocate_string("");
+	pptr->blob  = allocate_string("");
 	pptr->when  = time((long*) 0);
 	pptr->state = _OCCI_IDLE;
 	return;

@@ -19,6 +19,7 @@ struct	windowsazure
 	char *	firewall;
 	char *	hostname;
 	char *	workload;
+	char *	blob;
 
 	char *	node;
 	char *	architecture;

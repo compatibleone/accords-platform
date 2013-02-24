@@ -1,3 +1,21 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occipaas_c_
 #define _occipaas_c_
@@ -155,6 +173,8 @@ private void autoload_paas_nodes() {
 				pptr->hostname = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
 				pptr->workload = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "blob" )) != (struct xml_atribut *) 0)
+				pptr->blob = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
 				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "when" )) != (struct xml_atribut *) 0)
@@ -245,6 +265,9 @@ public  void autosave_paas_nodes() {
 		fprintf(h," workload=%c",0x0022);
 		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," blob=%c",0x0022);
+		fprintf(h,"%s",(pptr->blob?pptr->blob:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," agent=%c",0x0022);
 		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
 		fprintf(h,"%c",0x0022);
@@ -313,6 +336,8 @@ private void set_paas_field(
 			pptr->hostname = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
 			pptr->workload = allocate_string(vptr);
+		if (!( strcmp( nptr, "blob" ) ))
+			pptr->blob = allocate_string(vptr);
 		if (!( strcmp( nptr, "agent" ) ))
 			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "when" ) ))
@@ -483,6 +508,13 @@ private int pass_paas_filter(
 		else if ( strcmp(pptr->workload,fptr->workload) != 0)
 			return(0);
 		}
+	if (( fptr->blob )
+	&&  (strlen( fptr->blob ) != 0)) {
+		if (!( pptr->blob ))
+			return(0);
+		else if ( strcmp(pptr->blob,fptr->blob) != 0)
+			return(0);
+		}
 	if (( fptr->agent )
 	&&  (strlen( fptr->agent ) != 0)) {
 		if (!( pptr->agent ))
@@ -562,6 +594,9 @@ private struct rest_response * paas_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.workload=%c%s%c",optr->domain,optr->id,0x0022,pptr->workload,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.blob=%c%s%c",optr->domain,optr->id,0x0022,pptr->blob,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.agent=%c%s%c",optr->domain,optr->id,0x0022,pptr->agent,0x0022);
@@ -678,11 +713,9 @@ private struct rest_response * paas_post_item(
 	struct occi_kind_node * nptr;
 	struct paas * pptr;
 	char * reqhost;
-	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
 	if (!( nptr = add_paas_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -691,7 +724,7 @@ private struct rest_response * paas_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_paas_nodes();
-	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -773,11 +806,9 @@ private struct rest_response * paas_get_list(
 	struct paas * pptr;
 	struct paas * fptr;
 	char * reqhost;
-	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else reqport = rptr->port;
-	if (!( fptr = filter_paas_info( optr, rptr, aptr ) ))
+	else if (!( fptr = filter_paas_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = paas_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -786,7 +817,7 @@ private struct rest_response * paas_get_list(
 			continue;
 		if (!( pass_paas_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -968,6 +999,19 @@ private void	redirect_occi_paas_mt( struct rest_interface * iptr )
 	return;
 }
 
+/*	------------------------------------	*/
+/*	c r u d   d e l e t e   a c t i o n 	*/
+/*	------------------------------------	*/
+private struct rest_response * delete_action_paas(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{
+	aptr = liberate_rest_response( aptr );
+	return( occi_paas_delete(optr,cptr,rptr));
+}
+
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -1019,12 +1063,16 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "blob",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "when",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas)))
+			return( optr );
 		autoload_paas_nodes();
 		return(optr);
 	}
@@ -1259,6 +1307,17 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.blob='%s'\r\n",(sptr->blob?sptr->blob:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
