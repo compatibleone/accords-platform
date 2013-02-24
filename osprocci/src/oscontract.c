@@ -276,6 +276,7 @@ private	char *	resolve_vm_image_url( char * iid, char * pid )
 	struct	occi_element  * eptr;
 	struct	occi_element  * dptr;
 	char	buffer[2048];
+	char	url[4096];
 	char *	id=(char *) 0;
 	char *	hptr;
 	char *	vptr;
@@ -311,7 +312,9 @@ private	char *	resolve_vm_image_url( char * iid, char * pid )
 				continue;
 			else if (!( vptr = occi_category_id( dptr->value ) ))
 				continue;
-			else if (!( zptr = occi_simple_get( vptr, _CORDS_CONTRACT_AGENT, default_tls() )))
+			else	sprintf(url,"%s%s",buffer,vptr);
+
+			if (!( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )))
 				continue;
 			else if (!( eptr = occi_locate_element( zptr->first, "occi.vm.url" ) ))
 				zptr = occi_remove_response( zptr );
