@@ -329,7 +329,7 @@ private	struct	rest_response * start_contract(
 			/* ------------------------ */
 			/* consume placement quotas */
 			/* ------------------------ */
-			if ( pptr->placement )
+			if ( rest_valid_string( pptr->placement ) != 0 )
 			{
 				if ( cords_validate_action( 
 					(struct occi_client *) 0,
@@ -351,7 +351,7 @@ private	struct	rest_response * start_contract(
 			/* ------------------------ */
 			/* start monitoring session */
 			/* ------------------------ */
-			if ( pptr->session )
+			if ( rest_valid_string( pptr->session ) != 0)
 			{
 				if (!(zptr = cords_invoke_action( pptr->session, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -392,14 +392,14 @@ private	struct	rest_response * resolve_contract(
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->service )
+	else if ( rest_valid_string( pptr->service ) != 0 )
 	 	return( rest_html_response( aptr, 200, "OK" ) );
 	else if ( is_common_contract( pptr ) )
 	{
 		retrieve_provider_information( pptr );
 	 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
-	else if ((!( pptr->type )) ||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+	else if ((!( rest_valid_string( pptr->type ) )) ||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 	{
 		retrieve_provider_information( pptr );
 	 	return( rest_html_response( aptr, 200, "OK" ) );
@@ -439,7 +439,7 @@ private	struct	rest_response * restart_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ((!( pptr->type ))
+			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_RESTART, 
@@ -465,7 +465,7 @@ private	struct	rest_response * restart_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ( pptr->service )
+			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
 				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_RESTART, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -518,7 +518,7 @@ private	struct	rest_response * suspend_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ((!( pptr->type ))
+			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_SUSPEND, 
@@ -544,7 +544,7 @@ private	struct	rest_response * suspend_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ( pptr->service )
+			else if ( rest_valid_string( pptr->service ) )
 			{
 				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_SUSPEND, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -604,7 +604,7 @@ private	struct	rest_response * stop_contract(
 			/* ------------------------ */
 			/* stop monitoring session */
 			/* ------------------------ */
-			if ( pptr->session )
+			if ( rest_valid_string( pptr->session ) != 0 )
 			{
 				if (!(zptr = cords_invoke_action( pptr->session, _CORDS_STOP, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -632,7 +632,7 @@ private	struct	rest_response * stop_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ((!( pptr->type ))
+			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_STOP, 
@@ -658,7 +658,7 @@ private	struct	rest_response * stop_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ( pptr->service )
+			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
 				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_STOP, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -673,7 +673,7 @@ private	struct	rest_response * stop_contract(
 			/* ------------------------ */
 			/* restore placement quotas */
 			/* ------------------------ */
-			if ( pptr->placement )
+			if ( rest_valid_string( pptr->placement ) != 0 )
 			{
 				if ( cords_validate_action( 
 					(struct occi_client *) 0,
@@ -731,7 +731,7 @@ private	struct	rest_response * save_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ((!( pptr->type ))
+			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SAVE, 
@@ -759,7 +759,7 @@ private	struct	rest_response * save_contract(
 				else	zptr = occi_remove_response ( zptr );
 				retrieve_provider_information( pptr );
 			}
-			else if ( pptr->service )
+			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
 				if (!( zptr = cords_invoke_action( pptr->service, _CORDS_SAVE, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -810,7 +810,7 @@ private	struct	rest_response * snapshot_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ((!( pptr->type ))
+			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
 				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SNAPSHOT, 
@@ -836,7 +836,7 @@ private	struct	rest_response * snapshot_contract(
 				}
 				else	zptr = occi_remove_response ( zptr );
 			}
-			else if ( pptr->service )
+			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
 				if (!( zptr = cords_invoke_action( pptr->service, _CORDS_SNAPSHOT, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -874,10 +874,10 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ------------------------------------------------------- */
 	if (!( is_common_contract( pptr ) ))
 	{
-		if ((!( pptr->type ))
+		if ((!( rest_valid_string( pptr->type ) ))
 		||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			zptr = occi_simple_delete( pptr->provider, _CORDS_SERVICE_AGENT, default_tls() );
-		else if ( pptr->service )
+		else if ( rest_valid_string( pptr->service ) != 0 )
 			zptr = occi_simple_delete( pptr->service, _CORDS_SERVICE_AGENT, default_tls() );
 		if ( zptr )
 			zptr = occi_remove_response( zptr );
@@ -917,7 +917,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* -------------------------------------------- */
 	/* delete a monitoring session if one is active */
 	/* -------------------------------------------- */
-	if ( pptr->session )
+	if ( rest_valid_string( pptr->session ) != 0 )
 	{
 		if (( zptr = occi_simple_delete( pptr->session, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
@@ -927,7 +927,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ------------------------ */
 	/* consume placement quotas */
 	/* ------------------------ */
-	if ( pptr->placement )
+	if ( rest_valid_string( pptr->placement ) != 0 )
 	{
 		if ( cords_validate_action( 
 			(struct occi_client *) 0,
