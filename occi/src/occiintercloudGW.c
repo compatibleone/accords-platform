@@ -419,9 +419,11 @@ private struct rest_response * intercloudGW_post_item(
 	struct occi_kind_node * nptr;
 	struct intercloudGW * pptr;
 	char * reqhost;
+	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else reqport = rptr->port;
 	if (!( nptr = add_intercloudGW_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -430,7 +432,7 @@ private struct rest_response * intercloudGW_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_intercloudGW_nodes();
-	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -512,9 +514,11 @@ private struct rest_response * intercloudGW_get_list(
 	struct intercloudGW * pptr;
 	struct intercloudGW * fptr;
 	char * reqhost;
+	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_intercloudGW_info( optr, rptr, aptr ) ))
+	else reqport = rptr->port;
+	if (!( fptr = filter_intercloudGW_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = intercloudGW_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -523,7 +527,7 @@ private struct rest_response * intercloudGW_get_list(
 			continue;
 		if (!( pass_intercloudGW_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}

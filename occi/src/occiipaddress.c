@@ -453,9 +453,11 @@ private struct rest_response * cords_ipaddress_post_item(
 	struct occi_kind_node * nptr;
 	struct cords_ipaddress * pptr;
 	char * reqhost;
+	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else reqport = rptr->port;
 	if (!( nptr = add_cords_ipaddress_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -464,7 +466,7 @@ private struct rest_response * cords_ipaddress_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_cords_ipaddress_nodes();
-	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -546,9 +548,11 @@ private struct rest_response * cords_ipaddress_get_list(
 	struct cords_ipaddress * pptr;
 	struct cords_ipaddress * fptr;
 	char * reqhost;
+	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_cords_ipaddress_info( optr, rptr, aptr ) ))
+	else reqport = rptr->port;
+	if (!( fptr = filter_cords_ipaddress_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = cords_ipaddress_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -557,7 +561,7 @@ private struct rest_response * cords_ipaddress_get_list(
 			continue;
 		if (!( pass_cords_ipaddress_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
