@@ -502,6 +502,8 @@ public	int	create_openstack_contract(
 			return( terminate_openstack_contract( 1186, &contract ) );
 		else if (!( pptr->image = resolve_contract_image( subptr, &contract ) ))
 			return( terminate_openstack_contract( 1187, &contract ) );
+		else if (!( pptr->workload = os_build_image_reference( subptr, pptr->image ) ))
+			return( terminate_openstack_contract( 1187, &contract ) );
 	}
 
 	/* --------------------------------------- */
