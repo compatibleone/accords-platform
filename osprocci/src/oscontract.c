@@ -314,7 +314,7 @@ private	char *	resolve_vm_image_url( char * iid, char * pid )
 				continue;
 			else	sprintf(url,"%s%s",buffer,vptr);
 
-			if (!( zptr = occi_simple_get( buffer, _CORDS_CONTRACT_AGENT, default_tls() )))
+			if (!( zptr = occi_simple_get( url, _CORDS_CONTRACT_AGENT, default_tls() )))
 				continue;
 			else if (!( eptr = occi_locate_element( zptr->first, "occi.vm.url" ) ))
 				zptr = occi_remove_response( zptr );
