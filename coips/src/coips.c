@@ -561,6 +561,88 @@ private	struct occi_element * 	first_application_package_link( struct occi_respo
 /*	------------------------------------------------------------------	*/
 /*			l l _ b u i l d _ a p p l i c a t i o n			*/
 /*	------------------------------------------------------------------	*/
+private	int	install_application_packages( 
+		struct cords_application * aptr,
+		struct occi_response * zptr,
+		char * contract )
+
+{
+	struct	occi_response * wptr;
+	struct	occi_element  * eptr;
+	char *	vptr	  = (char *) 0;
+	char *	linkvalue = (char *) 0;
+	char * 	cosacs;
+	char *	package   = (char *) 0;
+	int	returnValue=0;
+
+	/* ------------------------- */
+	/* For Each Package 	     */
+	/* ------------------------- */
+	for (	eptr = first_application_package_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->name ))
+			continue;
+		else if (!( eptr->value ))
+			continue;
+		else if ( strcasecmp(eptr->name,"LINK") != 0 )
+			continue;
+		else if (!( linkvalue = coips_link_value( eptr->value )))
+			continue;
+		else
+		{
+			if (!( cosacs ))
+			{
+				/* --------------------------- */
+				/* retrieve the cosacs address */
+				/* --------------------------- */
+				if (!( wptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
+				{
+					returnValue = 805;
+					break;
+				}
+				else if (!( vptr = occi_extract_atribut( wptr, "occi","contract", "hostname" )))
+				{
+					returnValue = 806;
+					break;
+				}
+				else if (!( cosacs = allocate_string( vptr ) ))
+				{
+					returnValue = 807;
+					break;
+				}
+				else	
+				{
+					wptr = occi_remove_response( wptr );
+					coips_synchronise();
+				}
+			}
+
+			if (!( package = install_application_package( cosacs, linkvalue ) ))
+			{
+				returnValue = 808;
+				break;
+			}
+			else
+			{
+				linkvalue = liberate( linkvalue );
+				coips_synchronise();
+			}
+		}
+	}
+	if (!( returnValue ))
+	{
+		aptr->state |= _COIPS_PACKAGES_INSTALLED;
+		occi_flush_client( cosacs, _COSACS_PORT );
+		if ( cosacs ) cosacs = liberate( cosacs );
+	}
+	return( returnValue );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			l l _ b u i l d _ a p p l i c a t i o n			*/
+/*	------------------------------------------------------------------	*/
 private	int	ll_build_application( struct occi_category * optr, struct cords_application * aptr)
 {
 	int	returnValue=0;
@@ -568,10 +650,10 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	char *	contract  = (char *) 0;
 	char *	linkvalue = (char *) 0;
 	char *	package   = (char *) 0;
-	char *	cosacs	  = (char *) 0;
 	char *	agent	  = (char *) 0;
 	char *	vptr	  = (char *) 0;
 	int	packages=0;
+	int	nobuild=0;
 	struct	occi_response * zptr;
 	struct	occi_response * wptr;
 	struct	occi_element  * eptr;
@@ -608,13 +690,13 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	{
 		zptr = occi_remove_response( zptr );
 		aptr->state |= _COIPS_IMAGE_OK;
-		return(0);
+		nobuild = 1;
 	}
 	else if (!( use_cosacs_agent( agent ) ))
 	{
 		zptr = occi_remove_response( zptr );
 		aptr->state |= _COIPS_IMAGE_OK;
-		return(0);
+		nobuild = 1;
 	}
 
 	/* ---------------------------------------- */
@@ -624,7 +706,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	{
 		zptr = occi_remove_response( zptr );
 		aptr->state = _COIPS_IMAGE_OK;
-		return( 0 );
+		nobuild = 1;
 	}
 
 	/* ------------------------- */
@@ -660,9 +742,12 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	if ( aptr->state & _COIPS_CONTRACT_NEGOTIATED )
 	{
-		if (!( contract = provision_application_contract(contract)))
-			returnValue = 804;
-		else 	aptr->state |= _COIPS_CONTRACT_PROVISIONED;
+		if (!( nobuild ))
+		{
+			if (!( contract = provision_application_contract(contract)))
+				returnValue = 804;
+			else 	aptr->state |= _COIPS_CONTRACT_PROVISIONED;
+		}
 	}
 
 	/* ---------------------------------- */
@@ -670,68 +755,9 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ---------------------------------- */
 	if ( aptr->state & _COIPS_CONTRACT_PROVISIONED )
 	{
-		/* ------------------------- */
-		/* For Each Package 	     */
-		/* ------------------------- */
-		for (	eptr = first_application_package_link( zptr );
-			eptr != (struct occi_element *) 0;
-			eptr = eptr->next )
-		{
-			if (!( eptr->name ))
-				continue;
-			else if (!( eptr->value ))
-				continue;
-			else if ( strcasecmp(eptr->name,"LINK") != 0 )
-				continue;
-			else if (!( linkvalue = coips_link_value( eptr->value )))
-				continue;
-			else
-			{
-				if (!( cosacs ))
-				{
-					/* --------------------------- */
-					/* retrieve the cosacs address */
-					/* --------------------------- */
-					if (!( wptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
-					{
-						returnValue = 805;
-						break;
-					}
-					else if (!( vptr = occi_extract_atribut( wptr, "occi","contract", "hostname" )))
-					{
-						returnValue = 806;
-						break;
-					}
-					else if (!( cosacs = allocate_string( vptr ) ))
-					{
-						returnValue = 807;
-						break;
-					}
-					else	
-					{
-						wptr = occi_remove_response( wptr );
-						coips_synchronise();
-					}
-				}
-				if (!( package = install_application_package( cosacs, linkvalue ) ))
-				{
-					returnValue = 808;
-					break;
-				}
-				else
-				{
-					linkvalue = liberate( linkvalue );
-					coips_synchronise();
-				}
-			}
-		}
-		if (!( returnValue ))
-		{
-			aptr->state |= _COIPS_PACKAGES_INSTALLED;
-			zptr = occi_remove_response( zptr );
-			occi_flush_client( cosacs, _COSACS_PORT );
-			if ( cosacs ) cosacs = liberate( cosacs );
-		}
+		returnValue = install_application_packages( aptr, zptr, contract );
+		zptr = occi_remove_response( zptr );
+
 	}
 
 	/* ----------------------------- */
@@ -746,7 +772,7 @@ private	int	ll_build_application( struct occi_category * optr, struct cords_appl
 	/* ------------------------- */
 	/* Update Image name 	     */
 	/* ------------------------- */
-	if ( aptr->state & _COIPS_IMAGE_CREATED )
+	if (( aptr->state & _COIPS_IMAGE_CREATED ) || ( nobuild ))
 		if ((vptr = update_ezvm_image( contract, aptr )) != (char *) 0)
 			aptr->state |= _COIPS_IMAGE_OK;
 
