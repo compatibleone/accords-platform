@@ -41,7 +41,7 @@ private	int	retrieve_provider_information( struct cords_contract * pptr )
 	sprintf(buffer,"occi.%s.",pptr->profile);
 
 	if (!( zptr = occi_simple_get( pptr->provider, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		return( 400 );
+		return( 404 );
 	for (	fptr = zptr->first;
 		fptr != (struct occi_element *) 0;
 		fptr = fptr->next )
@@ -376,6 +376,37 @@ private	struct	rest_response * start_contract(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
+
+/*	-------------------------------------------	*/
+/* 	   r e s o l v e _ c o n t r a c t		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * resolve_contract(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	int	status;
+	struct	occi_response * zptr;
+	struct	cords_contract * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->service )
+	 	return( rest_html_response( aptr, 200, "OK" ) );
+	else if ( is_common_contract( pptr ) )
+	{
+		retrieve_provider_information( pptr );
+	 	return( rest_html_response( aptr, 200, "OK" ) );
+	}
+	else if ((!( pptr->type )) ||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+	{
+		retrieve_provider_information( pptr );
+	 	return( rest_html_response( aptr, 200, "OK" ) );
+	}
+	else	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
 
 /*	-------------------------------------------	*/
 /* 	   r e s t a r t _ c o n t r a c t		*/
@@ -1009,6 +1040,8 @@ private	struct	occi_category *	procci_contract_builder( char * domain, char * ca
 		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_contract)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,_CORDS_RESOLVE,"",resolve_contract)))
 			return( optr );
 		else	return( optr );
 	}

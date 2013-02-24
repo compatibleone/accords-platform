@@ -412,7 +412,9 @@ private int	save_application_image( char * contract )
 {
 	int	status;
 	struct	occi_response * zptr;
+
 	if ( check_debug() ) rest_log_message("coips:save_image");
+
 	if (!(zptr = cords_invoke_action( contract, "save", _CORDS_SERVICE_AGENT, default_tls() )))
 	{
 		rest_log_message("coips:save_image:failure");
@@ -491,6 +493,9 @@ private	char *	update_ezvm_image( char * contract, struct cords_application * ap
 	char *	vptr;
 
 	if ( check_debug() ) rest_log_message("coips:update_ezvm");
+	
+	if (( zptr = cords_invoke_action( contract, _CORDS_RESOLVE, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
 
 	if (!( zptr = occi_simple_get( contract, _CORDS_SERVICE_AGENT, default_tls() ) ))
 		result = (char *) 0;

@@ -54,6 +54,7 @@
 #define	_CORDS_CONSUME	"consume"
 #define	_CORDS_RESTORE	"restore"
 #define	_CORDS_RELEASE	"release"
+#define	_CORDS_RESOLVE	"resolve"
 
 /*	-------------------------	*/
 /*	cords atribut identifiers	*/
