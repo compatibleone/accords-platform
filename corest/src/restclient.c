@@ -840,6 +840,8 @@ public	struct	rest_response * rest_client_get_request(
 	if ( check_debug() )
 		printf("REST Client Request : GET %s \n",target );
 
+	if (!( rest_valid_string( target ) ))
+		return( rest_client_response( 599, "NULL URL", agent ) );
 
 	if (!( uptr = analyse_url( target ) ))
 		return( rest_client_response( 600, "Url Anaysis", agent ) );
