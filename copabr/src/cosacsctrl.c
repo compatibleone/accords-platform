@@ -366,8 +366,17 @@ public	int	cosacs_test_interface( char * cosacs, int timeout, int retry )
 	struct	rest_response * rptr;
 	if (!( host = getenv( "COSACS" ) ))
 		host = cosacs;
-	sprintf(buffer,"%s://%s:%u/-/",cosacs_http_prefix(),host,_COSACS_PORT);
 
+	/* -------------------------------- */
+	/* time out quick if incorrect host */
+	/* -------------------------------- */
+	if (!( rest_valid_string( host ) ))
+		return(0);
+	else	sprintf(buffer,"%s://%s:%u/-/",cosacs_http_prefix(),host,_COSACS_PORT);
+
+	/* ---------------------------------- */
+	/* detect arrival of cosacs interface */
+	/* ---------------------------------- */
 	if (!( rptr = rest_client_try_get_request( buffer, cosacs_tls(), agent, hptr, timeout, retry ) ))
 		return(0);
 	else	
