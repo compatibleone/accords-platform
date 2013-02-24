@@ -1491,6 +1491,8 @@ public	char *	os_build_image_reference(struct os_subscription * sptr, char * npt
 		return( nptr );
 	else if (!( strncmp( nptr, sptr->Os.base, strlen( sptr->Os.base ) ) ))
 		return( allocate_string( nptr ) );
+	else if (!( strncmp( nptr, "http", strlen( "http" ) ) ))
+		return( allocate_string( nptr ) );
 	else
 	{
 		sprintf(buffer,"%s/images/%s",sptr->Os.base,nptr);

@@ -267,6 +267,75 @@ private	char *	resolve_contract_flavor( struct	os_subscription * subptr, struct 
 }
 
 /*	-----------------------------------------------------------------	*/
+/*		r e s o l v e _ v m _ i m a g e _ u r l  			*/
+/*	-----------------------------------------------------------------	*/
+private	char *	resolve_vm_image_url( char * iid, char * pid )
+{
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	struct	occi_element  * dptr;
+	char	buffer[2048];
+	char *	id=(char *) 0;
+	char *	hptr;
+	char *	vptr;
+
+	/* ----------------------- */
+	/* Resolve the VM Category */
+	/* ----------------------- */
+	if (!( hptr = occi_resolve_category_provider( _CORDS_VM, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( (char *) 0 );
+	else	sprintf(buffer,"%s/%s/",hptr,_CORDS_VM);
+
+	if (!( dptr = occi_create_element( "occi.vm.image" , iid ) ))
+		return( (char *) 0 );
+	else if (!( dptr->next = occi_create_element( "occi.vm.provider" , pid ) ))
+		return( (char *) 0 );
+	else	dptr->next->previous = dptr;
+
+	if (!( yptr = occi_simple_list( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( (char *) 0 );
+
+	else
+	{
+		/* -------------------------- */
+		/* scan the list of responses */
+		/* -------------------------- */
+		for (	dptr = yptr->first;
+			dptr != (struct occi_element*) 0;
+			dptr = dptr->next )
+		{
+			if (!( dptr->name ))
+				continue;
+			else if (!( dptr->value ))
+				continue;
+			else if (!( vptr = occi_category_id( dptr->value ) ))
+				continue;
+			else if (!( zptr = occi_simple_get( vptr, _CORDS_CONTRACT_AGENT, default_tls() )))
+				continue;
+			else if (!( eptr = occi_locate_element( zptr->first, "occi.vm.url" ) ))
+				zptr = occi_remove_response( zptr );
+			else if (!(id = allocate_string( eptr->value )))
+				zptr = occi_remove_response( zptr );
+			else if (!(id = occi_unquoted_value( id ) ))
+				zptr = occi_remove_response( zptr );
+			else
+			{
+				zptr = occi_remove_response( zptr );
+				break;
+			}
+		}
+		yptr = occi_remove_response( yptr );
+		rest_log_message( "os_contract vm url :");
+		if ( id )
+			rest_log_message( id );
+		else	rest_log_message("(null)");
+		return( id );
+	}
+}
+
+
+/*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ c o n t r a c t _ i m a g e   			*/
 /*	-----------------------------------------------------------------	*/
 private	char *	resolve_contract_image( struct	os_subscription * subptr, struct cords_os_contract * cptr )
@@ -320,10 +389,7 @@ private	char *	resolve_contract_image( struct	os_subscription * subptr, struct c
 		else if ( strcmp( vptr, iname ) != 0 )
 			continue;
 		else if (!( vptr = json_atribut( dptr, "id" ) ))
-		{
-			liberate( iname );
-			return((char *) 0);
-		}
+			continue;
 		else
 		{
 			liberate( iname );
@@ -364,7 +430,9 @@ private	char *	resolve_contract_image( struct	os_subscription * subptr, struct c
 		else	continue;
 	}
 	if (!( best.id ))
-		return( best.id );
+	{
+		return( resolve_vm_image_url( cptr->image.id, _CORDS_OPENSTACK ) );
+	}
 	else
 	{
 		rest_log_message("os_contract best match");
