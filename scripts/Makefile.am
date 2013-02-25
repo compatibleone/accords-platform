@@ -7,7 +7,8 @@
 #   Jean Parpaillon <jparpaillon@mandriva.com>
 #
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
-dist_pkgsysconf_DATA=cords_user.xml accords.ini
+#dist_pkgsysconf_DATA=cords_user.xml accords.ini
+dist_pkgsysconf_DATA=cords_user.xml
 
 scripts=accords co-check
 
@@ -19,7 +20,8 @@ aliases = \
 	run-cosacs run-copaas run-paasprocci run-ec2procci accords-config run-cool
 
 
-EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
+#EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
+EXTRA_DIST = accords.in openssl.cnf publication.xml accords-config.in co-check.in accords.init accords.default
 CLEANFILES = $(scripts) $(aliases)
 
 # Edit for local run (without installation)
@@ -49,7 +51,8 @@ install-exec-local: accords.in Makefile accords.init co-check.in
 	mkdir -p $(DESTDIR)$(bindir)/ec2procci
 	mkdir -p $(DESTDIR)/etc/profile.d
 	cp -f $(srcdir)/ec2procci/ec2procci.py $(DESTDIR)$(bindir)/ec2procci/
-	echo 'export PYTHON_ACCORDS_PATH='$(bindir)/ec2procci/ > $(DESTDIR)/etc/profile.d/accords_python_path.sh
+	mkdir -p  $(DESTDIR)$(sysconfdir)/accords/
+	sed -e "s#^PYTHON_ACCORDS_PATH=.*#PYTHON_ACCORDS_PATH=$(bindir)/ec2procci/#" < $(srcdir)/accords.ini > $(DESTDIR)$(sysconfdir)/accords/accords.ini
 	srcdir=''; \
 	  test -f ./co-check.in || srcdir=$(srcdir)/; \
 	  $(installedit) $${srcdir}co-check.in >$(DESTDIR)$(bindir)/co-check
