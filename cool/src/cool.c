@@ -417,15 +417,23 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		if (!( eptr->contract = allocate_string( contract ) ))
 			return( liberate_elastic_contract( eptr ) );
 
-	/* ---------------------------------------------- */
-	/* retrieve and store the contract hostname value */
-	/* ---------------------------------------------- */
-	if (!( result = occi_extract_atribut( 
-			zptr, Cool.domain, 
-			_CORDS_CONTRACT, _CORDS_HOSTNAME )))
-		return( liberate_elastic_contract( eptr ) );
-	else if (!( eptr->hostname = allocate_string( result ) ))
-		return( liberate_elastic_contract( eptr ) );
+	/* ---------------------- */
+	/* if not secondary usage */
+	/* ---------------------- */
+	if (!( eptr->allocated & 2 ))
+	{
+
+		/* ---------------------------------------------- */
+		/* retrieve and store the contract hostname value */
+		/* ---------------------------------------------- */
+		if (!( result = occi_extract_atribut( 
+				zptr, Cool.domain, 
+				_CORDS_CONTRACT, _CORDS_HOSTNAME )))
+			return( liberate_elastic_contract( eptr ) );
+		else if (!( eptr->hostname = allocate_string( result ) ))
+			return( liberate_elastic_contract( eptr ) );
+
+	}
 
 	/* ------------------------------- */
 	/* append to the list of contracts */
