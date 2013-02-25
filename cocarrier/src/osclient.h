@@ -113,8 +113,17 @@ public	struct	os_response *	os_list_floating_ip_details(struct os_subscription *
 public	struct	os_response *	os_list_security_groups	(struct os_subscription *  sptr );
 public	struct	os_response *	os_list_security_group_details	(struct os_subscription *  sptr );
 
+public	struct	os_response *	os_list_volume_types(struct os_subscription *  sptr);
+public	struct	os_response *	os_list_volumes(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_list_volume_details(struct os_subscription *  sptr, char * id );
+
+public	struct	os_response *	os_create_volume(struct os_subscription *  sptr, char * name, char * size, char * type, char * zone );
+public	struct	os_response *	os_delete_volume(struct os_subscription *  sptr, char * id );
+
 public	struct	os_response *	os_create_flavor(struct os_subscription *  sptr, char * filename );
 public	struct	os_response *	os_create_server(struct os_subscription *  sptr, char * filename );
+public	struct	os_response *	os_attach_volume(struct os_subscription *  sptr, char * server, char * vid, char * device );
+public	struct	os_response *	os_detach_volume(struct os_subscription *  sptr, char * server, char * volume );
 public	struct	os_response *	os_create_image(struct os_subscription *  sptr, char * filename, char * serverid, int ispublic );
 public	struct	os_response *	os_create_address(struct os_subscription *  sptr);
 public	struct	os_response *	os_server_address(struct os_subscription *  sptr, char * filename, char * serverid );

@@ -112,6 +112,10 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( ( detail ? os_list_floating_ip_details(subscription) : os_list_floating_ips(subscription)) );
 		else if (!( strcasecmp( p2, "GROUPS" ) ))
 			os_result( ( detail ? os_list_security_group_details(subscription) : os_list_security_groups(subscription)) );
+		else if (!( strcasecmp( p2, "TYPES" ) ))
+			os_result( os_list_volume_types(subscription ) );
+		else if (!( strcasecmp( p2, "VOLUMES" ) ))
+			os_result( ( detail ? os_list_volume_details(subscription,p3) : os_list_volumes(subscription,p3)) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
 			os_result( os_list_server_metadata(subscription, p3 ) );
 		else	return( failure(33, p1, p2 ) );
@@ -128,6 +132,12 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"VOLUME" ) ))
+	{
+		os_result( os_create_volume(subscription, p2, p3, p4, p5 ) );
+		return( 0 );
+	}
+
 	else if (!( strcasecmp(p1,"SNAPSHOT" ) ))
 	{
 		if (!( nomfic = os_create_image_request(subscription, p2, p3 ) ))
@@ -177,6 +187,16 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_create_security_group(subscription, nomfic ) );
 			return( 0 );
 		}
+	}
+	else if (!( strcasecmp(p1,"ATTACH" ) ))
+	{
+		os_result( os_attach_volume(subscription, p2, p3, p4 ) );
+		return( 0 );
+	}
+	else if (!( strcasecmp(p1,"DETACH" ) ))
+	{
+		os_result( os_detach_volume(subscription, p2, p3 ) );
+		return( 0 );
 	}
 	else if (!( strcasecmp(p1,"RULE" ) ))
 	{
@@ -284,6 +304,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_delete_address( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			os_result( os_delete_flavor( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "VOLUME" ) ))
+			os_result( os_delete_volume( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			os_result( os_delete_security_group( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "RULE" ) ))
@@ -391,8 +413,11 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | METADATA <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
+	printf("\n   VOLUME   <name> <size> <type> <zone> ");
+	printf("\n   ATTACH   <server> <volume> <device> ");
+	printf("\n   DETACH   <server> <volume> ");
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
@@ -409,7 +434,7 @@ private	int	os_banner()
 	printf("\n   HEAD   [ GLANCE ] <id> ");
 	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

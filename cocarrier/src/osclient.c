@@ -1185,7 +1185,7 @@ public	char * 	os_create_metadata_request(struct os_subscription * subptr, char 
 		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
 		fprintf(h,"<metadata xmlns=%c%s%c>\n",0x0022,subptr->Os.namespace,0x0022);
 		while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
-			fprintf(h,"<meta key='%s'>%s</meta>\n",kptr,dptr);
+			fprintf(h,"<meta key=\"%s\">%s</meta>\n",kptr,dptr);
 		fprintf(h,"</metadata>\n");
 		fclose(h);
 		liberate( tptr );
@@ -1621,7 +1621,7 @@ public	char * os_create_server_request(
 				tptr = sptr;
 				while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
 				{
-					fprintf(h,"\t\t<meta key='%s'>%s</meta>\n",kptr,dptr);
+					fprintf(h,"\t\t<meta key=\"%s\">%s</meta>\n",kptr,dptr);
 				}
 				liberate(tptr );
 			}
@@ -1967,18 +1967,43 @@ public	struct	os_response *	os_server_address(struct os_subscription * sptr, cha
 }
 
 /*	------------------------------------------------------------	*/
-/*			o s _ c r e a t e _  s e r v e r 		*/
+/*			o s _ d e l e t e _ o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
-public	struct	os_response *	os_create_server(struct os_subscription * sptr, char * filename )
+private	struct	os_response *	os_delete_operation(struct os_subscription * sptr,  char * buffer )
 {
 	struct	os_response	*	rptr=(struct os_response *) 0;
 	struct	url		*	uptr;
-	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if ( hack )
-		return( os_check( euca_command_hack( filename ) ) );
-	sprintf(buffer,"/servers");
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _  o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+private	struct	os_response *	os_create_operation(struct os_subscription * sptr, char * buffer, char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
 	else if (!( uptr = analyse_url( sptr->Os.base )))
@@ -1996,6 +2021,131 @@ public	struct	os_response *	os_create_server(struct os_subscription * sptr, char
 		return( rptr );
 	}
 	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _ v o l u m e  		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_volume(struct os_subscription *  sptr, char * name, char * size, char * type, char * zone )
+{
+	char	buffer[1024];
+	char *	filename;
+	FILE *	h;
+
+	if (!( filename = rest_temporary_filename("json")))
+		return((struct	os_response *) 0);
+	else if (!( h = fopen( filename,"wa" ) ))
+		return((struct	os_response *) 0);
+	else
+	{
+		fprintf(h,"{ \"volume\": {\n");
+		fprintf(h,"\t\"display_name\":\"%s\",\n",name);
+		fprintf(h,"\t\"display_description\":\"%s\",\n","compatibleone volume");
+		fprintf(h,"\t\"size\":\"%s\",\n",size);
+		fprintf(h,"\t\"volume_type\":\"%s\",\n",type);
+		fprintf(h,"\t\"availability_zone\":\"%s\"\n",zone);
+		fprintf(h,"}}\n");
+		fclose(h);
+		sprintf(buffer,"/os-volumes");
+		return( os_create_operation( sptr,  buffer, filename ) );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e l e t e _ v o l u m e  		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_volume(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-volumes/%s",id);
+	return( os_delete_operation( sptr,  buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ l i s t _ v o l u m e  			*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_volumes(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/servers/%s/os-volume_attachments", id );
+	return( os_list_operation( sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		  o s _ l i s t _ v o l u m e _ t y p e s		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_volume_types(struct os_subscription *  sptr )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-volume-types" );
+	return( os_list_operation( sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*		   o s _ g e t _ v o l u m e _ t y p e s		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_volume_type(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/os-volume-types/%s",id );
+	return( os_list_operation( sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e t a i l _ v o l u m e  		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_volume_details(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/servers/%s/os-volume_attachments/details", id );
+	return( os_list_operation( sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ a t t a c h _ v o l u m e  		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_attach_volume(struct os_subscription *  sptr, char * server, char * vid, char * device )
+{
+	char	buffer[1024];
+	char *	filename;
+	FILE *	h;
+	sprintf(buffer,"/servers/%s/os-volume_attachments", server );
+
+	if (!( filename = rest_temporary_filename("json")))
+		return((struct	os_response *) 0);
+	else if (!( h = fopen( filename,"wa" ) ))
+		return((struct	os_response *) 0);
+	else
+	{
+		fprintf(h,"{ \"volumeAttachment\": { \"volumeId\":\"%s\", \"device\":\"%s\" } }",vid,device);
+		fclose(h);
+		return( os_create_operation( sptr,  buffer, filename ) );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e t a c h _  v o l u m e 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_detach_volume(struct os_subscription *  sptr, char * server, char * volume )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/servers/%s/os-volume_attachments/%s", server, volume );
+	return( os_delete_operation(sptr, buffer ) );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e a t e _  s e r v e r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_server(struct os_subscription * sptr, char * filename )
+{
+	char	buffer[1024];
+	if ( hack )
+		return( os_check( euca_command_hack( filename ) ) );
+	else
+	{
+		sprintf(buffer,"/servers");
+		return( os_create_operation( sptr,  buffer, filename ) );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2462,35 +2612,6 @@ public	struct	os_response *	os_delete_server(struct os_subscription * sptr,  cha
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
 	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
-}
-
-/*	------------------------------------------------------------	*/
-/*			o s _ d e l e t e _ o p e r a t i o n		*/
-/*	------------------------------------------------------------	*/
-private	struct	os_response *	os_delete_operation(struct os_subscription * sptr,  char * buffer )
-{
-	struct	os_response	*	rptr=(struct os_response *) 0;
-	struct	url		*	uptr;
-	char 			*	nptr;
-	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	if (!( hptr = os_authenticate(sptr) ))
-		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Os.base )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );
