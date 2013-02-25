@@ -54,7 +54,8 @@
 #define	_DEBUG_FUNCTION		8
 #define	_NEW_FUNCTION		9
 #define	_OPEN_FUNCTION		10
-#define	_MAX_FUNCTIONS		11
+#define	_EVAL_FUNCTION		11
+#define	_MAX_FUNCTIONS		12
 
 #define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57

@@ -17,6 +17,7 @@ private	struct cordscript_instruction * handle_catch( struct cordscript_context 
 private	void	check_line_end(struct cordscript_context * cptr, int level, int c);
 private	struct cordscript_context * copy_cordscript_class( struct cordscript_context * cptr );
 private	struct cordscript_context * resolve_cordscript_class( char * nptr );
+private	char * compile_cordscript_value( char * expression, int argc, struct cordscript_value * argv[] );
 
 private	int	end_of_instruction=0;
 private	int	abandon_compile=0;
@@ -1486,9 +1487,20 @@ private	void	join_operation( struct cordscript_instruction * iptr,struct cordscr
 				( xptr->value ? strlen( xptr->value ) : 0 ) +
 				strlen( sptr ) + 1 ) ))
 				break;
+			else if ( *sptr == ':' )
+			{
+				if (!( xptr->value ))
+				 	sprintf( wptr, "%c%s%c",0x0022,(rptr->value ?rptr->value : ""),0x0022);
+				else 	sprintf( wptr, "%s:%c%s%c",xptr->value, 0x0022,(rptr->value ?rptr->value : ""),0x0022);
+				if ( xptr->value )
+					liberate( xptr->value );
+				xptr->value = wptr;
+			}
 			else
 			{
-				sprintf( wptr, "%s%s%s",(xptr->value ? xptr->value : ""), sptr, (rptr->value ?rptr->value : ""));
+				if (!( xptr->value ))
+					strcpy( wptr, (rptr->value ?rptr->value : "" ));
+				else 	sprintf( wptr, "%s%s%s",xptr->value, sptr, (rptr->value ?rptr->value : ""));
 				if ( xptr->value )
 					liberate( xptr->value );
 				xptr->value = wptr;
@@ -1809,7 +1821,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"join",		_JOIN_FUNCTION,		-1 },
 	{	"debug",	_DEBUG_FUNCTION,	-1 },
 	{	"new",		_NEW_FUNCTION,		-1 },
-	{	"open",		_OPEN_FUNCTION,		-1 }
+	{	"open",		_OPEN_FUNCTION,		-1 },
+	{	"eval",		_EVAL_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2046,6 +2059,17 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				trace = 1;
 			else	trace = 0;
 			return( eval_next( iptr, argv ) );
+
+		case	_EVAL_FUNCTION		:
+			if (!( vptr->value ))
+				break;
+			else
+			{			
+				if ((tptr = compile_cordscript_value( vptr->value, argc, argv )) != (char *) 0)
+					push_value( iptr->context, string_value( tptr ) );
+				return( eval_next( iptr, argv ) );
+			}
+
 		case	_NEW_FUNCTION		:
 			if (!( vptr->value ))
 				break;
@@ -5532,31 +5556,80 @@ private	struct	cordscript_context * compile_cordscript_instructions( struct cord
 	return( cptr );
 }
 
+/*   ---------------------- */
+/*   eval_cordscript_string */
+/*   ---------------------- */
+public struct cordscript_context * eval_cordscript_string( 	
+		struct	cordscript_context * cptr,
+		char * expression, int argc, char * argv[] )
+{
+	int	argi;
+	char	buffer[8192];
+	struct	cordscript_value * vptr;
+
+	for ( argi=0; argi < argc; argi++ )
+	{
+		sprintf(buffer,"$%u",argi+1);
+		if (!( argv[argi] ))
+			break;
+		else if (!( vptr = resolve_variable( buffer, cptr )))
+			break;
+		else if (!( vptr->value = allocate_string( argv[argi] )))
+			break;
+		else	continue;
+	}
+	return( compile_cordscript_instructions( cptr, expression ) );
+}
+
 /*   ------------------------- */
 /*   compile_cordscript_string */
 /*   ------------------------- */
 public struct cordscript_context * compile_cordscript_string( char * expression, int argc, char * argv[] )
 {
 	struct	cordscript_context * cptr;
-	int	argi;
 	struct	cordscript_value * vptr;
-	char	buffer[8192];
 	if (!( cptr = allocate_cordscript_context() ))
 		return( cptr );
+	else 	return( eval_cordscript_string( cptr, expression, argc, argv ) );
+}
+
+/*   ------------------------ */
+/*   compile_cordscript_value */
+/*   ------------------------ */
+private	char * compile_cordscript_value( char * expression, int argc, struct cordscript_value * argv[] )
+{
+	struct	cordscript_context * cptr;
+	struct	cordscript_value * vptr;
+	char *	wptr;
+	char *	rptr;
+	char *	args[20];
+	int	argi;
+
+	for ( argi=0; argi < argc; argi++ )
+	{
+		if ( argv[argi] )
+			args[argi] = argv[argi]->value;
+		else	args[argi] = (char *) 0;
+	}
+
+	if (!( cptr = allocate_cordscript_context() ))
+		return((char *) 0);
+	else if (!( cptr = eval_cordscript_string( cptr, expression, argc, args ) ))
+		return((char *) 0);
+	else if (!( vptr = execute_cordscript( cptr ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
+	else if (!( rptr = allocate_string( vptr->value ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
 	else
 	{
-		for ( argi=0; argi < argc; argi++ )
-		{
-			sprintf(buffer,"$%u",argi+1);
-			if (!( argv[argi] ))
-				break;
-			else if (!( vptr = resolve_variable( buffer, cptr )))
-				break;
-			else if (!( vptr->value = allocate_string( argv[argi] )))
-				break;
-			else	continue;
-		}
-		return( compile_cordscript_instructions( cptr, expression ) );
+		cptr = liberate_cordscript_context( cptr );
+		return( rptr );
 	}
 }
 
