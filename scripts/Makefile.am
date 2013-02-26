@@ -16,7 +16,7 @@ aliases = \
 	co-start co-platform co-provision co-broker co-command co-parser co-provider co-resolver co-status co-stop \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-coobas run-conagios \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
-	run-cosched run-publisher run-osocciprocci run-dcprocci run-slam \
+	run-cosched run-publisher run-osocciprocci run-dcprocci run-cnprocci run-slam \
 	run-cosacs run-copaas run-paasprocci run-ec2procci accords-config run-cool
 
 
