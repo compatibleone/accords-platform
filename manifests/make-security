@@ -28,6 +28,7 @@ else
 	bash build-security slam 1 $1
 	bash build-security copaas 1 $1
 	bash build-security paasprocci 1 $1
+	bash build-security cnprocci 1 $1
 fi
 
 
