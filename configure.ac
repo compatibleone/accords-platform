@@ -348,6 +348,15 @@ AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
 AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
 AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
 
+AC_ARG_ENABLE([cnprocci],
+      [AS_HELP_STRING([--disable-cnprocci],
+		      [Disable cnprocci @<:@default=enable@:>@])],
+      [],
+      [enable_cnprocci=yes])
+AM_CONDITIONAL([ENABLE_CNPROCCI], [test "$enable_cnprocci" = "yes"])
+AC_SUBST([CFLAGS_CNPROCCI], [-I\${abs_top_srcdir}/cnprocci/src])
+AC_SUBST([PATH_CNPROCCI], [${abs_top_srcdir}/cnprocci/src])
+
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
 		      [Disable cool @<:@default=enable@:>@])],
@@ -517,6 +526,13 @@ AC_ARG_ENABLE([testaz],
       [enable_testaz=yes])
 AM_CONDITIONAL([ENABLE_TESTAZ], [test "$enable_testaz" = "yes"])
 
+AC_ARG_ENABLE([testcn],
+      [AS_HELP_STRING([--disable-testcn],
+		      [Disable testcn @<:@default=enable@:>@])],
+      [],
+      [enable_testcn=yes])
+AM_CONDITIONAL([ENABLE_TESTCN], [test "$enable_testcn" = "yes"])
+
 AC_ARG_ENABLE([fileserver],
       [AS_HELP_STRING([--disable-fileserver],
 		      [Disable fileserver @<:@default=enable@:>@])],
@@ -579,6 +595,7 @@ AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
 AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
+AC_CONFIG_FILES([cnprocci/Makefile cnprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
@@ -596,6 +613,7 @@ AC_CONFIG_FILES([testhdfs/Makefile testhdfs/src/Makefile])
 AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
 AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
 AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
+AC_CONFIG_FILES([testcn/Makefile testcn/src/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
 AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
@@ -643,6 +661,7 @@ echo "    - slam                     : $enable_slam"
 echo "    - copaas                   : $enable_copaas"
 echo "    - conagios                 : $enable_conagios"
 echo "    - paasprocci               : $enable_paasprocci"
+echo "    - cnprocci                 : $enable_cnprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - coidms                   : $enable_coidms"
@@ -659,6 +678,7 @@ echo "    - testhdfs                 : $enable_testhdfs"
 echo "    - testcp                   : $enable_testcp"
 echo "    - testcb                   : $enable_testcb"
 echo "    - testaz                   : $enable_testaz"
+echo "    - testcn                   : $enable_testcn"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
 echo "    - testsuite                : $enable_testsuite"

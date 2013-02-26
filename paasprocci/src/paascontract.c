@@ -1,3 +1,20 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
 #ifndef	_paas_contract_c	
 #define	_paas_contract_c
 
@@ -261,6 +278,48 @@ private	char *	paas_serialise_element( struct cords_vector * root )
 }
 
 /*	---------------------------------------------	*/
+/*		p a a s _ a p p l i ca t i o n _ i d		*/
+/*	---------------------------------------------	*/
+private char * paas_application_id( struct paas_response * rptr )
+{
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	if (!( rptr ))
+		return( (char *) 0 );
+	else if (!( rptr->xmlroot ))
+		return( (char *) 0 );
+	else if (!( eptr = document_element( rptr->xmlroot, "application" ) ))
+		return( (char *) 0 );
+	else if (!( aptr = document_atribut( eptr, "appId" ) ))
+		return( (char *) 0 );
+	else if (!( aptr->value ))
+		return( (char *) 0 );
+	else
+		return( allocate_string( aptr->value ) );
+}
+
+/*	---------------------------------------------	*/
+/*		p a a s _ e nv i r o n m e n t _ i d		*/
+/*	---------------------------------------------	*/
+private char * paas_environment_id( struct paas_response * rptr )
+{
+	struct	xml_element * eptr;
+	struct	xml_atribut * aptr;
+	if (!( rptr ))
+		return( (char *) 0 );
+	else if (!( rptr->xmlroot ))
+		return( (char *) 0 );
+	else if (!( eptr = document_element( rptr->xmlroot, "environment" ) ))
+		return( (char *) 0 );
+	else if (!( aptr = document_atribut( eptr, "envId" ) ))
+		return( (char *) 0 );
+	else if (!( aptr->value ))
+		return( (char *) 0 );
+	else
+		return( allocate_string( aptr->value ) );
+}
+
+/*	---------------------------------------------	*/
 /* 	   c r e a t e _ p a a s _ c o n t r a c t	*/
 /*	---------------------------------------------	*/
 public	int	create_paas_contract(
@@ -339,7 +398,7 @@ public	int	create_paas_contract(
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
 	else if (!( pptr->appfile = paas_serialise_element( &contract.application ) ))
-		return( terminate_paas_contract( 1171, &contract ) );
+		return( terminate_paas_contract( 1172, &contract ) );
 
 	/* -------------------------------------------- */
 	/*	Create paas environment                 */
@@ -348,32 +407,32 @@ public	int	create_paas_contract(
 	{
           	return( terminate_paas_contract( 501, &contract ) );
 	}
-	else   
+	/* ----------------------------------------- */
+	/* retrieve the environment id from response */
+	/* ----------------------------------------- */
+	else if (!( pptr->environment = paas_environment_id( rptr ) ))
 	{
-		/* ----------------------------------------- */
-		/* retrieve the environment id from response */
-		/* ----------------------------------------- */
-		if (!( pptr->environment = allocate_string( "#envID#" ) ))
-          		return( terminate_paas_contract( 527, &contract ) );
-		else	rptr = paas_remove_response( rptr );
-   	}
+			rptr = paas_remove_response( rptr );
+          	return( terminate_paas_contract( 502, &contract ) );
+	}
+	else	rptr = paas_remove_response( rptr );
 
 	/* ------------------------------------------- 	*/
 	/*	Create paas application	       		*/
    	/* ------------------------------------------- 	*/
    	if (!( rptr = create_paas_application( pptr->environment, pptr->appfile ) ))
    	{
-		return( terminate_paas_contract( 502, &contract ) );
+			return( terminate_paas_contract( 503, &contract ) );
    	}
-	else   
+	/* ----------------------------------------- */
+	/* retrieve the application id from response */
+	/* ----------------------------------------- */
+	else if (!( pptr->application = paas_application_id( rptr ) ))
 	{
-		/* ----------------------------------------- */
-		/* retrieve the application id from response */
-		/* ----------------------------------------- */
-		if (!( pptr->application = allocate_string( "#appID#" ) ))
-          		return( terminate_paas_contract( 527, &contract ) );
-		else	rptr = paas_remove_response( rptr );
+			rptr = paas_remove_response( rptr );
+      		return( terminate_paas_contract( 504, &contract ) );
    	}
+	else	rptr = paas_remove_response( rptr );
       
 	/* ----------------------------- */
 	/* contract creation is complete */
@@ -400,7 +459,13 @@ public	int	delete_paas_contract(
    	}   
    	else   rptr = paas_remove_response( rptr );
    
-   	/* ----------------------------------------------- */
+ 	if ( pptr->appfile )
+		pptr->appfile = liberate( pptr->appfile );
+
+	if ( pptr->application )
+		pptr->application = liberate( pptr->application );
+
+  	/* ----------------------------------------------- */
    	/*	Delete paas environment                    */
    	/* ----------------------------------------------- */
    	if (!( rptr = delete_paas_environment( pptr->environment )))
@@ -412,8 +477,8 @@ public	int	delete_paas_contract(
 	if ( pptr->envfile )
 		pptr->envfile = liberate( pptr->envfile );
 
-	if ( pptr->appfile )
-		pptr->appfile = liberate( pptr->appfile );
+	if ( pptr->environment )
+		pptr->environment = liberate( pptr->environment );
 
    	return(0);
 }

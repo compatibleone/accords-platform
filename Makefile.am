@@ -119,6 +119,9 @@ endif
 if ENABLE_AZPROCCI
 SUBDIRS += azprocci
 endif
+if ENABLE_CNPROCCI
+SUBDIRS += cnprocci
+endif
 if ENABLE_DCPROCCI
 SUBDIRS += dcprocci
 endif
@@ -133,6 +136,9 @@ SUBDIRS += testos
 endif
 if ENABLE_TESTON
 SUBDIRS += teston
+endif
+if ENABLE_TESTCN
+SUBDIRS += testcn
 endif
 if ENABLE_TESTHDFS
 SUBDIRS += testhdfs
