@@ -354,6 +354,14 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - Delta Cloud Procci subsystem
  CompatibleOne Accords Platform - Delta Cloud Procci subsystem package
 
+Package: compatibleone-cnprocci
+Section: net
+Architecture: any
+Provides: compatibleone-cloud-provider
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+Description: CompatibleOne Accords Platform - ComputeNext Procci subsystem
+ CompatibleOne Accords Platform - ComputeNext Procci subsystem package
+
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
