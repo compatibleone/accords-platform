@@ -181,6 +181,7 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 	struct	occi_element * eptr;
 	struct	occi_category * cptr;
 	char *	vptr;
+	char *	vvptr;
 	char 	aname[1024];
 	char *	nptr;
 	int	i;
@@ -225,9 +226,9 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 					continue;			
 				else if (!( strcmp( nptr, "state" ) ))
 					continue;
-				else if (!( rest_valid_string( vptr ) ))
-					vptr = "";
-				fprintf(h," %s=%c%s%c",nptr,0x0022,vptr,0x0022);
+				else if (!( rest_valid_string( vvptr = vptr ) ))
+					vvptr = "";
+				fprintf(h," %s=%c%s%c",nptr,0x0022,vvptr,0x0022);
 				liberate( vptr );
 				continue;
 			}
