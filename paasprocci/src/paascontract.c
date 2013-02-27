@@ -181,6 +181,9 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 	struct	occi_element * eptr;
 	struct	occi_category * cptr;
 	char *	vptr;
+	char 	aname[1024];
+	char *	nptr;
+	int	i;
 	struct	occi_response * zptr;
 
 	if (!( cptr = message->category ))
@@ -210,7 +213,21 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 			}
 			else
 			{
-				fprintf(h," %s=%s",eptr->name, eptr->value );
+				strcpy(nptr=aname,eptr->name);
+				if (!( strcmp( nptr, "link" ) ))
+					continue;			
+				for ( i=0; aname[i] != 0; i++)
+				{
+					if ( aname[i] == '.' )
+						nptr = (&aname[i+1]);
+				}
+				if (!( strcmp( nptr, "id" ) ))
+					continue;			
+				else if (!( strcmp( nptr, "state" ) ))
+					continue;
+				else if (!( rest_valid_string( vptr ) ))
+					vptr = "";
+				fprintf(h," %s=%c%s%c",nptr,0x0022,vptr,0x0022);
 				liberate( vptr );
 				continue;
 			}
@@ -225,11 +242,15 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 			eptr != (struct occi_element *) 0;
 			eptr = eptr->next )
 		{
-			if (!( eptr->value ))
+			if (!( eptr->name ))
+				continue;
+			else if ( strcmp( eptr->name, "link" ) != 0 )
+				continue;			
+			else if (!( eptr->value ))
 				continue;
 			else if (!( vptr = allocate_string( eptr->value ) ))
 				continue;
-			else if (!( vptr = occi_unquoted_value( vptr )))
+			else if (!( vptr = occi_unquoted_link( vptr )))
 				continue;
 			else if ( strncmp( vptr, "http", strlen( "http" ) ) != 0)
 			{
