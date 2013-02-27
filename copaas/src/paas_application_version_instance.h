@@ -6,6 +6,8 @@ struct	paas_application_version_instance
 	char *	name;
 	char *	default_instance;
 	char *	initial_stat;
+	char *	memory;
+	char *	disk;
 	int	state;
 };
 #endif

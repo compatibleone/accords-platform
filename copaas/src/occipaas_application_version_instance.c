@@ -141,6 +141,10 @@ private void autoload_paas_application_version_instance_nodes() {
 				pptr->default_instance = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "initial_stat" )) != (struct xml_atribut *) 0)
 				pptr->initial_stat = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "memory" )) != (struct xml_atribut *) 0)
+				pptr->memory = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "disk" )) != (struct xml_atribut *) 0)
+				pptr->disk = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -179,6 +183,12 @@ public  void autosave_paas_application_version_instance_nodes() {
 		fprintf(h," initial_stat=%c",0x0022);
 		fprintf(h,"%s",(pptr->initial_stat?pptr->initial_stat:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," memory=%c",0x0022);
+		fprintf(h,"%s",(pptr->memory?pptr->memory:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," disk=%c",0x0022);
+		fprintf(h,"%s",(pptr->disk?pptr->disk:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -209,6 +219,10 @@ private void set_paas_application_version_instance_field(
 			pptr->default_instance = allocate_string(vptr);
 		if (!( strcmp( nptr, "initial_stat" ) ))
 			pptr->initial_stat = allocate_string(vptr);
+		if (!( strcmp( nptr, "memory" ) ))
+			pptr->memory = allocate_string(vptr);
+		if (!( strcmp( nptr, "disk" ) ))
+			pptr->disk = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -263,6 +277,20 @@ private int pass_paas_application_version_instance_filter(
 		else if ( strcmp(pptr->initial_stat,fptr->initial_stat) != 0)
 			return(0);
 		}
+	if (( fptr->memory )
+	&&  (strlen( fptr->memory ) != 0)) {
+		if (!( pptr->memory ))
+			return(0);
+		else if ( strcmp(pptr->memory,fptr->memory) != 0)
+			return(0);
+		}
+	if (( fptr->disk )
+	&&  (strlen( fptr->disk ) != 0)) {
+		if (!( pptr->disk ))
+			return(0);
+		else if ( strcmp(pptr->disk,fptr->disk) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -286,6 +314,12 @@ private struct rest_response * paas_application_version_instance_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.initial_stat=%c%s%c",optr->domain,optr->id,0x0022,pptr->initial_stat,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.memory=%c%s%c",optr->domain,optr->id,0x0022,pptr->memory,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.disk=%c%s%c",optr->domain,optr->id,0x0022,pptr->disk,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -718,6 +752,10 @@ public struct occi_category * occi_paas_application_version_instance_builder(cha
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "initial_stat",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "memory",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "disk",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_application_version_instance)))
@@ -780,6 +818,28 @@ public struct rest_header *  paas_application_version_instance_occi_headers(stru
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas_application_version_instance.initial_stat='%s'\r\n",(sptr->initial_stat?sptr->initial_stat:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_application_version_instance.memory='%s'\r\n",(sptr->memory?sptr->memory:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_application_version_instance.disk='%s'\r\n",(sptr->disk?sptr->disk:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

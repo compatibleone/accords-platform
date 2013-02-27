@@ -50,6 +50,8 @@
 		<xsd:attribute name="name" type="xsd:NCName"/>
 		<xsd:attribute name="default_instance" default="true" type="xsd:string"/>
 		<xsd:attribute name="initial_state" default="runing" type="xsd:string"/>
+		<xsd:attribute name="memory" type="xsd:string"/>
+		<xsd:attribute name="disk" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 	<xsd:complexType name="paas_environment">
