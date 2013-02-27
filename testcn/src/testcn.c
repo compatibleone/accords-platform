@@ -19,6 +19,7 @@
 #define	_testcn_c
 
 #include "cnclient.h"
+#include "cnconfig.h"
 
 private char *	group=(char *) 0;
 private	int     detail=0;
@@ -55,6 +56,9 @@ public	int	failure( int e, char * m1, char * m2 )
 	}
 	return( e );
 }
+
+#include "cnconfig.c"
+#include "cnclient.c"
 
 private	int	cn_result( struct cn_response * rptr )
 {
@@ -204,7 +208,7 @@ private	int	cn_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		}
 		else if (!( strcasecmp( p2, "VS" ) ))
 		{
-			if (!( nomfic = cn_add_vs_request(p4, p5, p6, p7, p8) ))
+			if (!( nomfic = cn_add_vs_request(p4, p5, p6, p7, atoi(p8) ) ))
 				return( failure(27,"cannot create vs addition","request" ) );
 			else
 				cn_result( cn_add_vs_to_workload( config, p3, nomfic ) );

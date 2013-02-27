@@ -1,31 +1,33 @@
 /* -------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                    */
-/*  (C) 2013 by Daniel Sprouse (ComputeNext) <daniel@computenext.com>   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
 /* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License");      */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
 /* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at                              */
-/*                                                                      */
-/*  http://www.apache.org/licenses/LICENSE-2.0                          */
-/*                                                                      */
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
 /* Unless required by applicable law or agreed to in writing, software 	*/
 /* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      */
-/* implied.                                                             */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
 /* See the License for the specific language governing permissions and 	*/
-/* limitations under the License.                                       */
+/* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
+
+/* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _cnconfig_c_
 #define _cnconfig_c_
 
 #include "element.h"
-#include "stdio.h"
+
 #include "cnconfig.h"
 
 /*	------------------------------------	*/
 /*	l i b e r a t e _ c n _ c o n f i g 	*/
 /*	------------------------------------	*/
-struct cn_config * liberate_cn_config(struct cn_config * sptr)
+public struct cn_config * liberate_cn_config(struct cn_config * sptr)
 {
 	if ( sptr )
 	{
@@ -39,7 +41,7 @@ struct cn_config * liberate_cn_config(struct cn_config * sptr)
 			 sptr->apikey = liberate(sptr->apikey);
 		if ( sptr->apisec )
 			 sptr->apisec = liberate(sptr->apisec);
-	    if ( sptr->authentication )
+		if ( sptr->authentication )
 			 sptr->authentication = liberate(sptr->authentication);
 		if ( sptr->agent )
 			 sptr->agent = liberate(sptr->agent);
@@ -60,7 +62,7 @@ struct cn_config * liberate_cn_config(struct cn_config * sptr)
 /*	------------------------------	*/
 /*	r e s e t _ c n _ c o n f i g 	*/
 /*	------------------------------	*/
-struct cn_config * reset_cn_config(struct cn_config * sptr)
+public struct cn_config * reset_cn_config(struct cn_config * sptr)
 {
 	if ( sptr )
 	{
@@ -84,7 +86,7 @@ struct cn_config * reset_cn_config(struct cn_config * sptr)
 /*	------------------------------------	*/
 /*	a l l o c a t e _ c n _ c o n f i g 	*/
 /*	------------------------------------	*/
-struct cn_config * allocate_cn_config()
+public struct cn_config * allocate_cn_config()
 {
 	struct cn_config * sptr;
 	if (!( sptr = allocate( sizeof( struct cn_config ) ) ))
@@ -95,7 +97,7 @@ struct cn_config * allocate_cn_config()
 /*	------------------------------	*/
 /*	x m l i n _ c n _ c o n f i g 	*/
 /*	------------------------------	*/
-int xmlin_cn_config(struct cn_config * sptr,struct xml_element * eptr)
+public int xmlin_cn_config(struct cn_config * sptr,struct xml_element * eptr)
 {
 	struct xml_element * wptr;
 	if (!( eptr )) return(0);
@@ -158,7 +160,7 @@ int xmlin_cn_config(struct cn_config * sptr,struct xml_element * eptr)
 /*	--------------------------------------	*/
 /*	r e s t _ o c c i _ c n _ c o n f i g 	*/
 /*	--------------------------------------	*/
-int rest_occi_cn_config(FILE * fh,struct cn_config * sptr,char * prefix, char * nptr)
+public int rest_occi_cn_config(FILE * fh,struct cn_config * sptr,char * prefix, char * nptr)
 {
 	struct xml_element * wptr;
 	if (!( sptr )) return(0);
@@ -180,4 +182,4 @@ int rest_occi_cn_config(FILE * fh,struct cn_config * sptr,char * prefix, char * 
 
 }
 
-#endif	/* _cnconfig_c_ */
+#endif	/* _cnconfig_ccnconfig_c_ */

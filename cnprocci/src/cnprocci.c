@@ -32,6 +32,9 @@
 #include "computenext.h"
 #include "computenext.c"
 #include "occicomputenext.c"
+#include "cnconfig.h"
+#include "cnconfig.c"
+#include "occicnconfig.c"
 #include "cnclient.h"
 #include "cnclient.c"
 #include "cncontract.h"
@@ -98,8 +101,8 @@ private	void	cnprocci_configuration()
 private	int	cnprocci_banner()
 {
 	printf("\n   CompatibleOne ComputeNext PROCCI : Version 1.0a.0.01");
-	printf("\n   Beta Version : 24/01/2015 ");
-	printf("\n   Copyright (c) 2015 Iain James Marshall, Prologue");
+	printf("\n   Beta Version : 27/02/2013 ");
+	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -234,6 +237,13 @@ private	int	cnprocci_operation( char * nptr )
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
+	if (!( optr = occi_cn_config_builder( Configuration.domain, "computenext_configuration" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_computenext_builder( Configuration.domain, "computenext" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))

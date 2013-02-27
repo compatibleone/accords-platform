@@ -24,7 +24,7 @@ struct  cn_response
 };
 
 public  struct cn_response * cn_liberate_response( struct cn_response * rptr );
-public  struct cn_response * cn_allocate_config();
+public  struct cn_config   * cn_allocate_config();
 public  struct cn_response * cn_check( struct rest_response *  aptr );
 
 public  struct cn_response * cn_list_images( struct cn_config * sptr, char * query );
