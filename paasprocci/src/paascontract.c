@@ -245,15 +245,18 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 		{
 			if (!( eptr->name ))
 				continue;
-			else if ( strcmp( eptr->name, "link" ) != 0 )
-				continue;			
 			else if (!( eptr->value ))
 				continue;
 			else if (!( vptr = allocate_string( eptr->value ) ))
 				continue;
-			else if (!( vptr = occi_unquoted_link( vptr )))
+			else if (!( strcmp( eptr->name, "link" ) ))
+			{
+				if (!( vptr = occi_unquoted_link( vptr )))
+					continue;
+			}
+			else if (!( vptr = occi_unquoted_value( vptr )))
 				continue;
-			else if ( strncmp( vptr, "http", strlen( "http" ) ) != 0)
+			if ( strncmp( vptr, "http", strlen( "http" ) ) != 0)
 			{
 				liberate( vptr );
 				continue;
