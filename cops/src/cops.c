@@ -138,6 +138,9 @@ private	struct rest_extension * cops_extension( void * v,struct rest_server * sp
 #include "copsoperation.c"
 #include "copsplacement.c"
 
+#include "federation.h"
+#include "federation.c"
+#include "occifederation.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o p s _ o p e r a t i o n				*/
@@ -182,6 +185,13 @@ private	int	cops_operation( char * nptr )
 		return( 28 );
 	else if (!( optr = occi_add_action( optr,"release","",release_quantity)))
 		return( 28 );
+
+	if (!( optr = occi_cords_federation_builder( Cops.domain, "federation" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
 
 	if (!( optr = comons_connection_builder( Cops.domain ) ))
 		return( 27 );
