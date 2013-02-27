@@ -36,8 +36,13 @@ private	struct	paas_client Paas =
 {
 	(char *) 0,	/* agent 	*/
 	(char *) 0,	/* tls		*/
+	(char *) 0,	/* service 	*/
 	(char *) 0,	/* host		*/
-		 0	/* port		*/
+	(char *) 0,	/* user		*/
+	(char *) 0,	/* pass		*/
+		 0,	/* port		*/
+	(char *) 0	/* base		*/
+
 };
 
 /*	-----------------------------------------	*/
@@ -141,9 +146,11 @@ private	struct	rest_header * paas_authenticate()
 private	struct	rest_response * paas_get_request( char * url )
 {
 	struct	rest_header * hptr;
+	char 	burl[2048];
+	sprintf(burl,"%s://%s:%u%s%s", Paas.service, Paas.host, Paas.port, Paas.base, url );
 	if (!( hptr = paas_authenticate()))
 		return((struct rest_response *) 0);
-	else 	return( rest_client_get_request( url, Paas.tls, Paas.agent, hptr ) );
+	else 	return( rest_client_get_request( burl, Paas.tls, Paas.agent, hptr ) );
 }
 
 /*	-----------------------------------------	*/
@@ -152,9 +159,11 @@ private	struct	rest_response * paas_get_request( char * url )
 private	struct	rest_response * paas_delete_request( char * url )
 {
 	struct	rest_header * hptr;
+	char 	burl[2048];
+	sprintf(burl,"%s://%s:%u%s%s", Paas.service, Paas.host, Paas.port, Paas.base, url );
 	if (!( hptr = paas_authenticate()))
 		return((struct rest_response *) 0);
-	else	return( rest_client_get_request( url, Paas.tls, Paas.agent, hptr ) );
+	else	return( rest_client_get_request( burl, Paas.tls, Paas.agent, hptr ) );
 }
 
 /*	-----------------------------------------	*/
@@ -163,9 +172,11 @@ private	struct	rest_response * paas_delete_request( char * url )
 private	struct	rest_response * paas_post_request( char * url, char * filename )
 {
 	struct	rest_header * hptr;
+	char 	burl[2048];
+	sprintf(burl,"%s://%s:%u%s%s", Paas.service, Paas.host, Paas.port, Paas.base,url );
 	if (!( hptr = paas_authenticate()))
 		return((struct rest_response *) 0);
-	else	return( rest_client_post_request( url, Paas.tls, Paas.agent, filename, hptr ) );
+	else	return( rest_client_post_request( burl, Paas.tls, Paas.agent, filename, hptr ) );
 }
 
 /*	-----------------------------------------	*/
@@ -174,9 +185,11 @@ private	struct	rest_response * paas_post_request( char * url, char * filename )
 private	struct	rest_response * paas_put_request( char * url, char * filename )
 {
 	struct	rest_header * hptr;
+	char 	burl[2048];
+	sprintf(burl,"%s://%s:%u%s%s", Paas.service, Paas.host, Paas.port, Paas.base,url );
 	if (!( hptr = paas_authenticate()))
 		return((struct rest_response *) 0);
-	else	return( rest_client_put_request( url, Paas.tls, Paas.agent, filename, hptr ) );
+	else	return( rest_client_put_request( burl, Paas.tls, Paas.agent, filename, hptr ) );
 }
 
 /*	-----------------------------------------	*/
@@ -188,7 +201,7 @@ public	struct paas_response * start_paas_application(char * application )
 {
 	/* POST /app/{appId}/version/{versionId}/instance/{instanceId}/action/start */
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/action/start",application);
+	sprintf(uri,"/app/%s/start",application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -208,9 +221,9 @@ public	struct	paas_response * get_paas_task( char * task )
 /*	-----------------------------------------	*/
 public	struct paas_response * stop_paas_application(char * application)
 {
-	/* POST /app/{appId}/action/stop */
+	/* POST /app/{appId}/stop */
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/action/stop",application);
+	sprintf(uri,"/app/%s/stop",application);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 /*	-----------------------------------------	*/
@@ -223,12 +236,21 @@ public	struct paas_response * stop_paas_application(char * application)
 /*	- Description					*/
 /*	-Multi-tenant (yes/no).				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * create_paas_application(char * environment, char* filename )
+public	struct paas_response * create_paas_application( char* filename )
 {
 	/* POST /app */
-	char	buffer[2048];
-	sprintf(buffer,"/env/%s/app",environment);
-	return( paas_result( paas_post_request( buffer, filename ) ));
+	return( paas_result( paas_post_request( "/app", filename ) ));
+}
+
+/*	-----------------------------------------	*/
+/*	Updates an exiting application.			*/
+/*	-----------------------------------------	*/
+public	struct paas_response * update_paas_application( char * application, char* filename )
+{
+	/* POST /app */
+	char 	uri[2048];
+	sprintf(uri,"/app/%s/update",application);
+	return( paas_result( paas_post_request( uri, filename ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -237,7 +259,7 @@ public	struct paas_response * create_paas_application(char * environment, char* 
 public	struct paas_response * list_paas_applications()
 {
 	/* GET /app/ */
-	return( paas_result( paas_get_request( "/app/" ) ));
+	return( paas_result( paas_get_request( "/app" ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -264,6 +286,15 @@ public	struct paas_response * delete_paas_application(char * application)
 }
 
 /*	-----------------------------------------	*/
+/*	Delete all applications.			*/
+/*	-----------------------------------------	*/
+public	struct paas_response * delete_paas_applications()
+{
+	/* DELETE /app/delete */
+	return( paas_result( paas_delete_request( "/app/delete" ) ));
+}
+
+/*	-----------------------------------------	*/
 /*		Environment Management			*/
 /*	-----------------------------------------	*/
 
@@ -274,7 +305,7 @@ public	struct paas_response * start_paas_environment(char * environment)
 {
 	/* POST /environment/{envId}/action/start */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/start",environment);
+	sprintf(uri,"/environment/%s/start",environment);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -284,11 +315,23 @@ public	struct paas_response * start_paas_environment(char * environment)
 /*	-----------------------------------------	*/
 public	struct paas_response * stop_paas_environment(char * environment)
 {
-	/* POST /environment/{envId}/action/stop */
+	/* POST /environment/{envId}/stop */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/stop",environment);
+	sprintf(uri,"/environment/%s/stop",environment);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
+
+/*	-----------------------------------------	*/
+/*	Re Starts an environment 			*/
+/*	-----------------------------------------	*/
+public	struct paas_response * restart_paas_environment(char * environment)
+{
+	/* POST /environment/{envId}/action/start */
+	char 	uri[2048];
+	sprintf(uri,"/environment/%s/restart",environment);
+	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+}
+
 
 /*	-----------------------------------------	*/
 /*	Deploy an application instance on an 		*/
@@ -298,8 +341,8 @@ public	struct paas_response * deploy_paas_application( char * environment, char 
 {
 	/* POST /environment/{envId}/action/deploy/app/{appId} */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/deploy/app/%s",
-		environment,application);
+	sprintf(uri,"/app/%s/action/deploy/env/%s",
+		application,environment);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -311,8 +354,8 @@ public	struct paas_response * undeploy_paas_application( char * environment, cha
 {
 	/* POST /environment/{envId}/action/undeploy/app/{appId} */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/action/undeploy/app/%s",
-		environment,application);
+	sprintf(uri,"/app/%s/action/undeploy/env/%s",
+		application,environment);
 	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
 }
 
@@ -325,6 +368,14 @@ public	struct paas_response * create_paas_environment( char * filename )
 {
 	/* POST /environment	*/
 	return( paas_result( paas_post_request( "/environment", filename ) ));
+}
+
+public	struct paas_response * update_paas_environment( char * id, char * filename )
+{
+	/* POST /environment/is/update	*/
+	char 	buffer[2048];
+	sprintf(buffer,"/environment/%s/update",id);
+	return( paas_result( paas_post_request( buffer, filename ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -344,7 +395,7 @@ public	struct paas_response * delete_paas_environment( char * environment )
 public	struct paas_response * list_paas_environment()
 {
 	/* GET /environment */
-	return( paas_result( paas_get_request( "/environment/" ) ));
+	return( paas_result( paas_get_request( "/environment" ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -366,7 +417,7 @@ public	struct paas_response * get_paas_environment_application_instances(char * 
 {
 	/* GET /environment/{envid}/app/ */
 	char 	uri[2048];
-	sprintf(uri,"/environment/%s/app/",environment);
+	sprintf(uri,"/environment/%s/app",environment);
 	return( paas_result( paas_get_request( uri ) ));
 }
 
@@ -381,13 +432,15 @@ public	int	terminate_paas_client()
 		Paas.tls = liberate( Paas.tls );
 	if ( Paas.host )
 		Paas.host = liberate( Paas.host );
+	if ( Paas.base )
+		Paas.base = liberate( Paas.base );
 	return( 0 );
 }
 
 /*	------------------------------------------------	*/
 /*	  i n i t i a l i s e _ p a a s _ c l i e n t		*/
 /*	------------------------------------------------	*/
-public	int	initialise_paas_client( char * agent, char * tls, char * host, int port )
+public	int	initialise_paas_client( char * agent, char * tls, char * host, int port, char * user, char * password )
 {
 	terminate_paas_client();
 	if (!( Paas.agent = allocate_string( agent )))
@@ -396,9 +449,18 @@ public	int	initialise_paas_client( char * agent, char * tls, char * host, int po
 		return( 27 );
 	else if (!( Paas.host = allocate_string( host )))
 		return( 27 );
-	else
+	else if (!( Paas.user = allocate_string( user )))
+		return( 27 );
+	else if (!( Paas.pass = allocate_string( password )))
+		return( 27 );
+	else if (!( Paas.base = allocate_string( _COAPS_BASE )))
+		return( 27 );
+	else	
 	{
 		Paas.port = port;
+		if (!( rest_valid_string( Paas.tls ) ))
+			Paas.service = "http";
+		else	Paas.service = "https";
 		return( 0 );
 	}
 }

@@ -31,6 +31,8 @@
 #include "paasclient.h"
 #include "paascontract.h"
 
+#include "paasconfig.c"
+#include "occipaasconfig.c"
 #include "paas.c"
 #include "occipaas.c"
 #include "paascontract.c"

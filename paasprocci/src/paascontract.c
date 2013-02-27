@@ -46,6 +46,52 @@ struct	cords_paas_contract
 #define	_CORDS_PAAS_APPLICATION		"paas_application"
 #define	_CORDS_PAAS_ENVIRONMENT		"paas_environment"
 
+/* ---------------------------------------------------------------------------- */
+/* 	   l l _ r e s o l v e _ p a a s _ c o n f i g u r a t i o n		*/
+/* ---------------------------------------------------------------------------- */
+private	struct	paas_config * ll_resolve_paas_configuration( char * sptr )
+{
+	struct	occi_kind_node * nptr;
+	struct	paas_config * pptr=(struct paas_config *) 0;
+	struct	occi_kind_node  * occi_first_paas_config_node();
+	rest_log_message("resolve_paas_configuration");
+	rest_log_message( sptr );
+	for (	nptr = occi_first_paas_config_node();
+		nptr != (struct occi_kind_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( pptr = nptr->contents ))
+			continue;
+		else if (!( pptr->name ))
+			continue;
+		else if (!( strcmp( pptr->name, sptr ) ))
+			return( pptr );
+	}
+	return((struct paas_config *) 0);
+}
+
+/* ---------------------------------------------------------------------------- */
+/* 		r e s o l v e _ p a a s _ c o n f i g u r a t i o n		*/
+/* ---------------------------------------------------------------------------- */
+private	struct	paas_config * resolve_paas_configuration( char * sptr )
+{
+	struct	paas_config * pptr=(struct paas_config *) 0;
+	if (( pptr = ll_resolve_paas_configuration( sptr )) != (struct paas_config *) 0)
+		return( pptr );
+	else if (!( sptr = get_operator_profile() ))
+		return( pptr );
+	else if (!( pptr = ll_resolve_paas_configuration( sptr )))
+		return( pptr );
+	else
+	{
+		initialise_paas_client( 
+			"COAPSClient/V1", pptr->tls, 
+			pptr->host, pptr->port, 
+			pptr->user, pptr->password );
+		return( pptr );
+	}
+}
+
 /*	-------------------------------------------	*/
 /* 	   	   s t a r t _ p a a s     	        */
 /*	-------------------------------------------	*/
@@ -58,8 +104,11 @@ public	struct	rest_response * start_paas(
 {
 	struct	paas * pptr;
 	struct	paas_response * prptr;
+	struct	paas_config * cfgptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Invalid Action" ) );
 	else
 	{
 		/* ----------------------------------- */
@@ -96,8 +145,12 @@ public	struct	rest_response * save_paas(
 {
 	struct	paas * pptr;
 	struct paas_response * prptr;
+	struct	paas_config * cfgptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Invalid Action" ) );
+
 	else
 	{
 		/* ----------------------------------- */
@@ -119,8 +172,13 @@ public	struct	rest_response * stop_paas(
 {
 	struct	paas * pptr;
 	struct paas_response * prptr;
+	struct	paas_config * cfgptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+
+	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Invalid Action" ) );
+
 	else
 	{
 		/* ----------------------------------- */
@@ -359,8 +417,16 @@ public	int	create_paas_contract(
 	char	*	agent=_CORDS_CONTRACT_AGENT;
 	char 	*	tls=default_tls();
 	struct	cords_paas_contract	contract;
+	struct	paas_config * cfgptr;
 
 	memset( &contract, 0, sizeof( struct cords_paas_contract ));
+
+	if (!( pptr ))
+		return( 118 );
+	else if (!( pptr->profile ))
+		return( 118 );
+	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
+		return( 118 );
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -445,7 +511,7 @@ public	int	create_paas_contract(
 	/* ------------------------------------------- 	*/
 	/*	Create paas application	       		*/
    	/* ------------------------------------------- 	*/
-   	if (!( rptr = create_paas_application( pptr->environment, pptr->appfile ) ))
+   	if (!( rptr = create_paas_application( pptr->appfile ) ))
    	{
 			return( terminate_paas_contract( 503, &contract ) );
    	}
@@ -474,10 +540,14 @@ public	int	delete_paas_contract(
 		struct paas * pptr)
 {
    	struct paas_response * rptr;
+	struct	paas_config * cfgptr;
 
    	/* ----------------------------------------------- */
    	/*	Delete paas application                    */
    	/* ----------------------------------------------- */
+	if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
+		return( 118 );
+
    	if (!( rptr = delete_paas_application( pptr->application )))
    	{
           	return( 504 );
