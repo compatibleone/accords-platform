@@ -321,24 +321,10 @@ public	struct paas_response * undeploy_paas_application( char * environment, cha
 /*	An environment template descriptor must be	*/
 /*/	 provided.					*/
 /*	-----------------------------------------	*/
-public	struct paas_response * create_paas_environment( char * environment )
+public	struct paas_response * create_paas_environment( char * filename )
 {
 	/* POST /environment	*/
-	char *	filename=(char *) 0;
-	FILE *	h;
-	if (!( filename = rest_temporary_filename("xml")))
-		return((struct paas_response *) 0 );
-	else if (!( h = fopen( filename, "w" )))
-	{
-		liberate( filename );
-		return((struct paas_response *) 0 );
-	}
-	else
-	{
-		fprintf(h,"<environment name=%c%s%c/>\n",environment);		
-		fclose(h);
-		return( paas_result( paas_post_request( "/environment", filename ) ));
-	}
+	return( paas_result( paas_post_request( "/environment", filename ) ));
 }
 
 /*	-----------------------------------------	*/

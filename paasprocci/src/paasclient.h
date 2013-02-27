@@ -59,7 +59,7 @@ public	struct paas_response * get_paas_application(char * application);
 public	struct paas_response * delete_paas_application(char * application);
 public	struct paas_response * deploy_paas_application( char * environment, char * application);
 public	struct paas_response * undeploy_paas_application(char * environment, char * application);
-public	struct paas_response * create_paas_environment( char * environment );
+public	struct paas_response * create_paas_environment( char * xmlname );
 public	struct paas_response * delete_paas_environment( char * environment );
 public	struct paas_response * list_paas_environment();
 public	struct paas_response * get_paas_environment(char * environment);
