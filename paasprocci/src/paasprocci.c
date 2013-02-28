@@ -234,6 +234,13 @@ private	int	paasprocci_operation( char * nptr )
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
+	if (!( optr = occi_paas_config_builder( Configuration.domain, "paas_configuration" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_paas_builder( Configuration.domain, "paas" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
