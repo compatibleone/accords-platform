@@ -357,6 +357,15 @@ AM_CONDITIONAL([ENABLE_CNPROCCI], [test "$enable_cnprocci" = "yes"])
 AC_SUBST([CFLAGS_CNPROCCI], [-I\${abs_top_srcdir}/cnprocci/src])
 AC_SUBST([PATH_CNPROCCI], [${abs_top_srcdir}/cnprocci/src])
 
+AC_ARG_ENABLE([eziprocci],
+      [AS_HELP_STRING([--disable-eziprocci],
+		      [Disable eziprocci @<:@default=enable@:>@])],
+      [],
+      [enable_eziprocci=yes])
+AM_CONDITIONAL([ENABLE_EZIPROCCI], [test "$enable_eziprocci" = "yes"])
+AC_SUBST([CFLAGS_EZIPROCCI], [-I\${abs_top_srcdir}/eziprocci/src])
+AC_SUBST([PATH_EZIPROCCI], [${abs_top_srcdir}/eziprocci/src])
+
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
 		      [Disable cool @<:@default=enable@:>@])],
@@ -596,6 +605,7 @@ AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
 AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
 AC_CONFIG_FILES([cnprocci/Makefile cnprocci/src/Makefile])
+AC_CONFIG_FILES([eziprocci/Makefile eziprocci/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
@@ -662,6 +672,7 @@ echo "    - copaas                   : $enable_copaas"
 echo "    - conagios                 : $enable_conagios"
 echo "    - paasprocci               : $enable_paasprocci"
 echo "    - cnprocci                 : $enable_cnprocci"
+echo "    - eziprocci                : $enable_eziprocci"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - coidms                   : $enable_coidms"

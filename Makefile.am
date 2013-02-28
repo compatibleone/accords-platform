@@ -122,6 +122,9 @@ endif
 if ENABLE_CNPROCCI
 SUBDIRS += cnprocci
 endif
+if ENABLE_EZIPROCCI
+SUBDIRS += eziprocci
+endif
 if ENABLE_DCPROCCI
 SUBDIRS += dcprocci
 endif
