@@ -22,6 +22,7 @@ bash build-run-provider osprocci osprocci
 bash build-run-provider paprocci paprocci
 bash build-run-provider paasprocci paasprocci
 bash build-run-provider cnprocci cnprocci
+bash build-run-provider eziprocci eziprocci
 bash build-run-cool 
 bash build-run-tools 
 

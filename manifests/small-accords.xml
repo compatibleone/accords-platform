@@ -28,6 +28,7 @@
 				<port name="slam" protocol="tcp" range="0.0.0.0/0" from="8107" to="8107"/>
 				<port name="paasprocci" protocol="tcp" range="0.0.0.0/0" from="8108" to="8108"/>
 				<port name="cnprocci" protocol="tcp" range="0.0.0.0/0" from="8109" to="8109"/>
+				<port name="eziprocci" protocol="tcp" range="0.0.0.0/0" from="8110" to="8110"/>
 				<port name="cosacs" protocol="tcp" range="0.0.0.0/0" from="8286" to="8286"/>
 				<port name="ssh" protocol="tcp" from="22" to="22"/>
 			</network>
@@ -61,8 +62,10 @@
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-slam; bash run-slam 8107');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-paasprocci; bash run-paasprocci 8108');"/>
 		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-cnprocci; bash run-cnprocci 8109');"/>
+		<action expression="ap.system('wget http://www.compatibleone.fr/accords-platform/debian/run-eziprocci; bash run-eziprocci 8109');"/>
 	</configuration>
 	<release name="small-accords-platform">
+		<action expression="ap.kill('eziprocci');"/>
 		<action expression="ap.kill('cnprocci');"/>
 		<action expression="ap.kill('paasprocci');"/>
 		<action expression="ap.kill('slam');"/>

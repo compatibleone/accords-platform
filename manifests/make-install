@@ -23,4 +23,5 @@ bash build-install slam $1
 bash build-install copaas $1
 bash build-install paasprocci $1
 bash build-install cnprocci $1
+bash build-install eziprocci $1
 

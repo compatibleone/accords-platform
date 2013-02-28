@@ -22,4 +22,5 @@ bash build-nagios osocciprocci $1 8087
 bash build-nagios paprocci $1 8087
 bash build-nagios paasprocci $1 8087
 bash build-nagios cnprocci $1 8087
+bash build-nagios eziprocci $1 8087
 
