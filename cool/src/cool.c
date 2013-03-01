@@ -59,6 +59,9 @@ public	char *	default_operator()	{	return(Cool.operator);		}
 public	char *	default_tls()		{	return(Cool.tls);		}
 public	char *	default_zone()		{	return(Cool.zone);		}
 
+private	int	cool_create_job( char * contract, char * nptr );
+private	int	cool_create_workload( char * contract, int type );
+
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -156,6 +159,10 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 }
 
 #include "comonsconnection.c"
+#include "job.c"
+#include "occijob.c"
+#include "workload.c"
+#include "occiworkload.c"
 
 /*	-------------------------------------------	*/
 /*	E l a s t i c i t y   M a n a g e m e n t		*/
@@ -165,6 +172,7 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
+	(char *) 0, 	/* elastic job occi id	*/
 	(char *) 0,	/* elastic security	*/
 	0,	/* use elastic occi		*/
 	80,	/* elastic rest port		*/
@@ -1096,10 +1104,17 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 {
 	struct	elastic_contract * eptr;
 	char	buffer[245];
+	int	status;
 
 	sprintf(buffer,"add_elastic_contract(%u)",allocate);
 	cool_log_message(buffer,1);
 	cool_log_message(contract,1);
+
+	if ( Elastic.occi )
+	{
+		if ((status = cool_create_workload( contract, allocate )) != 0)
+			return((struct elastic_contract *) 0);
+	}
 
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
@@ -1351,6 +1366,23 @@ private	int	cool_occi_operation( char * nptr )
 	set_autosave_cords_xlink_name("links_cool.xml");
 
 	/* -------------------------------------- */
+	/* add the job and workload control stuff */
+	/* -------------------------------------- */
+	if (!( optr = occi_cords_job_builder( Cool.domain, "cool_job" )))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_cords_job_builder( Cool.domain, "cool_workload" )))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	/* -------------------------------------- */
 	/* add the monitoring connection category */
 	/* -------------------------------------- */
 	if (!( optr = comons_connection_builder( Cool.domain ) ))
@@ -1487,6 +1519,161 @@ private	int	load_balancer( char * nptr )
 	return( status );
 }
 
+/*	-------------------------------------------	*/
+/*		c o o l _ c r e a t e _ j o b 		*/
+/*	-------------------------------------------	*/
+private	int	cool_create_job( char * contract, char * nptr )
+{
+	char	buffer[2048];
+	struct	occi_element * eptr = (struct	occi_element *) 0;
+	struct	occi_element * root = (struct	occi_element *) 0;
+	struct	occi_element * foot = (struct	occi_element *) 0;
+	struct	occi_response * zptr;
+	char *	ihost=(char *) 0;
+	char	value[64];
+
+	sprintf(buffer,"%s/job/",Cool.identity);
+
+	if (!( eptr = occi_create_element( "occi.job.name", nptr ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.job.description", "load balanced job" ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.job.contract", contract )))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	sprintf(value,"%u",Elastic.floor);
+	
+	if (!( eptr = occi_create_element( "occi.job.floor", value ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	sprintf(value,"%u",Elastic.ceiling);
+	
+	if (!( eptr = occi_create_element( "occi.job.ceiling", value ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	sprintf(value,"%u",Elastic.strategy);
+	
+	if (!( eptr = occi_create_element( "occi.job.strategy", value ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( zptr = occi_simple_post( buffer, root, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( 118 );
+	else if (!( ihost = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 30 );
+	}
+	else if (!( Elastic.job = allocate_string( ihost ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 27 );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+}
+/*	-------------------------------------------	*/
+/*	  c o o l _ c r e a t e _ w o r k l o a d  	*/
+/*	-------------------------------------------	*/
+private	int	cool_create_workload( char * contract, int type )
+{
+	char	buffer[2048];
+	struct	occi_element * eptr = (struct	occi_element *) 0;
+	struct	occi_element * root = (struct	occi_element *) 0;
+	struct	occi_element * foot = (struct	occi_element *) 0;
+	struct	occi_response * zptr;
+	char *	ihost=(char *) 0;
+	char	value[64];
+	int	now;
+
+	sprintf(buffer,"%s/workload/",Cool.identity);
+
+	if (!( eptr = occi_create_element( "occi.workload.name", "workload" ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.workload.description", "load balanced workload" ) ))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( eptr = occi_create_element( "occi.workload.contract", contract )))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	now = time((long *) 0);
+	sprintf(value,"%u",now);
+
+	if (!( eptr = occi_create_element( "occi.workload.timestamp", value )))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	sprintf(value,"%u",type);
+
+	if (!( eptr = occi_create_element( "occi.workload.nature", value )))
+		return( 27 );
+	else if (!( eptr->previous = foot))
+		root = eptr;
+	else	foot->next = eptr;
+	foot = eptr;
+
+	if (!( zptr = occi_simple_post( buffer, root, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return( 118 );
+	else if (!( ihost = occi_extract_location( zptr ) ))
+	{
+		zptr = occi_remove_response( zptr );
+		return( 30 );
+	}
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		/* ---------------------------------- */
+		/* link the workload to thze job list */
+		/* ---------------------------------- */
+		if ((zptr = occi_create_link( Elastic.job, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+}
 
 /*	--------------------------------------------	*/
 /*		c o o l _ o p e r a t i o n 		*/
@@ -1622,7 +1809,13 @@ private	int	cool_operation( char * nptr )
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( cool_exit( 118, tptr ) );
 
-	else if (!( add_elastic_contract( eptr, 0 ) ))
+	if ( Elastic.occi )
+	{
+		if ((status = cool_create_job( eptr, "environment" )) != 0)
+			return( cool_exit( 118, tptr ) );
+	}
+
+	if (!( add_elastic_contract( eptr, 0 ) ))
 		return( cool_exit( 27, tptr ) );
 
 	else if (!( retrieve_elastic_contracts() ))
