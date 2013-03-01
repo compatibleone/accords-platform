@@ -21,7 +21,9 @@
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
+#include "restthread.h"
 #include "occi.h"
+#include "occibuilder.h"
 #include "occiclient.h"
 #include "document.h"
 #include "cool.h"
@@ -153,6 +155,8 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 	return( xptr );
 }
 
+#include "comonsconnection.c"
+
 /*	-------------------------------------------	*/
 /*	E l a s t i c i t y   M a n a g e m e n t		*/
 /*	-------------------------------------------	*/
@@ -162,6 +166,8 @@ private	struct	elastic_control Elastic =
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
 	(char *) 0,	/* elastic security	*/
+	0,	/* use elastic occi		*/
+	80,	/* elastic rest port		*/
 	1,	/* elastic floor 		*/
 	2, 	/* elastic ceiling		*/
 	0,	/* elastic strategy		*/
@@ -286,7 +292,7 @@ private	struct elastic_contract * allocate_elastic_contract()
 
 	if (!( eptr->service = allocate_string( ( rest_valid_string( Elastic.security ) ? "https" : "http" ) )))
 		return( liberate_elastic_contract( eptr ) );
-	else	eptr->port = Cool.restport;
+	else	eptr->port = Elastic.port;
 	return( eptr );
 }
 
@@ -422,17 +428,15 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* ---------------------- */
 	if (!( eptr->allocated & 2 ))
 	{
-
 		/* ---------------------------------------------- */
 		/* retrieve and store the contract hostname value */
 		/* ---------------------------------------------- */
 		if (!( result = occi_extract_atribut( 
-				zptr, Cool.domain, 
-				_CORDS_CONTRACT, _CORDS_HOSTNAME )))
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_HOSTNAME )))
 			return( liberate_elastic_contract( eptr ) );
 		else if (!( eptr->hostname = allocate_string( result ) ))
 			return( liberate_elastic_contract( eptr ) );
-
 	}
 
 	/* ------------------------------- */
@@ -456,8 +460,8 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* the parent service is required */
 		/* ------------------------------ */
 		else if (!( result = occi_extract_atribut( 
-				zptr, Cool.domain, 
-				_CORDS_CONTRACT, _CORDS_PARENTSERVICE )))
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_PARENTSERVICE )))
 			return( liberate_elastic_contract( eptr ) );
 		else if (!( Elastic.parentservice = allocate_string( result ) ))
 			return( liberate_elastic_contract( eptr ) );
@@ -466,8 +470,8 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* the contract name is required */
 		/* ----------------------------- */
 		else if (!( result = occi_extract_atribut( 
-				zptr, Cool.domain, 
-				_CORDS_CONTRACT, _CORDS_NAME )))
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_NAME )))
 			return( liberate_elastic_contract( eptr ) );
 		else if (!( Elastic.contractname = allocate_string( result ) ))
 			return( liberate_elastic_contract( eptr ) );
@@ -476,8 +480,8 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* the agreement is optional */
 		/* ------------------------- */
 		else if (( result = occi_extract_atribut( 
-				zptr, Cool.domain, 
-				_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
+			zptr, Cool.domain, 
+			_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
 			if (!( Elastic.agreement = allocate_string( result ) ))
 				return( liberate_elastic_contract( eptr ) );
 
@@ -1335,6 +1339,82 @@ private	struct rest_response * lb_head(
 }
 
 /*	---------------------------------------------------------	*/
+/* 				c o o l _ o c c i _ o p e r a t i o n			*/
+/*	---------------------------------------------------------	*/
+private	int	cool_occi_operation( char * nptr )
+{
+
+	struct	occi_category * first=(struct occi_category *) 0;
+	struct	occi_category * last=(struct occi_category *) 0;
+	struct	occi_category * optr=(struct occi_category *) 0;
+
+	set_autosave_cords_xlink_name("links_cool.xml");
+
+	/* -------------------------------------- */
+	/* add the monitoring connection category */
+	/* -------------------------------------- */
+	if (!( optr = comons_connection_builder( Cool.domain ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	/* ---------------------------------- */
+	/* add the monitoring packet category */
+	/* ---------------------------------- */
+	if (!( optr = comons_packet_builder( Cool.domain, "packet_cool.xml" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	rest_initialise_log(Cool.monitor);
+
+	if (!( Cool.identity ))
+		return( occi_server(  nptr, Cool.restport, Cool.tls, Cool.threads, first,(char *) 0 ) );
+	else
+	{
+		initialise_occi_publisher( Cool.publisher, (char*) 0, (char *) 0, (char *) 0);
+		return( publishing_occi_server(
+			Cool.user, Cool.password,
+			Cool.identity,  nptr, 
+			Cool.restport, Cool.tls, 
+			Cool.threads, first ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/* 				c o o l _ o c c i _ m a n a g e r 				*/
+/*	---------------------------------------------------------	*/
+private	void * 	cool_occi_manager( void * vptr )
+{
+	struct rest_thread * tptr=vptr;
+	rest_log_message("thread: cool pthread detach");
+	pthread_detach( tptr->id );
+
+	(void) cool_occi_operation( "coolocci/v1.0" );
+
+	tptr->status = 0;
+	rest_log_message("thread: cool pthread exit");
+	pthread_exit((void *) 0);
+}
+
+/*	---------------------------------------------------------	*/
+/*			c o o l _ e x i t 				*/
+/*	---------------------------------------------------------	*/
+private	int	cool_exit( int error, struct rest_thread * tptr )
+{
+	if ( tptr )
+	{
+		while( tptr->status )
+			sleep(5);
+	}
+	return( error );
+}
+
+/*	---------------------------------------------------------	*/
 /*			l o a d _ b a l a n c e r			*/
 /*	---------------------------------------------------------	*/
 private	int	load_balancer( char * nptr )
@@ -1401,17 +1481,22 @@ private	int	load_balancer( char * nptr )
 	/* --------------------------------- */
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
-	cool_log_message( "rest server starting", 0 );
-	status = rest_server(  nptr, Cool.restport, Elastic.security, 0, &Osi );
-	cool_log_message( "rest server shutdown", 0 );
+	cool_log_message( "cool rest server starting", 0 );
+	status = rest_server(  nptr, Elastic.port, Elastic.security, 0, &Osi );
+	cool_log_message( "cool rest server shutdown", 0 );
 	return( status );
 }
 
 
 /*	--------------------------------------------	*/
-/*	c o o l _ o p e r a t i o n 			*/
+/*		c o o l _ o p e r a t i o n 		*/
 /*	--------------------------------------------	*/
-/*	environment and category preparation		*/
+/*	This function performs the main operation of	*/
+/*	the compatible one http load balancer module	*/
+/*	- platform access protol AAA			*/
+/*	- OCCI server thread startup			*/
+/*	- elastic configuration collection		*/
+/*	- load balancer startup				*/
 /*	--------------------------------------------	*/
 private	int	cool_operation( char * nptr )
 {
@@ -1420,6 +1505,7 @@ private	int	cool_operation( char * nptr )
 	int	status;
 	char *	tls;
 	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
+	struct	rest_thread * tptr=(struct rest_thread *) 0;
 
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
@@ -1449,7 +1535,53 @@ private	int	cool_operation( char * nptr )
 		}
 	}
 
+	/* ----------------------------------------------------	*/	
+	/* Authentication and Authorization has been performed 	*/
+	/* so now the two servers can be brought up to handle  	*/
+	/* the elastic management and the OCCI interfaces	*/
+	/* ----------------------------------------------------	*/	
 	cool_log_message( "operation", 0 );
+
+	/* -------------------- */
+	/* set up the two ports */
+	/* -------------------- */
+	Elastic.port = Cool.restport;
+	Cool.restport = 8386;
+
+	/* ------------------------------ */
+	/* Detect need for OCCI Interface */
+	/* ------------------------------ */
+	if (( eptr = getenv( "elastic_occi" )) != (char *) 0)
+		Elastic.occi = atoi( eptr );
+
+	if ( Elastic.occi )
+	{
+		/* ---------------------- */
+		/* Launch the OCCI Thread */
+		/* ---------------------- */
+		if (!( tptr = allocate_rest_thread() ))
+			return( 37 );
+		else
+		{
+			tptr->status = 1;
+
+			pthread_attr_init( &tptr->attributes);
+		}
+		/* --------------------- */
+		/* launch the new thread */
+		/* --------------------- */
+		if ((status = pthread_create(
+				&tptr->id,
+				&tptr->attributes,
+				cool_occi_manager,	
+				(void *) tptr)) > 0 )
+			return( 38 );
+		else	sleep(2);
+	}
+
+	/* -------------------------------- */
+	/* launch the elastic load balencer */
+	/* -------------------------------- */
 
 	/* ------------------------------ */
 	/* analyse the elasticity options */
@@ -1488,13 +1620,13 @@ private	int	cool_operation( char * nptr )
 	else	Elastic.period = atoi(eptr);
 
 	if (!( eptr = getenv( "elastic_contract" ) ))
-		return( 118 );
+		return( cool_exit( 118, tptr ) );
 
 	else if (!( add_elastic_contract( eptr, 0 ) ))
-		return( 27 );
+		return( cool_exit( 27, tptr ) );
 
 	else if (!( retrieve_elastic_contracts() ))
-		return( 27 );
+		return( cool_exit( 27, tptr ) );
 
 	/* ----------------------------- */
 	/* put the load balancer online  */
@@ -1504,6 +1636,8 @@ private	int	cool_operation( char * nptr )
 	cool_log_message( "load balancer starting",1 );
 	status = load_balancer( nptr );
 	cool_log_message( "load balancer shutdown",1 );
+
+	cool_exit( status, tptr );
 
 	/* ----------------------------- */
 	/* release the elastic contracts */

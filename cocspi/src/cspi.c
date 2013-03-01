@@ -1919,6 +1919,93 @@ private	struct cordscript_instruction * explicite_construction(
 	}
 }
 
+/*	--------------------	*/
+/*	csp_categories		*/
+/*	--------------------	*/
+private	void	csp_categories( struct cordscript_instruction * iptr, char * url )
+{
+	struct	occi_client * kptr;
+	struct	occi_category * cptr;
+	struct	occi_action * aptr;
+	char *	result;
+	if (!( result = allocate_string( "[]" )))
+		push_value( iptr->context, string_value("[]") );
+	else if (!( kptr = occi_create_client( url, _CORDSCRIPT_AGENT, default_tls() ) ))
+		push_value( iptr->context, string_value( result ) );
+	else
+	{
+		for (	cptr=kptr->firstcat;
+			cptr != (struct occi_category *) 0;
+			cptr = cptr->next )
+			result = add_array( result, cptr->id, "" );
+		
+		push_value( iptr->context, string_value(result) );
+		occi_remove_client( kptr );
+	}
+	return;
+}
+
+/*	--------------------	*/
+/*	csp_category_actions	*/
+/*	--------------------	*/
+private	void	csp_category_actions( struct cordscript_instruction * iptr, char * url, char * cat )
+{
+	struct	occi_client * kptr;
+	struct	occi_category * cptr;
+	struct	occi_action * aptr;
+	char *	result;
+	if (!( result = allocate_string( "[]" )))
+		push_value( iptr->context, string_value("[]") );
+	else if (!( kptr = occi_create_client( url, _CORDSCRIPT_AGENT, default_tls() ) ))
+		push_value( iptr->context, string_value( result ) );
+	else if (!( cptr = occi_resolve_category( kptr->firstcat, cat ) ))
+	{
+		push_value( iptr->context, string_value(result) );
+		occi_remove_client( kptr );
+	}
+	else
+	{
+		for ( 	aptr=cptr->firstact;
+			aptr != (struct occi_action *) 0;
+			aptr = aptr->next )
+			result = add_array( result, aptr->name, "" );
+		
+		push_value( iptr->context, string_value(result) );
+		occi_remove_client( kptr );
+	}
+	return;
+}
+
+/*	---------------------	*/
+/*	csp_category_atributs	*/
+/*	---------------------	*/
+private	void	csp_category_atributs( struct cordscript_instruction * iptr, char * url, char * cat )
+{
+	struct	occi_client * kptr;
+	struct	occi_category * cptr;
+	struct	occi_attribute * aptr;
+	char *	result;
+	if (!( result = allocate_string( "[]" )))
+		push_value( iptr->context, string_value("[]") );
+	else if (!( kptr = occi_create_client( url, _CORDSCRIPT_AGENT, default_tls() ) ))
+		push_value( iptr->context, string_value( result ) );
+	else if (!( cptr = occi_resolve_category( kptr->firstcat, cat ) ))
+	{
+		push_value( iptr->context, string_value(result) );
+		occi_remove_client( kptr );
+	}
+	else
+	{
+		for ( 	aptr=cptr->first;
+			aptr != (struct occi_attribute *) 0;
+			aptr = aptr->next )
+			result = add_array( result, aptr->name, "" );
+		
+		push_value( iptr->context, string_value(result) );
+		occi_remove_client( kptr );
+	}
+	return;
+}
 
 /*	---------------		*/
 /*	 eval_operation		*/
@@ -2263,6 +2350,10 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_delete( evalue, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
 			}
+			else if (!( strcasecmp( wptr->value, "categories" ) ))
+			{
+				csp_categories( iptr, evalue );
+			}
 			else
 			{
 				/* it may be an OCCI action */
@@ -2367,6 +2458,14 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("") );
+			}
+			else if (!( strcasecmp( wptr->value, "attributes" ) ))
+			{
+				csp_category_attributes( iptr, sptr, evalue );
+			}
+			else if (!( strcasecmp( wptr->value, "actions" ) ))
+			{
+				csp_category_actions( iptr, sptr, evalue );
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{

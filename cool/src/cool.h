@@ -62,6 +62,8 @@ struct	elastic_control
 	/* will be provided through environment	*/
 	/* ------------------------------------ */
 	char 	*	security;
+	int		occi;
+	int		port;
 	int		floor;
 	int		ceiling;
 	int		strategy;

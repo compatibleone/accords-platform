@@ -2,6 +2,9 @@
 #define _commonsconnection_c 
 
 #include "cp.h"
+#include "connection.h"
+#include "packet.h"
+#include "xlink.h"
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -469,9 +472,6 @@ private	struct	occi_interface	connection_interface = {
 	update_connection,
 	delete_connection
 	};
-
-
-
 
 /*	------------------------------------------------------------------	*/
 /*		c o m o n s _ c o n n e c t i o n _ b u i l d e r		*/
