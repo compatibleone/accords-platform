@@ -29,6 +29,7 @@
 #include "cool.h"
 #include "cordslang.h"
 #include "cb.h"
+#include "url.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
@@ -1531,8 +1532,25 @@ private	int	cool_create_job( char * contract, char * nptr )
 	struct	occi_response * zptr;
 	char *	ihost=(char *) 0;
 	char	value[64];
+	struct	url *	uptr;
 
-	sprintf(buffer,"%s/job/",Cool.identity);
+	if (!( uptr = analyse_url( Cool.identity )))
+		return( 30 );
+	else
+	{
+		uptr->port = Cool.restport;
+		if (!( ihost = serialise_url( uptr,"" )))
+		{
+			return( 31 );
+			uptr = liberate_url( uptr );
+		}
+		else
+		{
+			sprintf(buffer,"%s/job/",ihost);
+			ihost = liberate( ihost );
+			uptr = liberate_url( uptr );
+		}
+	}
 
 	if (!( eptr = occi_create_element( "occi.job.name", nptr ) ))
 		return( 27 );
@@ -1613,8 +1631,25 @@ private	int	cool_create_workload( char * contract, int type )
 	char *	ihost=(char *) 0;
 	char	value[64];
 	int	now;
+	struct	url *	uptr;
 
-	sprintf(buffer,"%s/workload/",Cool.identity);
+	if (!( uptr = analyse_url( Cool.identity )))
+		return( 30 );
+	else
+	{
+		uptr->port = Cool.restport;
+		if (!( ihost = serialise_url( uptr,"" )))
+		{
+			return( 31 );
+			uptr = liberate_url( uptr );
+		}
+		else
+		{
+			sprintf(buffer,"%s/job/",ihost);
+			ihost = liberate( ihost );
+			uptr = liberate_url( uptr );
+		}
+	}
 
 	if (!( eptr = occi_create_element( "occi.workload.name", "workload" ) ))
 		return( 27 );
