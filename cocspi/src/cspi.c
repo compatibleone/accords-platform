@@ -1979,7 +1979,7 @@ private	void	csp_category_actions( struct cordscript_instruction * iptr, char * 
 /*	---------------------	*/
 /*	csp_category_atributs	*/
 /*	---------------------	*/
-private	void	csp_category_atributs( struct cordscript_instruction * iptr, char * url, char * cat )
+private	void	csp_category_attributes( struct cordscript_instruction * iptr, char * url, char * cat )
 {
 	struct	occi_client * kptr;
 	struct	occi_category * cptr;
