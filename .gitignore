@@ -61,6 +61,7 @@ debian/compatibleone-dashboard/
 debian/compatibleone-cnprocci/
 debian/compatibleone-dcprocci/
 debian/compatibleone-example/
+debian/compatibleone-eziprocci/
 debian/compatibleone-ezvm/
 debian/compatibleone-fileserver/
 debian/compatibleone-jpaasprocci/

@@ -1,11 +1,12 @@
 #
-# Manifests Makefile.am
+# Manpages Makefile.am
 #
-# Copyright 2012, Mandriva
+# Copyright 2012, 2013, Mandriva, CityPassenger
 # All rights reserved
 #
 # Authors:
 #   Alexandre Lissy <alissy@mandriva.com>
+#   Vincent Renardias <vrenardias@citypassenger.com>
 #
 
 dist_coman7_DATA = accords.7 compatibleone.7
@@ -23,7 +24,8 @@ dist_coman1_DATA = accords-config.1 co-broker.1 co-command.1 co-parser.1 \
 	run-osprocci.1 run-paprocci.1 run-parser.1 run-procci.1 run-publisher.1 \
 	run-slam.1 slam.1 co-check.1 co-platform.1 \
 	co-provider.1 co-provision.1 testaz.1 testcb.1 testcp.1 testdc.1 teston.1 \
-	testos.1 testresolver.1 accords.1
+	testos.1 testresolver.1 accords.1 \
+	cnprocci.1 testcn.1 run-cnprocci.1 run-eziprocci.1 eziprocci.1
 
 coman1dir = $(mandir)/man1/
 coman7dir = $(mandir)/man7/
