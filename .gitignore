@@ -9,6 +9,9 @@ broker/src/broker
 broker/src/Makefile.in
 build-stamp
 *.cache
+cnprocci/Makefile.in
+cnprocci/src/Makefile.in
+cnprocci/src/cnprocci
 coees/src/coees
 coes/Makefile.in
 coes/src/coes
@@ -106,6 +109,9 @@ debian/lintianreport.txt
 depcomp
 .deps
 example/src/example
+eziprocci/Makefile.in
+eziprocci/src/Makefile.in
+eziprocci/src/eziprocci
 ezvm/src/ezvm
 fileserver/Makefile.in
 fileserver/src/fileserver
@@ -174,6 +180,9 @@ testcb/src/testcb
 testcp/Makefile.in
 testcp/src/Makefile.in
 testcp/src/testcp
+testcn/Makefile.in
+testcn/src/Makefile.in
+testcn/src/testcn
 testdc/src/testdc
 testhdfs/src/testhdfs
 testhdfs/src/Makefile.in
