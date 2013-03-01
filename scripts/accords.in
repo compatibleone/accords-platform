@@ -441,6 +441,10 @@ _run_cosacs() {
     cosacs --config $target CO-SACS/1.0
 }
 
+_run_cool() {
+    cool --config $target CO-OL/1.0
+}
+
 _run_coss() {
     coss --config $target CO-SS/1.0
 }
@@ -1191,6 +1195,9 @@ case `basename $0` in
 	;;
     run-cosacs)
 	_run_cosacs $*
+	;;
+    run-cool)
+	_run_cool $*
 	;;
     run-publisher)
 	_run_publisher $*

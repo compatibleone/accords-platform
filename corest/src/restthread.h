@@ -34,6 +34,10 @@ struct	rest_thread
 	pthread_attr_t		attributes;
 };
 
+public	struct	rest_thread * allocate_rest_thread();
+public	struct	rest_thread * liberate_rest_thread(struct rest_thread * tptr);
+
+
 #endif	/* _rest_thread_h */
 	/* -------------- */
 
