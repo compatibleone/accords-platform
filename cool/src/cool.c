@@ -1534,6 +1534,9 @@ private	int	cool_create_job( char * contract, char * nptr )
 	char	value[64];
 	struct	url *	uptr;
 
+	cool_log_message("cool_create_job",0);
+	cool_log_message( contract,0);
+
 	if (!( uptr = analyse_url( Cool.identity )))
 		return( 30 );
 	else
@@ -1551,6 +1554,9 @@ private	int	cool_create_job( char * contract, char * nptr )
 			uptr = liberate_url( uptr );
 		}
 	}
+
+	cool_log_message( "identity job category",0);
+	cool_log_message( buffer,0);
 
 	if (!( eptr = occi_create_element( "occi.job.name", nptr ) ))
 		return( 27 );
@@ -1601,7 +1607,10 @@ private	int	cool_create_job( char * contract, char * nptr )
 	foot = eptr;
 
 	if (!( zptr = occi_simple_post( buffer, root, _CORDS_CONTRACT_AGENT, default_tls() )))
+	{
+		cool_log_message( "job post failure",0);
 		return( 118 );
+	}
 	else if (!( ihost = occi_extract_location( zptr ) ))
 	{
 		zptr = occi_remove_response( zptr );
@@ -1614,6 +1623,8 @@ private	int	cool_create_job( char * contract, char * nptr )
 	}
 	else
 	{
+		cool_log_message( "elastic_job",0);
+		cool_log_message( Elastic.job,0);
 		zptr = occi_remove_response( zptr );
 		return( 0 );
 	}
@@ -1633,6 +1644,8 @@ private	int	cool_create_workload( char * contract, int type )
 	int	now;
 	struct	url *	uptr;
 
+	cool_log_message( "cool_create_workload",0);
+	cool_log_message( contract,0);
 	if (!( uptr = analyse_url( Cool.identity )))
 		return( 30 );
 	else
@@ -1645,11 +1658,14 @@ private	int	cool_create_workload( char * contract, int type )
 		}
 		else
 		{
-			sprintf(buffer,"%s/job/",ihost);
+			sprintf(buffer,"%s/workload/",ihost);
 			ihost = liberate( ihost );
 			uptr = liberate_url( uptr );
 		}
 	}
+
+	cool_log_message( "identity workload category",0);
+	cool_log_message( buffer,0);
 
 	if (!( eptr = occi_create_element( "occi.workload.name", "workload" ) ))
 		return( 27 );
@@ -1692,7 +1708,10 @@ private	int	cool_create_workload( char * contract, int type )
 	foot = eptr;
 
 	if (!( zptr = occi_simple_post( buffer, root, _CORDS_CONTRACT_AGENT, default_tls() )))
+	{
+		cool_log_message( "workload post failure",0);
 		return( 118 );
+	}
 	else if (!( ihost = occi_extract_location( zptr ) ))
 	{
 		zptr = occi_remove_response( zptr );
@@ -1700,6 +1719,9 @@ private	int	cool_create_workload( char * contract, int type )
 	}
 	else
 	{
+		cool_log_message( "elastic workload",0);
+		cool_log_message( ihost,0);
+
 		zptr = occi_remove_response( zptr );
 		/* ---------------------------------- */
 		/* link the workload to thze job list */
