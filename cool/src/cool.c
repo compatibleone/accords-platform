@@ -1588,6 +1588,28 @@ private	int	load_balancer( char * nptr )
 }
 
 /*	-------------------------------------------	*/
+/*		c o o l _ t e s t _ o c c i		*/
+/*	-------------------------------------------	*/
+private	int	cool_test_occi( char * url )
+{
+	struct	rest_response * rptr;
+
+	cool_log_message("cool test occi server",0);
+
+	if (!( rptr = rest_client_try_get_request( url, default_tls(), _CORDS_CONTRACT_AGENT, (struct rest_header *) 0, 5, 12 ) ))
+	{
+		cool_log_message("occi server failure to respond",0);
+		return(0);
+	}
+	else	
+	{
+		cool_log_message("cool occi server ok",0);
+		rptr = liberate_rest_response( rptr );
+		return(1);
+	}
+}
+
+/*	-------------------------------------------	*/
 /*		c o o l _ c r e a t e _ j o b 		*/
 /*	-------------------------------------------	*/
 private	int	cool_create_job( char * contract, char * nptr )
@@ -1604,6 +1626,9 @@ private	int	cool_create_job( char * contract, char * nptr )
 	cool_log_message("cool_create_job",0);
 	cool_log_message( contract,0);
 
+	/* ----------------------------------------- */
+	/* transpose the port of the occi server url */
+	/* ----------------------------------------- */
 	if (!( uptr = analyse_url( Cool.identity )))
 		return( 30 );
 	else
@@ -1622,9 +1647,18 @@ private	int	cool_create_job( char * contract, char * nptr )
 		}
 	}
 
+	/* ---------------------------------------- */
+	/* wait for the occi server thread to start */
+	/* ---------------------------------------- */
+	if (!( cool_test_occi( buffer ) ))
+		return( 132 );
+
 	cool_log_message( "identity job category",0);
 	cool_log_message( buffer,0);
 
+	/* ----------------------------------------- */
+	/* create the occi job category instance now */
+	/* ----------------------------------------- */
 	if (!( eptr = occi_create_element( "occi.job.name", nptr ) ))
 		return( 27 );
 	else if (!( eptr->previous = foot))
