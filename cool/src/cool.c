@@ -1376,7 +1376,7 @@ private	int	cool_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_job_builder( Cool.domain, "workload" )))
+	if (!( optr = occi_cords_workload_builder( Cool.domain, "workload" )))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -1639,6 +1639,7 @@ private	int	cool_create_workload( char * contract, int type )
 	struct	occi_element * root = (struct	occi_element *) 0;
 	struct	occi_element * foot = (struct	occi_element *) 0;
 	struct	occi_response * zptr;
+	struct	occi_response * yptr;
 	char *	ihost=(char *) 0;
 	char	value[64];
 	int	now;
@@ -1722,12 +1723,12 @@ private	int	cool_create_workload( char * contract, int type )
 		cool_log_message( "elastic workload",0);
 		cool_log_message( ihost,0);
 
-		zptr = occi_remove_response( zptr );
 		/* ---------------------------------- */
 		/* link the workload to thze job list */
 		/* ---------------------------------- */
-		if ((zptr = occi_create_link( Elastic.job, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-			zptr = occi_remove_response( zptr );
+		if ((yptr = occi_create_link( Elastic.job, ihost, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			yptr = occi_remove_response( yptr );
+		zptr = occi_remove_response( zptr );
 		return( 0 );
 	}
 }
