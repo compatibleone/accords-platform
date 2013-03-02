@@ -15,6 +15,7 @@ struct	cords_node
 	char *				common;
 	char *				scope;
 	char *				type;
+	char *				entry;
 	char *				firewall;
 	char *				operator;
 	int	state;

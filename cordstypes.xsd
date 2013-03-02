@@ -140,6 +140,11 @@
 			type="xsd:string"
 			default="simple" 
 			/>
+		<xsd:attribute
+		 	name="entry" 
+			type="xsd:string"
+			default="none" 
+			/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 
 		<xsd:attribute 	

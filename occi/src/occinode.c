@@ -155,6 +155,8 @@ private void autoload_cords_node_nodes() {
 				pptr->scope = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "type" )) != (struct xml_atribut *) 0)
 				pptr->type = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "entry" )) != (struct xml_atribut *) 0)
+				pptr->entry = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
 				pptr->firewall = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "operator" )) != (struct xml_atribut *) 0)
@@ -218,6 +220,9 @@ public  void autosave_cords_node_nodes() {
 		fprintf(h," type=%c",0x0022);
 		fprintf(h,"%s",(pptr->type?pptr->type:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," entry=%c",0x0022);
+		fprintf(h,"%s",(pptr->entry?pptr->entry:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," firewall=%c",0x0022);
 		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
 		fprintf(h,"%c",0x0022);
@@ -268,6 +273,8 @@ private void set_cords_node_field(
 			pptr->scope = allocate_string(vptr);
 		if (!( strcmp( nptr, "type" ) ))
 			pptr->type = allocate_string(vptr);
+		if (!( strcmp( nptr, "entry" ) ))
+			pptr->entry = allocate_string(vptr);
 		if (!( strcmp( nptr, "firewall" ) ))
 			pptr->firewall = allocate_string(vptr);
 		if (!( strcmp( nptr, "operator" ) ))
@@ -375,6 +382,13 @@ private int pass_cords_node_filter(
 		else if ( strcmp(pptr->type,fptr->type) != 0)
 			return(0);
 		}
+	if (( fptr->entry )
+	&&  (strlen( fptr->entry ) != 0)) {
+		if (!( pptr->entry ))
+			return(0);
+		else if ( strcmp(pptr->entry,fptr->entry) != 0)
+			return(0);
+		}
 	if (( fptr->firewall )
 	&&  (strlen( fptr->firewall ) != 0)) {
 		if (!( pptr->firewall ))
@@ -433,6 +447,9 @@ private struct rest_response * cords_node_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.type=%c%s%c",optr->domain,optr->id,0x0022,pptr->type,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.entry=%c%s%c",optr->domain,optr->id,0x0022,pptr->entry,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.firewall=%c%s%c",optr->domain,optr->id,0x0022,pptr->firewall,0x0022);
@@ -885,6 +902,8 @@ public struct occi_category * occi_cords_node_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "type",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "entry",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "operator",0,0) ))
@@ -1028,6 +1047,17 @@ public struct rest_header *  cords_node_occi_headers(struct cords_node * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.cords_node.type='%s'\r\n",(sptr->type?sptr->type:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.cords_node.entry='%s'\r\n",(sptr->entry?sptr->entry:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
