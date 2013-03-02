@@ -1582,7 +1582,7 @@ private	int	load_balancer( char * nptr )
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
 	cool_log_message( "cool rest server starting", 0 );
-	status = rest_server(  nptr, Elastic.port, Elastic.security, 0, &Osi );
+	status = rest_server(  "cool" , Elastic.port, Elastic.security, 0, &Osi );
 	cool_log_message( "cool rest server shutdown", 0 );
 	return( status );
 }
