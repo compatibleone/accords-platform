@@ -1265,6 +1265,36 @@ private	void	lb_update_statistics()
 }
 
 /*	---------------------------------------------------------	*/
+/*		c o o l _ c o n t r a c t _ h o s t n a m e		*/
+/*	---------------------------------------------------------	*/
+/*	this function corrects a missing hostname value if it is	*/
+/*	possible to do so.						*/
+/*	---------------------------------------------------------	*/
+private	struct elastic_contract * cool_contract_hostname( struct elastic_contract * eptr )
+{
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	char *	vptr;
+	if (!( eptr ))
+		return( eptr );
+	else if ( rest_valid_string( eptr->hostname ) )
+		return( eptr );
+	else if (!( eptr->contract ))
+		return((struct elastic_contract *) 0);
+	else if (!( zptr = occi_simple_get( eptr->contract, _CORDS_CONTRACT_AGENT, default_tls() )))
+		return((struct elastic_contract *) 0);
+	else if (!( dptr = occi_locate_element( zptr->first, "occi.contract.hostname" ) ))
+		return((struct elastic_contract *) 0);
+	else if (!( vptr = allocate_string( dptr->value ) ))
+		return((struct elastic_contract *) 0);
+	else if (!( vptr = occi_unquoted_value( vptr ) ))
+		return((struct elastic_contract *) 0);
+	else if (!( eptr->hostname = allocate_string( vptr ) ))
+		return((struct elastic_contract *) 0);
+	else	return( eptr );
+}
+
+/*	---------------------------------------------------------	*/
 /*			l b _ r e d i r e c t					*/
 /*	---------------------------------------------------------	*/
 private	struct rest_response * lb_redirect( struct rest_client * cptr, struct rest_request * rptr )
@@ -1278,10 +1308,12 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 
 	if (!( eptr = next_elastic_contract() )) 
 		return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
-	else if (!( eptr->hostname ))
-		return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
 
-	else if (!( aptr = rest_allocate_response(cptr)))
+	else if (!( rest_valid_string( eptr->hostname ) ))
+		if (!( eptr = cool_contract_hostname( eptr ) ))
+			return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
+
+	if (!( aptr = rest_allocate_response(cptr)))
 		return( lb_failure(cptr,  500, "Server Failure : Out of Memory" ) );
 	else
 	{
