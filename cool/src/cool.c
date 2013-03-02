@@ -214,6 +214,24 @@ private	struct	elastic_control Elastic =
 	(struct elastic_contract *) 0  /* next  */
 };
 
+/*	-----------------------------------------------------------	*/
+/*		   	c o o l _ l o c k 				*/
+/*	-----------------------------------------------------------	*/
+private	void	cool_lock()
+{
+	pthread_mutex_lock( &Elastic.lock );
+	return;
+}
+
+/*	-----------------------------------------------------------	*/
+/*			c o o l _ u n l o c k 				*/
+/*	-----------------------------------------------------------	*/
+private	void	cool_unlock()
+{
+	pthread_mutex_unlock( &Elastic.lock );
+	return;
+}
+
 /*	---------------------------------------------------------	*/
 /*			l b _ f a i l u r e				*/
 /*	---------------------------------------------------------	*/
@@ -277,13 +295,16 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 		/* --------------------------------------------- */
 		if (( eptr->previous ) || ( eptr->next ))
 		{
+			cool_lock();
 			if (!( eptr->previous ))
 				Elastic.first = eptr->next;
 			else	eptr->previous->next = eptr->next;
 			if (!( eptr->next ))
 				Elastic.last = eptr->previous;
 			else	eptr->next->previous = eptr->previous;
+			cool_lock();
 		}
+
 		eptr = liberate( eptr );
 	}
 	return((struct elastic_contract *) 0);
@@ -317,6 +338,18 @@ private	struct elastic_contract * next_elastic_contract()
 	else	return( (Elastic.current = Elastic.current->next ) );
 }
 
+/*	---------------------------------------------------------	*/
+/*		n e x t _ e l a s t i c _ c o n t r a c t 	*/
+/*	---------------------------------------------------------	*/
+private	struct elastic_contract * cool_next_elastic_contract()
+{
+	struct	elastic_contract * eptr;
+	cool_lock();
+	eptr = next_elastic_contract();
+	cool_unlock();
+	return(eptr);
+}
+
 /*	--------------------------------------------	*/
 /*	c o o l _ a v e r a g e _ d u r a t i o n s	*/
 /*	--------------------------------------------	*/
@@ -338,7 +371,6 @@ private	void	cool_average_durations()
 	Elastic.average_start_duration	=
 	Elastic.average_stop_duration	= 0;
 
-
 	for (	eptr=Elastic.first;
 		eptr != (struct elastic_contract *) 0;
 		eptr = eptr->next )
@@ -352,6 +384,7 @@ private	void	cool_average_durations()
 			Elastic.total_stop_duration += eptr->stopduration;
 		}
 	}
+
 	if ( Elastic.active )
 	{
 		Elastic.average_start_duration = (Elastic.total_start_duration / Elastic.active);
@@ -451,10 +484,12 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* ------------------------------- */
 	/* append to the list of contracts */
 	/* ------------------------------- */
+	cool_lock();
 	if (!( eptr->previous = Elastic.last ))
 		Elastic.first = eptr;
 	else	eptr->previous->next = eptr;
 	Elastic.last = eptr;
+	cool_unlock();
 	Elastic.total++;
 
 	/* -------------------------------- */
@@ -1306,7 +1341,7 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 
 	lb_update_statistics();
 
-	if (!( eptr = next_elastic_contract() )) 
+	if (!( eptr = cool_next_elastic_contract() )) 
 		return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
 
 	else if (!( rest_valid_string( eptr->hostname ) ))
@@ -1784,6 +1819,7 @@ private	int	cool_operation( char * nptr )
 	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
 	struct	rest_thread * tptr=(struct rest_thread *) 0;
 
+	memset( &Elastic.lock,0,sizeof( Elastic.lock));
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
 
@@ -1927,7 +1963,6 @@ private	int	cool_operation( char * nptr )
 	/* ----------------------------- */
 	while ((ecptr = Elastic.first) != (struct elastic_contract *) 0)
 	{
-		Elastic.first = ecptr->next;
 		ecptr = liberate_elastic_contract( ecptr );
 	}
 

@@ -108,6 +108,7 @@ struct	elastic_control
 
 	int	*	unitdata;
 
+	pthread_mutex_t 		lock;
 
 };
 
