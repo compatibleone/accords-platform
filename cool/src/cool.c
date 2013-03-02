@@ -302,7 +302,7 @@ private	struct elastic_contract * liberate_elastic_contract(struct	elastic_contr
 			if (!( eptr->next ))
 				Elastic.last = eptr->previous;
 			else	eptr->next->previous = eptr->previous;
-			cool_lock();
+			cool_unlock();
 		}
 
 		eptr = liberate( eptr );
