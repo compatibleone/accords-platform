@@ -1369,14 +1369,14 @@ private	int	cool_occi_operation( char * nptr )
 	/* -------------------------------------- */
 	/* add the job and workload control stuff */
 	/* -------------------------------------- */
-	if (!( optr = occi_cords_job_builder( Cool.domain, "cool_job" )))
+	if (!( optr = occi_cords_job_builder( Cool.domain, "job" )))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_cords_job_builder( Cool.domain, "cool_workload" )))
+	if (!( optr = occi_cords_job_builder( Cool.domain, "workload" )))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
