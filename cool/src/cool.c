@@ -1233,8 +1233,11 @@ private	struct elastic_contract * scaledown_elastic_contract( struct elastic_con
 	if ( Elastic.active > Elastic.floor )
 	{
 		while ( contract )
+		{
 			if (!( contract->isactive ))
 				contract = contract->previous;
+			else	break;
+		}
 		if (!( contract ))
 			return( contract );
 		else 	
