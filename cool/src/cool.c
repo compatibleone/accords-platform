@@ -1670,7 +1670,9 @@ private	int	load_balancer( char * nptr )
 	/* ------------------------------------------ */
 	/* this parameter now controls thread workers */
 	/* ------------------------------------------ */
-	rest_thread_control(0);
+	if (!( Elastic.occi ))
+	{	rest_thread_control(0);		}
+
 
 	/* --------------------------------- */
 	/* launch the REST HTTP Server layer */
