@@ -767,11 +767,18 @@ private	int	intercept_identity( char * vptr )
 /*	-------------------------------------------------	*/
 private	int	intercept_publisher( char * vptr )
 {
+	int	status;
 	if ( rest_valid_string( Cosacs.publisher ) )
 		return(0);
 	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
 		return(0); 
-	else	return( cosacs_use_publisher() );
+	else if (!( status = cosacs_use_publisher()))
+		return(0);
+	else
+	{
+		activate_event_manager();
+		return(status);
+	}
 }
 
 /*	-------------------------------------------------	*/

@@ -1169,6 +1169,7 @@ public	int	publishing_occi_server(
 				return( status );
 		}
 	}
+	activate_event_manager();
 
 	/* ----------------------------------------- */
 	/* publish the collection of OCCI categories */

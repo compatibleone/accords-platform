@@ -2075,6 +2075,13 @@ private	char *	cords_event_manager( char * agent, char * tls )
 /*	-------------------------------------------------------		*/
 /*		    c o r d s _ p o s t _ e v e n t			*/
 /*	-------------------------------------------------------		*/
+private	int	use_event_manager=0;
+public	void	activate_event_manager()
+{
+	use_event_manager=1;
+	return;
+}
+
 public	int	cords_post_event( char * message, char * nature, char * agent, char * tls )
 {
 	char	*	ihost;
@@ -2093,7 +2100,9 @@ public	int	cords_post_event( char * message, char * nature, char * agent, char *
 	/* ----------------------------------- */
 	/* retrieve the event category manager */
 	/* ----------------------------------- */
-	if (!( ihost = cords_event_manager( agent, tls ) ))
+	if (!( use_event_manager ))
+		return(0);
+	else if (!( ihost = cords_event_manager( agent, tls ) ))
 		return(46);
 	else
 	{

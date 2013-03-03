@@ -1881,6 +1881,7 @@ private	int	cool_operation( char * nptr )
 			else	cool_log_message( "authentication", 0 );
 		}
 	}
+	activate_event_manager();
 
 	/* ----------------------------------------------------	*/	
 	/* Authentication and Authorization has been performed 	*/
