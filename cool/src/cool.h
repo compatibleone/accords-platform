@@ -18,6 +18,12 @@
 #ifndef	_cool_h	
 #define	_cool_h
 
+#define	_COOL_PORT	8386
+#define	_COOL_SCALEUP	"scaleup"
+#define	_COOL_SCALEDOWN	"scaledown"
+#define	_COOL_LINKS	"links_cool.xml"
+#define	_COOL_PACKETS	"packet_cool.xml"
+
 struct	elastic_contract
 {
 	struct	elastic_contract * previous;

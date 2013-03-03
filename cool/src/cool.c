@@ -113,9 +113,9 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.0a.0.04");
-	printf("\n   Beta Version : 09/10/2012 ");
-	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.01");
+	printf("\n   Beta Version : 03/03/2013 ");
+	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -1519,7 +1519,8 @@ private	int	cool_occi_operation( char * nptr )
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_autosave_cords_xlink_name("links_cool.xml");
+	set_autosave_cords_xlink_name(_COOL_LINKS);
+
 
 	/* -------------------------------------- */
 	/* add the job and workload control stuff */
@@ -1531,9 +1532,9 @@ private	int	cool_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	if (!( optr = occi_add_action( optr,"scaleup","",scaleup_job)))
+	if (!( optr = occi_add_action( optr,_COOL_SCALEUP,"",scaleup_job)))
 		return( 27 );
-	else if (!( optr = occi_add_action( optr,"scaledown","",scaledown_job)))
+	else if (!( optr = occi_add_action( optr,_COOL_SCALEDOWN,"",scaledown_job)))
 		return( 27 );
 
 	if (!( optr = occi_cords_workload_builder( Cool.domain, "workload" )))
@@ -1556,7 +1557,7 @@ private	int	cool_occi_operation( char * nptr )
 	/* ---------------------------------- */
 	/* add the monitoring packet category */
 	/* ---------------------------------- */
-	if (!( optr = comons_packet_builder( Cool.domain, "packet_cool.xml" ) ))
+	if (!( optr = comons_packet_builder( Cool.domain, _COOL_PACKETS ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -1702,23 +1703,13 @@ private	int	cool_test_occi( char * url )
 	}
 }
 
-/*	-------------------------------------------	*/
-/*		c o o l _ c r e a t e _ j o b 		*/
-/*	-------------------------------------------	*/
-private	int	cool_create_job( char * contract, char * nptr )
+/*	---------------------------------------------	*/
+/*	c o o l _ t r a n s p o s e _ i d e n t i t y
+/*	---------------------------------------------	*/
+private	int	cool_transpose_identity()
 {
-	char	buffer[2048];
-	struct	occi_element * eptr = (struct	occi_element *) 0;
-	struct	occi_element * root = (struct	occi_element *) 0;
-	struct	occi_element * foot = (struct	occi_element *) 0;
-	struct	occi_response * zptr;
 	char *	ihost=(char *) 0;
-	char	value[64];
 	struct	url *	uptr;
-
-	cool_log_message("cool_create_job",0);
-	cool_log_message( contract,0);
-
 	/* ----------------------------------------- */
 	/* transpose the port of the occi server url */
 	/* ----------------------------------------- */
@@ -1729,16 +1720,37 @@ private	int	cool_create_job( char * contract, char * nptr )
 		uptr->port = Cool.restport;
 		if (!( ihost = serialise_url( uptr,"" )))
 		{
-			return( 31 );
 			uptr = liberate_url( uptr );
+			return( 31 );
 		}
 		else
 		{
-			sprintf(buffer,"%s/job/",ihost);
-			ihost = liberate( ihost );
+			if ( Cool.identity )
+				Cool.identity = liberate( Cool.identity );
+			Cool.identity = ihost;
 			uptr = liberate_url( uptr );
+			return(0);
 		}
 	}
+}
+
+
+/*	-------------------------------------------	*/
+/*		c o o l _ c r e a t e _ j o b 		*/
+/*	-------------------------------------------	*/
+private	int	cool_create_job( char * contract, char * nptr )
+{
+	char	buffer[2048];
+	struct	occi_element * eptr = (struct	occi_element *) 0;
+	struct	occi_element * root = (struct	occi_element *) 0;
+	struct	occi_element * foot = (struct	occi_element *) 0;
+	struct	occi_response * zptr;
+	char	value[64];
+	char *	ihost;
+	cool_log_message("cool_create_job",0);
+	cool_log_message( contract,0);
+
+	sprintf(buffer,"%s/job/",Cool.identity);
 
 	/* ---------------------------------------- */
 	/* wait for the occi server thread to start */
@@ -1841,23 +1853,8 @@ private	int	cool_create_workload( char * contract, int type )
 
 	cool_log_message( "cool_create_workload",0);
 	cool_log_message( contract,0);
-	if (!( uptr = analyse_url( Cool.identity )))
-		return( 30 );
-	else
-	{
-		uptr->port = Cool.restport;
-		if (!( ihost = serialise_url( uptr,"" )))
-		{
-			return( 31 );
-			uptr = liberate_url( uptr );
-		}
-		else
-		{
-			sprintf(buffer,"%s/workload/",ihost);
-			ihost = liberate( ihost );
-			uptr = liberate_url( uptr );
-		}
-	}
+
+	sprintf(buffer,"%s/workload/",Cool.identity);
 
 	cool_log_message( "identity workload category",0);
 	cool_log_message( buffer,0);
@@ -1958,6 +1955,21 @@ private	int	cool_operation( char * nptr )
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
+	/* ------------------------------ */
+	/* Detect need for OCCI Interface */
+	/* ------------------------------ */
+	if (( eptr = getenv( "elastic_occi" )) != (char *) 0)
+		Elastic.occi = atoi( eptr );
+
+	/* ----------------------------------------------- */
+	/* set up the two ports and transpose the identity */
+	/* ----------------------------------------------- */
+	Elastic.port = Cool.restport;
+	Cool.restport = _COOL_PORT;
+
+	if ((status = cool_transpose_identity()) != 0)
+		return(status);
+
 	/* -------------------------------------------- */
 	/* handle transport layer security, if required */
 	/* -------------------------------------------- */
@@ -1982,18 +1994,6 @@ private	int	cool_operation( char * nptr )
 	/* the elastic management and the OCCI interfaces	*/
 	/* ----------------------------------------------------	*/	
 	cool_log_message( "operation", 0 );
-
-	/* -------------------- */
-	/* set up the two ports */
-	/* -------------------- */
-	Elastic.port = Cool.restport;
-	Cool.restport = 8386;
-
-	/* ------------------------------ */
-	/* Detect need for OCCI Interface */
-	/* ------------------------------ */
-	if (( eptr = getenv( "elastic_occi" )) != (char *) 0)
-		Elastic.occi = atoi( eptr );
 
 	if ( Elastic.occi )
 	{
