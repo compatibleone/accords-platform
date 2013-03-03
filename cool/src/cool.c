@@ -62,6 +62,8 @@ public	char *	default_zone()		{	return(Cool.zone);		}
 
 private	int	cool_create_job( char * contract, char * nptr );
 private	int	cool_create_workload( char * contract, int type );
+private	struct elastic_contract * scaledown_elastic_contract( struct elastic_contract * contract );
+private	struct elastic_contract * scaleup_elastic_contract( char * contract, int allocate );
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -165,6 +167,7 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 #include "workload.c"
 #include "occiworkload.c"
 
+
 /*	-------------------------------------------	*/
 /*	E l a s t i c i t y   M a n a g e m e n t		*/
 /*	-------------------------------------------	*/
@@ -241,6 +244,62 @@ private	struct rest_response * lb_failure(struct rest_client * cptr,  int status
 	if (!( aptr = rest_allocate_response(cptr)))
 		return( aptr );
 	else	return( rest_html_response( aptr, status, message ) );
+}
+
+
+/*	-------------------------------------------	*/
+/* 		s c a l e u p _ j o b 			*/
+/*	-------------------------------------------	*/
+private	struct rest_response * scaleup_job(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_job * pptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	char *	wptr;
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else if ( Elastic.active < Elastic.ceiling )
+	{
+		scaleup_elastic_contract( Elastic.first->contract, 1 );
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+	else	return( rest_html_response( aptr, 400, "Elastic Ceiling Reached" ) );
+}
+
+/*	-------------------------------------------	*/
+/* 		s c a l e d o w n _ j o b 		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * scaledown_job(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_job * pptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	char *	wptr;
+
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+
+	else if ( Elastic.active > Elastic.floor )
+	{
+		scaledown_elastic_contract( Elastic.last );
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+	else	return( rest_html_response( aptr, 400, "Elastic Floor Reached" ) );
+	
 }
 
 
@@ -1160,6 +1219,35 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 }
 
 
+/*	----------------------------------------------------	*/
+/*	 s c a l e d o w n _ e l a s t i c _ c o n t r a c t	*/
+/*	----------------------------------------------------	*/
+private	struct elastic_contract * scaledown_elastic_contract( struct elastic_contract * contract )
+{
+	struct	occi_response * yptr;
+	char	buffer[245];
+
+	sprintf(buffer,"scaledown_elastic_contract()");
+	cool_log_message(buffer,1);
+
+	if ( Elastic.active > Elastic.floor )
+	{
+		while ( contract )
+			if (!( contract->isactive ))
+				contract = contract->previous;
+		if (!( contract ))
+			return( contract );
+		else 	
+		{
+			contract->isactive = 0;
+			if (( yptr = cords_invoke_action( contract->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				yptr = occi_remove_response( yptr );
+			return( contract );
+		}
+	}
+	else	return((struct elastic_contract*) 0);
+}
+
 /*	-------------------------------------------------	*/
 /*	 s c a l e u p _ e l a s t i c _ c o n t r a c t	*/
 /*	-------------------------------------------------	*/
@@ -1442,6 +1530,11 @@ private	int	cool_occi_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+
+	if (!( optr = occi_add_action( optr,"scaleup","",scaleup_job)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,"scaledown","",scaledown_job)))
+		return( 27 );
 
 	if (!( optr = occi_cords_workload_builder( Cool.domain, "workload" )))
 		return( 27 );
