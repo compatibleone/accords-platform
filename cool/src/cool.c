@@ -169,7 +169,7 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 
 
 /*	-------------------------------------------	*/
-/*	E l a s t i c i t y   M a n a g e m e n t		*/
+/*	E l a s t i c i t y   M a n a g e m e n t	*/
 /*	-------------------------------------------	*/
 private	struct	elastic_control Elastic = 
 {
@@ -245,7 +245,6 @@ private	struct rest_response * lb_failure(struct rest_client * cptr,  int status
 		return( aptr );
 	else	return( rest_html_response( aptr, status, message ) );
 }
-
 
 /*	-------------------------------------------	*/
 /* 		s c a l e u p _ j o b 			*/
@@ -424,6 +423,8 @@ private	void	cool_average_durations()
 
 	cool_log_message("calculate_average_durations",1);
 
+	cool_lock();
+
 	Elastic.active			=
 	Elastic.total_start_duration	=
 	Elastic.total_stop_duration	=
@@ -444,10 +445,17 @@ private	void	cool_average_durations()
 		}
 	}
 
+
 	if ( Elastic.active )
 	{
 		Elastic.average_start_duration = (Elastic.total_start_duration / Elastic.active);
 		Elastic.average_stop_duration  = (Elastic.total_stop_duration  / Elastic.active);
+	}
+
+	cool_unlock();
+
+	if ( Elastic.active )
+	{
 		sprintf(buffer,"average_start_duration=%u( tot=%u / nb=%u )",
 			Elastic.average_start_duration,Elastic.total_start_duration,Elastic.active);
 		cool_log_message( buffer, 1 );
@@ -992,6 +1000,18 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 }
 
 /*	-------------------------------------------------	*/
+/*	    c o o l _ d e c r e m e n t _ a c t i v e		*/
+/*	-------------------------------------------------	*/
+private	void	cool_decrement_active()
+{
+	cool_lock();
+	if ( Elastic.active ) 
+		Elastic.active--;
+	cool_unlock();
+	return;
+}
+
+/*	-------------------------------------------------	*/
 /*	   s t o p _ e l a s t i c _ c o n t r a c t		*/
 /*	-------------------------------------------------	*/
 /*	invoke the stop action then recover statistics		*/
@@ -1005,8 +1025,7 @@ private	int	stop_elastic_contract( struct elastic_contract * eptr )
 
 	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )))
 	{
-		if ( Elastic.active ) 
-			Elastic.active--;
+		cool_decrement_active();
 		return( 0 ); 
 	}
 	else
@@ -1022,8 +1041,7 @@ private	int	stop_elastic_contract( struct elastic_contract * eptr )
 			cool_retrieve_durations( eptr, yptr );
 			yptr = occi_remove_response( yptr );
 		}
-		else if ( Elastic.active ) 
-			Elastic.active--;
+		else 	cool_decrement_active();
 		return( 0 );
 	}
 }
@@ -1290,12 +1308,15 @@ private	struct elastic_contract * scaledown_elastic_contract( struct elastic_con
 
 	if ( Elastic.active > Elastic.floor )
 	{
+		cool_lock();
 		while ( contract )
 		{
 			if (!( contract->isactive ))
 				contract = contract->previous;
 			else	break;
 		}
+		cool_unlock();
+
 		if (!( contract ))
 			return( contract );
 		else 	
