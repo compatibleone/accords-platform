@@ -1398,23 +1398,24 @@ private	int	retrieve_elastic_contracts()
 					||  (!( rest_valid_string( eptr->value ) ))
 					||  ( atoi( eptr->value ) != 0 ))
 					{
-						id = liberate( id );
-						yptr = occi_remove_response( yptr );
 						cptr->isactive = 1;
-						continue;
-					}
-					else if ( Elastic.active >= Elastic.floor )
-					{
+						cool_retrieve_durations( cptr, yptr );
 						id = liberate( id );
 						yptr = occi_remove_response( yptr );
-						cptr->isactive = 0;
 						continue;
 					}
-					else
+					else if ( Elastic.active < Elastic.floor )
 					{
 						start_elastic_contract( cptr );
 						yptr = occi_remove_response( yptr );
 						id = liberate( id );
+						continue;
+					}
+					else
+					{
+						id = liberate( id );
+						yptr = occi_remove_response( yptr );
+						cptr->isactive = 0;
 						continue;
 					}
 				}
@@ -1489,10 +1490,15 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 
 	lb_update_statistics();
 
-	if (!( eptr = cool_next_elastic_contract() )) 
-		return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
+	while (1)
+	{
+		if (!( eptr = cool_next_elastic_contract() )) 
+			return( lb_failure(cptr,  500, "Server Failure : No Host" ) );
+		else if ( eptr->isactive )
+			break;
+	}
 
-	else if (!( rest_valid_string( eptr->hostname ) ))
+	if (!( rest_valid_string( eptr->hostname ) ))
 		if (!( eptr = cool_contract_hostname( eptr ) ))
 			return( lb_failure(cptr,  500, "Server Failure : Bad Host" ) );
 
