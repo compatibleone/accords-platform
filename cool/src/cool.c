@@ -592,10 +592,11 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		/* indicate the template is active */
 		/* ------------------------------- */
 		eptr->isactive = 1;
-
 		cool_retrieve_durations( eptr, zptr );
 
 	}
+
+	zptr = occi_remove_response( zptr );
 
 	/* ---------------------------------------------------------------- */
 	/* add the contract to the list of contracts managed by the service */
@@ -609,7 +610,6 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 			zptr = occi_remove_response( zptr );
 	}
 
-	zptr = occi_remove_response( zptr );
 	return(eptr);
 	
 
@@ -627,7 +627,14 @@ private	char *	negotiate_elastic_contract(
 	char *	contract=(char *) 0;
 	struct	xml_element * document=(struct xml_element *) 0;
 	struct	xml_atribut * aptr;
+
 	cool_log_message("cool:negotiate_elastic_contract",0);
+
+	if ( agreement )
+	{
+		cool_log_message("cool:agreement",0);
+		cool_log_message(agreement,0);
+	}
 
 	if ( selector )
 		selector->flags = _INHIBIT_AUTOSTART;
@@ -985,6 +992,43 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 }
 
 /*	-------------------------------------------------	*/
+/*	   s t o p _ e l a s t i c _ c o n t r a c t		*/
+/*	-------------------------------------------------	*/
+/*	invoke the stop action then recover statistics		*/
+/*	-------------------------------------------------	*/
+private	int	stop_elastic_contract( struct elastic_contract * eptr )
+{
+	struct	occi_response * yptr;
+	char *	result;
+
+	cool_log_message("start_elastic_contract",1);
+
+	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )))
+	{
+		if ( Elastic.active ) 
+			Elastic.active--;
+		return( 0 ); 
+	}
+	else
+	{
+		yptr = occi_remove_response( yptr );
+		eptr->isactive = 0;
+
+		if ( eptr->hostname ) 
+			eptr->hostname = liberate( eptr->hostname );
+
+		if (( yptr = occi_simple_get( eptr->contract, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		{
+			cool_retrieve_durations( eptr, yptr );
+			yptr = occi_remove_response( yptr );
+		}
+		else if ( Elastic.active ) 
+			Elastic.active--;
+		return( 0 );
+	}
+}
+
+/*	-------------------------------------------------	*/
 /*	   s t a r t _ e l a s t i c _ c o n t r a c t		*/
 /*	-------------------------------------------------	*/
 /*	invoke the start action then recover statistics		*/
@@ -992,6 +1036,7 @@ private	int	cool_duplicate_contract( char * result, char * source, char * provis
 private	int	start_elastic_contract( struct elastic_contract * eptr )
 {
 	struct	occi_response * yptr;
+	char *	result;
 
 	cool_log_message("start_elastic_contract",1);
 
@@ -1009,8 +1054,20 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 			return(( eptr->isactive = 0 ));
 		else 
 		{
-			eptr->isactive = 1;
-			cool_retrieve_durations( eptr, yptr );
+			/* ---------------------------- */
+			/* retrieve the host name field */
+			/* ---------------------------- */
+			if (( result = occi_extract_atribut( 
+				yptr, Cool.domain, 
+				_CORDS_CONTRACT, _CORDS_HOSTNAME )) != (char *) 0)
+			{
+				if ( eptr->hostname )
+					eptr->hostname = liberate( eptr->hostname );
+
+				eptr->hostname = allocate_string( result );
+				eptr->isactive = 1;
+				cool_retrieve_durations( eptr, yptr );
+			}
 			yptr = occi_remove_response( yptr );
 			return( eptr->isactive );
 		}
@@ -1243,15 +1300,8 @@ private	struct elastic_contract * scaledown_elastic_contract( struct elastic_con
 			return( contract );
 		else 	
 		{
-			if (( yptr = cords_invoke_action( contract->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-			{
-				yptr = occi_remove_response( yptr );
-				contract->isactive = 0;
-				if (( yptr = occi_simple_get( contract->contract, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-					cool_retrieve_durations( contract, yptr );
-				else if ( Elastic.active ) 
-					Elastic.active--;
-			}
+			stop_elastic_contract( contract );
+
 			return( contract );
 		}
 	}
