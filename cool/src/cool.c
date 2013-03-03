@@ -1009,9 +1009,10 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 			return(( eptr->isactive = 0 ));
 		else 
 		{
+			eptr->isactive = 1;
 			cool_retrieve_durations( eptr, yptr );
 			yptr = occi_remove_response( yptr );
-			return(( eptr->isactive = 1 ));
+			return( eptr->isactive );
 		}
 	}
 }
@@ -1242,9 +1243,15 @@ private	struct elastic_contract * scaledown_elastic_contract( struct elastic_con
 			return( contract );
 		else 	
 		{
-			contract->isactive = 0;
 			if (( yptr = cords_invoke_action( contract->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			{
 				yptr = occi_remove_response( yptr );
+				contract->isactive = 0;
+				if (( yptr = occi_simple_get( contract->contract, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+					cool_retrieve_durations( contract, yptr );
+				else if ( Elastic.active ) 
+					Elastic.active--;
+			}
 			return( contract );
 		}
 	}
