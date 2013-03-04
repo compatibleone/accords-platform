@@ -55,6 +55,9 @@
 #define	_HTTP_BASIC		"Basic realm=*"
 
 #define	_HTTP_MOVED		301
+#define	_HTTP_TEMPORARY		302
+#define	_HTTP_TEMPORARY_GET	303
+#define	_HTTP_TEMPORARY_NEW	307
 
 struct	rest_server;
 struct	rest_client;

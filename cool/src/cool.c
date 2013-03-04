@@ -61,7 +61,7 @@ public	char *	default_tls()		{	return(Cool.tls);		}
 public	char *	default_zone()		{	return(Cool.zone);		}
 
 private	int	cool_create_job( char * contract, char * nptr );
-private	int	cool_create_workload( char * contract, int type );
+private	int	cool_create_workload( struct elastic_contract * eptr, int type );
 private	struct elastic_contract * scaledown_elastic_contract( struct elastic_contract * contract );
 private	struct elastic_contract * scaleup_elastic_contract( char * contract, int allocate );
 
@@ -267,6 +267,8 @@ private	struct rest_response * scaleup_job(
 	else if ( Elastic.active < Elastic.ceiling )
 	{
 		scaleup_elastic_contract( Elastic.first->contract, 1 );
+		pptr->workloads = Elastic.active;
+		autosave_cords_job_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Elastic Ceiling Reached" ) );
@@ -295,6 +297,8 @@ private	struct rest_response * scaledown_job(
 	else if ( Elastic.active > Elastic.floor )
 	{
 		scaledown_elastic_contract( Elastic.last );
+		pptr->workloads = Elastic.active;
+		autosave_cords_job_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Elastic Floor Reached" ) );
@@ -627,7 +631,8 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 /*	n e g o t i a t e _ e l a s t i c _ c o n t r a c t	*/
 /*	---------------------------------------------------	*/
 private	char *	negotiate_elastic_contract(
-			char * node,char * name, char * user, 
+			char * node,char * name, 
+			char * user, char * account,
 			struct cords_placement_criteria * selector, 
 			struct cords_guarantee_criteria * warranty,
 			char * agreement)
@@ -648,7 +653,7 @@ private	char *	negotiate_elastic_contract(
 		selector->flags = _INHIBIT_AUTOSTART;
 
 	if (!( document = cords_instance_node(
-		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), agreement, user, user, user) ))
+		selector, warranty, name, node, _CORDS_CONTRACT_AGENT, default_tls(), agreement, user, account, user) ))
 		return( (char *) 0 );
 
 	else if (!( aptr = document_atribut( document, _CORDS_ID ) ))
@@ -1235,7 +1240,7 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( econtract = negotiate_elastic_contract( 
-			eptr->node, Elastic.contractname, eptr->accountname, &selector, &warranty, eptr->agreement ) ))
+			eptr->node, Elastic.contractname, eptr->accountname, eptr->account, &selector, &warranty, eptr->agreement ) ))
 		return( liberate_elastic_contract( eptr ) );
 
 	else if (!( eptr->xptr = occi_simple_get( econtract , _CORDS_CONTRACT_AGENT, default_tls() ) ))
@@ -1279,22 +1284,30 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 	int	status;
 
 	sprintf(buffer,"add_elastic_contract(%u)",allocate);
+
 	cool_log_message(buffer,1);
 	cool_log_message(contract,1);
 
-	if ( Elastic.occi )
-	{
-		if ((status = cool_create_workload( contract, allocate )) != 0)
-			return((struct elastic_contract *) 0);
-	}
-
+	/* -------------------------- */
+	/* do the load balancer stuff */
+	/* -------------------------- */
 	if (!( eptr = allocate_elastic_contract() ))
 		return( eptr );
 	else if ((eptr->allocated = allocate) & 1)
-		return( new_elastic_contract( eptr, contract ) );
-	else	return( use_elastic_contract( eptr, contract ) );
-}
+		eptr = new_elastic_contract( eptr, contract );
+	else	eptr = use_elastic_contract( eptr, contract );
 
+	/* -------------------------- */
+	/* do the occi instance stuff */
+	/* -------------------------- */
+	if (!( Elastic.occi ))
+		return( eptr );
+	else if (!( eptr ))
+		return( eptr );
+	else if ((status = cool_create_workload( eptr, allocate )) != 0)
+		return((struct elastic_contract *) 0);
+	else	return( eptr );
+}
 
 /*	----------------------------------------------------	*/
 /*	 s c a l e d o w n _ e l a s t i c _ c o n t r a c t	*/
@@ -1538,7 +1551,23 @@ private	struct rest_response * lb_redirect( struct rest_client * cptr, struct re
 			aptr = rest_liberate_response( aptr );
 			return( lb_failure(cptr,  500, "Server Failure : Out of Memory" ) );
 		}
-		else	return( rest_html_response( aptr, _HTTP_MOVED, "Moved" ) );
+		else
+		{
+			switch ( Elastic.strategy )
+			{
+			case	_HTTP_TEMPORARY	:	/* moved temporary  old ( 302 ) */
+				return( rest_html_response( aptr, _HTTP_TEMPORARY, "Moved Temporary" ) );
+			case	_HTTP_TEMPORARY_GET	:	/* moved temporary new ( 303 )*/
+				return( rest_html_response( aptr, _HTTP_TEMPORARY_GET, "Moved Temporary" ) );
+			case	_HTTP_TEMPORARY_NEW	:	/* moved temporary new (307) */
+				return( rest_html_response( aptr, _HTTP_TEMPORARY, "Moved Temporary" ) );
+			case	0		:	/* implicite */
+			case	_HTTP_MOVED	:	/* moved permenant old ( 301 ) */
+				return( rest_html_response( aptr, _HTTP_MOVED, "Moved Permenant" ) );
+			default			:
+				return( rest_html_response( aptr, _HTTP_MOVED, "Moved Permenant" ) );
+			}
+		}
 	}
 }
 
@@ -1928,10 +1957,10 @@ private	int	cool_create_job( char * contract, char * nptr )
 /*	-------------------------------------------	*/
 /*	  c o o l _ c r e a t e _ w o r k l o a d  	*/
 /*	-------------------------------------------	*/
-private	int	cool_create_workload( char * contract, int type )
+private	int	cool_create_workload( struct elastic_contract * eptr, int type )
 {
 	char	buffer[2048];
-	struct	occi_element * eptr = (struct	occi_element *) 0;
+	struct	occi_element * dptr = (struct	occi_element *) 0;
 	struct	occi_element * root = (struct	occi_element *) 0;
 	struct	occi_element * foot = (struct	occi_element *) 0;
 	struct	occi_response * zptr;
@@ -1940,54 +1969,59 @@ private	int	cool_create_workload( char * contract, int type )
 	char	value[64];
 	int	now;
 	struct	url *	uptr;
-
+	
 	cool_log_message( "cool_create_workload",0);
-	cool_log_message( contract,0);
+
+	if (!( eptr ))
+		return( 118 );
+	else if (!( eptr->contract ))
+		return( 118 );
+
+	cool_log_message( eptr->contract,0);
 
 	sprintf(buffer,"%s/workload/",Cool.identity);
-
 	cool_log_message( "identity workload category",0);
 	cool_log_message( buffer,0);
 
-	if (!( eptr = occi_create_element( "occi.workload.name", "workload" ) ))
+	if (!( dptr = occi_create_element( "occi.workload.name", "workload" ) ))
 		return( 27 );
-	else if (!( eptr->previous = foot))
-		root = eptr;
-	else	foot->next = eptr;
-	foot = eptr;
+	else if (!( dptr->previous = foot))
+		root = dptr;
+	else	foot->next = dptr;
+	foot = dptr;
 
-	if (!( eptr = occi_create_element( "occi.workload.description", "load balanced workload" ) ))
+	if (!( dptr = occi_create_element( "occi.workload.description", "load balanced workload" ) ))
 		return( 27 );
-	else if (!( eptr->previous = foot))
-		root = eptr;
-	else	foot->next = eptr;
-	foot = eptr;
+	else if (!( dptr->previous = foot))
+		root = dptr;
+	else	foot->next = dptr;
+	foot = dptr;
 
-	if (!( eptr = occi_create_element( "occi.workload.contract", contract )))
+	if (!( dptr = occi_create_element( "occi.workload.contract", eptr->contract )))
 		return( 27 );
-	else if (!( eptr->previous = foot))
-		root = eptr;
-	else	foot->next = eptr;
-	foot = eptr;
+	else if (!( dptr->previous = foot))
+		root = dptr;
+	else	foot->next = dptr;
+	foot = dptr;
 
 	now = time((long *) 0);
 	sprintf(value,"%u",now);
 
-	if (!( eptr = occi_create_element( "occi.workload.timestamp", value )))
+	if (!( dptr = occi_create_element( "occi.workload.timestamp", value )))
 		return( 27 );
-	else if (!( eptr->previous = foot))
-		root = eptr;
-	else	foot->next = eptr;
-	foot = eptr;
+	else if (!( dptr->previous = foot))
+		root = dptr;
+	else	foot->next = dptr;
+	foot = dptr;
 
 	sprintf(value,"%u",type);
 
-	if (!( eptr = occi_create_element( "occi.workload.nature", value )))
+	if (!( dptr = occi_create_element( "occi.workload.nature", value )))
 		return( 27 );
-	else if (!( eptr->previous = foot))
-		root = eptr;
-	else	foot->next = eptr;
-	foot = eptr;
+	else if (!( dptr->previous = foot))
+		root = dptr;
+	else	foot->next = dptr;
+	foot = dptr;
 
 	if (!( zptr = occi_simple_post( buffer, root, _CORDS_CONTRACT_AGENT, default_tls() )))
 	{
@@ -2122,10 +2156,19 @@ private	int	cool_operation( char * nptr )
 	else if (!( Elastic.security = allocate_string( eptr ) ))
 		return( 27 );
 
+
+	/* --------------------------------------------------- */
+	/* this defines the MINIMUM number of active contracts */
+	/* required at any one time for load balancing reasons */
+	/* --------------------------------------------------- */ 
 	if (!( eptr = getenv( "elastic_floor" ) ))
 		Elastic.floor = 1;
 	else	Elastic.floor = atoi(eptr);
 
+	/* --------------------------------------------------- */
+	/* this defines the MAXIMUM number of active contracts */
+	/* required at any one time for load balancing reasons */
+	/* --------------------------------------------------- */ 
 	if (!( eptr = getenv( "elastic_ceiling" ) ))
 		Elastic.ceiling = 1;
 	else	Elastic.ceiling = atoi(eptr);
@@ -2138,9 +2181,14 @@ private	int	cool_operation( char * nptr )
 		Elastic.lower = 2;
 	else	Elastic.lower = atoi(eptr);
 
+	/* --------------------------------------------------- */
+	/* this defines the elastic response strategry by HTTP */
+	/* redirection header as 0,301,302,303 or 307 response */
+	/* --------------------------------------------------- */ 
 	if (!( eptr = getenv( "elastic_strategy" ) ))
-		Elastic.strategy = 0;
-	else	Elastic.strategy = atoi(eptr);
+		Elastic.strategy = _HTTP_MOVED;
+	else if (!( Elastic.strategy = atoi(eptr) ))
+		Elastic.strategy = _HTTP_MOVED;
 
 	if (!( eptr = getenv( "elastic_unit" ) ))
 		Elastic.unit = 10;
@@ -2150,6 +2198,10 @@ private	int	cool_operation( char * nptr )
 		Elastic.period = 60;
 	else	Elastic.period = atoi(eptr);
 
+	/* --------------------------------------------------- */
+	/* this defines the contract that is to be the content */
+	/* for load balancing and will be duplicated to floor. */
+	/* --------------------------------------------------- */ 
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( cool_exit( 118, tptr ) );
 
