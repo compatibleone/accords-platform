@@ -1263,15 +1263,12 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* ----------------------------- */
 		if (!( eptr->contract = allocate_string( econtract ) ))
 			return( liberate_elastic_contract( eptr ) );
+		else if (!( start_elastic_contract( eptr ) ))
+			return( liberate_elastic_contract( eptr ) );
 		/* -------------------------------- */
 		/* add to list of elastic contracts */
 		/* -------------------------------- */
-		else if (!( use_elastic_contract( eptr, econtract )))
-			return( eptr );
-		else if (!( start_elastic_contract( eptr ) ))
-			return( liberate_elastic_contract( eptr ) );
-		else	return( eptr );
-		
+		else	return( use_elastic_contract( eptr, econtract ));
 	}
 }
 
@@ -1909,14 +1906,10 @@ private	int	cool_create_job( char * contract, char * nptr )
 	cool_log_message("cool_create_job",0);
 	cool_log_message( contract,0);
 
-	if ((status = cool_local_identity(buffer)) != 0)
-		return( status );
-	else	strcat( buffer,"/job/" );
-
-	/* sprintf(buffer,"%s/job/",Cool.identity); */
-
-	cool_log_message("cool_local_identity",0);
+	sprintf(buffer,"%s/job/",Cool.identity); 
+	cool_log_message("cool_job_identity",0);
 	cool_log_message( buffer,0);
+	sleep(5);
 
 	/* ---------------------------------------- */
 	/* wait for the occi server thread to start */
@@ -2022,14 +2015,8 @@ private	int	cool_create_workload( struct elastic_contract * eptr, int type )
 		return( 118 );
 
 	cool_log_message( eptr->contract,0);
-
-	if ((status = cool_local_identity(buffer)) != 0)
-		return( status );
-	else	strcat( buffer,"/workload/" );
-
-	/* sprintf(buffer,"%s/workload/",Cool.identity); */
-
-	cool_log_message("cool_local_identity",0);
+	sprintf(buffer,"%s/workload/",Cool.identity);
+	cool_log_message("cool_workload_identity",0);
 	cool_log_message( buffer,0);
 
 	if (!( dptr = occi_create_element( "occi.workload.name", "workload" ) ))
