@@ -1263,13 +1263,14 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* ----------------------------- */
 		if (!( eptr->contract = allocate_string( econtract ) ))
 			return( liberate_elastic_contract( eptr ) );
-		else if (!( start_elastic_contract( eptr ) ))
-			return( liberate_elastic_contract( eptr ) );
-
 		/* -------------------------------- */
 		/* add to list of elastic contracts */
 		/* -------------------------------- */
-		else	return( use_elastic_contract( eptr, econtract ) );	
+		else if (!( use_elastic_contract( eptr, econtract )))
+			return( eptr );
+		else if (!( start_elastic_contract( eptr ) ))
+			return( liberate_elastic_contract( eptr ) );
+		else	return( eptr );
 		
 	}
 }
@@ -1853,6 +1854,44 @@ private	int	cool_transpose_identity()
 	}
 }
 
+/*	---------------------------------------------	*/
+/*	    c o o l _ l o c a l _ i d e n t i t y	*/
+/*	---------------------------------------------	*/
+private	int	cool_local_identity(char * buffer)
+{
+	char *	ihost=(char *) 0;
+	struct	url *	uptr;
+	/* ----------------------------------------- */
+	/* transpose the port of the occi server url */
+	/* ----------------------------------------- */
+	if (!( uptr = analyse_url( Cool.identity )))
+		return( 30 );
+	else
+	{
+		if ( uptr->host )
+			uptr->host = liberate( uptr->host );
+
+		if (!( uptr->host = allocate_string( "127.0.0.1" ) ))
+		{
+			uptr = liberate_url( uptr );
+			return( 27 );
+		}
+
+		if (!( ihost = serialise_url( uptr,"" )))
+		{
+			uptr = liberate_url( uptr );
+			return( 31 );
+		}
+		else
+		{
+			strcpy(buffer,ihost);
+			ihost = liberate(ihost);
+			uptr = liberate_url( uptr );
+			return(0);
+		}
+	}
+}
+
 
 /*	-------------------------------------------	*/
 /*		c o o l _ c r e a t e _ j o b 		*/
@@ -1866,19 +1905,24 @@ private	int	cool_create_job( char * contract, char * nptr )
 	struct	occi_response * zptr;
 	char	value[64];
 	char *	ihost;
+	int	status;
 	cool_log_message("cool_create_job",0);
 	cool_log_message( contract,0);
 
-	sprintf(buffer,"%s/job/",Cool.identity);
+	if ((status = cool_local_identity(buffer)) != 0)
+		return( status );
+	else	strcat( buffer,"/job/" );
+
+	/* sprintf(buffer,"%s/job/",Cool.identity); */
+
+	cool_log_message("cool_local_identity",0);
+	cool_log_message( buffer,0);
 
 	/* ---------------------------------------- */
 	/* wait for the occi server thread to start */
 	/* ---------------------------------------- */
 	if (!( cool_test_occi( buffer ) ))
 		return( 132 );
-
-	cool_log_message( "identity job category",0);
-	cool_log_message( buffer,0);
 
 	/* ----------------------------------------- */
 	/* create the occi job category instance now */
@@ -1968,7 +2012,7 @@ private	int	cool_create_workload( struct elastic_contract * eptr, int type )
 	char *	ihost=(char *) 0;
 	char	value[64];
 	int	now;
-	struct	url *	uptr;
+	int	status;
 	
 	cool_log_message( "cool_create_workload",0);
 
@@ -1979,8 +2023,13 @@ private	int	cool_create_workload( struct elastic_contract * eptr, int type )
 
 	cool_log_message( eptr->contract,0);
 
-	sprintf(buffer,"%s/workload/",Cool.identity);
-	cool_log_message( "identity workload category",0);
+	if ((status = cool_local_identity(buffer)) != 0)
+		return( status );
+	else	strcat( buffer,"/workload/" );
+
+	/* sprintf(buffer,"%s/workload/",Cool.identity); */
+
+	cool_log_message("cool_local_identity",0);
 	cool_log_message( buffer,0);
 
 	if (!( dptr = occi_create_element( "occi.workload.name", "workload" ) ))

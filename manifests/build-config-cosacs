@@ -19,7 +19,7 @@ domain=occi
 verbose=0
 debug=0
 threads=1
-monitor=1
+monitor=3
 
 echo "<accords>" > $target
 echo "<"${module} >> $target
