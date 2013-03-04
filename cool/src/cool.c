@@ -1429,11 +1429,9 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* -------------------------------- */
 		/* add to list of elastic contracts */
 		/* -------------------------------- */
-		else if (!( use_elastic_contract( eptr, econtract )))
-			return( liberate_elastic_contract( eptr ) );
 		else if (!( start_elastic_contract( eptr ) ))
 			return( liberate_elastic_contract( eptr ) );
-		else	return( eptr );
+		else	return( use_elastic_contract( eptr, econtract ));
 	}
 }
 
