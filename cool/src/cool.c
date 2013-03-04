@@ -1023,6 +1023,8 @@ private	int	stop_elastic_contract( struct elastic_contract * eptr )
 
 	cool_log_message("start_elastic_contract",1);
 
+	eptr->isactive = 0;
+
 	if (!( yptr = cords_invoke_action( eptr->contract, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )))
 	{
 		cool_decrement_active();
@@ -1031,7 +1033,6 @@ private	int	stop_elastic_contract( struct elastic_contract * eptr )
 	else
 	{
 		yptr = occi_remove_response( yptr );
-		eptr->isactive = 0;
 
 		if ( eptr->hostname ) 
 			eptr->hostname = liberate( eptr->hostname );
