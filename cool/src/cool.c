@@ -1098,6 +1098,169 @@ private	int	start_elastic_contract( struct elastic_contract * eptr )
 	}
 }
 
+/*	-------------------------------------------------	*/
+/*	   c o o l _ e l a s t i c _ c o n d i t i o n		*/
+/*	-------------------------------------------------	*/
+private	int	cool_elastic_condition(
+		struct cords_placement_criteria * placement,
+		char * nptr, char * vptr )
+{
+	if ((!( strcmp( nptr, "occi.elastic.floor" ) ))
+	||  (!( strcmp( nptr, "occi.job.floor" ) )))
+		Elastic.floor = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.ceiling" ) ))
+	||  (!( strcmp( nptr, "occi.job.ceiling" ) )))
+		Elastic.ceiling = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.strategy" ) ))
+	||  (!( strcmp( nptr, "occi.job.strategy" ) )))
+		Elastic.strategy = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.upper" ) ))
+	||  (!( strcmp( nptr, "occi.job.upper" ) )))
+		Elastic.upper = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.lower" ) ))
+	||  (!( strcmp( nptr, "occi.job.lower" ) )))
+		Elastic.lower = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.unit" ) ))
+	||  (!( strcmp( nptr, "occi.job.unit" ) )))
+		Elastic.unit = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.period" ) ))
+	||  (!( strcmp( nptr, "occi.job.period" ) )))
+		Elastic.period = atoi( vptr );
+
+	return( 0 );
+}
+
+
+
+/*	-------------------------------------------------	*/
+/*	  c o o l _ a n a l y s e _ c o n d i t i o n s		*/
+/*	-------------------------------------------------	*/
+/* 	this function retrieves placement conditions from	*/
+/*	the sla terms defined conditions block.			*/
+/*	-------------------------------------------------	*/
+private	int	cool_analyse_conditions( 
+		char * host,
+		char * termsid,
+		struct occi_response * zptr,
+		struct cords_placement_criteria * placement,
+		char * agent, char * tls )
+{
+	struct	occi_element * eptr;
+	struct	occi_element * fptr;
+	char *	id;
+	char *	vid;
+	char *	vptr;
+	char *	nptr;
+	struct	occi_response * aptr;
+	struct	occi_response * bptr;
+	int	status=0;
+
+	if (!( zptr )) 	
+		return(0);
+
+	/* ------------------------------------------------------- */
+	/* for all "term" elements attached to the "terms" section */
+	/* ------------------------------------------------------- */
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( aptr = occi_simple_get( id, agent, tls ) ))
+			return( 908 );
+		else
+		{
+			/* ---------------------------------------------------------- */
+			/* for all "variable" elements attached to the "term" section */
+			/* ---------------------------------------------------------- */
+			for (	fptr=cords_first_link( aptr );
+				fptr != (struct occi_element *) 0;
+				fptr = fptr->next )
+			{
+				if (!( fptr->value ))
+					continue;
+				else if (!( vid =  occi_unquoted_link( fptr->value ) ))
+					continue;
+				else if (!( bptr = occi_simple_get( vid, agent, tls ) ))
+					return( 908 );
+				else
+				{
+					/* --------------------------------------------------- */
+					/* extract name and values and set the criteria fields */
+					/* --------------------------------------------------- */
+					if (( nptr = occi_extract_atribut( bptr, Cool.domain, _CORDS_VARIABLE, _CORDS_PROPERTY )) != (char *) 0)
+					{
+						if (( vptr = occi_extract_atribut( bptr, Cool.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
+						{
+							cool_elastic_condition(placement, nptr, vptr );
+						}
+					}
+					bptr = occi_remove_response( bptr );
+					vid = liberate( vid );
+				}
+			}
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+		}
+	}
+	return( 0 );
+}
+
+
+/*	-------------------------------------------------	*/
+/*	 c o o l _ r e t r i e v e _ c o n d i t i o n s	*/
+/*	-------------------------------------------------	*/
+/* 	this function retrieves placement conditions from	*/
+/*	the sla terms defined conditions block.			*/
+/*	-------------------------------------------------	*/
+private	int	cool_retrieve_conditions( 
+		char * host,
+		char * slaid, 
+		struct occi_response * zptr,
+		struct cords_placement_criteria * placement,
+		struct cords_guarantee_criteria * warranty,
+		char * agent, char * tls )
+{
+	struct	occi_element * eptr;
+	char *	id;
+	char *	vptr;
+	struct	occi_response * aptr;
+	int	status=0;
+
+	if (!( zptr )) 	
+		return(0);
+
+	/* -------------------------------------------- */
+	/* for all "terms" attached to the sla instance */
+	/* -------------------------------------------- */
+	for (	eptr=cords_first_link( zptr );
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next )
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( id =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		/* ------------------------- */
+		/* retrieve the terms record */
+		/* ------------------------- */
+		else if (!( aptr = occi_simple_get( id, agent, tls ) ))
+			return( 908 );
+		else if (( vptr = occi_extract_atribut( aptr, Cool.domain, _CORDS_TERMS, _CORDS_TYPE )) != (char *) 0)
+		{
+			if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
+				status = cool_analyse_conditions( host, id, aptr, placement, agent, tls );
+			aptr = occi_remove_response( aptr );
+			id = liberate( id );
+			continue;
+		}
+	}
+	return( 0 );
+}
+
 /*	---------------------------------------------	*/
 /*	o c c i _ e l a s t i c _ c o n d i t i o n s	*/
 /*	---------------------------------------------	*/
@@ -1112,7 +1275,7 @@ private	struct elastic_contract * occi_elastic_conditions(
 		return( eptr );
 	else if (!( zptr = occi_simple_get( sla, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return( liberate_elastic_contract( eptr ) );
-	else if (!( cords_retrieve_conditions( sla, sla, zptr, selector, warranty, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (!( cool_retrieve_conditions( sla, sla, zptr, selector, warranty, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 	{
 		zptr = occi_remove_response( zptr );
 		return( eptr );
@@ -1263,12 +1426,14 @@ private	struct elastic_contract * new_elastic_contract( struct elastic_contract 
 		/* ----------------------------- */
 		if (!( eptr->contract = allocate_string( econtract ) ))
 			return( liberate_elastic_contract( eptr ) );
-		else if (!( start_elastic_contract( eptr ) ))
-			return( liberate_elastic_contract( eptr ) );
 		/* -------------------------------- */
 		/* add to list of elastic contracts */
 		/* -------------------------------- */
-		else	return( use_elastic_contract( eptr, econtract ));
+		else if (!( use_elastic_contract( eptr, econtract )))
+			return( liberate_elastic_contract( eptr ) );
+		else if (!( start_elastic_contract( eptr ) ))
+			return( liberate_elastic_contract( eptr ) );
+		else	return( eptr );
 	}
 }
 
