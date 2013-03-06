@@ -145,6 +145,8 @@ private void autoload_easiclouds_server_nodes() {
 				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
 				pptr->configuration = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "metadatas" )) != (struct xml_atribut *) 0)
 				pptr->metadatas = document_atribut_value(aptr);
 			}
@@ -189,6 +191,9 @@ public  void autosave_easiclouds_server_nodes() {
 		fprintf(h," configuration=%c",0x0022);
 		fprintf(h,"%s",(pptr->configuration?pptr->configuration:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," metadatas=%c",0x0022);
 		fprintf(h,"%u",pptr->metadatas);
 		fprintf(h,"%c",0x0022);
@@ -223,6 +228,8 @@ private void set_easiclouds_server_field(
 			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
 			pptr->configuration = allocate_string(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "metadatas" ) ))
 			pptr->metadatas = atoi(vptr);
 		}
@@ -285,6 +292,13 @@ private int pass_easiclouds_server_filter(
 		else if ( strcmp(pptr->configuration,fptr->configuration) != 0)
 			return(0);
 		}
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
+			return(0);
+		else if ( strcmp(pptr->description,fptr->description) != 0)
+			return(0);
+		}
 	if (( fptr->metadatas ) && ( pptr->metadatas != fptr->metadatas )) return(0);
 	return(1);
 }
@@ -314,6 +328,9 @@ private struct rest_response * easiclouds_server_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.configuration=%c%s%c",optr->domain,optr->id,0x0022,pptr->configuration,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.metadatas=%c%u%c",optr->domain,optr->id,0x0022,pptr->metadatas,0x0022);
@@ -750,6 +767,8 @@ public struct occi_category * occi_easiclouds_server_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "configuration",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "metadatas",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_easiclouds_server)))
@@ -834,6 +853,17 @@ public struct rest_header *  easiclouds_server_occi_headers(struct easiclouds_se
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.easiclouds_server.configuration='%s'\r\n",(sptr->configuration?sptr->configuration:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.easiclouds_server.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

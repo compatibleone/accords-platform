@@ -41,6 +41,8 @@ public struct easiclouds_server * liberate_easiclouds_server(struct easiclouds_s
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->configuration )
 			 sptr->configuration = liberate(sptr->configuration);
+		if ( sptr->description )
+			 sptr->description = liberate(sptr->description);
 		sptr = liberate( sptr );
 	}
 	return((struct easiclouds_server *) 0);
@@ -60,6 +62,7 @@ public struct easiclouds_server * reset_easiclouds_server(struct easiclouds_serv
 		sptr->imager = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->configuration = (char*) 0;
+		sptr->description = (char*) 0;
 		sptr->metadatas =  0;
 	}
 	return(sptr);
@@ -111,6 +114,10 @@ public int xmlin_easiclouds_server(struct easiclouds_server * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->configuration = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"description") ))
+		{
+			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"metadatas") ))
 		{
 			if ( wptr->value ) { sptr->metadatas = atoi(wptr->value); }
@@ -135,6 +142,7 @@ public int rest_occi_easiclouds_server(FILE * fh,struct easiclouds_server * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.imager='%s'\r\n",prefix,nptr,(sptr->imager?sptr->imager:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.metadatas='%u'\r\n",prefix,nptr,sptr->metadatas);
 	return(0);
 

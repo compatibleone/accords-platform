@@ -9,6 +9,7 @@
 		char 	*	imager;
 		char 	*	flavor;
 		char 	*	configuration;
+		char 	*	description;
 		int		metadatas;
 	};
 	#endif
