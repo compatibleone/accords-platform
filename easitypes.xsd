@@ -60,6 +60,14 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
+	<xsd:complexType name="easiclouds_metadata">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="label" type="xsd:string"/>
+		<xsd:attribute name="value" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
 	<xsd:complexType name="easiclouds_model">
 		<xsd:sequence>
 			<xsd:element name="easiclouds_input" type="easiclouds_node" minOccurs="0" maxOccurs="1"/>
@@ -110,12 +118,12 @@
 
 	<xsd:complexType name="easiclouds_server">
 		<xsd:sequence>
-			<xsd:element name="easiclouds_metadata" type="easiclouds_description" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="easiclouds_metadata" type="easiclouds_metadata" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
-		<xsd:attribute name="imager" type="xsd:string"/>	
+		<xsd:attribute name="image" type="xsd:string"/>	
 		<xsd:attribute name="flavor" type="xsd:string"/>
 		<xsd:attribute name="configuration" type="xsd:string"/>
 		<xsd:attribute name="metadatas" type="xsd:integer"/>

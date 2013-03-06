@@ -56,6 +56,7 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "easiclouds_application.c"
 #include "easiclouds_connection.c"
 #include "easiclouds_description.c"
+#include "easiclouds_metadata.c"
 #include "easiclouds_extra.c"
 #include "easiclouds_instance.c"
 #include "easiclouds_keypair.c"
@@ -69,6 +70,7 @@ public	int	failure( int e, char * m1, char * m2 )
 #include "occieasiclouds_application.c"
 #include "occieasiclouds_connection.c"
 #include "occieasiclouds_description.c"
+#include "occieasiclouds_metadata.c"
 #include "occieasiclouds_extra.c"
 #include "occieasiclouds_instance.c"
 #include "occieasiclouds_keypair.c"
@@ -241,6 +243,13 @@ private	int	coeasy_operation( char * nptr )
 	last = optr;
 
 	if (!( optr = occi_easiclouds_postconf_builder( CoEasy.domain, "easiclouds_postconf" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_easiclouds_metadata_builder( CoEasy.domain, "easiclouds_metadata" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

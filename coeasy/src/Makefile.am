@@ -11,6 +11,7 @@ bin_PROGRAMS = coeasy
 EXTRA_DIST = easiclouds_application.c \
 easiclouds_connection.c \
 easiclouds_description.c \
+easiclouds_metadata.c \
 easiclouds_extra.c \
 easiclouds_instance.c \
 easiclouds_keypair.c \
@@ -23,6 +24,7 @@ easiclouds_server.c \
 occieasiclouds_application.c \
 occieasiclouds_connection.c \
 occieasiclouds_description.c \
+occieasiclouds_metadata.c \
 occieasiclouds_extra.c \
 occieasiclouds_instance.c \
 occieasiclouds_keypair.c \

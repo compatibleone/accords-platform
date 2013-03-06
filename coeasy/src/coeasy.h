@@ -4,6 +4,7 @@
 #include "easiclouds_application.h"
 #include "easiclouds_connection.h"
 #include "easiclouds_description.h"
+#include "easiclouds_metadata.h"
 #include "easiclouds_extra.h"
 #include "easiclouds_instance.h"
 #include "easiclouds_keypair.h"
