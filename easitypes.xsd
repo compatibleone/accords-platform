@@ -31,6 +31,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="easiclouds_extra">
+		<xsd:sequence>
+			<xsd:element name="easiclouds_keypair" type="easiclouds_keypair" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
