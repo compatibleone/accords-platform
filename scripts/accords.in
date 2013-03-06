@@ -160,6 +160,7 @@ _co_platform() {
     _co_run_serv coips "accords image production services"
     _co_run_serv slam "accords sla services"
     _co_run_serv copaas "accords paas services"
+    _co_run_serv coeasy "accords easiclouds services"
     _co_run_serv conagios "accords nagios services"
     _co_run_serv parser "accords parser services"
     _co_run_serv broker "accords broker services"
@@ -348,7 +349,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas|coeasy)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -368,6 +369,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep cosacs || true
 	lsof -i | grep LISTEN | grep slam || true
 	lsof -i | grep LISTEN | grep copaas || true
+	lsof -i | grep LISTEN | grep coeasy || true
     else
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
@@ -392,6 +394,7 @@ _co_stop() {
     _stop_service broker
     _stop_service parser
     _stop_service copaas
+    _stop_service coeasy
     _stop_service conagios
     _stop_service ezvm
     _stop_service coips
@@ -493,6 +496,10 @@ _run_copaas() {
     copaas --config $target CO-PAAS/1.0
 }
 
+_run_coeasy() {
+    coeasy --config $target CO-EASY/1.0
+}
+
 _run_conagios() {
     conagios --config $target CO-NAGIOS/1.0
 }
@@ -559,6 +566,7 @@ _make_security_files() {
 	_mksecs eziprocci 1
 	_mksecs slam 1
 	_mksecs copaas 1
+	_mksecs coeasy 1
 	_mksecs conagios 1
 	_mksecs paasprocci 1
 	_mksecs command
@@ -645,6 +653,7 @@ _accords_config() {
 		_mkcert eziprocci
 		_mkcert slam
 		_mkcert copaas
+		_mkcert coeasy
 		_mkcert conagios
 		_mkcert paasprocci
 		_mkcert cosacs
@@ -697,6 +706,7 @@ _accords_config() {
     _mkcfg cosched
     _mkcfg slam
     _mkcfg copaas
+    _mkcfg coeasy
     _mkcfg conagios
     _mkpro paasprocci
     _mkpro cnprocci
@@ -1168,6 +1178,9 @@ case `basename $0` in
 	;;
     run-copaas)
 	_run_copaas $*
+	;;
+    run-coeasy)
+	_run_coeasy $*
 	;;
     run-conagios)
 	_run_conagios $*

@@ -125,6 +125,9 @@ endif
 if ENABLE_EZIPROCCI
 SUBDIRS += eziprocci
 endif
+if ENABLE_COEASY
+SUBDIRS += coeasy
+endif
 if ENABLE_DCPROCCI
 SUBDIRS += dcprocci
 endif
