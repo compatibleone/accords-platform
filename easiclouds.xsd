@@ -1,0 +1,20 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			EasiClouds Resource and Request Description Schema Version 1.01
+			Provisionary Version 6th March 2013
+			Enforced by the ACCORDS Parser
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/easitypes.xsd"/>
+
+	<xsd:element name="easiclouds_application" type="easiclouds_application"/>
+
+</xsd:schema>
+
+
+
+
+
