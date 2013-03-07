@@ -38,6 +38,7 @@ public	struct	rest_response * start_easiclouds(
 		void * vptr )
 {
 	struct	cords_contract * pptr;
+	rest_log_message("start_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -60,6 +61,7 @@ public	struct	rest_response * save_easiclouds(
 		void * vptr )
 {
 	struct	cords_contract * pptr;
+	rest_log_message("save_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -82,6 +84,7 @@ public	struct	rest_response * stop_easiclouds(
 		void * vptr )
 {
 	struct	cords_contract * pptr;
+	rest_log_message("stop_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -103,6 +106,7 @@ public	int	create_easiclouds_contract(
 	/* ----------------------------------- */
 	/* add code here for contract creation */
 	/* ----------------------------------- */
+	rest_log_message("create_easiclouds_contract");
 	return(0);
 }
 
@@ -116,6 +120,7 @@ public	int	delete_easiclouds_contract(
 	/* ----------------------------------- */
 	/* add code here for contract deletion */
 	/* ----------------------------------- */
+	rest_log_message("delete_easiclouds_contract");
 	return(0);
 }
 
