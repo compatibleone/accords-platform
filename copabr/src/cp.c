@@ -1744,6 +1744,7 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	xml_atribut * bptr;
 	char 		    * nodetype="simple";
 
 	/* ----------------------------------------------------------------------- */
@@ -1759,6 +1760,19 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 			return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
 		else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
 			return(cords_append_error(dptr,status,_CORDS_PROFILE));
+	}
+	else if ((bptr = document_atribut( dptr, _CORDS_CATEGORY )) != (struct xml_atribut *) 0) 
+	{
+		/* --------------------------------------------------------------------- */
+		/* here we have an abstract contract and need to keep the provider stuff */
+		/* --------------------------------------------------------------------- */
+		if (( bptr->value ) && ( strcmp( bptr->value, _CORDS_MANIFEST ) != 0 ))
+		{
+			if ((status = cords_instance_identifier( dptr, _CORDS_PROVIDER )) != 0)
+				return(cords_append_error(dptr,status,_CORDS_PROVIDER ));
+			else if ((status = cords_instance_identifier( dptr, _CORDS_PROFILE )) != 0)
+				return(cords_append_error(dptr,status,_CORDS_PROFILE));
+		}
 	}
 
 	/* ------------------------------ */
