@@ -301,7 +301,7 @@ private	struct	rest_response * start_contract(
 			/* extension category type defined contract */
 			/* ---------------------------------------- */
 			else if (( rest_valid_string( pptr->category ) != 0)
-			     && (!( strcmp( pptr->category, _CORDS_MANIFEST ) )))
+			     &&  ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0))
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
 				contract_instructions( pptr, fullid, pptr->provider );
@@ -654,7 +654,7 @@ private	struct	rest_response * stop_contract(
 				else	zptr = occi_remove_response ( zptr );
 			}
 			else if (( rest_valid_string( pptr->category ) != 0)
-			     && (!( strcmp( pptr->category, _CORDS_MANIFEST ) )))
+			     && ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0 ))
 			{
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_STOP, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -754,7 +754,7 @@ private	struct	rest_response * save_contract(
 				retrieve_provider_information( pptr );
 			}
 			else if (( rest_valid_string( pptr->category ) != 0)
-			     && (!( strcmp( pptr->category, _CORDS_MANIFEST ) )))
+			     && ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0))
 			{
 				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SAVE, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
@@ -832,7 +832,7 @@ private	struct	rest_response * snapshot_contract(
 				else	zptr = occi_remove_response ( zptr );
 			}
 			else if (( rest_valid_string( pptr->category ) != 0)
-			     && (!( strcmp( pptr->category, _CORDS_MANIFEST ) )))
+			     && (  strcmp( pptr->category, _CORDS_MANIFEST ) != 0 ))
 			{
 				if (!( zptr = cords_invoke_action( pptr->provider, _CORDS_SNAPSHOT, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))

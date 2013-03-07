@@ -86,9 +86,9 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	this function loads easiclouds configuration			*/
 /*	from the xml configuration file.				*/
 	/*	---------------------------------------------------------------	*/  
-private	void	easiclouds_configuration()
+private	void	eziprocci_configuration()
 {
-	load_accords_configuration( &Configuration, "easiclouds" );
+	load_accords_configuration( &Configuration, "eziprocci" );
 	return;
 }
 
@@ -98,7 +98,7 @@ private	void	easiclouds_configuration()
 /*	this function will be called to display module identification 	*/
 /*	when launched from the command line without any parameters.	*/
 /*	---------------------------------------------------------------	*/  
-private	int	easiclouds_banner()
+private	int	eziprocci_banner()
 {
 	printf("\n   CompatibleOne EasiClouds Procci : Version 1.0a.0.01");
 	printf("\n   Beta Version : 28/02/2013 ");
@@ -114,7 +114,7 @@ private	int	easiclouds_banner()
 /*	e a s i c l o u d s_ i n i t i a l i s e		*/
 /*	------------------------------------------- */
 
-private	struct rest_server * easiclouds_initialise(  void * v,struct rest_server * sptr )
+private	struct rest_server * eziprocci_initialise(  void * v,struct rest_server * sptr )
 {
 	struct	rest_extension * xptr;
 	if (!( xptr = rest_add_extension( sptr ) ))
@@ -129,7 +129,7 @@ private	struct rest_server * easiclouds_initialise(  void * v,struct rest_server
 /*	-------------------------------------------	*/
 /*	e a s i c l o u d s_ a u t h o r i s e 		*/
 /*	------------------------------------------- 	*/
-private	int	easiclouds_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
+private	int	eziprocci_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
 	if ( strcmp( username, Configuration.user ) )
 		return(0);
@@ -145,7 +145,7 @@ private	int	easiclouds_authorise(  void * v,struct rest_client * cptr, char * us
 /*	------------------------------------------- */
 /*	e a s i c l o u d s_ e x t e n s i o n 		*/
 /*	-------------------------------------------	*/
-private	struct rest_extension * easiclouds_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
+private	struct rest_extension * eziprocci_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
 	return( xptr );
 }
@@ -223,7 +223,7 @@ private	struct	occi_interface	easiclouds_interface = {
 /*	--------------------------------------------	*/
 /*	environment and category preparation		*/
 /*	--------------------------------------------	*/
-private	int	easiclouds_operation( char * nptr )
+private	int	eziprocci_operation( char * nptr )
 {
 
 	struct	occi_category * first=(struct occi_category *) 0;
@@ -304,12 +304,12 @@ private	int	easiclouds_operation( char * nptr )
 /*	------------------------------------------- */
 /*	Command line option analysis			*/
 /*	------------------------------------------- */
-private	int	easiclouds_options(int argc, char * argv[] )
+private	int	eziprocci_options(int argc, char * argv[] )
 {
 	int	status=0;
 	int	argi=0;
 	char *	aptr;
-	easiclouds_configuration();
+	eziprocci_configuration();
 	while ( argi < argc )
 	{
 		if (!( aptr = argv[++argi] ))
@@ -333,7 +333,7 @@ private	int	easiclouds_options(int argc, char * argv[] )
 			status = 30;
 			break;
 		}
-		else if (!( status = easiclouds_operation(aptr) ))
+		else if (!( status = eziprocci_operation(aptr) ))
 			continue;
 		else	break;
 	}
@@ -348,8 +348,8 @@ private	int	easiclouds_options(int argc, char * argv[] )
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
-		return( easiclouds_banner() );
-	else	return( easiclouds_options( argc, argv ) );
+		return( eziprocci_banner() );
+	else	return( eziprocci_options( argc, argv ) );
 }
 
 	/* ---------- */
