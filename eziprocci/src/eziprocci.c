@@ -29,8 +29,9 @@
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
-#include "eziclient.h"
 #include "eziconfig.h"
+#include "eziclient.h"
+#include "eziclient.c"
 #include "eziconfig.c"
 #include "occieziconfig.c"
 #include "easiclouds.h"

@@ -1,20 +1,25 @@
-#ifndef	_eziconfig_h
-#define	_eziconfig_h
-
+#ifndef	_ezi_config_h
+#define	_ezi_config_h
 
 struct	ezi_config
 {
 	char	*	id;
 	char	*	name;
-	char 	*	host;
-	char 	*	tenent;
+	char 	*	description;
 	char	*	user;
 	char	*	password;
+	char	*	authenticate;
+	char	*	agent;
+	char 	*	host;
 	char	*	version;
-	char 	*	tls;
+	char 	*	namespace;
 	char	*	base;
+	char 	*	tls;
+	int		current;
 	int	state;
-
 };
 
 #endif
+
+
+

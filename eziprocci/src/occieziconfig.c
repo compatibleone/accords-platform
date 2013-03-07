@@ -137,20 +137,28 @@ private void autoload_ezi_config_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
-				pptr->host = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "tenent" )) != (struct xml_atribut *) 0)
-				pptr->tenent = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
+				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "user" )) != (struct xml_atribut *) 0)
 				pptr->user = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "password" )) != (struct xml_atribut *) 0)
 				pptr->password = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "authenticate" )) != (struct xml_atribut *) 0)
+				pptr->authenticate = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
+				pptr->host = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "version" )) != (struct xml_atribut *) 0)
 				pptr->version = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
-				pptr->tls = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "namespace" )) != (struct xml_atribut *) 0)
+				pptr->namespace = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "base" )) != (struct xml_atribut *) 0)
 				pptr->base = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
+				pptr->tls = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "current" )) != (struct xml_atribut *) 0)
+				pptr->current = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -183,11 +191,8 @@ public  void autosave_ezi_config_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," host=%c",0x0022);
-		fprintf(h,"%s",(pptr->host?pptr->host:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," tenent=%c",0x0022);
-		fprintf(h,"%s",(pptr->tenent?pptr->tenent:""));
+		fprintf(h," description=%c",0x0022);
+		fprintf(h,"%s",(pptr->description?pptr->description:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," user=%c",0x0022);
 		fprintf(h,"%s",(pptr->user?pptr->user:""));
@@ -195,14 +200,29 @@ public  void autosave_ezi_config_nodes() {
 		fprintf(h," password=%c",0x0022);
 		fprintf(h,"%s",(pptr->password?pptr->password:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," authenticate=%c",0x0022);
+		fprintf(h,"%s",(pptr->authenticate?pptr->authenticate:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," host=%c",0x0022);
+		fprintf(h,"%s",(pptr->host?pptr->host:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," version=%c",0x0022);
 		fprintf(h,"%s",(pptr->version?pptr->version:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," namespace=%c",0x0022);
+		fprintf(h,"%s",(pptr->namespace?pptr->namespace:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," base=%c",0x0022);
+		fprintf(h,"%s",(pptr->base?pptr->base:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," tls=%c",0x0022);
 		fprintf(h,"%s",(pptr->tls?pptr->tls:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," base=%c",0x0022);
-		fprintf(h,"%s",(pptr->base?pptr->base:""));
+		fprintf(h," current=%c",0x0022);
+		fprintf(h,"%u",pptr->current);
 		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
@@ -230,20 +250,28 @@ private void set_ezi_config_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
-		if (!( strcmp( nptr, "host" ) ))
-			pptr->host = allocate_string(vptr);
-		if (!( strcmp( nptr, "tenent" ) ))
-			pptr->tenent = allocate_string(vptr);
+		if (!( strcmp( nptr, "description" ) ))
+			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "user" ) ))
 			pptr->user = allocate_string(vptr);
 		if (!( strcmp( nptr, "password" ) ))
 			pptr->password = allocate_string(vptr);
+		if (!( strcmp( nptr, "authenticate" ) ))
+			pptr->authenticate = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
+		if (!( strcmp( nptr, "host" ) ))
+			pptr->host = allocate_string(vptr);
 		if (!( strcmp( nptr, "version" ) ))
 			pptr->version = allocate_string(vptr);
-		if (!( strcmp( nptr, "tls" ) ))
-			pptr->tls = allocate_string(vptr);
+		if (!( strcmp( nptr, "namespace" ) ))
+			pptr->namespace = allocate_string(vptr);
 		if (!( strcmp( nptr, "base" ) ))
 			pptr->base = allocate_string(vptr);
+		if (!( strcmp( nptr, "tls" ) ))
+			pptr->tls = allocate_string(vptr);
+		if (!( strcmp( nptr, "current" ) ))
+			pptr->current = atoi(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -284,18 +312,11 @@ private int pass_ezi_config_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
-	if (( fptr->host )
-	&&  (strlen( fptr->host ) != 0)) {
-		if (!( pptr->host ))
+	if (( fptr->description )
+	&&  (strlen( fptr->description ) != 0)) {
+		if (!( pptr->description ))
 			return(0);
-		else if ( strcmp(pptr->host,fptr->host) != 0)
-			return(0);
-		}
-	if (( fptr->tenent )
-	&&  (strlen( fptr->tenent ) != 0)) {
-		if (!( pptr->tenent ))
-			return(0);
-		else if ( strcmp(pptr->tenent,fptr->tenent) != 0)
+		else if ( strcmp(pptr->description,fptr->description) != 0)
 			return(0);
 		}
 	if (( fptr->user )
@@ -312,6 +333,27 @@ private int pass_ezi_config_filter(
 		else if ( strcmp(pptr->password,fptr->password) != 0)
 			return(0);
 		}
+	if (( fptr->authenticate )
+	&&  (strlen( fptr->authenticate ) != 0)) {
+		if (!( pptr->authenticate ))
+			return(0);
+		else if ( strcmp(pptr->authenticate,fptr->authenticate) != 0)
+			return(0);
+		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
+	if (( fptr->host )
+	&&  (strlen( fptr->host ) != 0)) {
+		if (!( pptr->host ))
+			return(0);
+		else if ( strcmp(pptr->host,fptr->host) != 0)
+			return(0);
+		}
 	if (( fptr->version )
 	&&  (strlen( fptr->version ) != 0)) {
 		if (!( pptr->version ))
@@ -319,11 +361,11 @@ private int pass_ezi_config_filter(
 		else if ( strcmp(pptr->version,fptr->version) != 0)
 			return(0);
 		}
-	if (( fptr->tls )
-	&&  (strlen( fptr->tls ) != 0)) {
-		if (!( pptr->tls ))
+	if (( fptr->namespace )
+	&&  (strlen( fptr->namespace ) != 0)) {
+		if (!( pptr->namespace ))
 			return(0);
-		else if ( strcmp(pptr->tls,fptr->tls) != 0)
+		else if ( strcmp(pptr->namespace,fptr->namespace) != 0)
 			return(0);
 		}
 	if (( fptr->base )
@@ -333,6 +375,14 @@ private int pass_ezi_config_filter(
 		else if ( strcmp(pptr->base,fptr->base) != 0)
 			return(0);
 		}
+	if (( fptr->tls )
+	&&  (strlen( fptr->tls ) != 0)) {
+		if (!( pptr->tls ))
+			return(0);
+		else if ( strcmp(pptr->tls,fptr->tls) != 0)
+			return(0);
+		}
+	if (( fptr->current ) && ( pptr->current != fptr->current )) return(0);
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -352,10 +402,7 @@ private struct rest_response * ezi_config_occi_response(
 	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.host=%c%s%c",optr->domain,optr->id,0x0022,pptr->host,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.tenent=%c%s%c",optr->domain,optr->id,0x0022,pptr->tenent,0x0022);
+	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.user=%c%s%c",optr->domain,optr->id,0x0022,pptr->user,0x0022);
@@ -364,13 +411,28 @@ private struct rest_response * ezi_config_occi_response(
 	sprintf(cptr->buffer,"%s.%s.password=%c%s%c",optr->domain,optr->id,0x0022,pptr->password,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.authenticate=%c%s%c",optr->domain,optr->id,0x0022,pptr->authenticate,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%c%s%c",optr->domain,optr->id,0x0022,pptr->agent,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.host=%c%s%c",optr->domain,optr->id,0x0022,pptr->host,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.version=%c%s%c",optr->domain,optr->id,0x0022,pptr->version,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.namespace=%c%s%c",optr->domain,optr->id,0x0022,pptr->namespace,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.base=%c%s%c",optr->domain,optr->id,0x0022,pptr->base,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.tls=%c%s%c",optr->domain,optr->id,0x0022,pptr->tls,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.base=%c%s%c",optr->domain,optr->id,0x0022,pptr->base,0x0022);
+	sprintf(cptr->buffer,"%s.%s.current=%c%u%c",optr->domain,optr->id,0x0022,pptr->current,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -799,19 +861,27 @@ public struct occi_category * occi_ezi_config_builder(char * a,char * b) {
 		redirect_occi_ezi_config_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "host",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "tenent",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "user",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "password",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "authenticate",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "host",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "version",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "namespace",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "base",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "tls",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "base",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "current",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
@@ -863,18 +933,7 @@ public struct rest_header *  ezi_config_occi_headers(struct ezi_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.ezi_config.host='%s'\r\n",(sptr->host?sptr->host:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.ezi_config.tenent='%s'\r\n",(sptr->tenent?sptr->tenent:""));
+	sprintf(buffer,"occi.ezi_config.description='%s'\r\n",(sptr->description?sptr->description:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -907,7 +966,62 @@ public struct rest_header *  ezi_config_occi_headers(struct ezi_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
+	sprintf(buffer,"occi.ezi_config.authenticate='%s'\r\n",(sptr->authenticate?sptr->authenticate:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.ezi_config.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.ezi_config.host='%s'\r\n",(sptr->host?sptr->host:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
 	sprintf(buffer,"occi.ezi_config.version='%s'\r\n",(sptr->version?sptr->version:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.ezi_config.namespace='%s'\r\n",(sptr->namespace?sptr->namespace:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.ezi_config.base='%s'\r\n",(sptr->base?sptr->base:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -929,7 +1043,7 @@ public struct rest_header *  ezi_config_occi_headers(struct ezi_config * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.ezi_config.base='%s'\r\n",(sptr->base?sptr->base:""));
+	sprintf(buffer,"occi.ezi_config.current='%u'\r\n",sptr->current);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
