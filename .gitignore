@@ -12,6 +12,7 @@ build-stamp
 cnprocci/Makefile.in
 cnprocci/src/Makefile.in
 cnprocci/src/cnprocci
+coeasy/src/coeasy
 coees/src/coees
 coes/Makefile.in
 coes/src/coes
@@ -49,6 +50,7 @@ debian/compatibleone-accords-dev/
 debian/compatibleone-accords-testsuite/
 debian/compatibleone-azprocci/
 debian/compatibleone-broker/
+debian/compatibleone-coeasy/
 debian/compatibleone-coees/
 debian/compatibleone-coips/
 debian/compatibleone-comons/

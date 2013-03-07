@@ -370,6 +370,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - EasyClouds Procci subsystem
  CompatibleOne Accords Platform - EasyClouds Procci subsystem package
 
+Package: compatibleone-coeasy
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+Description: CompatibleOne Accords Platform - EasyClouds subsystem
+ CompatibleOne Accords Platform - EasyClouds subsystem package
+
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
