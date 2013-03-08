@@ -26,6 +26,61 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occibuilder.h"
+#include "cordslang.h"
+#include "cb.h"
+
+struct	cords_vector
+{
+	char *	id;
+	struct occi_response * message;
+};
+
+struct	cords_easy_contract
+{
+	struct	cords_vector	node;
+	struct	cords_vector	manifest;
+	struct	cords_vector	application;
+};
+
+/* ---------------------------------------------------------------------------- */
+/* 		r e s o l v e _ e z i  _ c o n f i g u r a t i o n		*/
+/* ---------------------------------------------------------------------------- */
+private	struct	ezi_config * resolve_ezi_configuration( char * sptr )
+{
+	struct	occi_kind_node * nptr;
+	struct	ezi_config * pptr=(struct ezi_config *) 0;
+	struct	occi_kind_node  * occi_first_ezi_config_node();
+	rest_log_message("resolve_ezi_configuration");
+	rest_log_message( sptr );
+	for (	nptr = occi_first_ezi_config_node();
+		nptr != (struct occi_kind_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( pptr = nptr->contents ))
+			continue;
+		else if (!( pptr->name ))
+			continue;
+		else if (!( strcmp( pptr->name, sptr ) ))
+			return( pptr );
+	}
+	return((struct ezi_config *) 0);
+}
+
+/*	--------------------------------------------------------	*/
+/* 	u s e _ e a s i c l o u d s _ c o n f i g u r a t i o n 	*/
+/*	--------------------------------------------------------	*/
+private	struct ezi_subscription * use_easiclouds_configuration( char * sptr )
+{
+	struct	ezi_config * pptr;
+
+	if (!( pptr = resolve_ezi_configuration( sptr )))
+	 	return((struct ezi_subscription *) 0);
+
+	else 	return( ezi_initialise_client( 
+			pptr->user, pptr->password, pptr->namespace,
+			pptr->host, _CORDS_CONTRACT_AGENT, pptr->version, pptr->tls ));
+}
+
 
 /*	-------------------------------------------	*/
 /* 	   	s t a r t _ e a s i c l o u d s     		*/
@@ -38,22 +93,32 @@ public	struct	rest_response * start_easiclouds(
 		void * vptr )
 {
 	struct	easiclouds * pptr;
+	struct	ezi_subscription * subptr;
+	struct	ezi_response * zptr;
 	rest_log_message("start_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else
+	else if (!( pptr->profile ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
+	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
+	else if (!( pptr->filename ))
+	 	return( rest_html_response( aptr, 500, "Application Message Failure" ) );
+	else if (!( zptr = ezi_create_server( subptr, pptr->filename ) ))
+	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
+	else 
 	{
-		/* ----------------------------------- */
-		/* add code here to allocate resources */	
-		/* ----------------------------------- */
 		pptr->state = 1;
 		pptr->hostname = allocate_string("vm.easiclouds.com");
+		zptr = liberate_ezi_response( zptr );
+		if ( rest_valid_string( pptr->price ) )
+			occi_send_transaction( "easiclouds", pptr->price, "action=start", pptr->account, pptr->id );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s a v e _ e a s i c l o u d s     	*/
+/* 	   	s a v e _ e a s i c l o u d s     		*/
 /*	-------------------------------------------	*/
 public	struct	rest_response * save_easiclouds(
 		struct occi_category * optr, 
@@ -63,9 +128,14 @@ public	struct	rest_response * save_easiclouds(
 		void * vptr )
 {
 	struct	easiclouds * pptr;
+	struct	ezi_subscription * subptr;
 	rest_log_message("save_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if (!( pptr->profile ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
+	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
 	else
 	{
 		/* ----------------------------------- */
@@ -78,7 +148,9 @@ public	struct	rest_response * save_easiclouds(
 /*	-----------------------------------------------		*/
 /* 	s t o p _ e a s i c l o u d s _ c o n t r a c t 	*/
 /*	-----------------------------------------------		*/
-private	int	stop_easiclouds_contract( struct easiclouds * pptr )
+private	int	stop_easiclouds_contract( 
+	struct	ezi_subscription * subptr,
+	struct easiclouds * pptr )
 {
 	if ( pptr->state )
 	{
@@ -86,6 +158,13 @@ private	int	stop_easiclouds_contract( struct easiclouds * pptr )
 		/* add code here to release resources */	
 		/* ---------------------------------- */
 		pptr->state = 0;
+		if ( pptr->application )
+		{
+			ezi_delete_server( subptr, pptr->application );
+			if ( rest_valid_string( pptr->price ) )
+				occi_send_transaction( "easiclouds", pptr->price, "action=stop", pptr->account, pptr->id );
+			pptr->application = liberate( pptr->application );	
+		}
 	}
 	return( 0 );
 }
@@ -101,28 +180,150 @@ public	struct	rest_response * stop_easiclouds(
 		void * vptr )
 {
 	struct	easiclouds * pptr;
+	struct	ezi_subscription * subptr;
 	rest_log_message("stop_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if (!( pptr->profile ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
+	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
+	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
 	else
 	{
-		stop_easiclouds_contract( pptr );
+		stop_easiclouds_contract( subptr, pptr );
 	 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
-/*	---------------------------------------------	*/
+/*	---------------------------------------------------	*/
+/* 	   t e r m i n a t e _ e a s y _ c o n t r a c t	*/
+/*	---------------------------------------------------	*/
+private	int	terminate_ezi_contract( int status, struct cords_easy_contract * contract )
+{
+	if ( contract )
+	{
+		if ( contract->node.id )
+			contract->node.id = liberate( contract->node.id );
+		if ( contract->node.message )
+			contract->node.message = occi_remove_response( contract->node.message );
+		if ( contract->manifest.id )
+			contract->manifest.id = liberate( contract->manifest.id );
+		if ( contract->manifest.message )
+			contract->manifest.message = occi_remove_response( contract->manifest.message );
+		if ( contract->application.id )
+			contract->application.id = liberate( contract->application.id );
+		if ( contract->application.message )
+			contract->application.message = occi_remove_response( contract->application.message );
+	}
+	return( status );
+}
+
+/*	---------------------------------------------------	*/
+/* 	 c r e a t e _ e a s i c l o u d s _ m e s s a g e  	*/
+/*	---------------------------------------------------	*/
+private	char *	create_easiclouds_request( struct cords_easy_contract * contract, struct easiclouds * pptr )
+{
+	char * filename;
+	char *	vptr;
+	FILE * h;
+
+	if (!( filename = rest_temporary_filename("json")))
+		return( filename );
+	else if (!( h = fopen( filename, "w") ))
+		return( liberate( filename ) );
+
+	fprintf(h,"{\n%ccompound_app%c : \n",0x0022,0x0022);
+
+	fprintf(h,"{\n");
+
+	if (( vptr = occi_extract_atribut( contract->node.message, "occi", "easiclouds_application", _CORDS_NAME )) != (char *) 0)
+	{
+		fprintf(h,"%cname%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
+	}
+
+	fprintf(h,"%cnodes%c : [\n",0x0022,0x0022);
+
+	fprintf(h,"],\n");
+
+	fprintf(h,"%cextras%c : {} \n",0x0022,0x0022);
+
+	fprintf(h,"%clinks%c : [\n",0x0022,0x0022);
+
+	fprintf(h,"],\n");
+
+	fprintf(h,"}\n");
+	fprintf(h,"}\n");
+	fclose( h );
+	return( filename );
+}
+
+/*	---------------------------------------------------	*/
 /* 	c r e a t e _ e a s i c l o u d s _ c o n t r a c t	*/
-/*	---------------------------------------------	*/
+/*	---------------------------------------------------	*/
 public	int	create_easiclouds_contract(
 		struct occi_category * optr,
 		struct easiclouds * pptr)
 {
-	/* ----------------------------------- */
-	/* add code here for contract creation */
-	/* ----------------------------------- */
+	struct	ezi_subscription * subptr;
+	struct	occi_response 	* zptr;
+	struct	occi_response 	* yptr;
+	char *	vptr;
+	struct	cords_easy_contract contract;
+	
+	memset(&contract,0,sizeof( struct cords_easy_contract ));
+
 	rest_log_message("create_easiclouds_contract");
-	return(0);
+
+	/* ------------------------ */
+	/* resolve the subscription */
+	/* ------------------------ */
+	if (!( pptr->profile ))
+	 	return( 118 );
+	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
+	 	return( 118 );
+	else if (!( pptr->node ))
+		return(118);
+
+	/* ------------------------------------- */
+	/* collect the manifest node description */
+	/* ------------------------------------- */
+	else if (!( contract.node.id = allocate_string( pptr->node ) ))
+		return(terminate_ezi_contract(118, &contract ));
+	else if (!( contract.node.message = occi_simple_get( contract.node.id, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		return( terminate_ezi_contract( 1170, &contract ) );
+	else if (!( vptr = occi_extract_atribut( contract.node.message, "occi", 
+		_CORDS_NODE, _CORDS_TYPE ) ))
+		return( terminate_ezi_contract( 1127, &contract ) );
+	/* ------------------------------------- */
+	/* collect abstract manifest name or url */
+	/* ------------------------------------- */
+	else if (!( contract.manifest.id = allocate_string( vptr ) ))
+		return(terminate_ezi_contract( 118, &contract ));
+	else if (!( contract.manifest.message = occi_simple_get( contract.manifest.id, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	{
+		/* ----------------------------- */
+		/* resolve the reference by name */
+		/* ----------------------------- */
+		if (!( yptr = cords_retrieve_named_instance_list( "easiclouds_application", "occi.easiclouds_application.name", contract.manifest.id, _CORDS_CONTRACT_AGENT,default_tls() ) ))
+			return( terminate_ezi_contract( 1404, &contract ) );
+		else if (!( contract.manifest.message = cords_retrieve_named_instance( yptr, _CORDS_CONTRACT_AGENT, default_tls() )))
+			return( terminate_ezi_contract( 1405, &contract ) );
+		else	yptr = occi_remove_response( yptr );
+	}
+	/* ------------------------------------------------------------------------------ */
+	/* arrival here the manifest element contains the application description message */
+	/* ------------------------------------------------------------------------------ */
+	if (!( pptr->filename = create_easiclouds_request( &contract, pptr ) ))
+		return( terminate_ezi_contract( 1406, &contract ) );
+
+	else
+	{
+		/* ----------------------------------------------- */
+		/* resolve any price informatino for this category */
+		/* ----------------------------------------------- */
+		pptr->price = occi_resolve_category_price( "easiclouds", default_operator(), _CORDS_CONTRACT_AGENT, default_tls() );
+		return( terminate_ezi_contract( 0, &contract ) );
+	}
 }
 
 /*	---------------------------------------------	*/
@@ -132,12 +333,20 @@ public	int	delete_easiclouds_contract(
 		struct occi_category * optr,
 		struct easiclouds * pptr)
 {
+	struct	ezi_subscription * subptr;
 	/* ----------------------------------- */
 	/* add code here for contract deletion */
 	/* ----------------------------------- */
 	rest_log_message("delete_easiclouds_contract");
-	stop_easiclouds_contract( pptr );
-	return(0);
+	if (!( pptr->profile ))
+	 	return( 118 );
+	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
+	 	return( 118 );
+	else
+	{
+		stop_easiclouds_contract( subptr, pptr );
+		return(0);
+	}
 }
 
 	/* -------------- */

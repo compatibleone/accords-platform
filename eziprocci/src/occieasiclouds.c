@@ -155,6 +155,10 @@ private void autoload_easiclouds_nodes() {
 				pptr->workload = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "blob" )) != (struct xml_atribut *) 0)
 				pptr->blob = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "price" )) != (struct xml_atribut *) 0)
+				pptr->price = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "application" )) != (struct xml_atribut *) 0)
+				pptr->application = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			}
@@ -214,6 +218,12 @@ public  void autosave_easiclouds_nodes() {
 		fprintf(h," blob=%c",0x0022);
 		fprintf(h,"%s",(pptr->blob?pptr->blob:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," price=%c",0x0022);
+		fprintf(h,"%s",(pptr->price?pptr->price:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," application=%c",0x0022);
+		fprintf(h,"%s",(pptr->application?pptr->application:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -258,6 +268,10 @@ private void set_easiclouds_field(
 			pptr->workload = allocate_string(vptr);
 		if (!( strcmp( nptr, "blob" ) ))
 			pptr->blob = allocate_string(vptr);
+		if (!( strcmp( nptr, "price" ) ))
+			pptr->price = allocate_string(vptr);
+		if (!( strcmp( nptr, "application" ) ))
+			pptr->application = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		}
@@ -361,6 +375,20 @@ private int pass_easiclouds_filter(
 		else if ( strcmp(pptr->blob,fptr->blob) != 0)
 			return(0);
 		}
+	if (( fptr->price )
+	&&  (strlen( fptr->price ) != 0)) {
+		if (!( pptr->price ))
+			return(0);
+		else if ( strcmp(pptr->price,fptr->price) != 0)
+			return(0);
+		}
+	if (( fptr->application )
+	&&  (strlen( fptr->application ) != 0)) {
+		if (!( pptr->application ))
+			return(0);
+		else if ( strcmp(pptr->application,fptr->application) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	return(1);
 }
@@ -405,6 +433,12 @@ private struct rest_response * easiclouds_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.blob=%c%s%c",optr->domain,optr->id,0x0022,pptr->blob,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.price=%c%s%c",optr->domain,optr->id,0x0022,pptr->price,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.application=%c%s%c",optr->domain,optr->id,0x0022,pptr->application,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -851,6 +885,10 @@ public struct occi_category * occi_easiclouds_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "blob",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "price",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_easiclouds)))
@@ -990,6 +1028,28 @@ public struct rest_header *  easiclouds_occi_headers(struct easiclouds * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.easiclouds.blob='%s'\r\n",(sptr->blob?sptr->blob:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.easiclouds.price='%s'\r\n",(sptr->price?sptr->price:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.easiclouds.application='%s'\r\n",(sptr->application?sptr->application:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

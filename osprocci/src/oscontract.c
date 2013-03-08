@@ -19,6 +19,7 @@
 #define	_oscontract_c
 
 #include "occiclient.h"
+#include "occiresolver.h"
 
 struct	cords_vector
 {

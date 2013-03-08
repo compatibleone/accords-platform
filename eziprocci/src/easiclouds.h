@@ -14,6 +14,8 @@ struct	easiclouds
 	char	*	reference;
 	char	*	workload;
 	char	*	blob;
+	char 	*	price;
+	char 	*	application;
 	int		state;
 };
 

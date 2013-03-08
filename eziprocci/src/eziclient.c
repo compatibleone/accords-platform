@@ -783,6 +783,7 @@ private	struct	ezi_response *	ezi_create_operation(struct ezi_subscription * spt
 	else	return( rptr );
 }
 
+
 /*	------------------------------------------------------------	*/
 /*			e z i _ c r e a t e _  s e r v e r 		*/
 /*	------------------------------------------------------------	*/
@@ -792,7 +793,6 @@ public	struct	ezi_response *	ezi_create_server(struct ezi_subscription * sptr, c
 	sprintf(buffer,"/servers");
 	return( ezi_create_operation( sptr,  buffer, filename ) );
 }
-
 /*	------------------------------------------------------------	*/
 /*			e z i _ d e l e t e _ s e r v e r 		*/
 /*	------------------------------------------------------------	*/
