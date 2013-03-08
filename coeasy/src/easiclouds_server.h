@@ -6,7 +6,7 @@
 		char	*	id;
 		char 	*	name;
 		int		state;
-		char 	*	imager;
+		char 	*	image;
 		char 	*	flavor;
 		char 	*	configuration;
 		char 	*	description;

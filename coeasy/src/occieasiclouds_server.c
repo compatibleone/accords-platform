@@ -139,8 +139,8 @@ private void autoload_easiclouds_server_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
-			if ((aptr = document_atribut( vptr, "imager" )) != (struct xml_atribut *) 0)
-				pptr->imager = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
+				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "flavor" )) != (struct xml_atribut *) 0)
 				pptr->flavor = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "configuration" )) != (struct xml_atribut *) 0)
@@ -182,8 +182,8 @@ public  void autosave_easiclouds_server_nodes() {
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
-		fprintf(h," imager=%c",0x0022);
-		fprintf(h,"%s",(pptr->imager?pptr->imager:""));
+		fprintf(h," image=%c",0x0022);
+		fprintf(h,"%s",(pptr->image?pptr->image:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," flavor=%c",0x0022);
 		fprintf(h,"%s",(pptr->flavor?pptr->flavor:""));
@@ -222,8 +222,8 @@ private void set_easiclouds_server_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
-		if (!( strcmp( nptr, "imager" ) ))
-			pptr->imager = allocate_string(vptr);
+		if (!( strcmp( nptr, "image" ) ))
+			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "flavor" ) ))
 			pptr->flavor = allocate_string(vptr);
 		if (!( strcmp( nptr, "configuration" ) ))
@@ -271,11 +271,11 @@ private int pass_easiclouds_server_filter(
 			return(0);
 		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
-	if (( fptr->imager )
-	&&  (strlen( fptr->imager ) != 0)) {
-		if (!( pptr->imager ))
+	if (( fptr->image )
+	&&  (strlen( fptr->image ) != 0)) {
+		if (!( pptr->image ))
 			return(0);
-		else if ( strcmp(pptr->imager,fptr->imager) != 0)
+		else if ( strcmp(pptr->image,fptr->image) != 0)
 			return(0);
 		}
 	if (( fptr->flavor )
@@ -321,7 +321,7 @@ private struct rest_response * easiclouds_server_occi_response(
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.imager=%c%s%c",optr->domain,optr->id,0x0022,pptr->imager,0x0022);
+	sprintf(cptr->buffer,"%s.%s.image=%c%s%c",optr->domain,optr->id,0x0022,pptr->image,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.flavor=%c%s%c",optr->domain,optr->id,0x0022,pptr->flavor,0x0022);
@@ -761,7 +761,7 @@ public struct occi_category * occi_easiclouds_server_builder(char * a,char * b) 
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "imager",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "image",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "flavor",0,0) ))
 			return(optr);
@@ -830,7 +830,7 @@ public struct rest_header *  easiclouds_server_occi_headers(struct easiclouds_se
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.easiclouds_server.imager='%s'\r\n",(sptr->imager?sptr->imager:""));
+	sprintf(buffer,"occi.easiclouds_server.image='%s'\r\n",(sptr->image?sptr->image:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

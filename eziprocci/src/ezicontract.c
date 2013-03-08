@@ -236,7 +236,7 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 
 	fprintf(h,"{\n");
 
-	if (( vptr = occi_extract_atribut( contract->node.message, "occi", "easiclouds_application", _CORDS_NAME )) != (char *) 0)
+	if (( vptr = occi_extract_atribut( contract->manifest.message, "occi", "easiclouds_application", _CORDS_NAME )) != (char *) 0)
 	{
 		fprintf(h,"%cname%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
 	}

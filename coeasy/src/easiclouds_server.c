@@ -35,8 +35,8 @@ public struct easiclouds_server * liberate_easiclouds_server(struct easiclouds_s
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
-		if ( sptr->imager )
-			 sptr->imager = liberate(sptr->imager);
+		if ( sptr->image )
+			 sptr->image = liberate(sptr->image);
 		if ( sptr->flavor )
 			 sptr->flavor = liberate(sptr->flavor);
 		if ( sptr->configuration )
@@ -59,7 +59,7 @@ public struct easiclouds_server * reset_easiclouds_server(struct easiclouds_serv
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->state =  0;
-		sptr->imager = (char*) 0;
+		sptr->image = (char*) 0;
 		sptr->flavor = (char*) 0;
 		sptr->configuration = (char*) 0;
 		sptr->description = (char*) 0;
@@ -102,9 +102,9 @@ public int xmlin_easiclouds_server(struct easiclouds_server * sptr,struct xml_el
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"imager") ))
+		else if (!( strcmp(wptr->name,"image") ))
 		{
-			if ( wptr->value ) { sptr->imager = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->image = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"flavor") ))
 		{
@@ -139,7 +139,7 @@ public int rest_occi_easiclouds_server(FILE * fh,struct easiclouds_server * sptr
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.imager='%s'\r\n",prefix,nptr,(sptr->imager?sptr->imager:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.flavor='%s'\r\n",prefix,nptr,(sptr->flavor?sptr->flavor:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.configuration='%s'\r\n",prefix,nptr,(sptr->configuration?sptr->configuration:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
