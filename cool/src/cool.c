@@ -18,6 +18,8 @@
 #ifndef	_cool_c	
 #define	_cool_c
 
+#define	_OPTIMISED_OCCI_CLIENT
+
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -1798,7 +1800,10 @@ private	int	cool_occi_operation( char * nptr )
 	struct	occi_category * optr=(struct occi_category *) 0;
 
 	set_autosave_cords_xlink_name(_COOL_LINKS);
+
+#ifdef	_OPTIMISED_OCCI_CLIENT
 	occi_optimise_local(1);
+#endif
 
 	/* -------------------------------------- */
 	/* add the job and workload control stuff */
@@ -2074,11 +2079,13 @@ private	int	cool_create_job( char * contract, char * nptr )
 	cool_log_message( buffer,0);
 	sleep(5);
 
+#ifndef	_OPTIMISED_OCCI_CLIENT
 	/* ---------------------------------------- */
 	/* wait for the occi server thread to start */
 	/* ---------------------------------------- */
 	if (!( cool_test_occi( buffer ) ))
 		return( 132 );
+#endif
 
 	/* ----------------------------------------- */
 	/* create the occi job category instance now */
