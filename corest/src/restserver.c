@@ -732,9 +732,9 @@ public	struct	rest_response * rest_allocate_response(struct rest_client * cptr)
 	struct 	rest_response* aptr;
 	struct	rest_header * hptr;
 	if (!( cptr ))
-		return((struct rest_response *) 0);
+		return(allocate_rest_response());
 	if (!( sptr = cptr->server ))
-		return((struct rest_response *) 0);
+		return(allocate_rest_response());
 	else if (!( aptr = allocate_rest_response() ))
 		return( aptr );
 	else if (!( hptr = rest_response_header( aptr, _HTTP_SERVER, sptr->name )))
