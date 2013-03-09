@@ -2077,7 +2077,6 @@ private	int	cool_create_job( char * contract, char * nptr )
 	sprintf(buffer,"%s/job/",Cool.identity); 
 	cool_log_message("cool_job_identity",0);
 	cool_log_message( buffer,0);
-	sleep(5);
 
 #ifndef	_OPTIMISED_OCCI_CLIENT
 	/* ---------------------------------------- */
@@ -2085,6 +2084,7 @@ private	int	cool_create_job( char * contract, char * nptr )
 	/* ---------------------------------------- */
 	if (!( cool_test_occi( buffer ) ))
 		return( 132 );
+	else	sleep(2);
 #endif
 
 	/* ----------------------------------------- */

@@ -1945,8 +1945,10 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 
 	if (!( uptr = analyse_url( target ) ))
 		return(occi_failure(cptr,930,"incorrect url"));
+
 	else if (!( rptr = allocate_rest_request() ))
 		return(occi_failure(cptr,927,"allocation failure"));
+
 	else if (!( rptr->object = allocate_string( uptr->object ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1967,6 +1969,11 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		rptr->port = uptr->port;
 	}
 	if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
 	{
 		rptr = liberate_rest_request( rptr );
 		return(occi_failure(cptr,927,"allocation failure"));
