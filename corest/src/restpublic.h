@@ -1,6 +1,9 @@
 #ifndef	_restpublic_h
 #define	_restpublic_h
 
+public	struct rest_request *	rest_parse_object(
+		struct rest_client  * cptr, 
+		struct rest_request * rptr);
 public	void	rest_replace_header( struct rest_header * hptr, char * vptr );
 
 public	char *	

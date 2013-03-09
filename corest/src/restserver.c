@@ -776,6 +776,10 @@ public	struct rest_response * rest_html_response( struct rest_response  * aptr, 
 	char 	buffer[64];
 	char *	htmlbody;
 
+	if (!( aptr ))
+		if (!( aptr = allocate_rest_response() ))
+			return( aptr );
+
 	if ( aptr->message )
 		aptr->message = liberate( aptr->message );
 
@@ -1180,9 +1184,9 @@ private	char * rest_consume_value( struct rest_client  * cptr )
 }
 
 /*	------------------------------------------------	*/
-/*	     r e s t _ c o n s u m e _ c o m m a n d 		*/
+/*	     r e s t _ p a r s e _ o b j e c t			*/
 /*	------------------------------------------------	*/
-private	struct rest_request *	rest_parse_object(
+public	struct rest_request *	rest_parse_object(
 		struct rest_client  * cptr, 
 		struct rest_request * rptr)
 {

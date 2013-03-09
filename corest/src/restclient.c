@@ -27,16 +27,6 @@
 #include "restlog.h"
 
 /*	-------------------------------------------------	*/
-/*		f o r w a r d   p r o t o t y p e s		*/
-/*	-------------------------------------------------	*/
-public struct rest_client 	* liberate_rest_client(struct rest_client * cptr);
-public struct rest_client 	* allocate_rest_client();
-public struct rest_request 	* allocate_rest_request();
-public struct rest_request 	* liberate_rest_request( struct rest_request * rptr );
-public struct rest_header 	* add_rest_header( struct rest_request * rptr );
-public struct rest_response 	* rest_accept_response( struct rest_client * cptr );
-
-/*	-------------------------------------------------	*/
 /*		s e r v i c e _ p r e f i x _ u r l		*/
 /*	-------------------------------------------------	*/
 /*	called to check the presence of a service prefix	*/

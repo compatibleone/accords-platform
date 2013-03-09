@@ -1798,7 +1798,7 @@ private	int	cool_occi_operation( char * nptr )
 	struct	occi_category * optr=(struct occi_category *) 0;
 
 	set_autosave_cords_xlink_name(_COOL_LINKS);
-
+	occi_optimise_local(1);
 
 	/* -------------------------------------- */
 	/* add the job and workload control stuff */
@@ -2406,6 +2406,8 @@ private	int	cool_operation( char * nptr )
 
 	if ( Elastic.occi )
 	{
+		occi_optimise_local(1);
+
 		if ((status = cool_create_job( eptr, "environment" )) != 0)
 			return( cool_exit( 118, tptr ) );
 	}

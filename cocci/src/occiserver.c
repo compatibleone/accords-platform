@@ -41,6 +41,7 @@
 #include "occibody.h"
 #include "occilogin.h"
 #include "json.h"
+#include "restclient.h"
 
 struct	accords_authorization
 {
@@ -51,6 +52,7 @@ struct	accords_authorization
 	char *	authorization;
 };
 
+private	struct	occi_category * OcciLocalCategory=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
 private	struct	accords_authorization * AccordsAuthorization=(struct accords_authorization *) 0;
@@ -1922,6 +1924,99 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 	return( category );
 }
 
+/*	--------------------------------------------------	*/
+/*		o c c i _ l o c a l _ s e r v e r		*/
+/*	--------------------------------------------------	*/
+/*	called back from the OCCI client when the identity	*/
+/*	and target verification indicates local service is	*/
+/*	useable for the request thus allowing optimisation	*/
+/*	--------------------------------------------------	*/
+public	struct	rest_response * occi_local_server( char * method, char * target, char * tls, char * agent, struct rest_header * hptr, char * body )
+{
+	struct 	rest_client * cptr=(struct rest_client *) 0;
+	struct 	rest_request * rptr=(struct rest_request *) 0;
+	struct	rest_response * aptr=(struct rest_response *) 0;
+	struct	url *	uptr;
+	/* --------------------------- */
+	/* build a pseudo rest request */
+	/* --------------------------- */
+	rest_log_message("occi_local_server");
+	rest_log_message( target );
+
+	if (!( uptr = analyse_url( target ) ))
+		return(occi_failure(cptr,930,"incorrect url"));
+	else if (!( rptr = allocate_rest_request() ))
+		return(occi_failure(cptr,927,"allocation failure"));
+	else if (!( rptr->object = allocate_string( uptr->object ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else if (!( rptr = rest_parse_object( (struct rest_client *) 0, rptr) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else if (!( rptr->host = allocate_string( uptr->host ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else
+	{
+		rptr->port = uptr->port;
+	}
+	if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else if (!( rptr->method = allocate_string( method ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
+	else
+	{
+		/* ----------------------- */
+		/* add the request headers */
+		/* ----------------------- */
+		if ((rptr->first = hptr) != (struct rest_header *) 0)
+		{
+			while ( hptr->next )
+				hptr = hptr->next;
+			rptr->last = hptr;
+		}
+
+		/* ---------------- */
+		/* process the body */
+		/* ---------------- */
+		if ( body )
+			rest_request_body( rptr, body, _FILE_BODY );
+		
+		/* ------------------- */
+		/* process the request */
+		/* ------------------- */
+		if (!( strcasecmp( method, "GET" ) ))
+			aptr = occi_get( OcciLocalCategory, cptr, rptr );
+		else if (!( strcasecmp( method, "PUT" ) ))
+			aptr = occi_put( OcciLocalCategory, cptr, rptr );
+		else if (!( strcasecmp( method, "POST" ) ))
+			aptr = occi_post( OcciLocalCategory, cptr, rptr );
+		else if (!( strcasecmp( method, "DELETE" ) ))
+			aptr = occi_delete( OcciLocalCategory, cptr, rptr );
+		else if (!( strcasecmp( method, "HEAD" ) ))
+			aptr = occi_head( OcciLocalCategory, cptr, rptr );
+
+		/* ----------------------- */
+		/* release the request now */
+		/* ----------------------- */
+		rptr = liberate_rest_request( rptr );
+		cptr = liberate_rest_client( cptr );
+		return( aptr );
+	}
+}
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ s e r v e r				*/
 /*	---------------------------------------------------------	*/
@@ -1965,6 +2060,7 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 	occi_authorization = authorization;
 	Osi.authorise = (void *) 0;
 	Osi.instance  = category;
+	OcciLocalCategory = category;
 
 	/* --------------------------------------------------------------- */
 	/* all compatible one servers have a default external link handler */

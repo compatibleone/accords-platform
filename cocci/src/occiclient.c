@@ -42,10 +42,26 @@ private	struct	occi_manager OcciManager =
 	_OCCI_MIME_JSON,
 	(char *) 0,		/* event log address */
 	0,
-	_OCCI_OPTIMISE_CLIENT | _OCCI_OPTIMISE_LOCAL
+	_OCCI_OPTIMISE_CLIENT 
 };
 
 #include "occiauth.c"
+
+public	void	occi_optimise_local( int v )
+{
+	if ( v )
+		OcciManager.optimise |= _OCCI_OPTIMISE_LOCAL;
+	else	OcciManager.optimise &= ~_OCCI_OPTIMISE_LOCAL;
+	return;
+}
+
+public	void	occi_optimise_client( int v )
+{
+	if ( v )
+		OcciManager.optimise |= _OCCI_OPTIMISE_CLIENT;
+	else	OcciManager.optimise &= ~_OCCI_OPTIMISE_CLIENT;
+	return;
+}
 
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a p p e n d _ h e a d e r			*/
@@ -95,7 +111,7 @@ private	struct	rest_header * occi_special_authorisation( struct rest_header * hp
 /*	this function detects requests to	*/
 /*	the local OCCI server.			*/ 
 /*	---------------------------------	*/
-private	int	occi_local_server( char * target )
+private	int	occi_detect_local_server( char * target )
 {
 	struct	url * local;
 	struct	url * remote;
@@ -130,6 +146,27 @@ private	int	occi_local_server( char * target )
 	}
 }
 
+#define	_OCCI_OPTIMISE_LOCAL_REQUESTS
+#ifndef	_OCCI_OPTIMISE_LOCAL_REQUESTS
+
+#define	local_client_get_request rest_client_get_request
+#define	local_client_head_request rest_client_head_request
+#define	local_client_put_request rest_client_put_request
+#define	local_client_post_request rest_client_post_request
+#define	local_client_delete_request rest_client_delete_request
+
+#else
+
+public	struct rest_response * occi_local_server( char * m, char * u, char * s, char * a, struct rest_header * h, char * b);
+
+#define	local_client_get_request(u,s,a,h) 	occi_local_server( "GET", u, s, a, h, (char *) 0)
+#define	local_client_head_request(u,s,a,h)  	occi_local_server( "HEAD", u, s, a, h, (char *) 0)
+#define	local_client_put_request(u,s,a,f,h) 	occi_local_server( "PUT", u, s, a, h, f )
+#define	local_client_post_request(u,s,a,f,h)	occi_local_server( "POST", u, s, a, h, f )
+#define	local_client_delete_request(u,s,a,h) 	occi_local_server( "DELETE", u, s, a, h, (char *) 0)
+
+#endif
+
 /*	---	*/
 /*	GET	*/
 /*	---	*/
@@ -138,10 +175,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	if (!( occi_local_server( target ) ))
+	if (!( occi_detect_local_server( target ) ))
 		return( rest_client_get_request( target, tls, nptr, hptr ) );
-	else	return( rest_client_get_request( target, tls, nptr, hptr ) );
-
+	else	return( local_client_get_request( target, tls, nptr, hptr ) );
 }
 
 
@@ -153,9 +189,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	if (!( occi_local_server( target ) ))
+	if (!( occi_detect_local_server( target ) ))
 		return( rest_client_delete_request( target, tls, nptr, hptr ) );
-	else	return( rest_client_delete_request( target, tls, nptr, hptr ) );
+	else	return( local_client_delete_request( target, tls, nptr, hptr ) );
 }
 
 
@@ -167,9 +203,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	if (!( occi_local_server( target ) ))
+	if (!( occi_detect_local_server( target ) ))
 		return( rest_client_head_request( target, tls, nptr, hptr ) );
-	else	return( rest_client_head_request( target, tls, nptr, hptr ) );
+	else	return( local_client_head_request( target, tls, nptr, hptr ) );
 }
 
 
@@ -181,9 +217,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	if (!( occi_local_server( target ) ))
+	if (!( occi_detect_local_server( target ) ))
 		return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
-	else	return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
+	else	return( local_client_post_request( target, tls, nptr, filename, hptr ) );
 }
 
 
@@ -195,9 +231,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	if (!( occi_local_server( target ) ))
+	if (!( occi_detect_local_server( target ) ))
 		return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
-	else	return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
+	else	return( local_client_put_request( target, tls, nptr, filename, hptr ) );
 }
 
 #define	rest_client_get_request occi_client_get_request
