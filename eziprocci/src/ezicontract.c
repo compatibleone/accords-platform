@@ -415,7 +415,7 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 				/* open the node collection */
 				/* ------------------------ */
 				if ( mode ) fprintf(h,"],\n");
-				fprintf(h,",%clinks%c : [\n",0x0022,0x0022);
+				fprintf(h,"%clinks%c : [\n",0x0022,0x0022);
 				mode = 2;
 			}
 			/* --------------------------------------------------- */

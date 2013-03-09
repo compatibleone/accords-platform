@@ -724,6 +724,22 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 
 }
 
+private	int	run_json_verification( char * filename )
+{
+	struct	data_element * dptr;
+
+	if (!( dptr = json_parse_file( filename ) ))
+		return( 40 );
+	else
+	{
+		printf("\n");
+		json_show( dptr );
+		printf("\n");
+		dptr = drop_data_element( dptr );
+		return(0);
+	}
+}
+
 /*	-----------------------------------	*/
 /*		o p e r a t i o n		*/
 /*	-----------------------------------	*/
@@ -749,6 +765,12 @@ private	int	operation( int argc, char * argv[] )
 				return( invoke_action( aptr, argv[argi] ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
 				return( run_cordscript_interpreter( aptr, argc-argi, &argv[argi] ) );
+			else if (!( strcasecmp( command, "JSON" ) ))
+			{
+				if (!( run_json_verification( aptr ) ))
+					continue;
+				else	break;
+			}
 			else if (!( strcasecmp( command, "ACCOUNT" ) ))
 				return( create_account( aptr ) );
 			else if (!( strcasecmp( command, "USER" ) ))
@@ -817,6 +839,7 @@ private	int	banner()
 	printf("\n         command <options> USER        <account> <name> <pass> <role> <email> <permission> ");
 	printf("\n         command <options> INVOKE      <action> <instance> ");
 	printf("\n         command <options> RUN         <script> ");
+	printf("\n         command <options> JSON        <script> ");
 	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
