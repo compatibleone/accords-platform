@@ -1983,11 +1983,17 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		rptr = liberate_rest_request( rptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
+	else if (!( hptr = rest_duplicate_headers( hptr )))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(occi_failure(cptr,927,"allocation failure"));
+	}
 	else
 	{
 		/* ----------------------- */
 		/* add the request headers */
 		/* ----------------------- */
+
 		if ((rptr->first = hptr) != (struct rest_header *) 0)
 		{
 			while ( hptr->next )
