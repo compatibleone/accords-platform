@@ -42,7 +42,7 @@ private	struct	occi_manager OcciManager =
 	_OCCI_MIME_JSON,
 	(char *) 0,		/* event log address */
 	0,
-	1			/* optimised */
+	_OCCI_OPTIMISE_CLIENT | _OCCI_OPTIMISE_LOCAL
 };
 
 #include "occiauth.c"
@@ -89,6 +89,47 @@ private	struct	rest_header * occi_special_authorisation( struct rest_header * hp
 	else	return( hptr );
 }
 
+/*	---------------------------------	*/
+/*	o c c i _ l o c a l _ s e r v e r	*/
+/*	---------------------------------	*/
+/*	this function detects requests to	*/
+/*	the local OCCI server.			*/ 
+/*	---------------------------------	*/
+private	int	occi_local_server( char * target )
+{
+	struct	url * local;
+	struct	url * remote;
+	char *	identity;
+	if (!( OcciManager.optimise & _OCCI_OPTIMISE_LOCAL ))
+		return(0);
+	else if (!( identity = get_identity() ))
+		return( 0 );
+	else if (!( remote = analyse_url( target )))
+		return( 0 );
+	else if (!( local = analyse_url( identity )))
+		return( 0 );
+
+	if ( remote->port != local->port )
+	{
+		remote = liberate_url( remote );
+		local = liberate_url( local );
+		return( 0 );
+	}
+	else if (!( strcmp( local->host, remote->host ) ))
+	{
+		remote = liberate_url( remote );
+		local = liberate_url( local );
+		rest_log_message( "occi:local:optimisation" );
+		return( 1 );
+	}
+	else
+	{
+		remote = liberate_url( remote );
+		local = liberate_url( local );
+		return( 0 );
+	}
+}
+
 /*	---	*/
 /*	GET	*/
 /*	---	*/
@@ -97,7 +138,10 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	return( rest_client_get_request( target, tls, nptr, hptr ) );
+	if (!( occi_local_server( target ) ))
+		return( rest_client_get_request( target, tls, nptr, hptr ) );
+	else	return( rest_client_get_request( target, tls, nptr, hptr ) );
+
 }
 
 
@@ -109,7 +153,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	return( rest_client_delete_request( target, tls, nptr, hptr ) );
+	if (!( occi_local_server( target ) ))
+		return( rest_client_delete_request( target, tls, nptr, hptr ) );
+	else	return( rest_client_delete_request( target, tls, nptr, hptr ) );
 }
 
 
@@ -121,7 +167,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	return( rest_client_head_request( target, tls, nptr, hptr ) );
+	if (!( occi_local_server( target ) ))
+		return( rest_client_head_request( target, tls, nptr, hptr ) );
+	else	return( rest_client_head_request( target, tls, nptr, hptr ) );
 }
 
 
@@ -133,7 +181,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
+	if (!( occi_local_server( target ) ))
+		return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
+	else	return( rest_client_post_request( target, tls, nptr, filename, hptr ) );
 }
 
 
@@ -145,7 +195,9 @@ public	struct	rest_response *
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr )
 {
 	hptr = occi_special_authorisation( hptr );
-	return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
+	if (!( occi_local_server( target ) ))
+		return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
+	else	return( rest_client_put_request( target, tls, nptr, filename, hptr ) );
 }
 
 #define	rest_client_get_request occi_client_get_request
@@ -1118,7 +1170,7 @@ public	struct	occi_client *	occi_flush_client( char * host, int port )
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_remove_client( struct occi_client * cptr )
 {
-	if ( OcciManager.optimise )
+	if ( OcciManager.optimise & _OCCI_OPTIMISE_CLIENT )
 		return((struct occi_client *) 0);
 	else	return( occi_delete_client( cptr ) );
 }
@@ -1530,7 +1582,7 @@ public	struct	occi_client *	occi_create_client( char * host, char * agent, char 
 		printf("OCCI CREATE CLIENT { \n\thost=%s,\n\tagent=%s,\n\ttls=%s };\n",host,agent,(tls ? tls : ""));
 	}
 
-	if ( OcciManager.optimise )
+	if ( OcciManager.optimise  & _OCCI_OPTIMISE_CLIENT )
 		if ((cptr = occi_resolve_client( host )) != (struct occi_client *) 0)
 			return( occi_redirect_client( cptr, host ) );
 

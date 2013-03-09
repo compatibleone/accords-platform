@@ -47,6 +47,10 @@ struct	occi_client
 #define	_OCCI_LINK  	2
 #define	_OCCI_MIXIN 	3
 
+#define	_OCCI_OPTIMISE_CLIENT 1
+#define	_OCCI_OPTIMISE_LOCAL  2
+
+
 struct	occi_element
 {
 	struct	occi_element * previous;
