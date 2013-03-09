@@ -5,6 +5,7 @@
 		char	*	id;
 		char 	*	name;
 		char 	*	description;
+		char 	*	tenant;
 		int		state;
 		int		servers;
 		int		extras;

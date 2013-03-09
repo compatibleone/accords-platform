@@ -1125,13 +1125,14 @@ private	int	cords_remove_links( struct xml_element * document, char * agent, cha
 /*	---------------------------------------------------	*/
 /*	 	    c o r d s _ a d d _ l i n k s		*/
 /*	---------------------------------------------------	*/
-private	int	cords_add_links( struct xml_element * document, char * element, char * agent, char * tls )
+private	int	cords_add_links( struct xml_element * document, char * element, char * agent, char * tls, int * links )
 {
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
 	struct	xml_element * eptr;
 	struct	occi_response * zptr;
-	int			count=0;
+	int	total=*links;
+	int	count=0;
 	char	buffer[512];
 	char	value[64];
 	
@@ -1152,7 +1153,7 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 		else if (!(bptr = document_atribut( eptr, _CORDS_ID )))
 			return( cords_append_error(document,701,"unresolved element ID") );
 
-		if (!( count ))
+		if (!( total+count ))
 			cords_remove_links( document, agent, tls );
 
 		if (!( zptr = occi_create_link( aptr->value, bptr->value, agent, tls ) ))
@@ -1170,6 +1171,7 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 	{
 		sprintf(buffer,"%ss",element);
 		sprintf(value,"%u",count);
+		*links = (count+total);
 		return( cords_instance_member( document, buffer, value ) );
 	}
 }
@@ -1183,9 +1185,10 @@ private	int	cords_add_links( struct xml_element * document, char * element, char
 /*	---------------------------------------------------	*/	
 private	int	cords_append_links( struct xml_element * document, char * element, char * agent, char * tls )
 {
+	int	total=0;
 	cords_remove_links( document, agent, tls );
 
-	return( cords_add_links( document, element, agent, tls ) );
+	return( cords_add_links( document, element, agent, tls, &total ) );
 }
 
 /*	---------------------------------------------------	*/
@@ -2379,6 +2382,7 @@ private	int	cords_terminate_xsd(
 	struct	xml_atribut * aptr;
 	int	modifications=0;
 	int	linked=0;
+	int	count=0;
 
 	/* --------------------------------- */
 	/* filter out ERROR, DESCRIPTION etc */
@@ -2485,7 +2489,8 @@ private	int	cords_terminate_xsd(
 		/* locate the first max occurs unbounded */
 		/* ------------------------------------- */
 
-		for ( 	eptr=first_xsd_element( wptr );
+		for ( 	count=0,
+			eptr=first_xsd_element( wptr );
 			eptr != (struct xml_element *) 0;
 			eptr = eptr->next )
 		{
@@ -2514,7 +2519,7 @@ private	int	cords_terminate_xsd(
 					else if (!( nptr = occi_unquoted_value( nptr ) ))
 						continue;
 
-					else if ((status = cords_add_links(dptr,nptr,agent,tls)) != 0)
+					else if ((status = cords_add_links(dptr,nptr,agent,tls,&count)) != 0)
 					{
 						liberate( nptr );
 						sprintf(buffer,"linkage failure:%s",nptr);
@@ -2523,7 +2528,7 @@ private	int	cords_terminate_xsd(
 					else
 					{
 						linked++;
-						liberate( nptr );
+						nptr = liberate( nptr );
 						break;
 					}
 				}

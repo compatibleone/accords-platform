@@ -223,10 +223,19 @@ private	int	terminate_ezi_contract( int status, struct cords_easy_contract * con
 /*	---------------------------------------------------	*/
 private	char *	create_easiclouds_request( struct cords_easy_contract * contract, struct easiclouds * pptr )
 {
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * eptr;
+	struct	occi_element * dptr;
 	char * filename;
 	char *	vptr;
+	char *	sptr;
+	char *	nptr;
 	FILE * h;
-
+	int	mode=0;
+	int	servers=0;
+	int	links=0;
+	int	nodes=0;
 	if (!( filename = rest_temporary_filename("json")))
 		return( filename );
 	else if (!( h = fopen( filename, "w") ))
@@ -241,15 +250,184 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 		fprintf(h,"%cname%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
 	}
 
-	fprintf(h,"%cnodes%c : [\n",0x0022,0x0022);
 
-	fprintf(h,"],\n");
+	/* --------------------------- */
+	/* foreach node or link record */
+	/* --------------------------- */
+	for (	eptr = cords_first_link( contract->manifest.message );
+		eptr != (struct occi_element *) 0;
+		eptr = cords_next_link( eptr ))
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( nptr =  occi_unquoted_link( eptr->value ) ))
+			continue;
+		else if (!( yptr = occi_simple_get( nptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			liberate( nptr );
+			continue;
+		}
+		else if (!( yptr->category ))
+		{
+			liberate( nptr );
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( yptr->category->id ))
+		{
+			liberate( nptr );
+			yptr = occi_remove_response( yptr );
+			continue;
+		}
+		else if (!( strcmp( yptr->category->id, "easiclouds_node" ) ))
+		{
+			if ( mode != 1 )
+			{
+				/* ------------------------ */
+				/* open the node collection */
+				/* ------------------------ */
+				if ( mode ) fprintf(h,"],\n");
+				fprintf(h,"%cnodes%c : [\n",0x0022,0x0022);
+				mode = 1;
+			}
+			/* --------------------------- */
+			/* open a named node structure */
+			/* --------------------------- */
+			if ( nodes++ )
+				fprintf(h,",{\n");
+			else	fprintf(h,"{\n");
 
-	fprintf(h,"%cextras%c : {} \n",0x0022,0x0022);
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_node", "name" )) != (char *) 0)
+				fprintf(h,"%cname%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+			else 	fprintf(h,"%cname%c : %c%s%c\n",0x0022,0x0022,0x0022,"noname",0x0022);
 
-	fprintf(h,"%clinks%c : [\n",0x0022,0x0022);
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_node", "tenant" )) != (char *) 0)
+			{
+				fprintf(h,"%c,os_tenant_id%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+			}
+			/* -------------------- */
+			/* open the server list */
+			/* -------------------- */
+			fprintf(h,",%cservers%c : [\n",0x0022,0x0022);
 
-	fprintf(h,"],\n");
+			for (	servers=0,dptr = cords_first_link( yptr );
+				dptr != (struct occi_element *) 0;
+				dptr = cords_next_link( dptr ))
+			{
+				if (!( dptr->value ))
+					continue;
+				else if (!( sptr =  occi_unquoted_link( dptr->value ) ))
+					continue;
+				else if (!( zptr = occi_simple_get( sptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+				{
+					liberate( sptr );
+					continue;
+				}
+				else if (!( yptr->category ))
+				{
+					liberate( sptr );
+					zptr = occi_remove_response( zptr );
+					continue;
+				}
+				else if (!( zptr->category->id ))
+				{
+					liberate( sptr );
+					zptr = occi_remove_response( zptr );
+					continue;
+				}
+				else if (!( strcmp( zptr->category->id, "easiclouds_server" ) ))
+				{
+					/* --------------------------------------------------- */
+					/* open a named server structure with image and flavor */
+					/* --------------------------------------------------- */
+					if ( servers++ )
+						fprintf(h,",{\n");
+					else	fprintf(h,"{\n");
+				
+					if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_server", "image" )) != (char *) 0)
+					{
+						fprintf(h,"%cimageRef%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
+					}
+					if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_server", "flavor" )) != (char *) 0)
+					{
+						fprintf(h,"%cflavorRef%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
+					}
+					if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_server", "name" )) != (char *) 0)
+					{
+						fprintf(h,"%cname%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+					}
+					/* -------------------------------- */
+					/* handle the bloody meta data TODO */
+					/* -------------------------------- */
+	
+					fprintf(h,"}\n");
+					zptr = occi_remove_response(zptr);
+				}
+				else	zptr = occi_remove_response(zptr);
+			}
+			fprintf(h,"]\n");
+
+			/* ---------------------- */
+			/* handle the extras TODO */
+			/* ---------------------- */
+			fprintf(h,",%cextras%c : {}\n",0x0022,0x0022);
+
+			/* --------------------------- */
+			/* handle the description TODO */
+			/* --------------------------- */
+			fprintf(h,",%cdescription%c : {}\n",0x0022,0x0022);
+
+			fprintf(h,"}\n");
+
+			yptr = occi_remove_response(yptr);
+		}
+		else if (!( strcmp( yptr->category->id, "easiclouds_link" ) ))
+		{
+			if ( mode != 2 )
+			{
+				/* ------------------------ */
+				/* open the node collection */
+				/* ------------------------ */
+				if ( mode ) fprintf(h,"],\n");
+				fprintf(h,",%clinks%c : [\n",0x0022,0x0022);
+				mode = 2;
+			}
+			/* --------------------------------------------------- */
+			/* open a named link structure with source and target  */
+			/* --------------------------------------------------- */
+			if ( links++ )
+				fprintf(h,",{\n");
+			else	fprintf(h,"{\n");
+
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_link", "name" )) != (char *) 0)
+				fprintf(h,"%cname%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
+			else	fprintf(h,"%cname%c : %c%s%c,\n",0x0022,0x0022,0x0022,"noname",0x0022);
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_link", "from" )) != (char *) 0)
+				fprintf(h,"%cnodeA_name%c : %c%s%c,\n",0x0022,0x0022,0x0022,vptr,0x0022);
+			else	fprintf(h,"%cnodeA_name%c : %c%s%c\n",0x0022,0x0022,0x0022,"nolink",0x0022);
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_link", "to" )) != (char *) 0)
+				fprintf(h,"%cnodeB_name%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+			else	fprintf(h,"%cnodeB_name%c : %c%s%c\n",0x0022,0x0022,0x0022,"nolink",0x0022);
+
+			/* ---------------------------------- */
+			/* handle the bloody description TODO */
+			/* ---------------------------------- */
+			fprintf(h,",%cdescription%c : {}\n",0x0022,0x0022);
+
+			/* ---------------------- */
+			/* handle the extras TODO */
+			/* ---------------------- */
+			fprintf(h,",%cextras%c : {}\n",0x0022,0x0022);
+
+			fprintf(h,"}\n");
+			yptr = occi_remove_response(yptr);
+		}
+		else	yptr = occi_remove_response( yptr );
+	}
+
+	if ( mode ) fprintf(h,"]\n");
+
+	fprintf(h,",%cextras%c : {} \n",0x0022,0x0022);
 
 	fprintf(h,"}\n");
 	fprintf(h,"}\n");

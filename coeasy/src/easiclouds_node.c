@@ -37,6 +37,8 @@ public struct easiclouds_node * liberate_easiclouds_node(struct easiclouds_node 
 			 sptr->name = liberate(sptr->name);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
+		if ( sptr->tenant )
+			 sptr->tenant = liberate(sptr->tenant);
 		sptr = liberate( sptr );
 	}
 	return((struct easiclouds_node *) 0);
@@ -53,6 +55,7 @@ public struct easiclouds_node * reset_easiclouds_node(struct easiclouds_node * s
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
 		sptr->description = (char*) 0;
+		sptr->tenant = (char*) 0;
 		sptr->state =  0;
 		sptr->servers =  0;
 		sptr->extras =  0;
@@ -94,6 +97,10 @@ public int xmlin_easiclouds_node(struct easiclouds_node * sptr,struct xml_elemen
 		{
 			if ( wptr->value ) { sptr->description = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"tenant") ))
+		{
+			if ( wptr->value ) { sptr->tenant = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -123,6 +130,7 @@ public int rest_occi_easiclouds_node(FILE * fh,struct easiclouds_node * sptr,cha
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.tenant='%s'\r\n",prefix,nptr,(sptr->tenant?sptr->tenant:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.servers='%u'\r\n",prefix,nptr,sptr->servers);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.extras='%u'\r\n",prefix,nptr,sptr->extras);
