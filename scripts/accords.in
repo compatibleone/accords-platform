@@ -697,7 +697,6 @@ _accords_config() {
     _mkpro osocciprocci  
     _mkpro onprocci
     _mkpro azprocci
-    _mkpro ec2procci
     _mkpro dcprocci
     _mkcfg fileserver
     _mkcfg ezvm
@@ -709,6 +708,7 @@ _accords_config() {
     _mkcfg coeasy
     _mkcfg conagios
     _mkpro paasprocci
+    _mkpro ec2procci
     _mkpro cnprocci
     _mkpro eziprocci
     _mkcosacs cosacs
