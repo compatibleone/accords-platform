@@ -2004,7 +2004,8 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		/* ---------------- */
 		/* process the body */
 		/* ---------------- */
-		if ( body )
+		if (( body )
+		&&  ((body = allocate_string(body)) != (char *) 0))
 			rest_request_body( rptr, body, _FILE_BODY );
 		
 		/* ------------------- */
