@@ -219,6 +219,39 @@ private	int	terminate_ezi_contract( int status, struct cords_easy_contract * con
 }
 
 /*	---------------------------------------------------	*/
+/*		e z i _ s e r i a l i s e _ e x t r a s		*/
+/*	---------------------------------------------------	*/
+/*	TODO	*/
+/*	----	*/
+private	int	ezi_serialise_extras( FILE * h, struct occi_response * zptr )
+{
+	fprintf(h,",%cextras%c : {}\n",0x0022,0x0022);
+	return(0);
+}
+
+/*	---------------------------------------------------	*/
+/*	 e z i _ s e r i a l i s e _ d e s c r i p t i o n	*/
+/*	---------------------------------------------------	*/
+/*	TODO	*/
+/*	----	*/
+private	int	ezi_serialise_description( FILE * h, struct occi_response * zptr )
+{
+	fprintf(h,",%cdescription%c : {}\n",0x0022,0x0022);
+	return(0);
+}
+
+/*	---------------------------------------------------	*/
+/*	    e z i _ s e r i a l i s e _ m e t a d a t a		*/
+/*	---------------------------------------------------	*/
+/*	TODO	*/
+/*	----	*/
+private	int	ezi_serialise_metadata( FILE * h, struct occi_response * zptr )
+{
+	fprintf(h,",%cmetadata%c : {}\n",0x0022,0x0022);
+	return(0);
+}
+
+/*	---------------------------------------------------	*/
 /* 	 c r e a t e _ e a s i c l o u d s _ m e s s a g e  	*/
 /*	---------------------------------------------------	*/
 private	char *	create_easiclouds_request( struct cords_easy_contract * contract, struct easiclouds * pptr )
@@ -356,10 +389,9 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 					{
 						fprintf(h,"%cname%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
 					}
-					/* -------------------------------- */
-					/* handle the bloody meta data TODO */
-					/* -------------------------------- */
-	
+
+					ezi_serialise_metadata( h, zptr );	
+
 					fprintf(h,"}\n");
 					zptr = occi_remove_response(zptr);
 				}
@@ -367,15 +399,9 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 			}
 			fprintf(h,"]\n");
 
-			/* ---------------------- */
-			/* handle the extras TODO */
-			/* ---------------------- */
-			fprintf(h,",%cextras%c : {}\n",0x0022,0x0022);
+			ezi_serialise_extras( h, yptr );
 
-			/* --------------------------- */
-			/* handle the description TODO */
-			/* --------------------------- */
-			fprintf(h,",%cdescription%c : {}\n",0x0022,0x0022);
+			ezi_serialise_description( h, yptr );
 
 			fprintf(h,"}\n");
 
@@ -409,15 +435,8 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 				fprintf(h,"%cnodeB_name%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
 			else	fprintf(h,"%cnodeB_name%c : %c%s%c\n",0x0022,0x0022,0x0022,"nolink",0x0022);
 
-			/* ---------------------------------- */
-			/* handle the bloody description TODO */
-			/* ---------------------------------- */
-			fprintf(h,",%cdescription%c : {}\n",0x0022,0x0022);
-
-			/* ---------------------- */
-			/* handle the extras TODO */
-			/* ---------------------- */
-			fprintf(h,",%cextras%c : {}\n",0x0022,0x0022);
+			ezi_serialise_description( h, yptr );
+			ezi_serialise_extras( h, yptr );
 
 			fprintf(h,"}\n");
 			yptr = occi_remove_response(yptr);
@@ -427,7 +446,7 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 
 	if ( mode ) fprintf(h,"]\n");
 
-	fprintf(h,",%cextras%c : {} \n",0x0022,0x0022);
+	ezi_serialise_extras( h, contract->manifest.message );
 
 	fprintf(h,"}\n");
 	fprintf(h,"}\n");
