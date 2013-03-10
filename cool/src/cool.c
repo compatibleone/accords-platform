@@ -1175,11 +1175,36 @@ private	int	cool_elastic_condition(
 	else if ((!( strcmp( nptr, "occi.elastic.period" ) ))
 	||  (!( strcmp( nptr, "occi.job.period" ) )))
 		Elastic.period = atoi( vptr );
-
-	return( 0 );
+	else	return(0);
+	return(1);
 }
 
-
+/*	-------------------------------------------------	*/
+/*	 c o o l _ p l a c e m e n t _ c o n d i t i o n	*/
+/*	-------------------------------------------------	*/
+private	int	cool_placement_condition(
+		struct cords_placement_criteria * placement,
+		char * nptr, char * vptr )
+{
+	if (!( strcmp( nptr, "occi.placement.algorithm" ) ))
+		placement->algorithm = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.provider" ) ))
+		placement->provider = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.operator" ) ))
+		placement->operator = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.zone" ) ))
+		placement->zone = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.opinion" ) ))
+		placement->opinion = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.energy" ) ))
+		placement->energy = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.security" ) ))
+		placement->security = allocate_string( vptr );
+	else if (!( strcmp( nptr, "occi.placement.price" ) ))
+		placement->price = allocate_string( vptr );
+	else	return( 0 );
+	return(1);
+}
 
 /*	-------------------------------------------------	*/
 /*	  c o o l _ a n a l y s e _ c o n d i t i o n s		*/
@@ -1244,7 +1269,8 @@ private	int	cool_analyse_conditions(
 					{
 						if (( vptr = occi_extract_atribut( bptr, Cool.domain, _CORDS_VARIABLE, _CORDS_VALUE )) != (char *) 0)
 						{
-							cool_elastic_condition(placement, nptr, vptr );
+							if (!( cool_elastic_condition(placement, nptr, vptr ) ))
+								cool_placement_condition( placement, nptr, vptr );
 						}
 					}
 					bptr = occi_remove_response( bptr );
