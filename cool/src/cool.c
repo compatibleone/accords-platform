@@ -69,6 +69,11 @@ private	int	cool_create_job( char * contract, char * nptr );
 private	int	cool_create_workload( struct elastic_contract * eptr, int type );
 private	struct elastic_contract * scaledown_elastic_contract( struct elastic_contract * contract );
 private	struct elastic_contract * scaleup_elastic_contract( char * contract, int allocate );
+private	struct elastic_contract * occi_elastic_conditions(
+	struct elastic_contract * eptr,
+	char * sla,
+	struct cords_placement_criteria * selector,
+	struct cords_guarantee_criteria * warranty );
 
 public	int	failure( int e, char * m1, char * m2 )
 {
@@ -516,6 +521,29 @@ private	void	cool_retrieve_durations(
 }
 
 /*	--------------------------------------------	*/
+/*	  u s e _ e l a s t i c _ a g r e e m e n t	*/
+/*	--------------------------------------------	*/
+private	struct	elastic_contract * use_elastic_agreement( struct elastic_contract * eptr )
+{
+	struct	cords_placement_criteria selector;
+	struct	cords_guarantee_criteria warranty;
+
+	memset( &warranty, 0, sizeof( struct cords_guarantee_criteria ));
+	memset( &selector, 0, sizeof( struct cords_placement_criteria ));
+
+	if ( Elastic.agreement )
+		return( eptr );
+	else
+	{
+		cool_log_message("use_elastic_agreement",0);
+		cool_log_message( eptr->agreement,0);
+		if (!( Elastic.agreement = allocate_string( eptr->agreement ) ))
+			return( liberate_elastic_contract( eptr ) );
+		else	return( occi_elastic_conditions( eptr, eptr->agreement, &selector, &warranty ) );
+	}
+}
+
+/*	--------------------------------------------	*/
 /*	  u s e _ e l a s t i c _ c o n t r a c t	*/
 /*	--------------------------------------------	*/
 private	struct elastic_contract * use_elastic_contract( struct elastic_contract * eptr, char * contract)
@@ -524,7 +552,7 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	struct	occi_response * zptr;
 	char *	result;
 
-	cool_log_message("use_elastic_contract",1);
+	cool_log_message("use_elastic_contract",0);
 
 	/* --------------------------------- */
 	/* retrieve the contract information */
@@ -602,8 +630,12 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 		else if (( result = occi_extract_atribut( 
 			zptr, Cool.domain, 
 			_CORDS_CONTRACT, _CORDS_AGREEMENT )) != (char * ) 0)
-			if (!( Elastic.agreement = allocate_string( result ) ))
+		{
+			if (!( eptr->agreement = allocate_string( result )))
 				return( liberate_elastic_contract( eptr ) );
+			else if (!( eptr = use_elastic_agreement( eptr ) ))
+				return( eptr );
+		}
 
 		/* ------------------------------- */
 		/* indicate the template is active */
