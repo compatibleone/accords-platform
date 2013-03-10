@@ -277,6 +277,9 @@ private	struct rest_response * scaleup_job(
 	{
 		scaleup_elastic_contract( Elastic.first->contract, 1 );
 		pptr->workloads = Elastic.active;
+		pptr->floor     = Elastic.floor;
+		pptr->ceiling   = Elastic.ceiling;
+		pptr->strategy  = Elastic.strategy;
 		autosave_cords_job_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -307,6 +310,9 @@ private	struct rest_response * scaledown_job(
 	{
 		scaledown_elastic_contract( Elastic.last );
 		pptr->workloads = Elastic.active;
+		pptr->floor     = Elastic.floor;
+		pptr->ceiling   = Elastic.ceiling;
+		pptr->strategy  = Elastic.strategy;
 		autosave_cords_job_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -588,12 +594,19 @@ private	struct elastic_contract * use_elastic_contract( struct elastic_contract 
 	/* append to the list of contracts */
 	/* ------------------------------- */
 	cool_lock();
+
 	if (!( eptr->previous = Elastic.last ))
 		Elastic.first = eptr;
 	else	eptr->previous->next = eptr;
 	Elastic.last = eptr;
-	cool_unlock();
+
+	/* ---------------------------------------- */
+	/* adjust this now to reflect real quantity */
+	/* ---------------------------------------- */
+	if ( eptr->isactive ) Elastic.active++;
 	Elastic.total++;
+
+	cool_unlock();
 
 	/* -------------------------------- */
 	/* if this is the template contract */
@@ -2098,6 +2111,9 @@ private	int	cool_elastic_manager()
 	int	status=0;
 	char *	eptr=(char *) 0;
 
+	/* ----------------------------------- */
+	/* retrieve existint elastic contracts */
+	/* ----------------------------------- */
 	if (!( retrieve_elastic_contracts() ))
 		return( 27 );
 
