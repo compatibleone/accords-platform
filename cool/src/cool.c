@@ -55,6 +55,9 @@ struct	accords_configuration Cool = {
 	(struct occi_category *) 0
 	};
 
+private	int	cool_occi_started=0;
+private	int	cool_rest_started=0;
+
 public	int	check_debug()		{	return(Cool.debug);		}
 public	int	check_verbose()		{	return(Cool.verbose);		}
 public	char *	default_publisher()	{	return(Cool.publisher);		}
@@ -1790,7 +1793,16 @@ private	struct rest_response * lb_head(
 }
 
 /*	---------------------------------------------------------	*/
-/* 				c o o l _ o c c i _ o p e r a t i o n			*/
+/* 		c o o l _ o c c i _ i n i t i a l i s e			*/
+/*	---------------------------------------------------------	*/
+private	struct rest_server * cool_occi_initialise( void * vptr, struct rest_server * sptr )
+{
+	cool_occi_started=1;
+	return( sptr );
+}
+
+/*	---------------------------------------------------------	*/
+/* 		c o o l _ o c c i _ o p e r a t i o n			*/
 /*	---------------------------------------------------------	*/
 private	int	cool_occi_operation( char * nptr )
 {
@@ -1798,6 +1810,13 @@ private	int	cool_occi_operation( char * nptr )
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
+	struct	rest_interface	callback;
+
+	/* -------------------------------------------------------- */
+	/* build the call back structure for server started message */
+	/* -------------------------------------------------------- */
+	memset( &callback, 0, sizeof( struct rest_interface ));
+	callback.initialise = cool_occi_initialise;
 
 	set_autosave_cords_xlink_name(_COOL_LINKS);
 
@@ -1814,6 +1833,8 @@ private	int	cool_occi_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+
+	optr->interface = &callback;
 
 	if (!( optr = occi_add_action( optr,_COOL_SCALEUP,"",scaleup_job)))
 		return( 27 );
@@ -1887,6 +1908,15 @@ private	int	cool_exit( int error, struct rest_thread * optr, struct rest_thread 
 }
 
 /*	---------------------------------------------------------	*/
+/* 		c o o l _ r e s t _ i n i t i a l i s e			*/
+/*	---------------------------------------------------------	*/
+private	struct rest_server * cool_rest_initialise( void * vptr, struct rest_server * sptr )
+{
+	cool_rest_started=1;
+	return( sptr );
+}
+
+/*	---------------------------------------------------------	*/
 /*		l o a d _ b a l a n c e r _ t h r e a d 		*/
 /*	---------------------------------------------------------	*/
 private	int	load_balancer_thread( char * nptr )
@@ -1895,7 +1925,7 @@ private	int	load_balancer_thread( char * nptr )
 	struct	rest_interface  Osi = 
 	{
 		(void *) 0,
-		(void *) 0,
+		cool_rest_initialise,
 		(void *) 0,
 		lb_get,
 		lb_post,
@@ -2177,6 +2207,7 @@ private	int	cool_create_job( char * contract, char * nptr )
 	char	value[64];
 	char *	ihost;
 	int	status;
+
 	cool_log_message("cool_create_job",0);
 	cool_log_message( contract,0);
 
@@ -2190,7 +2221,12 @@ private	int	cool_create_job( char * contract, char * nptr )
 	/* ---------------------------------------- */
 	if (!( cool_test_occi( buffer ) ))
 		return( 132 );
-	else	sleep(2);
+#else
+	/* ---------------------------------------- */
+	/* wait for the occi server thread to start */
+	/* ---------------------------------------- */
+	while (!( cool_occi_started ))
+		sleep(1);
 #endif
 
 	/* ----------------------------------------- */
@@ -2295,6 +2331,20 @@ private	int	cool_create_workload( struct elastic_contract * eptr, int type )
 	cool_log_message("cool_workload_identity",0);
 	cool_log_message( buffer,0);
 
+#ifndef	_OPTIMISED_OCCI_CLIENT
+	/* ---------------------------------------- */
+	/* wait for the occi server thread to start */
+	/* ---------------------------------------- */
+	if (!( cool_test_occi( buffer ) ))
+		return( 132 );
+#else
+	/* ---------------------------------------- */
+	/* wait for the occi server thread to start */
+	/* ---------------------------------------- */
+	while (!( cool_occi_started ))
+		sleep(1);
+#endif
+
 	if (!( dptr = occi_create_element( "occi.workload.name", "workload" ) ))
 		return( 27 );
 	else if (!( dptr->previous = foot))
@@ -2383,6 +2433,8 @@ private	int	cool_operation( char * nptr )
 	memset( &Elastic.lock,0,sizeof( Elastic.lock));
 	set_default_agent( nptr );
 	rest_initialise_log(Cool.monitor);
+	cool_occi_started=0;
+	cool_rest_started=0;
 
 	/* --------------------------------------------- */
 	/* initialise the resolver and publisher default */
