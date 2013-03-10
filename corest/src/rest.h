@@ -36,7 +36,7 @@
 #define	_FILE_BODY	0
 #define	_TEXT_BODY	1
 
-#define	_MAX_RESTBUFFER 64000
+#define	_MAX_RESTBUFFER 16000
 #define	_REST_THREAD_WORKER	1
 
 #define	_CORDS_REST_PATH	"rest/"
