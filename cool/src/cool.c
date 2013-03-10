@@ -1810,13 +1810,7 @@ private	int	cool_occi_operation( char * nptr )
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
-	struct	rest_interface	callback;
-
-	/* -------------------------------------------------------- */
-	/* build the call back structure for server started message */
-	/* -------------------------------------------------------- */
-	memset( &callback, 0, sizeof( struct rest_interface ));
-	callback.initialise = cool_occi_initialise;
+	struct	rest_interface	* callback=(struct rest_interface *) 0;
 
 	set_autosave_cords_xlink_name(_COOL_LINKS);
 
@@ -1834,7 +1828,11 @@ private	int	cool_occi_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-	optr->interface = &callback;
+	/* ------------------------------------------- */
+	/* set up server start relay on first category */
+	/* ------------------------------------------- */
+	if ((callback = optr->interface) != (struct rest_interface *) 0)
+		callback->initialise = cool_occi_initialise;
 
 	if (!( optr = occi_add_action( optr,_COOL_SCALEUP,"",scaleup_job)))
 		return( 27 );
