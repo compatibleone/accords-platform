@@ -1995,9 +1995,9 @@ private	void * 	cool_load_balancer( void * vptr )
 }
 
 /*	---------------------------------------------------------	*/
-/*			l o a d _ b a l a n c e r			*/
+/*			cool_elastic_start				*/
 /*	---------------------------------------------------------	*/
-private	int	cool_elastic_manager()
+private	int	cool_elastic_start()
 {
 	int	status=0;
 	char *	eptr=(char *) 0;
@@ -2067,8 +2067,19 @@ private	int	cool_elastic_manager()
 
 	if (!( add_elastic_contract( eptr, 0 ) ))
 		return( 27 );
+	else	return( 0 );
+}
 
-	else if (!( retrieve_elastic_contracts() ))
+
+/*	---------------------------------------------------------	*/
+/*			cool_elastic_manager				*/
+/*	---------------------------------------------------------	*/
+private	int	cool_elastic_manager()
+{
+	int	status=0;
+	char *	eptr=(char *) 0;
+
+	if (!( retrieve_elastic_contracts() ))
 		return( 27 );
 
 	/* -------------------------------------------- */
@@ -2512,10 +2523,16 @@ private	int	cool_operation( char * nptr )
 		}
 	}
 
+	/* --------------------------------- */
+	/* start elastic contract conditions */
+	/* --------------------------------- */
+	if ((status = cool_elastic_start()) != 0)
+		return( cool_exit( status, occimanager, loadbalancer ) );
+
 	/* -------------------------------- */
 	/* launch the elastic load balencer */
 	/* -------------------------------- */
-	if (!( loadbalancer = allocate_rest_thread() ))
+	else if (!( loadbalancer = allocate_rest_thread() ))
 		return( cool_exit( 37, occimanager, loadbalancer ) );
 	else
 	{
@@ -2534,9 +2551,9 @@ private	int	cool_operation( char * nptr )
 			return( cool_exit( 38, occimanager, loadbalancer ) );
 	}
 
-	/* ------------------------------- */
-	/* launch elastic contract manager */
-	/* ------------------------------- */
+	/* ---------------------------------- */
+	/* launch elastic scalability manager */
+	/* ---------------------------------- */
 	cool_log_message( "elastic manager starting",1 );
 	status = cool_elastic_manager();
 	cool_log_message( "elastic manager shutdown",1 );
