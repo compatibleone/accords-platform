@@ -116,7 +116,7 @@ private	void	cool_configuration()
 private	int	cool_banner()
 {
 	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.01");
-	printf("\n   Beta Version : 03/03/2013 ");
+	printf("\n   Beta Version : 10/03/2013 ");
 	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -1863,38 +1863,33 @@ private	int	cool_occi_operation( char * nptr )
 }
 
 /*	---------------------------------------------------------	*/
-/* 				c o o l _ o c c i _ m a n a g e r 				*/
-/*	---------------------------------------------------------	*/
-private	void * 	cool_occi_manager( void * vptr )
-{
-	struct rest_thread * tptr=vptr;
-	rest_log_message("thread: cool pthread detach");
-	pthread_detach( tptr->id );
-
-	(void) cool_occi_operation( "coolocci/v1.0" );
-
-	tptr->status = 0;
-	rest_log_message("thread: cool pthread exit");
-	pthread_exit((void *) 0);
-}
-
-/*	---------------------------------------------------------	*/
 /*			c o o l _ e x i t 				*/
 /*	---------------------------------------------------------	*/
-private	int	cool_exit( int error, struct rest_thread * tptr )
+private	int	cool_exit( int error, struct rest_thread * optr, struct rest_thread * rptr )
 {
-	if ( tptr )
-	{
-		while( tptr->status )
-			sleep(5);
-	}
+	/* ---------------------- */
+	/* wait for occi shutdown */
+	/* ---------------------- */
+	if ( optr )
+		while( optr->status )
+			if ( sleep(5) < 0 )
+				break;
+
+	/* ---------------------- */
+	/* wait for rest shutdown */
+	/* ---------------------- */
+	if ( rptr )
+		while( rptr->status )
+			if ( sleep( 5 ) < 0)
+				break;
+
 	return( error );
 }
 
 /*	---------------------------------------------------------	*/
-/*			l o a d _ b a l a n c e r			*/
+/*		l o a d _ b a l a n c e r _ t h r e a d 		*/
 /*	---------------------------------------------------------	*/
-private	int	load_balancer( char * nptr )
+private	int	load_balancer_thread( char * nptr )
 {
 	int	status=0;
 	struct	rest_interface  Osi = 
@@ -1920,6 +1915,133 @@ private	int	load_balancer( char * nptr )
 	/* -------------------------------------------- */
 	if (!( rest_valid_string( Cool.tls ) ))
 		Cool.tls = (char *) 0;
+
+	Osi.authorise = (void *) 0;
+
+	/* ------------------------------------------ */
+	/* this parameter now controls thread workers */
+	/* ------------------------------------------ */
+	if (!( Elastic.occi ))
+	{	rest_thread_control(0);		}
+
+
+	/* --------------------------------- */
+	/* launch the REST HTTP Server layer */
+	/* --------------------------------- */
+	cool_log_message( "cool rest server starting", 0 );
+	status = rest_server(  "cool" , Elastic.port, Elastic.security, 0, &Osi );
+	cool_log_message( "cool rest server shutdown", 0 );
+	return( status );
+}
+
+/*	---------------------------------------------------------	*/
+/* 		c o o l _ o c c i _ m a n a g e r 			*/
+/*	---------------------------------------------------------	*/
+private	void * 	cool_occi_manager( void * vptr )
+{
+	struct rest_thread * tptr=vptr;
+	rest_log_message("thread: cool OM pthread detach");
+	pthread_detach( tptr->id );
+
+	(void) cool_occi_operation( "coolocci/v1.0" );
+
+	tptr->status = 0;
+	rest_log_message("thread: cool OM pthread exit");
+	pthread_exit((void *) 0);
+}
+
+/*	---------------------------------------------------------	*/
+/* 		c o o l _ l o a d _ b a l a n c e r			*/
+/*	---------------------------------------------------------	*/
+private	void * 	cool_load_balancer( void * vptr )
+{
+	struct rest_thread * tptr=vptr;
+	rest_log_message("thread: cool LB pthread detach");
+	pthread_detach( tptr->id );
+
+	(void) load_balancer_thread( "coolocci/v1.0" );
+
+	tptr->status = 0;
+	rest_log_message("thread: cool LB pthread exit");
+	pthread_exit((void *) 0);
+}
+
+/*	---------------------------------------------------------	*/
+/*			l o a d _ b a l a n c e r			*/
+/*	---------------------------------------------------------	*/
+private	int	cool_elastic_manager()
+{
+	int	status=0;
+	char *	eptr=(char *) 0;
+
+	/* ------------------------------ */
+	/* analyse the elasticity options */
+	/* ------------------------------ */
+	if (!( eptr = getenv( "elastic_security" ) ))
+		Elastic.security = (char *) 0;
+	else 	Elastic.security = allocate_string( eptr );
+
+	/* --------------------------------------------------- */
+	/* this defines the MINIMUM number of active contracts */
+	/* required at any one time for load balancing reasons */
+	/* --------------------------------------------------- */ 
+	if (!( eptr = getenv( "elastic_floor" ) ))
+		Elastic.floor = 1;
+	else	Elastic.floor = atoi(eptr);
+
+	/* --------------------------------------------------- */
+	/* this defines the MAXIMUM number of active contracts */
+	/* required at any one time for load balancing reasons */
+	/* --------------------------------------------------- */ 
+	if (!( eptr = getenv( "elastic_ceiling" ) ))
+		Elastic.ceiling = 1;
+	else	Elastic.ceiling = atoi(eptr);
+
+	if (!( eptr = getenv( "elastic_upper" ) ))
+		Elastic.upper = 10;
+	else	Elastic.upper = atoi(eptr);
+
+	if (!( eptr = getenv( "elastic_lower" ) ))
+		Elastic.lower = 2;
+	else	Elastic.lower = atoi(eptr);
+
+	/* --------------------------------------------------- */
+	/* this defines the elastic response strategry by HTTP */
+	/* redirection header as 0,301,302,303 or 307 response */
+	/* --------------------------------------------------- */ 
+	if (!( eptr = getenv( "elastic_strategy" ) ))
+		Elastic.strategy = _HTTP_MOVED;
+	else if (!( Elastic.strategy = atoi(eptr) ))
+		Elastic.strategy = _HTTP_MOVED;
+
+	if (!( eptr = getenv( "elastic_unit" ) ))
+		Elastic.unit = 10;
+	else	Elastic.unit = atoi(eptr);
+
+	if (!( eptr = getenv( "elastic_period" ) ))
+		Elastic.period = 60;
+	else	Elastic.period = atoi(eptr);
+
+	/* --------------------------------------------------- */
+	/* this defines the contract that is to be the content */
+	/* for load balancing and will be duplicated to floor. */
+	/* --------------------------------------------------- */ 
+	if (!( eptr = getenv( "elastic_contract" ) ))
+		return( 118 );
+
+	if ( Elastic.occi )
+	{
+		occi_optimise_local(1);
+
+		if ((status = cool_create_job( eptr, "environment" )) != 0)
+			return( 118 );
+	}
+
+	if (!( add_elastic_contract( eptr, 0 ) ))
+		return( 27 );
+
+	else if (!( retrieve_elastic_contracts() ))
+		return( 27 );
 
 	/* -------------------------------------------- */
 	/* ensure TLS is correct either NULL or Valid   */
@@ -1947,22 +2069,6 @@ private	int	load_balancer( char * nptr )
 		if (!( scaleup_elastic_contract( Elastic.first->contract, 1 ) ))
 			return( 127 );
 
-
-	Osi.authorise = (void *) 0;
-
-	/* ------------------------------------------ */
-	/* this parameter now controls thread workers */
-	/* ------------------------------------------ */
-	if (!( Elastic.occi ))
-	{	rest_thread_control(0);		}
-
-
-	/* --------------------------------- */
-	/* launch the REST HTTP Server layer */
-	/* --------------------------------- */
-	cool_log_message( "cool rest server starting", 0 );
-	status = rest_server(  "cool" , Elastic.port, Elastic.security, 0, &Osi );
-	cool_log_message( "cool rest server shutdown", 0 );
 	return( status );
 }
 
@@ -2271,7 +2377,8 @@ private	int	cool_operation( char * nptr )
 	int	status;
 	char *	tls;
 	struct	tls_configuration * tlsconf=(struct tls_configuration *) 0;
-	struct	rest_thread * tptr=(struct rest_thread *) 0;
+	struct	rest_thread * occimanager=(struct rest_thread *) 0;
+	struct	rest_thread * loadbalancer=(struct rest_thread *) 0;
 
 	memset( &Elastic.lock,0,sizeof( Elastic.lock));
 	set_default_agent( nptr );
@@ -2316,6 +2423,11 @@ private	int	cool_operation( char * nptr )
 			else	cool_log_message( "authentication", 0 );
 		}
 	}
+
+	/* ------------------------------ */
+	/* start log activity as required */
+	/* ------------------------------ */
+	rest_initialise_log( Cool.monitor );
 	activate_event_manager();
 
 	/* ----------------------------------------------------	*/	
@@ -2330,111 +2442,59 @@ private	int	cool_operation( char * nptr )
 		/* ---------------------- */
 		/* Launch the OCCI Thread */
 		/* ---------------------- */
-		if (!( tptr = allocate_rest_thread() ))
+		if (!( occimanager = allocate_rest_thread() ))
 			return( 37 );
 		else
 		{
-			tptr->status = 1;
+			occimanager->status = 1;
 
-			pthread_attr_init( &tptr->attributes);
+			pthread_attr_init( &occimanager->attributes);
+
+			/* --------------------- */
+			/* launch the new thread */
+			/* --------------------- */
+			if ((status = pthread_create(
+					&occimanager->id,
+					&occimanager->attributes,
+					cool_occi_manager,	
+					(void *) occimanager)) > 0 )
+				return( 38 );
 		}
-		/* --------------------- */
-		/* launch the new thread */
-		/* --------------------- */
-		if ((status = pthread_create(
-				&tptr->id,
-				&tptr->attributes,
-				cool_occi_manager,	
-				(void *) tptr)) > 0 )
-			return( 38 );
-		else	sleep(2);
 	}
 
 	/* -------------------------------- */
 	/* launch the elastic load balencer */
 	/* -------------------------------- */
-
-	/* ------------------------------ */
-	/* analyse the elasticity options */
-	/* ------------------------------ */
-	if (!( eptr = getenv( "elastic_security" ) ))
-		Elastic.security = (char *) 0;
-	else if (!( Elastic.security = allocate_string( eptr ) ))
-		return( 27 );
-
-
-	/* --------------------------------------------------- */
-	/* this defines the MINIMUM number of active contracts */
-	/* required at any one time for load balancing reasons */
-	/* --------------------------------------------------- */ 
-	if (!( eptr = getenv( "elastic_floor" ) ))
-		Elastic.floor = 1;
-	else	Elastic.floor = atoi(eptr);
-
-	/* --------------------------------------------------- */
-	/* this defines the MAXIMUM number of active contracts */
-	/* required at any one time for load balancing reasons */
-	/* --------------------------------------------------- */ 
-	if (!( eptr = getenv( "elastic_ceiling" ) ))
-		Elastic.ceiling = 1;
-	else	Elastic.ceiling = atoi(eptr);
-
-	if (!( eptr = getenv( "elastic_upper" ) ))
-		Elastic.upper = 10;
-	else	Elastic.upper = atoi(eptr);
-
-	if (!( eptr = getenv( "elastic_lower" ) ))
-		Elastic.lower = 2;
-	else	Elastic.lower = atoi(eptr);
-
-	/* --------------------------------------------------- */
-	/* this defines the elastic response strategry by HTTP */
-	/* redirection header as 0,301,302,303 or 307 response */
-	/* --------------------------------------------------- */ 
-	if (!( eptr = getenv( "elastic_strategy" ) ))
-		Elastic.strategy = _HTTP_MOVED;
-	else if (!( Elastic.strategy = atoi(eptr) ))
-		Elastic.strategy = _HTTP_MOVED;
-
-	if (!( eptr = getenv( "elastic_unit" ) ))
-		Elastic.unit = 10;
-	else	Elastic.unit = atoi(eptr);
-
-	if (!( eptr = getenv( "elastic_period" ) ))
-		Elastic.period = 60;
-	else	Elastic.period = atoi(eptr);
-
-	/* --------------------------------------------------- */
-	/* this defines the contract that is to be the content */
-	/* for load balancing and will be duplicated to floor. */
-	/* --------------------------------------------------- */ 
-	if (!( eptr = getenv( "elastic_contract" ) ))
-		return( cool_exit( 118, tptr ) );
-
-	if ( Elastic.occi )
+	if (!( loadbalancer = allocate_rest_thread() ))
+		return( cool_exit( 37, occimanager, loadbalancer ) );
+	else
 	{
-		occi_optimise_local(1);
+		loadbalancer->status = 1;
 
-		if ((status = cool_create_job( eptr, "environment" )) != 0)
-			return( cool_exit( 118, tptr ) );
+		pthread_attr_init( &loadbalancer->attributes);
+
+		/* --------------------- */
+		/* launch the new thread */
+		/* --------------------- */
+		if ((status = pthread_create(
+				&loadbalancer->id,
+				&loadbalancer->attributes,
+				cool_load_balancer,	
+				(void *) loadbalancer)) > 0 )
+			return( cool_exit( 38, occimanager, loadbalancer ) );
 	}
 
-	if (!( add_elastic_contract( eptr, 0 ) ))
-		return( cool_exit( 27, tptr ) );
+	/* ------------------------------- */
+	/* launch elastic contract manager */
+	/* ------------------------------- */
+	cool_log_message( "elastic manager starting",1 );
+	status = cool_elastic_manager();
+	cool_log_message( "elastic manager shutdown",1 );
 
-	else if (!( retrieve_elastic_contracts() ))
-		return( cool_exit( 27, tptr ) );
-
-	/* ----------------------------- */
-	/* put the load balancer online  */
-	/* ----------------------------- */
-	rest_initialise_log( Cool.monitor );
-
-	cool_log_message( "load balancer starting",1 );
-	status = load_balancer( nptr );
-	cool_log_message( "load balancer shutdown",1 );
-
-	cool_exit( status, tptr );
+	/* ----------------------- */
+	/* await thread completion */
+	/* ----------------------- */
+	cool_exit( status, occimanager, loadbalancer );
 
 	/* ----------------------------- */
 	/* release the elastic contracts */
