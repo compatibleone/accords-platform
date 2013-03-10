@@ -188,7 +188,6 @@ private	struct	elastic_control Elastic =
 	/* ------------------------------------ */
 	(char *) 0, 	/* elastic job occi id	*/
 	(char *) 0,	/* elastic security	*/
-	0,	/* use elastic occi		*/
 	80,	/* elastic rest port		*/
 	1,	/* elastic floor 		*/
 	2, 	/* elastic ceiling		*/
@@ -1498,9 +1497,7 @@ private	struct elastic_contract * add_elastic_contract( char * contract, int all
 	/* -------------------------- */
 	/* do the occi instance stuff */
 	/* -------------------------- */
-	if (!( Elastic.occi ))
-		return( eptr );
-	else if (!( eptr ))
+	if (!( eptr ))
 		return( eptr );
 	else if ((status = cool_create_workload( eptr, allocate )) != 0)
 		return((struct elastic_contract *) 0);
@@ -1978,13 +1975,6 @@ private	int	load_balancer_thread( char * nptr )
 
 	Osi.authorise = (void *) 0;
 
-	/* ------------------------------------------ */
-	/* this parameter now controls thread workers */
-	/* ------------------------------------------ */
-	if (!( Elastic.occi ))
-	{	rest_thread_control(0);		}
-
-
 	/* --------------------------------- */
 	/* launch the REST HTTP Server layer */
 	/* --------------------------------- */
@@ -2089,13 +2079,10 @@ private	int	cool_elastic_start()
 	if (!( eptr = getenv( "elastic_contract" ) ))
 		return( 118 );
 
-	if ( Elastic.occi )
-	{
-		occi_optimise_local(1);
+	occi_optimise_local(1);
 
-		if ((status = cool_create_job( eptr, "environment" )) != 0)
-			return( 118 );
-	}
+	if ((status = cool_create_job( eptr, "environment" )) != 0)
+		return( 118 );
 
 	if (!( add_elastic_contract( eptr, 0 ) ))
 		return( 27 );
@@ -2485,12 +2472,6 @@ private	int	cool_operation( char * nptr )
 	if ((status = occi_publisher_default()) != 0 )
 		return( status );
 
-	/* ------------------------------ */
-	/* Detect need for OCCI Interface */
-	/* ------------------------------ */
-	if (( eptr = getenv( "elastic_occi" )) != (char *) 0)
-		Elastic.occi = atoi( eptr );
-
 	/* ----------------------------------------------- */
 	/* set up the two ports and transpose the identity */
 	/* ----------------------------------------------- */
@@ -2530,29 +2511,25 @@ private	int	cool_operation( char * nptr )
 	/* ----------------------------------------------------	*/	
 	cool_log_message( "operation", 0 );
 
-	if ( Elastic.occi )
+	/* ---------------------- */
+	/* Launch the OCCI Thread */
+	/* ---------------------- */
+	if (!( occimanager = allocate_rest_thread() ))
+		return( 37 );
+	else
 	{
-		/* ---------------------- */
-		/* Launch the OCCI Thread */
-		/* ---------------------- */
-		if (!( occimanager = allocate_rest_thread() ))
-			return( 37 );
-		else
-		{
-			occimanager->status = 1;
+		occimanager->status = 1;
+		pthread_attr_init( &occimanager->attributes);
 
-			pthread_attr_init( &occimanager->attributes);
-
-			/* --------------------- */
-			/* launch the new thread */
-			/* --------------------- */
-			if ((status = pthread_create(
-					&occimanager->id,
-					&occimanager->attributes,
-					cool_occi_manager,	
-					(void *) occimanager)) > 0 )
-				return( 38 );
-		}
+		/* --------------------- */
+		/* launch the new thread */
+		/* --------------------- */
+		if ((status = pthread_create(
+				&occimanager->id,
+				&occimanager->attributes,
+				cool_occi_manager,	
+				(void *) occimanager)) > 0 )
+			return( 38 );
 	}
 
 	/* --------------------------------- */

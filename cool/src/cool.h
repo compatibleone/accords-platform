@@ -69,7 +69,6 @@ struct	elastic_control
 	/* ------------------------------------ */
 	char 	*	job;
 	char 	*	security;
-	int		occi;
 	int		port;
 	int		floor;
 	int		ceiling;
