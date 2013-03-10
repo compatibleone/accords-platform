@@ -1,0 +1,151 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-easicloudsmanifest.txt					 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the list of easiclouds manifests in the system allowing access for inspection of each    */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+
+function	Serialise( $mid )
+{
+	$items=0;
+	$cat = "";
+	$content = [];
+
+	$record = $mid.get();
+
+	foreach ( $record as $tuple )
+	{
+		forboth ( $tuple as $name and $value )
+		{
+			if ( $name != "link" )
+			{
+				if ( $value.length() > 40 )
+				{
+					$v = $value / ":";
+					$s = $v[0];
+				}
+				else	
+				{
+					$s = "none";
+				}
+				if ( $s != "https" )
+				{
+					$n = $name / ".";
+					$name = $n[2];
+					if ( $name != "id" )
+					{
+						if ( $items == 0 )
+						{
+							$cat = $n[1];
+							$content = $content + $cat;
+							$m = "&lt;"#$cat;
+							$m.display();
+						}
+						$items = $items + 1;
+						if ( $value.length() > 0 )
+						{
+							$m = ' '#$name#'="'#$value#'"';
+							$m.display();
+						}
+					}
+				}
+				else
+				{
+					$content = $content + $value;
+				}
+			}
+			else
+			{
+				$content = $content + $value;
+			}
+		}
+	}
+	"&gt;<br>".display();
+	return( $content );
+
+}
+
+
+
+	HtmlHeader("Accords Platform Easiclouds Application Manifest",$1);
+
+	"<tr><td colspan=4>".display();
+
+	$what = $2;
+
+
+	if ( $what.length() > 0 )
+	{
+		$cat1 = "(null)";
+		$content1 = Serialise( $what );
+		foreach ( $content1 as $what1 )
+		{
+			if ( $cat1.length() == 0 )
+			{
+				$cat1 = $what1;
+			}
+			else
+			{
+				$content2 = Serialise( $what1 );
+				$cat2 = "(null)";
+				foreach ( $content2 as $what2 )
+				{
+					if ( $cat2.length() == 0 )
+					{
+						$cat2 = $what2;
+					}
+					else
+					{
+						$content3 = Serialise( $what2 );
+						$cat3 = "(null)";
+						foreach ( $content3 as $what3 )
+						{
+							if ( $cat3.length() == 0 )
+							{
+								$cat3 = $what3;
+							}
+							else
+							{
+								$content4 = Serialise( $what3 );
+								$cat4 = "(null)";
+								foreach ( $content4 as $what4 )
+								{
+									if ( $cat4.length() == 0 )
+									{
+										$cat4 = $what4;
+									}
+									else
+									{
+										$content5 = Serialise( $what4 );
+										$cat5 = $content5[0];
+										$m = "&lt;/"#$cat5#"&gt;<br>";
+										$m.display();
+										$cat5 = "(null)";
+									}
+								}
+								$m = "&lt;/"#$cat4#"&gt;<br>";
+								$m.display();
+								$cat4 = "(null)";
+							}
+						}
+						$m = "&lt;/"#$cat3#"&gt;<br>";
+						$m.display();
+						$cat3 = "(null)";
+					}
+				}
+				$m = "&lt;/"#$cat2#"&gt;<br>";
+				$m.display();
+				$cat2 ="(null)";
+			}
+		}
+		$m = "&lt;/"#$cat1#"&gt;<br>";
+		$m.display();
+		$cat1 = "(null)";
+	}
+
+	"</td></tr>".display();
+
+	HtmlFooter();
+

@@ -13,9 +13,9 @@
 	AccountList( " " );
 	"</td></tr>".display();
 
-	"<tr><th colspan=4><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newaccount.txt'>Create Customer Account</a></th></tr>".display();
-	"<tr><th colspan=4><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailed Transactions List</a></th></tr>".display();
-	"<tr><th colspan=4><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
+	"<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-newaccount.txt'>Create Customer Account</a></th></tr>".display();
+	"<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailed Transactions List</a></th></tr>".display();
+	"<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
 
 	HtmlFooter();
 

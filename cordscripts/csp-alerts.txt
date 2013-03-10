@@ -16,7 +16,7 @@
 	AlertList( " " );
 	"</td></tr>".display();
 
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-scheduling.txt&option="#$what#"'>Scheduling</a></th></tr>";
+	$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-scheduling.txt&option="#$what#"'>Scheduling</a></th></tr>";
 	$m.display();
 	
 	HtmlFooter();

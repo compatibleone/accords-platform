@@ -42,6 +42,11 @@
 
 		$id = penalty.post( $s );
 
+
+		$probe = $control["occi.control.probe"];
+		$probe.unlink( $packet );
+		$penalty.link( $packet );
+
 	}
 
 

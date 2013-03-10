@@ -1,15 +1,15 @@
 function	VendorMenu($account)
 {
 	"<tr>".display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML&option="#$account#"'>Accounts</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML&option="#$account#"'>Accounts</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML&option="#$account#"'>Applications</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML&option="#$account#"'>Applications</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-sales.txt&ouput=HTML&option="#$account#"'>Sales</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-sales.txt&ouput=HTML&option="#$account#"'>Sales</a>";
 	$m.display();
 	return;
 }

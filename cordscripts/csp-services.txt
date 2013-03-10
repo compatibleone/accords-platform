@@ -9,18 +9,23 @@
 
 
 	include "csp-header.txt";
-
+	include "csp-main.txt";
 
 	HtmlHeader("Accords Platform Service Contract List",$1);
 
 	$who    = $1
 	$what   = $2;
 
-	if ( $what != "all" )
+	if ( $what.length() > 0 )
 	{
-		$accounts = account.list('occi.account.name="'#$what#'"');
-		$account  = $accounts[0];
-		$selector = 'occi.service.account="'#$account#'"';
+		if ( $what != "all" )
+		{
+			$accounts = account.list('occi.account.name="'#$what#'"');
+			$account  = $accounts[0];
+			$selector = 'occi.service.account="'#$account#'"';
+		}
+		else
+		{	$selector = " ";	}
 	}
 	else
 	{
@@ -29,7 +34,7 @@
 
 	$action = $3;
 
-	$baseurl = "/accords/dashboard.php";
+	$baseurl = "dashboard.php";
 
 	$list = service.list($selector);
 	
@@ -69,48 +74,59 @@
 
 			$chost=$record["occi.contract.hostname"];
 			$ctime=$record["occi.contract.when"];
+			$cnode=$record["occi.contract.node"];
 			$cdate=$ctime.date();
 			$cprov=$record["occi.contract.profile"];
-			
+			$flags = $record["occi.contract.flags"];
 			$m = "<td><a href='"#$contract#"'>";
 			$m.display();
-
+			if ( $flags > 0 )
+			{	"<i>".display();	}
+			else
+			{	"<b>".display();	}
 			$cname.display();	
-			"(".display();
+			if ( $flags > 0 )
+			{	"</i>".display();	}
+			else
+			{	"</b>".display();	}
+			" &nbsp; ".display();
 			$cprov.display();
-			")</a>".display();
-			if ( $first != 0 )
-			{
-				$first = 0;
+			"</a>".display();
 			if ( $status != 0 )
 			{
-				$n = "<td>"#$chost#"<br>"#$cdate;
-				$n.display();
-				$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
-				$n.display();
-				$n = "<input type=submit name=action class=action value='stop service'></form>";
+				$chost = NodeEntry( $cnode, $chost );
+				$n = "<td><b><a href='"#$chost#"'>"#$chost#"</a></b><br>"#$cdate;
 				$n.display();
 			}
 			else
 			{
-				"<td>&nbsp;".display();
-				$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
-				$n.display();
-				$n = "<input type=submit name=action class=action value='start service'></form>";
-				$n.display();
+				"<td>&nbsp;</td>".display();
 			}
+			if ( $first != 0 )
+			{
+				$first = 0;
+				if ( $status != 0 )
+				{
+					$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+					$n.display();
+					$n = "<input type=submit name=action class=action value='stop service'></form>";
+					$n.display();
+				}
+				else
+				{
+					$n = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+					$n.display();
+					$n = "<input type=submit name=action class=action value='start service'></form>";
+					$n.display();
+				}
 			}
 			$sm ="<tr>";
 		}
 
 	}
-	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-penalties.txt&option="#$what#"'>Incurred Penalties</a></th></tr>";
+	$m = "<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-penalties.txt&option="#$what#"'>Incurred Penalties</a></th></tr>";
 	$m.display();
-	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$who#"'>Process Transactions</a></th></tr>";
+	$m = "<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$who#"'>Process Transactions</a></th></tr>";
 	$m.display();
-	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" start'>Start All Services</a></th></tr>";
+	$m = "<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" start'>Start All Services</a></th></tr>";
 	$m.display();
-	$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#" stop'>Stop All Services</a></th></tr>";
-	$m.display();
-
-	HtmlFooter();

@@ -1,6 +1,6 @@
 function vendorList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$vendors = vendor.list( $selector );
 

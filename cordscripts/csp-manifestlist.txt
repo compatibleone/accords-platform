@@ -1,7 +1,7 @@
 
 function ManifestList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$manifests = manifest.list( $selector );
 

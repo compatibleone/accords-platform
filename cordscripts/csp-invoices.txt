@@ -11,14 +11,19 @@
 
 	$what = $2;
 
-	$accounts = account.list( 'occi.account.name="'#$what#'"');
+	if ( $what.length() > 0 )
+	{	$selector = 'occi.account.name="'#$what#'"';	}
+	else
+	{	$selector = " ";	}
+
+	$accounts = account.list( $selector );
 	$account = $accounts[0];
 
 	"<tr><td colspan=6>".display();
 	InvoiceList( 'occi.invoice.account="'#$account#'"' );
 	"</td></tr>".display();
 
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$what#"'>Process Transactions</a></th></tr>";
+	$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$what#"'>Process Transactions</a></th></tr>";
 	$m.display();
 	
 	HtmlFooter();

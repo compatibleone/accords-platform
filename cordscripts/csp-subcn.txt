@@ -13,20 +13,20 @@
 	}
 
 
-	HtmlHeader("OpenNebula Subscription",$1);
+	HtmlHeader("ComputeNext Subscription",$1);
 
 	$what = $2;
 
-	$un = '"occi.opennebula_configuration.name":"'#$what#'"';
-	$list = opennebula_configuration.list( $un );
+	$un = '{"occi.computenext_configuration.name":"'#$what#'"}';
+	$list = computenext_configuration.list( $un );
 	$cid  = $list[0];
 	if ( $cid.length() > 0 )
 	{
 		$record = $cid.get();
-		$sname = $record["occi.opennebula_configuration.user"];
-		$spass = $record["occi.opennebula_configuration.password"];
-		$shost = $record["occi.opennebula_configuration.host"];
-		$smore = $record["occi.opennebula_configuration.namespace"];
+		$sname = $record["occi.computenext_configuration.apikey"];
+		$spass = $record["occi.computenext_configuration.apisec"];
+		$shost = $record["occi.computenext_configuration.host"];
+		$smore = $record["occi.computenext_configuration.namespace"];
 	}
 	else
 	{
@@ -37,8 +37,8 @@
 	}
 	
 	"<table width='100%'>".display();
-	"<tr><td colspan=4><h3>Addition or modification of the OpenNebula Subscription for an Existing Customer Account</h3></td></tr>".display();
-	"<tr><td colspan=4>This document allows you to add or modify the OpenNebula subscription record  of an existing customer account allowing provisioning through the interface.<p>".display();
+	"<tr><td colspan=4><h3>Addition or modification of the ComputeNext Subscription for an Existing Customer Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to add or modify the ComputeNext subscription record  of an existing customer account allowing provisioning through the interface.<p>".display();
 
 	SectionHeader("The Account");
 
@@ -62,27 +62,28 @@
 
 	"<tr><td colspan=2>Here you should specify the URL of the provisioning platform. This must include the service prefix, the host name,".display(); 
 	"the service port and any other information such as version number.".display(); 
-	"<td colspan=2>Here you should specify the tenent information of your subscription account.".display(); 
+	"<td colspan=2>&nbsp;".display(); 
 
-	$m = "<tr><td><b>Host</b><td><input type=text name='host' value='"#$shost#"'>";
+	$m = "<tr><td><b>Host</b><td><input type=text name='host' value='"#$shost#"'>"
 	$m.display();
 
-	$m = "<td><b>Tenent</b><td><input type=text name='tenent' value='"#$smore#"'>";
+	$m = "<td><b>&nbsp;</b><td><input type=hidden name='tenent' value='"#$smore#"'>";
 	$m.display();
 	
-	"<tr><td colspan=4>Here you must specify the authentication credentials of the subscription account comprising user name and password.".display();
-	$m = "<tr><td><b>User</b><td><input type=text name='user' value='"#$sname#"' >";
+	"<tr><td colspan=4>Here you must specify the authentication credentials of the subscription account comprising the API KEy and the API Secret.".display();
+	$m = "<tr><td><b>API Key</b><td><input type=text name='key' value='"#$sname#"'>";
 	$m.display();
 
-	$m = "<td><b>Password</b><td><input type=password name='password' value='"#$spass#"'>";
+	$m = "<td><b>API Secret</b><td><input type=text name='secret' value='"#$spass#"'>";
 	$m.display();
+
 
 
 	SectionHeader("Subscription Confirmation");
 
 	"<tr><td><td colspan=2> Finally you must submit the subscription information for processing and acceptance.<p>".display();
 	"Please verify all information provided here very carefully prior to submission.<td>".display();
-	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add on subscription'><td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add cn subscription'><td>".display();
 
 	'</table></form></td></tr>'.display();
 

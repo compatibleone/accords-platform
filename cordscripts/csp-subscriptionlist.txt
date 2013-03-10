@@ -1,7 +1,7 @@
 
 function SubscriptionList( $aname )
 {
-	$baseurl ="/accords/dashboard.php";
+	$baseurl ="dashboard.php";
 	"<table width='100%'><tr><td class=section colspan=5><b>Subscription Information</b></td></tr>".display();
 	"<tr><td class=title>Provision<td class=title>Tenent<td class=title>User<td class=title>Password<td colspan=2 class=title>Host</tr>".display();
 	$providers = provider.list();
@@ -65,7 +65,6 @@ function SubscriptionList( $aname )
 			$pass = $record["occi.paas_configuration.password"];
 			$what = $record["occi.paas_configuration.namespace"];
 			$script = "csp-subpp.txt";
-
 			break;
 
 		case	"proactive"		:
@@ -77,8 +76,8 @@ function SubscriptionList( $aname )
 			$pass = $record["occi.proactive_configuration.password"];
 			$what = $record["occi.proactive_configuration.namespace"];
 			$script = "csp-subpa.txt";
-
 			break;
+
 		case	"deltacloud"		:
 			$record = deltacloud_configuration.list('occi.deltacloud_configuration.name="'#$aname#'"');
 			$rid = $record[0];
@@ -88,9 +87,18 @@ function SubscriptionList( $aname )
 			$pass = $record["occi.deltacloud_configuration.password"];
 			$what = $record["occi.deltacloud_configuration.namespace"];
 			$script = "csp-subdc.txt";
-
 			break;
 
+		case	"computenext"		:
+			$record = computenext_configuration.list('occi.computenext_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.computenext_configuration.host"];
+			$user = $record["occi.computenext_configuration.apikey"];
+			$pass = $record["occi.computenext_configuration.apisec"];
+			$what = $record["occi.computenext_configuration.namespace"];
+			$script = "csp-subcn.txt";
+			break;
 		default			:
 			$host = ""; 
 			$user = ""; 
@@ -98,6 +106,7 @@ function SubscriptionList( $aname )
 			$what = "";
 
 		}
+		$pass = "************";
 		$m = "<tr><td><a href='"#$baseurl#"?action=compile&script="#$script#"&output=HTML&option="#$aname#"'>"#$category#"</a>";
 		$m = $m#"<td>"#$what;
 		$m = $m#"<td>"#$user;

@@ -1,7 +1,7 @@
 
 function PenaltyList( $selection )
 {
-	$baseurl ="/accords/dashboard.php";
+	$baseurl ="dashboard.php";
 	"<table width='100%'><tr><td class=section colspan=5><b>penalties</b></td></tr>".display();
 	"<tr><td class=title>Date<td class=title>Account<td class=title>Contract<td class=title>Agreement<td class=title>Sequence<td class=title>Fault Condition</tr>".display();
 	$penaltys = penalty.list($selection);

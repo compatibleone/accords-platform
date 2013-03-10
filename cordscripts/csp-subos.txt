@@ -88,7 +88,7 @@
 
 	"<tr><td colspan=4>&nbsp;</td></tr>".display();
 
-	$m = "<tr><th colspan=4><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-subscriptions.txt&option="#$what#"'>List of Subscriptions</a></th></tr>";
+	$m = "<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-subscriptions.txt&option="#$what#"'>List of Subscriptions</a></th></tr>";
 	$m.display();
 
 

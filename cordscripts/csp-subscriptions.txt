@@ -18,7 +18,7 @@
  
 	"</td></tr>".display();
 
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-account.txt&option="#$what#"'>Account Information</a></th></tr>";
+	$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-account.txt&option="#$what#"'>Account Information</a></th></tr>";
 	$m.display();
 	
 	HtmlFooter();

@@ -13,7 +13,7 @@
 	ProviderList( " " );
 	"</td></tr>".display();
 
-	"<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newprovider.txt&option=yes'>Create Provider Account</a></th></tr>".display();
+	"<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-newprovider.txt&option=yes'>Create Provider Account</a></th></tr>".display();
 	
 	HtmlFooter();
 

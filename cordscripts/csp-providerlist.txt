@@ -1,6 +1,6 @@
 function ProviderList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$providers = provider.list( $selector );
 

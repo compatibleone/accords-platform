@@ -1,6 +1,6 @@
 function AccountList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$accounts = account.list( $selector );
 

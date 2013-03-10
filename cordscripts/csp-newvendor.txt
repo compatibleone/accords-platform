@@ -1,0 +1,83 @@
+
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+	include "csp-selectmanifest.txt";
+	include "csp-selectprovider.txt";
+	include "csp-selectmetric.txt";
+	include "csp-selectalgorithm.txt";
+	include "csp-selectzone.txt";
+	include "csp-selectrole.txt";
+	include "csp-selectrating.txt";
+	include "csp-selectsecurity.txt";
+	include "csp-selectenergy.txt";
+	include "csp-selectcondition.txt";
+	include "csp-selectbusiness.txt";
+	include "csp-selectagreement.txt";
+	include "csp-uploadmanifest.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("Vendor Account Creation",$1);
+
+	
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Creation of a Vendor or End User Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This documentleads you through the steps comprising the work flow that need to be completed for the creation of a vendor account.<p>".display();
+	"The creation of an account is required for the identification of the user such that they engage in service level agreements with the platform operator for deployment of cloud resources.<p>".display();
+
+	SectionHeader("The Account Header");
+
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+
+	"<tr><td colspan=2>Specify here the name of the new Vendor account. This must be a unique identifier in the system.".display();
+
+	"<tr><td><b>Account Name</b><td><input type=text name='name' value=''>".display();
+
+	"<td><b>Nature</b><td><input type=text name='type' value='vendor' readonly>".display();
+
+	"<tr><td colspan=2>Specify here the account number of the new Vendor account. This must be a unique account identifier in the accountancy system.".display();
+
+	"<tr><td><b>Account Number</b><td><input type=text name='number' value=''>".display();
+
+	"<tr><td colspan=2>Specify here the nature of the sales transactions collation policy.".display();
+	"<td colspan=2>Specify the name of the script when the collation policy has been set to use a custom script.".display();
+
+	"<tr><td><b>Invoice Policy</b><td><select name='policy'><option value=default>default</option><option value=script>script</option></select>".display();
+
+	"<td><b>Policy Script</b><td><input type=text name=script value=''>".display();
+
+	SectionHeader("The Primary Account User");
+
+	"<tr><td><b>User Name</b><td><input type=text name='username' value=''>".display();
+
+	"<td><b>Role</b><td>".display();
+	SelectRole("role");
+
+	"<tr><td><b>Password</b><td><input type=password name='password' value='' >".display();
+
+	"<td><b>Email</b><td><input type=text name='mail' value='' >".display();
+
+
+
+	SectionHeader("The Account Completion");
+
+	"<tr><td><td colspan=2> Finally you must submit the description of the vendor account for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='create user account'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+	"</table>".display();
+
+	HtmlFooter();

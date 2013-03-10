@@ -1,7 +1,7 @@
 
 function ApplicationList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$applications = saas.list( $selector );
 

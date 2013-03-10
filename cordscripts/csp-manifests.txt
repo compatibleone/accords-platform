@@ -7,14 +7,13 @@
 	include "csp-header.txt";
 	include "csp-manifestlist.txt";
 
-	HtmlHeader("Accords Platform Manifests and Nodes",$1);
+	HtmlHeader("Accords Platform Manifests",$1);
 
 	"<tr><td colspan=6>".display();
 	ManifestList( " " );
 	"</td></tr>".display();
 
-	"<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailled Transactions List</a></th></tr>".display();
-	"<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
+	"<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-operations.txt&option=no'>Platform Operations</a></th></tr>".display();
 	
 	HtmlFooter();
 

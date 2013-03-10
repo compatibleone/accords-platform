@@ -1,0 +1,27 @@
+function EventList( $selector )
+{
+	$baseurl   = "/accords/dashboard.php";
+
+	$events = event.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=4><b>Events</b></td></tr>".display();
+
+	"<tr><td class=title>When<td class=title>Source<td class=title>Nature<td class=title>Description</tr>".display();
+
+
+	foreach ( $events as $eid )
+	{
+		$event = $eid.get();
+		$d = $event["occi.event.description"];
+		$n = $event["occi.event.nature"];
+		$s = $event["occi.event.source"];
+		$w = $event["occi.event.timestamp"];
+		$when = $w.date()
+		$m = "<tr><td>"#$when#"<td>"#$s#"<td>"#$n#"<td>"#$d#"</tr>";
+		$m.display();
+	}
+
+	"</table>".display();
+	return;
+}
+

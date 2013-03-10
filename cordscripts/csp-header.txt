@@ -39,12 +39,12 @@ function	HtmlHeader($title,$accountname)
 	else
 	{
 		"<tr>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML'>Accounts</a>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-providers.txt&ouput=HTML'>Providers</a>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-manifests.txt&ouput=HTML'>Manifests</a>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML'>Agreements</a>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
-		"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML'>Accounts</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-providers.txt&ouput=HTML'>Providers</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-manifests.txt&ouput=HTML'>Manifests</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML'>Agreements</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
+		"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
 	}
 	"</tr><tr><th colspan=6>&nbsp</tr>".display();
 	$m = "<tr><th colspan=6><h2 align=center><b>"#$title#"<br>"#$when#"</b></h2></th></tr>";

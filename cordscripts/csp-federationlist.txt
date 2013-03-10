@@ -1,0 +1,35 @@
+function FederationList( $selector )
+{
+	$baseurl   = "dashboard.php";
+
+	$federations = federation.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=6><b>Federation Information</b></td></tr>".display();
+	"<tr><td class=title>Name<td class=title>Publisher<td class=title>User<td class=title>Security</tr>".display();
+
+	foreach ( $federations as $mid )
+	{
+		$federation = $mid.get();
+		$id     = $federation["occi.core.id"];
+		$name   = $federation["occi.federation.name"];
+		$how    = $federation["occi.federation.publisher"];
+		$who    = $federation["occi.federation.user"];
+		$where  = $federation["occi.federation.security"];
+
+		$url = $baseurl#"?action=compile&script=csp-addfederation.txt&output=HTML&option="#$name;
+		$m = "<tr><td><a href='"#$url#"'>"#$name#"</a>";
+		$m.display();
+
+		$m = "<td>"#$how#"</td>";
+		$m.display();
+		$m = "<td>"#$who#"</td>";
+		$m.display();
+		$m = "<td>"#$where#"</td></tr>";
+		$m.display();
+
+	}
+	"</table>".display();
+	return;
+
+}
+

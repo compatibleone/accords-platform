@@ -1,0 +1,85 @@
+	/* ------------------------------------------------------------- */
+	/* csp-updcn.txt 				       	         */
+	/* ------------------------------------------------------------- */
+	/* update of computenext subscription information for an account */
+	/* ------------------------------------------------------------- */
+
+
+	$s = {};
+
+
+	if ( $2.length() > 0 )
+	{
+		$a = $2 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "name" )
+		{
+			$un = '"occi.computenext_configuration.name":"'#$v#'"';
+			$s = $s + $un;
+		}
+
+
+		if ( $3.length() > 0 )
+		{
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.computenext_configuration.host":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $4.length() > 0 )
+		{
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "tenent" )
+			{
+				$i = '"occi.computenext_configuration.namespace":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $5.length() > 0 )
+		{
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "key" )
+			{
+				$i = '"occi.computenext_configuration.apikey":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "secret" )
+			{
+				$i = '"occi.computenext_configuration.apisec":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		$list = computenext_configuration.list( $un );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
+		{
+			$result = $cid.put( $s );
+		}
+		else
+		{
+			$aid = computenext_configuration.post( $s );
+		}
+	}
+
+	$2 = $1;
+	include "csp-subscriptions.txt";
+

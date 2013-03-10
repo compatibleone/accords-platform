@@ -11,14 +11,21 @@
 
 	$what = $2;
 
-	$accounts = account.list( 'occi.account.name="'#$what#'"');
-	$account = $accounts[0];
+	if ( $what.length() > 0 )
+	{	
+		$selector = 'occi.account.name="'#$what#'"';
+		$accounts = account.list( $selector );
+		$account  = $accounts[0];
+		$selector = 'occi.agreement.initiator="'#$account#'"';
+	}
+	else
+	{	$selector = " ";	}
 
 	"<tr><td colspan=6>".display();
-	AgreementList( 'occi.agreement.initiator="'#$account#'"' );
+	AgreementList( $selector );
 	"</td></tr>".display();
 
-	$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>"
+	$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>"
 	$m.display();
 	
 	HtmlFooter();

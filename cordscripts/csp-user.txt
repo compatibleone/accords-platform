@@ -1,0 +1,93 @@
+	include "csp-header.txt";
+
+	include "csp-selectrole.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("Accords Platform User",$1);
+
+	$what = $2;
+	
+	$un = '{"occi.user.name":"'#$what#'"}';
+
+	$list = user.list( $un );
+	$cid  = $list[0];
+	if ( $cid.length() > 0 )
+	{
+		$record = $cid.get();
+		$sname = $record["occi.user.name"];
+		$spass = $record["occi.user.password"];
+		$srole = $record["occi.user.role"];
+		$smail = $record["occi.user.email"];
+	}
+	else
+	{
+		$sname = "";
+		$spass = "";
+		$srole = "";
+		$smail = "";
+	}
+
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Creation or modification of an Accords Platform User record of an Existing Customer Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to create or modify the Accords Platform User record of an existing customer account allowing provisioning through the interface.<p>".display();
+
+	SectionHeader("The User");
+
+	'<tr><td colspan=4><form method=POST action="dashboard.php">'.display();
+	$m = "<input type=text name='id' hidden value='"#$cid#"'>";
+	$m.display();
+
+	'<table width="100%">'.display();
+
+	"<tr><td colspan=2>Here you should specify the user information including the login name.".display(); 
+	"<td colspan=2>Here you should specify the pasword credential that authenticates the user login name.".display(); 
+
+	if ( $sname.length() ==0 ) { $sname = ""; }
+	$m = "<tr><td><b>Name</b><td><input type=text name='username' value='"#$sname#"'>"
+	$m.display();
+
+	if ( $spass.length() ==0 ) { $spass = ""; }
+	$m = "<td><b>Password</b><td><input type=text name='password' value='"#$spass#"'>";
+	$m.display();
+	
+	"<tr><td colspan=2>Here you must specify the role of the user as customer, operator, vendor or administration.".display();
+	"<td colspan=2>Here you should specify the email to be used in communication with the user.".display(); 
+	if ( $srole.length() ==0 ) { $srole = ""; }
+	$m = "<tr><td><b>Role</b><td><input type=text name='role' value='"#$srole#"'>";
+	$m.display();
+
+	if ( $smail.length() ==0 ) { $smail = ""; }
+	$m = "<td><b>Email</b><td><input type=text name='mail' value='"#$smail#"'>";
+	$m.display();
+
+
+	SectionHeader("Subscription Confirmation");
+
+	"<tr><td><td colspan=2> Finally you must submit the user information for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='update user'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+
+	$m = "<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-account.txt&option="#$what#"'>User Account</a></th></tr>";
+	$m.display();
+
+
+	"</table>".display();
+
+
+	HtmlFooter();
+
+

@@ -88,10 +88,10 @@
 	}		
 
 
-	"<tr><th colspan=3><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-manifest.txt'>Restitution of Manifests</a></th></tr>".display();
-	"<tr><th colspan=3><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-services.txt'>Service Contract List</a></th></tr>".display();
-	"<tr><th colspan=3><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailled Transactions List</a></th></tr>".display();
-	"<tr><th colspan=3><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
+	"<tr><th colspan=3><a href='dashboard.php?action=compile&output=HTML&script=csp-manifest.txt'>Restitution of Manifests</a></th></tr>".display();
+	"<tr><th colspan=3><a href='dashboard.php?action=compile&output=HTML&script=csp-services.txt'>Service Contract List</a></th></tr>".display();
+	"<tr><th colspan=3><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailled Transactions List</a></th></tr>".display();
+	"<tr><th colspan=3><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
 
 	HtmlFooter();
 

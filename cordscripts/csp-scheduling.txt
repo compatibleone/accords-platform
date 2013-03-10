@@ -9,6 +9,11 @@ include "csp-header.txt";
 	$jobs = [];
 	$max  = 0;
 
+	$maximum = 0;
+	$minimum = 0;
+	$total   = 0;
+	$cumul   = 0;
+
 	foreach ( $list as $id )
 	{
 		$schedule = $id.get();
@@ -59,6 +64,14 @@ include "csp-header.txt";
 			if ( $name == "duration" ) 
 			{ 
 				$duration = $value;
+				$cumul = $cumul + $duration;
+				$total = $total + 1;
+				if ( $duration > $maximum ) { $maximum = $duration; };
+				if ( $duration != 0 )
+				{
+					if ( $minimum == 0 ) { $minimum = $duration; }
+					if ( $duration < $minimum ) { $minimum = $duration; };
+				}
 				$minutes = $duration / 60;
 				$seconds = $duration -  $minutes * 60;
 				$hours   = $minutes / 60;
@@ -82,6 +95,17 @@ include "csp-header.txt";
 		$m.display();
 	}
 
-	"<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-jobs.txt'>All Jobs</a></th></tr>".display();
+	"<tr><td class=title>Count<td class=title>Minumum<td class=title>Average<td class=title>Maximum<td class=title>Deviation</tr>".display();
+	$deviation = $maximum - $minimum;
+	$average   = $cumul / $total;
+
+	$m = "<tr><td>"#$total;
+	$m = $m#"<td>"#$minimum;
+	$m = $m#"<td>"#$average;
+	$m = $m#"<td>"#$maximum;
+	$m = $m#"<td>"#$deviation;
+	$m.display();
+
+	"<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-operations.txt'>Platform Operations</a></th></tr>".display();
 
 	HtmlFooter();

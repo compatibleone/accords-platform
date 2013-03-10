@@ -1,0 +1,24 @@
+
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-documentmenu.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the platform operator document management menu for all manifest document types documents */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+function	DocumentMenu()
+{
+	"<tr>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-manifests.txt&ouput=HTML'>IaaS Manifests</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-paasmanifests.txt&ouput=HTML'>PaaS Manifests</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-easimanifests.txt&ouput=HTML'>Easi Manifests</a>".display();
+	return;
+}
+
+
+	HtmlHeader("Platform Operator Document Management",$1);
+
+	DocumentMenu();
+
+	HtmlFooter();

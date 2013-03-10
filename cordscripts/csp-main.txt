@@ -1,0 +1,30 @@
+	function NodeEntry( $nid, $host )
+	{ 
+		$node = $nid.get();
+		$nn   = $node["occi.node.name"];
+		$e    = $node["occi.node.entry"];
+		$fid  = $node["occi.node.firewall"];
+		$fw   = $fid.get();
+		foreach ( $fw as $tuple )
+		{
+			forboth ( $tuple as $name and $value )
+			{
+				if ( $name == "link" )
+				{
+					$p = $value.get();
+					$port = $p["occi.port.from"];
+					$pn   = $p["occi.port.name"];
+					if ( $pn == $e )
+					{
+						$prefix = "http";
+						$u = $prefix#"://"#$host#":"#$port#"/";
+						return( $u );
+					}
+				}
+			}
+		}
+		return( $host );
+	}
+
+
+

@@ -233,7 +233,7 @@
 
 	foreach ( $agreements as $aid )
 	{
-		$m = "<table width='100%'><tr><td class=title><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-updatesla.txt&option="#$aid#"'>"#$aid#"</a></td></tr>";
+		$m = "<table width='100%'><tr><td class=title><a href='dashboard.php?action=compile&output=HTML&script=csp-updatesla.txt&option="#$aid#"'>"#$aid#"</a></td></tr>";
 		$m.display();
 		"<tr><td><code><pre>".display();
 		$agreement = $aid.get();
@@ -313,12 +313,7 @@
 		"&lt;/agreement&gt;".display();	
 		"</pre></code></td></tr>".dislpay();	
 
-		$m = "<tr><td class=title><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-invokemethod.txt&option="#$aid#" instance'>"#$aid#".instance</a></td></tr>";
-		$m.display();
-
 	}
 
 
 	HtmlFooter();
-
-

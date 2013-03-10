@@ -19,9 +19,15 @@
 		$node = $placement["occi.placement.node"];
 		$provider = $placement["occi.placement.provider"];
 		$selector = 'occi.provider.category="'#$provider#'"';
+		/* ------------------------------------------ */
+		/* count number of providers of this category */
+		/* ------------------------------------------ */
 		$nbpro    = provider.count( $selector );
 		if ( $nbpro > 0 )
 		{
+			/* --------------------------------------- */
+			/* retrieve the first in the list as usual */
+			/* --------------------------------------- */
 			$plist = provider.list($selector);
 			if ( $nbpro > 1 )
 			{
@@ -29,6 +35,37 @@
 			}
 			else
 			{
+				/* ------------------------------- */
+				/* consult the federated platforms */
+				/* ------------------------------- */
+				$flist = federation.list();
+
+				foreach ( $flist as $fid )
+				{
+					/* -------------------------------- */
+					/* retrieve publisher of federation */
+					/* -------------------------------- */
+					$federation = $fid.get();
+					$pubhost = $federation["occi.federation.publisher"];
+					$pubhost = $pubhost#"/publication/";
+
+					/* ------------------------------------------ */
+					/* list the providers known by this publisher */
+					/* ------------------------------------------ */
+					$pex = 'occi.publication.what="provider"';
+					$publist = $pubhost.list( $pex );
+					foreach ( $publist as $provider )
+					{
+						$fedplace = $provider.get();
+						$fedplace = $fedplace#"/provider/";
+						$nbpro = $fedplace.count( $selector );
+						if ( $nbpro > 0 )
+						{
+							$plist = $fedplace.list( $selector );
+							$result = $plist[0];
+						}
+					}
+				}
 				$result = $plist[0];
 			}		
 			$record = $result.get();

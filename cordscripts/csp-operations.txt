@@ -1,0 +1,26 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-operations.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the platform operator platform management operations menu for scheduling and penalty     */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+function	OperationMenu()
+{
+	"<tr>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-documentmenu.txt&ouput=HTML'>Documents</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-scheduling.txt&ouput=HTML'>Scheduling</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-jobs.txt&ouput=HTML'>Jobs</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-federations.txt&ouput=HTML'>Federation</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-penalties.txt&ouput=HTML'>Penalties</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-events.txt&ouput=HTML'>Events</a>".display();
+	return;
+}
+
+
+	HtmlHeader("Platform Operator Management Operations",$1);
+
+	OperationMenu();
+
+	HtmlFooter();

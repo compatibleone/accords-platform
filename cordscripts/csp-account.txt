@@ -19,7 +19,7 @@
 	HtmlHeader("Accords Platform Account",$1);
 
 	$what     = $2;
-	$baseurl  = "/accords/dashboard.php";
+	$baseurl  = "dashboard.php";
 	$accounts = account.list('occi.account.name="'#$what#'"');
 
 	foreach ( $accounts as $aid )
@@ -72,7 +72,7 @@
 				{
 					$user = $v.get();
 					$n = $user["occi.user.name"];
-					$m = "<tr><td>"#$n;
+					$m = "<tr><td><a href='dashboard.php?action=compile&output=HTML&script=csp-user.txt&option="#$n#"'>"#$n#"</a>";
 					$n = $user["occi.user.role"];
 					$m = $m#"<td>"#$n;
 					$n = $user["occi.user.email"];
@@ -81,6 +81,7 @@
 					else
 					{	$m = $m#"<td colspan=2>&nbsp;";	}
 					$n = $user["occi.user.password"];
+					$n = "**********";
 					if ( $n.length() > 0 )
 					{	$m = $m#"<td>"#$n#"</tr>";	}
 					else
@@ -90,7 +91,7 @@
 			}
 		}
 
-		$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newuser.txt&option="#$what#"'>Add a New Account User</a></th></tr>";
+		$m = "<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-newuser.txt&option="#$what#"'>Add a New Account User</a></th></tr>";
 		$m.display();
 
 		/* ----------------------------- */
@@ -107,7 +108,7 @@
 
 		AgreementList( 'occi.agreement.initiator="'#$aid#'"');
 
-		$m = "<tr><th colspan=6><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>";
+		$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-newsla.txt&option="#$what#"'>Create a New Service Level Agreement</a></th></tr>";
 		$m.display();
 
 		/* --------------------------------- */
@@ -131,7 +132,7 @@
 
 		InvoiceList('occi.invoice.account="'#$aid#'"');
  
-		$m = "<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$what#"'>Process Transactions</a></th></tr>";
+		$m = "<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option="#$what#"'>Process Transactions</a></th></tr>";
 		$m.display();
 
 

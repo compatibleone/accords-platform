@@ -31,7 +31,7 @@
 
 	}
 
-	"<tr><th colspan=5><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-scheduling.txt'>Provisioning Operations</a></th></tr>".display();
+	"<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-operations.txt'>Platform Operations</a></th></tr>".display();
 
 	HtmlFooter();
 

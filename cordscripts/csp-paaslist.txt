@@ -1,6 +1,6 @@
 function PaasList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$paas_application_manifests = paas_application_manifest.list( $selector );
 

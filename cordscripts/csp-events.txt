@@ -1,0 +1,22 @@
+
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-events.txt							 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the list of events in the system allowing access for inspection of each    	         */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-eventlist.txt";
+
+	HtmlHeader("Accords Platform Events",$1);
+
+	"<tr><td colspan=4>".display();
+	EventList( " " );
+	"</td></tr>".display();
+
+	"<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-operations.txt&option='>Platform Operations</a></th></tr>".display();
+	
+
+	HtmlFooter();
+
+

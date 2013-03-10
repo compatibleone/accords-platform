@@ -1,7 +1,7 @@
 
 function InstanceList( $selection )
 {
-	$baseurl ="/accords/dashboard.php";
+	$baseurl ="dashboard.php";
 	"<table width='100%'><tr><td class=section colspan=5><b>Service Instances</b></td></tr>".display();
 	"<tr><td class=title>Service<td class=title>Sla<td class=title>Manifest<td class=title>Date<td colspan=2 class=title>Action</tr>".display();
 	$services = service.list($selection);
@@ -19,7 +19,7 @@ function InstanceList( $selection )
 		$when = $w.date();
 		$state = $service["occi.service.state"];
 		$sm = "<tr><td><img src=bluecloud.png>"#$id;
-		$sm = $sm#"<td>"#$sla#"<td><a href='/accords/dashboard.php?action=compile&output=HTML&script=csp-manifest.txt&option="#m#"'>"#$man#"</a><td>"#$when#"<td>";
+		$sm = $sm#"<td>"#$sla#"<td><a href='dashboard.php?action=compile&output=HTML&script=csp-manifest.txt&option="#m#"'>"#$man#"</a><td>"#$when#"<td>";
 		$sm.display();
 		if ( $state != 0 )
 		{

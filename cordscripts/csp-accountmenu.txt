@@ -1,0 +1,24 @@
+
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-accountmenu.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the platform operator account management menu for customer, provider and vendor accounts */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+function	AccountMenu()
+{
+	"<tr>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML'>Accounts</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-providers.txt&ouput=HTML'>Providers</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-vendors.txt&ouput=HTML'>Vendors</a>".display();
+	return;
+}
+
+
+	HtmlHeader("Platform Operator Account Management",$1);
+
+	AccountMenu();
+
+	HtmlFooter();

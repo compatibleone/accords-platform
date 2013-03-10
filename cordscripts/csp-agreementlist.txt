@@ -1,6 +1,6 @@
 function AgreementList( $selector )
 {
-	$baseurl   = "/accords/dashboard.php";
+	$baseurl   = "dashboard.php";
 
 	$agreements = agreement.list( $selector );
 

@@ -1,14 +1,14 @@
 function	CustomerMenu($account)
 {
 	"<tr>".display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-account.txt&ouput=HTML&option="#$account#"'>Account</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-account.txt&ouput=HTML&option="#$account#"'>Account</a>";
 	$m.display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML'>Applications</a>".display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML'>Applications</a>".display();
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML&option="#$account#"'>Invoices</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML&option="#$account#"'>Invoices</a>";
 	$m.display();
 	return;
 }

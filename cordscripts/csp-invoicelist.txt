@@ -5,7 +5,7 @@ function InvoiceList( $selection )
 	/* display the list of invoices */
 	/* ---------------------------- */
 	"<table width='100%'><tr><td class=section colspan=6><b>Invoices</b></td></tr>".display();
-	$baseurl ="/accords/dashboard.php";
+	$baseurl ="dashboard.php";
 
 	"<tr><td class=title>Invoice<td class=title>Account<td class=title>Transactions<td class=title>Date<td class=title>Total<td class=title>State</tr>".display();
 	$invoices = invoice.list($selection);

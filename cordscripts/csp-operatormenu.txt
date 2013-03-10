@@ -1,13 +1,12 @@
 function	OperatorMenu($account)
 {
 	"<tr>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-accounts.txt&ouput=HTML'>Accounts</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-providers.txt&ouput=HTML'>Providers</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-vendors.txt&ouput=HTML'>Vendors</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML'>Applications</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML'>Agreements</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
-	"<td class=title><a class=option href='/accords/dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-accountmenu.txt&ouput=HTML'>Accounts</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-operations.txt&ouput=HTML'>Operations</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-applications.txt&ouput=HTML'>Applications</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML'>Agreements</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-services.txt&ouput=HTML'>Services</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-invoices.txt&ouput=HTML'>Invoices</a>".display();
 	return;
 }
 

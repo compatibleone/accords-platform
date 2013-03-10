@@ -1,0 +1,87 @@
+	/* ----------------------------------------------------------- */
+	/* csp-updfederation.txt 			      	       */
+	/* ----------------------------------------------------------- */
+	/* update of accords federation information for an operator    */
+	/* ----------------------------------------------------------- */
+
+
+	$s = {};
+
+
+	if ( $2.length() > 0 )
+	{
+		$a = $2 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "name" )
+		{
+			$un = '"occi.federation.name":"'#$v#'"';
+			$fn = 'occi.federation.name="'#$v#'"';
+			$s = $s + $un;
+		}
+
+
+		if ( $3.length() > 0 )
+		{
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.federation.user":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $4.length() > 0 )
+		{
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "password" )
+			{
+				$i = '"occi.federation.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $5.length() > 0 )
+		{
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.federation.publisher":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "security" )
+			{
+				$i = '"occi.federation.security":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+
+		$list = federation.list( $fn );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
+		{
+			$result = $cid.put( $s );
+		}
+		else
+		{
+			$aid = federation.post( $s );
+		}
+	}
+
+	$2 = $1;
+	include "csp-federations.txt";
+
