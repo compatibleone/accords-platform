@@ -285,7 +285,10 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 				else if (!( strcmp( nptr, "state" ) ))
 					continue;
 				else if (!( rest_valid_string( vvptr = vptr ) ))
-					vvptr = "";
+				{
+					if ( vptr ) liberate( vptr );
+					continue;
+				}
 				fprintf(h," %s=%c%s%c",nptr,0x0022,vvptr,0x0022);
 				liberate( vptr );
 				continue;
