@@ -3,8 +3,9 @@ compatibleone-accords (1.0-6) unstable; urgency=low
   * Improved Python bindings.
   * Add 'compatibleone-cnprocci' package for ComputeNext interface.
   * Add 'compatibleone-eziprocci' package for EasyClouds interface.
+  * Upstream code update.
 
- -- Vincent <vincent@renardias.com>  Thu, 7 Mar 2013 15:44:52 +0100
+ -- Vincent Renardias <vincent@renardias.com>  Mon, 11 Mar 2013 10:34:58 +0100
 
 compatibleone-accords (1.0-5) unstable; urgency=low
 
