@@ -442,12 +442,14 @@ public	int	terminate_paas_client()
 /*	------------------------------------------------	*/
 public	int	initialise_paas_client( char * agent, char * tls, char * host, int port, char * user, char * password )
 {
+	struct	url * uptr;
+
 	terminate_paas_client();
+
+	/* ---------------------------- */
+	/* use the mandatory parameters */
+	/* ---------------------------- */
 	if (!( Paas.agent = allocate_string( agent )))
-		return( 27 );
-	else if (!( Paas.tls = allocate_string( tls )))
-		return( 27 );
-	else if (!( Paas.host = allocate_string( host )))
 		return( 27 );
 	else if (!( Paas.user = allocate_string( user )))
 		return( 27 );
@@ -455,12 +457,46 @@ public	int	initialise_paas_client( char * agent, char * tls, char * host, int po
 		return( 27 );
 	else if (!( Paas.base = allocate_string( _COAPS_BASE )))
 		return( 27 );
-	else	
+	else if (!( uptr = analyse_url( host ) ))
+		return( 30 );
+	else
 	{
-		Paas.port = port;
+		/* --------------------------------- */
+		/* analyse and use the port and host */
+		/* --------------------------------- */
+		if (!( port ))
+			port = uptr->port;
+
+		if (!( Paas.host = allocate_string( uptr->host ) ))
+		{
+			uptr = liberate_url( uptr );
+			return( 27 );
+		}
+		else	uptr = liberate_url( uptr );
+
+		/* -------------------------------------------- */
+		/* handle the optional transport layer security */
+		/* -------------------------------------------- */ 
+		if (!( rest_valid_string( tls ) ))
+			Paas.tls = (char *) 0;
+		else if (!( Paas.tls = allocate_string( tls )))
+			return( 27 );
+
+		/* ------------------------------- */
+		/* set the service prefix and port */
+		/* ------------------------------- */
 		if (!( rest_valid_string( Paas.tls ) ))
+		{
 			Paas.service = "http";
-		else	Paas.service = "https";
+			if (!( Paas.port = port ))
+				Paas.port = 80;
+		}
+		else
+		{
+			Paas.service = "https";
+			if (!( Paas.port = port ))
+				Paas.port = 443;
+		}
 		return( 0 );
 	}
 }
@@ -468,4 +504,5 @@ public	int	initialise_paas_client( char * agent, char * tls, char * host, int po
 	/* -------------- */
 #endif	/* _paasclient_c */
 	/* -------------- */
+
 
