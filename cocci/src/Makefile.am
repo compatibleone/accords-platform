@@ -5,6 +5,7 @@
 #
 # Authors:
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
+#   Iain James Marshall <ijm667@hotmail.com>
 #
 lib_LTLIBRARIES = libcocci.la
 EXTRA_DIST = occic.c occic.h \
@@ -14,6 +15,7 @@ EXTRA_DIST = occic.c occic.h \
 	occirespro.h \
 	urlpublic.h \
 	authitem.c authitem.h \
+	occitimer.c occitimer.h \
 	occiauth.h occiauth.c authcache.h
 
 libcocci_la_SOURCES = occiclient.c occiclient.h \

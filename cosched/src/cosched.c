@@ -147,6 +147,20 @@ private	void	cosched_synchronise()
 	sleep(1);
 }
 
+#include "counter.h"
+#include "counter.c"
+#include "occicounter.c"
+
+#include "timer.h"
+#include "timer.c"
+#include "occitimer.c"
+
+#include "cotimer.c"
+
+#include "schedule.h"
+#include "schedule.c"
+#include "occischedule.c"
+
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ s c h e d u l e   		*/
 /*	-------------------------------------------	*/
@@ -316,6 +330,32 @@ private	int	cosched_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 	optr->callback = &cords_schedule_interface;
+
+	initialise_timer_control();
+
+	if (!( optr = occi_cords_counter_builder( Cosched.domain, "counter" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_add_action( optr,"hit","",hit_counter)))
+		return(27);
+
+	if (!( optr = occi_cords_timer_builder( Cosched.domain, "timer" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	optr->callback  = &timer_interface;
+
+	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_timer)))
+		return(27);
+	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_timer)))
+		return(27);
 
 	rest_initialise_log(Cosched.monitor);
 

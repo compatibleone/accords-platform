@@ -20,6 +20,7 @@ struct	cords_control
 	char *	connection;
 	char *	metric;
 	char *	probe;
+	char *	timer;
 	int	process;
 	int	state;
 };

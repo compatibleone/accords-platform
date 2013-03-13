@@ -9,6 +9,7 @@ struct	cords_probe
 	char *	metric;
 	char *	connection;
 	char *	expression;
+	char *	timer;
 	int	samples;
 	int	period;
 	int	pid;

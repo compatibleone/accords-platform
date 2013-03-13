@@ -12,7 +12,6 @@ public struct occi_category * occi_cords_guarantee_builder(char *a,char * b);
 public struct occi_category * occi_cords_business_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_import_builder(char *a,char * b);
-public struct occi_category * occi_cords_schedule_builder(char *a,char * b);
 public struct occi_category * occi_cords_interface_builder(char *a,char * b);
 public struct occi_category * occi_cords_session_builder(char *a,char * b);
 public struct occi_category * occi_cords_consumer_builder(char *a,char * b);
@@ -95,7 +94,6 @@ const static struct {
 	{ "guarantee", occi_cords_guarantee_builder },
 	{ "business", occi_cords_business_builder },
 	{ "import", occi_cords_import_builder },
-	{ "schedule", occi_cords_schedule_builder },
 	{ "interface", occi_cords_interface_builder },
 	{ "session", occi_cords_session_builder },
 	{ "consumer", occi_cords_consumer_builder },
