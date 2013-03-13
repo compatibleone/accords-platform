@@ -95,6 +95,7 @@
 #define	_CORDS_EXPIRATION	"expiration"
 #define	_CORDS_QUOTA		"quota"
 #define	_CORDS_QUANTITY		"quantity"
+#define	_CORDS_TIMER		"timer"
 
 /*	-------------------------	*/
 /*	cords element identifiers	*/

@@ -272,7 +272,7 @@ private	int	scripted_timer_processing(
 		/* ----------------------------------------------------------------------- */
 		/* CORDSCRIPT: CALLER, CONTROLID, NATURE, PACKET, PUBLISHER, OPERATOR, TLS */
 		/* ----------------------------------------------------------------------- */
-		sprintf(buffer,"%s/%s/%s",get_identity(), "timer", timer );
+		sprintf(buffer,"%s/%s/%s",get_identity(), _CORDS_TIMER, timer );
 		argv[argc++] = "timer.event";
 		argv[argc++] = buffer;
 		argv[argc++] = ( account ? account : "none");

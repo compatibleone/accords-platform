@@ -5,6 +5,7 @@ struct	cords_control
 {
 	char *	id;
 	char *	name;
+	char *	mode;
 	char *	contract;
 	char *	agreement;
 	char *	property;

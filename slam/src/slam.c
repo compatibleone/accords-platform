@@ -349,6 +349,8 @@ private	int	slam_operation( char * nptr )
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_control)))
 		return( 27 );
+	else if (!( optr = occi_add_action( optr,"verify","",verify_control)))
+		return( 27 );
 
 	if (!( optr = occi_cords_penalty_builder( Slam.domain, _CORDS_PENALTY ) ))
 		return( 27 );

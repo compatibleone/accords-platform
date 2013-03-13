@@ -35,6 +35,8 @@ public struct cords_control * liberate_cords_control(struct cords_control * sptr
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->mode )
+			 sptr->mode = liberate(sptr->mode);
 		if ( sptr->contract )
 			 sptr->contract = liberate(sptr->contract);
 		if ( sptr->agreement )
@@ -65,6 +67,8 @@ public struct cords_control * liberate_cords_control(struct cords_control * sptr
 			 sptr->metric = liberate(sptr->metric);
 		if ( sptr->probe )
 			 sptr->probe = liberate(sptr->probe);
+		if ( sptr->timer )
+			 sptr->timer = liberate(sptr->timer);
 		sptr = liberate( sptr );
 	}
 	return((struct cords_control *) 0);
@@ -80,6 +84,7 @@ public struct cords_control * reset_cords_control(struct cords_control * sptr)
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->mode = (char*) 0;
 		sptr->contract = (char*) 0;
 		sptr->agreement = (char*) 0;
 		sptr->property = (char*) 0;
@@ -95,6 +100,7 @@ public struct cords_control * reset_cords_control(struct cords_control * sptr)
 		sptr->connection = (char*) 0;
 		sptr->metric = (char*) 0;
 		sptr->probe = (char*) 0;
+		sptr->timer = (char*) 0;
 		sptr->process =  0;
 		sptr->state =  0;
 	}
@@ -130,6 +136,10 @@ public int xmlin_cords_control(struct cords_control * sptr,struct xml_element * 
 		else if (!( strcmp(wptr->name,"name") ))
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"mode") ))
+		{
+			if ( wptr->value ) { sptr->mode = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"contract") ))
 		{
@@ -191,6 +201,10 @@ public int xmlin_cords_control(struct cords_control * sptr,struct xml_element * 
 		{
 			if ( wptr->value ) { sptr->probe = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"timer") ))
+		{
+			if ( wptr->value ) { sptr->timer = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"process") ))
 		{
 			if ( wptr->value ) { sptr->process = atoi(wptr->value); }
@@ -215,6 +229,7 @@ public int rest_occi_cords_control(FILE * fh,struct cords_control * sptr,char * 
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.mode='%s'\r\n",prefix,nptr,(sptr->mode?sptr->mode:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.contract='%s'\r\n",prefix,nptr,(sptr->contract?sptr->contract:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agreement='%s'\r\n",prefix,nptr,(sptr->agreement?sptr->agreement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.property='%s'\r\n",prefix,nptr,(sptr->property?sptr->property:""));
@@ -230,6 +245,7 @@ public int rest_occi_cords_control(FILE * fh,struct cords_control * sptr,char * 
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.connection='%s'\r\n",prefix,nptr,(sptr->connection?sptr->connection:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.metric='%s'\r\n",prefix,nptr,(sptr->metric?sptr->metric:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.probe='%s'\r\n",prefix,nptr,(sptr->probe?sptr->probe:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.timer='%s'\r\n",prefix,nptr,(sptr->timer?sptr->timer:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.process='%u'\r\n",prefix,nptr,sptr->process);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);

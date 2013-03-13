@@ -2,6 +2,7 @@
 #define	_slamcontrol_c
 
 #define	_CONTROL_SIGNAL SIGKILL
+#define	_DEFAULT_CONTROL_PERIOD	60
 
 #include "cb.h"
 #include "cspi.h"
@@ -539,6 +540,34 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 }
 
 /*	-------------------------------------------	*/
+/*		c o n t r o l _ p e r i o d		*/
+/*	-------------------------------------------	*/
+private	int	control_period( struct cords_control * pptr )
+{
+	int	period;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	if (!( pptr ))
+		period =  _DEFAULT_CONTROL_PERIOD;
+	else if (!( rest_valid_string( pptr->metric ) ))
+		period =  _DEFAULT_CONTROL_PERIOD;
+	else if (!( zptr = occi_simple_get( pptr->metric, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		period =  _DEFAULT_CONTROL_PERIOD;
+	else if ((!( dptr = occi_locate_element( zptr->first, "occi.metric.period" ) ))
+	     ||  (!( rest_valid_string( dptr->value ) )))
+	{
+		zptr = occi_remove_response( zptr );
+		period =  _DEFAULT_CONTROL_PERIOD;
+	}
+	else
+	{
+		period = atoi( dptr->value );
+		zptr = occi_remove_response( zptr );
+	}
+	return( period );
+}
+
+/*	-------------------------------------------	*/
 /* 	     c o n t r o l _ w o r k e r		*/
 /*	-------------------------------------------	*/
 /*	the control worker is responsible for the 	*/
@@ -552,7 +581,7 @@ private	void	evaluate_control_packets(struct cords_control * pptr, char * packet
 /*	-------------------------------------------	*/
 private	int	control_worker( struct cords_control * pptr )
 {
-	int	tempo=60;
+	int	tempo=_DEFAULT_CONTROL_PERIOD;
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	struct	occi_response 	* zptr; 
@@ -566,21 +595,8 @@ private	int	control_worker( struct cords_control * pptr )
 		return( 0 );
 	else if (!( rest_valid_string( pptr->probe )))
 		return(0);
-	else if (!( rest_valid_string( pptr->metric ) ))
-		tempo = 60;
-	else if (!( zptr = occi_simple_get( pptr->metric, _CORDS_CONTRACT_AGENT, default_tls() ) ))
-		tempo = 60;
-	else if ((!( dptr = occi_locate_element( zptr->first, "occi.metric.period" ) ))
-	     ||  (!( rest_valid_string( dptr->value ) )))
-	{
-		zptr = occi_remove_response( zptr );
-		tempo = 60;
-	}
-	else
-	{
-		tempo = atoi( dptr->value );
-		zptr = occi_remove_response( zptr );
-	}
+	else if (!( tempo = control_period( pptr ) ))
+		tempo = _DEFAULT_CONTROL_PERIOD;
 
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (1)
@@ -603,6 +619,65 @@ private	int	control_worker( struct cords_control * pptr )
 }
 
 	
+/*	-------------------------------------------	*/
+/*	      t i m e r _ c o n t r o l 		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * timer_control( struct cords_control * pptr, struct rest_response * aptr )
+{
+	struct	occi_response * zptr;
+	struct	occi_element  * dptr;
+	char	buffer[2048];
+	char	timer[2048];
+	char	period[256];
+	char *	ihost;
+
+	if (!( rest_valid_string( pptr->timer ) ))
+	{
+		if (!( ihost = occi_resolve_category_provider( _CORDS_TIMER, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			return( rest_html_response( aptr, 478, "Timer ServiceFailure" ) );
+		else
+		{
+			sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
+			sprintf(period, "%u",60*5);
+			sprintf(timer,  "%s/%s/",ihost,_CORDS_TIMER);
+			ihost = liberate( ihost );
+		}
+
+		/* --------------------------------------------------------------------- */
+		/* create a penalty category instance to show the arrival of the penalty */
+		/* --------------------------------------------------------------------- */
+		if ((!( dptr = occi_create_element(       "occi.timer.name",    	pptr->name	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.timer.target",		buffer		) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.timer.source", 		"verify"	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.timer.nature", 		"periodic"	) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.timer.period", 		period 		) ))
+		||  (!( dptr = occi_append_element( dptr, "occi.timer.account",	  	pptr->account	) )))
+		{
+			return( rest_html_response( aptr, 500, "Timer Activation Failure" ) );
+		}
+		else if (!( zptr = occi_simple_post( timer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		{
+			return( rest_html_response( aptr, 501, "Timer Activation Failure" ) );
+		}
+		else if (!( ihost = occi_extract_location( zptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return( rest_html_response( aptr, 502, "Timer Activation Failure" ) );
+		}
+		else if (!( pptr->timer = allocate_string( ihost ) ))
+		{
+			zptr = occi_remove_response( zptr );
+			return( rest_html_response( aptr, 503, "Timer Activation Failure" ) );
+		}
+		else	zptr = occi_remove_response( zptr );
+	}
+
+	if (( zptr = cords_invoke_action( pptr->timer, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+		zptr = occi_remove_response( zptr );
+
+	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
 /*	-------------------------------------------	*/
 /*	   c o n s u m e _ c o n t r o l 		*/
 /*	-------------------------------------------	*/
@@ -643,6 +718,10 @@ private	struct rest_response * start_control(
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if ( pptr->state )
 		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( rest_valid_string( pptr->mode ) ))
+		return( consume_control( pptr, aptr ) );
+	else if (!( strcmp( pptr->mode, _CORDS_TIMER ) ))
+		return( timer_control( pptr, aptr ) );
 	else	return( consume_control( pptr, aptr ) );
 }
 
@@ -685,8 +764,42 @@ private	struct rest_response * stop_control(
 			waitpid(pptr->process,&status,0);
 			pptr->process = 0;
 		}
+		else if ( rest_valid_string( pptr->timer ) )
+		{
+			if (( zptr = cords_invoke_action( pptr->timer, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+		}
 		pptr->state = 0;
 		autosave_cords_control_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}		
+}
+
+/*	-------------------------------------------	*/
+/* 		v e r i f y _ c o n t r o l		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * verify_control(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_control * pptr;
+	char	packets[1024];
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+	else if (!( pptr->state ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else
+	{
+		sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
+		/* ------------------------------------- */
+		/* if no penalties or rewards just purge */
+		/* ------------------------------------- */
+		if (!( rest_valid_string( pptr->reference ) ))
+			purge_control_packets( pptr, packets, pptr->probe );
+		else	evaluate_control_packets( pptr, packets, pptr->probe );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }
