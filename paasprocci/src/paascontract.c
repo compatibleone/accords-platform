@@ -485,14 +485,14 @@ public	int	create_paas_contract(
 	/* generate the XML request file that will be used for EBV */
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
-	else if (!( pptr->envfile = paas_serialise_element( &contract.environment ) ))
+	else if (!( pptr->envfile = paas_serialise_element( &contract.manifest ) ))
 		return( terminate_paas_contract( 1171, &contract ) );
 
 	/* ------------------------------------------------------- */
 	/* generate the XML request file that will be used for EBV */
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
-	else if (!( pptr->appfile = paas_serialise_element( &contract.application ) ))
+	else if (!( pptr->appfile = paas_serialise_element( &contract.manifest ) ))
 		return( terminate_paas_contract( 1172, &contract ) );
 
 	/* -------------------------------------------- */
