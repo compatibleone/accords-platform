@@ -104,7 +104,7 @@ public	struct	rest_response * start_easiclouds(
 	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
 	else if (!( pptr->filename ))
 	 	return( rest_html_response( aptr, 500, "Application Message Failure" ) );
-	else if (!( zptr = ezi_create_server( subptr, pptr->filename ) ))
+	else if (!( zptr = ezi_create_server( subptr, allocate_string( pptr->filename ) ) ))
 	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
 	else 
 	{

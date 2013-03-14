@@ -498,16 +498,15 @@ public	int	create_paas_contract(
 	/* -------------------------------------------- */
 	/*	Create paas environment                 */
 	/* -------------------------------------------- */
-	if (!( rptr = create_paas_environment( pptr->envfile ) ))
-	{
+	if (!( rptr = create_paas_environment( allocate_string( pptr->envfile ) ) ))
           	return( terminate_paas_contract( 501, &contract ) );
-	}
+
 	/* ----------------------------------------- */
 	/* retrieve the environment id from response */
 	/* ----------------------------------------- */
 	else if (!( pptr->environment = paas_environment_id( rptr ) ))
 	{
-			rptr = paas_remove_response( rptr );
+		rptr = paas_remove_response( rptr );
           	return( terminate_paas_contract( 502, &contract ) );
 	}
 	else	rptr = paas_remove_response( rptr );
@@ -515,16 +514,15 @@ public	int	create_paas_contract(
 	/* ------------------------------------------- 	*/
 	/*	Create paas application	       		*/
    	/* ------------------------------------------- 	*/
-   	if (!( rptr = create_paas_application( pptr->appfile ) ))
-   	{
-			return( terminate_paas_contract( 503, &contract ) );
-   	}
+   	if (!( rptr = create_paas_application( allocate_string( pptr->appfile ) ) ))
+		return( terminate_paas_contract( 503, &contract ) );
+
 	/* ----------------------------------------- */
 	/* retrieve the application id from response */
 	/* ----------------------------------------- */
 	else if (!( pptr->application = paas_application_id( rptr ) ))
 	{
-			rptr = paas_remove_response( rptr );
+		rptr = paas_remove_response( rptr );
       		return( terminate_paas_contract( 504, &contract ) );
    	}
 	else	rptr = paas_remove_response( rptr );
