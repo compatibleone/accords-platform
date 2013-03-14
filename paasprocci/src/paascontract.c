@@ -357,6 +357,7 @@ private	char *	paas_serialise_element( struct cords_vector * root )
 		return( liberate( filename ) );
 	else
 	{
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF8\"?>\n");
 		paas_serialise_message( h, root->message );
 		fclose(h);
 		return( filename );
