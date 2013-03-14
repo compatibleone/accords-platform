@@ -137,7 +137,8 @@ public	struct	paas_response * paas_result( struct rest_response *  aptr )
 private	struct	rest_header * paas_authenticate()
 {
 	struct	rest_header * hptr;
-	return( rest_create_header( "X-PAAS-AUTHORIZE", "None" ) );
+	return( rest_create_header( _HTTP_ACCEPT, "application/xml" ) );
+	/* return( rest_create_header( "X-PAAS-AUTHORIZE", "None" ) ); */
 }
 
 /*	-----------------------------------------	*/
