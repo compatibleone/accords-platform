@@ -188,19 +188,25 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 		/* start the SLA controlled service */
 		/* -------------------------------- */
 		rest_add_http_prefix(buffer,1024,ihost);
-		ihost = liberate( ihost );
 
 		if (!( Cb.deployment ))
 		{
+			if (( zptr =  cords_invoke_action( buffer, _CORDS_STOP, agent, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
 			printf("service/%s\n",ihost);
+			ihost = liberate( ihost );
 			return( 0 );
 		}
-		else if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
-			return(503);
-		else
+		else 
 		{
-			zptr = occi_remove_response( zptr );
-			return( 0 );
+			ihost = liberate( ihost );
+			if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
+				return(503);
+			else
+			{
+				zptr = occi_remove_response( zptr );
+				return( 0 );
+			}
 		}
 	}
 }
