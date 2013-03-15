@@ -19,6 +19,9 @@
 
 export PATH=@sitepath@:@bindir@:$PATH
 
+#pyaccordsSDK (ec2procci) settings
+export PYTHON_ACCORDS_PATH=/usr/local/bin/ec2procci/
+
 # -------------------------------------
 # to activate the security using nethsm
 # set nethsm to 1
@@ -389,6 +392,7 @@ _co_stop() {
     _stop_service osprocci
     _stop_service paprocci
     _stop_service azprocci
+    _stop_service ec2procci
     _stop_service cosched
     _stop_service procci
     _stop_service broker
@@ -473,9 +477,6 @@ _run_osprocci() {
 }
 
 _run_ec2procci(){
-    if [ -z $PYTHON_ACCORDS_PATH ]; then
-	. /etc/profile
-    fi
     python ${PYTHON_ACCORDS_PATH}/ec2procci.py --config $target CO-EC2PROCCI/1.0 &
     echo $! > ~/.ec2procci.pid
 }

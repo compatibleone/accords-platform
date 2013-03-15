@@ -115,6 +115,7 @@ def amazonEc2_stop(accesskey,secretkey,zone,amazonEc2):
 	while inst.state != "terminated":
 		time.sleep(1.0)
 		inst.update()
+	amazonEc2.state = 0
 	return amazonEc2
 
 
@@ -153,6 +154,7 @@ def amazonEc2_suspend(accesskey,secretkey,zone,amazonEc2):
 	while inst.state != "stopped":
 		time.sleep(5.0)
 		inst.update()
+	amazonEc2.state = 2
 	return amazonEc2
 
 

@@ -12,5 +12,8 @@ module1 = Extension('pycompdev',
  
 setup (name = 'pycompdev',
         version = '1.0',
-        description = 'This is the pycompdev package',
+	author = 'Hamid Medjahed',
+	author_email = 'hmedjahed@prologue.fr'
+	url = 'www.compatibleone.org',
+        description = 'This is the pycompdev package of pyaccordsSDK',
         ext_modules = [module1])

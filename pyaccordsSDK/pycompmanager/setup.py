@@ -9,5 +9,8 @@ module1 = Extension('pycompmanager',
                    )
 setup (name = 'pycompmanager',
         version = '1.0',
-        description = 'This is the pycompmanager package',
+	author = 'Hamid Medjahed',
+	author_email = 'hmedjahed@prologue.fr',
+	url = 'www.compatibleone.org',
+        description = 'This is the pycompmanager package of pyaccordsSDK',
         ext_modules = [module1])
