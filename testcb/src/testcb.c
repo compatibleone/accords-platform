@@ -95,6 +95,9 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 	char  	*	manv;
 	char 	*	ihost;
 	char 	*	aptr;
+	int		i;
+	int		j;
+	FILE	*	h;
 	struct	occi_client * kptr;
 	struct	occi_request* qptr;
 	struct	occi_element* dptr;
@@ -191,9 +194,16 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 
 		if (!( Cb.deployment ))
 		{
-			if (( zptr =  cords_invoke_action( buffer, _CORDS_STOP, agent, default_tls())) != (struct occi_response *) 0)
-				zptr = occi_remove_response( zptr );
-			printf("service/%s\n",ihost);
+			for ( j=0,i=0; *(ihost+i) != 0; i++)
+				if ( *(ihost+i) == '/' )
+					j = (i+1);
+			sprintf(buffer,"service/%s",(ihost+j));
+			printf("%s\n",buffer);
+			if ((h = fopen(buffer,"w")) != (FILE *) 0)
+			{
+				fprintf(h,"{}\n");
+				fclose(h);
+			}
 			ihost = liberate( ihost );
 			return( 0 );
 		}
