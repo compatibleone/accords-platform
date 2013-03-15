@@ -238,9 +238,9 @@ _co_start()
 
 _co_broker() {
     if [ -z "$tls" ]; then
-	testcb --publisher "$publisher" --verbose plan_$1.xml
+	testcb --publisher "$publisher" --verbose $2 plan_$1.xml
     else
-	testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose plan_$1.xml
+	testcb --tls security/testcbTls.xml --publisher "$publisher" --verbose $2 plan_$1.xml
     fi
 } 
 

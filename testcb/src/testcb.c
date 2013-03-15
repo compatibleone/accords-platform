@@ -33,6 +33,7 @@ struct	cords_broker_config
 	char *	zone;
 	char *	operator;
 	char *	security;
+	int	deployment;
 } Cb = 	{
 	(char * ) 0,
 	_CORDS_DEFAULT_PUBLISHER,
@@ -42,7 +43,8 @@ struct	cords_broker_config
 	(char *) 0,
 	(char *) 0,
 	(char *) 0,
-	(char *) 0
+	(char *) 0,
+	1
 	};
 
 private	int	debug=0;
@@ -187,7 +189,13 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 		/* -------------------------------- */
 		rest_add_http_prefix(buffer,1024,ihost);
 		ihost = liberate( ihost );
-		if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
+
+		if (!( Cb.deployment ))
+		{
+			printf("service/%s\n",ihost);
+			return( 0 );
+		}
+		else if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
 			return(503);
 		else
 		{
@@ -367,6 +375,16 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 					set_default_account( argv[argi++] );
 					continue;
 				}
+				else if (!( strcmp( aptr, "no-dep" ) ))
+				{
+					Cb.deployment = 0;
+					continue;
+				}
+				else if (!( strcmp( aptr, "no-deployment" ) ))
+				{
+					Cb.deployment = 0;
+					continue;
+				}
 				else if (!( strcmp( aptr, "operator" ) ))
 				{
 					Cb.operator = argv[argi++];
@@ -431,8 +449,8 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.b.0.01 ");
-	printf("\n   Beta Version 05/01/2013 \n");
+	printf("\n   Cords Broker : Version 1.0.b.0.02 ");
+	printf("\n   Beta Version 15/03/2013 \n");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
@@ -444,6 +462,7 @@ private	int	test_cords_broker_banner(char * n)
 	printf("\n   --zone <zone>        specify required provisioning zone ");
 	printf("\n   --operator <name>    specify required operator name ");
 	printf("\n   --security <type>    specify required security level");
+	printf("\n   --no-deployment      inhibit automatic provisioning ");
 	printf("\n   --verbose            activate verbose messages ");
 	printf("\n   --debug              activate debug messages \n");
 	printf("\n   Example : \n");
