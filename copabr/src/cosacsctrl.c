@@ -34,6 +34,7 @@
 #define	_COSACS_HOST "127.0.0.1"
 #define	_COSACS_ITERATIONS 10
 #define	_COSACS_PERIOD "2"
+#define	_CONTROL_MODE "timer"
 
 /*	-------------------------------------------------	*/
 /*		c o s a c s _ s y n c h r o n i s e		*/
@@ -816,6 +817,7 @@ private	char *	cosacs_connection_monitor(
 	/* update the control with probe and other information */
 	/* --------------------------------------------------- */
 	if ((!( dptr = occi_create_element(  "occi.control.probe",     probe  	) ))
+	||  (!( dptr = occi_append_element( dptr, "occi.control.mode", _CONTROL_MODE 	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.control.metric",     metric 	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.control.account",    account	) ))
 	||  (!( dptr = occi_append_element( dptr, "occi.control.monitor",    monitor	) ))
