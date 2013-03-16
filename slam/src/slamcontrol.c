@@ -629,16 +629,19 @@ private	struct rest_response * timer_control( struct cords_control * pptr, struc
 	char	buffer[2048];
 	char	timer[2048];
 	char	period[256];
+	int	tempo=_DEFAULT_CONTROL_PERIOD;
 	char *	ihost;
 
 	if (!( rest_valid_string( pptr->timer ) ))
 	{
+		if (!( tempo = control_period( pptr ) ))
+			tempo = _DEFAULT_CONTROL_PERIOD;
 		if (!( ihost = occi_resolve_category_provider( _CORDS_TIMER, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 			return( rest_html_response( aptr, 478, "Timer ServiceFailure" ) );
 		else
 		{
 			sprintf(buffer, "%s/%s/%s",get_identity(),_CORDS_CONTROL,pptr->id);
-			sprintf(period, "%u",60*5);
+			sprintf(period, "%u",tempo);
 			sprintf(timer,  "%s/%s/",ihost,_CORDS_TIMER);
 			ihost = liberate( ihost );
 		}
@@ -672,8 +675,12 @@ private	struct rest_response * timer_control( struct cords_control * pptr, struc
 		else	zptr = occi_remove_response( zptr );
 	}
 
+	pptr->state = 1;
+	autosave_cords_control_nodes();
+
 	if (( zptr = cords_invoke_action( pptr->timer, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		zptr = occi_remove_response( zptr );
+
 
 	return( rest_html_response( aptr, 200, "OK" ) );
 }
