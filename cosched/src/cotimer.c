@@ -52,7 +52,7 @@ private	void	lock_job_timer(struct job_timer * tptr)
 /*	-----------------------------------------------------------	*/
 /*		u n l o c k _ l o b _ t i m e r				*/
 /*	-----------------------------------------------------------	*/
-private	void	unlock_job_time(struct job_timer * tptr)
+private	void	unlock_job_timer(struct job_timer * tptr)
 {
 	pthread_mutex_unlock( &tptr->lock );
 	return;
@@ -331,6 +331,7 @@ private	void	process_job_alarm(int before, int after)
 	/* --------------------------------- */
 	/* here we must launch the timed job */
 	/* --------------------------------- */
+	lock_job_control();
 	if ( job_debug ) { printf("job timer manager process alarm\n"); }
 	if (( tptr = JobControl.current ) != (struct job_timer *) 0)
 	{
@@ -352,8 +353,8 @@ private	void	process_job_alarm(int before, int after)
 		calculate_durations(0);
 	}
 	else	calculate_durations(0);
-
 	JobControl.hitcount++;
+	unlock_job_control();
 	return;
 }
 
@@ -430,13 +431,11 @@ private	void * 	job_timer_manager( void * vptr )
 public	void	inform_job_control()
 {
 	struct	rest_thread * tptr;
-	if (!( tptr = JobControl.thread ))
-		return;
-	else 
-	{
+	lock_job_control();
+	if (( tptr = JobControl.thread ))
 		pthread_kill( tptr->id, SIGUSR1 );
-		return;
-	}
+	unlock_job_control();
+	return;
 }
 
 /*	-----------------------------------	*/
