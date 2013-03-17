@@ -551,6 +551,12 @@ private	int	connect_openstack_server(
 					return( openstack_build_failure( pptr, 905, "Incorrect Json Message : Missing status" ) );
 				else	yptr = zptr;
 			}
+
+			else if (!( strcmp( vptr, "ERROR" )))
+			{
+				if ( zptr ) zptr = liberate_os_response( zptr );
+				return( openstack_build_failure( pptr, 999, "VM ERROR : Get Server" ) );
+			}
 			else if (!( strcmp( vptr, "BUILD" )))
 			{
 				if ( zptr ) zptr = liberate_os_response( zptr );
