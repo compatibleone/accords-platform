@@ -331,7 +331,6 @@ private	void	process_job_alarm(int before, int after)
 	/* --------------------------------- */
 	/* here we must launch the timed job */
 	/* --------------------------------- */
-	lock_job_control();
 	if ( job_debug ) { printf("job timer manager process alarm\n"); }
 	if (( tptr = JobControl.current ) != (struct job_timer *) 0)
 	{
@@ -340,21 +339,24 @@ private	void	process_job_alarm(int before, int after)
 		{
 			if (!( tptr->duration ))
 			{
+				lock_job_timer(tptr);
 				tptr->hitcount++;
 				tptr->timestamp = time((long *) 0);
 				tptr->duration  = tptr->period;
 				if ( job_debug) { printf("job timer launched job : (id=%u, hit=%u, time=%u)\n",tptr->number,tptr->hitcount,tptr->timestamp); }
+				unlock_job_timer(tptr);
 				job_invocation( tptr );
 			}
 			tptr = tptr->next;
 		}
+		lock_job_control();
 		JobControl.duration=0;
 		JobControl.current=(struct job_timer *) 0;
+		unlock_job_control();
 		calculate_durations(0);
 	}
 	else	calculate_durations(0);
 	JobControl.hitcount++;
-	unlock_job_control();
 	return;
 }
 
