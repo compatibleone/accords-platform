@@ -21,6 +21,8 @@
 #define	_COOL_PORT	8386
 #define	_COOL_SCALEUP	"scaleup"
 #define	_COOL_SCALEDOWN	"scaledown"
+#define	_COOL_SCALEBACK	"scaleback"
+
 #define	_COOL_LINKS	"links_cool.xml"
 #define	_COOL_PACKETS	"packet_cool.xml"
 
@@ -77,6 +79,7 @@ struct	elastic_control
 	int		lower;
 	int		unit;
 	int		period;
+	int		autoscale;
 
 	/* ------------------------------------ */
 	/* will be calculated during operation  */

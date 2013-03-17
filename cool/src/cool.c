@@ -196,6 +196,7 @@ private	struct	elastic_control Elastic =
 	2,	/* lower			*/
 	10,	/* elastic unit			*/
 	60,	/* elastic period		*/
+	1,	/* elastic auto scale		*/
 	/* ------------------------------------ */
 	/* will be calculated during operation  */
 	/* ------------------------------------ */
@@ -317,6 +318,44 @@ private	struct rest_response * scaledown_job(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Elastic Floor Reached" ) );
+	
+}
+
+/*	-------------------------------------------	*/
+/* 		s c a l e b a c k _ j o b 		*/
+/*	-------------------------------------------	*/
+private	struct rest_response * scaleback_job(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	cords_job * pptr;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response * zptr;
+	struct	occi_element  * eptr;
+	char *	wptr;
+
+	if (!( pptr = vptr ))
+		return( rest_html_response( aptr, 400, "Failure" ) );
+
+	else if ( Elastic.active <= Elastic.floor )
+		return( rest_html_response( aptr, 400, "Elastic Floor Reached" ) );
+	else 
+	{
+		while ( Elastic.active > Elastic.floor )
+		{
+			scaledown_elastic_contract( Elastic.last );
+			pptr->workloads = Elastic.active;
+			pptr->floor     = Elastic.floor;
+			pptr->ceiling   = Elastic.ceiling;
+			pptr->strategy  = Elastic.strategy;
+			autosave_cords_job_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	
 }
 
@@ -1175,6 +1214,9 @@ private	int	cool_elastic_condition(
 	else if ((!( strcmp( nptr, "occi.elastic.period" ) ))
 	||  (!( strcmp( nptr, "occi.job.period" ) )))
 		Elastic.period = atoi( vptr );
+	else if ((!( strcmp( nptr, "occi.elastic.autoscale" ) ))
+	||  (!( strcmp( nptr, "occi.job.autoscale" ) )))
+		Elastic.autoscale = atoi( vptr );
 	else	return(0);
 	return(1);
 }
@@ -1696,11 +1738,12 @@ private	int	retrieve_elastic_contracts()
 }
 
 /*	---------------------------------------------------------	*/
-/*		l b _ u p d a t e _ s t a t i s t i c s 			*/
+/*		l b _ u p d a t e _ s t a t i s t i c s 		*/
 /*	---------------------------------------------------------	*/
 private	void	lb_update_statistics()
 {	
-	int		now=time((long *) 0);
+	char 	buffer[1024];
+	int	now=time((long *) 0);
 	if ( Elastic.lasthit == now )
 		Elastic.hitcount++;
 	else
@@ -1708,12 +1751,29 @@ private	void	lb_update_statistics()
 		Elastic.lasthit=now;
 		Elastic.hitcount=1;
 	}
+
 	if ( Elastic.hitcount > Elastic.maxhit )
 		Elastic.maxhit = Elastic.hitcount;
 
-	if ( Elastic.hitcount > Elastic.upper )
-		if ( Elastic.active < Elastic.ceiling )
-			scaleup_elastic_contract( Elastic.first->contract, 1 );
+	sprintf(buffer,"lb_stat(hits=%u,max=%u,low=%u,upp=%u,act=%u,floor=%u,ceiling=%u)",
+			Elastic.hitcount,Elastic.maxhit,Elastic.upper,Elastic.lower,
+			Elastic.active,Elastic.floor,Elastic.ceiling);
+
+	cool_log_message( buffer, 1 );	
+
+	if ( Elastic.autoscale )
+	{
+		if ( Elastic.hitcount >= ( Elastic.upper * Elastic.active ) )
+		{
+			if ( Elastic.active < Elastic.ceiling )
+				scaleup_elastic_contract( Elastic.first->contract, 1 );
+		}
+		else if ( Elastic.hitcount <= ( Elastic.lower * Elastic.active ) )
+		{
+			if ( Elastic.active > Elastic.floor )
+				scaledown_elastic_contract( Elastic.first );
+		}
+	}
 	return;
 }
 
@@ -1905,6 +1965,8 @@ private	int	cool_occi_operation( char * nptr )
 	if (!( optr = occi_add_action( optr,_COOL_SCALEUP,"",scaleup_job)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,_COOL_SCALEDOWN,"",scaledown_job)))
+		return( 27 );
+	else if (!( optr = occi_add_action( optr,_COOL_SCALEBACK,"",scaleback_job)))
 		return( 27 );
 
 	if (!( optr = occi_cords_workload_builder( Cool.domain, "workload" )))
@@ -2098,6 +2160,10 @@ private	int	cool_elastic_start()
 	/* this defines the elastic response strategry by HTTP */
 	/* redirection header as 0,301,302,303 or 307 response */
 	/* --------------------------------------------------- */ 
+	if (!( eptr = getenv( "elastic_autoscale" ) ))
+		Elastic.autoscale = 0;
+	else	Elastic.autoscale = atoi(eptr);
+
 	if (!( eptr = getenv( "elastic_strategy" ) ))
 		Elastic.strategy = _HTTP_MOVED;
 	else if (!( Elastic.strategy = atoi(eptr) ))
