@@ -1766,12 +1766,18 @@ private	void	lb_update_statistics()
 		if ( Elastic.hitcount >= ( Elastic.upper * Elastic.active ) )
 		{
 			if ( Elastic.active < Elastic.ceiling )
+			{
+				Elastic.active++;
 				scaleup_elastic_contract( Elastic.first->contract, 1 );
+			}				
 		}
 		else if ( Elastic.hitcount <= ( Elastic.lower * Elastic.active ) )
 		{
 			if ( Elastic.active > Elastic.floor )
+			{
+				Elastic.active--;
 				scaledown_elastic_contract( Elastic.first );
+			}
 		}
 	}
 	return;
