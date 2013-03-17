@@ -4,23 +4,25 @@
 struct  computenext
 {
         char *  id;
-        char *  name;
+        char *  profile;
         char *  description;
         char *  hostname;
-		char *  placement;
 		
         int     state;
 
+	char *	node;
+	char *	access;
+	char *	agent;
+	char *	account;
+	char *	firewall;
+
         char *  workload;
-        char *  workloadelement;
         char *  transaction;
         char *  image;
         char *  instancetype;
-        char *  virtualmachine;
         char *  volumestorage;
 
         char *  securitygroup;
-        char *  port;
         char *  keypair;
         char *  password;
         char *  username;

@@ -135,34 +135,36 @@ private void autoload_computenext_nodes() {
 			else if (!( pptr = nptr->contents )) break;
 			if ((aptr = document_atribut( vptr, "id" )) != (struct xml_atribut *) 0)
 				pptr->id = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
-				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
+				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "description" )) != (struct xml_atribut *) 0)
 				pptr->description = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "hostname" )) != (struct xml_atribut *) 0)
 				pptr->hostname = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "placement" )) != (struct xml_atribut *) 0)
-				pptr->placement = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
+			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
+				pptr->node = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "access" )) != (struct xml_atribut *) 0)
+				pptr->access = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "agent" )) != (struct xml_atribut *) 0)
+				pptr->agent = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "account" )) != (struct xml_atribut *) 0)
+				pptr->account = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "firewall" )) != (struct xml_atribut *) 0)
+				pptr->firewall = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "workload" )) != (struct xml_atribut *) 0)
 				pptr->workload = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "workloadelement" )) != (struct xml_atribut *) 0)
-				pptr->workloadelement = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "transaction" )) != (struct xml_atribut *) 0)
 				pptr->transaction = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "image" )) != (struct xml_atribut *) 0)
 				pptr->image = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "instancetype" )) != (struct xml_atribut *) 0)
 				pptr->instancetype = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "virtualmachine" )) != (struct xml_atribut *) 0)
-				pptr->virtualmachine = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "volumestorage" )) != (struct xml_atribut *) 0)
 				pptr->volumestorage = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "securitygroup" )) != (struct xml_atribut *) 0)
 				pptr->securitygroup = document_atribut_string(aptr);
-			if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
-				pptr->port = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "keypair" )) != (struct xml_atribut *) 0)
 				pptr->keypair = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "password" )) != (struct xml_atribut *) 0)
@@ -214,8 +216,8 @@ public  void autosave_computenext_nodes() {
 		fprintf(h," id=%c",0x0022);
 		fprintf(h,"%s",(pptr->id?pptr->id:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," name=%c",0x0022);
-		fprintf(h,"%s",(pptr->name?pptr->name:""));
+		fprintf(h," profile=%c",0x0022);
+		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," description=%c",0x0022);
 		fprintf(h,"%s",(pptr->description?pptr->description:""));
@@ -223,17 +225,26 @@ public  void autosave_computenext_nodes() {
 		fprintf(h," hostname=%c",0x0022);
 		fprintf(h,"%s",(pptr->hostname?pptr->hostname:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," placement=%c",0x0022);
-		fprintf(h,"%s",(pptr->placement?pptr->placement:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
+		fprintf(h," node=%c",0x0022);
+		fprintf(h,"%s",(pptr->node?pptr->node:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," access=%c",0x0022);
+		fprintf(h,"%s",(pptr->access?pptr->access:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," agent=%c",0x0022);
+		fprintf(h,"%s",(pptr->agent?pptr->agent:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," account=%c",0x0022);
+		fprintf(h,"%s",(pptr->account?pptr->account:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," firewall=%c",0x0022);
+		fprintf(h,"%s",(pptr->firewall?pptr->firewall:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," workload=%c",0x0022);
 		fprintf(h,"%s",(pptr->workload?pptr->workload:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," workloadelement=%c",0x0022);
-		fprintf(h,"%s",(pptr->workloadelement?pptr->workloadelement:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," transaction=%c",0x0022);
 		fprintf(h,"%s",(pptr->transaction?pptr->transaction:""));
@@ -244,17 +255,11 @@ public  void autosave_computenext_nodes() {
 		fprintf(h," instancetype=%c",0x0022);
 		fprintf(h,"%s",(pptr->instancetype?pptr->instancetype:""));
 		fprintf(h,"%c",0x0022);
-		fprintf(h," virtualmachine=%c",0x0022);
-		fprintf(h,"%s",(pptr->virtualmachine?pptr->virtualmachine:""));
-		fprintf(h,"%c",0x0022);
 		fprintf(h," volumestorage=%c",0x0022);
 		fprintf(h,"%s",(pptr->volumestorage?pptr->volumestorage:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," securitygroup=%c",0x0022);
 		fprintf(h,"%s",(pptr->securitygroup?pptr->securitygroup:""));
-		fprintf(h,"%c",0x0022);
-		fprintf(h," port=%c",0x0022);
-		fprintf(h,"%s",(pptr->port?pptr->port:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," keypair=%c",0x0022);
 		fprintf(h,"%s",(pptr->keypair?pptr->keypair:""));
@@ -313,34 +318,36 @@ private void set_computenext_field(
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
 	if (!( strncmp( nptr, prefix, strlen(prefix) ) )) {
 		nptr += strlen(prefix);
-		if (!( strcmp( nptr, "name" ) ))
-			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "profile" ) ))
+			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "description" ) ))
 			pptr->description = allocate_string(vptr);
 		if (!( strcmp( nptr, "hostname" ) ))
 			pptr->hostname = allocate_string(vptr);
-		if (!( strcmp( nptr, "placement" ) ))
-			pptr->placement = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
+		if (!( strcmp( nptr, "node" ) ))
+			pptr->node = allocate_string(vptr);
+		if (!( strcmp( nptr, "access" ) ))
+			pptr->access = allocate_string(vptr);
+		if (!( strcmp( nptr, "agent" ) ))
+			pptr->agent = allocate_string(vptr);
+		if (!( strcmp( nptr, "account" ) ))
+			pptr->account = allocate_string(vptr);
+		if (!( strcmp( nptr, "firewall" ) ))
+			pptr->firewall = allocate_string(vptr);
 		if (!( strcmp( nptr, "workload" ) ))
 			pptr->workload = allocate_string(vptr);
-		if (!( strcmp( nptr, "workloadelement" ) ))
-			pptr->workloadelement = allocate_string(vptr);
 		if (!( strcmp( nptr, "transaction" ) ))
 			pptr->transaction = allocate_string(vptr);
 		if (!( strcmp( nptr, "image" ) ))
 			pptr->image = allocate_string(vptr);
 		if (!( strcmp( nptr, "instancetype" ) ))
 			pptr->instancetype = allocate_string(vptr);
-		if (!( strcmp( nptr, "virtualmachine" ) ))
-			pptr->virtualmachine = allocate_string(vptr);
 		if (!( strcmp( nptr, "volumestorage" ) ))
 			pptr->volumestorage = allocate_string(vptr);
 		if (!( strcmp( nptr, "securitygroup" ) ))
 			pptr->securitygroup = allocate_string(vptr);
-		if (!( strcmp( nptr, "port" ) ))
-			pptr->port = allocate_string(vptr);
 		if (!( strcmp( nptr, "keypair" ) ))
 			pptr->keypair = allocate_string(vptr);
 		if (!( strcmp( nptr, "password" ) ))
@@ -396,11 +403,11 @@ private int pass_computenext_filter(
 		else if ( strcmp(pptr->id,fptr->id) != 0)
 			return(0);
 		}
-	if (( fptr->name )
-	&&  (strlen( fptr->name ) != 0)) {
-		if (!( pptr->name ))
+	if (( fptr->profile )
+	&&  (strlen( fptr->profile ) != 0)) {
+		if (!( pptr->profile ))
 			return(0);
-		else if ( strcmp(pptr->name,fptr->name) != 0)
+		else if ( strcmp(pptr->profile,fptr->profile) != 0)
 			return(0);
 		}
 	if (( fptr->description )
@@ -417,26 +424,47 @@ private int pass_computenext_filter(
 		else if ( strcmp(pptr->hostname,fptr->hostname) != 0)
 			return(0);
 		}
-	if (( fptr->placement )
-	&&  (strlen( fptr->placement ) != 0)) {
-		if (!( pptr->placement ))
+	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
+	if (( fptr->node )
+	&&  (strlen( fptr->node ) != 0)) {
+		if (!( pptr->node ))
 			return(0);
-		else if ( strcmp(pptr->placement,fptr->placement) != 0)
+		else if ( strcmp(pptr->node,fptr->node) != 0)
 			return(0);
 		}
-	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
+	if (( fptr->access )
+	&&  (strlen( fptr->access ) != 0)) {
+		if (!( pptr->access ))
+			return(0);
+		else if ( strcmp(pptr->access,fptr->access) != 0)
+			return(0);
+		}
+	if (( fptr->agent )
+	&&  (strlen( fptr->agent ) != 0)) {
+		if (!( pptr->agent ))
+			return(0);
+		else if ( strcmp(pptr->agent,fptr->agent) != 0)
+			return(0);
+		}
+	if (( fptr->account )
+	&&  (strlen( fptr->account ) != 0)) {
+		if (!( pptr->account ))
+			return(0);
+		else if ( strcmp(pptr->account,fptr->account) != 0)
+			return(0);
+		}
+	if (( fptr->firewall )
+	&&  (strlen( fptr->firewall ) != 0)) {
+		if (!( pptr->firewall ))
+			return(0);
+		else if ( strcmp(pptr->firewall,fptr->firewall) != 0)
+			return(0);
+		}
 	if (( fptr->workload )
 	&&  (strlen( fptr->workload ) != 0)) {
 		if (!( pptr->workload ))
 			return(0);
 		else if ( strcmp(pptr->workload,fptr->workload) != 0)
-			return(0);
-		}
-	if (( fptr->workloadelement )
-	&&  (strlen( fptr->workloadelement ) != 0)) {
-		if (!( pptr->workloadelement ))
-			return(0);
-		else if ( strcmp(pptr->workloadelement,fptr->workloadelement) != 0)
 			return(0);
 		}
 	if (( fptr->transaction )
@@ -460,13 +488,6 @@ private int pass_computenext_filter(
 		else if ( strcmp(pptr->instancetype,fptr->instancetype) != 0)
 			return(0);
 		}
-	if (( fptr->virtualmachine )
-	&&  (strlen( fptr->virtualmachine ) != 0)) {
-		if (!( pptr->virtualmachine ))
-			return(0);
-		else if ( strcmp(pptr->virtualmachine,fptr->virtualmachine) != 0)
-			return(0);
-		}
 	if (( fptr->volumestorage )
 	&&  (strlen( fptr->volumestorage ) != 0)) {
 		if (!( pptr->volumestorage ))
@@ -479,13 +500,6 @@ private int pass_computenext_filter(
 		if (!( pptr->securitygroup ))
 			return(0);
 		else if ( strcmp(pptr->securitygroup,fptr->securitygroup) != 0)
-			return(0);
-		}
-	if (( fptr->port )
-	&&  (strlen( fptr->port ) != 0)) {
-		if (!( pptr->port ))
-			return(0);
-		else if ( strcmp(pptr->port,fptr->port) != 0)
 			return(0);
 		}
 	if (( fptr->keypair )
@@ -587,7 +601,7 @@ private struct rest_response * computenext_occi_response(
 	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
+	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.description=%c%s%c",optr->domain,optr->id,0x0022,pptr->description,0x0022);
@@ -596,16 +610,25 @@ private struct rest_response * computenext_occi_response(
 	sprintf(cptr->buffer,"%s.%s.hostname=%c%s%c",optr->domain,optr->id,0x0022,pptr->hostname,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.placement=%c%s%c",optr->domain,optr->id,0x0022,pptr->placement,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.workload=%c%s%c",optr->domain,optr->id,0x0022,pptr->workload,0x0022);
+	sprintf(cptr->buffer,"%s.%s.node=%c%s%c",optr->domain,optr->id,0x0022,pptr->node,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.workloadelement=%c%s%c",optr->domain,optr->id,0x0022,pptr->workloadelement,0x0022);
+	sprintf(cptr->buffer,"%s.%s.access=%c%s%c",optr->domain,optr->id,0x0022,pptr->access,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.agent=%c%s%c",optr->domain,optr->id,0x0022,pptr->agent,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.account=%c%s%c",optr->domain,optr->id,0x0022,pptr->account,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.firewall=%c%s%c",optr->domain,optr->id,0x0022,pptr->firewall,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.workload=%c%s%c",optr->domain,optr->id,0x0022,pptr->workload,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.transaction=%c%s%c",optr->domain,optr->id,0x0022,pptr->transaction,0x0022);
@@ -617,16 +640,10 @@ private struct rest_response * computenext_occi_response(
 	sprintf(cptr->buffer,"%s.%s.instancetype=%c%s%c",optr->domain,optr->id,0x0022,pptr->instancetype,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.virtualmachine=%c%s%c",optr->domain,optr->id,0x0022,pptr->virtualmachine,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.volumestorage=%c%s%c",optr->domain,optr->id,0x0022,pptr->volumestorage,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.securitygroup=%c%s%c",optr->domain,optr->id,0x0022,pptr->securitygroup,0x0022);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.port=%c%s%c",optr->domain,optr->id,0x0022,pptr->port,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.keypair=%c%s%c",optr->domain,optr->id,0x0022,pptr->keypair,0x0022);
@@ -770,9 +787,11 @@ private struct rest_response * computenext_post_item(
 	struct occi_kind_node * nptr;
 	struct computenext * pptr;
 	char * reqhost;
+	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
+	else reqport = rptr->port;
 	if (!( nptr = add_computenext_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
@@ -781,7 +800,7 @@ private struct rest_response * computenext_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
 	autosave_computenext_nodes();
-	sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -863,9 +882,11 @@ private struct rest_response * computenext_get_list(
 	struct computenext * pptr;
 	struct computenext * fptr;
 	char * reqhost;
+	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	else if (!( fptr = filter_computenext_info( optr, rptr, aptr ) ))
+	else reqport = rptr->port;
+	if (!( fptr = filter_computenext_info( optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	for ( sptr = computenext_first;
 		sptr != (struct occi_kind_node *) 0;
@@ -874,7 +895,7 @@ private struct rest_response * computenext_get_list(
 			continue;
 		if (!( pass_computenext_filter( pptr, fptr ) ))
 			continue;
-		sprintf(cptr->buffer,"%s%s%s",reqhost,optr->location,pptr->id);
+		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
@@ -1082,19 +1103,25 @@ public struct occi_category * occi_computenext_builder(char * a,char * b) {
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
 		redirect_occi_computenext_mt(optr->interface);
-		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "description",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "hostname",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "placement",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "workloadelement",0,0) ))
+		if (!( optr = occi_add_attribute(optr, "access",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "agent",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "account",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "firewall",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "workload",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "transaction",0,0) ))
 			return(optr);
@@ -1102,13 +1129,9 @@ public struct occi_category * occi_computenext_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "instancetype",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_attribute(optr, "virtualmachine",0,0) ))
-			return(optr);
 		if (!( optr = occi_add_attribute(optr, "volumestorage",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "securitygroup",0,0) ))
-			return(optr);
-		if (!( optr = occi_add_attribute(optr, "port",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "keypair",0,0) ))
 			return(optr);
@@ -1171,7 +1194,7 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.computenext.name='%s'\r\n",(sptr->name?sptr->name:""));
+	sprintf(buffer,"occi.computenext.profile='%s'\r\n",(sptr->profile?sptr->profile:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1204,17 +1227,6 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.computenext.placement='%s'\r\n",(sptr->placement?sptr->placement:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.computenext.state='%u'\r\n",sptr->state);
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1226,7 +1238,7 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.computenext.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
+	sprintf(buffer,"occi.computenext.node='%s'\r\n",(sptr->node?sptr->node:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1237,7 +1249,51 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.computenext.workloadelement='%s'\r\n",(sptr->workloadelement?sptr->workloadelement:""));
+	sprintf(buffer,"occi.computenext.access='%s'\r\n",(sptr->access?sptr->access:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.computenext.agent='%s'\r\n",(sptr->agent?sptr->agent:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.computenext.account='%s'\r\n",(sptr->account?sptr->account:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.computenext.firewall='%s'\r\n",(sptr->firewall?sptr->firewall:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.computenext.workload='%s'\r\n",(sptr->workload?sptr->workload:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
@@ -1281,17 +1337,6 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 		last = hptr;
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
-	sprintf(buffer,"occi.computenext.virtualmachine='%s'\r\n",(sptr->virtualmachine?sptr->virtualmachine:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
 	sprintf(buffer,"occi.computenext.volumestorage='%s'\r\n",(sptr->volumestorage?sptr->volumestorage:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
@@ -1304,17 +1349,6 @@ public struct rest_header *  computenext_occi_headers(struct computenext * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.computenext.securitygroup='%s'\r\n",(sptr->securitygroup?sptr->securitygroup:""));
-	if (!( hptr->value = allocate_string(buffer)))
-		return(first);
-	if (!( hptr = allocate_rest_header()))
-		return(first);
-		else	if (!( hptr->previous = last))
-			first = hptr;
-		else	hptr->previous->next = hptr;
-		last = hptr;
-	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
-		return(first);
-	sprintf(buffer,"occi.computenext.port='%s'\r\n",(sptr->port?sptr->port:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

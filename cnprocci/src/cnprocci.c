@@ -25,20 +25,9 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
-
-/* 	----------------------------------------	*/	
-/*	Prototype Contract Negotiation Functions	*/
-/* 	----------------------------------------	*/
-#include "computenext.h"
-#include "computenext.c"
-#include "occicomputenext.c"
-#include "cnconfig.h"
-#include "cnconfig.c"
-#include "occicnconfig.c"
-#include "cnclient.h"
-#include "cnclient.c"
-#include "cncontract.h"
-#include "cncontract.c"
+#include "cordslang.h"
+#include "cosacsctrl.h"
+#include "stdnode.h"
 
 struct	accords_configuration Configuration = {
 	0,0,
@@ -57,7 +46,8 @@ struct	accords_configuration Configuration = {
 	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
-	};
+};
+
 
 public	int	check_debug()		{	return(Configuration.debug);		}
 public	int	check_verbose()		{	return(Configuration.verbose);		}
@@ -80,12 +70,28 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+#define	_CORDS_COMPUTENEXT "computenext"
+
+/* 	----------------------------------------	*/	
+/*	Prototype Contract Negotiation Functions	*/
+/* 	----------------------------------------	*/
+#include "cnconfig.h"
+#include "cnconfig.c"
+#include "occicnconfig.c"
+#include "computenext.h"
+#include "computenext.c"
+#include "occicomputenext.c"
+#include "cnclient.h"
+#include "cnclient.c"
+#include "cncontract.h"
+#include "cncontract.c"
+
 /*	---------------------------------------------------------------	*/  
-/*	e x a m p l e _ c o n f i g u r a t i o n			*/
+/*	c o m p u t e n e x t _ c o n f i g u r a t i o n               */
 /*	---------------------------------------------------------------	*/  
-/*	this function loads cnprocci configuration			*/
-/*	from the xml configuration file.				*/
-	/*	---------------------------------------------------------------	*/  
+/*	this function loads cnprocci configuration                      */
+/*	from the xml configuration file.                                */
+/*	---------------------------------------------------------------	*/  
 private	void	cnprocci_configuration()
 {
 	load_accords_configuration( &Configuration, "cnprocci" );
@@ -93,16 +99,16 @@ private	void	cnprocci_configuration()
 }
 
 /*	---------------------------------------------------------------	*/  
-/*	e x a m p l e _ b a n n e r					*/
+/*	c o m p u t e n e x t _ b a n n e r                                     */
 /*	---------------------------------------------------------------	*/  
 /*	this function will be called to display module identification 	*/
-/*	when launched from the command line without any parameters.	*/
+/*	when launched from the command line without any parameters.     */
 /*	---------------------------------------------------------------	*/  
 private	int	cnprocci_banner()
 {
 	printf("\n   CompatibleOne ComputeNext PROCCI : Version 1.0a.0.01");
-	printf("\n   Beta Version : 27/02/2013 ");
-	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
+	printf("\n   Beta Version : 17/03/2013 ");
+	printf("\n   Copyright (c) 2013 Daniel Sprouse(ComputeNext) and Iain James Marshall(Prologue)");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -111,7 +117,7 @@ private	int	cnprocci_banner()
 }
 
 /*	------------------------------------------- */
-/*	e x a m p l e _ i n i t i a l i s e		*/
+/*	c o m p u t e n e x t _ i n i t i a l i s e         */
 /*	------------------------------------------- */
 
 private	struct rest_server * cnprocci_initialise(  void * v,struct rest_server * sptr )
@@ -127,8 +133,8 @@ private	struct rest_server * cnprocci_initialise(  void * v,struct rest_server *
 }
 
 /*	-------------------------------------------	*/
-/*	e x a m p l e _ a u t h o r i s e 		*/
-/*	------------------------------------------- 	*/
+/*	c o m p u t e n e x t _ a u t h o r i s e           */
+/*	------------------------------------------- */
 private	int	cnprocci_authorise(  void * v,struct rest_client * cptr, char * username, char * password )
 {
 	if ( strcmp( username, Configuration.user ) )
@@ -143,7 +149,7 @@ private	int	cnprocci_authorise(  void * v,struct rest_client * cptr, char * user
 }
 
 /*	------------------------------------------- */
-/*	e x a m p l e _ e x t e n s i o n 		*/
+/*	c o m p u t e n e x t _ e x t e n s i o n   */
 /*	-------------------------------------------	*/
 private	struct rest_extension * cnprocci_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr)
 {
@@ -151,9 +157,9 @@ private	struct rest_extension * cnprocci_extension( void * v,struct rest_server 
 }
 
 /*	-------------------------------------------	*/
-/*	cnprocci C R U D Method  Extension Functions 	*/
+/*	cnprocci C R U D Method  Extension Functions*/
 /*	-------------------------------------------	*/
-/* 	   c r e a t e _ e x a m p l e  		*/
+/* 	   c r e a t e _ c o m p u t e n e x t      */
 /*	-------------------------------------------	*/
 private	int	create_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
@@ -167,7 +173,7 @@ private	int	create_computenext(struct occi_category * optr, void * vptr, struct 
 }
 
 /*	-------------------------------------------	*/
-/* 	 r e t r i e v e _ e x a m p l e 	*/
+/* 	 r e t r i e v e _ c o m p u t e n e x t    */
 /*	-------------------------------------------	*/
 private	int	retrieve_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
@@ -181,7 +187,7 @@ private	int	retrieve_computenext(struct occi_category * optr, void * vptr, struc
 }
 
 /*	-------------------------------------------	*/
-/* 	   u p d a t e _ e x a m p l e		*/
+/* 	   u p d a t e _ c o m p u t e n e x t		*/
 /*	-------------------------------------------	*/
 private	int	update_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
@@ -195,7 +201,7 @@ private	int	update_computenext(struct occi_category * optr, void * vptr, struct 
 }
 
 /*	-------------------------------------------	*/
-/* 	   d e l e t e  _ e x a m p l e 		*/
+/* 	   d e l e t e  _ c o m p u t e n e x t     */
 /*	-------------------------------------------	*/
 private	int	delete_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
@@ -209,7 +215,7 @@ private	int	delete_computenext(struct occi_category * optr, void * vptr, struct 
 }
 
 /*	--------------------------------------------	*/
-/*	CRUD Methods Relay Table			*/
+/*	CRUD Methods Relay Table                        */
 /*	--------------------------------------------	*/
 private	struct	occi_interface	cnprocci_interface = {
 	create_computenext,
@@ -219,9 +225,9 @@ private	struct	occi_interface	cnprocci_interface = {
 	};	
 
 /*	--------------------------------------------	*/
-/*	e x a m p l e _ o p e r a t i o n 		*/
+/*	c o m p u t e n e x t _ o p e r a t i o n 		*/
 /*	--------------------------------------------	*/
-/*	environment and category preparation		*/
+/*	environment and category preparation		    */
 /*	--------------------------------------------	*/
 private	int	cnprocci_operation( char * nptr )
 {
@@ -237,13 +243,6 @@ private	int	cnprocci_operation( char * nptr )
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
-	if (!( optr = occi_cn_config_builder( Configuration.domain, "computenext_configuration" ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
 	if (!( optr = occi_computenext_builder( Configuration.domain, "computenext" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
@@ -254,7 +253,7 @@ private	int	cnprocci_operation( char * nptr )
 	/* -------------------------------------------------------------- */
 	/* this option indicates that the category is a provider category */
 	/* and con be used as a legal value for the provider attribute of */
-	/* a node description of a manifest.				  */
+	/* a node description of a manifest.                              */
 	/* -------------------------------------------------------------- */
 	optr->access    |= _OCCI_PROVIDER;
 
@@ -263,13 +262,13 @@ private	int	cnprocci_operation( char * nptr )
 	/* these are necessary for a PROCCI to be able  */
 	/* coordinate provisioning with the calls from  */
 	/* the service manager for the management of    */
-	/* the service life cycle.			*/
+	/* the service life cycle.                      */
 	/* ---------------------------------------------*/
-	if (!( optr = occi_add_action( optr, "start", "", start_computenext)))
+	if (!( optr = occi_add_action( optr, _CORDS_START, "", start_computenext)))
 		return( 27 );
-	else if (!( optr = occi_add_action( optr, "stop"," ", stop_computenext)))
+	else if (!( optr = occi_add_action( optr, _CORDS_STOP," ", stop_computenext)))
 		return( 27 );
-	else if (!( optr = occi_add_action( optr, "save", "", save_computenext)))
+	else if (!( optr = occi_add_action( optr, _CORDS_SAVE, "", save_computenext)))
 		return( 27 );
 
 	if (!( Configuration.identity ))
@@ -299,9 +298,9 @@ private	int	cnprocci_operation( char * nptr )
 }
 
 /*	------------------------------------------- */
-/*	e x a m p l e _ o p t i o n s			*/
+/*	c o m p u t e n e x t _ o p t i o n s       */
 /*	------------------------------------------- */
-/*	Command line option analysis			*/
+/*	Command line option analysis                */
 /*	------------------------------------------- */
 private	int	cnprocci_options(int argc, char * argv[] )
 {
@@ -339,11 +338,11 @@ private	int	cnprocci_options(int argc, char * argv[] )
 	return(status);
 }
 
-/*	--------------------------------------------	*/
-/*	m a i n 					*/
-/*	--------------------------------------------	*/
-/*	Entry point from the command line		*/
-/*	--------------------------------------------	*/
+/*	-------------------------------------------- */
+/*	m a i n                                      */
+/*	-------------------------------------------- */
+/*	Entry point from the command line            */
+/*	-------------------------------------------- */
 public	int	main(int argc, char * argv[] )
 {
 	if ( argc == 1 )
@@ -351,8 +350,8 @@ public	int	main(int argc, char * argv[] )
 	else	return( cnprocci_options( argc, argv ) );
 }
 
-	/* ---------- */
+        /* ----------  */
 #endif 	/* _cnprocci_c */
-	/* ---------- */
+        /* ----------  */
 
 

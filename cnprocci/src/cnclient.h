@@ -67,15 +67,19 @@ public  struct cn_response * cn_stop_transaction( struct cn_config * sptr, char 
 
 public  char *
     cn_create_securitygroup_request( char * name, char * description, char * region, char * provider );
+
 public  char *
     cn_create_keypair_request( char * name, char * region, char * provider );
+
 public  char *
     cn_create_workload_request( char * name );
+
 public  char *
     cn_create_transaction_request( char * workload, char * billingtype );
     
 public  char *
     cn_add_port_request( char * protocol, char * from, char * to, char * cidr );
+
 public  char *
     cn_remove_port_request( char * protocol, char * from, char * to, char * cidr  );
 

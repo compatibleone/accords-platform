@@ -33,32 +33,34 @@ public struct computenext * liberate_computenext(struct computenext * sptr)
 	{
 		if ( sptr->id )
 			 sptr->id = liberate(sptr->id);
-		if ( sptr->name )
-			 sptr->name = liberate(sptr->name);
+		if ( sptr->profile )
+			 sptr->profile = liberate(sptr->profile);
 		if ( sptr->description )
 			 sptr->description = liberate(sptr->description);
 		if ( sptr->hostname )
 			 sptr->hostname = liberate(sptr->hostname);
-		if ( sptr->placement )
-			 sptr->placement = liberate(sptr->placement);
+		if ( sptr->node )
+			 sptr->node = liberate(sptr->node);
+		if ( sptr->access )
+			 sptr->access = liberate(sptr->access);
+		if ( sptr->agent )
+			 sptr->agent = liberate(sptr->agent);
+		if ( sptr->account )
+			 sptr->account = liberate(sptr->account);
+		if ( sptr->firewall )
+			 sptr->firewall = liberate(sptr->firewall);
 		if ( sptr->workload )
 			 sptr->workload = liberate(sptr->workload);
-		if ( sptr->workloadelement )
-			 sptr->workloadelement = liberate(sptr->workloadelement);
 		if ( sptr->transaction )
 			 sptr->transaction = liberate(sptr->transaction);
 		if ( sptr->image )
 			 sptr->image = liberate(sptr->image);
 		if ( sptr->instancetype )
 			 sptr->instancetype = liberate(sptr->instancetype);
-		if ( sptr->virtualmachine )
-			 sptr->virtualmachine = liberate(sptr->virtualmachine);
 		if ( sptr->volumestorage )
 			 sptr->volumestorage = liberate(sptr->volumestorage);
 		if ( sptr->securitygroup )
 			 sptr->securitygroup = liberate(sptr->securitygroup);
-		if ( sptr->port )
-			 sptr->port = liberate(sptr->port);
 		if ( sptr->keypair )
 			 sptr->keypair = liberate(sptr->keypair);
 		if ( sptr->password )
@@ -97,20 +99,21 @@ public struct computenext * reset_computenext(struct computenext * sptr)
 	if ( sptr )
 	{
 		sptr->id = (char*) 0;
-		sptr->name = (char*) 0;
+		sptr->profile = (char*) 0;
 		sptr->description = (char*) 0;
 		sptr->hostname = (char*) 0;
-		sptr->placement = (char*) 0;
 		sptr->state =  0;
+		sptr->node = (char*) 0;
+		sptr->access = (char*) 0;
+		sptr->agent = (char*) 0;
+		sptr->account = (char*) 0;
+		sptr->firewall = (char*) 0;
 		sptr->workload = (char*) 0;
-		sptr->workloadelement = (char*) 0;
 		sptr->transaction = (char*) 0;
 		sptr->image = (char*) 0;
 		sptr->instancetype = (char*) 0;
-		sptr->virtualmachine = (char*) 0;
 		sptr->volumestorage = (char*) 0;
 		sptr->securitygroup = (char*) 0;
-		sptr->port = (char*) 0;
 		sptr->keypair = (char*) 0;
 		sptr->password = (char*) 0;
 		sptr->username = (char*) 0;
@@ -153,9 +156,9 @@ public int xmlin_computenext(struct computenext * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->id = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"name") ))
+		else if (!( strcmp(wptr->name,"profile") ))
 		{
-			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->profile = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"description") ))
 		{
@@ -165,21 +168,33 @@ public int xmlin_computenext(struct computenext * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->hostname = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"placement") ))
-		{
-			if ( wptr->value ) { sptr->placement = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"node") ))
+		{
+			if ( wptr->value ) { sptr->node = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"access") ))
+		{
+			if ( wptr->value ) { sptr->access = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"agent") ))
+		{
+			if ( wptr->value ) { sptr->agent = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"account") ))
+		{
+			if ( wptr->value ) { sptr->account = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"firewall") ))
+		{
+			if ( wptr->value ) { sptr->firewall = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"workload") ))
 		{
 			if ( wptr->value ) { sptr->workload = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"workloadelement") ))
-		{
-			if ( wptr->value ) { sptr->workloadelement = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"transaction") ))
 		{
@@ -193,10 +208,6 @@ public int xmlin_computenext(struct computenext * sptr,struct xml_element * eptr
 		{
 			if ( wptr->value ) { sptr->instancetype = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"virtualmachine") ))
-		{
-			if ( wptr->value ) { sptr->virtualmachine = allocate_string(wptr->value); }
-		}
 		else if (!( strcmp(wptr->name,"volumestorage") ))
 		{
 			if ( wptr->value ) { sptr->volumestorage = allocate_string(wptr->value); }
@@ -204,10 +215,6 @@ public int xmlin_computenext(struct computenext * sptr,struct xml_element * eptr
 		else if (!( strcmp(wptr->name,"securitygroup") ))
 		{
 			if ( wptr->value ) { sptr->securitygroup = allocate_string(wptr->value); }
-		}
-		else if (!( strcmp(wptr->name,"port") ))
-		{
-			if ( wptr->value ) { sptr->port = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"keypair") ))
 		{
@@ -272,20 +279,21 @@ public int rest_occi_computenext(FILE * fh,struct computenext * sptr,char * pref
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.description='%s'\r\n",prefix,nptr,(sptr->description?sptr->description:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.hostname='%s'\r\n",prefix,nptr,(sptr->hostname?sptr->hostname:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.placement='%s'\r\n",prefix,nptr,(sptr->placement?sptr->placement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.access='%s'\r\n",prefix,nptr,(sptr->access?sptr->access:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.account='%s'\r\n",prefix,nptr,(sptr->account?sptr->account:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.firewall='%s'\r\n",prefix,nptr,(sptr->firewall?sptr->firewall:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.workload='%s'\r\n",prefix,nptr,(sptr->workload?sptr->workload:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.workloadelement='%s'\r\n",prefix,nptr,(sptr->workloadelement?sptr->workloadelement:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.transaction='%s'\r\n",prefix,nptr,(sptr->transaction?sptr->transaction:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.image='%s'\r\n",prefix,nptr,(sptr->image?sptr->image:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.instancetype='%s'\r\n",prefix,nptr,(sptr->instancetype?sptr->instancetype:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.virtualmachine='%s'\r\n",prefix,nptr,(sptr->virtualmachine?sptr->virtualmachine:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.volumestorage='%s'\r\n",prefix,nptr,(sptr->volumestorage?sptr->volumestorage:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.securitygroup='%s'\r\n",prefix,nptr,(sptr->securitygroup?sptr->securitygroup:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.port='%s'\r\n",prefix,nptr,(sptr->port?sptr->port:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.keypair='%s'\r\n",prefix,nptr,(sptr->keypair?sptr->keypair:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.password='%s'\r\n",prefix,nptr,(sptr->password?sptr->password:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.username='%s'\r\n",prefix,nptr,(sptr->username?sptr->username:""));
