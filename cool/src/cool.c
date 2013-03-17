@@ -1761,17 +1761,21 @@ private	void	lb_update_statistics()
 
 	cool_log_message( buffer, 1 );	
 
-	if ( Elastic.autoscale )
+	if ( Elastic.autoscale & 1)
 	{
 		if ( Elastic.hitcount >= ( Elastic.upper * Elastic.active ) )
 		{
 			if ( Elastic.active < Elastic.ceiling )
 			{
 				Elastic.active++;
+				Elastic.hitcount=0;
 				scaleup_elastic_contract( Elastic.first->contract, 1 );
 			}				
 		}
-		else if ( Elastic.hitcount <= ( Elastic.lower * Elastic.active ) )
+	}
+	if ( Elastic.autoscale & 2 )
+	{
+		if ( Elastic.hitcount <= ( Elastic.lower * Elastic.active ) )
 		{
 			if ( Elastic.active > Elastic.floor )
 			{
