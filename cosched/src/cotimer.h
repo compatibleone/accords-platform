@@ -17,6 +17,8 @@ struct	job_timer
 	int	timestamp;		/* time of last launch		*/
 	int	status;			/* status of job 0/1 active	*/
 	int	result;			/* last result 0 or ! 0		*/
+	int	working;		/* signals timer has fired load	*/
+	int	deleting;		/* delete has been requested	*/
 	char *	id;
 	char *	source;
 	char *	target;

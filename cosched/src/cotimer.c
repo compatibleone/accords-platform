@@ -135,10 +135,10 @@ public	struct job_timer * resolve_timer_operation( int reference )
 	return( jptr );
 }
 
-/*	----------------------------------------	*/
-/*	d r o p _ t i m e r _ o p e r a t i o n 	*/
-/*	----------------------------------------	*/
-public	int	drop_timer_operation(struct job_timer * tptr)
+/*	-------------------------------------------	*/
+/*	f o r g e t _ t i m e r _ o p e r a t i o n 	*/
+/*	-------------------------------------------	*/
+private	int	forget_timer_operation(struct job_timer * tptr)
 {
 	lock_job_control();
 	if (!( tptr->previous ))
@@ -150,6 +150,15 @@ public	int	drop_timer_operation(struct job_timer * tptr)
 	if ( JobControl.timers )
 		JobControl.timers--;
 	unlock_job_control();
+	return(0);
+}
+
+/*	----------------------------------------	*/
+/*	d r o p _ t i m e r _ o p e r a t i o n 	*/
+/*	----------------------------------------	*/
+public	int	drop_timer_operation(struct job_timer * tptr)
+{
+	forget_timer_operation(tptr);
 	tptr = liberate_job_timer( tptr );
 	return( 0 );
 }
@@ -328,6 +337,7 @@ private	void	process_job_alarm(int before, int after)
 {
 	int	consumed = (after-before);
 	struct	job_timer * tptr;
+	struct	job_timer * jptr;
 	/* --------------------------------- */
 	/* here we must launch the timed job */
 	/* --------------------------------- */
@@ -339,15 +349,45 @@ private	void	process_job_alarm(int before, int after)
 		{
 			if (!( tptr->duration ))
 			{
+				/* ----------------------- */
+				/* adjust timer statistics */
+				/* ----------------------- */
 				lock_job_timer(tptr);
+				tptr->working=1;
 				tptr->hitcount++;
 				tptr->timestamp = time((long *) 0);
 				tptr->duration  = tptr->period;
 				if ( job_debug) { printf("job timer launched job : (id=%u, hit=%u, time=%u)\n",tptr->number,tptr->hitcount,tptr->timestamp); }
 				unlock_job_timer(tptr);
+				/* ------------------------- */
+				/* launch the timed workload */
+				/* ------------------------- */
 				job_invocation( tptr );
+
+				/* ---------------------- */
+				/* post workload clean up */
+				/* ---------------------- */
+				lock_job_timer(tptr);
+				tptr->working = 0;
+				if ( tptr->deleting )
+				{
+					/* ----------------- */
+					/* delete is pending */
+					/* ----------------- */
+					jptr = tptr->next;
+					forget_timer_operation(tptr);
+					unlock_job_timer(tptr);
+					tptr = liberate_job_timer( tptr );
+					tptr = jptr;
+					continue;
+				}
+				else
+				{
+					unlock_job_timer(tptr);
+					tptr = tptr->next;
+				}
 			}
-			tptr = tptr->next;
+			else	tptr = tptr->next;
 		}
 		lock_job_control();
 		JobControl.duration=0;
@@ -583,12 +623,19 @@ private	int	release_timer( int reference )
 		if (( JobControl.current )
 		&&  ( JobControl.current->number == jptr->number ))
 		{
+			lock_job_timer( jptr );
+			if ( jptr->working )
+				jptr->deleting = 1;
 			JobControl.current = (struct job_timer *) 0;
 			JobControl.duration= 0;
+			unlock_job_timer( jptr );
 		}	
 		unlock_job_control();
-		drop_timer_operation( jptr );
-		inform_job_control();
+		if (!( jptr->deleting ))
+		{
+			drop_timer_operation( jptr );
+			inform_job_control();
+		}
 		return( 0 );
 	}
 }
