@@ -138,7 +138,7 @@ public	struct	rest_response * start_paas(
 		/* ----------------------------------- */
         	/*	Deploy paas application        */
 		/* ----------------------------------- */
-        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application, pptr->wardata, pptr->boundary ) ))
+        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application, allocate_string(pptr->wardata), pptr->boundary ) ))
         	{
         	       return( rest_html_response( aptr, 601, "application deployment failure" ) );
         	}
