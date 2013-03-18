@@ -384,7 +384,7 @@ private	char *	paas_multipart_content( char * control, char * type, char * conte
 {
 	FILE * h;
 	FILE * sh;
-	int	c;
+	unsigned int	c;
 	char 	buffer[256];
 	int	now;
 	char *	filename;
