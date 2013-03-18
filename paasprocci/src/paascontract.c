@@ -96,6 +96,24 @@ private	struct	paas_config * resolve_paas_configuration( char * sptr )
 	}
 }
 
+/*	-----------------------------------------	*/
+/*	p a a s _ r e s o l v e _ h o s t n a m e 	*/
+/*	-----------------------------------------	*/
+private	char * paas_resolve_hostname( struct paas_response  * zptr )
+{
+	struct xml_element * document;
+	struct xml_element * eptr;
+	if (!( zptr ))
+		return((char *) 0);
+	else if (!( document = zptr->xmlroot ))
+		return((char *) 0);
+	else if (!( eptr = document_element( document, "uris" ) ))
+		return((char *) 0);
+	else if (!( eptr->value ))
+		return((char *) 0);
+	else	return( allocate_string( eptr->value ) );
+}
+
 /*	-------------------------------------------	*/
 /* 	   	   s t a r t _ p a a s     	        */
 /*	-------------------------------------------	*/
@@ -111,6 +129,8 @@ public	struct	rest_response * start_paas(
 	struct	paas_config * cfgptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state != 0 )
+	 	return( rest_html_response( aptr, 200, "OK Already Started" ) );
 	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
 	 	return( rest_html_response( aptr, 403, "Invalid Action" ) );
 	else
@@ -131,9 +151,17 @@ public	struct	rest_response * start_paas(
 	        {
 	               return( rest_html_response( aptr, 603, "application start failure" ) );
 	        }
-	        else   prptr = paas_remove_response( prptr );
-        
-		return( rest_html_response( aptr, 200, "OK" ) );
+	        else   
+		{
+			/* resolve the access URI */
+			/* ---------------------- */
+			if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+			pptr->hostname = paas_resolve_hostname( prptr );
+			prptr = paas_remove_response( prptr );
+			pptr->state = 1;
+			autosave_paas_nodes();
+			return( rest_html_response( aptr, 200, "OK" ) );
+        	}
 	}
 }
 
@@ -179,7 +207,8 @@ public	struct	rest_response * stop_paas(
 	struct	paas_config * cfgptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-
+	else if (!( pptr->state ))
+	 	return( rest_html_response( aptr, 200,"OK Already Stopped" ) );
 	else if (!( cfgptr = resolve_paas_configuration( pptr->profile ) ))
 	 	return( rest_html_response( aptr, 403, "Invalid Action" ) );
 
@@ -202,8 +231,10 @@ public	struct	rest_response * stop_paas(
 	               return( rest_html_response( aptr, 601, "application undeployment failure" ) );
 	        }
 	        else   prptr = paas_remove_response( prptr );
-        
- 		return( rest_html_response( aptr, 200, "OK" ) );
+		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
+		pptr->state = 0;
+		autosave_paas_nodes();
+		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
 
