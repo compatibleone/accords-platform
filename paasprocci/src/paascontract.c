@@ -404,7 +404,7 @@ private	char *	paas_multipart_content( char * control, char * type, char * conte
 	{
 		fprintf(h,"--%s\r\n",boundary);
 		fprintf(h,"Content-Disposition: form-data; name=\"%s\"\r\n",control);
-		fprintf(h,"Content-Type: %s\r\n",type);
+		fprintf(h,"Content-Type: %s\r\n\r\n",type);
 		while ((c = fgetc(sh)) != -1) fputc(c,h);
 		fprintf(h,"\r\n--%s--\r\n",boundary);
 		fclose(h);
