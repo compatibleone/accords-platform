@@ -367,7 +367,7 @@ private	char *	paas_retrieve_war( struct cords_vector * root )
 	if (!( nptr = occi_extract_atribut( root->message, "occi", 
 		_CORDS_PAAS_DEPLOYABLE, _CORDS_NAME) ))
 		return((char *) 0);
-	else if (!( nptr = occi_extract_atribut( root->message, "occi", 
+	else if (!( pptr = occi_extract_atribut( root->message, "occi", 
 		_CORDS_PAAS_DEPLOYABLE, "location") ))
 		return((char *) 0);
 	else
