@@ -1,3 +1,10 @@
+compatibleone-accords (1.0-7) unstable; urgency=low
+
+  * Upstream code update.
+  * New package: compatible-ec2procci.
+
+ -- Vincent Renardias <vincent@renardias.com>  Mon, 18 Mar 2013 15:45:01 +0100
+
 compatibleone-accords (1.0-6) unstable; urgency=low
 
   * Improved Python bindings.

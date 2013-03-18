@@ -65,6 +65,7 @@ debian/compatibleone-coss/
 debian/compatibleone-dashboard/
 debian/compatibleone-cnprocci/
 debian/compatibleone-dcprocci/
+debian/compatibleone-ec2procci/
 debian/compatibleone-example/
 debian/compatibleone-eziprocci/
 debian/compatibleone-ezvm/
