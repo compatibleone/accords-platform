@@ -118,7 +118,7 @@ public	struct	rest_response * start_paas(
 		/* ----------------------------------- */
         	/*	Deploy paas application        */
 		/* ----------------------------------- */
-        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application, pptr->wardata ) ))
+        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application, pptr->wardata, pptr->boundary ) ))
         	{
         	       return( rest_html_response( aptr, 601, "application deployment failure" ) );
         	}
@@ -380,7 +380,7 @@ private	char *	paas_retrieve_war( struct cords_vector * root )
 /*	-------------------------------------------	*/
 /*	p a a s _ m u l t i p a r t _ c o n t e n t 	*/
 /*	-------------------------------------------	*/
-private	char *	paas_multipart_content( char * control, char * type, char * content )
+private	char *	paas_multipart_content( char * control, char * type, char * content, char * boundary )
 {
 	FILE * h;
 	FILE * sh;
@@ -402,13 +402,11 @@ private	char *	paas_multipart_content( char * control, char * type, char * conte
 	}
 	else
 	{
-		now = time((long *)0);
-		sprintf(buffer,"----%x----%x----%x",now,now,now);
-		fprintf(h,"%s\r\n",buffer);
+		fprintf(h,"--%s\r\n",boundary);
 		fprintf(h,"Content-Disposition: form-data; name=\"%s\"\r\n",control);
 		fprintf(h,"Content-Type: %s\r\n",type);
 		while ((c = fgetc(sh)) != -1) fputc(c,h);
-		fprintf(h,"%s\r\n",buffer);
+		fprintf(h,"\r\n--%s--\r\n",boundary);
 		fclose(h);
 		fclose(sh);
 		return( filename );
@@ -599,8 +597,10 @@ public	int	create_paas_contract(
 	/* ----------------------- */
 	else if (!( pptr->warfile = paas_retrieve_war( &contract.deployable ) ))
 		return( terminate_paas_contract( 1173, &contract ) );
-	else if (!( pptr->wardata = paas_multipart_content( "file", "application/octet-stream", pptr->warfile ) ))
+	else if (!( pptr->boundary = occi_allocate_uuid() ))
 		return( terminate_paas_contract( 1174, &contract ) );
+	else if (!( pptr->wardata = paas_multipart_content( "file", "application/octet-stream", pptr->warfile, pptr->boundary ) ))
+		return( terminate_paas_contract( 1175, &contract ) );
 
 	/* -------------------------------------------- */
 	/*	Create paas environment                 */

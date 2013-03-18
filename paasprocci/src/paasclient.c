@@ -358,14 +358,15 @@ public	struct paas_response * restart_paas_environment(char * environment)
 /*	Deploy an application instance on an 		*/
 /*	available environment				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * deploy_paas_application( char * environment, char * application, char * war )
+public	struct paas_response * deploy_paas_application( char * environment, char * application, char * war, char * boundary )
 {
 	/* POST /environment/{envId}/action/deploy/app/{appId} */
 	struct	rest_header * hptr;
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/action/deploy/env/%s",
-		application,environment);
-	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "multipart/form-data" ) ))
+	char 	buffer[1024];
+	sprintf(buffer,"multipart/form-data; boundary=%s",boundary);
+	sprintf(uri,"/app/%s/action/deploy/env/%s",application,environment);
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, buffer ) ))
 		return((struct paas_response *) 0);
 	else	return( paas_result( paas_post_request( uri, war, hptr  ) ));
 }

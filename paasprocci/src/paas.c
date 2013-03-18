@@ -47,6 +47,8 @@ public struct paas * liberate_paas(struct paas * sptr)
 			 sptr->warfile = liberate(sptr->warfile);
 		if ( sptr->wardata )
 			 sptr->wardata = liberate(sptr->wardata);
+		if ( sptr->boundary )
+			 sptr->boundary = liberate(sptr->boundary);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
 		if ( sptr->node )
@@ -100,6 +102,7 @@ public struct paas * reset_paas(struct paas * sptr)
 		sptr->appfile = (char*) 0;
 		sptr->warfile = (char*) 0;
 		sptr->wardata = (char*) 0;
+		sptr->boundary = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->price = (char*) 0;
@@ -175,6 +178,10 @@ public int xmlin_paas(struct paas * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"wardata") ))
 		{
 			if ( wptr->value ) { sptr->wardata = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"boundary") ))
+		{
+			if ( wptr->value ) { sptr->boundary = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"profile") ))
 		{
@@ -270,6 +277,7 @@ public int rest_occi_paas(FILE * fh,struct paas * sptr,char * prefix, char * npt
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.appfile='%s'\r\n",prefix,nptr,(sptr->appfile?sptr->appfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.warfile='%s'\r\n",prefix,nptr,(sptr->warfile?sptr->warfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.wardata='%s'\r\n",prefix,nptr,(sptr->wardata?sptr->wardata:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.boundary='%s'\r\n",prefix,nptr,(sptr->boundary?sptr->boundary:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));

@@ -13,6 +13,7 @@ struct	paas
 	char *	appfile;
 	char *	warfile;
 	char *	wardata;
+	char *	boundary;
 
 	char *	profile;
 
