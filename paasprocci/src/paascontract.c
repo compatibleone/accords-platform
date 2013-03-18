@@ -371,6 +371,7 @@ private char * paas_application_id( struct paas_response * rptr )
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
+	char * vptr;
 	if (!( rptr ))
 		return( (char *) 0 );
 	else if (!( rptr->xmlroot ))
@@ -381,17 +382,19 @@ private char * paas_application_id( struct paas_response * rptr )
 		return( (char *) 0 );
 	else if (!( aptr->value ))
 		return( (char *) 0 );
-	else
-		return( allocate_string( aptr->value ) );
+	else if (!( vptr = allocate_string( aptr->value ) ))
+		return( vptr );
+	else	return( occi_unquoted_value( vptr ) );
 }
 
 /*	---------------------------------------------	*/
-/*		p a a s _ e nv i r o n m e n t _ i d		*/
+/*		p a a s _ e nv i r o n m e n t _ i d	*/
 /*	---------------------------------------------	*/
 private char * paas_environment_id( struct paas_response * rptr )
 {
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
+	char * vptr;
 	if (!( rptr ))
 		return( (char *) 0 );
 	else if (!( rptr->xmlroot ))
@@ -402,8 +405,9 @@ private char * paas_environment_id( struct paas_response * rptr )
 		return( (char *) 0 );
 	else if (!( aptr->value ))
 		return( (char *) 0 );
-	else
-		return( allocate_string( aptr->value ) );
+	else if (!( vptr = allocate_string( aptr->value ) ))
+		return( vptr );
+	else	return( occi_unquoted_value( vptr ) );
 }
 
 /*	---------------------------------------------	*/
