@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _paas_c_
@@ -43,6 +45,8 @@ public struct paas * liberate_paas(struct paas * sptr)
 			 sptr->application = liberate(sptr->application);
 		if ( sptr->appfile )
 			 sptr->appfile = liberate(sptr->appfile);
+		if ( sptr->warfile )
+			 sptr->warfile = liberate(sptr->warfile);
 		if ( sptr->profile )
 			 sptr->profile = liberate(sptr->profile);
 		if ( sptr->node )
@@ -94,6 +98,7 @@ public struct paas * reset_paas(struct paas * sptr)
 		sptr->envfile = (char*) 0;
 		sptr->application = (char*) 0;
 		sptr->appfile = (char*) 0;
+		sptr->warfile = (char*) 0;
 		sptr->profile = (char*) 0;
 		sptr->node = (char*) 0;
 		sptr->price = (char*) 0;
@@ -161,6 +166,10 @@ public int xmlin_paas(struct paas * sptr,struct xml_element * eptr)
 		else if (!( strcmp(wptr->name,"appfile") ))
 		{
 			if ( wptr->value ) { sptr->appfile = allocate_string(wptr->value); }
+		}
+		else if (!( strcmp(wptr->name,"warfile") ))
+		{
+			if ( wptr->value ) { sptr->warfile = allocate_string(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"profile") ))
 		{
@@ -254,6 +263,7 @@ public int rest_occi_paas(FILE * fh,struct paas * sptr,char * prefix, char * npt
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.envfile='%s'\r\n",prefix,nptr,(sptr->envfile?sptr->envfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.application='%s'\r\n",prefix,nptr,(sptr->application?sptr->application:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.appfile='%s'\r\n",prefix,nptr,(sptr->appfile?sptr->appfile:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.warfile='%s'\r\n",prefix,nptr,(sptr->warfile?sptr->warfile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.profile='%s'\r\n",prefix,nptr,(sptr->profile?sptr->profile:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.node='%s'\r\n",prefix,nptr,(sptr->node?sptr->node:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.price='%s'\r\n",prefix,nptr,(sptr->price?sptr->price:""));

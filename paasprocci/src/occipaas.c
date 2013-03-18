@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occipaas_c_
@@ -145,6 +147,8 @@ private void autoload_paas_nodes() {
 				pptr->application = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "appfile" )) != (struct xml_atribut *) 0)
 				pptr->appfile = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "warfile" )) != (struct xml_atribut *) 0)
+				pptr->warfile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
@@ -222,6 +226,9 @@ public  void autosave_paas_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," appfile=%c",0x0022);
 		fprintf(h,"%s",(pptr->appfile?pptr->appfile:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," warfile=%c",0x0022);
+		fprintf(h,"%s",(pptr->warfile?pptr->warfile:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
@@ -308,6 +315,8 @@ private void set_paas_field(
 			pptr->application = allocate_string(vptr);
 		if (!( strcmp( nptr, "appfile" ) ))
 			pptr->appfile = allocate_string(vptr);
+		if (!( strcmp( nptr, "warfile" ) ))
+			pptr->warfile = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
@@ -408,6 +417,13 @@ private int pass_paas_filter(
 		if (!( pptr->appfile ))
 			return(0);
 		else if ( strcmp(pptr->appfile,fptr->appfile) != 0)
+			return(0);
+		}
+	if (( fptr->warfile )
+	&&  (strlen( fptr->warfile ) != 0)) {
+		if (!( pptr->warfile ))
+			return(0);
+		else if ( strcmp(pptr->warfile,fptr->warfile) != 0)
 			return(0);
 		}
 	if (( fptr->profile )
@@ -552,6 +568,9 @@ private struct rest_response * paas_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.appfile=%c%s%c",optr->domain,optr->id,0x0022,pptr->appfile,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.warfile=%c%s%c",optr->domain,optr->id,0x0022,pptr->warfile,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
@@ -1003,19 +1022,6 @@ private void	redirect_occi_paas_mt( struct rest_interface * iptr )
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_paas(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_paas_delete(optr,cptr,rptr));
-}
-
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -1038,6 +1044,8 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 		if (!( optr = occi_add_attribute(optr, "application",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "appfile",0,0) ))
+			return(optr);
+		if (!( optr = occi_add_attribute(optr, "warfile",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
@@ -1075,8 +1083,6 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas)))
-			return( optr );
 		autoload_paas_nodes();
 		return(optr);
 	}
@@ -1157,6 +1163,17 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas.appfile='%s'\r\n",(sptr->appfile?sptr->appfile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.warfile='%s'\r\n",(sptr->warfile?sptr->warfile:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

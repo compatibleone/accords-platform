@@ -338,13 +338,13 @@ public	struct paas_response * restart_paas_environment(char * environment)
 /*	Deploy an application instance on an 		*/
 /*	available environment				*/
 /*	-----------------------------------------	*/
-public	struct paas_response * deploy_paas_application( char * environment, char * application )
+public	struct paas_response * deploy_paas_application( char * environment, char * application, char * war )
 {
 	/* POST /environment/{envId}/action/deploy/app/{appId} */
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/action/deploy/env/%s",
 		application,environment);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, war ) ));
 }
 
 /*	-----------------------------------------	*/

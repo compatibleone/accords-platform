@@ -39,11 +39,15 @@ struct	cords_paas_contract
 	struct	cords_vector	node;
 	struct	cords_vector	manifest;
 	struct	cords_vector	application;
+	struct	cords_vector	version;
+	struct	cords_vector	deployable;
 	struct	cords_vector	environment;
 };
 
 #define	_CORDS_PAAS_MANIFEST		"paas_application_manifest"
 #define	_CORDS_PAAS_APPLICATION		"paas_application"
+#define	_CORDS_PAAS_VERSION		"paas_application_version"
+#define	_CORDS_PAAS_DEPLOYABLE		"paas_application_deployable"
 #define	_CORDS_PAAS_ENVIRONMENT		"paas_environment"
 
 /* ---------------------------------------------------------------------------- */
@@ -114,7 +118,7 @@ public	struct	rest_response * start_paas(
 		/* ----------------------------------- */
         	/*	Deploy paas application        */
 		/* ----------------------------------- */
-        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application ) ))
+        	if (!( prptr = deploy_paas_application( pptr->environment, pptr->application, pptr->warfile ) ))
         	{
         	       return( rest_html_response( aptr, 601, "application deployment failure" ) );
         	}
@@ -222,6 +226,16 @@ private	int	terminate_paas_contract(int status, struct cords_paas_contract * cpt
 		cptr->application.id = liberate( cptr->application.id );
 	if ( cptr->application.message )
 		cptr->application.message = occi_remove_response( cptr->application.message );
+
+	if ( cptr->version.id )
+		cptr->version.id = liberate( cptr->version.id );
+	if ( cptr->version.message )
+		cptr->version.message = occi_remove_response( cptr->version.message );
+
+	if ( cptr->deployable.id )
+		cptr->deployable.id = liberate( cptr->deployable.id );
+	if ( cptr->deployable.message )
+		cptr->deployable.message = occi_remove_response( cptr->deployable.message );
 
 	if ( cptr->environment.id )
 		cptr->environment.id = liberate( cptr->environment.id );
@@ -341,6 +355,28 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 		return( 0 );
 	}
 }
+
+/*	---------------------------------------------	*/
+/*		p a a s _ r e t r i e v e _ w a r 	*/
+/*	---------------------------------------------	*/
+private	char *	paas_retrieve_war( struct cords_vector * root )
+{
+	char *	nptr;
+	char *	pptr;
+	char 	buffer[2048];
+	if (!( nptr = occi_extract_atribut( root->message, "occi", 
+		_CORDS_PAAS_DEPLOYABLE, _CORDS_NAME) ))
+		return((char *) 0);
+	else if (!( nptr = occi_extract_atribut( root->message, "occi", 
+		_CORDS_PAAS_DEPLOYABLE, "location") ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s%s",pptr,nptr);
+		return( allocate_string( buffer ) );
+	}
+}
+
 
 /*	---------------------------------------------	*/
 /*	p a a s _ s e r i a l i s e _ e l e m e n t	*/
@@ -474,6 +510,28 @@ public	int	create_paas_contract(
 	else if (!( contract.application.message = occi_simple_get( contract.application.id, agent, tls ) ))
 		return( terminate_paas_contract( 1404, &contract ) );
 
+	/* -------------------------------- */
+	/* retrieve the application version */
+	/* -------------------------------- */
+	else if (!( vptr = occi_extract_atribut( contract.application.message, "occi", 
+		_CORDS_PAAS_APPLICATION, _CORDS_PAAS_VERSION ) ))
+		return( terminate_paas_contract( 1127, &contract ) );
+	else if (!( contract.version.id = allocate_string( vptr ) ))
+		return(terminate_paas_contract( 118, &contract ));
+	else if (!( contract.version.message = occi_simple_get( contract.version.id, agent, tls ) ))
+		return( terminate_paas_contract( 1404, &contract ) );
+
+	/* ----------------------------- */
+	/* and the application deploable */
+	/* ----------------------------- */
+	else if (!( vptr = occi_extract_atribut( contract.version.message, "occi", 
+		_CORDS_PAAS_VERSION, _CORDS_PAAS_DEPLOYABLE ) ))
+		return( terminate_paas_contract( 1127, &contract ) );
+	else if (!( contract.deployable.id = allocate_string( vptr ) ))
+		return(terminate_paas_contract( 118, &contract ));
+	else if (!( contract.deployable.message = occi_simple_get( contract.deployable.id, agent, tls ) ))
+		return( terminate_paas_contract( 1404, &contract ) );
+
 	/* ---------------------------------------------------- */
 	/* recover the paas environment linkage and description */
 	/* ---------------------------------------------------- */
@@ -498,6 +556,12 @@ public	int	create_paas_contract(
 	/* ------------------------------------------------------- */
 	else if (!( pptr->appfile = paas_serialise_element( &contract.manifest ) ))
 		return( terminate_paas_contract( 1172, &contract ) );
+
+	/* ----------------------- */
+	/* build the WAR file name */
+	/* ----------------------- */
+	else if (!( pptr->warfile = paas_retrieve_war( &contract.deployable ) ))
+		return( terminate_paas_contract( 1173, &contract ) );
 
 	/* -------------------------------------------- */
 	/*	Create paas environment                 */
