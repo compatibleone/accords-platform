@@ -27,7 +27,7 @@
 	</xsd:complexType>
 	<xsd:complexType name="paas_application_version">
 		<xsd:sequence>
-			<xsd:element name="paas_application_deployable" type="paas_application_deployable" minOccurs="1" maxOccurs="unbounded"/>	
+			<xsd:element name="paas_application_deployable" type="paas_application_deployable" minOccurs="1"  maxOccurs="1"/>	
 			<xsd:element name="paas_application_version_instance" type="paas_application_version_instance" minOccurs="1" maxOccurs="1"/>	
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>

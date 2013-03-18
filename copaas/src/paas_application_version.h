@@ -5,6 +5,7 @@ struct	paas_application_version
 	char *	id;
 	char *	name;
 	char *	label;
+	char *	paas_application_deployable;
 	char *	paas_application_version_instance;
 	int	state;
 };

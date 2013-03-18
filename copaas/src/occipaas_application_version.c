@@ -1,20 +1,22 @@
-/* -------------------------------------------------------------------- */
-/*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
-/* -------------------------------------------------------------------- */
-/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
-/* you may not use this file except in compliance with the License. 	*/
-/* You may obtain a copy of the License at 				*/
-/*  									*/
-/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
-/*  									*/
-/* Unless required by applicable law or agreed to in writing, software 	*/
-/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
-/* implied. 								*/
-/* See the License for the specific language governing permissions and 	*/
-/* limitations under the License. 					*/
-/* -------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                   */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>    */
+/* --------------------------------------------------------------------*/
+/*  This is free software; you can redistribute it and/or modify it    */
+/*  under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2.1 of   */
+/*  the License, or (at your option) any later version.                */
+/*                                                                     */
+/*  This software is distributed in the hope that it will be useful,   */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of     */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU   */
+/*  Lesser General Public License for more details.                    */
+/*                                                                     */
+/*  You should have received a copy of the GNU Lesser General Public   */
+/*  License along with this software; if not, write to the Free        */
+/*  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA */
+/*  02110-1301 USA, or see the FSF site: http://www.fsf.org.           */
+/* --------------------------------------------------------------------*/
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
 #ifndef _occipaas_application_version_c_
@@ -139,6 +141,8 @@ private void autoload_paas_application_version_nodes() {
 				pptr->name = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "label" )) != (struct xml_atribut *) 0)
 				pptr->label = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "paas_application_deployable" )) != (struct xml_atribut *) 0)
+				pptr->paas_application_deployable = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "paas_application_version_instance" )) != (struct xml_atribut *) 0)
 				pptr->paas_application_version_instance = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -176,6 +180,9 @@ public  void autosave_paas_application_version_nodes() {
 		fprintf(h," label=%c",0x0022);
 		fprintf(h,"%s",(pptr->label?pptr->label:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," paas_application_deployable=%c",0x0022);
+		fprintf(h,"%s",(pptr->paas_application_deployable?pptr->paas_application_deployable:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," paas_application_version_instance=%c",0x0022);
 		fprintf(h,"%s",(pptr->paas_application_version_instance?pptr->paas_application_version_instance:""));
 		fprintf(h,"%c",0x0022);
@@ -207,6 +214,8 @@ private void set_paas_application_version_field(
 			pptr->name = allocate_string(vptr);
 		if (!( strcmp( nptr, "label" ) ))
 			pptr->label = allocate_string(vptr);
+		if (!( strcmp( nptr, "paas_application_deployable" ) ))
+			pptr->paas_application_deployable = allocate_string(vptr);
 		if (!( strcmp( nptr, "paas_application_version_instance" ) ))
 			pptr->paas_application_version_instance = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -256,6 +265,13 @@ private int pass_paas_application_version_filter(
 		else if ( strcmp(pptr->label,fptr->label) != 0)
 			return(0);
 		}
+	if (( fptr->paas_application_deployable )
+	&&  (strlen( fptr->paas_application_deployable ) != 0)) {
+		if (!( pptr->paas_application_deployable ))
+			return(0);
+		else if ( strcmp(pptr->paas_application_deployable,fptr->paas_application_deployable) != 0)
+			return(0);
+		}
 	if (( fptr->paas_application_version_instance )
 	&&  (strlen( fptr->paas_application_version_instance ) != 0)) {
 		if (!( pptr->paas_application_version_instance ))
@@ -283,6 +299,9 @@ private struct rest_response * paas_application_version_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.label=%c%s%c",optr->domain,optr->id,0x0022,pptr->label,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.paas_application_deployable=%c%s%c",optr->domain,optr->id,0x0022,pptr->paas_application_deployable,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.paas_application_version_instance=%c%s%c",optr->domain,optr->id,0x0022,pptr->paas_application_version_instance,0x0022);
@@ -686,19 +705,6 @@ private void	redirect_occi_paas_application_version_mt( struct rest_interface * 
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_paas_application_version(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_paas_application_version_delete(optr,cptr,rptr));
-}
-
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
@@ -716,12 +722,12 @@ public struct occi_category * occi_paas_application_version_builder(char * a,cha
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "label",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "paas_application_deployable",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "paas_application_version_instance",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_paas_application_version)))
-			return( optr );
 		autoload_paas_application_version_nodes();
 		return(optr);
 	}
@@ -769,6 +775,17 @@ public struct rest_header *  paas_application_version_occi_headers(struct paas_a
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas_application_version.label='%s'\r\n",(sptr->label?sptr->label:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas_application_version.paas_application_deployable='%s'\r\n",(sptr->paas_application_deployable?sptr->paas_application_deployable:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
