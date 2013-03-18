@@ -12,6 +12,7 @@ struct	paas
 	char *	application;
 	char *	appfile;
 	char *	warfile;
+	char *	wardata;
 
 	char *	profile;
 

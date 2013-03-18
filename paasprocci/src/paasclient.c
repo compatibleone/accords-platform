@@ -365,7 +365,7 @@ public	struct paas_response * deploy_paas_application( char * environment, char 
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/action/deploy/env/%s",
 		application,environment);
-	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/octet-stream" ) ))
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "multipart/form-data" ) ))
 		return((struct paas_response *) 0);
 	else	return( paas_result( paas_post_request( uri, war, hptr  ) ));
 }

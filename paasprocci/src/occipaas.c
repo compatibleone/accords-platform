@@ -147,6 +147,8 @@ private void autoload_paas_nodes() {
 				pptr->appfile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "warfile" )) != (struct xml_atribut *) 0)
 				pptr->warfile = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "wardata" )) != (struct xml_atribut *) 0)
+				pptr->wardata = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "profile" )) != (struct xml_atribut *) 0)
 				pptr->profile = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "node" )) != (struct xml_atribut *) 0)
@@ -227,6 +229,9 @@ public  void autosave_paas_nodes() {
 		fprintf(h,"%c",0x0022);
 		fprintf(h," warfile=%c",0x0022);
 		fprintf(h,"%s",(pptr->warfile?pptr->warfile:""));
+		fprintf(h,"%c",0x0022);
+		fprintf(h," wardata=%c",0x0022);
+		fprintf(h,"%s",(pptr->wardata?pptr->wardata:""));
 		fprintf(h,"%c",0x0022);
 		fprintf(h," profile=%c",0x0022);
 		fprintf(h,"%s",(pptr->profile?pptr->profile:""));
@@ -315,6 +320,8 @@ private void set_paas_field(
 			pptr->appfile = allocate_string(vptr);
 		if (!( strcmp( nptr, "warfile" ) ))
 			pptr->warfile = allocate_string(vptr);
+		if (!( strcmp( nptr, "wardata" ) ))
+			pptr->wardata = allocate_string(vptr);
 		if (!( strcmp( nptr, "profile" ) ))
 			pptr->profile = allocate_string(vptr);
 		if (!( strcmp( nptr, "node" ) ))
@@ -422,6 +429,13 @@ private int pass_paas_filter(
 		if (!( pptr->warfile ))
 			return(0);
 		else if ( strcmp(pptr->warfile,fptr->warfile) != 0)
+			return(0);
+		}
+	if (( fptr->wardata )
+	&&  (strlen( fptr->wardata ) != 0)) {
+		if (!( pptr->wardata ))
+			return(0);
+		else if ( strcmp(pptr->wardata,fptr->wardata) != 0)
 			return(0);
 		}
 	if (( fptr->profile )
@@ -569,6 +583,9 @@ private struct rest_response * paas_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.warfile=%c%s%c",optr->domain,optr->id,0x0022,pptr->warfile,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.wardata=%c%s%c",optr->domain,optr->id,0x0022,pptr->wardata,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.profile=%c%s%c",optr->domain,optr->id,0x0022,pptr->profile,0x0022);
@@ -1058,6 +1075,8 @@ public struct occi_category * occi_paas_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "warfile",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "wardata",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "profile",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "node",0,0) ))
@@ -1187,6 +1206,17 @@ public struct rest_header *  paas_occi_headers(struct paas * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.paas.warfile='%s'\r\n",(sptr->warfile?sptr->warfile:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.paas.wardata='%s'\r\n",(sptr->wardata?sptr->wardata:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))
