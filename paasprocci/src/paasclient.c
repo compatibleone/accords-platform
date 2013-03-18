@@ -170,14 +170,24 @@ private	struct	rest_response * paas_delete_request( char * url )
 /*	-----------------------------------------	*/
 /*	    p a a s _ p o s t _ r e q u e s t		*/
 /*	-----------------------------------------	*/
-private	struct	rest_response * paas_post_request( char * url, char * filename )
+private	struct	rest_response * paas_post_request( char * url, char * filename, struct rest_header * ctptr )
 {
 	struct	rest_header * hptr;
 	char 	burl[2048];
 	sprintf(burl,"%s://%s:%u%s%s", Paas.service, Paas.host, Paas.port, Paas.base,url );
 	if (!( hptr = paas_authenticate()))
 		return((struct rest_response *) 0);
-	else	return( rest_client_post_request( burl, Paas.tls, Paas.agent, filename, hptr ) );
+	else
+	{
+	 	if (!( ctptr ))
+			ctptr = hptr;
+		else 
+		{
+			ctptr->next = hptr;
+			hptr->previous = ctptr;
+		}
+		return( rest_client_post_request( burl, Paas.tls, Paas.agent, filename, ctptr ) );
+	}
 }
 
 /*	-----------------------------------------	*/
@@ -203,7 +213,7 @@ public	struct paas_response * start_paas_application(char * application )
 	/* POST /app/{appId}/version/{versionId}/instance/{instanceId}/action/start */
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/start",application);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -225,7 +235,7 @@ public	struct paas_response * stop_paas_application(char * application)
 	/* POST /app/{appId}/stop */
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/stop",application);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 /*	-----------------------------------------	*/
 /*	Creates a new application.			*/
@@ -240,7 +250,10 @@ public	struct paas_response * stop_paas_application(char * application)
 public	struct paas_response * create_paas_application( char* filename )
 {
 	/* POST /app */
-	return( paas_result( paas_post_request( "/app", filename ) ));
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
+		return( (struct paas_response *) 0);
+	else	return( paas_result( paas_post_request( "/app", filename, hptr ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -250,8 +263,15 @@ public	struct paas_response * update_paas_application( char * application, char*
 {
 	/* POST /app */
 	char 	uri[2048];
-	sprintf(uri,"/app/%s/update",application);
-	return( paas_result( paas_post_request( uri, filename ) ));
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
+		return( (struct paas_response *) 0);
+
+	else
+	{
+		sprintf(uri,"/app/%s/update",application);
+		return( paas_result( paas_post_request( uri, filename, hptr ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
@@ -307,7 +327,7 @@ public	struct paas_response * start_paas_environment(char * environment)
 	/* POST /environment/{envId}/action/start */
 	char 	uri[2048];
 	sprintf(uri,"/environment/%s/start",environment);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 
 
@@ -319,7 +339,7 @@ public	struct paas_response * stop_paas_environment(char * environment)
 	/* POST /environment/{envId}/stop */
 	char 	uri[2048];
 	sprintf(uri,"/environment/%s/stop",environment);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -330,7 +350,7 @@ public	struct paas_response * restart_paas_environment(char * environment)
 	/* POST /environment/{envId}/action/start */
 	char 	uri[2048];
 	sprintf(uri,"/environment/%s/restart",environment);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 
 
@@ -341,10 +361,13 @@ public	struct paas_response * restart_paas_environment(char * environment)
 public	struct paas_response * deploy_paas_application( char * environment, char * application, char * war )
 {
 	/* POST /environment/{envId}/action/deploy/app/{appId} */
+	struct	rest_header * hptr;
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/action/deploy/env/%s",
 		application,environment);
-	return( paas_result( paas_post_request( uri, war ) ));
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/octet-stream" ) ))
+		return((struct paas_response *) 0);
+	else	return( paas_result( paas_post_request( uri, war, hptr  ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -357,7 +380,7 @@ public	struct paas_response * undeploy_paas_application( char * environment, cha
 	char 	uri[2048];
 	sprintf(uri,"/app/%s/action/undeploy/env/%s",
 		application,environment);
-	return( paas_result( paas_post_request( uri, (char *) 0 ) ));
+	return( paas_result( paas_post_request( uri, (char *) 0,(struct rest_header *) 0 ) ));
 }
 
 /*	-----------------------------------------	*/
@@ -368,15 +391,24 @@ public	struct paas_response * undeploy_paas_application( char * environment, cha
 public	struct paas_response * create_paas_environment( char * filename )
 {
 	/* POST /environment	*/
-	return( paas_result( paas_post_request( "/environment", filename ) ));
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
+		return( (struct paas_response *) 0);
+	else 	return( paas_result( paas_post_request( "/environment", filename,hptr ) ));
 }
 
 public	struct paas_response * update_paas_environment( char * id, char * filename )
 {
 	/* POST /environment/is/update	*/
 	char 	buffer[2048];
-	sprintf(buffer,"/environment/%s/update",id);
-	return( paas_result( paas_post_request( buffer, filename ) ));
+	struct	rest_header * hptr;
+	if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, "application/xml" ) ))
+		return( (struct paas_response *) 0);
+	else
+	{
+		sprintf(buffer,"/environment/%s/update",id);
+		return( paas_result( paas_post_request( buffer, filename,hptr ) ));
+	}
 }
 
 /*	-----------------------------------------	*/
