@@ -11,6 +11,7 @@
 #include "occiresolver.h"
 #include "occibuilder.h"
 #include "cnclient.h"
+#include "cb.h"
 
 struct	cn_instancetype
 {
@@ -222,7 +223,11 @@ public	int	create_computenext_contract(
 	char *	vptr;
 
 	if (!(config = use_computenext_configuration( pptr->profile )))
+	{
+		rest_log_message("Could not find Configuration");
+		rest_log_message( pptr->profile );
 		return( status );
+	}
 	else
 	{
 		memset( &contract, 0, sizeof( struct cords_cn_contract ));
@@ -280,7 +285,7 @@ public	int	create_computenext_contract(
 		/* ------------------------------------------------------ */
 		/* retrieve detailed list of images and resolve contract  */
 		/* ------------------------------------------------------ */
-		if (!( contract.images = cn_list_images(config,"**TODO**") ))
+		if (!( contract.images = cn_list_images(config,"") ))
 			return( terminate_computenext_contract( 1186, &contract ) );
 		else if (!( pptr->image = resolve_contract_image( config, &contract ) ))
 			return( terminate_computenext_contract( 1187, &contract ) );
@@ -316,7 +321,7 @@ public	int	create_computenext_contract(
 	/* -------------------------------------------------------------- */
 	/* recover detailed list of CN instancetypes and resolve contract */
 	/* -------------------------------------------------------------- */
-	else if (!( contract.instancetypes = cn_list_instancetypes(config,"**TODO**") ))
+	else if (!( contract.instancetypes = cn_list_instancetypes(config,"") ))
 		return( terminate_computenext_contract( 1180, &contract ) );
 	else if (!( pptr->instancetype = resolve_contract_instancetype( config, &contract ) ))
 		return( terminate_computenext_contract( 1181, &contract ) );
@@ -390,7 +395,7 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 	struct	data_element * dptr=(struct data_element *) 0;
 
 
-	if (!( eptr = cptr->images->jsonroot ))
+	if (!( eptr = cptr->images->jsonroot )) /* TODO may need to fix for array */
 		return((char *) 0);
 
 	/* ---------------------------------------------------------- */
@@ -518,7 +523,7 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
-	if (!( eptr = cptr->instancetypes->jsonroot ))
+	if (!( eptr = cptr->instancetypes->jsonroot )) /* TODO may need to fix for array */
 		return((char *) 0);
 
 	/* -------------------------------------------------------------- */
@@ -658,7 +663,7 @@ private char * resolve_contract_securitygroup( struct cn_config * config, struct
 	/* ---------------------------------------- */
 	if (!( nptr = occi_extract_atribut( cptr->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME ) ))
 		return((char *) 0);
-	else if (!( fptr = cptr->securitygroups->jsonroot ))
+	else if (!( fptr = cptr->securitygroups->jsonroot )) /* TODO may need to fix for array */
 		return((char *) 0);
 	
 	for ( 	dptr=fptr->first;
@@ -686,11 +691,13 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 	char *	filename;
 	struct  cn_response *   cnptr;
 	struct  occi_element *  eptr;
+	struct  occi_response * rptr;
 	char * rulefrom=(char *) 0;
 	char * ruleto=(char *) 0;
 	char * ruleproto=(char *) 0;
 	char * sptr;
 	char * nptr=(char *) 0;
+	char * zptr=(char *) 0;
 	
 	/* -------------------------- */
 	/* create the security group  */
@@ -709,27 +716,30 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 		return( allocate_string("") );
 	}
 	else cnptr = cn_liberate_response( cnptr );
-	
 
-	/* TODO how do we iterate through the port messages using the contract */	
-
-	for (	eptr = first_standard_message_link( cptr->firewall.message );
+	for (	eptr = cords_first_link( cptr->network.message );
 		eptr != (struct occi_element *) 0;
-		eptr = next_standard_message_link( eptr ) )
+		eptr = cords_next_link( eptr ) )
 	{	
 
 		/* ---------------------------------- */
 		/* retrieve the port rule information */
 		/* ---------------------------------- */
-		if ((!( ruleproto = occi_extract_atribut( cptr->port.message, "occi", 
+		if(!( zptr = occi_unquoted_value(eptr->value) ))
+			return( allocate_string(sptr) );
+		else if(!( rptr = occi_simple_get(zptr, _CORDS_CN_AGENT, default_tls()) ))
+			return( allocate_string(sptr) );
+		else if ((!( ruleproto = occi_extract_atribut( rptr, "occi", 
 			_CORDS_PORT, _CORDS_PROTOCOL ) ))
-		||  (!( rulefrom = occi_extract_atribut( cptr->port.message, "occi", 
+		||  (!( rulefrom = occi_extract_atribut( rptr, "occi", 
 			_CORDS_PORT, _CORDS_FROM ) ))
-		||  (!( ruleto = occi_extract_atribut( cptr->port.message, "occi", 
+		||  (!( ruleto = occi_extract_atribut( rptr, "occi", 
 			_CORDS_PORT, _CORDS_TO   ) )) )
 		{
+			occi_remove_response(rptr);
 			return( allocate_string(sptr) );
 		}
+		else occi_remove_response(rptr);
 		/* ---------------------------------- */
 		/* add the port to the security group */
 		/* ---------------------------------- */
@@ -813,8 +823,7 @@ private	struct	cn_config * resolve_cn_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	cn_config * pptr=(struct cn_config *) 0;
 	struct	occi_kind_node  * occi_first_cn_config_node();
-	
-	/* TODO Don't know how/if this works with occi_first_os_config_node() */
+
 	rest_log_message("resolve_cn_configuration");
 	rest_log_message( sptr );
 	
@@ -822,10 +831,17 @@ private	struct	cn_config * resolve_cn_configuration( char * sptr )
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next )
 	{
+		rest_log_message( nptr->contents );
 		if (!( pptr = nptr->contents ))
+		{
+			rest_log_message("Contents not set");
 			continue;
+		}
 		else if (!( pptr->name ))
+		{
+			rest_log_message("Name not set");
 			continue;
+		}
 		else if (!( strcmp( pptr->name, sptr ) ))
 			return( cn_initialise_client( 
 			pptr->apikey, pptr->apisec, pptr->host, 
@@ -892,7 +908,7 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 			/* -------------------------- */
 			while ((cnptr=cn_get_transaction( config, pptr->transaction )) != (struct cn_response *) 0)
 			{
-				if (!(fptr = cnptr->jsonroot))
+				if (!(fptr = cnptr->jsonroot)) /* TODO may need to fix for array */
 					break;
 				else if (!( vptr = json_atribut( fptr, "StatusCode" ) ))
 					break;
@@ -922,6 +938,9 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 /*	-----------------------------------------------------------------  */
 private	int	terminate_computenext_contract( int status, struct cords_cn_contract * cptr )
 {
+	rest_log_message("Terminating Contract. Reason:");
+	rest_log_message(status);
+	
 	if ( cptr->node.message )
 		cptr->node.message = occi_remove_response( cptr->node.message );
 	if ( cptr->infrastructure.message )
