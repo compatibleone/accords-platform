@@ -243,6 +243,13 @@ private	int	cnprocci_operation( char * nptr )
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
+	if (!( optr = occi_cn_config_builder( Configuration.domain, "computenext_configuration" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_computenext_builder( Configuration.domain, "computenext" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
