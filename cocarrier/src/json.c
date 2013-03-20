@@ -368,10 +368,26 @@ public	struct	data_element *	json_parse_file( char * filename )
 		{
 			if (!(dptr->name = allocate_string( filename )))
 				dptr = liberate_data_element( dptr );
-			else if ((c = json_get_punctuation(h)) != '{' )
-				dptr = liberate_data_element( dptr );
-			else if (!( dptr = json_get_complex(h,dptr) ))
-				json_failure(33,"incorrect file",filename);
+			else
+			{
+				switch ((c = json_get_punctuation(h)))
+				{
+
+				case	'['	:
+					if (!( dptr = json_get_matrix( h, dptr ) ))
+						json_failure(33,"incorrect array",filename);
+					break;
+
+				case	'{'	:
+					if (!( dptr = json_get_complex( h, dptr) ))
+						json_failure(33,"incorrect structure",filename);
+					break;
+
+				default		:
+					dptr = liberate_data_element( dptr );
+					json_failure(33,"incorrect file",filename);
+				}
+			}
 			json_terminate( h );
 		}
 	}
