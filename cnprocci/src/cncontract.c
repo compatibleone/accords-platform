@@ -588,7 +588,7 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 		else	instancetype.storage = rest_normalise_value(vptr,'G');
 		if (!( vptr = json_atribut( dptr, "ram" ) ))
 			instancetype.memory = 0;
-		else	instancetype.memory = rest_normalise_value(vptr,'M');
+		else	instancetype.memory = rest_normalise_value(vptr,'G');
 		if (!( vptr = json_atribut( dptr, "cpuCount" ) ))
 			instancetype.cores = 0;
 		else	instancetype.cores = rest_normalise_value(vptr,'U');
