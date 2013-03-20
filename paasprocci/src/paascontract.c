@@ -622,7 +622,7 @@ public	int	create_paas_contract(
 	/* generate the XML request file that will be used for EBV */
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
-	else if (!( pptr->envfile = paas_serialise_element( &contract.manifest,(appcount=++appcounter) ) ))
+	else if (!( pptr->envfile = paas_serialise_element( &contract.manifest,(appcount=++applicationcounter) ) ))
 		return( terminate_paas_contract( 1171, &contract ) );
 
 	/* ------------------------------------------------------- */
