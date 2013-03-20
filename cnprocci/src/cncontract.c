@@ -831,7 +831,6 @@ private	struct	cn_config * resolve_cn_configuration( char * sptr )
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next )
 	{
-		rest_log_message( nptr->contents );
 		if (!( pptr = nptr->contents ))
 		{
 			rest_log_message("Contents not set");
@@ -844,8 +843,8 @@ private	struct	cn_config * resolve_cn_configuration( char * sptr )
 		}
 		else if (!( strcmp( pptr->name, sptr ) ))
 			return( cn_initialise_client( 
-			pptr->apikey, pptr->apisec, pptr->host, 
-			_CORDS_CN_AGENT, pptr->version, pptr->tls ));
+				pptr->apikey, pptr->apisec, pptr->host, 
+				_CORDS_CN_AGENT, pptr->version, pptr->tls ));
 	}
 	return((struct cn_config *) 0);
 }
@@ -938,9 +937,6 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 /*	-----------------------------------------------------------------  */
 private	int	terminate_computenext_contract( int status, struct cords_cn_contract * cptr )
 {
-	rest_log_message("Terminating Contract. Reason:");
-	rest_log_message(status);
-	
 	if ( cptr->node.message )
 		cptr->node.message = occi_remove_response( cptr->node.message );
 	if ( cptr->infrastructure.message )
