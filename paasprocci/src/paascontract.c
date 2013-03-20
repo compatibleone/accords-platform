@@ -80,20 +80,18 @@ private	struct	paas_config * ll_resolve_paas_configuration( char * sptr )
 private	struct	paas_config * resolve_paas_configuration( char * sptr )
 {
 	struct	paas_config * pptr=(struct paas_config *) 0;
-	if (( pptr = ll_resolve_paas_configuration( sptr )) != (struct paas_config *) 0)
-		return( pptr );
-	else if (!( sptr = get_operator_profile() ))
-		return( pptr );
-	else if (!( pptr = ll_resolve_paas_configuration( sptr )))
-		return( pptr );
-	else
+	if (!( pptr = ll_resolve_paas_configuration( sptr )))
 	{
-		initialise_paas_client( 
-			"COAPSClient/V1", pptr->tls, 
-			pptr->host, pptr->port, 
-			pptr->user, pptr->password );
-		return( pptr );
-	}
+		if (!( sptr = get_operator_profile() ))
+			return( pptr );
+		else if (!( pptr = ll_resolve_paas_configuration( sptr )))
+			return( pptr );
+	}	
+	initialise_paas_client( 
+		"COAPSClient/V1", pptr->tls, 
+		pptr->host, pptr->port, 
+		pptr->user, pptr->password );
+	return( pptr );
 }
 
 /*	-----------------------------------------	*/
