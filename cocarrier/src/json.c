@@ -193,7 +193,7 @@ private	int	json_get_punctuation( FILE * h )
 /*	------------------------------------------------	*/
 private	char * json_get_token( FILE * h )
 {
-	char		buffer[2049];
+	char		buffer[16001];
 	int		i=0;
 	int		c;
 	int		quoting=0;
@@ -201,7 +201,7 @@ private	char * json_get_token( FILE * h )
 	if (!( json_remove_white(h) ))
 		return((char *) 0);
 	
-	while (i < 2048)
+	while (i < 16000)
 	{
 		if (!( c = json_getch(h)))
 			break;
@@ -222,7 +222,15 @@ private	char * json_get_token( FILE * h )
 			json_ungetch(c);
 			break;
 		}
-		else	buffer[i++] = c;
+		else
+		{
+			/* handle escape now */
+			if ( c == 0x005C )
+				if (!( c = json_getch(h)))
+					break;
+				
+			buffer[i++] = c;
+		}
 	}
 	buffer[i++] = 0;
 	return( allocate_string( buffer ) );
