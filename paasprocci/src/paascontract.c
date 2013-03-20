@@ -279,6 +279,7 @@ private	int	terminate_paas_contract(int status, struct cords_paas_contract * cpt
 /*	-------------------------------------------	*/
 /*	p a a s _ s e r i a l i s e _ m e s s a g e	*/
 /*	-------------------------------------------	*/
+private	int	applicationcounter=0;
 private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 { 
 	struct	occi_element * eptr;
@@ -288,6 +289,7 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 	char 	aname[1024];
 	char *	nptr;
 	int	i;
+	int	isapplication;
 	struct	occi_response * zptr;
 
 	if (!( cptr = message->category ))
@@ -295,7 +297,10 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 	else
 	{
 		fprintf(h,"<%s",cptr->id);
-
+		if (!( strcmp( cptr->id, "paas_application") ))
+			isapplication = ++applicationcounter;
+		else	isapplication = 0;
+	
 		/* -------------------- */
 		/* serialise attributes */
 		/* -------------------- */
@@ -334,7 +339,12 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 					if ( vptr ) liberate( vptr );
 					continue;
 				}
-				fprintf(h," %s=%c%s%c",nptr,0x0022,vvptr,0x0022);
+				if (!( isapplication ))
+					fprintf(h," %s=%c%s%c",nptr,0x0022,vvptr,0x0022);
+				else if (!( strcmp( nptr, "name") ))
+					fprintf(h," %s=%c%s%u%c",nptr,0x0022,vvptr,isapplication,0x0022);
+				else	fprintf(h," %s=%c%s%c",nptr,0x0022,vvptr,0x0022);
+
 				liberate( vptr );
 				continue;
 			}
