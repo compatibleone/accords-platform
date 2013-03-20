@@ -278,7 +278,7 @@ private	int	terminate_paas_contract(int status, struct cords_paas_contract * cpt
 /*	p a a s _ s e r i a l i s e _ m e s s a g e	*/
 /*	-------------------------------------------	*/
 private	int	applicationcounter=0;
-private	int	paas_serialise_message( FILE * h, struct occi_response * message )
+private	int	paas_serialise_message( FILE * h, struct occi_response * message,int appcounter )
 { 
 	struct	occi_element * eptr;
 	struct	occi_category * cptr;
@@ -296,7 +296,7 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 	{
 		fprintf(h,"<%s",cptr->id);
 		if (!( strcmp( cptr->id, "paas_application") ))
-			isapplication = ++applicationcounter;
+			isapplication = appcounter;
 		else	isapplication = 0;
 	
 		/* -------------------- */
@@ -382,7 +382,7 @@ private	int	paas_serialise_message( FILE * h, struct occi_response * message )
 			}
 			else 
 			{
-				paas_serialise_message( h, zptr );
+				paas_serialise_message( h, zptr, appcounter );
 				zptr = occi_remove_response( zptr );
 				liberate( vptr );
 				continue;
@@ -455,7 +455,7 @@ private	char *	paas_multipart_content( char * control, char * type, char * conte
 /*	---------------------------------------------	*/
 /*	p a a s _ s e r i a l i s e _ e l e m e n t	*/
 /*	---------------------------------------------	*/
-private	char *	paas_serialise_element( struct cords_vector * root )
+private	char *	paas_serialise_element( struct cords_vector * root, int appcount )
 {
 	FILE *	h;
 	char *	vptr;
@@ -468,7 +468,7 @@ private	char *	paas_serialise_element( struct cords_vector * root )
 	else
 	{
 		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF8\"?>\n");
-		paas_serialise_message( h, root->message );
+		paas_serialise_message( h, root->message,appcount );
 		fclose(h);
 		return( filename );
 	}
@@ -527,6 +527,7 @@ public	int	create_paas_contract(
 		struct occi_category * optr,
 		struct paas * pptr)
 {
+	int	appcount=0;
 	char 	*	requestfile;
      	struct  paas_response * rptr;
 	struct	occi_response * node;
@@ -621,14 +622,14 @@ public	int	create_paas_contract(
 	/* generate the XML request file that will be used for EBV */
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
-	else if (!( pptr->envfile = paas_serialise_element( &contract.manifest ) ))
+	else if (!( pptr->envfile = paas_serialise_element( &contract.manifest,(appcount=++appcounter) ) ))
 		return( terminate_paas_contract( 1171, &contract ) );
 
 	/* ------------------------------------------------------- */
 	/* generate the XML request file that will be used for EBV */
 	/* API request calls to the intermediary "PAAS Interface"  */
 	/* ------------------------------------------------------- */
-	else if (!( pptr->appfile = paas_serialise_element( &contract.manifest ) ))
+	else if (!( pptr->appfile = paas_serialise_element( &contract.manifest,appcount ) ))
 		return( terminate_paas_contract( 1172, &contract ) );
 
 	/* ----------------------- */
