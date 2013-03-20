@@ -208,7 +208,13 @@ private	char * json_get_token( FILE * h )
 		else if ( quoting )
 		{
 			if ( c != quoting )
+			{
+				/* handle escape now */
+				if ( c == 0x005C )
+					if (!( c = json_getch(h)))
+						break;
 				buffer[i++] = c;
+			}
 			else	quoting = 0;
 		}
 		else if ( c == '"' )
