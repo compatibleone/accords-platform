@@ -430,7 +430,7 @@ private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
 	maxcolumns=0;
-	printf("<p><table><tr>\n");
+	printf("<tr>\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
@@ -448,6 +448,7 @@ private	void	colog_show_detail()
 {
 	int	from=0;
 	int	to=0;
+	int	items=0;
 	struct	colog_event * eptr;
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
@@ -467,6 +468,13 @@ private	void	colog_show_detail()
 		else if (!( tptr = eptr->to ))
 			continue;
 
+		items++;
+		if ( items > 60 )
+		{
+			colog_show_header();
+			items=1;
+		}
+
 		printf("<tr>");
 		if ( fptr->column > tptr->column )
 		{
@@ -479,27 +487,28 @@ private	void	colog_show_detail()
 			to = tptr->column;
 		}
 		if ( from > 1 )
-			printf("<td colspan=%u>&nbsp;",from-1);
+			printf("<td class=nb colspan=%u>&nbsp;",from-1);
 		if (( (to - from) +1 ) > 1 )
 			printf("<td colspan=%u>",(to-from)+1);
 		else	printf("<td>");
 		printf("<hr>");
 		if (( maxcolumns - to ) > 1)
-			printf("<td colspan=%u>&nbsp;",(maxcolumns-to));
+			printf("<td class=nb colspan=%u>&nbsp;",(maxcolumns-to));
 		else if ( maxcolumns > to )
-			printf("<td>&nbsp;");
+			printf("<td class=nb>&nbsp;");
 	}
-	printf("</table><p>\n");
 	return;
 }
 
 private	void	colog_show_results()
 {
-	printf("<html><head><title>colog module list</title></head>\n");
+	printf("<html><head><title>colog module list</title>\n");
+	printf("<style>.nb { border-style: none; }</style></head>\n");
 	printf("<body><div align=center>\n");
+	printf("<p><table border=1>\n");
 	colog_show_header();
 	colog_show_detail();
-	printf("</div><p></body></html>\n");
+	printf("</table></div><p></body></html>\n");
 }
 
 public	int	colog_analysis( char * filename )
