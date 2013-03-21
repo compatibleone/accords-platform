@@ -60,6 +60,7 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 #include "cspi.h"
+#include "colog.c"
 
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
@@ -763,6 +764,8 @@ private	int	operation( int argc, char * argv[] )
 			}
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[argi] ) );
+			else if (!( strcasecmp( command, "ANALYSE" ) ))
+				return( colog_analysis( aptr ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
 				return( run_cordscript_interpreter( aptr, argc-argi, &argv[argi] ) );
 			else if (!( strcasecmp( command, "JSON" ) ))
