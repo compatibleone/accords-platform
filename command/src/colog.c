@@ -10,6 +10,7 @@
 #define	private	static
 #endif
 
+int	maxcolumns=0;
 
 struct	colog_request
 {
@@ -46,6 +47,7 @@ struct	colog_module
 	char *	host;
 	int	port;
 	char *	object;
+	int	column;
 	struct colog_event * event;
 };
 
@@ -383,7 +385,7 @@ private	void	colog_show_events()
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
 	printf("<p><table><tr><th colspan=3>COLOG Event List</th></tr>\n");
-	printf("<table><tr><th>Time<th>From<th>To</tr>\n");
+	printf("<tr><th>Time<th>From<th>To</tr>\n");
 	for (	eptr=Manager.FirstEvent;
 		eptr !=(struct colog_event *) 0;
 		eptr = eptr->next )
@@ -402,7 +404,7 @@ private	void	colog_show_events()
 			( (tptr = eptr->to) ? ( tptr->name ? tptr->name : 
 			( tptr->host ? tptr->host : "[unknown]")) : "[unknown]" ));
 	}
-	printf("</table></div><p></body></html>\n");
+	printf("</table><p>\n");
 	return;
 }
 
@@ -411,7 +413,7 @@ private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
 	printf("<p><table><tr><th colspan=3>COLOG Module List</th></tr>\n");
-	printf("<table><tr><th>Name<th>Process<th>URL</tr>\n");
+	printf("<tr><th>Name<th>Process<th>URL</tr>\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
@@ -424,13 +426,79 @@ private	void	colog_show_modules()
 	printf("</table></div><p></body></html>\n");
 	return;
 }
+private	void	colog_show_header()
+{
+	struct	colog_module * mptr;
+	maxcolumns=0;
+	printf("<p><table><tr>\n");
+	for (	mptr=Manager.FirstModule;
+		mptr !=(struct colog_module *) 0;
+		mptr = mptr->next )
+	{
+		if ( mptr->name )
+			printf("<th>%s</th>\n",mptr->name);
+		else	printf("<th>%s:%u</th>\n",( mptr->host ? mptr->host : "unknown" ),mptr->port);
+		mptr->column = ++maxcolumns;
+	}
+	printf("</tr>\n");
+	return;
+}
+
+private	void	colog_show_detail()
+{
+	int	from=0;
+	int	to=0;
+	struct	colog_event * eptr;
+	struct	colog_module * fptr;
+	struct	colog_module * tptr;
+
+	for (	eptr=Manager.FirstEvent;
+		eptr !=(struct colog_event *) 0;
+		eptr = eptr->next )
+	{
+		if ( eptr->response )
+			continue;
+		else if (!( eptr->dir ))
+			continue;
+		else if ( eptr->dir > 1 )
+			continue;
+		if (!( fptr = eptr->from ))
+			continue;
+		else if (!( tptr = eptr->to ))
+			continue;
+
+		printf("<tr>");
+		if ( fptr->column > tptr->column )
+		{
+			from = tptr->column;
+			to = fptr->column;
+		}
+		else
+		{
+			from = fptr->column;
+			to = tptr->column;
+		}
+		if ( from > 1 )
+			printf("<td colspan=%u>&nbsp;",from-1);
+		if (( (to - from) +1 ) > 1 )
+			printf("<td colspan=%u>",(to-from)+1);
+		else	printf("<td>");
+		printf("<hr>");
+		if (( maxcolumns - to ) > 1)
+			printf("<td colspan=%u>&nbsp;",(maxcolumns-to));
+		else if ( maxcolumns > to )
+			printf("<td>&nbsp;");
+	}
+	printf("</table><p>\n");
+	return;
+}
 
 private	void	colog_show_results()
 {
 	printf("<html><head><title>colog module list</title></head>\n");
 	printf("<body><div align=center>\n");
-	colog_show_modules();
-	colog_show_events();
+	colog_show_header();
+	colog_show_detail();
 	printf("</div><p></body></html>\n");
 }
 
