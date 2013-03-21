@@ -149,6 +149,8 @@ private void autoload_ezi_config_nodes() {
 				pptr->agent = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
 				pptr->host = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "iaas" )) != (struct xml_atribut *) 0)
+				pptr->iaas = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "version" )) != (struct xml_atribut *) 0)
 				pptr->version = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "namespace" )) != (struct xml_atribut *) 0)
@@ -209,6 +211,9 @@ public  void autosave_ezi_config_nodes() {
 		fprintf(h," host=%c",0x0022);
 		fprintf(h,"%s",(pptr->host?pptr->host:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," iaas=%c",0x0022);
+		fprintf(h,"%s",(pptr->iaas?pptr->iaas:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," version=%c",0x0022);
 		fprintf(h,"%s",(pptr->version?pptr->version:""));
 		fprintf(h,"%c",0x0022);
@@ -262,6 +267,8 @@ private void set_ezi_config_field(
 			pptr->agent = allocate_string(vptr);
 		if (!( strcmp( nptr, "host" ) ))
 			pptr->host = allocate_string(vptr);
+		if (!( strcmp( nptr, "iaas" ) ))
+			pptr->iaas = allocate_string(vptr);
 		if (!( strcmp( nptr, "version" ) ))
 			pptr->version = allocate_string(vptr);
 		if (!( strcmp( nptr, "namespace" ) ))
@@ -354,6 +361,13 @@ private int pass_ezi_config_filter(
 		else if ( strcmp(pptr->host,fptr->host) != 0)
 			return(0);
 		}
+	if (( fptr->iaas )
+	&&  (strlen( fptr->iaas ) != 0)) {
+		if (!( pptr->iaas ))
+			return(0);
+		else if ( strcmp(pptr->iaas,fptr->iaas) != 0)
+			return(0);
+		}
 	if (( fptr->version )
 	&&  (strlen( fptr->version ) != 0)) {
 		if (!( pptr->version ))
@@ -418,6 +432,9 @@ private struct rest_response * ezi_config_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.host=%c%s%c",optr->domain,optr->id,0x0022,pptr->host,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.iaas=%c%s%c",optr->domain,optr->id,0x0022,pptr->iaas,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.version=%c%s%c",optr->domain,optr->id,0x0022,pptr->version,0x0022);
@@ -873,6 +890,8 @@ public struct occi_category * occi_ezi_config_builder(char * a,char * b) {
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "host",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "iaas",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "version",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "namespace",0,0) ))
@@ -989,6 +1008,17 @@ public struct rest_header *  ezi_config_occi_headers(struct ezi_config * sptr)
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.ezi_config.host='%s'\r\n",(sptr->host?sptr->host:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.ezi_config.iaas='%s'\r\n",(sptr->iaas?sptr->iaas:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

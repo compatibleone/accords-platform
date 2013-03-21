@@ -11,6 +11,7 @@ struct	ezi_config
 	char	*	authenticate;
 	char	*	agent;
 	char 	*	host;
+	char 	*	iaas;
 	char	*	version;
 	char 	*	namespace;
 	char	*	base;

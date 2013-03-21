@@ -47,6 +47,8 @@ public struct ezi_config * liberate_ezi_config(struct ezi_config * sptr)
 			 sptr->agent = liberate(sptr->agent);
 		if ( sptr->host )
 			 sptr->host = liberate(sptr->host);
+		if ( sptr->iaas )
+			 sptr->iaas = liberate(sptr->iaas);
 		if ( sptr->version )
 			 sptr->version = liberate(sptr->version);
 		if ( sptr->namespace )
@@ -76,6 +78,7 @@ public struct ezi_config * reset_ezi_config(struct ezi_config * sptr)
 		sptr->authenticate = (char*) 0;
 		sptr->agent = (char*) 0;
 		sptr->host = (char*) 0;
+		sptr->iaas = (char*) 0;
 		sptr->version = (char*) 0;
 		sptr->namespace = (char*) 0;
 		sptr->base = (char*) 0;
@@ -140,6 +143,10 @@ public int xmlin_ezi_config(struct ezi_config * sptr,struct xml_element * eptr)
 		{
 			if ( wptr->value ) { sptr->host = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"iaas") ))
+		{
+			if ( wptr->value ) { sptr->iaas = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"version") ))
 		{
 			if ( wptr->value ) { sptr->version = allocate_string(wptr->value); }
@@ -186,6 +193,7 @@ public int rest_occi_ezi_config(FILE * fh,struct ezi_config * sptr,char * prefix
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.authenticate='%s'\r\n",prefix,nptr,(sptr->authenticate?sptr->authenticate:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.agent='%s'\r\n",prefix,nptr,(sptr->agent?sptr->agent:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.host='%s'\r\n",prefix,nptr,(sptr->host?sptr->host:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.iaas='%s'\r\n",prefix,nptr,(sptr->iaas?sptr->iaas:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.version='%s'\r\n",prefix,nptr,(sptr->version?sptr->version:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.namespace='%s'\r\n",prefix,nptr,(sptr->namespace?sptr->namespace:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.base='%s'\r\n",prefix,nptr,(sptr->base?sptr->base:""));

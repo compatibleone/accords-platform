@@ -78,7 +78,7 @@ private	struct ezi_subscription * use_easiclouds_configuration( char * sptr )
 
 	else 	return( ezi_initialise_client( 
 			pptr->user, pptr->password, pptr->namespace,
-			pptr->host, _CORDS_CONTRACT_AGENT, pptr->version, pptr->tls ));
+			pptr->host, pptr->iaas, _CORDS_CONTRACT_AGENT, pptr->version, pptr->tls ));
 }
 
 

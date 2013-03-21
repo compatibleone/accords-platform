@@ -66,7 +66,7 @@ public	struct	ezi_subscription * ezi_liberate_subscription(struct ezi_subscripti
 
 public	struct ezi_subscription * ezi_initialise_client( 
 		char * user, char * password, char * tenant, 
-		char * host, char * agent, char * version, char * tls );
+		char * host, char * iaas, char * agent, char * version, char * tls );
 
 public	struct	ezi_response * 
 	ezi_client_get_request(

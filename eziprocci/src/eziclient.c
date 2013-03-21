@@ -596,6 +596,8 @@ public	int	check_keystone_authorization(struct ezi_subscription * sptr)
 			rptr = liberate_rest_response( rptr );
 			if (!( sptr->Ezi.base ))
 				return( 0 );
+			else if (!( sptr->Ezi.iaas ))
+				return( 0 );
 			else	return( 1 );
 		}
 	}
@@ -737,7 +739,7 @@ private	struct	ezi_response *	ezi_delete_operation(struct ezi_subscription * spt
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.base )))
+	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -766,7 +768,7 @@ private	struct	ezi_response *	ezi_create_operation(struct ezi_subscription * spt
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.base )))
+	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -806,7 +808,7 @@ public	struct	ezi_response *	ezi_delete_server(struct ezi_subscription * sptr,  
 	sprintf(buffer,"/servers/%s",id);
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.base )))
+	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -837,7 +839,7 @@ public	struct	ezi_response *	ezi_get_server	( struct ezi_subscription * sptr, ch
 	sprintf(buffer,"/servers/%s",id);
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.base )))
+	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -891,7 +893,7 @@ public	struct	ezi_subscription * ezi_allocate_subscription()
 /*	------------------------------------------------------------	*/
 public	struct ezi_subscription * ezi_initialise_client( 
 		char * user, char * password, char * tenant, 
-		char * host, char * agent, char * version, char * tls )
+		char * host, char * iaas, char * agent, char * version, char * tls )
 {
 	struct ezi_subscription * sptr=(struct ezi_subscription *) 0;
 	char	*	eptr;
@@ -910,6 +912,8 @@ public	struct ezi_subscription * ezi_initialise_client(
 	if (!( sptr->Ezi.password = allocate_string( password )))
 		return(ezi_liberate_subscription( sptr ));
 	if (!( sptr->Ezi.host = allocate_string( host )))
+		return(ezi_liberate_subscription( sptr ));
+	if (!( sptr->Ezi.iaas = allocate_string( iaas )))
 		return(ezi_liberate_subscription( sptr ));
 	else if (!( sptr->Ezi.agent = allocate_string( agent )))
 		return(ezi_liberate_subscription( sptr ));
