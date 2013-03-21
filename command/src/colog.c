@@ -489,9 +489,9 @@ private	void	colog_show_detail()
 		if ( from > 1 )
 			printf("<td class=nb colspan=%u>&nbsp;",from-1);
 		if (( (to - from) +1 ) > 1 )
-			printf("<td colspan=%u>",(to-from)+1);
-		else	printf("<td>");
-		printf("<hr>");
+			printf("<td class=b colspan=%u>",(to-from)+1);
+		else	printf("<td class=b>");
+		printf("&nbsp:");
 		if (( maxcolumns - to ) > 1)
 			printf("<td class=nb colspan=%u>&nbsp;",(maxcolumns-to));
 		else if ( maxcolumns > to )
@@ -503,7 +503,7 @@ private	void	colog_show_detail()
 private	void	colog_show_results()
 {
 	printf("<html><head><title>colog module list</title>\n");
-	printf("<style>.nb { border-style: none; }</style></head>\n");
+	printf("<style>.nb { border-style: none; } .b { background-color: grey; border-style: solid; } </style></head>\n");
 	printf("<body><div align=center>\n");
 	printf("<p><table border=1>\n");
 	colog_show_header();
