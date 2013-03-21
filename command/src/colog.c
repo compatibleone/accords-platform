@@ -83,13 +83,6 @@ private	void	drop_module( struct colog_module * mptr )
 		if (!( mptr->next ))
 			Manager.LastModule = mptr->previous;
 		else	mptr->next->previous = mptr->previous;
-		if ( mptr->name )
-			mptr->name = liberate( mptr->name );
-		if ( mptr->host )
-			mptr->host = liberate( mptr->host );
-		if ( mptr->object )
-			mptr->object = liberate( mptr->object );
-		liberate( mptr );
 	}
 }
 
