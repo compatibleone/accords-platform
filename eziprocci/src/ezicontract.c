@@ -152,7 +152,6 @@ public	struct	rest_response * start_easiclouds(
 	else
 	{
 		pptr->state = 1;
-		pptr->hostname = allocate_string("vm.easiclouds.com");
 		zptr = liberate_ezi_response( zptr );
 		if ( rest_valid_string( pptr->price ) )
 			occi_send_transaction( "easiclouds", pptr->price, "action=start", pptr->account, pptr->id );
