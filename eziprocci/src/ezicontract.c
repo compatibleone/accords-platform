@@ -82,8 +82,45 @@ private	struct ezi_subscription * use_easiclouds_configuration( char * sptr )
 }
 
 
+/*	---------------------------------------------------------	*/
+/*		e z i _ x m l _ i n t e g r a t i o n			*/
+/*	---------------------------------------------------------	*/
+private	int	ezi_xml_integration( struct xml_element * xptr, struct easiclouds * pptr )
+{
+	return( 200 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		e z i _ j s o n _ i n t e g r a t i o n			*/
+/*	---------------------------------------------------------	*/
+private	int	ezi_json_integration( struct data_element * dptr, struct easiclouds * pptr )
+{
+	return( 200 );
+}
+
+/*	---------------------------------------------------------	*/
+/*		e z i _ c r e a t i o n _ s t a t u s			*/
+/*	---------------------------------------------------------	*/
+public	int	ezi_creation_status( struct ezi_response * zptr, struct easiclouds * pptr )
+{
+	struct	xml_element * xptr;
+	struct	data_element * dptr;
+	if (!( zptr ))
+		return( 500 );
+	else if (!( zptr->response ))
+		return( 501 );
+	else if ( zptr->response->status > 299 )
+		return( zptr->response->status );
+	else if (( xptr = zptr->xmlroot ) != (struct xml_element *) 0)
+		return( ezi_xml_integration( xptr, pptr ) );
+	else if (( dptr = zptr->jsonroot ) != (struct data_element *) 0)
+		return( ezi_json_integration( dptr, pptr ) );
+	else	return( 502 );
+}
+
+
 /*	-------------------------------------------	*/
-/* 	   	s t a r t _ e a s i c l o u d s     		*/
+/* 	   	s t a r t _ e a s i c l o u d s     	*/
 /*	-------------------------------------------	*/
 public	struct	rest_response * start_easiclouds(
 		struct occi_category * optr, 
@@ -95,6 +132,7 @@ public	struct	rest_response * start_easiclouds(
 	struct	easiclouds * pptr;
 	struct	ezi_subscription * subptr;
 	struct	ezi_response * zptr;
+	int	status;
 	rest_log_message("start_easiclouds_contract");
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -106,7 +144,12 @@ public	struct	rest_response * start_easiclouds(
 	 	return( rest_html_response( aptr, 500, "Application Message Failure" ) );
 	else if (!( zptr = ezi_create_server( subptr, allocate_string( pptr->filename ) ) ))
 	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
-	else 
+	else if (( status = ezi_creation_status( zptr, pptr )) != 200)
+	{
+		zptr = liberate_ezi_response( zptr );
+	 	return( rest_html_response( aptr, status, "Application Strart Failure" ) );
+	}
+	else
 	{
 		pptr->state = 1;
 		pptr->hostname = allocate_string("vm.easiclouds.com");
