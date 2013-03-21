@@ -399,7 +399,8 @@ private	void	colog_show_events()
 			( eptr->dir ? ( eptr->dir == 1 ? "Sent by" : "Received by" ) : " "),
 			( (fptr = eptr->from) ? ( fptr->name ? fptr->name : "[unknown]") : "[unknown]" ),
 			( eptr->dir ? ( eptr->dir == 1 ? "to" : "from" ) : " "),
-			( (tptr = eptr->to) ? ( tptr->name ? tptr->name : "[unknown]") : "[unknown]" ));
+			( (tptr = eptr->to) ? ( tptr->name ? tptr->name : 
+			( tptr->host ? tptr->host : "[unknown]")) : "[unknown]" ));
 	}
 	printf("</table></div><p></body></html>\n");
 	return;
