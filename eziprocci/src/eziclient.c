@@ -898,6 +898,7 @@ public	struct ezi_subscription * ezi_initialise_client(
 	struct ezi_subscription * sptr=(struct ezi_subscription *) 0;
 	char	*	eptr;
 	struct	url * 	url;
+	char 	buffer[1024];
 
 	if (!( sptr = ezi_allocate_subscription()))
 		return( sptr );
@@ -913,13 +914,16 @@ public	struct ezi_subscription * ezi_initialise_client(
 		return(ezi_liberate_subscription( sptr ));
 	if (!( sptr->Ezi.host = allocate_string( host )))
 		return(ezi_liberate_subscription( sptr ));
-	if (!( sptr->Ezi.iaas = allocate_string( iaas )))
-		return(ezi_liberate_subscription( sptr ));
 	else if (!( sptr->Ezi.agent = allocate_string( agent )))
 		return(ezi_liberate_subscription( sptr ));
 	else if (!( sptr->Ezi.version = allocate_string( version )))
 		return(ezi_liberate_subscription( sptr ));
 	else if (!( sptr->KeyStone.tenantname = allocate_string( tenant )))
+		return(ezi_liberate_subscription( sptr ));
+	
+	sprintf(buffer,"%s/%s",iaas,tenant);
+
+	if (!( sptr->Ezi.iaas = allocate_string( buffer )))
 		return(ezi_liberate_subscription( sptr ));
 
 	/* namespace selection */
