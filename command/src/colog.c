@@ -446,6 +446,7 @@ private	void	colog_show_header()
 
 private	void	colog_show_detail()
 {
+	int	n;
 	int	from=0;
 	int	to=0;
 	int	items=0;
@@ -487,15 +488,34 @@ private	void	colog_show_detail()
 			to = tptr->column;
 		}
 		if ( from > 1 )
-			printf("<td class=nb colspan=%u>&nbsp;",from-1);
-		if (( (to - from) +1 ) > 1 )
-			printf("<td class=b colspan=%u>",(to-from)+1);
-		else	printf("<td class=b>");
-		printf("&nbsp:");
-		if (( maxcolumns - to ) > 1)
-			printf("<td class=nb colspan=%u>&nbsp;",(maxcolumns-to));
-		else if ( maxcolumns > to )
-			printf("<td class=nb>&nbsp;");
+		{
+			n = from-1;
+			while ( n )
+			{
+				printf("<td class=nb><img src='vertical.png'></td>\n");
+				n--;
+			}
+		}
+		printf("<td class=nb><img src='fromleft.png'></td>\n");
+		
+		n = (to - from);
+		if ( n > 1 )
+		{
+			n -= 1;
+			n = from-1;
+			while ( n )
+			{
+				printf("<td class=nb><img src='through.png'></td>\n");
+				n--;
+			}
+		}
+		printf("<td class=nb><img src='toright.png'></td>\n");
+		n = maxcolumns - to;
+		while ( n)
+		{
+			printf("<td class=nb><img src='vertical.png'></td>\n");
+			n--;
+		}
 	}
 	return;
 }
