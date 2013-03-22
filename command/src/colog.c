@@ -483,15 +483,15 @@ private	void	colog_show_detail()
 		{
 			from = tptr->column;
 			to = fptr->column;
-			ifrom = "fromleft.png";
-			ito = "toright.png";
+			ito = "fromright.png";
+			ifrom = "toleft.png";
 		}
 		else
 		{
 			from = fptr->column;
 			to = tptr->column;
-			ifrom = "fromright.png";
-			ito = "toleft.png";
+			ifrom = "fromleft.png";
+			ito = "toright.png";
 		}
 		if ( from > 1 )
 		{
