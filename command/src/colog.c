@@ -514,7 +514,7 @@ private	void	colog_show_detail()
 				n--;
 			}
 		}
-		printf("<td class=nb><img src='%S'></td>\n",ito);
+		printf("<td class=nb><img src='%s'></td>\n",ito);
 		n = maxcolumns - to;
 		while ( n)
 		{
