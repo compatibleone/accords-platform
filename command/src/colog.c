@@ -502,7 +502,6 @@ private	void	colog_show_detail()
 		if ( n > 1 )
 		{
 			n -= 1;
-			n = from-1;
 			while ( n )
 			{
 				printf("<td class=nb><img src='through.png'></td>\n");
