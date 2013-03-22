@@ -412,7 +412,7 @@ private	void	colog_show_events()
 private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
-	printf("<p><table><tr><th colspan=3>COLOG Module List</th></tr>\n");
+	printf("<p><table width='90%'><tr><th colspan=4>COLOG Module List</th></tr>\n");
 	printf("<tr><th>Number<th>Name<th>Process<th>URL</tr>\n");
 	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;
@@ -540,8 +540,8 @@ private	void	colog_show_results()
 	printf(".b  { background-color: grey; border-style: solid; }\n");
 	printf("</style></head>\n");
 	printf("<body><div align=center>\n");
-	printf("<p><table border=1>\n");
 	colog_show_modules();
+	printf("<p><table border=1>\n");
 	colog_show_header();
 	colog_show_detail();
 	printf("</table></div><p></body></html>\n");
