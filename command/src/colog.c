@@ -522,7 +522,14 @@ private	void	colog_show_detail()
 private	void	colog_show_results()
 {
 	printf("<html><head><title>colog module list</title>\n");
-	printf("<style>table { padding: 0px; } .nb { border-style: none; } .b { background-color: grey; border-style: solid; } </style></head>\n");
+	printf("<style>\n");
+	printf("table { padding: 0px; margin: 0px; }\n");
+	printf("td  { padding: 0px; margin: 0px; }\n");
+	printf("th  { padding: 0px; margin: 0px; }\n");
+	printf("tr  { padding: 0px; margin: 0px; }\n");
+	printf(".nb { border-style: none; }\n");
+	printf(".b  { background-color: grey; border-style: solid; }\n");
+	printf("</style></head>\n");
 	printf("<body><div align=center>\n");
 	printf("<p><table border=1>\n");
 	colog_show_header();
