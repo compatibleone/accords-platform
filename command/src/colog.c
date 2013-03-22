@@ -523,10 +523,10 @@ private	void	colog_show_results()
 {
 	printf("<html><head><title>colog module list</title>\n");
 	printf("<style>\n");
-	printf("table { padding: 0px; margin: 0px; }\n");
-	printf("td  { padding: 0px; margin: 0px; }\n");
-	printf("th  { padding: 0px; margin: 0px; }\n");
-	printf("tr  { padding: 0px; margin: 0px; }\n");
+	printf("table { border-width: 0px; padding: 0px; margin: 0px; }\n");
+	printf("td  { border-width: 0px; padding: 0px; margin: 0px; }\n");
+	printf("th  { border-width: 0px; background-color: grey; padding: 0px; margin: 0px; }\n");
+	printf("tr  { border-width: 0px; padding: 0px; margin: 0px; }\n");
 	printf(".nb { border-style: none; }\n");
 	printf(".b  { background-color: grey; border-style: solid; }\n");
 	printf("</style></head>\n");
