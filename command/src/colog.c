@@ -413,32 +413,35 @@ private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
 	printf("<p><table><tr><th colspan=3>COLOG Module List</th></tr>\n");
-	printf("<tr><th>Name<th>Process<th>URL</tr>\n");
+	printf("<tr><th>Number<th>Name<th>Process<th>URL</tr>\n");
+	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
 	{
-		printf("<tr><td>%s<td>%u<td>%s:%u</tr>\n",
+		mptr->column = ++maxcolumns;
+		printf("<tr><th>%u<td>%s<td>%u<td>%s:%u</tr>\n",
+			mptr->column,
 			( mptr->name ? mptr->name : "[unknown]" ),
 			mptr->pid,
 			( mptr->host ? mptr->host : "[unknown]" ),mptr->port);
 	}
-	printf("</table></div><p></body></html>\n");
+	printf("</table><p>\n");
 	return;
 }
 private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
-	maxcolumns=0;
 	printf("<tr>\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
 	{
-		if ( mptr->name )
+		if ( mptr->column )
+			printf("<th>%u</th>\n",mptr->column);
+		else if ( mptr->name )
 			printf("<th>%s</th>\n",mptr->name);
 		else	printf("<th>%s:%u</th>\n",( mptr->host ? mptr->host : "unknown" ),mptr->port);
-		mptr->column = ++maxcolumns;
 	}
 	printf("</tr>\n");
 	return;
@@ -538,6 +541,7 @@ private	void	colog_show_results()
 	printf("</style></head>\n");
 	printf("<body><div align=center>\n");
 	printf("<p><table border=1>\n");
+	colog_show_modules();
 	colog_show_header();
 	colog_show_detail();
 	printf("</table></div><p></body></html>\n");
