@@ -450,6 +450,8 @@ private	void	colog_show_detail()
 	int	from=0;
 	int	to=0;
 	int	items=0;
+	char *	ifrom;
+	char *	ito;
 	struct	colog_event * eptr;
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
@@ -481,11 +483,15 @@ private	void	colog_show_detail()
 		{
 			from = tptr->column;
 			to = fptr->column;
+			ifrom = "fromright.png";
+			ito = "toleft.png";
 		}
 		else
 		{
 			from = fptr->column;
 			to = tptr->column;
+			ifrom = "fromleft.png";
+			ito = "toright.png";
 		}
 		if ( from > 1 )
 		{
@@ -496,7 +502,7 @@ private	void	colog_show_detail()
 				n--;
 			}
 		}
-		printf("<td class=nb><img src='fromleft.png'></td>\n");
+		printf("<td class=nb><img src='%s'></td>\n",ifrom);
 		
 		n = (to - from);
 		if ( n > 1 )
@@ -508,7 +514,7 @@ private	void	colog_show_detail()
 				n--;
 			}
 		}
-		printf("<td class=nb><img src='toright.png'></td>\n");
+		printf("<td class=nb><img src='%S'></td>\n",ito);
 		n = maxcolumns - to;
 		while ( n)
 		{
@@ -524,8 +530,8 @@ private	void	colog_show_results()
 	printf("<html><head><title>colog module list</title>\n");
 	printf("<style>\n");
 	printf("table { border-width: 0px; padding: 0px; margin: 0px; }\n");
-	printf("td  { border-width: 0px; padding: 0px; margin: 0px; }\n");
-	printf("th  { border-width: 0px; background-color: grey; padding: 0px; margin: 0px; }\n");
+	printf("td  { width: 80px; border-width: 0px; padding: 0px; margin: 0px; }\n");
+	printf("th  { width: 80px; border-width: 0px; background-color: grey; padding: 0px; margin: 0px; }\n");
 	printf("tr  { border-width: 0px; padding: 0px; margin: 0px; }\n");
 	printf(".nb { border-style: none; }\n");
 	printf(".b  { background-color: grey; border-style: solid; }\n");
