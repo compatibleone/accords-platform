@@ -486,9 +486,9 @@ private	void	colog_show_header()
 	{
 		if ( mptr->column )
 		{
-			printf("<th>%u",mpr->column);
+			printf("<th>%u",mptr->column);
 			if ( mptr->name )
-				printf("<br><small>%s</small>",mptr->name);
+				printf("<br><font size=8>%s</font>",mptr->name);
 			printf("</th>\n");
 		}
 		else if ( mptr->name )
