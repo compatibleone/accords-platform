@@ -463,11 +463,19 @@ private	void	colog_show_modules()
 		mptr = mptr->next )
 	{
 		mptr->column = ++maxcolumns;
-		printf("<tr><th>%u<td>%s<td>%u<td>%s:%u</tr>\n",
-			mptr->column,
-			( mptr->name ? mptr->name : "unknown" ),
-			mptr->pid,
-			( mptr->host ? mptr->host : "unknown" ),mptr->port);
+
+		printf("<tr><th>%u<td>%s", mptr->column, ( mptr->name ? mptr->name : "&nbsp;" ));
+
+		if ( mptr->pid )
+			printf("<td>%u",mptr->pid);
+		else	printf("<td>&nbsp;");
+
+		printf("<td>%s", ( mptr->host ? mptr->host : "&nbsp;" ));
+
+		if ( mptr->port )
+			printf(":%u",mptr->port);
+
+		printf("</tr>\n");
 	}
 	printf("</table><p>\n");
 	return;
@@ -488,7 +496,7 @@ private	void	colog_show_header()
 		{
 			printf("<th>%u",mptr->column);
 			if ( mptr->name )
-				printf("<br><font size=8>%s</font>",mptr->name);
+				printf("<br><font size=1>%s</font>",mptr->name);
 			printf("</th>\n");
 		}
 		else if ( mptr->name )
