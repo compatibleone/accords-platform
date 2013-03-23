@@ -485,7 +485,12 @@ private	void	colog_show_header()
 		mptr = mptr->next )
 	{
 		if ( mptr->column )
-			printf("<th>%u</th>\n",mptr->column);
+		{
+			printf("<th>%u",mpr->column);
+			if ( mptr->name )
+				printf("<br><small>%s</small>",mptr->name);
+			printf("</th>\n");
+		}
 		else if ( mptr->name )
 			printf("<th>%s</th>\n",mptr->name);
 		else	printf("<th>%s:%u</th>\n",( mptr->host ? mptr->host : "unknown" ),mptr->port);
