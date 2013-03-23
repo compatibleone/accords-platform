@@ -21,7 +21,7 @@
 #include "cnclient.h"
 #include "encode64.c"
 
-public  struct cn_config * cn_allocate_config()
+public  struct cn_response * cn_allocate_config()
 {
 	struct	cn_config * sptr;
 	if (!( sptr = (struct cn_config *) allocate( sizeof( struct cn_config ) ) ))
@@ -262,22 +262,34 @@ private struct cn_response * cn_client_put_request( struct cn_config * sptr, cha
 
 public  struct cn_response * cn_list_images( struct cn_config * sptr, char * query )
 {
-	return( cn_client_get_request(sptr, "/resourceQuery/query/image" ) ); /* TODO: integrate query string with list operation */
+	char	buffer[1024];
+	
+	sprintf(buffer,"/resourceQuery/query/image?%s",query);
+	return( cn_client_get_request(sptr, buffer ) ); 
 }
 
 public  struct cn_response * cn_list_instancetypes( struct cn_config * sptr, char * query )
 {
-	return( cn_client_get_request(sptr, "/resourceQuery/query/instanceType" ) ); /* TODO: integrate query string with list operation */
+	char	buffer[1024];
+	
+	sprintf(buffer,"/resourceQuery/query/instanceType?%s",query);
+	return( cn_client_get_request(sptr, buffer ) ); 
 }
 
 public  struct cn_response * cn_list_virtualmachines( struct cn_config * sptr, char * query )
 {
-	return( cn_client_get_request(sptr, "/resourceQuery/query/virtualMachine" ) ); /* TODO: integrate query string with list operation */
+	char	buffer[1024];
+	
+	sprintf(buffer,"/resourceQuery/query/virtualMachine?%s",query);
+	return( cn_client_get_request(sptr, buffer ) ); 
 }
 
 public  struct cn_response * cn_list_volumestores( struct cn_config * sptr, char * query )
 {
-	return( cn_client_get_request(sptr, "/resourceQuery/query/volumeStorage" ) ); /* TODO: integrate query string with list operation */
+	char	buffer[1024];
+	
+	sprintf(buffer,"/resourceQuery/query/volumeStorage?%s",query);
+	return( cn_client_get_request(sptr, buffer ) ); 
 }
 
 public  struct cn_response * cn_list_securitygroups( struct cn_config * sptr )
@@ -494,7 +506,7 @@ public  char * cn_create_securitygroup_request(  char * name, char * description
 		fprintf(h,"\t%cName%c:%c%s%c,\n",0x0022,0x0022,0x0022,name,0x0022);
 		fprintf(h,"\t%cDescription%c:%c%s%c,\n",0x0022,0x0022,0x0022,description,0x0022);
 		fprintf(h,"\t%cRegion%c:%c%s%c,\n",0x0022,0x0022,0x0022,region,0x0022);
-		fprintf(h,"\t%cProvider%c:%c%s%c\n",0x0022,0x0022,0x0022,provider,0x0022);
+		fprintf(h,"\t%cProviderId%c:%c%s%c\n",0x0022,0x0022,0x0022,provider,0x0022);
 		fprintf(h,"}\n");
 		fclose(h);
 		return( filename );
@@ -633,7 +645,7 @@ public  char * cn_add_vm_request(
 			fprintf(h,"\t%cSecurityGroupNames%c:[%c%s%c],\n",0x0022,0x0022,0x0022,securitygroup,0x0022);
 			
 		if(keypair != (char *) 0)
-			fprintf(h,"\t%cKeyPairName%c:[%c%s%c],\n",0x0022,0x0022,0x0022,keypair,0x0022);
+			fprintf(h,"\t%cKeyPairName%c:%c%s%c,\n",0x0022,0x0022,0x0022,keypair,0x0022);
 			
 		if(resourceparameters != (char *) 0)	
 			fprintf(h,"\t%cResourceParameters%c:%c%s%c,\n",0x0022,0x0022,0x0022,resourceparameters,0x0022);

@@ -1,3 +1,20 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2013 by Daniel Sprouse (ComputeNext) <daniel@computenext.com>   */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");      */
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at                              */
+/*                                                                      */
+/*  http://www.apache.org/licenses/LICENSE-2.0                          */
+/*                                                                      */
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      */
+/* implied.                                                             */
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License.                                       */
+/* -------------------------------------------------------------------- */
 #ifndef	_cncontract_c	
 #define	_cncontract_c
 
@@ -23,6 +40,7 @@ struct	cn_instancetype
 	char *  id;
 	char *  name;
 	char *	provider;
+	char *  providerId;
 	char *	region;
 	char *	location;
 };
@@ -33,6 +51,7 @@ struct	cn_image
 	char *	name;
 	char *	other;
 	char *	provider;
+	char *  providerId;
 	char *	region;
 	char *	location;
 };
@@ -43,6 +62,7 @@ struct	cn_virtualmachine
 	char *	name;
 	char *  other;
 	char *	provider;
+	char *  providerId;
 	char *	region;
 	char *	location;
 	struct cn_image        image;
@@ -64,6 +84,7 @@ public	struct	rest_response * start_computenext(
 	struct  cn_config *      config;
 	struct  cn_response *    cnptr;
 	int	status;
+	char *  sptr;
 	char *	filename;
 	char 	buffer[1024];
 	char	reference[1024];
@@ -90,6 +111,12 @@ public	struct	rest_response * start_computenext(
 	/* ---------------------- */
 	/* create the transaction */
 	/* ---------------------- */
+	if(!(pptr->workload))
+	{
+		config = cn_liberate_config( config );
+		computenext_build_failure( pptr, 911, "Failure Finding Workload Id" );
+	 	return( rest_html_response( aptr, 4004, "Server Failure : Cannot Find Workload" ) );
+	}
 	if (!( filename = cn_create_transaction_request( pptr->workload, "Paid" ) ))
 	{
 		config = cn_liberate_config( config );
@@ -102,13 +129,19 @@ public	struct	rest_response * start_computenext(
 		computenext_build_failure( pptr, 911, "Failure Creating Transaction" );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Transaction Request" ) );
 	}
-	else if(!(pptr->transaction = json_atribut( cnptr->jsonroot, "TransactionId" ) ))
+	else if(!(sptr = json_atribut( cnptr->jsonroot, "TransactionId" ) ))
 	{
 		config = cn_liberate_config( config );
 		computenext_build_failure( pptr, 911, "Failure Finding TransactionId" );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Find TransactionId" ) );
 	}
-	else 	cnptr = cn_liberate_response( cnptr );
+	else if(!( pptr->transaction = allocate_string(sptr) ))
+	{
+		config = cn_liberate_config( config );
+		computenext_build_failure( pptr, 911, "Failure Saving TransactionId" );
+	 	return( rest_html_response( aptr, 4008, "Server Failure : Save TransactionId" ) );
+	}
+	else cnptr = cn_liberate_response( cnptr );
 
 	/* ---------------------------------------- */
 	/* poll transaction until started or failed */
@@ -122,14 +155,14 @@ public	struct	rest_response * start_computenext(
 			computenext_build_failure( pptr, 911, "Failure Starting Transaction" );
 			return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
 		}
-		else if ( strcmp( vptr, _CN_STATUS_FAILED ) )
+		else if (!( strcmp( vptr, _CN_STATUS_FAILED ) ))
 		{
 			config = cn_liberate_config( config );
 			cnptr = cn_liberate_response( cnptr );
-			computenext_build_failure( pptr, 911, "Failure Starting Transaction" );
+			computenext_build_failure( pptr, 911, "Transaction In Failed Status" );
 			return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
 		}
-		else if ( strcmp( vptr, _CN_STATUS_CREATED ) )
+		else if (!( strcmp( vptr, _CN_STATUS_CREATED ) ))
 			break;
 		else
 		{
@@ -144,8 +177,17 @@ public	struct	rest_response * start_computenext(
 	if ( rest_valid_string( pptr->price ) )
 		occi_send_transaction( _CORDS_COMPUTENEXT, pptr->price, "action=start", pptr->account, reference );
 
+	/* TODO set the public and private addresses */
+	/* TODO Retrieve the keypair or password/username so ACCORDS can connect */
 	config = cn_liberate_config( config );
 	cnptr = cn_liberate_response( cnptr );
+	
+	pptr->state = _OCCI_RUNNING;
+	if ( check_debug() )
+	{
+		rest_log_message("*** CN PROCCI Instance is UP and RUNNING ***");
+	}
+		
 	return( rest_html_response( aptr, 200, "OK" ) );	
 }
 
@@ -221,11 +263,11 @@ public	int	create_computenext_contract(
 	struct	cn_response *     images = (struct cn_response *) 0;
 	int	status;
 	char *	vptr;
+	char buffer[256];
 
 	if (!(config = use_computenext_configuration( pptr->profile )))
 	{
-		rest_log_message("Could not find Configuration");
-		rest_log_message( pptr->profile );
+		rest_log_message("Could Not Find Configuration");
 		return( status );
 	}
 	else
@@ -294,6 +336,8 @@ public	int	create_computenext_contract(
 	/* -------------------------------------- */
 	/* recover the infrastructure description */
 	/* -------------------------------------- */
+	sprintf(buffer,"provider=%s&region=%s", contract.provider, contract.region);
+	
 	if (!( contract.infrastructure.id = occi_extract_atribut( contract.node.message, "occi", 
 		_CORDS_NODE, _CORDS_INFRASTRUCTURE ) ))
 		return( terminate_computenext_contract( 1171, &contract ) );
@@ -321,7 +365,8 @@ public	int	create_computenext_contract(
 	/* -------------------------------------------------------------- */
 	/* recover detailed list of CN instancetypes and resolve contract */
 	/* -------------------------------------------------------------- */
-	else if (!( contract.instancetypes = cn_list_instancetypes(config,"") ))
+	
+	else if (!( contract.instancetypes = cn_list_instancetypes(config,buffer) ))
 		return( terminate_computenext_contract( 1180, &contract ) );
 	else if (!( pptr->instancetype = resolve_contract_instancetype( config, &contract ) ))
 		return( terminate_computenext_contract( 1181, &contract ) );
@@ -391,11 +436,14 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 	struct  cn_image    best;
 	char *  vptr;
 	char *  iname=(char*) 0;
+	char *  pname=(char*) 0;
+	char *  rname=(char*) 0;
+	char *  pid=(char*) 0;
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
 
-	if (!( eptr = cptr->images->jsonroot )) /* TODO may need to fix for array */
+	if (!( eptr = cptr->images->jsonroot ))
 		return((char *) 0);
 
 	/* ---------------------------------------------------------- */
@@ -435,19 +483,33 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 			continue;
 		else if (!( vptr = json_atribut( dptr, "id" ) ))
 			continue;
-		else if (!( cptr->provider = json_atribut( dptr, "provider" ) ))
+		else if (!( pname = json_atribut( dptr, "provider" ) ))
 			continue;
-		else if (!( cptr->region = json_atribut( dptr, "region" ) ))
+		else if (!( pid = json_atribut( dptr, "providerId" ) ))
+			continue;
+		else if (!( rname = json_atribut( dptr, "region" ) ))
 			continue;
 		else
 		{
+			
+			cptr->provider = allocate_string( pname );
+			cptr->providerId = allocate_string( pid );
+			cptr->region = allocate_string( rname );
 			liberate( iname );
+			liberate( pname );
+			liberate( rname );
+			liberate( pid );
 			rest_log_message("cn_contract perfect match");
 			rest_log_message( vptr );
+			rest_log_message( cptr->provider );
+			rest_log_message( cptr->region );
 			return( allocate_string( vptr ) );
 		}
 	}
 	liberate( iname );
+	liberate( pname );
+	liberate( rname );
+	liberate( pid );
 
 	/* --------------------------------------------------- */
 	/* scan the image list for a system name partial match */
@@ -468,6 +530,9 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 		if (!( vptr = json_atribut( dptr, "provider" ) ))
 			continue;
 		else    image.provider = vptr;
+		if (!( vptr = json_atribut( dptr, "providerId" ) ))
+			continue;
+		else    image.providerId = vptr;
 		if (!( vptr = json_atribut( dptr, "region" ) ))
 			continue;
 		else    image.region = vptr;
@@ -478,6 +543,7 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 			best.id = image.id;
 			best.name = image.name;
 			best.provider = image.provider;
+			best.providerId = image.providerId;
 			best.region = image.region;
 			rest_log_message("cn_contract found match");
 			rest_log_message( image.name );
@@ -488,27 +554,23 @@ private char * resolve_contract_image( struct cn_config * config, struct cords_c
 	}
 	if (!( best.id ))
 	{
-		cptr->provider = image.provider;
-		cptr->region = image.region;
-		return( resolve_vm_image_url( cptr->image.id, _CORDS_COMPUTENEXT ) );
+		cptr->provider = allocate_string( image.provider );
+		cptr->providerId = allocate_string( image.providerId );
+		cptr->region = allocate_string( image.region );
+		return(allocate_string( best.id ));
 	}
 	else
 	{
-		cptr->provider = best.provider;
-		cptr->region = best.region;
+		cptr->provider = allocate_string( best.provider );
+		cptr->providerId = allocate_string( best.providerId );
+		cptr->region = allocate_string( best.region );
 		rest_log_message("cn_contract best match");
 		rest_log_message( best.name );
 		rest_log_message( best.id );
+		rest_log_message( cptr->provider );
+		rest_log_message( cptr->region );
 		return(allocate_string( best.id ));
 	}
-}
-
-/*	-----------------------------------------------------------------	*/
-/*		r e s o l v e _ v m _ i m a g e _ u r l  			*/
-/*	-----------------------------------------------------------------	*/
-private	char *	resolve_vm_image_url( char * iid, char * pid )
-{
-	return("**TODO**");
 }
 
 /*	-----------------------------------------------------------------  */
@@ -523,16 +585,17 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 	struct	data_element * eptr=(struct data_element *) 0;
 	struct	data_element * dptr=(struct data_element *) 0;
 
-	if (!( eptr = cptr->instancetypes->jsonroot )) /* TODO may need to fix for array */
+	if (!( eptr = cptr->instancetypes->jsonroot ))
 		return((char *) 0);
 
+	rest_log_message("cn_contract resolving instancetype");
 	/* -------------------------------------------------------------- */
 	/* retrieve appropriate parameters from infrastructure components */
 	/* -------------------------------------------------------------- */
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
 		request.memory = 0;
-	else	request.memory = rest_normalise_value( vptr,'G' );
+	else	request.memory = rest_normalise_value( vptr,'U' );
 
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_CORES ) ))
@@ -542,19 +605,19 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_SPEED ) ))
 		request.speed = 0;
-	else	request.speed = rest_normalise_value(vptr,'G');
+	else	request.speed = rest_normalise_value(vptr,'U');
 	
 	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
 		_CORDS_STORAGE, _CORDS_SIZE ) ))
 		request.storage = 0;
-	else	request.storage = rest_normalise_value(vptr,'G');
+	else	request.storage = rest_normalise_value(vptr,'U');
 
 	/* --------------------------------------------- */
 	/* collect and control the architecture required */
 	/* --------------------------------------------- */
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
 		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
-		strcpy(request.architecture,"blank" );
+		strcpy(request.architecture,"32 Bit / 64 Bit" );
 	else if ((!(strcasecmp( vptr, "x86"    		) ))
 	     ||  (!(strcasecmp( vptr, "txt86" 		) )))
 		strcpy(request.architecture,"32 Bit / 64 Bit" );
@@ -596,46 +659,50 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 			instancetype.speed = 0;
 		else	instancetype.speed = rest_normalise_value(vptr,'G');
 		if (!( vptr = json_atribut( dptr, "provider" ) ))
-			strcpy(instancetype.provider, "" );
-		else	strcpy( instancetype.architecture, vptr );
+			instancetype.provider = "";
+		else	instancetype.provider = vptr;
 		if (!( vptr = json_atribut( dptr, "region" ) ))
-			strcpy( instancetype.region, "" );
-		else	strcpy(instancetype.architecture, vptr );
+			instancetype.region = "";
+		else	instancetype.region = vptr;
 		if (!( vptr = json_atribut( dptr, "operatingSystemVersion" ) ))
 			strcpy( instancetype.architecture, "32 Bit / 64 Bit" );
-		else	strcpy(instancetype.architecture, vptr );
-
+		else	strcpy( instancetype.architecture, vptr );
+		
 		/* ------------------------------------ */
 		/* handle flavour architecture types    */
 		/* ------------------------------------ */
-		if (!( strcasecmp( request.architecture, instancetype.architecture ) ))
+		if ( ( strcasecmp( request.architecture, "32 Bit / 64 Bit" ) )
+		&&   ( strncasecmp( request.architecture, instancetype.architecture, strlen( request.architecture ) )))
 			continue; 
-		if (( request.storage ) && ( instancetype.storage < request.storage ))
+		else if (( request.storage ) && ( instancetype.storage ) && ( instancetype.storage < request.storage ))
 			continue;
-		else if (( request.memory  ) && ( instancetype.memory < request.memory ))
+		else if (( request.memory  ) && ( instancetype.memory ) && ( instancetype.memory < request.memory ))
 			continue;
-		else if (( request.cores ) && ( instancetype.cores < request.cores ))
+		else if (( request.cores ) && ( instancetype.cores ) && ( instancetype.cores < request.cores ))
 			continue;
-		else if (( request.speed ) && ( instancetype.speed < request.speed ))
+		else if (( request.speed ) && ( instancetype.speed ) && ( instancetype.speed < request.speed ))
 			continue;
-		else if (!( strcasecmp( cptr->provider, instancetype.provider ) ))
-			continue; 
-		else if (!( strcasecmp( cptr->region, instancetype.region ) ))
-			continue; ;
+		else if ( strcasecmp( cptr->provider, instancetype.provider ) != 0 )
+			continue;
+		else if ( strcasecmp( cptr->region, instancetype.region ) != 0 )
+			continue;
+			
 		/* --------------------- */
 		/* ok so its good enough */
 		/* --------------------- */
-		if (( best.cores ) && ( best.cores < instancetype.cores ))
+		if (( best.cores ) && ( instancetype.cores ) && ( best.cores < instancetype.cores ))
 			continue;
-		if (( best.speed ) && ( best.speed < instancetype.speed ))
+		if (( best.speed ) && ( instancetype.speed ) && ( best.speed < instancetype.speed ))
 			continue;
-		if (( best.memory ) && ( best.memory < instancetype.memory ))
+		if (( best.memory ) && ( instancetype.memory ) && ( best.memory < instancetype.memory ))
 			continue;
-		if (( best.storage ) && ( best.storage < instancetype.storage ))
+		if (( best.storage ) && ( instancetype.storage ) && ( best.storage < instancetype.storage ))
 			continue;
 		/* -------------------- */
 		/* in fact it is better */
 		/* -------------------- */
+		rest_log_message("cn_contract best instance choice updated");
+		rest_log_message(instancetype.name);
 		best.cores = instancetype.cores;
 		best.speed = instancetype.speed;
 		best.memory = instancetype.memory;
@@ -643,7 +710,7 @@ private char * resolve_contract_instancetype( struct cn_config * config, struct 
 		best.id = instancetype.id;
 	}
 	if (!( best.id ))
-		return( best.id );
+		return( allocate_string( best.id ) );
 	else	return(allocate_string( best.id ) );
 }
 
@@ -661,23 +728,35 @@ private char * resolve_contract_securitygroup( struct cn_config * config, struct
 	/* ---------------------------------------- */
 	/* look for existing network in computenext */
 	/* ---------------------------------------- */
+	rest_log_message("cn_contract resolving securitygroup");
 	if (!( nptr = occi_extract_atribut( cptr->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME ) ))
 		return((char *) 0);
-	else if (!( fptr = cptr->securitygroups->jsonroot )) /* TODO may need to fix for array */
+	else if (!( fptr = cptr->securitygroups->jsonroot ))
 		return((char *) 0);
 	
 	for ( 	dptr=fptr->first;
 		dptr != (struct data_element *) 0;
 		dptr = dptr->next )
 	{
-		if (!( vptr = json_atribut( dptr, "Name" ) ))
+		if (!( vptr = json_atribut( dptr, "ProviderName" ) ))
+			continue;
+		else if ( strcmp( vptr, cptr->provider ) )
+			continue;
+		else if (!( vptr = json_atribut( dptr, "Region" ) ))
+			continue;
+		else if ( strcmp( vptr, cptr->region ) )
+			continue;
+		else if (!( vptr = json_atribut( dptr, "Name" ) ))
 			continue;
 		else if ( strcmp( vptr, nptr ) )
 			continue;
-		else if (!( vptr = json_atribut( dptr, "SecurityGroupId" ) ))
-			continue;
+		
 		else
-			return( vptr );				
+		{
+			rest_log_message("cn_contract found existing security group");
+			rest_log_message(vptr);
+			return( allocate_string( vptr ) );
+		}			
 	}
 	
 	return( build_computenext_securitygroup(config, cptr, pptr) );
@@ -702,21 +781,24 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 	/* -------------------------- */
 	/* create the security group  */
 	/* -------------------------- */
+	rest_log_message("cn_contract building new security group");
 	if(!( nptr = occi_extract_atribut( cptr->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME ) ))
 		return( allocate_string("") );
 	if (!( filename = cn_create_securitygroup_request( 
 				nptr, "CNPROCCI auto-generated securitygroup", 
-				cptr->provider, cptr->region )))
-		return( allocate_string("") );
+				cptr->region, cptr->providerId )))
+		return( allocate_string(nptr) );
 	else if (!( cnptr = cn_create_securitygroup( config,filename ) ))
-		return( allocate_string("") );
+		return( allocate_string(nptr) );
 	else if (!( sptr = json_atribut( cnptr->jsonroot, "SecurityGroupId") ))
 	{
 		cnptr = cn_liberate_response( cnptr );
-		return( allocate_string("") );
+		return( allocate_string(nptr) );
 	}
-	else cnptr = cn_liberate_response( cnptr );
 
+	rest_log_message("cn_contract securitygroup built");
+	rest_log_message(sptr);
+	
 	for (	eptr = cords_first_link( cptr->network.message );
 		eptr != (struct occi_element *) 0;
 		eptr = cords_next_link( eptr ) )
@@ -726,9 +808,9 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 		/* retrieve the port rule information */
 		/* ---------------------------------- */
 		if(!( zptr = occi_unquoted_value(eptr->value) ))
-			return( allocate_string(sptr) );
+			return( allocate_string(nptr) );
 		else if(!( rptr = occi_simple_get(zptr, _CORDS_CN_AGENT, default_tls()) ))
-			return( allocate_string(sptr) );
+			return( allocate_string(nptr) );
 		else if ((!( ruleproto = occi_extract_atribut( rptr, "occi", 
 			_CORDS_PORT, _CORDS_PROTOCOL ) ))
 		||  (!( rulefrom = occi_extract_atribut( rptr, "occi", 
@@ -737,20 +819,26 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 			_CORDS_PORT, _CORDS_TO   ) )) )
 		{
 			occi_remove_response(rptr);
-			return( allocate_string(sptr) );
+			return( allocate_string(nptr) );
 		}
 		else occi_remove_response(rptr);
 		/* ---------------------------------- */
 		/* add the port to the security group */
 		/* ---------------------------------- */
 		if (!( filename = cn_add_port_request( ruleproto, rulefrom, ruleto, "0.0.0.0/0" ) ))
-			return( allocate_string(sptr) );
-		else if (!( cnptr = cn_add_port( config, pptr->securitygroup, filename ) ))
-			return( allocate_string(sptr) );
-		else	cnptr = cn_liberate_response( cnptr );
+			return( allocate_string(nptr) );
+		else if (!( cnptr = cn_add_port( config, sptr, filename ) ))
+			return( allocate_string(nptr) );
+		else if (!( sptr = json_atribut( cnptr->jsonroot, "SecurityGroupId") ))
+		{
+			cnptr = cn_liberate_response( cnptr );
+			return( allocate_string(nptr) );
+		}
 	}
-
-	return( allocate_string(sptr) );
+	
+	cnptr = cn_liberate_response( cnptr );
+	rest_log_message("cn_contract ports added successfully");
+	return( allocate_string(nptr) );
 }
 
 
@@ -763,25 +851,33 @@ private	char *	build_computenext_workload(struct cn_config * config, struct comp
 	char *  vptr;
 	char *  sptr;
 	char *  filename;
+	char    wlname[256];
 	
 	/* --------------------------- */
 	/* create a new empty workload */
 	/* --------------------------- */
+	rest_log_message("cn_contract building workload");
+	
 	if(!( vptr = occi_extract_atribut( cptr->node.message, "occi", 
 		_CORDS_NODE, _CORDS_NAME ) ))
 		return ( (char *) 0);
-	else if(!(filename = cn_create_workload_request(vptr) ))
+		
+	sprintf(wlname,"CO-%ld-%s",time((long *) 0),vptr);
+	
+	if(!(filename = cn_create_workload_request(wlname) ))
 		return ( (char *) 0); 
 	else if(!(cnptr = cn_create_workload( config, filename ) ))
 		return ( (char *) 0);  
 	else if(cnptr->response->status >= 300)
-		return ( (char *) 0);
-	else if (!( sptr = json_atribut( cnptr->jsonroot, "WorkloadId") ))
+		return ( (char *) 0);	
+	else if (!( sptr = json_atribut( cnptr->jsonroot, "WorkloadId" ) ))
 	{
 		cnptr = cn_liberate_response( cnptr );
 		return ( (char *) 0);
 	}
-	else cnptr = cn_liberate_response( cnptr );
+	
+	rest_log_message("cn_contract workload built");
+	rest_log_message(sptr);
 	
 	/* ------------------------------- */
 	/* add resolved vm to new workload */
@@ -790,13 +886,15 @@ private	char *	build_computenext_workload(struct cn_config * config, struct comp
 		_CORDS_INFRASTRUCTURE, _CORDS_NAME ) ))
 		return ( (char *) 0);
 	else if(!(filename = cn_add_vm_request( vptr, 1, pptr->image,
-		pptr->instancetype, pptr->securitygroup, "", "" ) ))
+		pptr->instancetype, pptr->securitygroup, "MyKeyPair", "" ) ))
 		return ( (char *) 0);
-	else if(!(cnptr = cn_add_vm_to_workload( config, filename, sptr ) ))
+	else if(!(cnptr = cn_add_vm_to_workload( config, sptr, filename ) ))
 		return ( (char *) 0);  
 	else if(cnptr->response->status >= 300)
 		return ( (char *) 0);
 	else cnptr = cn_liberate_response( cnptr );
+	
+	rest_log_message("cn_contract VM added to workload");
 	
 	return( allocate_string(sptr) );
 
@@ -875,6 +973,7 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 	char   reference[512];
 	char *	vptr;
 
+	rest_log_message("*** CNPROCCI Stop Provisioning ****");
 	if (!( config = use_computenext_configuration( pptr->profile )))
 		return((struct cn_response *) 0);
 	else
@@ -894,38 +993,46 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 			}
 		}
 
-		/* -------------------------------------- */
-		/* launch the deletion of the transaction */
-		/* -------------------------------------- */
-		if ((cnptr=cn_delete_transaction( config,pptr->transaction )) != (struct cn_response *) 0)
-		{
-			
-			cnptr = cn_liberate_response( cnptr );
-			
-			/* -------------------------- */
-			/* await transaction deletion */
-			/* -------------------------- */
-			while ((cnptr=cn_get_transaction( config, pptr->transaction )) != (struct cn_response *) 0)
-			{
-				if (!(fptr = cnptr->jsonroot)) /* TODO may need to fix for array */
-					break;
-				else if (!( vptr = json_atribut( fptr, "StatusCode" ) ))
-					break;
-				else if ( strcmp( vptr, _CN_STATUS_DELETED ) )
-					break;
-				else
-				{
-					sleep( _CN_DESTROY_SLEEP );
-					cnptr = cn_liberate_response( cnptr );
-				}
-			}	
-		}
-		
 		/* ------------------------------------------ */
 		/* delete workload if there is no transaction */
 		/* ------------------------------------------ */
-		else if(!(cnptr=cn_delete_workload(config, pptr->workload) )) {
-			cnptr = cn_liberate_response( cnptr );
+		if(!(pptr->transaction))
+		{
+			if(!(pptr->workload))
+				cnptr = cn_liberate_response( cnptr );
+			else if(!(cnptr=cn_delete_workload(config, pptr->workload) )) {
+				cnptr = cn_liberate_response( cnptr );
+			}
+		}
+		
+		/* -------------------------------------- */
+		/* launch the deletion of the transaction */
+		/* -------------------------------------- */
+		else if ((cnptr=cn_delete_transaction( config,pptr->transaction )) != (struct cn_response *) 0)
+		{
+			/* -------------------------- */
+			/* await transaction deletion */
+			/* -------------------------- */
+			if(cnptr->response->status >= 300)
+				cnptr = cn_liberate_response( cnptr );
+			else
+			{
+				cnptr = cn_liberate_response( cnptr );
+				while ((cnptr=cn_get_transaction( config, pptr->transaction )) != (struct cn_response *) 0)
+				{
+					if (!(fptr = cnptr->jsonroot))
+						break;
+					else if (!( vptr = json_atribut( fptr, "StatusCode" ) ))
+						break;
+					else if (!( strcmp( vptr, _CN_STATUS_DELETED ) ))
+						break;
+					else
+					{
+						sleep( _CN_DESTROY_SLEEP );
+						cnptr = cn_liberate_response( cnptr );
+					}
+				}	
+			}
 		}
 		
 		return( cnptr );
@@ -937,6 +1044,12 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 /*	-----------------------------------------------------------------  */
 private	int	terminate_computenext_contract( int status, struct cords_cn_contract * cptr )
 {
+	char sptr[256];
+	
+	sprintf(sptr, "Status: %d", status);
+	rest_log_message("*** CNPROCCI Contract Terminated ***");
+	rest_log_message(sptr);
+	
 	if ( cptr->node.message )
 		cptr->node.message = occi_remove_response( cptr->node.message );
 	if ( cptr->infrastructure.message )

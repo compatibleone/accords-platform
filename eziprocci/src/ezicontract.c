@@ -431,6 +431,13 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 					{
 						fprintf(h,"%cname%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
 					}
+					if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_server", "access" )) != (char *) 0)
+					{
+						if (!( strcasecmp( vptr, "PUBLIC" ) ))
+							fprintf(h,"%cpublic_ip%c : %ctrue%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+						else if (!( strcasecmp( vptr, "PRIVATE" ) ))
+							fprintf(h,"%cpublic_ip%c : %cfalse%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+					}
 
 					ezi_serialise_metadata( h, zptr );	
 

@@ -10,6 +10,7 @@
 		char 	*	flavor;
 		char 	*	configuration;
 		char 	*	description;
+		char	*	access;
 		int		metadatas;
 	};
 	#endif

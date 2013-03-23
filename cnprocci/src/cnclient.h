@@ -1,3 +1,20 @@
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2013 by Daniel Sprouse (ComputeNext) <daniel@computenext.com>   */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License");      */
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at                              */
+/*                                                                      */
+/*  http://www.apache.org/licenses/LICENSE-2.0                          */
+/*                                                                      */
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      */
+/* implied.                                                             */
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License.                                       */
+/* -------------------------------------------------------------------- */
 #ifndef _cn_client_h
 #define _cn_client_h
 
@@ -24,7 +41,7 @@ struct  cn_response
 };
 
 public  struct cn_response * cn_liberate_response( struct cn_response * rptr );
-public  struct cn_config   * cn_allocate_config();
+public  struct cn_response * cn_allocate_config();
 public  struct cn_response * cn_check( struct rest_response *  aptr );
 
 public  struct cn_response * cn_list_images( struct cn_config * sptr, char * query );
@@ -67,19 +84,15 @@ public  struct cn_response * cn_stop_transaction( struct cn_config * sptr, char 
 
 public  char *
     cn_create_securitygroup_request( char * name, char * description, char * region, char * provider );
-
 public  char *
     cn_create_keypair_request( char * name, char * region, char * provider );
-
 public  char *
     cn_create_workload_request( char * name );
-
 public  char *
     cn_create_transaction_request( char * workload, char * billingtype );
     
 public  char *
     cn_add_port_request( char * protocol, char * from, char * to, char * cidr );
-
 public  char *
     cn_remove_port_request( char * protocol, char * from, char * to, char * cidr  );
 

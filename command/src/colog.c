@@ -75,6 +75,9 @@ Manager =
 	(struct colog_module *) 0
 };
 
+/*	---------------------------------	*/
+/*	      d r o p _ m o d u l e 		*/
+/*	---------------------------------	*/
 private	void	drop_module( struct colog_module * mptr )
 {
 	if ( mptr )
@@ -88,6 +91,9 @@ private	void	drop_module( struct colog_module * mptr )
 	}
 }
 
+/*	---------------------------------	*/
+/*	  a l l o c a t e _ m o d u l e		*/
+/*	---------------------------------	*/
 private	struct colog_module * allocate_module()
 {
 	struct	colog_module * mptr;
@@ -100,6 +106,9 @@ private	struct colog_module * allocate_module()
 	}
 }
 
+/*	---------------------------------	*/
+/*	   a l l o c a t e _ e v e n t		*/
+/*	---------------------------------	*/
 private	struct colog_event * allocate_event()
 {
 	struct	colog_event * eptr;
@@ -112,6 +121,9 @@ private	struct colog_event * allocate_event()
 	}
 }
 
+/*	---------------------------------	*/
+/*	   r e s o l v e _ b y _ p i d 		*/
+/*	---------------------------------	*/
 private	struct	colog_module * resolve_by_pid( int pid )
 {
 	struct	colog_module * mptr;
@@ -132,6 +144,10 @@ private	struct	colog_module * resolve_by_pid( int pid )
 		return( mptr );
 	}
 }
+
+/*	---------------------------------	*/
+/*	r e s o l v e _ b y _ o b j e c t	*/
+/*	---------------------------------	*/
 private	struct	colog_module * resolve_by_object( char * object )
 {
 	struct	colog_module * mptr;
@@ -148,6 +164,9 @@ private	struct	colog_module * resolve_by_object( char * object )
 	return( mptr );
 }
 
+/*	---------------------------------	*/
+/*	   r e s o l v e _ b y _ u r l 		*/
+/*	---------------------------------	*/
 private	struct	colog_module * resolve_by_url( struct url * uptr )
 {
 	struct	colog_module * mptr;
@@ -178,6 +197,9 @@ private	struct	colog_module * resolve_by_url( struct url * uptr )
 	}
 }
 
+/*	---------------------------------	*/
+/*	   c o l o g _ s c a n p a s t		*/
+/*	---------------------------------	*/
 private	char *	scanpast( char * mptr, int c )
 {
 	if (!( mptr ))
@@ -194,6 +216,9 @@ private	char *	scanpast( char * mptr, int c )
 	return( mptr );
 }
 
+/*	---------------------------------	*/
+/*	c o l o g _ h t t p _ m e t h o d	*/
+/*	---------------------------------	*/
 private	int	colog_http_method( char * mptr )
 {
 	if (!( strcasecmp( mptr, "GET" ) ))
@@ -213,6 +238,9 @@ private	int	colog_http_method( char * mptr )
 	else	return( 0 );
 }
 
+/*	---------------------------------	*/
+/*	 c o l o g _ s e n t _ e v e n t  	*/
+/*	---------------------------------	*/
 private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 {
 	struct	colog_module * mptr;
@@ -256,6 +284,9 @@ private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 	}
 }
 
+/*	---------------------------------------		*/
+/*	c o l o g _ r e c e i v e d _ e v e n t 	*/
+/*	---------------------------------------		*/
 private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 {
 	struct	colog_module * mptr;
@@ -304,8 +335,9 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 	return;
 }
 
-
-
+/*	---------------------------------	*/
+/*	  c o l o g _ u s e _ e v e n t 	*/
+/*	---------------------------------	*/
 private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, int dir )
 {
 	struct colog_event * eptr;
@@ -327,6 +359,9 @@ private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, 
 	return( 0 );
 }
 
+/*	---------------------------------	*/
+/*	   c o l o g _ u s e _ l i n e		*/
+/*	---------------------------------	*/
 private	int	colog_use_line( char * buffer )
 {
 	char *	wptr=buffer;
@@ -362,6 +397,9 @@ private	int	colog_use_line( char * buffer )
 		return( colog_use_event( mptr, wptr, when, dir ));
 }
 
+/*	---------------------------------	*/
+/*	  c o l o g _ o p e r a t i o n		*/
+/*	---------------------------------	*/
 private	int	colog_operation( char * mptr )
 {
 	FILE * h;
@@ -379,6 +417,9 @@ private	int	colog_operation( char * mptr )
 	}
 }
 
+/*	---------------------------------	*/
+/*	c o l o g _ s h o w _ e v e n t s	*/
+/*	---------------------------------	*/
 private	void	colog_show_events()
 {
 	struct	colog_event * eptr;
@@ -399,16 +440,18 @@ private	void	colog_show_events()
 		printf("<tr><th>%u<td>%s %s<td> %s %s</tr>\n",
 			eptr->when,
 			( eptr->dir ? ( eptr->dir == 1 ? "Sent by" : "Received by" ) : " "),
-			( (fptr = eptr->from) ? ( fptr->name ? fptr->name : "[unknown]") : "[unknown]" ),
+			( (fptr = eptr->from) ? ( fptr->name ? fptr->name : "unknown") : "unknown" ),
 			( eptr->dir ? ( eptr->dir == 1 ? "to" : "from" ) : " "),
 			( (tptr = eptr->to) ? ( tptr->name ? tptr->name : 
-			( tptr->host ? tptr->host : "[unknown]")) : "[unknown]" ));
+			( tptr->host ? tptr->host : "unknown")) : "unknown" ));
 	}
 	printf("</table><p>\n");
 	return;
 }
 
-
+/*	---------------------------------	*/
+/*	c o l o g _ s h o w _ m o d u l e	*/
+/*	---------------------------------	*/
 private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
@@ -422,13 +465,17 @@ private	void	colog_show_modules()
 		mptr->column = ++maxcolumns;
 		printf("<tr><th>%u<td>%s<td>%u<td>%s:%u</tr>\n",
 			mptr->column,
-			( mptr->name ? mptr->name : "[unknown]" ),
+			( mptr->name ? mptr->name : "unknown" ),
 			mptr->pid,
-			( mptr->host ? mptr->host : "[unknown]" ),mptr->port);
+			( mptr->host ? mptr->host : "unknown" ),mptr->port);
 	}
 	printf("</table><p>\n");
 	return;
 }
+
+/*	---------------------------------	*/
+/*	c o l o g _ s h o w _ h e a d e r	*/
+/*	---------------------------------	*/
 private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
@@ -447,6 +494,9 @@ private	void	colog_show_header()
 	return;
 }
 
+/*	---------------------------------	*/
+/*	c o l o g _ s h o w _ d e t a i l	*/
+/*	---------------------------------	*/
 private	void	colog_show_detail()
 {
 	int	n;
@@ -458,6 +508,8 @@ private	void	colog_show_detail()
 	struct	colog_event * eptr;
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
+	struct	colog_module * left;
+	struct	colog_module * right;
 
 	for (	eptr=Manager.FirstEvent;
 		eptr !=(struct colog_event *) 0;
@@ -474,16 +526,26 @@ private	void	colog_show_detail()
 		else if (!( tptr = eptr->to ))
 			continue;
 
+		/* -------------------------------- */
+		/* handle pagination with title bar */
+		/* -------------------------------- */
 		items++;
-		if ( items > 60 )
+		if ( items > 48 )
 		{
 			colog_show_header();
 			items=1;
 		}
 
 		printf("<tr>");
+
+		/* -------------------------------------- */
+		/* reorganise as from smallest to largest */
+		/* column id adjusting representation     */
+		/* -------------------------------------- */
 		if ( fptr->column > tptr->column )
 		{
+			right = fptr;
+			left = tptr;
 			from = tptr->column;
 			to = fptr->column;
 			ito = "fromright.png";
@@ -491,11 +553,17 @@ private	void	colog_show_detail()
 		}
 		else
 		{
+			right = tptr;
+			left = fptr;
 			from = fptr->column;
 			to = tptr->column;
 			ifrom = "fromleft.png";
 			ito = "toright.png";
 		}
+
+		/* ----------------------- */
+		/* left hand empty columns */
+		/* ----------------------- */
 		if ( from > 1 )
 		{
 			n = from-1;
@@ -505,8 +573,16 @@ private	void	colog_show_detail()
 				n--;
 			}
 		}
-		printf("<td class=nb><img src='%s'></td>\n",ifrom);
+
+		/* -------------------------- */
+		/* left hand image to or from */
+		/* -------------------------- */
+		printf("<td class=nb><img src='%s' alt='%s'></td>\n",ifrom,
+			( left->name ? left->name : "unknown" ));
 		
+		/* -------------- */
+		/* central images */
+		/* -------------- */
 		n = (to - from);
 		if ( n > 1 )
 		{
@@ -517,7 +593,16 @@ private	void	colog_show_detail()
 				n--;
 			}
 		}
-		printf("<td class=nb><img src='%s'></td>\n",ito);
+
+		/* --------------------------- */
+		/* right hand image to or from */
+		/* --------------------------- */
+		printf("<td class=nb><img src='%s' alt='%s'></td>\n",ito,
+			( right->name ? right->name : "unknown" ));
+
+		/* ------------------------ */
+		/* right hand empty columns */
+		/* ------------------------ */
 		n = maxcolumns - to;
 		while ( n)
 		{
@@ -528,7 +613,10 @@ private	void	colog_show_detail()
 	return;
 }
 
-private	void	colog_show_results()
+/*	---------------------------------	*/
+/*	c o l o g _ s h o w _ r e s u l t 	*/
+/*	---------------------------------	*/
+private	void	colog_show_result()
 {
 	printf("<html><head><title>colog module list</title>\n");
 	printf("<style>\n");
@@ -541,20 +629,24 @@ private	void	colog_show_results()
 	printf("</style></head>\n");
 	printf("<body><div align=center>\n");
 	colog_show_modules();
-	printf("<p><table border=1>\n");
+	printf("<p><table border=0>\n");
 	colog_show_header();
 	colog_show_detail();
+	colog_show_header();
 	printf("</table></div><p></body></html>\n");
 }
 
+/*	---------------------------------	*/
+/*	  c o l o g _ a n a l y s i s 		*/
+/*	---------------------------------	*/
 public	int	colog_analysis( char * filename )
 {
 	colog_operation( filename );
-	colog_show_results();
+	colog_show_result();
 	return( 0 );
 }
-
 	
+	/* -------- */
 #endif 	/* _colog_c */
-	/* --------- */
+	/* -------- */
 

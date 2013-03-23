@@ -3,12 +3,12 @@
 
 struct  computenext
 {
-        char *  id;
-        char *  profile;
-        char *  description;
-        char *  hostname;
-		
-        int     state;
+	char *  id;
+	char *  profile;
+	char *  description;
+	char *  hostname;
+
+	int     state;
 
 	char *	node;
 	char *	access;
@@ -16,28 +16,28 @@ struct  computenext
 	char *	account;
 	char *	firewall;
 
-        char *  workload;
-        char *  transaction;
-        char *  image;
-        char *  instancetype;
-        char *  volumestorage;
+	char *  workload;
+	char *  transaction;
+	char *  image;
+	char *  instancetype;
+	char *  volumestorage;
 
-        char *  securitygroup;
-        char *  keypair;
-        char *  password;
-        char *  username;
+	char *  securitygroup;
+	char *  keypair;
+	char *  password;
+	char *  username;
 
-        char *  ipaddress;
-        char *  status;
+	char *  ipaddress;
+	char *  status;
 
-        char *  provider;
-        char *  region;
-        char *  zone;
-        char *  price;
-        char *  location;
+	char *  provider;
+	char *  region;
+	char *  zone;
+	char *  price;
+	char *  location;
 
-        char *  apikey;
-        char *  apisec;
+	char *  apikey;
+	char *  apisec;
 };
 
 #endif
