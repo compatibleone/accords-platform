@@ -1,0 +1,22 @@
+
+	if ( $1 == "timer.event" )
+	{
+
+		"hello world".display();
+
+		$1.display();
+		$2.display();
+		$3.display();
+		$4.display();
+
+		$cid = counter.post();
+		$cid.display();
+
+		"over and out".display();
+
+	}
+
+
+
+
+

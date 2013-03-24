@@ -1,0 +1,95 @@
+	/* ----------------------------------------------------------- */
+	/* csp-updez.txt 				      	       */
+	/* ----------------------------------------------------------- */
+	/* update of easiclouds subscription information for an account */
+	/* ----------------------------------------------------------- */
+
+
+	$s = {};
+
+
+	if ( $2.length() > 0 )
+	{
+		$a = $2 / "=";
+		$n = $a[0];
+		$v = $a[1];
+		if ( $n == "name" )
+		{
+			$un = '"occi.easiclouds_configuration.name":"'#$v#'"';
+			$s = $s + $un;
+		}
+
+
+		if ( $3.length() > 0 )
+		{
+			$a = $3 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "host" )
+			{
+				$i = '"occi.easiclouds_configuration.host":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $4.length() > 0 )
+		{
+			$a = $4 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "tenent" )
+			{
+				$i = '"occi.easiclouds_configuration.namespace":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $5.length() > 0 )
+		{
+			$a = $5 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "user" )
+			{
+				$i = '"occi.easiclouds_configuration.user":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		if ( $6.length() > 0 )
+		{
+			$a = $6 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "password" )
+			{
+				$i = '"occi.easiclouds_configuration.password":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+		if ( $7.length() > 0 )
+		{
+			$a = $7 / "=";
+			$n = $a[0];
+			$v = $a[1];
+			if ( $n == "iaas" )
+			{
+				$i = '"occi.easiclouds_configuration.iaas":"'#$v#'"';
+				$s = $s + $i;
+			}
+		}
+
+		$list = easiclouds_configuration.list( $un );
+		$cid  = $list[0];
+		if ( $cid.length() > 0 )
+		{
+			$result = $cid.put( $s );
+		}
+		else
+		{
+			$aid = easiclouds_configuration.post( $s );
+		}
+	}
+
+	$2 = $1;
+	include "csp-subscriptions.txt";

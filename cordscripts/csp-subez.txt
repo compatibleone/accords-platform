@@ -1,0 +1,106 @@
+	include "csp-header.txt";
+
+	include "csp-selectaccount.txt";
+
+	function SectionHeader($pt)
+	{
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		"<tr><td colspan=4 class=title>".display();
+		$pt.display();
+		"</tr>".display();
+		"<tr><td colspan=4>&nbsp;</td></tr>".display();
+		return;
+	}
+
+
+	HtmlHeader("Easiclouds Subscription",$1);
+
+	$what = $2;
+	
+	$un = '{"occi.easiclouds_configuration.name":"'#$what#'"}';
+	$list = easiclouds_configuration.list( $un );
+	$cid  = $list[0];
+	if ( $cid.length() > 0 )
+	{
+		$record = $cid.get();
+		$sname = $record["occi.easiclouds_configuration.user"];
+		$spass = $record["occi.easiclouds_configuration.password"];
+		$shost = $record["occi.easiclouds_configuration.host"];
+		$siaas = $record["occi.easiclouds_configuration.iaas"];
+		$smore = $record["occi.easiclouds_configuration.namespace"];
+	}
+	else
+	{
+		$sname = "";
+		$spass = "";
+		$siaas = "";
+		$shost = "";
+		$smore = "";
+	}
+
+	"<table width='100%'>".display();
+	"<tr><td colspan=4><h3>Addition or modification of the Easiclouds Subscription for an Existing Customer Account</h3></td></tr>".display();
+	"<tr><td colspan=4>This document allows you to add or modify the easiclouds subscription record of an existing customer account allowing provisioning through the interface.<p>".display();
+
+	SectionHeader("The Account");
+	
+	'<tr><td colspan=4><form method=POST action="dashboard.php"><table width="100%">'.display();
+
+	if ( $what.length() > 0 )
+	{
+		"<tr><td colspan=2>This is your customer account name.".display(); 
+		"<tr><td><b>Customer Account Name</b><td>".display();
+		$m = "<input type=text name=name readonly value='"#$what#"'>";
+		$m.display();
+	}
+	else
+	{
+		"<tr><td colspan=2>Here you should select the customer account name for which the subscription is to be created or modified.".display(); 
+		"<tr><td><b>Customer Account Name</b><td>".display();
+		SelectAccount("name");
+	}
+
+	SectionHeader("The Subscription");
+
+	"<tr><td colspan=2>Here you should specify the URL of the provisioning platform. This must include the service prefix, the host name,".display(); 
+	"the service port and any other information such as version number.".display(); 
+	"<td colspan=2>Here you should specify the tenent information of your subscription account.".display(); 
+
+	$m = "<tr><td><b>Host</b><td><input type=text name='host' value='"#$shost#"'>"
+	$m.display();
+
+	$m = "<td><b>Tenent</b><td><input type=text name='tenent' value='"#$smore#"'>";
+	$m.display();
+	
+	"<tr><td colspan=4>Here you must specify the full URL ( service, host and port ) to access the IAAS++ Server".display();
+	$m = "<tr><td><b>Host</b><td><input type=text name='iaas' value='"#$siaas#"'>"
+	$m.display();
+
+	"<tr><td colspan=4>Here you must specify the authentication credentials of the subscription account comprising user name and password.".display();
+	$m = "<tr><td><b>User</b><td><input type=text name='user' value='"#$sname#"'>";
+	$m.display();
+
+	$m = "<td><b>Password</b><td><input type=text name='password' value='"#$spass#"'>";
+	$m.display();
+
+
+	SectionHeader("Subscription Confirmation");
+
+	"<tr><td><td colspan=2> Finally you must submit the subscription information for processing and acceptance.<p>".display();
+	"Please verify all information provided here very carefully prior to submission.<td>".display();
+	"<tr><td><td><b>Submit</b><td><input type=submit name=action class=action value='add ez subscription'><td>".display();
+
+	'</table></form></td></tr>'.display();
+
+	"<tr><td colspan=4>&nbsp;</td></tr>".display();
+
+	$m = "<tr><th colspan=4><a href='dashboard.php?action=compile&output=HTML&script=csp-subscriptions.txt&option="#$what#"'>List of Subscriptions</a></th></tr>";
+	$m.display();
+
+
+	"</table>".display();
+
+
+	HtmlFooter();
+
+

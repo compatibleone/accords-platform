@@ -1,0 +1,16 @@
+"<html><head><title>Accords Platform Deleting Timer Timers</title></head>".display();
+"<body><div align=center><table><tr><th colspan=2><h1>Accords Platform Deleting Timers</h1></tr>".display();
+$m = "<tr><th colspan=2><h2>"#$1#"</h2></tr>";
+$m.display();
+	
+	$list = timer.list();
+	foreach ( $list as $timer )
+	{
+		$m = "<tr><th colspan=2>"#$timer;
+		$m.display();
+		if ( $1.length() > 0 ) 	{ $timer.$1(); 	}
+		else		   	{ $timer.delete();	}
+	}
+
+"</table></div></body></html>".display();
+

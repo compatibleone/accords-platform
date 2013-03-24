@@ -1,0 +1,59 @@
+	if ( $2.length() > 0 )
+	{
+
+	$record = {};
+
+	$domain = "occi.timer.";
+	$name  = $domain#"name";
+	$value = $2;
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$name  = $domain#"account";
+	$value = $3;
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$name  = $domain#"period";
+	$value = $4;
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$name  = $domain#"nature";
+	$value = $5;
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$name  = $domain#"source";
+	$value = "csp-newtimer.txt";
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$name  = $domain#"target";
+	$value = "cordscript: include 'csp-timertick.txt';";
+	$tuple = '"'#$name#'":"'#$value#'"';
+	$record = $record + $tuple;
+
+	$tid = timer.post( $record );
+
+	/* ----------------------------------- */
+	/* test for immediate start invocation */
+	/* ----------------------------------- */
+	if ( $6.length() > 0 ) { $tid.$6(); }
+
+	/* include "listimer.txt"; */
+
+	}
+	else
+	{
+		"useage: newtimer user name account period nature".display();
+	}
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,13 @@
 	/* -------------------------------------------------------------- */
 	/* this script is intended to be called from a penalty expression */
 	/* -------------------------------------------------------------- */
+	"0".debug();
 
 	if ( $1 == "slam.control" )
 	{
+		/* --------------------- */
+		/* create penalty record */
+		/* --------------------- */
 		$s ={};
 
 		$a = '"occi.penalty.name":"scripted"';
@@ -18,8 +22,8 @@
 		$a = '"occi.penalty.agreement":"'#$v#'"';
 		$s = $s + $a;
 
-		$v = $control["occi.control.contract"];
-		$a = '"occi.penalty.contract":"'#$v#'"';
+		$contract = $control["occi.control.contract"];
+		$a = '"occi.penalty.contract":"'#$contract#'"';
 		$s = $s + $a;
 
 		$a = '"occi.penalty.control":"'#$2#'"';
@@ -29,7 +33,8 @@
 		$a = '"occi.penalty.packet":"'#$4#'"';
 		$s = $s + $a;
 
-		$packet = $4.get();
+		$packid = $4;
+		$packet = $packid.get();
 		$v = $packet["occi.packet.sequence"];
 		$a = '"occi.penalty.sequence":"'#$v#'"';
 		$s = $s + $a;
@@ -42,11 +47,35 @@
 
 		$id = penalty.post( $s );
 
+		/* ---------------------------- */
+		/* delete and unlink the packet */
+		/* ---------------------------- */
 
 		$probe = $control["occi.control.probe"];
-		$probe.unlink( $packet );
-		$penalty.link( $packet );
+		$probe.unlink( $packid );
+		$packid.delete();          
 
+		/* ------------------------------------ */
+		/* create or update the penalty counter */
+		/* ------------------------------------ */
+		$s = {};
+		$a = '"occi.counter.name":"'#$contract#'"';
+		$s = $s + $a;
+		$v = counter.count( $s );
+		if ( $v > 0 )
+		{
+			$v = counter.list( $s );
+			$c = $v[0];
+			$c.hit();
+		}
+		else
+		{
+			$a = '"occi.counter.description":"penalties incurred by contract"';
+			$s = $s + $a;
+			$a = '"occi.counter.value":"1"';
+			$s = $s + $a;
+			$v = counter.post( $s );
+		}
 	}
 
 

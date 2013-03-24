@@ -1,0 +1,30 @@
+"<html><head><title>Accords Platform Timer List</title></head>".display();
+"<body><div align=center><table><tr><th colspan=2><h1>Accords Platform Timer List</h1></tr>".display();
+$m = "<tr><th colspan=2><h2>"#$1#"</h2></tr>";
+$m.display();
+
+$list = timer.list();
+foreach ( $list as $item )
+{
+	$m = "<tr><th colspan=2 class='title'>"#$item#"</tr>";
+	$m.display();
+	$i = $item.get();
+	foreach ( $i as $r )
+	{
+		forboth ( $r as $n and $v )
+		{
+			if ( $n != "link" )
+			{
+				$m = "<tr><th>"#$n#"<td>"#$v#"</tr>";
+			}
+			else
+			{
+				$m = "<tr><th>&nbsp;<td>"#$v#"</tr>";
+			}
+			$m.display();
+		}
+	}
+}
+"</table></div></body></html>".display();
+
+

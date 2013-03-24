@@ -22,7 +22,7 @@
 					{
 						$m = $m#' name="'#$n#'"';
 					}
-					$n = $port["occi.user.from"];
+					$n = $port["occi.port.from"];
 					if ( $n == "(null)" ) { $n = ""; }
 					if ( $n.length() > 0 )
 					{
@@ -142,7 +142,7 @@
 		{
 			$m = $m#' name="'#$n#'"';
 		}
-		$m = $m#"/&gt;";
+		$m = $m#"&gt;";
 		$m.display();
 		$sid = $r["occi.infrastructure.compute"];
 		if ( $sid.length() > 0 )
@@ -201,7 +201,7 @@
 			{
 				$m = $m#' size="'#$n#'"';
 			}
-			$m = $m#"/&gt;";
+			$m = $m#"&gt;";
 			$m.display();
 		}
 		else
@@ -260,7 +260,7 @@
 		{
 			$m = $m#' agent="'#$n#'"';
 		}
-		$m = $m#"/&gt;";
+		$m = $m#"&gt;";
 		$m.display();
 		$sid = $r["occi.image.system"];
 		if ( $sid.length() > 0 )
@@ -310,6 +310,7 @@
 					{
 						$m = $m#' name="'#$n#'"';
 					}
+
 					$n = $node["occi.node.type"];
 					if ( $n.length() > 0 )
 					{
@@ -326,6 +327,11 @@
 						{
 							$m = $m#' category="'#$n#'"';
 						}
+					}
+					$n = $node["occi.node.entry"];
+					if ( $n.length() > 0 )
+					{
+						$m = $m#' entry="'#$n#'"';
 					}
 					$n = $node["occi.node.access"];
 					if ( $n.length() > 0 )

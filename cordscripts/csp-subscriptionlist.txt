@@ -99,6 +99,16 @@ function SubscriptionList( $aname )
 			$what = $record["occi.computenext_configuration.namespace"];
 			$script = "csp-subcn.txt";
 			break;
+		case	"easiclouds"		:
+			$record = easiclouds_configuration.list('occi.easiclouds_configuration.name="'#$aname#'"');
+			$rid = $record[0];
+			$record = $rid.get();
+			$host = $record["occi.easiclouds_configuration.host"];
+			$user = $record["occi.easiclouds_configuration.user"];
+			$pass = $record["occi.easiclouds_configuration.password"];
+			$what = $record["occi.easiclouds_configuration.namespace"];
+			$script = "csp-subez.txt";
+			break;
 		default			:
 			$host = ""; 
 			$user = ""; 

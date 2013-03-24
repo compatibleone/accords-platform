@@ -1,48 +1,183 @@
 	include "csp-header.txt";
+	include "csp-main.txt";
 
+	function ShowContract( $contract, $provider )
+	{
+		$m = "<tr>";
+		$n = $contract["occi.contract.name"];
+		$m = $m#"<td>"#$n;
+		$pn = $contract["occi.contract.profile"];
+		$m = $m#"<td>"#$pn;
+		$n = $contract["occi.contract.hostname"];
+		$nid = $contract["occi.contract.node"];
+		$hostname = NodeEntry( $nid, $n );
+		if ( $hostname != $n )
+		{ 	$m = $m#"<td><a href='"#$hostname#"'>"#$hostname#"</a>";	}
+		else
+		{	$m = $m#"<td>"#$hostname;					}
+		$n = $contract["occi.contract.state"];
+		if ( $n > 0 )
+		{	$m = $m#"<td>Deployed since";		}
+		else
+		{	$m = $m#"<td>&nbsp;";		}
+		$n = $contract["occi.contract.when"];
+		$n = $n.date();
+		$m = $m#"<td>"#$n;
+		$m.display();
+		$pr = $provider.get();
+		$pp = "occi."#$pn#".price";
+		$prix = $pr[$pp];
+		if ( $prix.length() > 0 )
+		{	
+			$price = $prix.get();
+			$fixed = $price["occi.price.fixed"];
+			$rate  = $price["occi.price.rate"];
+			$rate = $rate.round(2);
+			if ( $fixed == "yes" )
+			{
+				$m = "<td><div align=right>"#$rate#"</right>";
+				$m.display();
+			}
+			else
+			{
+				$period = $price["occi.price.period"];
+				$m = "<td><div align=right>"#$rate#"€ / "#$period#"</right>";
+				$m.display();
+			}
+		}
+		else
+		{
+			"<td>&nbsp;".display();
+		}
 
-	HtmlHeader("Accords Platform Service and Contracts",$1);
+	}
 
-	$sid = $2;
+	HtmlHeader("Accords Platform Service Report",$1);
 
-	$services = service.get('"occi.core.id="'#$sid#'"');
-	$service  = $services[0];
+	$service = $2;
 
 	if ($service.length() > 0 )
 	{
 		$record = $service.get();
+		$sid    = $record["occi.core.id"];
+
+		$m = "<tr><td class=title colspan=6>Service</td></tr>";
+		$m.display();
+		$m = "<tr><td><b>Reference</b><td colspan=4>"#$service#"</td>";
+		$m.display();
+		$state = $record["occi.service.state"];
+		$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+		$m.display();
+
+		if ( $state > 0 )
+		{	"<input type=submit class=action name=action value='stop service'></form></tr>".display();	}
+		else
+		{	"<input type=submit class=action name=action value='start service'></form></tr>".display();	}
+
+		$aid     = $record["occi.service.account"];
+		$account = $aid.get();
+		$slaid   = $record["occi.service.sla"];
+		$sla     = $slaid.get();
+		$manid   = $record["occi.service.manifest"];
+		$manifest= $manid.get();
+
+		$m = "<tr>";
+		$name = $account["occi.account.name"];
+		$m = $m#"<td><b>Account</b><td>"#$name;
+		$name = $sla["occi.agreement.name"];
+		$m = $m#"<td><b>Agreement</b><td>"#$name;
+		$name = $manifest["occi.manifest.name"];
+		$m = $m#"<td><b>Manifest</b><td>"#$name;
+		$m.display();
+
+		$m = "<tr>";
+		$value = $record["occi.service.initiation"];
+		if ( $value == "now" )   { $value = "now".date();  }
+		else			 { $value = $value.date(); }
+		$m = $m#"<td><b>Initiation</b><td>"#$value;
+		$value = $record["occi.service.expiration"];
+		if ( $value != "never" ) { $value = $value.date(); }
+		$m = $m#"<td><b>Expires</b><td>"#$value;
+
+		$value = $record["occi.service.when"];
+		$value = $value.date(); 
+		$state = $record["occi.service.state"];
+		if ( $state > 0 )
+		{ 	$m = $m#"<td><b>Deployed Since</b><td>"#$value;	}
+		else
+		{ 	$m = $m#"<td><b>Un-deployed Since</b><td>"#$value;	}
+		$m.display();
+
+		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td class=title>Date<td class=title>Price</tr>";
+		$m.display();
+
 		foreach ( $record as $tuple )
 		{
 			forboth ( $tuple as $name and $value )
 			{
-				if ( $name != "link" )
+				if ( $name == "link" )
 				{
-					if ( $name == "state" )
-					{	$state = $value; 	}
-					
-					$m = "<tr><td><div align=right>"#$name#"</div><td><input type=text name="#$name#" value='"#$value#"'></tr>";
-					$m.display();
-				}
-				else
-				{
-					$m = "<tr><td><div align=right>Contract</div>";
-					$m.display();
 					$contract = $value.get();
-					$n = $contract["occi.contract.name"];
-					$m = "<td><b>"#$n#"</b></tr>";
-					$m.display();
+					$p = $contract["occi.contract.provider"];
+					if ( $p.length() == 0 )
+					{
+						$p = $contract["occi.contract.service"];
+						if ( $p.length() > 0 )
+						{
+							$sr = $p.get();
+							foreach ( $sr as $st )
+							{
+								forboth ( $st as $sn and $sv )
+								{
+									if ( $sn == "link" )
+									{
+										$sc = $sv.get();
+										$sp = $sc["occi.contract.provider"];
+										ShowContract( $sc, $sp );
+									}
+								}
+							}
+
+						}
+					}
+					else
+					{
+						ShowContract($contract,$p);
+					}
 				}
 			}
 		}
-		if ( $state > 0 )
+	}
+	$m = "<tr><td class=title colspan=6>List of Primary Services</td></tr>";
+	$m.display();
+	$list = service.list();
+	foreach ( $list as $sid )
+	{
+		$selector = 'occi.contract.service="'#$sid#'"';
+		$dependance = contract.list( $selector );
+		$dependent = $dependance[0];
+		if ( $dependent.length() == 0 )
 		{
-			"<tr><td><div align=right>Action</div><td><input type=submit class=action name=action value='stop service'></tr>".display();
-		}
-		else
-		{
-			"<tr><td><div align=right>Action</div><td><input type=submit class=action name=action value='start service'></tr>".display();
+			$record = $sid.get();
+			$sla    = $record["occi.service.sla"];
+			if ( $sla.length() > 0 )
+			{
+				$agreement = $sla.get();
+				$aname = $agreement["occi.agreement.name"];
+				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sid#"</a></td>";
+				$state = $record["occi.service.state"];
+				if ( $state > 0 )
+				{ $m = $m#"<td>Deployed</td></tr>"; }
+				else
+				{ $m = $m#"<td>Created</td></tr>"; }
+				$m.display();
+			}
 		}
 	}
+		
+
+
+		$m = "<tr><td
 
 	HtmlFooter();
 

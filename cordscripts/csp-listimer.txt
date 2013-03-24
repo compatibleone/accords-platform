@@ -1,0 +1,28 @@
+"<html><head><title>Accords Platform Timer List</title></head>".display();
+"<body><div align=center><table width='90%' border=1><tr><th colspan=6><h1>Accords Platform Timer List</h1></tr>".display();
+$when = "now".date();
+$m = "<tr><th colspan=6><h2>"#$when#"</h2></tr>";
+$m.display();
+"<tr><th>ID<th>Account<th>Name<th>Period<th>Nature<th>Target".display();	
+
+	$list = timer.list();
+	foreach ( $list as $timer )
+	{
+		$m = "<tr><td>"#$timer;
+		$what = $timer.get();
+		$v = $what["occi.timer.account"];
+		$m = $m#"<td>"#$v;
+		$v = $what["occi.timer.name"];
+		$m = $m#"<td>"#$v;
+		$v = $what["occi.timer.period"];
+		$m = $m#"<td>"#$v;
+		$v = $what["occi.timer.nature"];
+		$m = $m#"<td>"#$v;
+		$v = $what["occi.timer.target"];
+		$m = $m#"<td>"#$v;
+		$m.display();
+	}
+
+"</table></div></body></html>".display();
+
+

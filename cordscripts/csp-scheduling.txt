@@ -37,6 +37,9 @@ include "csp-header.txt";
 		{
 			switch ( $url )
 			{
+			case	"paas"	:
+			case	"easiclouds"	:
+			case	"computenext"	:
 			case	"openstack"	:
 			case	"opennebula"	:
 			case	"windowsazure"	:

@@ -59,7 +59,7 @@
 		$filter = "occi.contract.parentservice="#$service;
 		$contracts = contract.count( $filter );
 		$sm = "<tr><td rowspan="#$contracts#"><img src=bluecloud.png>";
-		$url = $baseurl#"?action=compile&output=HTML&script=csp-service.txt&option="#$sid;
+		$url = $baseurl#"?action=compile&output=HTML&script=csp-service.txt&option="#$service;
 		$sm = $sm#"<a href='"#$url#"'>"#$sid#"</a>";
 		$sm = $sm#"<td rowspan="#$contracts#">";
 		$url = $baseurl#"?action=compile&output=HTML&script=csp-account.txt&option="#$acname;

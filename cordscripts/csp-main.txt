@@ -1,30 +1,34 @@
 	function NodeEntry( $nid, $host )
 	{ 
-		$node = $nid.get();
-		$nn   = $node["occi.node.name"];
-		$e    = $node["occi.node.entry"];
-		$fid  = $node["occi.node.firewall"];
-		$fw   = $fid.get();
-		foreach ( $fw as $tuple )
+		if ( $host.length() > 0 )
 		{
-			forboth ( $tuple as $name and $value )
+			$node = $nid.get();
+			$nn   = $node["occi.node.name"];
+			$e    = $node["occi.node.entry"];
+			$fid  = $node["occi.node.firewall"];
+			$fw   = $fid.get();
+			foreach ( $fw as $tuple )
 			{
-				if ( $name == "link" )
+				forboth ( $tuple as $name and $value )
 				{
-					$p = $value.get();
-					$port = $p["occi.port.from"];
-					$pn   = $p["occi.port.name"];
-					if ( $pn == $e )
+					if ( $name == "link" )
 					{
-						$prefix = "http";
-						$u = $prefix#"://"#$host#":"#$port#"/";
-						return( $u );
+						$p = $value.get();
+						$port = $p["occi.port.from"];
+						$pn   = $p["occi.port.name"];
+						if ( $pn == $e )
+						{
+							$prefix = "http";
+							if ($port.length() > 0)
+							{	$u = $prefix#"://"#$host#":"#$port#"/";	}
+							else
+							{	$u = $prefix#"://"#$host#"/";		}
+							return( $u );
+						}
 					}
 				}
 			}
 		}
 		return( $host );
 	}
-
-
 
