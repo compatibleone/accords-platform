@@ -43,6 +43,7 @@ struct	colog_module
 	struct	colog_request * first;
 	struct 	colog_request * last;
 	int	pid;
+	int	tid;
 	char *	name;
 	char *	host;
 	int	port;
@@ -57,6 +58,7 @@ struct	colog_event
 	struct	colog_event * next;
 	struct	colog_module * from;
 	struct 	colog_module * to;
+	char *	method;
 	int	when;
 	int	dir;
 	int	response;
@@ -124,19 +126,25 @@ private	struct colog_event * allocate_event()
 /*	---------------------------------	*/
 /*	   r e s o l v e _ b y _ p i d 		*/
 /*	---------------------------------	*/
-private	struct	colog_module * resolve_by_pid( int pid )
+private	struct	colog_module * resolve_by_pid( int pid, int tid )
 {
 	struct	colog_module * mptr;
 	for (	mptr=Manager.FirstModule;
 			mptr != (struct colog_module *) 0;
 			mptr = mptr->next )
-		if ( mptr->pid == pid )
-			return( mptr );
+	{
+		if ( mptr->pid != pid )
+			continue;
+		else if ( mptr->tid != tid )
+			continue;
+		else	return( mptr );
+	}
 	if (!( mptr = allocate_module()))
 			return( mptr );
 	else 
 	{
 		mptr->pid = pid;
+		mptr->tid = tid;
 		if (!( mptr->previous = Manager.LastModule ))
 			Manager.FirstModule = mptr;
 		else	mptr->previous->next = mptr;
@@ -340,12 +348,19 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 /*	---------------------------------	*/
 private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, int dir )
 {
+	char * method=(char *) 0;
 	struct colog_event * eptr;
 	if (!( eptr = allocate_event() ))
 		return( 27 );
 	else if (!( eptr->previous = Manager.LastEvent ))
 		Manager.FirstEvent = eptr;
 	else	eptr->previous->next = eptr;
+
+	wptr = scanpast(( method = wptr), ' ');
+
+	if ( method )
+		if (!( eptr->method = allocate_string( method ) ))
+			return(27);
 	Manager.LastEvent = eptr;
 	eptr->when = when;
 	eptr->dir  = dir;
@@ -368,13 +383,16 @@ private	int	colog_use_line( char * buffer )
 	char *	vptr;
 	int	when;
 	int	what;
-	char * who;
+	int	thrd;
+	char * 	who;
 	int	dir;
 	struct	colog_module * mptr;
 	wptr = scanpast(vptr=wptr,':');
 	when = atoi(vptr);
 	wptr = scanpast(vptr=wptr,':');
 	what = atoi(vptr);
+	wptr = scanpast(vptr=wptr,':');
+	thrd = atoi(vptr);
 	if (!( what )) return(0);
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(who=wptr,'/');
@@ -387,7 +405,7 @@ private	int	colog_use_line( char * buffer )
 	else if (!( strcmp( vptr, "-->" ) ))
 		dir = 1;
 	else	dir = 0;
-	if (!( mptr = resolve_by_pid( what ) ))
+	if (!( mptr = resolve_by_pid( what, thrd ) ))
 		return( 27 );
 	else if ( mptr->name )
 		return( colog_use_event( mptr, wptr, when, dir ));
@@ -456,7 +474,7 @@ private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
 	printf("<p><table width='90%'><tr><th colspan=4>COLOG Module List</th></tr>\n");
-	printf("<tr><th>Number<th>Name<th>Process<th>URL</tr>\n");
+	printf("<tr><th>Number<th>Name<th>Process<th>Thread<th>URL</tr>\n");
 	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
@@ -469,6 +487,11 @@ private	void	colog_show_modules()
 		if ( mptr->pid )
 			printf("<td>%u",mptr->pid);
 		else	printf("<td>&nbsp;");
+
+		if ( mptr->tid )
+			printf("<td>%u",mptr->tid);
+		else	printf("<td>&nbsp;");
+
 
 		printf("<td>%s", ( mptr->host ? mptr->host : "&nbsp;" ));
 
@@ -487,7 +510,7 @@ private	void	colog_show_modules()
 private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
-	printf("<tr>\n");
+	printf("<tr><th>#<th>&nbsp;\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
@@ -515,14 +538,15 @@ private	void	colog_show_detail()
 	int	n;
 	int	from=0;
 	int	to=0;
-	int	items=0;
 	char *	ifrom;
 	char *	ito;
+	int	items=0;
 	struct	colog_event * eptr;
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
 	struct	colog_module * left;
 	struct	colog_module * right;
+	int	total=0;
 
 	for (	eptr=Manager.FirstEvent;
 		eptr !=(struct colog_event *) 0;
@@ -549,7 +573,7 @@ private	void	colog_show_detail()
 			items=1;
 		}
 
-		printf("<tr>");
+		printf("<tr><th>%u<th>",++total,(eptr->method ? eptr->method : ""));
 
 		/* -------------------------------------- */
 		/* reorganise as from smallest to largest */
@@ -632,13 +656,8 @@ private	void	colog_show_detail()
 private	void	colog_show_result()
 {
 	printf("<html><head><title>colog module list</title>\n");
-	printf("<style>\n");
-	printf("table { border-width: 0px; padding: 0px; margin: 0px; }\n");
-	printf("td  { width: 80px; border-width: 0px; padding: 0px; margin: 0px; }\n");
-	printf("th  { width: 80px; border-width: 0px; background-color: grey; padding: 0px; margin: 0px; }\n");
-	printf("tr  { border-width: 0px; padding: 0px; margin: 0px; }\n");
-	printf(".nb { border-style: none; }\n");
-	printf(".b  { background-color: grey; border-style: solid; }\n");
+	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"SCREEN\">\n");
+	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"PRINT\">\n");
 	printf("</style></head>\n");
 	printf("<body><div align=center>\n");
 	colog_show_modules();

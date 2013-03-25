@@ -1,0 +1,30 @@
+table 
+{ 
+	border-width: 0px; padding: 0px; margin: 0px; 
+}
+
+td  
+{ 
+	width: 80px; border-width: 0px; padding: 0px; margin: 0px; 
+}
+
+th  
+{ 
+	width: 80px; border-width: 0px; background-color: grey; padding: 0px; margin: 0px; 
+}
+
+tr  
+{ 
+	border-width: 0px; padding: 0px; margin: 0px; 
+}
+
+.nb 
+{ 
+	border-style: none; 
+}
+
+.b  
+{ 
+	background-color: grey; border-style: solid; 
+}
+

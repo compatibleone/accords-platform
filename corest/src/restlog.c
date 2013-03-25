@@ -109,6 +109,16 @@ public 	int	rest_log_comons( char * buffer, char * nature )
 }
 
 /*	---------------------------------------------------------	*/
+/*			r e s t _ t h r e a d _ i d 			*/
+/*	---------------------------------------------------------	*/
+private	int	rest_thread_id()
+{
+	pthread_t	t;
+	t = pthread_self();
+	return((int) t);
+}
+
+/*	---------------------------------------------------------	*/
 /*		    r e s t _ l o g _ f i l e 				*/
 /*	---------------------------------------------------------	*/
 public 	int	rest_log_file( char * buffer )
@@ -121,7 +131,7 @@ public 	int	rest_log_file( char * buffer )
 		return(46);
 	else
 	{
-		fprintf(h,"%u:%u: %s\n",time((long *) 0),getpid(),buffer);
+		fprintf(h,"%u:%u:%u: %s\n",time((long *) 0),getpid(),rest_thread_id(),buffer);
 		fclose(h);
 		return(0);
 	}
