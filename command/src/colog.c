@@ -293,7 +293,7 @@ private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 /*	---------------------------------------		*/
 /*	c o l o g _ r e c e i v e d _ e v e n t 	*/
 /*	---------------------------------------		*/
-private	void	colog_received_event( struct colog_event * eptr, char * wptr )
+private	int	colog_received_event( struct colog_event * eptr, char * wptr )
 {
 	struct	colog_module * mptr;
 	struct	colog_module * self;
@@ -306,7 +306,9 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(method=wptr,' ');
 	if (!( what = colog_http_method( method ) ))
-		return;
+		return(30);
+	else if (!( eptr->method = allocate_string( method )))
+		return(27);
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(object=wptr,' ');
 
@@ -314,7 +316,7 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 	if ( what > 5 ) 
 	{
 		eptr->response = 1;
-		return;
+		return(31);
 	}
 
 	if (!( self->host ))
@@ -338,7 +340,7 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 				self->object = liberate( self->object );
 		}
 	}
-	return;
+	return(0);
 }
 
 /*	---------------------------------	*/
@@ -346,7 +348,6 @@ private	void	colog_received_event( struct colog_event * eptr, char * wptr )
 /*	---------------------------------	*/
 private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, int dir )
 {
-	char * method=(char *) 0;
 	struct colog_event * eptr;
 	if (!( eptr = allocate_event() ))
 		return( 27 );
@@ -354,11 +355,6 @@ private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, 
 		Manager.FirstEvent = eptr;
 	else	eptr->previous->next = eptr;
 
-	wptr = scanpast(( method = wptr), ' ');
-
-	if ( method )
-		if (!( eptr->method = allocate_string( method ) ))
-			return(27);
 	Manager.LastEvent = eptr;
 	eptr->when = when;
 	eptr->dir  = dir;
@@ -472,7 +468,7 @@ private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
 	printf("<p><table width='90%'><tr><th colspan=4>COLOG Module List</th></tr>\n");
-	printf("<tr><th>Number<th>Name<th>Process<th>Thread<th>URL</tr>\n");
+	printf("<tr><th>Number<th>Name<th>Process<th>URL</tr>\n");
 	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
@@ -485,11 +481,6 @@ private	void	colog_show_modules()
 		if ( mptr->pid )
 			printf("<td>%u",mptr->pid);
 		else	printf("<td>&nbsp;");
-
-		if ( mptr->tid )
-			printf("<td>%u",mptr->tid);
-		else	printf("<td>&nbsp;");
-
 
 		printf("<td>%s", ( mptr->host ? mptr->host : "&nbsp;" ));
 
