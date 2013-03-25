@@ -247,7 +247,7 @@ private	int	colog_http_method( char * mptr )
 /*	---------------------------------	*/
 /*	 c o l o g _ s e n t _ e v e n t  	*/
 /*	---------------------------------	*/
-private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
+private	int	colog_sent_event( struct colog_event * eptr, char * wptr )
 {
 	struct	colog_module * mptr;
 	struct	url * uptr;
@@ -257,7 +257,7 @@ private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(method=wptr,' ');
 	if (!( what = colog_http_method( method ) ))
-		return;
+		return(30);
 	else if (!( eptr->method = allocate_string( method )))
 		return(27);
 	while ( *wptr == ' ' ) wptr++;
@@ -267,28 +267,28 @@ private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 	if ( what > 5 ) 
 	{
 		eptr->response = 1;
-		return;
+		return(31);
 	}
 
 	if (!( uptr = analyse_url( object )))
-		return;
+		return(31);
 
 	else if (!( mptr = resolve_by_url( uptr )))
 	{
 		uptr = liberate_url( uptr );
-		return;
+		return(31);
 	}
 	else if (!( mptr->object = allocate_string( uptr->object ) ))
 	{
 		uptr = liberate_url( uptr );
-		return;
+		return(27);
 	}
 	else
 	{
 		mptr->event = eptr;
 		eptr->to = mptr;
 		uptr = liberate_url( uptr );
-		return;
+		return(0);
 	}
 }
 
@@ -304,7 +304,7 @@ private	int	colog_received_event( struct colog_event * eptr, char * wptr )
 	char *	object;
 	int	what;
 	if (!( self = eptr->from ))
-		return;
+		return(118);
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(method=wptr,' ');
 	if (!( what = colog_http_method( method ) ))
@@ -324,11 +324,11 @@ private	int	colog_received_event( struct colog_event * eptr, char * wptr )
 	if (!( self->host ))
 	{
 		if (!( mptr = resolve_by_object( object ) ))
-			return;
+			return(78);
 		else if (!( mptr->host ))
-			return;
+			return(118);
 		else if (!( self->host = allocate_string( mptr->host ) ))
-			return;
+			return(27);
 		else 
 		{
 			self->port = mptr->port;
