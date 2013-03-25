@@ -135,8 +135,6 @@ private	struct	colog_module * resolve_by_pid( int pid, int tid )
 	{
 		if ( mptr->pid != pid )
 			continue;
-		else if ( mptr->tid != tid )
-			continue;
 		else	return( mptr );
 	}
 	if (!( mptr = allocate_module()))
