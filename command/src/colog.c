@@ -258,6 +258,8 @@ private	void	colog_sent_event( struct colog_event * eptr, char * wptr )
 	wptr = scanpast(method=wptr,' ');
 	if (!( what = colog_http_method( method ) ))
 		return;
+	else if (!( eptr->method = allocate_string( method )))
+		return(27);
 	while ( *wptr == ' ' ) wptr++;
 	wptr = scanpast(object=wptr,' ');
 
