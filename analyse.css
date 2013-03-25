@@ -1,19 +1,19 @@
-table 
+.at
 { 
 	border-width: 0px; padding: 0px; margin: 0px; 
 }
 
-td  
+.atd  
 { 
 	width: 80px; border-width: 0px; padding: 0px; margin: 0px; 
 }
 
-th  
+.ath  
 { 
 	width: 80px; border-width: 0px; background-color: grey; padding: 0px; margin: 0px; 
 }
 
-tr  
+.atr  
 { 
 	border-width: 0px; padding: 0px; margin: 0px; 
 }
