@@ -564,7 +564,7 @@ private	void	colog_show_detail()
 			items=1;
 		}
 
-		printf("<tr><th class=ath>%u<th class=ath>",++total,(eptr->method ? eptr->method : ""));
+		printf("<tr><th class=ath>%u<th class=ath>%s",++total,(eptr->method ? eptr->method : ""));
 
 		/* -------------------------------------- */
 		/* reorganise as from smallest to largest */
