@@ -23,28 +23,28 @@ class user_role extends role
 	{
 		$this->page->tabpage = $t;
 
-		$tabimage1 = "imgs/tabsla.png";
-		$tabimage2 = "imgs/tabprovisioning.png";
-		$tabimage3 = "imgs/tabfinancial.png";
-		$tabimage4 = "imgs/tabscript.png";
-		$tabimage5 = "imgs/tabmenu.png";
+		$tabimage1 = "images/tabsla.png";
+		$tabimage2 = "images/tabprovisioning.png";
+		$tabimage3 = "images/tabfinancial.png";
+		$tabimage4 = "images/tabscript.png";
+		$tabimage5 = "images/tabmenu.png";
 
 		switch ( $this->page->tabpage )
 		{
 		case	5 :
-			$tabimage5 = "imgs/actmenu.png";
+			$tabimage5 = "images/actmenu.png";
 			break;
 		case	4 :
-			$tabimage4 = "imgs/actscript.png";
+			$tabimage4 = "images/actscript.png";
 			break;
 		case	3 :
-			$tabimage3 = "imgs/actfinancial.png";
+			$tabimage3 = "images/actfinancial.png";
 			break;
 		case	2 :
-			$tabimage2 = "imgs/actprovisioning.png";
+			$tabimage2 = "images/actprovisioning.png";
 			break;
 		case	1 :
-			$tabimage1 = "imgs/actsla.png";
+			$tabimage1 = "images/actsla.png";
 			break;
 		}
 
@@ -100,10 +100,21 @@ class user_role extends role
 				$result = compile_and_run($this->page);
 				break;
 
-
+			/* -------------------------- */
 			/* script launched operations */
 			/* -------------------------- */
 
+			case	"delete log"		:
+				$this->page->tabpage="2";
+				$this->display_tabs( $this->page->tabpage );
+				$this->page->delete_log( $this->page );
+				break;
+
+			case	"analyse log"		:
+				$this->page->tabpage="2";
+				$this->display_tabs( $this->page->tabpage );
+				$this->page->analyse_log( $this->page );
+				break;
 
 			case	"create provider"	:
 
@@ -121,15 +132,36 @@ class user_role extends role
 				break;
 
 			case	"add account user"		:
-
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
-				$args = $args." user=".$_REQUEST['username']." pass=".$_REQUEST['password']." mail=".$_REQUEST['mail']." role=".$_REQUEST['role'];
+				$args = $args." user=".$_REQUEST['username'];
+				$args = $args." pass=".$_REQUEST['password'];
+				$args = $args." mail=".$_REQUEST['mail'];
+				$args = $args." role=".$_REQUEST['role'];
 				compile_cordscript( "csp-adduser.txt", $this->page,"HTML", $args );
 				break;
 
-			case	"create sla"		:
+			case	"add federation"		:
+				$args = $this->page->user;
+				$args = $args." name=".$_REQUEST['name'];
+				$args = $args." user=".$_REQUEST['user'];
+				$args = $args." password=".$_REQUEST['password'];
+				$args = $args." host=".$_REQUEST['host'];
+				$args = $args." security=".$_REQUEST['security'];
+				compile_cordscript( "csp-updfederation.txt", $this->page,"HTML", $args );
+				break;
 
+			case	"update user"		:
+				$args = $this->page->user;
+				$args = $args." id=".$_REQUEST['id'];
+				$args = $args." user=".$_REQUEST['username'];
+				$args = $args." pass=".$_REQUEST['password'];
+				$args = $args." mail=".$_REQUEST['mail'];
+				$args = $args." role=".$_REQUEST['role'];
+				compile_cordscript( "csp-upduser.txt", $this->page,"HTML", $args );
+				break;
+
+			case	"create sla"		:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
 				$args = $args." desc='".$_REQUEST['desc']."'";
@@ -151,6 +183,18 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updos.txt", $this->page,"HTML", $args );
 				break;
+
+			case	"add ez subscription"	:
+				$args = $this->page->user;
+				$args = $args." name=".$_REQUEST['name'];
+				$args = $args." host=".$_REQUEST['host'];
+				$args = $args." tenent=".$_REQUEST['tenent'];
+				$args = $args." user=".$_REQUEST['user'];
+				$args = $args." password=".$_REQUEST['password'];
+				$args = $args." iaas=".$_REQUEST['iaas'];
+				compile_cordscript( "csp-updez.txt", $this->page,"HTML", $args );
+				break;
+
 			case	"add on subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -160,6 +204,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updon.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add az subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -169,6 +214,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updaz.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add pp subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -178,6 +224,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updpp.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add pa subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -187,6 +234,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updpa.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add ec subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -196,6 +244,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updec.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add dc subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -206,9 +255,17 @@ class user_role extends role
 				compile_cordscript( "csp-upddc.txt", $this->page,"HTML", $args );
 				break;
 
+			case	"add cn subscription"	:
+				$args = $this->page->user;
+				$args = $args." name=".$_REQUEST['name'];
+				$args = $args." host=".$_REQUEST['host'];
+				$args = $args." tenent=".$_REQUEST['tenent'];
+				$args = $args." key=".$_REQUEST['key'];
+				$args = $args." secret=".$_REQUEST['secret'];
+				compile_cordscript( "csp-updcn.txt", $this->page,"HTML", $args );
+				break;
 
 			case	"add condition"		:
-
 				$args = $this->page->user;
 				$args = $args." id=".$_REQUEST['id'];
 				$args = $args." algorithm=".$_REQUEST['algo'];
@@ -330,8 +387,11 @@ class user_role extends role
 				break;
 
 			default	:
-				$this->page->tabpage="0";
+				$this->page->tabpage="5";
 				$this->display_tabs( $this->page->tabpage );
+				$_REQUEST['output']="HTML";
+				$_REQUEST['script']="csp-welcome.txt";
+				$result = compile_and_run($this->page);
 				break;
 			}
 		}
@@ -368,7 +428,7 @@ class user_role extends role
 		{
 		case	"4"	:
 			$this->page->comment("This page gives access to the Accords Platform Script Upload and Execution Operations");
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local cordscript document for upload, compile and execution";
 			print "<th colspan=4>\n";
 			require "compile.php";
@@ -377,11 +437,11 @@ class user_role extends role
 		case	"1"	:
 			$this->page->comment("This page gives access to the Accords Platform Manifest and Service Level Agreement Parsing Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local manifest document for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "upload.php";
-			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='imgs/agreement.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='images/agreement.png'></a></th>\n";
 			print "<th class=description>Use this option to create a service level agreement for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "sla.php";
@@ -390,7 +450,7 @@ class user_role extends role
 		case	"2"	:
 			$this->page->comment("This page gives access to Accords Platform Service Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/broker.png'></a></th>\n";
 			print "<th class=description>Use this option to broker and launch a service instance from a selected provisioning plan.";
 			print "<th colspan=4>";
 			print "<form action='dashboard.php' method='POST'>\n";
@@ -401,11 +461,13 @@ class user_role extends role
 			print "</select>\n";
 			print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='create service'></div></tr>\n";
 			print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='inspect plan'></div></tr>\n";
+			print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='analyse log'></div></tr>\n";
+			print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='delete log'></div></tr>\n";
 			print "</table></div>\n";
 			print "</form></tr>";
 			print "</tr>\n";
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='images/stop.png'></a></th>\n";
 	print "<th class=description>Use this option to terminate an active service instance and release all deployed resources. The service may be restarted using the appropriate service maintenance operation.";
 	print "<th colspan=4>";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -425,7 +487,7 @@ class user_role extends role
 	print "</table></div>\n";
 	print "</form></tr>";
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='images/start.png'></a></th>\n";
 	print "<th class=description>Use this option to restart a terminated service instance and deploy all provisioned resources.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -445,7 +507,7 @@ class user_role extends role
 	print "</form><p>\n";
 			$this->page->separator();
 
-	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='imgs/check2.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='images/check2.png'></a></th>\n";
 	print "<th class=description>Use this option to snapshot or save the state of the machine images of the contracts of a service.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -468,7 +530,7 @@ class user_role extends role
 		case	"3"	:
 			$this->page->comment("This page gives access to the Accords Platform Account Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/invoice.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/invoice.png'></a></th>\n";
 			print "<th class=description>Use this option to collect the transactions for a specifed account and generate the invoice.";
 			print "<p>This option also permits the selection of a particular invoice for consultation, update processing or closure.";
 			print "<th colspan=4>\n";

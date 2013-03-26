@@ -183,7 +183,7 @@ class	page_manager
 		}
 		print "<table width='98%'><tr><th class=category><div align=center><p>\n";
 		print "<table width='98%'>\n";
-		print "<tr><th class=banner colspan=6><div align=left><img src='imgs/banner.png'></div>\n";
+		print "<tr><th class=banner colspan=6><div align=left><img src='images/banner.png'></div>\n";
 	}
 
 	/*	---------------------------	*/
@@ -197,7 +197,7 @@ class	page_manager
 			for ( $i=0; $i < strlen( $n ); $i += 1 )
 			{
 				$c = substr( $n,$i, 1);
-				print "<img width='40' height='48' src='imgs/".$c."-icon.png'>\n";
+				print "<img width='40' height='48' src='images/".$c."-icon.png'>\n";
 			}
 		}
 		else	{	print $n;	}
@@ -229,7 +229,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='imgs/".$n.".png'>";
+		print "<img width=128 height=158 src='images/".$n.".png'>";
 		print "</a></th>";
 		print "<td class='category'>";
 		print "<table><tr><td class='category'>&nbsp;</td><tr>\n";
@@ -240,6 +240,21 @@ class	page_manager
 		print "<tr><td class='category'>&nbsp;</td><tr></table></tD>\n";
 	}
 
+	public	function analyse_log($p)
+	{
+		$a = array();
+		$v = exec( "bash $configdir/dashboard-analyse", &$a);
+		$p->html_output( "Log Analysis", $a );
+		return("analyse");
+	}
+
+	public	function delete_log($p)
+	{
+		$a = array();
+		$v = exec( "rm $configdir/co-log -f", &$a);
+		return("delete");
+	}
+
 	/*	----------------------------------------	*/
 	/*	f u l l _ c o r d s _ s t a t i s t i c		*/
 	/*	----------------------------------------	*/
@@ -247,7 +262,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='imgs/".$n.".png'>";
+		print "<img width=128 height=158 src='images/".$n.".png'>";
 		print "</a></th><td class='value'>";
 		$v = exec("./dashboard-stat.sh cords_".$n);
 		$this->display_number($v);
@@ -261,7 +276,7 @@ class	page_manager
 	{
 		print "<th class='category'>";
 		$this->windowed_link( $a."/".$n."/" );
-		print "<img width=128 height=158 src='imgs/".$n.".png'>";
+		print "<img width=128 height=158 src='images/".$n.".png'>";
 		print "</a></th>";
 		print "<td class='category'>";
 		print "<table><tr><td class='category'>&nbsp;</td><tr>\n";
@@ -277,18 +292,18 @@ class	page_manager
 	/*	---------------------------------	*/
 	function functions()
 	{
-		print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
+		print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='images/start.png'></a></th>\n";
 		print "<th class=description>Use this option to access the service management functions";
-		print "<th class=category><a href=\"dashboard.php?action=check\"><img width='128' height='158' src='imgs/check.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=check\"><img width='128' height='158' src='images/check.png'></a></th>\n";
 		print "<th class=description>Use this option to verify the integrity of the complete collection of Accords Platform category managers.";
-		print "<th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='images/stop.png'></a></th>\n";
 		print "<th class=description>Use this option to access the service management functions";
 		$this->separator();
-		print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
+		print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 		print "<th class=description>Use this option to select a manifest document for upload or create a service level agreement. <p>The resulting documents will then be parsed into the Accords Platform OCCI database";
-		print "<th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/broker.png'></a></th>\n";
 		print "<th class=description>Use this option to select a provisioning plan, resulting from the parsing of an uploaded manifest or service level agreement. <p>The provisioning plan will then be used to broker a service instance and deploy the corresponding cloud resources.";
-		print "<th class=category><a href=\"dashboard.php?action=log\"><img width='128' height='158' src='imgs/inspect.png'></a></th>\n";
+		print "<th class=category><a href=\"dashboard.php?action=log\"><img width='128' height='158' src='images/inspect.png'></a></th>\n";
 		print "<th class=description>Use this option to inspect the accords platform log file.";
 	}
 
@@ -388,11 +403,11 @@ class	page_manager
 		case	"7"	:
 			$this->comment("This page gives access to the Accords Platform Parsing Operations");
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='imgs/parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local manifest document for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "upload.php";
-			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='imgs/agreement.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='images/agreement.png'></a></th>\n";
 			print "<th class=description>Use this option to create a service level agreement for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "sla.php";
@@ -401,7 +416,7 @@ class	page_manager
 		case	"8"	:
 			$this->comment("This page gives access to the Accords Platform Brokering and Invoice Operations");
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/broker.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/broker.png'></a></th>\n";
 			print "<th class=description>Use this option to broker and launch a service instance from a selected provisioning plan.";
 			print "<th colspan=4>";
 			print "<form action='dashboard.php' method='POST'>\n";
@@ -422,7 +437,7 @@ class	page_manager
 			print "</tr>\n";
 
 			$this->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='imgs/invoice.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/invoice.png'></a></th>\n";
 			print "<th class=description>Use this option to collect the transactions for a specifed account and generate the invoice.";
 			print "<p>This option also permits the selection of a particular invoice for consultation, update processing or closure.";
 			print "<th colspan=4>\n";
@@ -476,7 +491,7 @@ class	page_manager
 		print "<div class=tiny>".$this->copyright[1]."</div>\n";
 		print "</th></tr>\n";
 		print "</table></div></table><p></div></div><p>\n";
-		/*cedexis_radar("01-11403");*/
+		cedexis_radar("01-11403");
 		print "</body></html>\n";
 	}
 	

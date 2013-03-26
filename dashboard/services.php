@@ -12,7 +12,7 @@ public function create($p)
 	if ( $_REQUEST['upload'] != "" )
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-broker --verbose ".$_REQUEST['upload'],&$a);
+		$result = exec("bash ./dashboard-broker --no-deployment --verbose ".$_REQUEST['upload'],&$a);
 		$p->command_output( "Instance Plan", $a );
 		return( "instance" );
 	}

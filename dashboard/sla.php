@@ -1,6 +1,6 @@
 <?php
-require_once("dashboard.inc");
-global $configdir;
+	require_once("dashboard.inc");
+	global $configdir;
 
 	print "<form method=\"POST\" action=\"dashboard.php\">\n";
 
@@ -96,6 +96,19 @@ global $configdir;
 	print "<option value=high>high</option>\n";
 	print "<option value=normal>normal</option>\n";
 	print "<option value=low>low</option>\n";
+	print "</select></td></tr>\n";
+
+	/* --------------------- */
+	/* Load Balancer Options */
+	/* --------------------- */
+	print "<tr><td colspan=4><div align=left><b>Scalability Conditions</b></div></th></tr>\n";
+	print "<tr><td>Floor<td><input type=text name=ejf value=''></tr>";
+	print "<tr><td>Ceiling<td><input type=text name=ejc value=''></tr>";
+	print "<tr><td>Strategy<td><select style='width: 50mm;' name=ejs>\n";
+	print "<option value=301>301 Moved Permenant</option>\n";
+	print "<option value=302>302 Moved Temporary</option>\n";
+	print "<option value=303>303 Moved Temporary GET</option>\n";
+	print "<option value=307>307 Moved Temporary POST</option>\n";
 	print "</select></td></tr>\n";
 
 	print "<tr><td colspan=4><div align=left><b>Service Guarantees</b></div></th></tr>\n";

@@ -79,6 +79,17 @@ class	platform_operations
 		return( "start" );
 	}
 
+	/*	----------------------------------	*/
+	/* 		a n a l y s e _ l o g 		*/
+	/*	----------------------------------	*/
+	public function analyse_log($p)
+	{
+		$a = array();
+		exec("bash ./dashboard-analyse",&$a);
+		$p->command_output( "Log Analysis",$a );
+		return( "analysis" );
+	}
+
 	/*	---------------------------------	*/
 	/*	   c h e c k _ p l a t f o r m		*/
 	/*	---------------------------------	*/

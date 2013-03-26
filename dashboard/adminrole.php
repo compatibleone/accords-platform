@@ -20,7 +20,7 @@ class admin_role extends role
 	private function services()
 	{
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='imgs/stop.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='images/stop.png'></a></th>\n";
 	print "<th class=description>Use this option to terminate an active service instance and release all deployed resources. The service may be restarted using the appropriate service maintenance operation.";
 	print "<th colspan=4>";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -41,7 +41,7 @@ class admin_role extends role
 	print "</form></tr>";
 
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='imgs/start.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='images/start.png'></a></th>\n";
 	print "<th class=description>Use this option to restart a terminated service instance and deploy all provisioned resources.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -61,7 +61,7 @@ class admin_role extends role
 	print "</form><p>\n";
 
 	$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='imgs/check2.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='images/check2.png'></a></th>\n";
 	print "<th class=description>Use this option to snapshot or save the state of the machine images of the contracts of a service.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -88,31 +88,31 @@ class admin_role extends role
 	function display_tabs( $t )
 	{
 		$this->page->tabpage = $t;
-		$tabimage1 = "imgs/tabdashboard.png";
-		$tabimage2 = "imgs/tabprovisioning.png";
-		$tabimage3 = "imgs/tabsla.png";
-		$tabimage4 = "imgs/tabproviders.png";
-		$tabimage5 = "imgs/tabmonitoring.png";
-		$tabimage6 = "imgs/tabfinancial.png";
+		$tabimage1 = "images/tabdashboard.png";
+		$tabimage2 = "images/tabprovisioning.png";
+		$tabimage3 = "images/tabsla.png";
+		$tabimage4 = "images/tabproviders.png";
+		$tabimage5 = "images/tabmonitoring.png";
+		$tabimage6 = "images/tabfinancial.png";
 		switch ( $this->page->tabpage )
 		{
 		case	1 :
-			$tabimage1 = "imgs/actdashboard.png";
+			$tabimage1 = "images/actdashboard.png";
 			break;
 		case	2 :
-			$tabimage2 = "imgs/actprovisioning.png";
+			$tabimage2 = "images/actprovisioning.png";
 			break;
 		case	3 :
-			$tabimage3 = "imgs/actsla.png";
+			$tabimage3 = "images/actsla.png";
 			break;
 		case	4 :
-			$tabimage4 = "imgs/actproviders.png";
+			$tabimage4 = "images/actproviders.png";
 			break;	
 		case	5 :
-			$tabimage5 = "imgs/actmonitoring.png";
+			$tabimage5 = "images/actmonitoring.png";
 			break;
 		case	6 :
-			$tabimage6 = "imgs/actfinancial.png";
+			$tabimage6 = "images/actfinancial.png";
 			break;
 		}
 

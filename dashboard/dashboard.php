@@ -1,7 +1,7 @@
 <?php
 
 require_once( "dashboard.inc"	);
-/* require_once( "cedexis.inc"  	); */
+require_once( "cedexis.inc"  	);
 require_once( "platform.php"  	);
 require_once( "invoice.php"   	);
 require_once( "services.php"    );
@@ -152,6 +152,25 @@ function generate_sla($p)
 				$_REQUEST['slaenergy']);
 			fprintf($h,"</term>\n");
 		}
+		if ( $_REQUEST['ejf'] > '0' )
+		{
+			fprintf($h,"<term name=\":ef\" >\n");
+			fprintf($h,"<variable name=\":ef\" property=\"occi.elastic.floor\" condition=\"eq\" value=\"%s\"/>\n",
+				$_REQUEST['ejf']);
+			fprintf($h,"</term>\n");
+			if ( $_REQUEST['ejc'] > '0' )
+			{
+				fprintf($h,"<term name=\":ec\" >\n");
+				fprintf($h,"<variable name=\":ec\" property=\"occi.elastic.ceiling\" condition=\"eq\" value=\"%s\"/>\n",
+					$_REQUEST['ejc']);
+				fprintf($h,"</term>\n");
+			}
+			fprintf($h,"<term name=\":es\" >\n");
+			fprintf($h,"<variable name=\":es\" property=\"occi.elastic.strategy\" condition=\"eq\" value=\"%s\"/>\n",
+				$_REQUEST['ejs']);
+			fprintf($h,"</term>\n");
+		}
+
 		fprintf($h,"</terms>\n");
 		fprintf($h,"<terms name=\":g\" type=\"guarantees\">\n");
 		sla_guarantee( $h,1,$_REQUEST['gp1'],$_REQUEST['gc1'],$_REQUEST['gv1'],$_REQUEST['gb1'],$_REQUEST['gx1']);
@@ -361,7 +380,7 @@ function page_access($p)
 	{
 		$a = explode(":",$_COOKIE['session'] );
 
-		if ( ($a[2]+360) < ($now+0) )
+		if ( ($a[2]+900) < ($now+0) )
 		{	return( "incorrect session" );	}
 
 		$role = user_login( $a[0], $a[1] );

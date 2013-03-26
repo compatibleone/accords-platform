@@ -58,6 +58,9 @@ chmod uog+x dashboard-broker
 echo "/usr/local/bin/command --tls security/commandTls.xml --publisher $var invoice \$1 " > ./dashboard-invoice
 chmod uog+x dashboard-invoice
 
+echo "/usr/local/bin/command --tls security/commandTls.xml --publisher $var analyse co-log " > ./dashboard-analyse
+chmod uog+x dashboard-analyse
+
 echo "/usr/local/bin/command --tls security/commandTls.xml --publisher $var \$* " > ./dashboard-command
 chmod uog+x dashboard-command
 

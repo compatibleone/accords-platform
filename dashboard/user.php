@@ -1,6 +1,6 @@
 <?php
-require_once("dashboard.inc");
-global $configdir;
+	require_once("dashboard.inc");
+	global $configdir;
 
 	print "<form method=\"POST\" action=\"dashboard.php\">\n";
 
