@@ -1178,18 +1178,17 @@ private	void	colog_show_detail()
 	struct	colog_module * tptr;
 	struct	colog_module * left;
 	struct	colog_module * right;
+	char *	ifr;
+	char *	ifl;
+	char *	itr;
+	char *	itl;
+	char *	ith;
 	int	total=0;
 
 	for (	eptr=Manager.FirstEvent;
 		eptr !=(struct colog_event *) 0;
 		eptr = eptr->next )
 	{
-		if ( eptr->response )
-			continue;
-		else if (!( eptr->dir ))
-			continue;
-		else if ( eptr->dir > 1 )
-			continue;
 		if (!( fptr = eptr->from ))
 			continue;
 		else if (!( tptr = eptr->to ))
@@ -1205,7 +1204,27 @@ private	void	colog_show_detail()
 			items=1;
 		}
 
-		printf("<tr><th class=ath>%u<th class=ath>%s",++total,(eptr->method ? eptr->method : ""));
+		switch ( eptr->dir )
+		{
+		case	1	:
+			printf("<tr><th class=ath>%u<th class=ath>%s",++total,(eptr->method ? eptr->method : ""));
+			ifr = "reqfr.png";
+			itl = "reqtl.png";
+			ifl = "reqfl.png";
+			itr = "reqtr.png";
+			ith = "reqth.png";
+			break;
+		case	2	:
+			printf("<tr><th class=ath>%u<th class=ath>%u",++total,eptr->status);
+			ifr = "repfr.png";
+			itl = "reptl.png";
+			ifl = "repfl.png";
+			itr = "reptr.png";
+			ith = "repth.png";
+			break;
+		default		:
+			continue;
+		}
 
 		/* -------------------------------------- */
 		/* reorganise as from smallest to largest */
@@ -1217,8 +1236,8 @@ private	void	colog_show_detail()
 			left = tptr;
 			from = tptr->column;
 			to = fptr->column;
-			ito = "fromright.png";
-			ifrom = "toleft.png";
+			ito = ifr;
+			ifrom = itl;
 		}
 		else
 		{
@@ -1226,8 +1245,8 @@ private	void	colog_show_detail()
 			left = fptr;
 			from = fptr->column;
 			to = tptr->column;
-			ifrom = "fromleft.png";
-			ito = "toright.png";
+			ifrom = ifl;
+			ito = itr;
 		}
 
 		/* ----------------------- */
@@ -1258,7 +1277,7 @@ private	void	colog_show_detail()
 			n -= 1;
 			while ( n )
 			{
-				printf("<td class=nb><img src='through.png'></td>\n");
+				printf("<td class=nb><img src='%s'></td>\n",ith);
 				n--;
 			}
 		}
