@@ -210,10 +210,10 @@ private	struct colog_event * allocate_event()
 	}
 }
 
-/*	---------------------------------	*/
-/*	   r e s o l v e _ b y _ p i d 		*/
-/*	---------------------------------	*/
-private	struct	colog_module * resolve_module_by_pid( int pid )
+/*	-----------------------------------------	*/
+/*	 l o c a t e _ m o d u l e  b y _ p i d 	*/
+/*	----------------------------------------	*/
+private	struct	colog_module * locate_module_by_pid( int pid )
 {
 	struct	colog_module * mptr;
 	for (	mptr=Manager.FirstModule;
@@ -222,9 +222,20 @@ private	struct	colog_module * resolve_module_by_pid( int pid )
 	{
 		if ( mptr->pid != pid )
 			continue;
-		else	return( mptr );
+		else	break;
 	}
-	if (!( mptr = allocate_module()))
+	return( mptr );
+}
+
+/*	---------------------------------	*/
+/*	   r e s o l v e _ b y _ p i d 		*/
+/*	---------------------------------	*/
+private	struct	colog_module * resolve_module_by_pid( int pid )
+{
+	struct	colog_module * mptr;
+	if ((mptr = locate_module_by_pid( pid )) != (struct colog_module *) 0)
+		return( mptr );
+	else if (!( mptr = allocate_module()))
 			return( mptr );
 	else 
 	{
@@ -708,7 +719,7 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 		}
 		else if (!( mptr->pid )) 
 		{
-			if (!( xptr = resolve_module_by_pid( pid ) ))
+			if (!( xptr = locate_module_by_pid( pid ) ))
 			{
 				if (!(mptr->name = allocate_string( who ) ))
 				{
