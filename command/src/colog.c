@@ -42,9 +42,11 @@ struct	colog_event
 	struct	colog_module * from;
 	struct 	colog_module * to;
 	char *	method;
+	char *	object;
 	int	when;
 	int	dir;
 	int	status;
+	char *	message;
 	int	response;
 };
 
@@ -618,6 +620,9 @@ private	int	colog_request_event( struct colog_request * rptr )
 
 	eptr->when = rptr->when;
 	eptr->dir  = 1;
+	if (( rptr->object )
+	&&  ( rptr->object->object))
+		eptr->object = allocate_string( rptr->object->object );
 	eptr->from = rptr->from;
 	eptr->to   = rptr->to;
 	rptr->event= eptr;
@@ -641,6 +646,8 @@ private	int	colog_response_event( struct colog_request * qptr,struct colog_respo
 	eptr->when   = qptr->when;
 	eptr->dir    = 2;
 	eptr->status = aptr->status;
+	if ( aptr->message )
+		eptr->message = allocate_string( aptr->message );
 	eptr->from   = qptr->to;
 	eptr->to     = qptr->from;
 	aptr->event  = eptr;
@@ -1142,7 +1149,7 @@ private	void	colog_show_modules()
 private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
-	printf("<tr><th class=ath>#<th class=ath>&nbsp;\n");
+	printf("<tr><th class=ath>#<th class=ath>&nbsp;<th class=ath>Info\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
@@ -1207,7 +1214,9 @@ private	void	colog_show_detail()
 		switch ( eptr->dir )
 		{
 		case	1	:
-			printf("<tr><th class=ath>%u<th class=ath>%s",++total,(eptr->method ? eptr->method : ""));
+			printf("<tr><th class=ath>%u<th class=ath>%s<td class=msg>%s",++total,
+				(eptr->method ? eptr->method : ""),
+				(eptr->object ? eptr->object : ""));
 			ifr = "reqfr.png";
 			itl = "reqtl.png";
 			ifl = "reqfl.png";
@@ -1215,7 +1224,7 @@ private	void	colog_show_detail()
 			ith = "reqth.png";
 			break;
 		case	2	:
-			printf("<tr><th class=ath>%u<th class=ath>%u",++total,eptr->status);
+			printf("<tr><th class=ath>%u<th class=ath>%u<th class=msg>%s",++total,eptr->status,(eptr->message ? eptr->message : "&nbsp;"));
 			ifr = "repfr.png";
 			itl = "reptl.png";
 			ifl = "repfl.png";
@@ -1306,11 +1315,11 @@ private	void	colog_show_detail()
 /*	---------------------------------	*/
 private	void	colog_show_result()
 {
-	printf("<html><head><title>colog module list</title>\n");
+	printf("<html><head><title>Accords Platform LOG Analysis Report</title>\n");
 	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"SCREEN\">\n");
 	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"PRINT\">\n");
 	printf("</style></head>\n");
-	printf("<body><div align=center>\n");
+	printf("<body><div align=center><h1>Accords Platform LOG Analysis Report</h1><p>\n");
 	colog_show_modules();
 	printf("<p><table border=0>\n");
 	colog_show_header();

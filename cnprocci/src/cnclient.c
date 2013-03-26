@@ -21,7 +21,7 @@
 #include "cnclient.h"
 #include "encode64.c"
 
-public  struct cn_response * cn_allocate_config()
+public  struct cn_config * cn_allocate_config()
 {
 	struct	cn_config * sptr;
 	if (!( sptr = (struct cn_config *) allocate( sizeof( struct cn_config ) ) ))
