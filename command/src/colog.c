@@ -82,6 +82,7 @@ struct	colog_response
 
 struct	colog_analsis
 {
+	struct colog_module * TrashModule;
 	struct colog_module * FirstModule;
 	struct colog_module * LastModule;
 	struct colog_event * FirstEvent;
@@ -91,6 +92,7 @@ struct	colog_analsis
 } 
 Manager = 
 {
+	(struct colog_module *) 0,
 	(struct colog_module *) 0,
 	(struct colog_module *) 0,
 	(struct colog_event *) 0,
@@ -631,6 +633,23 @@ private	int	colog_response_event( struct colog_request * qptr,struct colog_respo
 	return( 0 );
 }
 
+/*	-----------------------------------	*/
+/*		d r o p _ m o d u l e		*/
+/*	-----------------------------------	*/
+private	void	forget_module( struct colog_module * mptr )
+{
+	if (!( mptr->previous ))
+		Manager.FirstModule = mptr->next;
+	else	mptr->previous->next = mptr->next;
+	if (!( mptr->next ))
+		Manager.LastModule = mptr->previous;
+	else	mptr->next->previous = mptr->previous;
+
+	mptr->next = Manager.TrashModule;
+	Manager.TrashModule = mptr;
+	return;
+}
+
 /*	-------------------------------------------	*/
 /*	c o l o g _ r e c e i v e d _ r e q u e s t	*/
 /*	-------------------------------------------	*/
@@ -639,6 +658,7 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 	struct	colog_request * rptr;
 	struct	colog_request * qptr;
 	struct	colog_module  * mptr;
+	struct	colog_module  * xptr;
 	int	status;
 
 	if (!( rptr = allocate_request()))
@@ -676,17 +696,25 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 				return( 27 );
 			}
 		}
-		else if ((!( mptr->name )) && (!( mptr->name = allocate_string( who ) )))
+		else if (!( mptr->pid )) 
 		{
-			liberate_request( rptr );
-			return( 27 );
+			if (!( xptr = resolve_module_by_pid( pid ) ))
+			{
+				if (!(mptr->name = allocate_string( who ) ))
+				{
+					liberate_request( rptr );
+					return( 27 );
+				}
+				else	mptr->pid = pid;
+			}
+			else
+			{
+				forget_module( mptr );
+				qptr->to = xptr;
+			}
 		}
-		else
-		{
-			mptr->pid = pid;
-			rptr->to = qptr->to;
-			rptr->from = qptr->from;
-		}
+		rptr->to = qptr->to;
+		rptr->from = qptr->from;
 
 		/* ----------------------- */
 		/* would add an event here */
