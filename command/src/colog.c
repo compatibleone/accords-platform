@@ -10,31 +10,14 @@
 #define	private	static
 #endif
 
+private	int	colog_sent_request(int when,int pid,int tid,char * who,int dir, char * method, char * object);
+private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, char * method, char * object);
+private	int	colog_sent_response(int when,int pid,int tid,char * who,int dir, char * object);
+private	int	colog_received_response(int when,int pid,int tid,char * who,int dir, char * object);
+
 int	maxcolumns=0;
 
-struct	colog_request
-{
-	int	number;
-	int	sent;
-	int	from;
-	int	received;
-	int	by;
-	char *	method;
-	char *	object;
-	char *	version;
-};
-
-struct	colog_reponse
-{
-	int	number;
-	int	sent;
-	int	from;
-	int	received;
-	int	by;
-	char *	version;
-	char *	status;
-	char *	message;
-};
+struct	colog_reponse;
 
 struct	colog_module
 {
@@ -43,7 +26,6 @@ struct	colog_module
 	struct	colog_request * first;
 	struct 	colog_request * last;
 	int	pid;
-	int	tid;
 	char *	name;
 	char *	host;
 	int	port;
@@ -61,7 +43,41 @@ struct	colog_event
 	char *	method;
 	int	when;
 	int	dir;
+	int	status;
 	int	response;
+};
+
+struct	colog_request
+{
+	struct	colog_request 	* previous;
+	struct	colog_request 	* next;
+	struct	colog_request	* received;
+	struct	colog_response	* response;
+	struct	colog_event   	* event;
+	struct	colog_module  	* from;
+	struct	colog_module  	* to;
+	int	when;
+	int	pid;
+	int	tid;
+	char *	method;
+	struct url * object;
+};
+
+struct	colog_response
+{
+	struct	colog_response  * previous;
+	struct	colog_response  * next;
+	struct	colog_request	* request;
+	struct	colog_event	* event;
+	struct	colog_module  	* from;
+	struct	colog_module  	* to;
+	int	when;
+	int	pid;
+	int	tid;
+	int	received;
+	char *	version;
+	int	status;
+	char *	message;
 };
 
 struct	colog_analsis
@@ -70,11 +86,17 @@ struct	colog_analsis
 	struct colog_module * LastModule;
 	struct colog_event * FirstEvent;
 	struct colog_event * LastEvent;
+	struct colog_request * FirstRequest;
+	struct colog_request * LastRequest;
 } 
 Manager = 
 {
 	(struct colog_module *) 0,
-	(struct colog_module *) 0
+	(struct colog_module *) 0,
+	(struct colog_event *) 0,
+	(struct colog_event *) 0,
+	(struct colog_request *) 0,
+	(struct colog_request *) 0
 };
 
 /*	---------------------------------	*/
@@ -109,6 +131,66 @@ private	struct colog_module * allocate_module()
 }
 
 /*	---------------------------------	*/
+/*	 l i b e r a t e _ r e q u e s t 	*/
+/*	---------------------------------	*/
+private	struct colog_request * liberate_request(struct colog_request * rptr)
+{
+	if ( rptr )
+	{
+		if ( rptr->method )
+			rptr->method = liberate( rptr->method );
+
+		if ( rptr->object )
+			rptr->object = liberate_url( rptr->object );
+
+		liberate( rptr );
+	}
+	return((struct colog_request *) 0);
+}
+
+/*	---------------------------------	*/
+/*	 a l l o c a t e _ r e q u e s t	*/
+/*	---------------------------------	*/
+private	struct colog_request * allocate_request()
+{
+	struct	colog_request * rptr;
+	if (!( rptr = (struct colog_request *) allocate( sizeof( struct colog_request ) )))
+		return( rptr );
+	else
+	{
+		memset(rptr,0,sizeof( struct colog_request ));
+		return( rptr );
+	}
+}
+
+/*	---------------------------------	*/
+/*	l i b e r a t e _ r e s p o n s e	*/
+/*	---------------------------------	*/
+private	struct colog_response * liberate_response(struct colog_response * rptr)
+{
+	if ( rptr )
+	{
+		liberate( rptr );
+	}
+	return((struct colog_response *) 0);
+}
+
+/*	---------------------------------	*/
+/*	a l l o c a t e _ r e s p o n s e	*/
+/*	---------------------------------	*/
+private	struct colog_response * allocate_response()
+{
+	struct	colog_response * rptr;
+	if (!( rptr = (struct colog_response *) allocate( sizeof( struct colog_response ) )))
+		return( rptr );
+	else
+	{
+		memset(rptr,0,sizeof( struct colog_response ));
+		return( rptr );
+	}
+}
+
+/*	---------------------------------	*/
 /*	   a l l o c a t e _ e v e n t		*/
 /*	---------------------------------	*/
 private	struct colog_event * allocate_event()
@@ -126,7 +208,7 @@ private	struct colog_event * allocate_event()
 /*	---------------------------------	*/
 /*	   r e s o l v e _ b y _ p i d 		*/
 /*	---------------------------------	*/
-private	struct	colog_module * resolve_by_pid( int pid, int tid )
+private	struct	colog_module * resolve_module_by_pid( int pid )
 {
 	struct	colog_module * mptr;
 	for (	mptr=Manager.FirstModule;
@@ -142,7 +224,6 @@ private	struct	colog_module * resolve_by_pid( int pid, int tid )
 	else 
 	{
 		mptr->pid = pid;
-		mptr->tid = tid;
 		if (!( mptr->previous = Manager.LastModule ))
 			Manager.FirstModule = mptr;
 		else	mptr->previous->next = mptr;
@@ -154,7 +235,7 @@ private	struct	colog_module * resolve_by_pid( int pid, int tid )
 /*	---------------------------------	*/
 /*	r e s o l v e _ b y _ o b j e c t	*/
 /*	---------------------------------	*/
-private	struct	colog_module * resolve_by_object( char * object )
+private	struct	colog_module * resolve_module_by_object( char * object )
 {
 	struct	colog_module * mptr;
 	for (	mptr=Manager.FirstModule;
@@ -173,23 +254,46 @@ private	struct	colog_module * resolve_by_object( char * object )
 /*	---------------------------------	*/
 /*	   r e s o l v e _ b y _ u r l 		*/
 /*	---------------------------------	*/
-private	struct	colog_module * resolve_by_url( struct url * uptr )
+private	struct	colog_module * resolve_module_by_url( struct url * uptr )
 {
 	struct	colog_module * mptr;
-	for (	mptr=Manager.FirstModule;
-		mptr != (struct colog_module *) 0;
-		mptr = mptr->next )
+
+	if (!( uptr ))
+		return((struct colog_module *) 0);
+	else if (!( uptr->host ))
 	{
-		if (!( mptr->host ))
-			continue;
-		else if ( strcmp( mptr->host, uptr->host ) != 0 )
-			continue;
-		else if ( mptr->port != uptr->port )
-			continue;
-		else	return( mptr );
+		if (( mptr = resolve_module_by_object( uptr->object )))
+			return( mptr );
+		else if (!( mptr = allocate_module()))
+			return( mptr );
+		else if (!( mptr->object = allocate_string( uptr->object ) ))
+			return((struct colog_module *) 0 );
+		else
+		{
+			if (!( mptr->previous = Manager.LastModule ))
+				Manager.FirstModule = mptr;
+			else	mptr->previous->next = mptr;
+			Manager.LastModule = mptr;
+			return( mptr );
+		}
+	}
+	else
+	{
+		for (	mptr=Manager.FirstModule;
+			mptr != (struct colog_module *) 0;
+			mptr = mptr->next )
+		{
+			if (!( mptr->host ))
+				continue;
+			else if ( strcmp( mptr->host, uptr->host ) != 0 )
+				continue;
+			else if ( mptr->port != uptr->port )
+				continue;
+			else	return( mptr );
+		}
 	}
 	if (!( mptr = allocate_module()))
-			return( mptr );
+		return( mptr );
 	else if (!( mptr->host = allocate_string( uptr->host ) ))
 		return((struct colog_module *) 0 );
 	else
@@ -201,6 +305,117 @@ private	struct	colog_module * resolve_by_url( struct url * uptr )
 		Manager.LastModule = mptr;
 		return( mptr );
 	}
+}
+
+/*	-------------------------------------------	*/
+/*	r e s o l v e _ r e q u e s t _ b y _ u r l 	*/
+/*	-------------------------------------------	*/
+private	struct	colog_request * resolve_request_by_url( struct url * optr )
+{
+	struct	url * uptr;
+	struct	colog_request * rptr;
+	for (	rptr=Manager.FirstRequest;
+		rptr != (struct colog_request *) 0;
+		rptr = rptr->next )
+	{
+		if (!( uptr = rptr->object ))
+			continue;
+		if (!( uptr->host ))
+			continue;
+		else if ( strcmp( uptr->host, optr->host ) != 0 )
+			continue;
+		else if ( uptr->port != optr->port )
+			continue;
+		else	return( rptr );
+	}
+	return( rptr );
+}
+
+/*	----------------------------------	*/
+/*	   r e s o l v e _ r e q u e s t 	*/
+/*	----------------------------------	*/
+private	struct	colog_request * resolve_request( char * method, char * object )
+{
+	struct	colog_request * rptr;
+	for (	rptr=Manager.FirstRequest;
+		rptr != (struct colog_request *) 0;
+		rptr = rptr->next )
+	{
+		if ( rptr->received )
+			continue;
+		else if (!( rptr->method ))
+			continue;
+		else if ( strcasecmp( rptr->method, method ) )
+			continue;
+		else if (!( rptr->object ))
+			continue;
+		else if (!( rptr->object->object ))
+			continue;
+		else if (!( strcmp( rptr->object->object, object ) ))
+			break;
+	}
+	return( rptr );
+}
+
+/*	----------------------------------	*/
+/*	 r e s o l v e _ r e s p on d e d 	*/
+/*	----------------------------------	*/
+private	struct	colog_request * resolve_responded( int pid, int tid )
+{
+	struct	colog_request * rptr;
+	struct	colog_request * qptr;
+	for (	rptr=Manager.FirstRequest;
+		rptr != (struct colog_request *) 0;
+		rptr = rptr->next )
+	{
+		if (!(qptr = rptr->received ))
+			continue;
+		else if (!( qptr->response ))
+			continue;
+		else if ( rptr->pid != pid )
+			continue;
+		else if ( rptr->tid != tid )
+			continue;
+		else	break;
+	}
+	return( rptr );
+}
+
+/*	----------------------------------	*/
+/*	 r e s o l v e _ r e c e i v e d	*/
+/*	----------------------------------	*/
+private	struct	colog_request * resolve_received( int pid, int tid )
+{
+	struct	colog_request  * qptr;
+	struct	colog_response * aptr;
+	struct	colog_request  * rptr;
+	for (	qptr=Manager.FirstRequest;
+		qptr != (struct colog_request *) 0;
+		qptr = qptr->next )
+	{
+		/* ----------------------------- */
+		/* eliminate if not yet received */
+		/* ----------------------------- */
+		if (!(rptr = qptr->received ))
+			continue;
+		/* -------------------------- */
+		/* eliminate if response sent */
+		/* -------------------------- */
+		else if ((aptr = rptr->response) != (struct colog_response *) 0)
+			continue;
+		/* ------------------------- */
+		/* ensure correct process id */
+		/* ------------------------- */
+		else if ( rptr->pid != pid )
+			continue;
+		/* ------------------------- */
+		/* ensure correct  thread id */
+		/* ------------------------- */
+		else if ( rptr->tid != tid )
+			continue;
+		else	break;
+	}
+	return( qptr );
 }
 
 /*	---------------------------------	*/
@@ -273,7 +488,7 @@ private	int	colog_sent_event( struct colog_event * eptr, char * wptr )
 	if (!( uptr = analyse_url( object )))
 		return(31);
 
-	else if (!( mptr = resolve_by_url( uptr )))
+	else if (!( mptr = resolve_module_by_url( uptr )))
 	{
 		uptr = liberate_url( uptr );
 		return(31);
@@ -323,7 +538,7 @@ private	int	colog_received_event( struct colog_event * eptr, char * wptr )
 
 	if (!( self->host ))
 	{
-		if (!( mptr = resolve_by_object( object ) ))
+		if (!( mptr = resolve_module_by_object( object ) ))
 			return(78);
 		else if (!( mptr->host ))
 			return(118);
@@ -370,10 +585,371 @@ private	int	colog_use_event( struct colog_module * mptr, char * wptr, int when, 
 	return( 0 );
 }
 
+/*	-------------------------------------	*/
+/*	c o l o g _ r e q u e s t _ e v e n t 	*/
+/*	-------------------------------------	*/
+private	int	colog_request_event( struct colog_request * rptr )
+{
+	struct colog_event * eptr;
+	if (!( eptr = allocate_event() ))
+		return( 27 );
+	else if (!( eptr->method = allocate_string(rptr->method)))
+		return(27);
+	else if (!( eptr->previous = Manager.LastEvent ))
+		Manager.FirstEvent = eptr;
+	else	eptr->previous->next = eptr;
+	Manager.LastEvent = eptr;
+
+	eptr->when = rptr->when;
+	eptr->dir  = 1;
+	eptr->from = rptr->from;
+	eptr->to   = rptr->to;
+	rptr->event= eptr;
+	return( 0 );
+}
+
+/*	--------------------------------------	*/
+/*	c o l o g _ r e s p o n s e_ e v e n t 	*/
+/*	--------------------------------------	*/
+private	int	colog_response_event( struct colog_request * qptr,struct colog_response * aptr )
+{
+	struct colog_event * eptr;
+
+	if (!( eptr = allocate_event() ))
+		return( 27 );
+	else if (!( eptr->previous = Manager.LastEvent ))
+		Manager.FirstEvent = eptr;
+	else	eptr->previous->next = eptr;
+
+	Manager.LastEvent = eptr;
+	eptr->when   = qptr->when;
+	eptr->dir    = 2;
+	eptr->status = aptr->status;
+	eptr->from   = qptr->from;
+	eptr->to     = qptr->to;
+	aptr->event  = eptr;
+	return( 0 );
+}
+
+/*	-------------------------------------------	*/
+/*	c o l o g _ r e c e i v e d _ r e q u e s t	*/
+/*	-------------------------------------------	*/
+private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, char * method, char * object)
+{
+	struct	colog_request * rptr;
+	struct	colog_request * qptr;
+	struct	colog_module  * mptr;
+	int	status;
+
+	if (!( rptr = allocate_request()))
+		return(27);
+	else if (!( rptr->method = allocate_string( method ) ))
+	{
+		liberate_request( rptr );
+		return(27);
+	}
+	else if (!( rptr->object = analyse_url( object ) ))
+	{
+		liberate_request( rptr );
+		return(27);
+	}
+	else
+	{
+		rptr->when = when;
+		rptr->pid  = pid;
+		rptr->tid  = tid;
+		/* ----------------------------------- */
+		/* is the original request on the heap */
+		/* ----------------------------------- */
+		if (!( qptr = resolve_request( rptr->method, object )))
+		{
+			if ((status = colog_sent_request(when,0,0,"unknown",1,method, object )) != 0)
+				return( status );
+			else if (!( qptr = resolve_request( rptr->method, object )))
+				return(78);
+		}
+		if (!( mptr = qptr->to ))
+		{
+			if (!( rptr->to = resolve_module_by_pid( pid ) ))
+			{
+				liberate_request( rptr );
+				return( 27 );
+			}
+		}
+		else if ((!( mptr->name )) && (!( mptr->name = allocate_string( who ) )))
+		{
+			liberate_request( rptr );
+			return( 27 );
+		}
+		else
+		{
+			mptr->pid = pid;
+			rptr->to = qptr->to;
+			rptr->from = qptr->from;
+		}
+
+		/* ----------------------- */
+		/* would add an event here */
+		/* ----------------------- */
+		if ( check_verbose() )
+			printf("recv request event(%u,%u,%u,%s,%s,%s)\n",when,pid,tid,who,method,object);		
+		qptr->received = rptr;
+		return(0);
+	}
+}
+
+/*	----------------------------------------	*/
+/*		d r o p _ r e q u e s t			*/
+/*	----------------------------------------	*/
+private	struct colog_request * drop_request( struct colog_request * rptr )
+{
+	struct	colog_request * qptr;
+	struct	colog_response * aptr;
+	
+	if ( rptr )
+	{
+		if ( check_verbose() )
+			printf("drop request\n");
+		if ((qptr = rptr->received) != (struct colog_request *) 0)
+		{
+			if ((aptr = qptr->response) != (struct colog_response *) 0)
+				aptr = liberate_response( aptr );
+			qptr = liberate_request( qptr );
+		}
+		if (!( rptr->previous ))
+			Manager.FirstRequest = rptr->next;
+		else	rptr->previous->next = rptr->next;
+		if (!( rptr->next ))
+			Manager.LastRequest = rptr->previous;
+		else	rptr->next->previous = rptr->previous;
+		rptr = liberate_request( rptr );
+	}
+	return((struct colog_request *) 0);
+}
+
+/*	---------------------------------------------	*/
+/*	c o l o g _ r e c e i v e d _ r e s p o n s e 	*/	
+/*	---------------------------------------------	*/
+private	int	colog_received_response(int when,int pid,int tid,char * who,int dir, char *wptr)
+{
+	struct	colog_request  * qptr;
+	struct	colog_request  * rptr;
+	struct	colog_response * aptr;
+	/* --------------------------------------------------------------- */
+	/* locate a request which has been received by this process.thread */
+	/* --------------------------------------------------------------- */
+	if (!( qptr = resolve_responded( pid, tid ) ))
+		return( 78 );
+	else
+	{
+		/* ------------------------- */
+		/* event would be added here */
+		/* ------------------------- */
+		if ( check_verbose() )
+			printf("recv reponse event(%u,%u,%u,%s,%s)\n",when,pid,tid,who,wptr);
+		drop_request( qptr );
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	c o l o g _ r e c e i v e d _ m e s s a g e	*/	
+/*	-------------------------------------------	*/
+private	int	colog_received_message(int when,int pid,int tid,char * who,int dir, char *wptr)
+{
+	char *	method;
+	int	what;
+
+	/* ------------------------- */
+	/* collect method or version */
+	/* ------------------------- */
+	while ( *wptr == ' ' ) wptr++;
+	wptr = scanpast(method=wptr,' ');
+
+	switch (( what = colog_http_method( method ) ))
+	{
+	case	1	:	/* GET 	*/
+	case	2	:	/* POST */
+	case	3	:	/* PUT 	*/
+	case	4	:	/* DELETE */
+	case	5	:	/* HEAD */
+		return( colog_received_request( when, pid, tid, who, dir, method, wptr ) );
+	case	6	:	/* HTTP/1.X */
+		return( colog_received_response( when, pid, tid, who, dir, wptr ) );
+	default		:
+		return(30);
+	}
+}
+
+/*	-----------------------------------	*/
+/*	c o l o g _ s e n t _ r e q u e s t	*/	
+/*	-----------------------------------	*/
+private	int	colog_sent_request(int when,int pid,int tid,char * who,int dir, char * method, char * object)
+{
+	struct	colog_request * rptr;
+
+	if (!( rptr = allocate_request()))
+		return(27);
+	else if (!( rptr->method = allocate_string( method ) ))
+	{
+		liberate_request( rptr );
+		return(27);
+	}
+	else if (!( rptr->object = analyse_url( object ) ))
+	{
+		liberate_request( rptr );
+		return(27);
+	}
+	else if (!( rptr->from = resolve_module_by_pid( pid ) ))
+	{
+		liberate_request( rptr );
+		return( 27 );
+	}
+	else if ((!( rptr->from->name )) && (!( rptr->from->name = allocate_string( who ) )))
+	{
+		liberate_request( rptr );
+		return( 27 );
+	}
+	else if (!( rptr->to = resolve_module_by_url( rptr->object ) ))
+	{
+		liberate_request( rptr );
+		return( 27 );
+	}
+	else
+	{
+		rptr->when = when;
+		rptr->pid  = pid;
+		rptr->tid  = tid;
+		if (!( rptr->previous = Manager.LastRequest ))
+			Manager.FirstRequest = rptr;
+		else	rptr->previous->next = rptr;
+		Manager.LastRequest = rptr;
+		if ( check_verbose() )
+			printf("sent request event(%u,%u,%u,%s,%s,%s)\n",when,pid,tid,who,method,object);		
+		return( colog_request_event( rptr ) );
+	}
+}
+
+/*	-------------------------------------	*/
+/*	c o l o g _ s e n t _ r e s p o n s e 	*/	
+/*	-------------------------------------	*/
+private	int	colog_sent_response(int when,int pid,int tid,char * who,int dir, char *wptr)
+{
+	struct	colog_request  * qptr;
+	struct	colog_request  * rptr;
+	struct	colog_response * aptr;
+	char *	vptr;
+	/* --------------------------------------------------------------- */
+	/* locate a request which has been received by this process.thread */
+	/* --------------------------------------------------------------- */
+	if (!( qptr = resolve_received( pid, tid ) ))
+		return( 78 );
+	else if (!( rptr = qptr->received ))
+		return( 118 );
+	else if (!( aptr = allocate_response()))
+		return( 27 );
+	else
+	{
+		rptr->response = aptr;
+		while ( *wptr == ' ' ) wptr++;	
+		wptr = scanpast(vptr=wptr,' ');
+		aptr->status = atoi(vptr);
+		aptr->message = allocate_string( wptr );
+		if ( check_verbose() )
+			printf("sent reponse event(%u,%u,%u,%s,%s)\n",when,pid,tid,who,wptr);
+		return( colog_response_event( qptr, aptr ) );
+		return(0);
+	}				
+}
+
+/*	-----------------------------------	*/
+/*	c o l o g _ s e n t _ m e s s a g e	*/	
+/*	-----------------------------------	*/
+private	int	colog_sent_message(int when,int pid,int tid,char * who,int dir, char *wptr)
+{
+	char *	method;
+	int	what;
+
+	/* ------------------------- */
+	/* collect method or version */
+	/* ------------------------- */
+	while ( *wptr == ' ' ) wptr++;
+	wptr = scanpast(method=wptr,' ');
+
+	switch (( what = colog_http_method( method ) ))
+	{
+	case	1	:	/* GET 	*/
+	case	2	:	/* POST */
+	case	3	:	/* PUT 	*/
+	case	4	:	/* DELETE */
+	case	5	:	/* HEAD */
+		return( colog_sent_request( when, pid, tid, who, dir, method, wptr ) );
+	case	6	:	/* HTTP/1.X */
+		return( colog_sent_response( when, pid, tid, who, dir, wptr ) );
+	default		:
+		return(30);
+	}
+}
+
 /*	---------------------------------	*/
 /*	   c o l o g _ u s e _ l i n e		*/
 /*	---------------------------------	*/
 private	int	colog_use_line( char * buffer )
+{
+	char *	wptr=buffer;
+	char *	vptr;
+	int	when;
+	int	what;
+	int	thrd;
+	char * 	who;
+	int	dir;
+	struct	colog_module * mptr;
+
+	/* ------------------ */
+	/* collect time stamp */
+	/* ------------------ */
+	wptr = scanpast(vptr=wptr,':');
+	when = atoi(vptr);
+
+	/* ------------------ */
+	/* collect process id */
+	/* ------------------ */
+	wptr = scanpast(vptr=wptr,':');
+	what = atoi(vptr);
+
+	/* ------------------ */
+	/* collect pthread id */
+	/* ------------------ */
+	wptr = scanpast(vptr=wptr,':');
+	thrd = atoi(vptr);
+
+	if (!( what )) return(0);
+
+	/* ------------------ */
+	/* collect modulename */
+	/* ------------------ */
+	while ( *wptr == ' ' ) wptr++;
+	wptr = scanpast(who=wptr,'/');
+	wptr = scanpast(wptr,' ');
+
+	/* ------------------ */
+	/* collect  direction */
+	/* ------------------ */
+	while ( *wptr == ' ' ) wptr++;
+	wptr = scanpast(vptr=wptr,' ');
+	while ( *wptr == ' ' ) wptr++;
+
+	if (!( strcmp( vptr, "<--" ) ))
+		return(colog_received_message(when,what,thrd,who,2,wptr));
+	else if (!( strcmp( vptr, "-->" ) ))
+		return(colog_sent_message(when,what,thrd,who,1,wptr));
+	else	return(0);
+}
+
+/*	---------------------------------	*/
+/*	   c o l o g _ u s e _ l i n e		*/
+/*	---------------------------------	*/
+private	int	colog_old_use_line( char * buffer )
 {
 	char *	wptr=buffer;
 	char *	vptr;
@@ -401,7 +977,7 @@ private	int	colog_use_line( char * buffer )
 	else if (!( strcmp( vptr, "-->" ) ))
 		dir = 1;
 	else	dir = 0;
-	if (!( mptr = resolve_by_pid( what, thrd ) ))
+	if (!( mptr = resolve_module_by_pid( what ) ))
 		return( 27 );
 	else if ( mptr->name )
 		return( colog_use_event( mptr, wptr, when, dir ));
