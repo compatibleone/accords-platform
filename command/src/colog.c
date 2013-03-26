@@ -1149,7 +1149,7 @@ private	void	colog_show_modules()
 private	void	colog_show_header()
 {
 	struct	colog_module * mptr;
-	printf("<tr><th class=ath>#<th class=ath>&nbsp;<th class=ath>Info\n");
+	printf("<tr><th class=ath>#<th class=ath>&nbsp;<th class=mth>Information\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
