@@ -25,6 +25,7 @@ struct	colog_module
 	struct	colog_module * next;
 	struct	colog_request * first;
 	struct 	colog_request * last;
+	int	trash;
 	int	pid;
 	char *	name;
 	char *	host;
@@ -82,7 +83,8 @@ struct	colog_response
 
 struct	colog_analsis
 {
-	struct colog_module * TrashModule;
+	struct colog_module * FirstTrash;
+	struct colog_module * LastTrash;
 	struct colog_module * FirstModule;
 	struct colog_module * LastModule;
 	struct colog_event * FirstEvent;
@@ -92,6 +94,7 @@ struct	colog_analsis
 } 
 Manager = 
 {
+	(struct colog_module *) 0,
 	(struct colog_module *) 0,
 	(struct colog_module *) 0,
 	(struct colog_module *) 0,
@@ -638,15 +641,21 @@ private	int	colog_response_event( struct colog_request * qptr,struct colog_respo
 /*	-----------------------------------	*/
 private	void	forget_module( struct colog_module * mptr )
 {
-	if (!( mptr->previous ))
-		Manager.FirstModule = mptr->next;
-	else	mptr->previous->next = mptr->next;
-	if (!( mptr->next ))
-		Manager.LastModule = mptr->previous;
-	else	mptr->next->previous = mptr->previous;
-
-	mptr->next = Manager.TrashModule;
-	Manager.TrashModule = mptr;
+	if (!( mptr->trash ))
+	{
+		if (!( mptr->previous ))
+			Manager.FirstModule = mptr->next;
+		else	mptr->previous->next = mptr->next;
+		if (!( mptr->next ))
+			Manager.LastModule = mptr->previous;
+		else	mptr->next->previous = mptr->previous;
+		mptr->trash = 1;
+		mptr->previous = mptr->next = (struct colog_module *) 0;
+		if (!( mptr->previous = Manager.LastTrash ))
+			Manager.FirstTrash = mptr;
+		else	mptr->previous->next = mptr;
+		Manager.LastTrash = mptr;
+	}
 	return;
 }
 
