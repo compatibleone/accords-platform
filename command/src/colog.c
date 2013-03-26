@@ -690,11 +690,12 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 		}
 		if (!( mptr = qptr->to ))
 		{
-			if (!( rptr->to = resolve_module_by_pid( pid ) ))
+			if (!( xptr = resolve_module_by_pid( pid ) ))
 			{
 				liberate_request( rptr );
 				return( 27 );
 			}
+			else	qptr->to = xptr;
 		}
 		else if (!( mptr->pid )) 
 		{
