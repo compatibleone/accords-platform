@@ -730,6 +730,15 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 			}
 			else
 			{
+				if ((!( xptr->host )) && ( mptr->host ))
+				{
+					if (!( xptr->host = allocate_string( mptr->host ) ))
+					{
+						liberate_request( rptr );
+						return( 27 );
+					}
+					else	xptr->port = mptr->port;
+				}				
 				forget_module( mptr );
 				qptr->to = xptr;
 			}
