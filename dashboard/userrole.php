@@ -349,13 +349,13 @@ class user_role extends role
 			case	"create service" :
 				$this->display_tabs( $this->page->tabpage );
 				$result = $this->service->create($this->page);
-				this->service_list($this->page);
+				$this->service_list($this->page);
 				break;
 			case	"startservice"	:
 			case	"start service" :
 				$this->display_tabs("0");
 				$result = $this->service->start($this->page);
-				this->service_list($this->page);
+				$this->service_list($this->page);
 				break;
 			case	"inspect service" :
 				$this->display_tabs("0");
@@ -377,7 +377,7 @@ class user_role extends role
 			case	"stop service" :
 				$this->display_tabs("0");
 				$result = $this->service->stop($this->page);
-				this->service_list($this->page);
+				$this->service_list($this->page);
 				break;
 			case	"delete service" :
 				$this->display_tabs("0");
