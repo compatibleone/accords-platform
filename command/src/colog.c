@@ -641,8 +641,8 @@ private	int	colog_response_event( struct colog_request * qptr,struct colog_respo
 	eptr->when   = qptr->when;
 	eptr->dir    = 2;
 	eptr->status = aptr->status;
-	eptr->from   = qptr->from;
-	eptr->to     = qptr->to;
+	eptr->from   = qptr->to;
+	eptr->to     = qptr->from;
 	aptr->event  = eptr;
 	return( 0 );
 }
