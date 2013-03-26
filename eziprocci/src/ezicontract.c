@@ -147,7 +147,7 @@ public	struct	rest_response * start_easiclouds(
 	else if (( status = ezi_creation_status( zptr, pptr )) != 200)
 	{
 		zptr = liberate_ezi_response( zptr );
-	 	return( rest_html_response( aptr, status, "Application Strart Failure" ) );
+	 	return( rest_html_response( aptr, status, "Application Start Failure" ) );
 	}
 	else
 	{
@@ -194,20 +194,17 @@ private	int	stop_easiclouds_contract(
 	struct	ezi_subscription * subptr,
 	struct easiclouds * pptr )
 {
-	if ( pptr->state )
-	{
-		/* ---------------------------------- */
-		/* add code here to release resources */	
-		/* ---------------------------------- */
-		pptr->state = 0;
-		if ( pptr->application )
-		{
-			ezi_delete_server( subptr, pptr->application );
-			if ( rest_valid_string( pptr->price ) )
-				occi_send_transaction( "easiclouds", pptr->price, "action=stop", pptr->account, pptr->id );
-			pptr->application = liberate( pptr->application );	
-		}
-	}
+	/* ---------------------------------- */
+	/* add code here to release resources */	
+	/* ---------------------------------- */
+	pptr->state = 0;
+	if (!( rest_valid_string( pptr->application ) ))
+		pptr->application = (char *) 0;
+	ezi_delete_server( subptr, pptr->application );
+	if ( rest_valid_string( pptr->price ) )
+		occi_send_transaction( "easiclouds", pptr->price, "action=stop", pptr->account, pptr->id );
+	if ( pptr->application )
+		pptr->application = liberate( pptr->application );	
 	return( 0 );
 }
 

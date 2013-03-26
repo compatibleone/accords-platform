@@ -792,7 +792,7 @@ private	struct	ezi_response *	ezi_create_operation(struct ezi_subscription * spt
 public	struct	ezi_response *	ezi_create_server(struct ezi_subscription * sptr, char * filename )
 {
 	char	buffer[1024];
-	sprintf(buffer,"/servers");
+	sprintf(buffer,"/compound_app");
 	return( ezi_create_operation( sptr,  buffer, filename ) );
 }
 /*	------------------------------------------------------------	*/
@@ -805,7 +805,9 @@ public	struct	ezi_response *	ezi_delete_server(struct ezi_subscription * sptr,  
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/servers/%s",id);
+	if (!( id ))
+		sprintf(buffer,"/compound_app");
+	else	sprintf(buffer,"/compound_app/%s",id);
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
 	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
@@ -836,7 +838,9 @@ public	struct	ezi_response *	ezi_get_server	( struct ezi_subscription * sptr, ch
 	char	buffer[1024];
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
-	sprintf(buffer,"/servers/%s",id);
+	if (!( id ))
+		sprintf(buffer,"/compoud_app");
+	else	sprintf(buffer,"/compoud_app/%s",id);
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
 	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
