@@ -1102,6 +1102,7 @@ private	struct rest_response * rest_process_request(
 		struct rest_request * rptr)
 {
 	struct	rest_response * aptr;
+	rest_log_recv_request( cptr->server->name, rptr );
 	if ( cptr->server->method.before )
 		(*cptr->server->method.before)(cptr->server->method.instance,cptr,rptr);
 	aptr = rest_ll_process_request( cptr, rptr );
@@ -1599,7 +1600,6 @@ private	struct rest_request *	rest_consume_request( struct rest_client * cptr, i
 		return( rptr );
 
 	rest_show_request( rptr );
-	rest_log_recv_request( cptr->server->name, rptr );
 
 	if (!( rptr = rest_consume_body( cptr, rptr )))
 		return( rptr );
