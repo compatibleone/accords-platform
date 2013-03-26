@@ -715,7 +715,12 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 				liberate_request( rptr );
 				return( 27 );
 			}
-			else	qptr->to = xptr;
+			else
+			{
+				qptr->to = xptr;
+				if ( qptr->event )
+					qptr->event->to = xptr;
+			}
 		}
 		else if (!( mptr->pid )) 
 		{
@@ -741,6 +746,8 @@ private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, 
 				}				
 				forget_module( mptr );
 				qptr->to = xptr;
+				if ( qptr->event )
+					qptr->event->to = xptr;
 			}
 		}
 		rptr->to = qptr->to;
