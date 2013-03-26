@@ -940,10 +940,10 @@ private	int	colog_use_line( char * buffer )
 	while ( *wptr == ' ' ) wptr++;
 
 	if (!( strcmp( vptr, "<--" ) ))
-		return(colog_received_message(when,what,thrd,who,2,wptr));
+		colog_received_message(when,what,thrd,who,2,wptr);
 	else if (!( strcmp( vptr, "-->" ) ))
-		return(colog_sent_message(when,what,thrd,who,1,wptr));
-	else	return(0);
+		colog_sent_message(when,what,thrd,who,1,wptr);
+	return(0);
 }
 
 /*	---------------------------------	*/
