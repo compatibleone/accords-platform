@@ -58,7 +58,15 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
  
  sprintf(cordshname,"#include \"%s.h\"",categoryName);
- sprintf(occibuildername,"public struct occi_category * occi_cords_%s_builder(char * a,char *b);",categoryName);
+ 
+ if(!flag)
+ { 
+	sprintf(occibuildername,"public struct occi_category * occi_cords_%s_builder(char * a,char *b);",categoryName);
+ }
+ else
+ {
+    	sprintf(occibuildername,"public struct occi_category * occi_%s_builder(char * a,char *b);",categoryName);
+ }
  
  sprintf(cordsbase,"%s/%s",pathf,INCLUDE_CORDS_BASE);
  sprintf(cordsbasename,"#include \"%s.c\"",categoryName);
