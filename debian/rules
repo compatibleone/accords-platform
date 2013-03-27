@@ -91,7 +91,7 @@ install: build
 	cp -r cordscripts/*.txt debian/tmp/var/lib/accords
 	cp -r dashboard/* debian/tmp/var/lib/accords
 	chmod 755 `grep -l \#\!\/bin debian/tmp/var/lib/accords/*`
-	chmod 644 debian/tmp/var/lib/accords/imgs/*
+	chmod 644 debian/tmp/var/lib/accords/images/*
 	rm -f debian/tmp/var/lib/accords/dashboard.inc debian/tmp/var/lib/accords/dashboard.sh
 	sed -i	-e 's#usr/local/bin#usr/bin#g' -e 's#/usr/local/etc/accords#/etc/accords#g' \
 		debian/tmp/var/lib/accords/dashboard-*
