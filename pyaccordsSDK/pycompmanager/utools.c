@@ -295,7 +295,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
          fprintf(fOut,"%s",line);
          if(line[0]=='p') 
          {
-               addBack(&categoryN,getCategoryName(line,"_",3));
+               addBack(&categoryN,getCategoryName(line,"_",2));
          }
      }
      else
@@ -306,7 +306,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
             fprintf(fOut,"%s",line);
             if(line[0]=='p') 
             {
-               addBack(&categoryN,getCategoryName(line,"_",3));
+               addBack(&categoryN,getCategoryName(line,"_",2));
             }
           }
      } 
@@ -315,7 +315,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
   if(!a)
   {
      fprintf(fOut,"%s\n",categoryName);
-      ctemp = allocate_string(getCategoryName(categoryName,"_",3));
+      ctemp = allocate_string(getCategoryName(categoryName,"_",2));
      if (ctemp)
       addBack(&categoryN,ctemp);
   }
@@ -328,7 +328,7 @@ int insertInFilePyStruct(char pathf[],char categoryName[],char categoryNames[])
   elem *pelem = categoryN.first;
   while(pelem)
   {          
-     fprintf(fOut,"\t{ \"%s\", occi_cords_%s_builder },\n",pelem->value,pelem->value); 
+     fprintf(fOut,"\t{ \"%s\", occi_%s_builder },\n",pelem->value,pelem->value); 
      pelem = pelem->next;
   }
    

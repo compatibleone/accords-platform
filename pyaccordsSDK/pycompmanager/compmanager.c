@@ -2230,9 +2230,16 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     fprintf(f,"/*	------------------------------------------	*/\n");
     fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
     fprintf(f,"/*	------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"/* occi category rest instance builder for : occi_cords_%s */\n",categoryName);
-    else fprintf(f,"/* occi category rest instance builder for : occi_%s */\n",categoryName);
-    fprintf(f,"public struct occi_category * occi_cords_%s_builder(char * a,char * b) {\n",categoryName);
+    if(!flag) 
+    {
+	fprintf(f,"/* occi category rest instance builder for : occi_cords_%s */\n",categoryName);
+	fprintf(f,"public struct occi_category * occi_cords_%s_builder(char * a,char * b) {\n",categoryName);
+    }	
+    else 
+    {
+	fprintf(f,"/* occi category rest instance builder for : occi_%s */\n",categoryName);
+    	fprintf(f,"public struct occi_category * occi_%s_builder(char * a,char * b) {\n",categoryName);
+    }
     fprintf(f,"\tchar * c=\"http://scheme.compatibleone.fr/scheme/compatible#\";\n");
     fprintf(f,"\tchar * d=\"kind\";\n");
     fprintf(f,"\tchar * e=\"http://scheme.ogf.org/occi/resource#\";\n");
