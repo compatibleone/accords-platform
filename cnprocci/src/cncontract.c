@@ -1034,7 +1034,7 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 				}	
 			}
 		}
-		
+		pptr->state = _OCCI_IDLE;
 		return( cnptr );
 	}
 }
