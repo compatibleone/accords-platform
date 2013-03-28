@@ -1077,6 +1077,10 @@ private	struct cn_response * stop_computenext_provisioning( struct computenext *
 			}
 		}
 		pptr->state = _OCCI_IDLE;
+		if ( pptr->hostname )
+			pptr->hostname = liberate(pptr->hostname);
+		if ( pptr->ipaddress )
+			pptr->ipaddress = liberate(pptr->ipaddress);
 		return( cnptr );
 	}
 }
