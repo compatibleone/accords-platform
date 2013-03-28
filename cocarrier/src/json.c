@@ -419,11 +419,11 @@ public	struct	data_element *	json_parse_string( char * sptr )
 	FILE * h;
 	if (!( filename = rest_temporary_filename( ".json" )))
 		return((struct data_element *) 0);
-	else if (!( fopen( filename,"w" ) ))
+	else if (!(h = fopen( filename,"w" ) ))
 		return((struct data_element *) 0);
 	else
 	{
-		fprintf("%s\n",sptr);
+		fprintf(h,"%s\n",sptr);
 		fclose( h );
 		dptr = json_parse_file( filename );
 		return( dptr );
