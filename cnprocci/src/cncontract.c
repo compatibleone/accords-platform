@@ -84,6 +84,7 @@ public	struct	rest_response * start_computenext(
 	struct  cn_config *      config;
 	struct  cn_response *    cnptr;
 	struct	data_element * eptr;
+	struct	data_element * dptr;
 	int	status;
 	char *  sptr;
 	char *	filename;
@@ -176,18 +177,39 @@ public	struct	rest_response * start_computenext(
 		}
 		else if (!( strcmp( sptr, _CN_STATUS_STARTED ) ))
 		{
-			if (!( pptr->ipaddress = json_atribut( eptr->first, "PublicIpAddress" ) ))
+			if (!( sptr = json_atribut( eptr->first, "PublicIpAddress" ) ))
 			{
 				config = cn_liberate_config( config );
 				cnptr = cn_liberate_response( cnptr );
 				computenext_build_failure( pptr, 911, "Failure Finding IpAddress" );
 				return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
 			}
-			else
+			else if ( *sptr == '{' )
 			{
-				pptr->hostname = allocate_string( pptr->ipaddress );
-				break;
+				if (!( dptr = json_parse_string( sptr )))
+				{
+					config = cn_liberate_config( config );
+					cnptr = cn_liberate_response( cnptr );
+					computenext_build_failure( pptr, 911, "Failure Finding IpAddress" );
+					return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
+				}
+				else if (!( sptr = json_atribut( dptr, "publicIP" ) ))
+				{
+					config = cn_liberate_config( config );
+					cnptr = cn_liberate_response( cnptr );
+					computenext_build_failure( pptr, 911, "Failure Finding IpAddress" );
+					return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
+				}
 			}
+			if ((!( pptr->ipaddress = allocate_string( sptr )))
+			||  (!( pptr->hostname = allocate_string( pptr->ipaddress ))))
+			{
+				config = cn_liberate_config( config );
+				cnptr = cn_liberate_response( cnptr );
+				computenext_build_failure( pptr, 911, "Failure Finding IpAddress" );
+				return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
+			}
+			else	break;
 		}
 		else
 		{

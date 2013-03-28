@@ -408,6 +408,27 @@ public	struct	data_element *	json_parse_file( char * filename )
 	return( dptr );
 }
 	
+/*	------------------------------------------------	*/
+/*		j s o n _ p a r s e _ s t r i n g		*/
+/*	------------------------------------------------	*/
+public	struct	data_element *	json_parse_string( char * sptr )
+{
+	char *	filename;
+	struct	data_element * dptr;
+	char * rest_temporary_filename( char * s);
+	FILE * h;
+	if (!( filename = rest_temporary_filename( ".json" )))
+		return((struct data_element *) 0);
+	else if (!( fopen( filename,"w" ) ))
+		return((struct data_element *) 0);
+	else
+	{
+		fprintf("%s\n",sptr);
+		fclose( h );
+		dptr = json_parse_file( filename );
+		return( dptr );
+	}
+}
 
 /*	------------------------------------------------	*/
 /*	  j s o n _ s e r i a l i s e _ c o m p l e x  		*/
