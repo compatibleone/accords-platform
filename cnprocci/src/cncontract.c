@@ -83,6 +83,7 @@ public	struct	rest_response * start_computenext(
 	struct	computenext * pptr;
 	struct  cn_config *      config;
 	struct  cn_response *    cnptr;
+	struct	data_element * eptr;
 	int	status;
 	char *  sptr;
 	char *	filename;
@@ -108,15 +109,19 @@ public	struct	rest_response * start_computenext(
 	sprintf(buffer,"contract=%s/%s/%s\npublisher=%s\n",
 		Configuration.identity,_CORDS_COMPUTENEXT,pptr->id,Configuration.publisher);
 		
+	/* ------------------------------------------------------ */
+	/* build the CN workload based on the contract resolution */
+	/* ------------------------------------------------------ */
+	if(!(pptr->workload = build_computenext_workload( config, pptr ) ))
+	{
+		config = cn_liberate_config( config );
+		computenext_build_failure( pptr, 911, "Failure Creating Workload" );
+	 	return( rest_html_response( aptr, 4004, "Server Failure : Cannot Create Workload" ) );
+	}
+	
 	/* ---------------------- */
 	/* create the transaction */
 	/* ---------------------- */
-	if(!(pptr->workload))
-	{
-		config = cn_liberate_config( config );
-		computenext_build_failure( pptr, 911, "Failure Finding Workload Id" );
-	 	return( rest_html_response( aptr, 4004, "Server Failure : Cannot Find Workload" ) );
-	}
 	if (!( filename = cn_create_transaction_request( pptr->workload, "Paid" ) ))
 	{
 		config = cn_liberate_config( config );
@@ -148,22 +153,42 @@ public	struct	rest_response * start_computenext(
 	/* ---------------------------------------- */
 	while ((cnptr=cn_get_transaction( config, pptr->transaction )) != (struct cn_response *) 0)
 	{
-		if (!( vptr = json_atribut( cnptr->jsonroot, "StatusCode" ) ))
+		if (!( eptr = json_element( cnptr->jsonroot, "ResourceStatusDetails" )))
 		{
 			config = cn_liberate_config( config );
 			cnptr = cn_liberate_response( cnptr );
-			computenext_build_failure( pptr, 911, "Failure Starting Transaction" );
+			computenext_build_failure( pptr, 911, "Failure Finding Resource Details" );
 			return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
 		}
-		else if (!( strcmp( vptr, _CN_STATUS_FAILED ) ))
+		else if (!( sptr = json_atribut( eptr->first, "StatusCode" ) ))
 		{
 			config = cn_liberate_config( config );
 			cnptr = cn_liberate_response( cnptr );
-			computenext_build_failure( pptr, 911, "Transaction In Failed Status" );
+			computenext_build_failure( pptr, 911, "Failure Finding Status Code" );
 			return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
 		}
-		else if (!( strcmp( vptr, _CN_STATUS_CREATED ) ))
-			break;
+		else if (!( strcmp( sptr, _CN_STATUS_FAILED ) ))
+		{
+			config = cn_liberate_config( config );
+			cnptr = cn_liberate_response( cnptr );
+			computenext_build_failure( pptr, 911, "Transaction In Failed State" );
+			return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
+		}
+		else if (!( strcmp( sptr, _CN_STATUS_STARTED ) ))
+		{
+			if (!( pptr->ipaddress = json_atribut( eptr->first, "PublicIpAddress" ) ))
+			{
+				config = cn_liberate_config( config );
+				cnptr = cn_liberate_response( cnptr );
+				computenext_build_failure( pptr, 911, "Failure Finding IpAddress" );
+				return( rest_html_response( aptr, 4008, "Server Failure : Poll Transaction Request" ) );
+			}
+			else
+			{
+				pptr->hostname = allocate_string( pptr->ipaddress );
+				break;
+			}
+		}
 		else
 		{
 			sleep( _CN_BUILD_SLEEP );
@@ -183,10 +208,6 @@ public	struct	rest_response * start_computenext(
 	cnptr = cn_liberate_response( cnptr );
 	
 	pptr->state = _OCCI_RUNNING;
-	if ( check_debug() )
-	{
-		rest_log_message("*** CN PROCCI Instance is UP and RUNNING ***");
-	}
 		
 	return( rest_html_response( aptr, 200, "OK" ) );	
 }
@@ -393,12 +414,6 @@ public	int	create_computenext_contract(
 	/* resolve any price information for this category */
 	/* ----------------------------------------------- */
 	pptr->price = occi_resolve_category_price( _CORDS_COMPUTENEXT, default_operator(), _CORDS_CONTRACT_AGENT, default_tls() );
-	
-	/* ------------------------------------------------------ */
-	/* build the CN workload based on the contract resolution */
-	/* ------------------------------------------------------ */
-	if(!(pptr->workload = build_computenext_workload( config, pptr, &contract ) ))
-		return( terminate_computenext_contract( 1192, &contract ) );
 
 	return( terminate_computenext_contract( 0, &contract ) );
 }
@@ -845,24 +860,32 @@ private	char *	build_computenext_securitygroup(struct cn_config * config, struct
 /*	-----------------------------------------------------------------  */
 /*      b u i l d _ c o m p u t e n e x t _ w o r k l o a d            	   */
 /*	-----------------------------------------------------------------  */
-private	char *	build_computenext_workload(struct cn_config * config, struct computenext * pptr, struct cords_cn_contract * cptr )
+private	char *	build_computenext_workload(struct cn_config * config, struct computenext * pptr )
 {
 	struct cn_response * cnptr;
+	struct standard_message node;
 	char *  vptr;
 	char *  sptr;
 	char *  filename;
 	char    wlname[256];
 	
+	rest_log_message("*** CN PROCCI Building New Workload ***");
+	
+	memset( &node, 0, sizeof(struct standard_message));
+	
 	/* --------------------------- */
 	/* create a new empty workload */
 	/* --------------------------- */
-	rest_log_message("cn_contract building workload");
-	
-	if(!( vptr = occi_extract_atribut( cptr->node.message, "occi", 
-		_CORDS_NODE, _CORDS_NAME ) ))
+	if( get_standard_message( &node, pptr->node, _CORDS_CONTRACT_AGENT, default_tls() ) )
 		return ( (char *) 0);
+	else if(!( vptr = occi_extract_atribut( node.message, "occi", _CORDS_NODE, _CORDS_NAME ) ))
+		return ( (char *) 0);
+	else release_standard_message( &node );
 		
 	sprintf(wlname,"CO-%ld-%s",time((long *) 0),vptr);
+	
+	rest_log_message("*** CN PROCCI Workload Name ***");
+	rest_log_message(wlname);
 	
 	if(!(filename = cn_create_workload_request(wlname) ))
 		return ( (char *) 0); 
@@ -876,16 +899,13 @@ private	char *	build_computenext_workload(struct cn_config * config, struct comp
 		return ( (char *) 0);
 	}
 	
-	rest_log_message("cn_contract workload built");
+	rest_log_message("*** CN PROCCI Workload Built Successfully ***");
 	rest_log_message(sptr);
 	
 	/* ------------------------------- */
 	/* add resolved vm to new workload */
 	/* ------------------------------- */
-	if(!( vptr = occi_extract_atribut( cptr->infrastructure.message, "occi", 
-		_CORDS_INFRASTRUCTURE, _CORDS_NAME ) ))
-		return ( (char *) 0);
-	else if(!(filename = cn_add_vm_request( vptr, 1, pptr->image,
+	if(!(filename = cn_add_vm_request( vptr, 1, pptr->image,
 		pptr->instancetype, pptr->securitygroup, "MyKeyPair", "" ) ))
 		return ( (char *) 0);
 	else if(!(cnptr = cn_add_vm_to_workload( config, sptr, filename ) ))
@@ -894,7 +914,7 @@ private	char *	build_computenext_workload(struct cn_config * config, struct comp
 		return ( (char *) 0);
 	else cnptr = cn_liberate_response( cnptr );
 	
-	rest_log_message("cn_contract VM added to workload");
+	rest_log_message("*** CN PROCCI VM Added Successfully ***");
 	
 	return( allocate_string(sptr) );
 

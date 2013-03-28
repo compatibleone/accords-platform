@@ -19,7 +19,7 @@
 #define	_cncontract_h
 
 #define	_CN_STATUS_DELETED  "Deleted"
-#define	_CN_STATUS_CREATED  "Created"
+#define	_CN_STATUS_STARTED  "Started"
 #define	_CN_STATUS_FAILED  "Failed"
 #define	_CN_BUILD_SLEEP     20
 #define	_CN_DESTROY_SLEEP   10
@@ -86,8 +86,8 @@ public	int	delete_computenext_contract(
 private	struct cn_config * 	use_computenext_configuration( char * nptr );
 private	struct	cn_config * 	resolve_cn_configuration( char * sptr );
 private	struct cn_response * 	stop_computenext_provisioning( struct computenext * pptr );
-private	char *			build_computenext_securitygroup(struct cn_config * config, struct cords_cn_contract * cptr, struct computenext * pptr);
-private	char *			build_computenext_workload(struct cn_config * config, struct computenext * pptr, struct cords_cn_contract * cptr );
+private	char *			build_computenext_securitygroup(struct cn_config * config, struct cords_cn_contract * cptr, struct computenext * pptr );
+private	char *			build_computenext_workload(struct cn_config * config, struct computenext * pptr );
 private char * 			resolve_contract_securitygroup( struct cn_config * config, struct cords_cn_contract * cptr,struct computenext * pptr  );
 private char * 			resolve_contract_image( struct cn_config * config, struct cords_cn_contract * cptr );
 private char * 			resolve_contract_instancetype( struct cn_config * config, struct cords_cn_contract * cptr );
