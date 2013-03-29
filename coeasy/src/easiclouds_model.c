@@ -41,10 +41,10 @@ public struct easiclouds_model * liberate_easiclouds_model(struct easiclouds_mod
 			 sptr->size = liberate(sptr->size);
 		if ( sptr->number )
 			 sptr->number = liberate(sptr->number);
-		if ( sptr->inputs )
-			 sptr->inputs = liberate(sptr->inputs);
-		if ( sptr->outputs )
-			 sptr->outputs = liberate(sptr->outputs);
+		if ( sptr->easiclouds_input )
+			 sptr->easiclouds_input = liberate(sptr->easiclouds_input);
+		if ( sptr->easiclouds_output )
+			 sptr->easiclouds_output = liberate(sptr->easiclouds_output);
 		sptr = liberate( sptr );
 	}
 	return((struct easiclouds_model *) 0);
@@ -63,9 +63,9 @@ public struct easiclouds_model * reset_easiclouds_model(struct easiclouds_model 
 		sptr->type = (char*) 0;
 		sptr->size = (char*) 0;
 		sptr->number = (char*) 0;
-		sptr->inputs = (char*) 0;
-		sptr->outputs = (char*) 0;
-		sptr->instances =  0;
+		sptr->easiclouds_input = (char*) 0;
+		sptr->easiclouds_output = (char*) 0;
+		sptr->easiclouds_instances =  0;
 		sptr->state =  0;
 	}
 	return(sptr);
@@ -113,17 +113,17 @@ public int xmlin_easiclouds_model(struct easiclouds_model * sptr,struct xml_elem
 		{
 			if ( wptr->value ) { sptr->number = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"inputs") ))
+		else if (!( strcmp(wptr->name,"easiclouds_input") ))
 		{
-			if ( wptr->value ) { sptr->inputs = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->easiclouds_input = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"outputs") ))
+		else if (!( strcmp(wptr->name,"easiclouds_output") ))
 		{
-			if ( wptr->value ) { sptr->outputs = allocate_string(wptr->value); }
+			if ( wptr->value ) { sptr->easiclouds_output = allocate_string(wptr->value); }
 		}
-		else if (!( strcmp(wptr->name,"instances") ))
+		else if (!( strcmp(wptr->name,"easiclouds_instances") ))
 		{
-			if ( wptr->value ) { sptr->instances = atoi(wptr->value); }
+			if ( wptr->value ) { sptr->easiclouds_instances = atoi(wptr->value); }
 		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
@@ -148,9 +148,9 @@ public int rest_occi_easiclouds_model(FILE * fh,struct easiclouds_model * sptr,c
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.type='%s'\r\n",prefix,nptr,(sptr->type?sptr->type:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.size='%s'\r\n",prefix,nptr,(sptr->size?sptr->size:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.number='%s'\r\n",prefix,nptr,(sptr->number?sptr->number:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.inputs='%s'\r\n",prefix,nptr,(sptr->inputs?sptr->inputs:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.outputs='%s'\r\n",prefix,nptr,(sptr->outputs?sptr->outputs:""));
-	fprintf(fh,"X-OCCI-Attribute: %s.%s.instances='%u'\r\n",prefix,nptr,sptr->instances);
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.easiclouds_input='%s'\r\n",prefix,nptr,(sptr->easiclouds_input?sptr->easiclouds_input:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.easiclouds_output='%s'\r\n",prefix,nptr,(sptr->easiclouds_output?sptr->easiclouds_output:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.easiclouds_instances='%u'\r\n",prefix,nptr,sptr->easiclouds_instances);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	return(0);
 

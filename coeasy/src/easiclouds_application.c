@@ -35,6 +35,8 @@ public struct easiclouds_application * liberate_easiclouds_application(struct ea
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->easiclouds_postconf )
+			 sptr->easiclouds_postconf = liberate(sptr->easiclouds_postconf);
 		sptr = liberate( sptr );
 	}
 	return((struct easiclouds_application *) 0);
@@ -50,6 +52,7 @@ public struct easiclouds_application * reset_easiclouds_application(struct easic
 	{
 		sptr->id = (char*) 0;
 		sptr->name = (char*) 0;
+		sptr->easiclouds_postconf = (char*) 0;
 		sptr->state =  0;
 		sptr->nodes =  0;
 		sptr->links =  0;
@@ -88,6 +91,10 @@ public int xmlin_easiclouds_application(struct easiclouds_application * sptr,str
 		{
 			if ( wptr->value ) { sptr->name = allocate_string(wptr->value); }
 		}
+		else if (!( strcmp(wptr->name,"easiclouds_postconf") ))
+		{
+			if ( wptr->value ) { sptr->easiclouds_postconf = allocate_string(wptr->value); }
+		}
 		else if (!( strcmp(wptr->name,"state") ))
 		{
 			if ( wptr->value ) { sptr->state = atoi(wptr->value); }
@@ -120,6 +127,7 @@ public int rest_occi_easiclouds_application(FILE * fh,struct easiclouds_applicat
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.id='%s'\r\n",prefix,nptr,(sptr->id?sptr->id:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.name='%s'\r\n",prefix,nptr,(sptr->name?sptr->name:""));
+	fprintf(fh,"X-OCCI-Attribute: %s.%s.easiclouds_postconf='%s'\r\n",prefix,nptr,(sptr->easiclouds_postconf?sptr->easiclouds_postconf:""));
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.state='%u'\r\n",prefix,nptr,sptr->state);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.nodes='%u'\r\n",prefix,nptr,sptr->nodes);
 	fprintf(fh,"X-OCCI-Attribute: %s.%s.links='%u'\r\n",prefix,nptr,sptr->links);

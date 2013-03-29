@@ -137,6 +137,8 @@ private void autoload_easiclouds_application_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "easiclouds_postconf" )) != (struct xml_atribut *) 0)
+				pptr->easiclouds_postconf = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
 				pptr->state = document_atribut_value(aptr);
 			if ((aptr = document_atribut( vptr, "nodes" )) != (struct xml_atribut *) 0)
@@ -175,6 +177,9 @@ public  void autosave_easiclouds_application_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," easiclouds_postconf=%c",0x0022);
+		fprintf(h,"%s",(pptr->easiclouds_postconf?pptr->easiclouds_postconf:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," state=%c",0x0022);
 		fprintf(h,"%u",pptr->state);
 		fprintf(h,"%c",0x0022);
@@ -210,6 +215,8 @@ private void set_easiclouds_application_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "easiclouds_postconf" ) ))
+			pptr->easiclouds_postconf = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
 			pptr->state = atoi(vptr);
 		if (!( strcmp( nptr, "nodes" ) ))
@@ -256,6 +263,13 @@ private int pass_easiclouds_application_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
+	if (( fptr->easiclouds_postconf )
+	&&  (strlen( fptr->easiclouds_postconf ) != 0)) {
+		if (!( pptr->easiclouds_postconf ))
+			return(0);
+		else if ( strcmp(pptr->easiclouds_postconf,fptr->easiclouds_postconf) != 0)
+			return(0);
+		}
 	if (( fptr->state ) && ( pptr->state != fptr->state )) return(0);
 	if (( fptr->nodes ) && ( pptr->nodes != fptr->nodes )) return(0);
 	if (( fptr->links ) && ( pptr->links != fptr->links )) return(0);
@@ -276,6 +290,9 @@ private struct rest_response * easiclouds_application_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.easiclouds_postconf=%c%s%c",optr->domain,optr->id,0x0022,pptr->easiclouds_postconf,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,pptr->state,0x0022);
@@ -713,6 +730,8 @@ public struct occi_category * occi_easiclouds_application_builder(char * a,char 
 		redirect_occi_easiclouds_application_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "easiclouds_postconf",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "nodes",0,0) ))
@@ -759,6 +778,17 @@ public struct rest_header *  easiclouds_application_occi_headers(struct easiclou
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.easiclouds_application.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.easiclouds_application.easiclouds_postconf='%s'\r\n",(sptr->easiclouds_postconf?sptr->easiclouds_postconf:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

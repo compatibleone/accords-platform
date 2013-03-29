@@ -258,6 +258,130 @@ private	int	terminate_ezi_contract( int status, struct cords_easy_contract * con
 }
 
 /*	---------------------------------------------------	*/
+/*		e z i _ s e r i a l i s e _ m o d e l 		*/
+/*	---------------------------------------------------	*/
+private	int	ezi_serialise_model( FILE * h, struct occi_response * zptr, int item )
+{
+	struct	occi_response * yptr;
+	char *	vptr;
+	if ( item )
+		fprintf(h,",");
+
+	if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_model", "number" )) != (char *) 0)
+	{
+		fprintf(h,"{\n",0x0022,0x0022);
+		fprintf(h,"%cid%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+		liberate( vptr );
+	}
+	else	return(0);
+
+	if (( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_model", "type" )) != (char *) 0)
+	{
+		fprintf(h,",%ctype%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+		liberate( vptr );
+	}
+
+	if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_model", "easiclouds_output" )))
+		fprintf(h,",%coutputs%c : {} \n",0x0022,0x0022);
+	else if (!( yptr = occi_simple_get( vptr,  _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		fprintf(h,",%coutputs%c : {} \n",0x0022,0x0022);
+	else
+	{
+		if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_output", "name" )))
+		{
+			fprintf(h,",%coutputs%c : {\n",0x0022,0x0022);
+			fprintf(h,"%cname%c : ",0x0022,0x0022);
+			if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_output", "value" )))
+				fprintf(h,"[ %s ] \n",0x0022,vptr,0x0022);
+			else	fprintf(h,"[] \n");
+		}
+	}
+
+
+	if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_model", "easiclouds_input" )))
+		fprintf(h,",%cinputs%c : {} \n",0x0022,0x0022);
+	else if (!( yptr = occi_simple_get( vptr,  _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		fprintf(h,",%cinputs%c : {} \n",0x0022,0x0022);
+	else
+	{
+		if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_input", "name" )))
+		{
+			fprintf(h,",%cinputs%c : {\n",0x0022,0x0022);
+			fprintf(h,"%cname%c : ",0x0022,0x0022);
+			if (!( vptr = occi_extract_atribut( zptr, "occi", "easiclouds_input", "value" )))
+				fprintf(h,"[ %s ] \n",0x0022,vptr,0x0022);
+			else	fprintf(h,"[] \n");
+		}
+	}
+
+
+	fprintf(h,"}\n",0x0022,0x0022);
+	return(1);
+}
+
+/*	---------------------------------------------------	*/
+/*	    e z i _ s e r i a l i s e _ p o s t c o n f		*/
+/*	---------------------------------------------------	*/
+private	int	ezi_serialise_postconf( FILE * h, struct occi_response * mptr )
+{
+	char *	vptr;
+	char *	nptr;
+	struct	occi_response * zptr;
+	struct	occi_element * eptr;
+	struct	occi_response * yptr;
+	int	models=0;
+
+	if (( vptr = occi_extract_atribut( mptr, "occi", "easiclouds_application", "easiclouds_postconf" )) != (char *) 0)
+	{
+		fprintf(h,",%cpostconf%c : {\n",0x0022,0x0022);
+		if (!( zptr = occi_simple_get( vptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			liberate( vptr );
+		else
+		{
+			liberate( vptr );
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_postconf", "type" )) != (char *) 0)
+			{
+				fprintf(h,"%ctype%c : %c%s%c\n",0x0022,0x0022,0x0022,vptr,0x0022);
+				liberate( vptr );
+			}
+			if (( vptr = occi_extract_atribut( yptr, "occi", "easiclouds_postconf", "parameters" )) != (char *) 0)
+			{
+				fprintf(h,",%cparameters%c : {}\n",0x0022,0x0022);
+				liberate( vptr );
+			}
+			else	fprintf(h,",%cparameters%c : {}\n",0x0022,0x0022);
+			models = 0;
+			/* --------------------------- */
+			/* foreach node or link record */	
+			/* --------------------------- */
+			for (	eptr = cords_first_link( zptr );
+				eptr != (struct occi_element *) 0;
+				eptr = cords_next_link( eptr ))
+			{
+				if (!( eptr->value ))
+					continue;
+				else if (!( nptr =  occi_unquoted_link( eptr->value ) ))
+					continue;
+				else if (!( yptr = occi_simple_get( nptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+				{
+					liberate( nptr );
+					continue;
+				}
+				/* ------------------------------------------ */
+				/* open the models array if this is the first */
+				/* ------------------------------------------ */
+				if (!( models )) { fprintf(h,",%cmodels%c : [\n",0x0022,0x0022); }
+				models += ezi_serialise_model( h, yptr, models );
+
+			}
+			if ( models )	{	fprintf(h,"]\n");	}
+		}
+		fprintf(h,"}\n");
+	}
+	return(0);
+}
+
+/*	---------------------------------------------------	*/
 /*		e z i _ s e r i a l i s e _ e x t r a s		*/
 /*	---------------------------------------------------	*/
 /*	TODO	*/
@@ -493,6 +617,8 @@ private	char *	create_easiclouds_request( struct cords_easy_contract * contract,
 	if ( mode ) fprintf(h,"]\n");
 
 	ezi_serialise_extras( h, contract->manifest.message );
+
+	ezi_serialise_postconf( h, contract->manifest.message );
 
 	fprintf(h,"}\n");
 	fprintf(h,"}\n");

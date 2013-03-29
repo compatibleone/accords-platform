@@ -8,9 +8,9 @@
 		char 	*	type;
 		char 	*	size;
 		char 	*	number;
-		char 	*	inputs;
-		char 	*	outputs;
-		int		instances;
+		char 	*	easiclouds_input;
+		char 	*	easiclouds_output;
+		int		easiclouds_instances;
 		int		state;
 	};
 	#endif

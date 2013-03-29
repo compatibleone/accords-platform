@@ -5,6 +5,7 @@
 			<xsd:element name="easiclouds_node" type="easiclouds_node" minOccurs="1" maxOccurs="unbounded"/>
 			<xsd:element name="easiclouds_link" type="easiclouds_link" minOccurs="1" maxOccurs="unbounded"/>
 			<xsd:element name="easiclouds_extra" type="easiclouds_extra" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="easiclouds_postconf" type="easiclouds_postconf" minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -46,6 +47,20 @@
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
+	<xsd:complexType name="easiclouds_input">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="value" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="easiclouds_output">
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="value" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
 	<xsd:complexType name="easiclouds_keypair">
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -76,7 +91,7 @@
 
 	<xsd:complexType name="easiclouds_model">
 		<xsd:sequence>
-			<xsd:element name="easiclouds_input" type="easiclouds_node" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="easiclouds_input" type="easiclouds_input" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="easiclouds_instance" type="easiclouds_instance" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="easiclouds_output" type="easiclouds_output" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
@@ -85,9 +100,9 @@
 		<xsd:attribute name="type" type="xsd:string"/>
 		<xsd:attribute name="size" type="xsd:string"/>
 		<xsd:attribute name="number" type="xsd:string"/>
-		<xsd:attribute name="inputs" type="xsd:string"/>
-		<xsd:attribute name="outputs" type="xsd:string"/>
-		<xsd:attribute name="instances" type="xsd:integer"/>
+		<xsd:attribute name="easiclouds_input" type="xsd:string"/>
+		<xsd:attribute name="easiclouds_output" type="xsd:string"/>
+		<xsd:attribute name="easiclouds_instances" type="xsd:integer"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
