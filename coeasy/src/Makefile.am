@@ -14,6 +14,8 @@ easiclouds_description.c \
 easiclouds_metadata.c \
 easiclouds_extra.c \
 easiclouds_instance.c \
+easiclouds_input.c \
+easiclouds_output.c \
 easiclouds_keypair.c \
 easiclouds_link.c \
 easiclouds_model.c \
@@ -27,6 +29,8 @@ occieasiclouds_description.c \
 occieasiclouds_metadata.c \
 occieasiclouds_extra.c \
 occieasiclouds_instance.c \
+occieasiclouds_input.c \
+occieasiclouds_output.c \
 occieasiclouds_keypair.c \
 occieasiclouds_link.c \
 occieasiclouds_model.c \
