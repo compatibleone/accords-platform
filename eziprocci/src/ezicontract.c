@@ -144,11 +144,13 @@ public	struct	rest_response * start_easiclouds(
 	 	return( rest_html_response( aptr, 500, "Application Message Failure" ) );
 	else if (!( zptr = ezi_create_server( subptr, allocate_string( pptr->filename ) ) ))
 	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
-	else if (( status = ezi_creation_status( zptr, pptr )) != 200)
+	else if (( status = ezi_creation_status( zptr, pptr )) > 299)
 	{
 		zptr = liberate_ezi_response( zptr );
 	 	return( rest_html_response( aptr, status, "Application Start Failure" ) );
 	}
+	else if (!( zptr = ezi_get_server( subptr, pptr->application ) ))
+	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
 	else
 	{
 		pptr->state = 1;

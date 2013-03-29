@@ -760,6 +760,37 @@ private	struct	ezi_response *	ezi_delete_operation(struct ezi_subscription * spt
 }
 
 /*	------------------------------------------------------------	*/
+/*			e z i _ g e t _ o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+private	struct	ezi_response *	ezi_get_operation(struct ezi_subscription * sptr,  char * buffer )
+{
+	struct	ezi_response	*	rptr=(struct ezi_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				uri[2048];
+	if (!( hptr = ezi_authenticate(sptr) ))
+		return( rptr );
+	else	sprintf(uri,"%s/%s",sptr->Ezi.iaas,sptr->KeyStone.tenantid);
+	if (!( uptr = analyse_url( uri )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = ezi_client_get_request( nptr, sptr->Ezi.tls, sptr->Ezi.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*			e z i _ c r e a t e _  o p e r a t i o n		*/
 /*	------------------------------------------------------------	*/
 private	struct	ezi_response *	ezi_create_operation(struct ezi_subscription * sptr, char * buffer, char * filename )
@@ -828,24 +859,7 @@ public	struct	ezi_response *	ezi_get_server	( struct ezi_subscription * sptr, ch
 	if (!( id ))
 		sprintf(buffer,"/compoud_app");
 	else	sprintf(buffer,"/compoud_app/%s",id);
-	if (!( hptr = ezi_authenticate(sptr) ))
-		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr,buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = ezi_client_get_request( nptr, sptr->Ezi.tls, sptr->Ezi.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( ezi_get_operation( sptr,  buffer ) );
 }
 
 /*	------------------------------------------------------------	*/
