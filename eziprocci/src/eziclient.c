@@ -737,9 +737,11 @@ private	struct	ezi_response *	ezi_delete_operation(struct ezi_subscription * spt
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				uri[2048];
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
+	else	sprintf(uri,"%s/%s",sptr->Ezi.iaas,sptr->KeyStone.tenantid);
+	if (!( uptr = analyse_url( uri )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -766,9 +768,11 @@ private	struct	ezi_response *	ezi_create_operation(struct ezi_subscription * spt
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				uri[2048];
 	if (!( hptr = ezi_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
+	else	sprintf(uri,"%s/%s",sptr->Ezi.iaas,sptr->KeyStone.tenantid);
+	if (!( uptr = analyse_url( uri )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -925,9 +929,7 @@ public	struct ezi_subscription * ezi_initialise_client(
 	else if (!( sptr->KeyStone.tenantname = allocate_string( tenant )))
 		return(ezi_liberate_subscription( sptr ));
 	
-	sprintf(buffer,"%s/%s",iaas,tenant);
-
-	if (!( sptr->Ezi.iaas = allocate_string( buffer )))
+	if (!( sptr->Ezi.iaas = allocate_string( iaas )))
 		return(ezi_liberate_subscription( sptr ));
 
 	/* namespace selection */
