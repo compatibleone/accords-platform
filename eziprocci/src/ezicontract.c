@@ -111,11 +111,15 @@ public	int	ezi_creation_status( struct ezi_response * zptr, struct easiclouds * 
 		return( 501 );
 	else if ( zptr->response->status > 299 )
 		return( zptr->response->status );
-	else if (( xptr = zptr->xmlroot ) != (struct xml_element *) 0)
-		return( ezi_xml_integration( xptr, pptr ) );
-	else if (( dptr = zptr->jsonroot ) != (struct data_element *) 0)
-		return( ezi_json_integration( dptr, pptr ) );
-	else	return( 502 );
+	else
+	{
+		sleep(5);
+		if (( xptr = zptr->xmlroot ) != (struct xml_element *) 0)
+			return( ezi_xml_integration( xptr, pptr ) );
+		else if (( dptr = zptr->jsonroot ) != (struct data_element *) 0)
+			return( ezi_json_integration( dptr, pptr ) );
+		else 	return( zptr->response->status );
+	}
 }
 
 
