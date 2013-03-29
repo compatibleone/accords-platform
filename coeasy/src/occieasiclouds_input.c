@@ -137,6 +137,8 @@ private void autoload_easiclouds_input_nodes() {
 				pptr->id = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
 				pptr->name = document_atribut_string(aptr);
+			if ((aptr = document_atribut( vptr, "label" )) != (struct xml_atribut *) 0)
+				pptr->label = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "value" )) != (struct xml_atribut *) 0)
 				pptr->value = document_atribut_string(aptr);
 			if ((aptr = document_atribut( vptr, "state" )) != (struct xml_atribut *) 0)
@@ -171,6 +173,9 @@ public  void autosave_easiclouds_input_nodes() {
 		fprintf(h," name=%c",0x0022);
 		fprintf(h,"%s",(pptr->name?pptr->name:""));
 		fprintf(h,"%c",0x0022);
+		fprintf(h," label=%c",0x0022);
+		fprintf(h,"%s",(pptr->label?pptr->label:""));
+		fprintf(h,"%c",0x0022);
 		fprintf(h," value=%c",0x0022);
 		fprintf(h,"%s",(pptr->value?pptr->value:""));
 		fprintf(h,"%c",0x0022);
@@ -200,6 +205,8 @@ private void set_easiclouds_input_field(
 		nptr += strlen(prefix);
 		if (!( strcmp( nptr, "name" ) ))
 			pptr->name = allocate_string(vptr);
+		if (!( strcmp( nptr, "label" ) ))
+			pptr->label = allocate_string(vptr);
 		if (!( strcmp( nptr, "value" ) ))
 			pptr->value = allocate_string(vptr);
 		if (!( strcmp( nptr, "state" ) ))
@@ -242,6 +249,13 @@ private int pass_easiclouds_input_filter(
 		else if ( strcmp(pptr->name,fptr->name) != 0)
 			return(0);
 		}
+	if (( fptr->label )
+	&&  (strlen( fptr->label ) != 0)) {
+		if (!( pptr->label ))
+			return(0);
+		else if ( strcmp(pptr->label,fptr->label) != 0)
+			return(0);
+		}
 	if (( fptr->value )
 	&&  (strlen( fptr->value ) != 0)) {
 		if (!( pptr->value ))
@@ -266,6 +280,9 @@ private struct rest_response * easiclouds_input_occi_response(
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.name=%c%s%c",optr->domain,optr->id,0x0022,pptr->name,0x0022);
+	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
+		return( rest_html_response( aptr, 500, "Server Failure" ) );
+	sprintf(cptr->buffer,"%s.%s.label=%c%s%c",optr->domain,optr->id,0x0022,pptr->label,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.value=%c%s%c",optr->domain,optr->id,0x0022,pptr->value,0x0022);
@@ -697,6 +714,8 @@ public struct occi_category * occi_easiclouds_input_builder(char * a,char * b) {
 		redirect_occi_easiclouds_input_mt(optr->interface);
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
+		if (!( optr = occi_add_attribute(optr, "label",0,0) ))
+			return(optr);
 		if (!( optr = occi_add_attribute(optr, "value",0,0) ))
 			return(optr);
 		if (!( optr = occi_add_attribute(optr, "state",0,0) ))
@@ -739,6 +758,17 @@ public struct rest_header *  easiclouds_input_occi_headers(struct easiclouds_inp
 	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
 		return(first);
 	sprintf(buffer,"occi.easiclouds_input.name='%s'\r\n",(sptr->name?sptr->name:""));
+	if (!( hptr->value = allocate_string(buffer)))
+		return(first);
+	if (!( hptr = allocate_rest_header()))
+		return(first);
+		else	if (!( hptr->previous = last))
+			first = hptr;
+		else	hptr->previous->next = hptr;
+		last = hptr;
+	if (!( hptr->name = allocate_string("X-OCCI-Attribute")))
+		return(first);
+	sprintf(buffer,"occi.easiclouds_input.label='%s'\r\n",(sptr->label?sptr->label:""));
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	if (!( hptr = allocate_rest_header()))

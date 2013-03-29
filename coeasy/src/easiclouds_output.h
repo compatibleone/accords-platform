@@ -4,6 +4,7 @@ struct	easiclouds_output
 {
 	char	*	id;
 	char 	*	name;
+	char 	*	label;
 	char	*	value;
 	int		state;
 };
