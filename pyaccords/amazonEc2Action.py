@@ -63,48 +63,57 @@ from amazonEc2Class import *
 def amazonEc2_start(accesskey,secretkey,zone,keypair,amazonEc2):
 	conn = boto.ec2.connect_to_region(zone,aws_access_key_id=accesskey,aws_secret_access_key=secretkey)
 	status = 1
-	mykeys = conn.get_all_key_pairs()
-	if((keypair) and (keypair!= " ")):
-		mykeyname = ntpath.basename(keypair)
-		fp = open(os.path.expanduser(keypair))
-		mykey = fp.read()
-		fp.close()
-		for k in mykeys:
-			if(k.name == mykeyname):
-				amazonEc2.keypair = k.name
-				status = 2
-				break
-			else:
-				status = 0
-	if(status==0):
-			key = conn.import_key_pair(mykeyname,mykey)
-			amazonEc2.keypair = key.name			
-	elif (status == 1):
-        	if(mykeys):
-			amazonEc2.keypair = mykeys[0].name
-		else:
-			amazonEc2.keypair = " "
-
-	if(amazonEc2.keypair != " "):
-		res = conn.run_instances(amazonEc2.image,instance_type=amazonEc2.flavor,min_count=1,max_count=1,key_name=amazonEc2.keypair,security_groups=[amazonEc2.group],user_data=None)
+        if(amazonEc2.state == 2):
+		resinst = conn.start_instances(amazonEc2.reference)
+		instance = resinst[0]
+		while instance.state != "running":
+			time.sleep(5)
+			instance.update()
+		amazonEc2.state = 1
+		return amazonEc2
 	else:
-		res = conn.run_instances(amazonEc2.image,instance_type=amazonEc2.flavor,min_count=1,max_count=1,security_groups=[amazonEc2.group],user_data=None)		
+		mykeys = conn.get_all_key_pairs()
+		if((keypair) and (keypair!= " ")):
+			mykeyname = ntpath.basename(keypair)
+			fp = open(os.path.expanduser(keypair))
+			mykey = fp.read()
+			fp.close()
+			for k in mykeys:
+				if(k.name == mykeyname):
+					amazonEc2.keypair = k.name
+					status = 2
+					break
+				else:
+					status = 0
+		if(status==0):
+				key = conn.import_key_pair(mykeyname,mykey)
+				amazonEc2.keypair = key.name			
+		elif (status == 1):
+        		if(mykeys):
+				amazonEc2.keypair = mykeys[0].name
+			else:
+				amazonEc2.keypair = " "
 
-	inst = res.instances[0]
-	while inst.state != "running":
-		time.sleep(5)
-		inst.update()
-	conn.create_tags([inst.id],{"Name": amazonEc2.name})
-	amazonEc2.reference = inst.id
-	amazonEc2.hostname = inst.dns_name
-	amazonEc2.publicaddr = inst.public_dns_name
-	amazonEc2.privateaddr = inst.private_dns_name
-	if(inst.dns_name):
-		ipaddr = inst.dns_name.split("-")
-		ipaddr4 = ipaddr[4].split(".")
-		amazonEc2.accessip = ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]+"."+ipaddr4[0]
-	amazonEc2.state = 1;
-	return amazonEc2
+		if(amazonEc2.keypair != " "):
+			res = conn.run_instances(amazonEc2.image,instance_type=amazonEc2.flavor,min_count=1,max_count=1,key_name=amazonEc2.keypair,security_groups=[amazonEc2.group],user_data=None)
+		else:
+			res = conn.run_instances(amazonEc2.image,instance_type=amazonEc2.flavor,min_count=1,max_count=1,security_groups=[amazonEc2.group],user_data=None)		
+
+		inst = res.instances[0]
+		while inst.state != "running":
+			time.sleep(5)
+			inst.update()
+		conn.create_tags([inst.id],{"Name": amazonEc2.name})
+		amazonEc2.reference = inst.id
+		amazonEc2.hostname = inst.dns_name
+		amazonEc2.publicaddr = inst.public_dns_name
+		amazonEc2.privateaddr = inst.private_dns_name
+		if(inst.dns_name):
+			ipaddr = inst.dns_name.split("-")
+			ipaddr4 = ipaddr[4].split(".")
+			amazonEc2.accessip = ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]+"."+ipaddr4[0]
+		amazonEc2.state = 1
+		return amazonEc2
 			
 
 def amazonEc2_stop(accesskey,secretkey,zone,amazonEc2):

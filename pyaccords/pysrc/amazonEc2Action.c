@@ -43,6 +43,11 @@ struct rest_response * start_amazonEc2(
 	/* --------------------------------- */
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 404, "ec2 Invalid Action" ) );
+	else if(pptr->state == _OCCI_SUSPENDED)
+	{
+		if((status = start_ec2_instance(subptr,pptr)!=0))
+			return ( rest_html_response( aptr, status, "start ec2 vm failure"));
+	}
 	else if (pptr->state != _OCCI_IDLE )
 		return( rest_html_response(aptr, 200, "ok ") );
 	else if (!(subptr = use_ec2_configuration(get_default_agent(),default_tls(),pptr->profile)))
@@ -51,6 +56,7 @@ struct rest_response * start_amazonEc2(
 		return ( rest_html_response( aptr, 888, "ec2 firewall failure"));
 	else if((status = start_ec2_instance(subptr,pptr)!=0))
 		return ( rest_html_response( aptr, status, "start ec2 vm failure"));
+
 	sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 	/* ---------------------------- */
 	/* launch the COSACS operations */
