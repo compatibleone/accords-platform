@@ -812,24 +812,7 @@ public	struct	ezi_response *	ezi_delete_server(struct ezi_subscription * sptr,  
 	if (!( id ))
 		sprintf(buffer,"/compound_app");
 	else	sprintf(buffer,"/compound_app/%s",id);
-	if (!( hptr = ezi_authenticate(sptr) ))
-		return( rptr );
-	else if (!( uptr = analyse_url( sptr->Ezi.iaas )))
-		return( rptr );
-	else if (!( uptr = validate_url( uptr ) ))
-		return( rptr );
-	else if (!( nptr = serialise_url( uptr, buffer ) ))
-	{
-		uptr = liberate_url( uptr );
-		return( rptr );
-	}
-	else if (!( rptr = ezi_client_delete_request( nptr, sptr->Ezi.tls, sptr->Ezi.agent, hptr ) ))
-	{
-		uptr = liberate_url( uptr );
-		liberate( nptr );
-		return( rptr );
-	}
-	else	return( rptr );
+	return( ezi_delete_operation( sptr,  buffer ) );
 }
 
 /*	------------------------------------------------------------	*/

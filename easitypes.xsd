@@ -5,7 +5,6 @@
 			<xsd:element name="easiclouds_node" type="easiclouds_node" minOccurs="1" maxOccurs="unbounded"/>
 			<xsd:element name="easiclouds_link" type="easiclouds_link" minOccurs="1" maxOccurs="unbounded"/>
 			<xsd:element name="easiclouds_extra" type="easiclouds_extra" minOccurs="1" maxOccurs="unbounded"/>
-			<xsd:element name="easiclouds_postconf" type="easiclouds_postconf" minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
@@ -147,6 +146,7 @@
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 		<xsd:attribute name="image" type="xsd:string"/>	
+		<xsd:attribute name="access" type="xsd:string"/>	
 		<xsd:attribute name="flavor" type="xsd:string"/>
 		<xsd:attribute name="configuration" type="xsd:string"/>
 		<xsd:attribute name="description" type="xsd:string"/>
