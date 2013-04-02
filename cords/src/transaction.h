@@ -2,6 +2,8 @@
 #ifndef	_cords_transaction_h
 #define	_cords_transaction_h
 
+#define _CORDS_CLOSED_TRANSACTION_STATE "1"
+
 struct	cords_transaction
 {
 	char	*	id;
