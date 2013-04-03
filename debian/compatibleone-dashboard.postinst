@@ -5,5 +5,8 @@ if [ "$1" = "configure" ] || [ "$1" = "triggered" ] || [ "$1" = "upgrade" ] ; th
 	if [ ! -e /var/lib/accords/dashboard.inc ] ; then
 		cd /var/lib/accords && ( /var/lib/accords/dashboard-init-unsafe.sh > /dev/null 2>&1 || /bin/true)
 	fi
+
+	echo "The default dashboard (http://localhost/accords/) login is 'admin', with 'admin' as password.
+
 fi
 

@@ -1,8 +1,8 @@
-compatibleone-accords (1.0-8) precise; urgency=low
+compatibleone-accords (1.0-8) unstable; urgency=low
 
   * Upstream code update (big dashboard scripts update).
 
- -- Vincent Renardias <vincent@renardias.com>  Wed, 27 Mar 2013 09:33:41 +0100
+ -- Vincent Renardias <vincent@renardias.com>  Wed, 03 Apr 2013 15:14:24 +0200
 
 compatibleone-accords (1.0-7) unstable; urgency=low
 

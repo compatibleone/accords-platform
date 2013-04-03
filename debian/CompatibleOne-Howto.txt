@@ -27,6 +27,10 @@ To reconfigure CompatibleOne to your needs/configuration, you need to:
 - you can now parse your manifest and agreement files ('co-parser') and then ask for the 
   provisioned machines to be deployed and run ('co-broker').
 
+A dashboard is available on http://localhost/accords/ (if you installed the package
+compatibleone-dashboard), the default login is 'admin', with 'admin' as password.
+
+
 Here's a list of the files which should be present in your accords working directory along
 with their role/use.
 
