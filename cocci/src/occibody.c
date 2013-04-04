@@ -336,6 +336,48 @@ public	char *	occi_html_capacities(
 }
 
 /*	------------------------------------------------------------	*/
+/*	  		o c c i _ x m l _ c a p a c i t i e s		*/
+/*	------------------------------------------------------------	*/
+public	char *	occi_xml_capacities( 
+		struct occi_category * cptr,
+		struct rest_response * aptr )
+{
+	FILE *	h;
+	char *	filename;
+	char	buffer[2048];
+	char *	vptr;
+	char *	nptr;
+	struct	rest_header * contentlength=(struct rest_header *) 0;
+	struct	rest_header * contenttype=(struct rest_header *) 0;
+
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( filename );
+
+	else if (!( h = fopen(filename,"w")))
+	{
+		return(liberate(filename));
+	}
+	else
+	{
+			while ( cptr->previous ) cptr = cptr->previous;
+			while ( cptr )
+			{
+				if ((vptr = occi_xml_capacity( cptr )) != (char *) 0 )
+				{
+					fprintf(h,"%s\n",vptr);
+					liberate( vptr );
+				}
+				cptr = cptr->next;
+			}
+
+		fclose(h);
+		if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
+			return( filename );
+		else	return( occi_content_length(contentlength, filename ));
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*			o c c i _ a c c e p t _ h e a d e r 		*/
 /*	------------------------------------------------------------	*/
 public	struct	rest_header * occi_accept_header( struct rest_response * aptr )

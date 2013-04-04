@@ -1655,6 +1655,24 @@ public	struct	rest_response * rest_accept_response( struct rest_client * cptr )
 	}
 }
 
+/*	-----------------------------------------------------	*/
+/*	r e s t _ l i b e r a t e _ r e s p o n s e _ f i l e	*/
+/*	-----------------------------------------------------	*/
+private	int	rest_liberate_response_file( struct rest_response * aptr )
+{
+	if (!( aptr ))
+		return( 0 );
+	else if (!( aptr->body ))
+		return( 0 );
+	else if ( aptr->type != _FILE_BODY )
+		return( 0 );
+	else 	
+	{
+		unlink( aptr->body );
+		return(0);
+	}
+}
+
 /*	------------------------------------------------	*/
 /*	     r e s t _ p r o c e s s _ m e s s a g e		*/
 /*	------------------------------------------------	*/
@@ -1677,6 +1695,7 @@ private	int	rest_process_message(
 		rest_log_debug("rest: transmit response");
 		rest_transmit_response( cptr, aptr );
 		rest_log_debug("rest: liberate request");
+		rest_liberate_response_file( aptr );
 		liberate_rest_request( rptr );
 		rest_log_debug("rest: liberate response");
 		rest_liberate_response( aptr );

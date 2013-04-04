@@ -23,54 +23,50 @@
 /*	---------------------------------------------------	*/
 public	char *	occi_xml_capacity( struct occi_category * optr )
 {
-	char	buffer[8192];
+	char	buffer[16000];
 	char  *	term;
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
-	sprintf(buffer,"%s;\r\n scheme=\"%s\";\r\n class=%s;\r\n rel=\"%s\";\r\n",
-		optr->id,optr->scheme,optr->class,optr->rel );
+
+	sprintf(buffer,"<category name=\"%s\" scheme=\"%s\" class=\"%s\" rel=\"%s\" location=\"%s\">\n",
+		optr->id,optr->scheme,optr->class,optr->rel,optr->location );
 
 	if ( optr->first )
 	{
-		strcat( buffer, " attributes");
-		term = "=";
+		strcat( buffer, "<attributes>\n");
 		for (	mptr = optr->first;
 			mptr != (struct occi_attribute *) 0;
 			mptr = mptr->next )
 		{
-			strcat( buffer, term );
+			strcat( buffer, "<attribute name=\"");
 			strcat( buffer, optr->domain );
 			strcat( buffer, "." );
 			strcat( buffer, optr->id   );
 			strcat( buffer, "." );
 			strcat( buffer, mptr->name );
-			if ( mptr->mandatory )
-				strcat( buffer,"{required}" );
-			if ( mptr->immutable )
-				strcat( buffer,"{immutable}" );
-			term=",";
+			strcat( buffer, "\" type=\"string\"" );
+			sprintf( (buffer+strlen(buffer))," required=\"%s\"", ( mptr->mandatory ? "true" : "false") );
+			sprintf( (buffer+strlen(buffer))," immutable=\"%s\"", ( mptr->immutable ? "true" : "false") );
+			strcat( buffer, "/>\n" );
 		}
-		strcat( buffer, ";\r\n" );
-
+		strcat( buffer, "</attributes>\n");
 	}
+
 	if ( optr->firstact )
 	{
-		strcat( buffer, " actions");
-		term = "=";
+		strcat( buffer, "<actions>\n");
 		for (	fptr = optr->firstact;
 			fptr != (struct occi_action *) 0;
 			fptr = fptr->next )
 		{
-			strcat( buffer, term );
+			strcat( buffer, "<action name=\"");
 			strcat( buffer, fptr->name );
-			term=",";
+			strcat( buffer, "\"/>\n");
 		}
-		strcat( buffer, ";\r\n" );
+		strcat( buffer, "</actions>\n");
 	}
 
-	strcat( buffer, " location=\"" );
-	strcat( buffer, optr->location );
-	strcat( buffer, "\";" );
+	strcat( buffer, "</category>\n");
 
 	return( allocate_string( buffer ) );
 

@@ -33,6 +33,8 @@ public	char *	occi_text_capacities( struct occi_category * cptr, struct rest_res
 public	char *	occi_response_body( char * accepts, struct occi_category * cptr, struct rest_header * hptr );
 public	int	accept_string_includes( char * sptr, char * tptr );
 public	char *	occi_html_body( struct occi_category * cptr,struct rest_header  * hptr );
+public	char *	occi_xml_capacity( struct occi_category * optr );
+public	char *  occi_xml_capacities( struct occi_category * cptr, struct rest_response  * aptr );
 
 	/* ------------ */
 #endif	/* _occi_body_h */
