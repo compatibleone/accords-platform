@@ -375,10 +375,10 @@ public	int	socket_listen( int h, int port, int max )
 /*	------------------------------------------	*/
 int	free_socket( int s )
 {
-	if ( socket ) {
-		socket_shutdown(s,2);
-		socket_close(s);
-		}
+	if ( socket >= 0) {
+	    socket_shutdown(s,2);
+	    socket_close(s);
+	}
 	return(0);
 }
 

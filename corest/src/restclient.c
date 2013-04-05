@@ -317,7 +317,7 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 			failure(27,"rest","allocate client");
 		return( cptr );
 	}
-	else if (!(cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )))
+	else if ((cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
 	{
 		if ( check_debug() )
 			failure(errno,"socket_create","errno");
@@ -377,7 +377,7 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 			failure(27,"rest","allocate client");
 		return( cptr );
 	}
-	else if (!(cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )))
+	else if ((cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
 	{
 		if ( check_debug() )
 			failure(errno,"socket_create","errno");
