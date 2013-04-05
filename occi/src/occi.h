@@ -114,12 +114,16 @@ public	char *	get_default_account_id();
 
 #define	_OCCI_OCCI_JSON		"application/json+occi"
 #define	_OCCI_APP_JSON		"application/json"
+#define	_OCCI_APPLICATION_JSON	"application/json"
+#define	_OCCI_X_APPLICATION_JSON	"x-application/json"
 #define	_OCCI_TEXT_JSON		"text/json"
 #define	_OCCI_MIME_JSON		"text/json"
 #define	_OCCI_TEXT_FORM		"application/x-www-form-urlencoded"
 
 #define	_OCCI_OCCI_XML		"application/xml+occi"
 #define	_OCCI_APP_XML		"application/xml"
+#define	_OCCI_APPLICATION_XML	"application/xml"
+#define	_OCCI_X_APPLICATION_XML	"x-application/xml"
 #define	_OCCI_TEXT_XML		"text/xml"
 #define	_OCCI_MIME_XML		"text/xml"
 
