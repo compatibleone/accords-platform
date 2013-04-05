@@ -215,7 +215,7 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 		failure(27,"rest","allocate server");
 		return( sptr );
 	}
-	else if (!(sptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )))
+	else if ((sptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
 	{
  	        failure(errno,"socket_create",strerror(errno));
 		return( rest_liberate_server( sptr ) );
