@@ -38,16 +38,30 @@ public	char *	occi_xml_capacity( struct occi_category * optr )
 			mptr != (struct occi_attribute *) 0;
 			mptr = mptr->next )
 		{
-			strcat( buffer, "<attribute id=\"");
-			strcat( buffer, optr->domain );
-			strcat( buffer, "." );
-			strcat( buffer, optr->id   );
-			strcat( buffer, "." );
+			strcat( buffer, "<attribute name=\"");
 			strcat( buffer, mptr->name );
-			strcat( buffer, "\" type=\"string\"" );
-			strcat( buffer, "\" index=\"true\"" );
-			strcat( buffer, "\" default=\" \"" );
-			strcat( buffer, "\" units=\"none\"" );
+			strcat( buffer, "\"");
+
+			strcat( buffer, " type=\"" );
+			strcat( buffer, ( mptr->type ? mptr->type : "string" ));
+			strcat( buffer, "\"");
+
+			strcat( buffer, " index=\"" );
+			strcat( buffer, ( mptr->indexed ? "true" : "false" ));
+			strcat( buffer, "\"");
+
+			strcat( buffer, " default=\"" );
+			strcat( buffer, ( mptr->defaultvalue ? mptr->defaultvalue : " " ));
+			strcat( buffer, "\"");
+
+			strcat( buffer, " validation=\"" );
+			strcat( buffer, ( mptr->validation ? mptr->validation : "*" ));
+			strcat( buffer, "\"");
+
+			strcat( buffer, " units=\"" );
+			strcat( buffer, ( mptr->units ? mptr->units : "none" ));
+			strcat( buffer, "\"");
+
 			sprintf( (buffer+strlen(buffer))," required=\"%s\"", ( mptr->mandatory ? "true" : "false") );
 			sprintf( (buffer+strlen(buffer))," immutable=\"%s\"", ( mptr->immutable ? "true" : "false") );
 			strcat( buffer, "/>\n" );

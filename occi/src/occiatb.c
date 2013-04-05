@@ -29,6 +29,14 @@ public struct occi_attribute * liberate_occi_attribute(struct occi_attribute * s
 	{
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
+		if ( sptr->type )
+			 sptr->type = liberate(sptr->type);
+		if ( sptr->units )
+			 sptr->units = liberate(sptr->units);
+		if ( sptr->validation )
+			 sptr->validation = liberate(sptr->validation);
+		if ( sptr->defaultvalue )
+			 sptr->defaultvalue = liberate(sptr->defaultvalue);
 		sptr = liberate( sptr );
 	}
 	return((struct occi_attribute *) 0);
@@ -46,6 +54,11 @@ public struct occi_attribute * reset_occi_attribute(struct occi_attribute * sptr
 		sptr->next = (struct occi_attribute*) 0;
 		sptr->parent = (struct occi_category*) 0;
 		sptr->name = (char*) 0;
+		sptr->type = (char*) 0;
+		sptr->units= (char*) 0;
+		sptr->validation = (char*) 0;
+		sptr->defaultvalue = (char*) 0;
+		sptr->indexed   =  0;
 		sptr->mandatory =  0;
 		sptr->immutable =  0;
 	}

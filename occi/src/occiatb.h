@@ -7,7 +7,12 @@ struct	occi_attribute
 	struct	occi_attribute 	* next;
 	struct	occi_category  	* parent;
 	char		    	* name;
+	char		    	* type;
+	char		    	* units;
+	char		    	* validation;
+	char		    	* defaultvalue;
 	int			  mandatory;
+	int			  indexed;
 	int			  immutable;
 };
 
