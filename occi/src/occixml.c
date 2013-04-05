@@ -28,7 +28,7 @@ public	char *	occi_xml_capacity( struct occi_category * optr )
 	struct	occi_attribute * mptr;
 	struct	occi_action    * fptr;
 
-	sprintf(buffer,"<category name=\"%s\" scheme=\"%s\" class=\"%s\" rel=\"%s\" location=\"%s\">\n",
+	sprintf(buffer,"<category term=\"%s\" scheme=\"%s\" class=\"%s\" rel=\"%s\" location=\"%s\">\n",
 		optr->id,optr->scheme,optr->class,optr->rel,optr->location );
 
 	if ( optr->first )
@@ -38,13 +38,16 @@ public	char *	occi_xml_capacity( struct occi_category * optr )
 			mptr != (struct occi_attribute *) 0;
 			mptr = mptr->next )
 		{
-			strcat( buffer, "<attribute name=\"");
+			strcat( buffer, "<attribute id=\"");
 			strcat( buffer, optr->domain );
 			strcat( buffer, "." );
 			strcat( buffer, optr->id   );
 			strcat( buffer, "." );
 			strcat( buffer, mptr->name );
 			strcat( buffer, "\" type=\"string\"" );
+			strcat( buffer, "\" index=\"true\"" );
+			strcat( buffer, "\" default=\" \"" );
+			strcat( buffer, "\" units=\"none\"" );
 			sprintf( (buffer+strlen(buffer))," required=\"%s\"", ( mptr->mandatory ? "true" : "false") );
 			sprintf( (buffer+strlen(buffer))," immutable=\"%s\"", ( mptr->immutable ? "true" : "false") );
 			strcat( buffer, "/>\n" );
@@ -59,7 +62,7 @@ public	char *	occi_xml_capacity( struct occi_category * optr )
 			fptr != (struct occi_action *) 0;
 			fptr = fptr->next )
 		{
-			strcat( buffer, "<action name=\"");
+			strcat( buffer, "<action id=\"http://scheme.compatibleone.fr/scheme/compatible#");
 			strcat( buffer, fptr->name );
 			strcat( buffer, "\"/>\n");
 		}
