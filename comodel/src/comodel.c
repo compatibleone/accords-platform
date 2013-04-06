@@ -29,6 +29,8 @@
 #include "comodel.h"
 #include "strukt.h"
 
+#define	_COMODEL_VERSION "1.0.01"
+
 /*	------------------------------------------------------------------	*/
 /*	   a c c o r d s _ p l a t f o r m _ c o n f i g u r a t i o n		*/
 /*	------------------------------------------------------------------	*/
@@ -410,6 +412,9 @@ private	void	comodel_xml_category( FILE * h, struct occi_category * optr )
 		if ( optr->location )
 			fprintf(h," location=\"%s\"",optr->location );
 
+		if ( optr->version )
+			fprintf(h," version=\"%s\"",optr->version );
+
 		fprintf(h,">\n");
 		fprintf(h,"<attributes>\n");
 		for (	aptr=optr->first;
@@ -486,6 +491,9 @@ private	int	comodel_by_category( struct xml_element * eptr )
 			optr->class    = comodel_attribute(eptr,"class");
 			optr->rel      = comodel_attribute(eptr,"rel");
 			optr->location = comodel_attribute(eptr,"location");
+
+			if (!( optr->version = comodel_attribute(eptr,"version") ))
+				optr->version = allocate_string(_COMODEL_VERSION);
 						
 			if ((dptr=document_element( eptr, "attributes")) != (struct xml_element *) 0)
 			{

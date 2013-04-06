@@ -47,6 +47,8 @@ public struct occi_category * liberate_occi_category(struct occi_category * sptr
 			 sptr->id = liberate(sptr->id);
 		if ( sptr->scheme )
 			 sptr->scheme = liberate(sptr->scheme);
+		if ( sptr->version )
+			 sptr->version = liberate(sptr->version);
 		if ( sptr->class )
 			 sptr->class = liberate(sptr->class);
 		if ( sptr->title )
@@ -81,6 +83,7 @@ public struct occi_category * reset_occi_category(struct occi_category * sptr)
 		sptr->domain = (char*) 0;
 		sptr->id = (char*) 0;
 		sptr->scheme = (char*) 0;
+		sptr->version = (char*) 0;
 		sptr->class = (char*) 0;
 		sptr->title = (char*) 0;
 		sptr->rel = (char*) 0;
