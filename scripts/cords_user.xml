@@ -10,6 +10,8 @@
 <cords_user
  id="3d960eb3-easi-4bdd-a7a7-20e9coms85f3" name="service-eziprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-coez-4bdd-a7a7-20e9coms85f3" name="service-coeasy" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-cnpr-4bdd-a7a7-20e9coms85f3" name="service-cnprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-osoc-4bdd-a7a7-20e9coms85f3" name="service-osocciprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
@@ -73,4 +75,30 @@
  id="4903596a-4668-4abe-8d08-2dccdd2ff6e3" name="fabio" password="cuimhne" role="user" email="fabio@compatibleone.fr" account="fabio" authorization="" when="0" state="0" />
 <cords_user
  id="4903596a-acco-4abe-8d08-2dccdd2ff6e3" name="accords" password="platform" role="operator" email="fabio@compatibleone.fr" account="fabio" authorization="" when="0" state="0" />
+<cords_user
+ id="6cfd8da4-da69-4100-a700-b8797cbd2890" name="operator" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="e5d3cead-0592-49fd-9bdc-a59c8f4cf29e" name="osprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="49ae50fe-2819-4a28-9efb-5898255d5802" name="osocciprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="6777a050-5a66-4f5d-a2ca-db1709d30ea8" name="onprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="2fc6084f-11ec-4bb3-b40c-3e1cda9e8598" name="azprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="c289b192-c937-419e-b7eb-61f8d7a87ded" name="dcprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="61b3c5d8-878f-44c4-b622-492b59b5e1b5" name="cnprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="1f1d0793-7b45-4acb-8333-31e7a97b3d20" name="paprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="f48ce922-b407-4d61-a636-a978133a6d8c" name="eziprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="e6b704ec-da6c-422d-8851-cffd421034a5" name="paasprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="6ca6fd44-00b0-4120-8d69-2a522f175280" name="pcprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="4cade59c-c86d-4774-b829-dca8857f3730" name="oaprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="8e5b411d-0762-4474-88b3-02599d671dcd" name="ec2procci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
 </cords_users>
