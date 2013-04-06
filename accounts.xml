@@ -10,6 +10,7 @@
 <account name="dcprocci"><user name="dcprocci" role="admin"/></account>
 <account name="cnprocci"><user name="cnprocci" role="admin"/></account>
 <account name="paprocci"><user name="paprocci" role="admin"/></account>
+<account name="eziprocci"><user name="eziprocci" role="admin"/></account>
 <account name="paasprocci"><user name="paasprocci" role="admin"/></account>
 <account name="pcprocci"><user name="pcprocci" role="admin"/></account>
 <account name="oaprocci"><user name="oaprocci" role="admin"/></account>
