@@ -221,6 +221,7 @@ _co_provision()
     _co_run_prov dcprocci accords "accords delta cloud services" 10 10 1000 10 10
     _co_run_prov cnprocci accords "accords compute next services" 10 10 1000 10 10
     _co_run_prov eziprocci accords "accords easiclouds services" 10 10 1000 10 10
+    _co_run_prov oaprocci accords "accords on app services" 10 10 1000 10 10
     _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
     _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
 
@@ -384,6 +385,7 @@ _co_stop() {
     _stop_service cosacs
     _stop_service slam
     _stop_service paasprocci
+    _stop_service oaprocci
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service cnprocci
@@ -521,6 +523,10 @@ _run_eziprocci() {
     eziprocci --config $target CO-EZIPROCCI/1.0
 }
 
+_run_oaprocci() {
+    oaprocci --config $target CO-OAPROCCI/1.0
+}
+
 _run_parser() {
     parser --config $target CO-PARSER/1.0
 }
@@ -565,6 +571,7 @@ _make_security_files() {
 	_mksecs dcprocci 1
 	_mksecs cnprocci 1
 	_mksecs eziprocci 1
+	_mksecs oaprocci 1
 	_mksecs slam 1
 	_mksecs copaas 1
 	_mksecs coeasy 1
@@ -652,6 +659,7 @@ _accords_config() {
 		_mkcert dcprocci
 		_mkcert cnprocci
 		_mkcert eziprocci
+		_mkcert oaprocci
 		_mkcert slam
 		_mkcert copaas
 		_mkcert coeasy
@@ -712,6 +720,7 @@ _accords_config() {
     _mkpro ec2procci
     _mkpro cnprocci
     _mkpro eziprocci
+    _mkpro oaprocci
     _mkcosacs cosacs
 
     _termnag
@@ -1197,6 +1206,9 @@ case `basename $0` in
 	;;
     run-eziprocci)
 	_run_eziprocci $*
+	;;
+    run-oaprocci)
+	_run_oaprocci $*
 	;;
     run-parser)
 	_run_parser $*

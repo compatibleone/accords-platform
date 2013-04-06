@@ -14,6 +14,8 @@
 <cords_user
  id="3d960eb3-osoc-4bdd-a7a7-20e9coms85f3" name="service-osocciprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-oapr-4bdd-a7a7-20e9coms85f3" name="service-oaprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-copa-4bdd-a7a7-20e9coms85f3" name="service-copaas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-cona-4bdd-a7a7-20e9coms56e4" name="service-conagios" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />

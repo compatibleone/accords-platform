@@ -12,6 +12,7 @@
 <account name="paprocci"><user name="paprocci" role="admin"/></account>
 <account name="paasprocci"><user name="paasprocci" role="admin"/></account>
 <account name="pcprocci"><user name="pcprocci" role="admin"/></account>
+<account name="oaprocci"><user name="oaprocci" role="admin"/></account>
 <account name="ec2procci"><user name="ec2procci" role="admin"/></account>
 
 </import>

@@ -24,6 +24,7 @@ bash build-package paprocci
 bash build-package paasprocci
 bash build-package cnprocci
 bash build-package eziprocci
+bash build-package oaprocci
 bash build-package-tools
 
 
