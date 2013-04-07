@@ -42,6 +42,7 @@ struct	accords_configuration Procci = {
 	"procci.xml",
 	"europe",
 	"storage",
+	"procci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

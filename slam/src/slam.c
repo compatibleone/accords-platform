@@ -44,6 +44,7 @@ struct	accords_configuration Slam = {
 	"slam.xml",
 	"europe",
 	"storage",
+	"slam",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

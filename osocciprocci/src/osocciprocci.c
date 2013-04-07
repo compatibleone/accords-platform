@@ -50,6 +50,7 @@ struct	accords_configuration OsOcciProcci = {
 	"OsOcciProcci.xml",
 	"europe",
 	"storage",
+	"osocciprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

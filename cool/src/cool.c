@@ -50,7 +50,8 @@ struct	accords_configuration Cool = {
 	"domain",
 	"cool.xml",
 	"europe",
-	"storage",	
+	"storage",
+	"cool",	
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

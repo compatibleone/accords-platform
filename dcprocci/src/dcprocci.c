@@ -48,6 +48,7 @@ struct	accords_configuration DcProcci = {
 	"domain",
 	"dcprocci.xml",
 	"europe",
+	"dcprocci",
 	"storage",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0

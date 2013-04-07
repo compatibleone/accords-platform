@@ -26,6 +26,7 @@
 private	struct	accords_configuration 	* configuration 		= (struct accords_configuration *) 0;
 private	char				* section 			= (char *) 0;
 private	char				* identity			= (char *) 0;
+private	char				* component			= (char *) 0;
 private	char				* default_account		= (char *) 0;
 private	char				* default_account_id		= (char *) 0;
 private	char				* default_agent			= (char *) 0;
@@ -39,6 +40,16 @@ public	char *	get_identity()
 	if (!( configuration ))
 		return((char *) 0);
 	else 	return( configuration->identity ); 
+}
+
+/*	---------------------------------------------------------	*/
+/*			g e t _ c o m p o n e n t			*/
+/*	---------------------------------------------------------	*/
+public	char *	get_component()
+{
+	if (!( configuration ))
+		return((char *) 0);
+	else 	return( configuration->component ); 
 }
 	
 /*	---------------------------------------------------------	*/
@@ -159,6 +170,8 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		configuration->publisher = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "identity" ) ))
 		identity = configuration->identity = allocate_string( argv[++argi] );
+	else if (!( strcmp( aptr, "component" ) ))
+		component = configuration->component = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "zone" ) ))
 		configuration->zone = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "storage" ) ))
@@ -202,6 +215,7 @@ public	void	accords_configuration_options()
 	printf("\n   --chatport   <number>      specify chat server port");
 	printf("\n   --publisher  <url>         specify url of publisher");
 	printf("\n   --operator   <name>        specify name of operator");
+	printf("\n   --component  <name>        specify name of component");
 	printf("\n   --identity   <url>         specify url for publication ");
 	printf("\n   --zone       <name>        specify location zone   ");
 	printf("\n   --storage    <name>        specify data storage name");
@@ -250,6 +264,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		{
 			if ((aptr = document_atribut( eptr, "identity" )) != (struct xml_atribut *) 0)
 				configuration->identity = document_atribut_string( aptr );
+			if ((aptr = document_atribut( eptr, "component" )) != (struct xml_atribut *) 0)
+				configuration->component = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "publisher")) != (struct xml_atribut *) 0)
 				configuration->publisher = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "operator")) != (struct xml_atribut *) 0)

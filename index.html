@@ -1,0 +1,95 @@
+<category term="publication" scheme="http://scheme.compatibleone.fr/scheme/compatible#" class="kind" rel="http://scheme.ogf.org/occi/resource#" location="/publication/">
+<attributes>
+<attribute name="remote" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="what" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="where" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="why" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="when" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="uptime" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="who" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="pass" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="identity" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="zone" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="price" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="rating" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="operator" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="pid" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="state" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+<actions>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#DELETE"/>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#suspend"/>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#restart"/>
+</actions>
+</category>
+
+<category term="enquiry" scheme="http://scheme.compatibleone.fr/scheme/compatible#" class="kind" rel="http://scheme.ogf.org/occi/resource#" location="/enquiry/">
+<attributes>
+<attribute name="where" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="what" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="who" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="pass" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="state" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+<actions>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#DELETE"/>
+</actions>
+</category>
+
+<category term="operator" scheme="http://scheme.compatibleone.fr/scheme/compatible#" class="kind" rel="http://scheme.ogf.org/occi/resource#" location="/operator/">
+<attributes>
+<attribute name="name" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="description" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="account" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="security" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="pricelist" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="state" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+<actions>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#DELETE"/>
+</actions>
+</category>
+
+<category term="agency" scheme="http://scheme.compatibleone.fr/scheme/compatible#" class="kind" rel="http://scheme.ogf.org/occi/resource#" location="/agency/">
+<attributes>
+<attribute name="servicename" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="description" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="identity" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="port" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="domain" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="publisher" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="user" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="password" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="process" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="start" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="uptime" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="state" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+<actions>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#DELETE"/>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#start"/>
+<action id="http://scheme.compatibleone.fr/scheme/compatible#stop"/>
+</actions>
+</category>
+
+<category term="entity" scheme="http://schemas.ogf.org/core#" class="kind" rel="http://scheme.ogf.org/occi/entity#" location="/entity/">
+<attributes>
+<attribute name="id" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="title" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+</category>
+
+<category term="resource" scheme="http://schemas.ogf.org/core#" class="kind" rel="http://scheme.ogf.org/occi/resource#" location="/resource/">
+<attributes>
+<attribute name="summary" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+</category>
+
+<category term="link" scheme="http://schemas.ogf.org/core#" class="kind" rel="http://scheme.ogf.org/occi/link#" location="/link/">
+<attributes>
+<attribute name="source" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+<attribute name="target" type="string" index="false" default=" " validation="*" units="none" required="false" immutable="false"/>
+</attributes>
+</category>
+
+</component>

@@ -49,6 +49,7 @@ struct	accords_configuration OsProcci = {
 	"osprocci.xml",
 	"europe",
 	"storage",
+	"osprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

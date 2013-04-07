@@ -28,6 +28,7 @@ struct	accords_configuration CoNagios = {
 	"europe",
 	"conagios.xml",
 	"storage",
+	"conagios",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

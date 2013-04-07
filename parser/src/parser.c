@@ -43,6 +43,7 @@ struct	accords_configuration Parser = {
 	"parser.xml",
 	"europe",
 	"storage",
+	"parser",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

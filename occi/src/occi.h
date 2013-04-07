@@ -37,6 +37,7 @@ public	struct	occi_link_node * liberate_occi_link_node(struct	occi_link_node * n
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
 
 public	char *	get_identity();
+public	char *	get_component();
 public	char * 	get_default_agent();
 public	int	set_default_agent( char * nptr);
 public	char *	get_operator_profile();

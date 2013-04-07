@@ -43,6 +43,7 @@ struct	accords_configuration Coees = {
 	"coees.xml",
 	"europe",
 	"storage",
+	"coees",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

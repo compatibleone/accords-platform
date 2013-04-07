@@ -345,31 +345,33 @@ public	char *	occi_xml_capacities(
 	FILE *	h;
 	char *	filename;
 	char	buffer[2048];
+	char *	identity;
 	char *	vptr;
 	char *	nptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	rest_header * contenttype=(struct rest_header *) 0;
 
-	if (!( filename = rest_temporary_filename( "xml" ) ))
+	if (!( identity = get_component()))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( filename );
 
 	else if (!( h = fopen(filename,"w")))
-	{
 		return(liberate(filename));
-	}
-	else
+	else	
 	{
-			while ( cptr->previous ) cptr = cptr->previous;
-			while ( cptr )
+		fprintf(h,"<component name=\"%s\">\n", identity );
+		while ( cptr->previous ) cptr = cptr->previous;
+		while ( cptr )
+		{
+			if ((vptr = occi_xml_capacity( cptr )) != (char *) 0 )
 			{
-				if ((vptr = occi_xml_capacity( cptr )) != (char *) 0 )
-				{
-					fprintf(h,"%s\n",vptr);
-					liberate( vptr );
-				}
-				cptr = cptr->next;
+				fprintf(h,"%s\n",vptr);
+				liberate( vptr );
 			}
-
+			cptr = cptr->next;
+		}
+		fprintf(h,"</component>\n");
 		fclose(h);
 		if (!( contentlength = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, "0" ) ))
 			return( filename );

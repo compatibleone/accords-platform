@@ -50,6 +50,7 @@ private	struct	accords_configuration Cosacs = {
 	"cosacs.xml",
 	"europe",
 	"storage",
+	"cosacs",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

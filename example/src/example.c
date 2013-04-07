@@ -50,6 +50,7 @@ struct	accords_configuration Configuration = {
 	"example.xml",
 	"europe",
 	"storage",
+	"example",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

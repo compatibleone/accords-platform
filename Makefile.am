@@ -128,6 +128,9 @@ endif
 if ENABLE_COEASY
 SUBDIRS += coeasy
 endif
+if ENABLE_COMODEL
+SUBDIRS += comodel
+endif
 if ENABLE_DCPROCCI
 SUBDIRS += dcprocci
 endif

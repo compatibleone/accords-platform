@@ -41,7 +41,7 @@ struct	accords_configuration
 	char *	config;			/* configuration file			*/
 	char *	zone;			/* location of host			*/
 	char *	storage;		/* the data storage table or file name 	*/
-
+	char *	component;		/* the component name			*/
 	struct	occi_category *	firstcat;
 	struct	occi_category *	lastcat;
 

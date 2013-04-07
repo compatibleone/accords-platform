@@ -50,6 +50,7 @@ struct	accords_configuration Cosched = {
 	"cosched.xml",
 	"europe",
 	"storage",
+	"cosched",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

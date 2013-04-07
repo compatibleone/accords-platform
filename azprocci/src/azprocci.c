@@ -49,6 +49,7 @@ struct	accords_configuration WazProcci = {
 	"azprocci.xml",
 	"europe",
 	"storage",
+	"azprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

@@ -44,6 +44,7 @@ struct	accords_configuration Ezvm = {
 	"ezvm.xml",
 	"europe",
 	"storage",
+	"ezvm",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

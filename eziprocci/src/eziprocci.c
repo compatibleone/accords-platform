@@ -55,6 +55,7 @@ struct	accords_configuration Configuration = {
 	"easiclouds.xml",
 	"europe",
 	"storage",
+	"eziprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

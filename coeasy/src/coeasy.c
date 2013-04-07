@@ -28,6 +28,7 @@ struct	accords_configuration CoEasy = {
 	"europe",
 	"coeasy.xml",
 	"storage",
+	"coeasy",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

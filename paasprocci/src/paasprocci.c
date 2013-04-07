@@ -52,6 +52,7 @@ struct	accords_configuration Configuration = {
 	"paasprocci.xml",
 	"europe",
 	"storage",
+	"paasprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

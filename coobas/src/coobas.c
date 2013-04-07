@@ -48,6 +48,7 @@ struct	accords_configuration CooBas = {
 	"coobas.xml",
 	"europe",
 	"storage",
+	"coobas",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

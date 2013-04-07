@@ -43,6 +43,7 @@ struct	accords_configuration Cops = {
 	"cops.xml",
 	"europe",
 	"storage",
+	"cops",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

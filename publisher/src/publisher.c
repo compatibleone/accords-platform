@@ -65,6 +65,7 @@ struct	accords_configuration Publisher = {
 	"publisher.xml",
 	"europe",
 	"storage",
+	"publisher",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

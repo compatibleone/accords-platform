@@ -375,6 +375,15 @@ AM_CONDITIONAL([ENABLE_COEASY], [test "$enable_coeasy" = "yes"])
 AC_SUBST([CFLAGS_COEASY], [-I\${abs_top_srcdir}/coeasy/src])
 AC_SUBST([PATH_COEASY], [${abs_top_srcdir}/coeasy/src])
 
+AC_ARG_ENABLE([comodel],
+      [AS_HELP_STRING([--disable-comodel],
+		      [Disable comodel @<:@default=enable@:>@])],
+      [],
+      [enable_comodel=yes])
+AM_CONDITIONAL([ENABLE_COMODEL], [test "$enable_comodel" = "yes"])
+AC_SUBST([CFLAGS_COMODEL], [-I\${abs_top_srcdir}/comodel/src])
+AC_SUBST([PATH_COMODEL], [${abs_top_srcdir}/comodel/src])
+
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
 		      [Disable cool @<:@default=enable@:>@])],
@@ -616,6 +625,7 @@ AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
 AC_CONFIG_FILES([cnprocci/Makefile cnprocci/src/Makefile])
 AC_CONFIG_FILES([eziprocci/Makefile eziprocci/src/Makefile])
 AC_CONFIG_FILES([coeasy/Makefile coeasy/src/Makefile])
+AC_CONFIG_FILES([comodel/Makefile comodel/src/Makefile])
 AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
 AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
 AC_CONFIG_FILES([example/Makefile example/src/Makefile])
@@ -684,6 +694,7 @@ echo "    - paasprocci               : $enable_paasprocci"
 echo "    - cnprocci                 : $enable_cnprocci"
 echo "    - eziprocci                : $enable_eziprocci"
 echo "    - coeasy                   : $enable_coeasy"
+echo "    - comodel                  : $enable_comodel"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
 echo "    - coidms                   : $enable_coidms"

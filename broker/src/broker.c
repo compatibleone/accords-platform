@@ -42,6 +42,7 @@ struct	accords_configuration Broker = {
 	"broker.xml",
 	"europe",
 	"storage",
+	"broker",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

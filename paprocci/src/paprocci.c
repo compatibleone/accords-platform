@@ -50,6 +50,7 @@ struct	accords_configuration WpaProcci = {
 	"paprocci.xml",
 	"europe",
 	"storage",
+	"paprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};

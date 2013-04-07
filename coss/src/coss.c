@@ -42,6 +42,7 @@ struct	accords_configuration Coss = {
 	"coss.xml",
 	"europe",
 	"storage",
+	"coss",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 	};
