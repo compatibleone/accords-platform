@@ -504,13 +504,11 @@ private	struct rest_response * occi_get_capacities(
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else	return( rest_response_status( aptr, 200, "OK" ) );
 	}
-	else if (( accept_string_includes( ctptr, _OCCI_TEXT_XML ) )
-	     ||  ( accept_string_includes( ctptr, _OCCI_APPLICATION_XML ) )
-	     ||  ( accept_string_includes( ctptr, _OCCI_X_APPLICATION_XML ) ))
+	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
 	{
-		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_APPLICATION_XML ) ))
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
-		else if (!( mptr = occi_xml_capacities( optr, aptr ) ))
+		else if (!( mptr = occi_html_capacities( optr, aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else
 		{
@@ -518,11 +516,13 @@ private	struct rest_response * occi_get_capacities(
 			return( rest_response_status( aptr, 200, "OK" ) );
 		}
 	}
-	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
+	else if (( accept_string_includes( ctptr, _OCCI_TEXT_XML ) )
+	     ||  ( accept_string_includes( ctptr, _OCCI_APPLICATION_XML ) )
+	     ||  ( accept_string_includes( ctptr, _OCCI_X_APPLICATION_XML ) ))
 	{
-		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_APPLICATION_XML ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
-		else if (!( mptr = occi_html_capacities( optr, aptr ) ))
+		else if (!( mptr = occi_xml_capacities( optr, aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 		else
 		{
