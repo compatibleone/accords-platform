@@ -54,9 +54,32 @@ private	void	generate_accords_config( FILE * h, char * nptr )
 	fprintf(h,"\t};\n");
 
 
-		fprintf(h,"public int check_debug() { return( Configuration.debug ); }\n");
+	fprintf(h,"public int check_debug() { return( Configuration.debug ); }\n");
+	fprintf(h,"public int check_verbose() { return( Configuration.verbose ); }\n");
+	fprintf(h,"public char * default_publisher() { return(Configuration.publisher); }\n");
+	fprintf(h,"public char * default_operator() { return(Configuration.operator); }\n");
+	fprintf(h,"public char * default_tls() { return(Configuration.tls); }\n");
+	fprintf(h,"public char * default_zone() { return(Configuration.zone); }\n");
 
+	fprintf(h,"public int %s_failure( int e, char * m1, char * m2 )\n{\n",nptr);
+	fprintf(h,"\tif ( e )\n{\n");
+	fprintf(h,"\t\tprintf(\"\\n*** failure \%u\",e);\n");
+	fprintf(h,"\t\tif ( m1 ) printf(\" : \%s\",m1);\n");
+	fprintf(h,"\t\tif ( m2 ) printf(\" : \%s\",m2);\n");	
+	fprintf(h,"\t\tprintf(\" **\\n\");\n");
+	fprintf(h,"\t}\nreturn( e );\n}\n");
+	fprintf(h,"private void	%s_configuration()\n{\n",nptr);
+	fprintf(h,"\tload_accords_configuration( &Configuration, \"%s\");\n",nptr);
+	fprintf(h,"\treturn;\n}\n");
 
+	fprintf(h,"private int %s_banner()\n{\n",nptr);
+	fprintf(h,"printf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
+	fprintf(h,"printf(\"\\n   Beta Version : 12/04/2013 \");\n",nptr);
+	fprintf(h,"printf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n",nptr);
+	fprintf(h,"printf(\"\\n\");\n",nptr);
+	fprintf(h,"accords_configuration_options();\n",nptr);
+	fprintf(h,"printf(\"\\n\\n\");\n");
+	fprintf(h,"return(0);\n}\n",nptr);
 
 	return;
 }
@@ -68,6 +91,15 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr )
 {
 	struct	occi_action * aptr;
 	char *	nptr;
+	char	buffer[1024];
+
+	sprintf(buffer,"%s.h",cptr->id);
+	generate_file_inclusion(h,buffer);
+	sprintf(buffer,"%s.c",cptr->id);
+	generate_file_inclusion(h,buffer);
+	sprintf(buffer,"occi%s.c",cptr->id);
+	generate_file_inclusion(h,buffer);
+
 	fprintf(h,"/* Actions of Category : %s */\n",cptr->id);
 	for (	aptr=cptr->firstact;
 		aptr != (struct occi_action *) 0;
@@ -163,11 +195,21 @@ private	void	generate_file_operation( FILE * h, char * nptr, struct occi_categor
 	fprintf(h,"\nprivate int %s_operation( char * sptr )\n{\n",nptr);
 	fprintf(h,"\tstruct occi_category * first=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * last=(struct occi_category *) 0;\n");
-	for (;	
+	fprintf(h,"\tstruct occi_category * optr=(struct occi_category *) 0;\n");
+	fprintf(h,"\tset_autosave_cords_xlink_name(\"links_%S.xml\");\n",nptr);
+	fprintf(h,"\trest_initialise_log( Configuration.monitor );\n");
+	for (	;	
 		cptr != (struct occi_category *) 0; 
 		cptr = cptr->next )
+	{
 		generate_add_category(h, cptr );
-
+	}
+	fprintf(h,"\tif (!( Configuration.identity ))\n");
+	fprintf(h,"\t\tocci_server(sptr,Configuration.restport, Configuration.tls,Configuration.threads, first, (char *) 0 ) );\n");
+	fprintf(h,"\telse\n\t{\n");
+	fprintf(h,"\t\tinitialise_occi_publisher(Configuration.publisher,(char *) 0,(char *) 0,(char *) 0);\n");
+	fprintf(h,"\t\treturn( publishing_occi_server(Configuration.user, Configuration.password,Configuration.identity,sptr,Configuration.restport,Configuration.tls,Configuration.threads,first));\n");
+	fprintf(h,"\t}\n");
 	fprintf(h,"\treturn(0);\n");
 	fprintf(h,"}\n");
 	return;
@@ -181,6 +223,7 @@ private	void	generate_file_start( FILE * h, char * nptr )
 	fprintf(h,"\nprivate int %s( int argc, char * argv[] )\n{\n",nptr);
 	fprintf(h,"\tint argi=1;\n");
 	fprintf(h,"\tchar * aptr;\n");
+	fprintf(h,"\t%s_configuration();\n",nptr);
 	fprintf(h,"\twhile ( argi < argc ) {\n");
 	fprintf(h,"\t\tif (!( aptr = argv[argi++] )) break;\n");
 	fprintf(h,"\t\telse if ( *aptr != '-' ) return( %s_operation( aptr ) );\n",nptr);
@@ -270,4 +313,3 @@ public	int	generate_procci_component( char * name, struct occi_category * cptr  
 }
 
 #endif	/* _gencomp_c */
-	/* ---------- */
