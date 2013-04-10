@@ -678,6 +678,7 @@ private	int	comodel_c_production()
 			cptr != (struct occi_component *) 0;
 			cptr = cptr->next )
 		{
+			generate_service_component( cptr->name, cptr->first );
 			for (	optr=cptr->first;
 				optr != (struct occi_category *) 0;
 				optr = optr->next )
