@@ -62,24 +62,24 @@ private	void	generate_accords_config( FILE * h, char * nptr )
 	fprintf(h,"public char * default_zone() { return(Configuration.zone); }\n");
 
 	fprintf(h,"public int %s_failure( int e, char * m1, char * m2 )\n{\n",nptr);
-	fprintf(h,"\tif ( e )\n{\n");
-	fprintf(h,"\t\tprintf(\"\\n*** failure \%u\",e);\n");
-	fprintf(h,"\t\tif ( m1 ) printf(\" : \%s\",m1);\n");
-	fprintf(h,"\t\tif ( m2 ) printf(\" : \%s\",m2);\n");	
+	fprintf(h,"\tif ( e )\n\t{\n");
+	fprintf(h,"\t\tprintf(\"\\n*** failure %cu\",e);\n",0x0025);
+	fprintf(h,"\t\tif ( m1 ) printf(\" : %cs\",m1);\n",0x0025);
+	fprintf(h,"\t\tif ( m2 ) printf(\" : %cs\",m2);\n",0x0025);	
 	fprintf(h,"\t\tprintf(\" **\\n\");\n");
-	fprintf(h,"\t}\nreturn( e );\n}\n");
+	fprintf(h,"\t}\n\treturn( e );\n}\n");
 	fprintf(h,"private void	%s_configuration()\n{\n",nptr);
 	fprintf(h,"\tload_accords_configuration( &Configuration, \"%s\");\n",nptr);
 	fprintf(h,"\treturn;\n}\n");
 
 	fprintf(h,"private int %s_banner()\n{\n",nptr);
-	fprintf(h,"printf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
-	fprintf(h,"printf(\"\\n   Beta Version : 12/04/2013 \");\n",nptr);
-	fprintf(h,"printf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n",nptr);
-	fprintf(h,"printf(\"\\n\");\n",nptr);
-	fprintf(h,"accords_configuration_options();\n",nptr);
-	fprintf(h,"printf(\"\\n\\n\");\n");
-	fprintf(h,"return(0);\n}\n",nptr);
+	fprintf(h,"\tprintf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
+	fprintf(h,"\tprintf(\"\\n   Beta Version : 12/04/2013 \");\n",nptr);
+	fprintf(h,"\tprintf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n",nptr);
+	fprintf(h,"\tprintf(\"\\n\");\n",nptr);
+	fprintf(h,"\taccords_configuration_options();\n",nptr);
+	fprintf(h,"\tprintf(\"\\n\\n\");\n");
+	fprintf(h,"\treturn(0);\n}\n",nptr);
 
 	return;
 }
@@ -93,6 +93,10 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr )
 	char *	nptr;
 	char	buffer[1024];
 
+	if (!( comodel_category_filter( cptr ) ))
+		return;
+
+	fprintf(h,"/* Category : %s */\n",cptr->id);
 	sprintf(buffer,"%s.h",cptr->id);
 	generate_file_inclusion(h,buffer);
 	sprintf(buffer,"%s.c",cptr->id);
@@ -100,7 +104,6 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr )
 	sprintf(buffer,"occi%s.c",cptr->id);
 	generate_file_inclusion(h,buffer);
 
-	fprintf(h,"/* Actions of Category : %s */\n",cptr->id);
 	for (	aptr=cptr->firstact;
 		aptr != (struct occi_action *) 0;
 		aptr = aptr->next )
@@ -127,7 +130,7 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr )
 				fprintf(h,"\tstruct rest_client * cptr,\n");
 				fprintf(h,"\tstruct rest_request * rptr,\n");
 				fprintf(h,"\tstruct rest_response * aptr )\n{\n");
-				fprintf(h,"\treturn( rest_response( aptr, 200, \"OK\" ) );\n");
+				fprintf(h,"\treturn( rest_html_response( aptr, 200, \"OK\" ) );\n");
 				fprintf(h,"}\n");
 			}
 		}
@@ -143,8 +146,10 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 {
 	struct	occi_action * aptr;
 	char *	nptr;
-	fprintf(h,"\tif (!( optr = occi_%s_builder( Configuration.domain, %c%s%c ) ))\n",cptr->id,0x0022,cptr->id,0x0022);
-	fprintf(h,"\t\treturn( 27 )\n");
+	if (!( comodel_category_filter( cptr ) ))
+		return;
+	fprintf(h,"\tif (!( optr = occi_cords_%s_builder( Configuration.domain, %c%s%c ) ))\n",cptr->id,0x0022,cptr->id,0x0022);
+	fprintf(h,"\t\treturn( 27 );\n");
 	fprintf(h,"\tif (!( optr->previous = last ))\n");
 	fprintf(h,"\t\tfirst = optr;\n");
 	fprintf(h,"\telse\toptr->previous->next = optr;\n");
@@ -169,7 +174,7 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 			if (!( strcmp( nptr, "DELETE" )))
 				continue;
 			fprintf(h,"\tif (!( optr = occi_add_action( optr, %c%s%c, \"\", _%s_%s ) ))\n",0x0022,nptr,0x0022,nptr,cptr->id);
-			fprintf(h,"\t\treturn( 27 )\n");
+			fprintf(h,"\t\treturn( 27 );\n");
 		}
 	}
  	return;
@@ -196,7 +201,7 @@ private	void	generate_file_operation( FILE * h, char * nptr, struct occi_categor
 	fprintf(h,"\tstruct occi_category * first=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * last=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * optr=(struct occi_category *) 0;\n");
-	fprintf(h,"\tset_autosave_cords_xlink_name(\"links_%S.xml\");\n",nptr);
+	fprintf(h,"\tset_autosave_cords_xlink_name(\"links_%s.xml\");\n",nptr);
 	fprintf(h,"\trest_initialise_log( Configuration.monitor );\n");
 	for (	;	
 		cptr != (struct occi_category *) 0; 
@@ -205,12 +210,11 @@ private	void	generate_file_operation( FILE * h, char * nptr, struct occi_categor
 		generate_add_category(h, cptr );
 	}
 	fprintf(h,"\tif (!( Configuration.identity ))\n");
-	fprintf(h,"\t\tocci_server(sptr,Configuration.restport, Configuration.tls,Configuration.threads, first, (char *) 0 ) );\n");
+	fprintf(h,"\t\treturn( occi_server(sptr,Configuration.restport, Configuration.tls,Configuration.threads, first, (char *) 0 ) );\n");
 	fprintf(h,"\telse\n\t{\n");
 	fprintf(h,"\t\tinitialise_occi_publisher(Configuration.publisher,(char *) 0,(char *) 0,(char *) 0);\n");
 	fprintf(h,"\t\treturn( publishing_occi_server(Configuration.user, Configuration.password,Configuration.identity,sptr,Configuration.restport,Configuration.tls,Configuration.threads,first));\n");
 	fprintf(h,"\t}\n");
-	fprintf(h,"\treturn(0);\n");
 	fprintf(h,"}\n");
 	return;
 }
@@ -242,7 +246,7 @@ private	void	generate_file_start( FILE * h, char * nptr )
 private	void	generate_file_main( FILE * h, char * nptr )
 {
 	fprintf(h,"\npublic int main( int argc, char * argv[] )\n{\n");
-	fprintf(h,"\tif ( argc == 1 ) return( banner() );\n");
+	fprintf(h,"\tif ( argc == 1 ) return( %s_banner() );\n",nptr);
 	fprintf(h,"\telse return( %s(argc,argv) );\n",nptr);
 	fprintf(h,"}\n");
 	return;
@@ -267,7 +271,8 @@ public	int	generate_service_component( char * name, struct occi_category * cptr 
 		generate_file_inclusion(h,"occi.h");
 		generate_file_inclusion(h,"document.h");
 		generate_file_inclusion(h,"cordspublic.h");
-		generate_file_inclusion(h,"occispublisher.h");
+		generate_file_inclusion(h,"occipublisher.h");
+		generate_file_inclusion(h,"accords.h");
 		generate_accords_config(h,name);
 
 		generate_file_actions(h,cptr);

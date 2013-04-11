@@ -44,7 +44,7 @@ struct	accords_configuration Configuration = {
 	"accords.xml",
 	"europe",
 	"storage",
-	"onprocci",
+	"oaprocci",
 	(struct occi_category *) 0,
 	(struct occi_category *) 0
 };

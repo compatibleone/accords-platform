@@ -41,7 +41,7 @@ public	char *	get_component();
 public	char * 	get_default_agent();
 public	int	set_default_agent( char * nptr);
 public	char *	get_operator_profile();
-
+public	char *	serialise_component_configuration();
 
 #define	_CORDS_SERVICE_AGENT 	get_default_agent()
 #define	_CORDS_CONTRACT_AGENT 	get_default_agent()

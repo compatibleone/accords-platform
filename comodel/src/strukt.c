@@ -70,7 +70,7 @@ public	int	strukt_set_license(char * filename)
 
 public	void	strukt_set_prefix(char * value )
 {
-	C.prefix = value;
+	C.prefix = allocate_string( value );
 }
 
 public	void	strukt_set_gencrud(int value)
@@ -836,7 +836,7 @@ private	void	file_header( FILE * h, char * nptr, char * iptr)
 	char	buffer[1024];
 	if ( C.genrest )
 		sprintf(buffer,"occi%s",nptr);
-	else	strcat(buffer,nptr);
+	else	strcpy(buffer,nptr);
 	if ( C.license ) { prepend_license( h, C.license ); }
 	fprintf(h,"/* STRUKT WARNING : this file has been generated and should not be modified by hand */\n");
 	fprintf(h,"#ifndef ");
@@ -858,7 +858,7 @@ private	void	file_footer( FILE * h, char * nptr)
 	char	buffer[1024];
 	if ( C.genrest )
 		sprintf(buffer,"occi%s",nptr);
-	else	strcat(buffer,nptr);
+	else	strcpy(buffer,nptr);
 	fprintf(h,"\n#endif\t/* ");
 	file_symbol( h, buffer );
 	fprintf(h," */\n");

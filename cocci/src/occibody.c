@@ -346,12 +346,15 @@ public	char *	occi_xml_capacities(
 	char *	filename;
 	char	buffer[2048];
 	char *	identity;
+	char *	configuration;
 	char *	vptr;
 	char *	nptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	rest_header * contenttype=(struct rest_header *) 0;
 
 	if (!( identity = get_component()))
+		return((char *) 0);
+	else if (!( configuration = serialise_component_configuration((struct accords_configuration*) 0)))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( filename );
@@ -360,7 +363,8 @@ public	char *	occi_xml_capacities(
 		return(liberate(filename));
 	else	
 	{
-		fprintf(h,"<component name=\"%s\">\n", identity );
+		fprintf(h,"<component %s>\n", configuration );
+		liberate( configuration );
 		while ( cptr->previous ) cptr = cptr->previous;
 		while ( cptr )
 		{

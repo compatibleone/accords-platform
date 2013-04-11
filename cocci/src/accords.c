@@ -354,6 +354,170 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 	return;
 }
 
+/*	----------------------------------------------------	*/
+/*	l o a d _ a c c o r d s _ c o n f i g u r a t i o n	*/
+/*	----------------------------------------------------	*/
+/*	this function provides configuration loading for all	*/
+/*	modules of the accords platform except the publisher	*/
+/*	----------------------------------------------------	*/
+
+public	int	save_accords_configuration( struct accords_configuration * cptr, char * sptr )
+{
+	int	security=0;
+	struct	xml_element * document;
+	struct	xml_element * eptr;
+	struct	xml_element * vptr;
+	struct	xml_atribut * aptr;
+	FILE *	h;
+	if (!( h = fopen( sptr, "w" ) ))
+		return( 46 );
+
+	else
+	{
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		fprintf(h,"<%s\n",cptr->component);
+			fprintf(h,"\tpublisher=\"%s\"\n",cptr->publisher);
+			fprintf(h,"\tidentity=\"%s\"\n",cptr->identity);
+			fprintf(h,"\toperator=\"%s\"\n",cptr->operator);
+			fprintf(h,"\tcomponent=\"%s\"\n",cptr->component);
+			fprintf(h,"\tverbose=\"%u\"\n",cptr->verbose);
+			fprintf(h,"\tipv6=\"%u\"\n",cptr->ipv6);
+			fprintf(h,"\tdebug=\"%u\"\n",cptr->debug);
+			fprintf(h,"\tthreads=\"%u\">\n",cptr->threads);
+			fprintf(h,"<rest host=\"%s\" port=\"%u\" storage=\"%s\"/>\n",
+				cptr->resthost,cptr->restport,cptr->storage);
+			fprintf(h,"<security user=\"%s\" password=\"%s\" tls=\"%s\" monitor=\"%u\"/>\n",
+				cptr->user,cptr->password,cptr->tls,cptr->monitor);
+			fprintf(h,"<domain name=\"%s\" zone=\"%s\"/>\n",
+				cptr->domain,cptr->zone);
+		fprintf(h,"</%s>\n",cptr->component);
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		s e r i a l i s e _ s t r i n g _ v a l u e 			*/
+/*	-----------------------------------------------------------------	*/
+private	char *	serialise_string_value( char * result, char * nptr, char * vptr )
+{
+	char	buffer[2048];
+	if ( result )
+	{
+		sprintf(buffer,"%s %s=%c%s%c",result,nptr,0x0022,(vptr ? vptr : ""),0x0022);
+		liberate( result );
+	}
+	else	sprintf(buffer,"%s=%c%s%c",nptr,0x0022,(vptr ? vptr : ""),0x0022);
+	return( allocate_string( buffer ) );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*		s e r i a l i s e _ i n t e g e r _ v a l u e 			*/
+/*	-----------------------------------------------------------------	*/
+private	char *	serialise_integer_value( char * result, char * nptr, int vptr )
+{
+	char	buffer[2048];
+	if ( result )
+	{
+		sprintf(buffer,"%s %s=%c%u%c",result,nptr,0x0022,vptr,0x0022);
+		liberate( result );
+	}
+	else	sprintf(buffer,"%s=%c%u%c",nptr,0x0022,vptr,0x0022);
+	return( allocate_string( buffer ) );
+}
+
+/*	-----------------------------------------------------------------	*/
+/*	s e r i a l i s e _ c o m p o n e n t _ c o n f i g u r a t i o n	*/
+/*	-----------------------------------------------------------------	*/
+public	char *	serialise_component_configuration(struct accords_configuration * cptr)
+{
+	char *	result=(char *) 0;
+	if (!( cptr ))
+		if (!( cptr = configuration ))
+			return( result );
+	if (!( result = serialise_string_value( result, "name", cptr->component )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "identity", cptr->identity )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "publisher", cptr->publisher )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "operator", cptr->operator )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "storage", cptr->storage )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "domain", cptr->domain )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "zone", cptr->zone )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "tls", cptr->tls )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "user", cptr->user )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "password", cptr->password )))
+		return( result );
+	else if (!( result = serialise_string_value( result, "host", cptr->resthost )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "port", cptr->restport )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "verbose", cptr->verbose )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "debug", cptr->debug )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "ipv6", cptr->ipv6 )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "threads", cptr->threads )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "monitor", cptr->monitor )))
+		return( result );
+	else	return( result );
+}
+
+/*	---------------------------------------------------------------------	*/
+/*	d e s e r i a l i s e _ c o m p o n e n t _ c o n f i g u r a t i o n	*/
+/*	---------------------------------------------------------------------	*/
+public	void	deserialise_component_configuration( 
+		struct accords_configuration * configuration,
+		struct xml_element * eptr )
+{
+	struct	xml_atribut * aptr;
+	if ((aptr = document_atribut( eptr, "identity" )) != (struct xml_atribut *) 0)
+		configuration->identity = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "name" )) != (struct xml_atribut *) 0)
+		configuration->component = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "publisher")) != (struct xml_atribut *) 0)
+		configuration->publisher = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "operator")) != (struct xml_atribut *) 0)
+		configuration->operator = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "verbose")) != (struct xml_atribut *) 0)
+		configuration->verbose = document_atribut_value( aptr );
+	if ((aptr = document_atribut( eptr, "ipv6")) != (struct xml_atribut *) 0)
+		configuration->ipv6 = document_atribut_value( aptr );
+	if ((aptr = document_atribut( eptr, "debug")) != (struct xml_atribut *) 0)
+		configuration->debug = document_atribut_value( aptr );
+	if ((aptr = document_atribut( eptr, "threads")) != (struct xml_atribut *) 0)
+		configuration->threads = document_atribut_value( aptr );
+
+	if ((aptr = document_atribut( eptr, "host" )) != (struct xml_atribut *) 0)
+		configuration->resthost = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "port" )) != (struct xml_atribut *) 0)
+		configuration->restport = document_atribut_value( aptr );
+	if ((aptr = document_atribut( eptr, "storage" )) != (struct xml_atribut *) 0)
+		configuration->storage = document_atribut_string( aptr );
+
+	if ((aptr = document_atribut( eptr, "user" )) != (struct xml_atribut *) 0)
+		configuration->user = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "password"))  != (struct xml_atribut *) 0)
+		configuration->password = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "tls" )) != (struct xml_atribut *) 0)
+		configuration->tls = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "monitor")) != (struct xml_atribut *) 0)
+		configuration->monitor = document_atribut_value( aptr );
+	if ((aptr = document_atribut( eptr, "domain" )) != (struct xml_atribut *) 0)
+		configuration->domain = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "zone" )) != (struct xml_atribut *) 0)
+		configuration->zone = document_atribut_string( aptr );
+	return;
+}
 
 #endif	/* _accords_c */
 	/* ---------- */
