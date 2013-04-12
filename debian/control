@@ -195,6 +195,14 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - Azur Procci subsystem
  CompatibleOne Accords Platform - Azur Procci subsystem package
 
+Package: compatibleone-oaprocci
+Section: net
+Architecture: any
+Provides: compatibleone-cloud-provider
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+Description: CompatibleOne Accords Platform - OnApp procci subsystem
+ CompatibleOne Accords Platform - OnApp Procci subsystem package
+
 Package: compatibleone-ec2procci
 Section: net
 Architecture: all
@@ -385,6 +393,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - EasyClouds subsystem
  CompatibleOne Accords Platform - EasyClouds subsystem package
 
+Package: compatibleone-comodel
+Section: net
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
+Description: CompatibleOne Accords Platform - Model Generator
+ CompatibleOne Accords Platform - comodel subsystem package
+
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
@@ -494,7 +509,7 @@ Description: CompatibleOne Accords Platform - Dashboard
 Package: compatibleone-accords
 Architecture: all
 Section: net
-Depends: compatibleone (>= ${binary:Version}),  compatibleone-base (>= ${binary:Version}), compatibleone-azprocci (>= ${binary:Version}),  compatibleone-broker (>= ${binary:Version}),  compatibleone-cool (>= ${binary:Version}),  compatibleone-coees (>= ${binary:Version}),  compatibleone-copaas (>= ${binary:Version}),  compatibleone-cops (>= ${binary:Version}),  compatibleone-coips (>= ${binary:Version}),  compatibleone-comons (>= ${binary:Version}),  compatibleone-conets (>= ${binary:Version}),  compatibleone-coobas (>= ${binary:Version}),  compatibleone-cosacs (>= ${binary:Version}),  compatibleone-cosched (>= ${binary:Version}), compatibleone-coeasy (>= ${binary:Version}), compatibleone-coss (>= ${binary:Version}), compatibleone-cnprocci (>= ${binary:Version}), compatibleone-eziprocci (>= ${binary:Version}), compatibleone-dcprocci (>= ${binary:Version}), compatibleone-ec2procci (>= ${binary:Version}),  compatibleone-ezvm (>= ${binary:Version}),  compatibleone-fileserver (>= ${binary:Version}),  compatibleone-onprocci (>= ${binary:Version}),  compatibleone-osocciprocci (>= ${binary:Version}),  compatibleone-osprocci (>= ${binary:Version}),  compatibleone-procci (>= ${binary:Version}),  compatibleone-publisher (>= ${binary:Version}),  compatibleone-paasprocci (>= ${binary:Version}),  compatibleone-slam (>= ${binary:Version}), compatibleone-accords-doc
+Depends: compatibleone (>= ${binary:Version}),  compatibleone-base (>= ${binary:Version}), compatibleone-azprocci (>= ${binary:Version}),  compatibleone-broker (>= ${binary:Version}),  compatibleone-cool (>= ${binary:Version}),  compatibleone-coees (>= ${binary:Version}),  compatibleone-copaas (>= ${binary:Version}),  compatibleone-cops (>= ${binary:Version}),  compatibleone-coips (>= ${binary:Version}),  compatibleone-comons (>= ${binary:Version}),  compatibleone-conets (>= ${binary:Version}),  compatibleone-coobas (>= ${binary:Version}),  compatibleone-cosacs (>= ${binary:Version}),  compatibleone-cosched (>= ${binary:Version}), compatibleone-coeasy (>= ${binary:Version}), compatibleone-coss (>= ${binary:Version}), compatibleone-comodel (>= ${binary:Version}), compatibleone-cnprocci (>= ${binary:Version}), compatibleone-eziprocci (>= ${binary:Version}), compatibleone-dcprocci (>= ${binary:Version}), compatibleone-ec2procci (>= ${binary:Version}),  compatibleone-ezvm (>= ${binary:Version}),  compatibleone-fileserver (>= ${binary:Version}),  compatibleone-onprocci (>= ${binary:Version}),  compatibleone-osocciprocci (>= ${binary:Version}),  compatibleone-osprocci (>= ${binary:Version}),  compatibleone-procci (>= ${binary:Version}),  compatibleone-publisher (>= ${binary:Version}),  compatibleone-paasprocci (>= ${binary:Version}),  compatibleone-slam (>= ${binary:Version}), compatibleone-accords-doc
 Recommends: compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (runtime)
  CompatibleOne is an open source project which provides a model, CORDS
