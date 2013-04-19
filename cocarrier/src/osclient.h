@@ -165,6 +165,12 @@ public	char *	os_build_glance_reference(struct os_subscription *  sptr, char * n
 public	char *	os_build_flavor_reference(struct os_subscription *  sptr, char * nptr );
 public	struct os_response * liberate_os_response(struct os_response * rptr );	
 
+public	struct	os_response *	os_create_keypair(struct os_subscription *  sptr, char * filename);
+public	struct	os_response *	os_get_keypair(struct os_subscription *  sptr, char * name );
+public	struct	os_response *	os_delete_keypair(struct os_subscription *  sptr, char * name );
+public	struct	os_response *	os_list_keypairs(struct os_subscription *  sptr );
+public	char *	os_keypair_request( struct os_subscription *  sptr, char * name, char * value );
+
 
 #endif	/* _os_client_h */
 	/* ------------ */

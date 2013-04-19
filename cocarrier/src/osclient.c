@@ -2626,6 +2626,158 @@ public	struct	os_response *	os_delete_server(struct os_subscription * sptr,  cha
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ k e y p a i r _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+public	char *	os_keypair_request( struct os_subscription *  sptr, char * name, char * value )
+{
+	char *	filename;
+	FILE *	h;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate(sptr) ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("xml")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",0x0022,0x0022,0x0022,0x0022);
+		fprintf(h,"<keypair>\n<name>%s</name>\n",name);
+		if ( rest_valid_string( value ) )
+		{
+			fprintf(h,"<public_key>%s</public_key>\n",value);
+		}
+		fprintf(h,"</keypair>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ c r e at e _ k e y p a i r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_create_keypair(struct os_subscription *  sptr, char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-keypairs");
+
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			    o s _ g e t _ k e y p a i r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_get_keypair(struct os_subscription *  sptr, char * name )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-keypairs/%s",name);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			o s _ d e l e t e _ k e y p a i r 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_delete_keypair(struct os_subscription *  sptr, char * name )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-keypairs/%s",name);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*			    o s _ l i s t _ k e y p a i r s 		*/
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_keypairs(struct os_subscription *  sptr )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char	buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	sprintf(buffer,"/os-keypairs");
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*			o s _ d e l e t e _ i m a g e 			*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_delete_image	(struct os_subscription * sptr,  char * id )

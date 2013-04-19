@@ -104,6 +104,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( failure(33, "missing", "parameter" ));
 		else if (!( strcasecmp( p2, "SERVERS" ) ))
 			os_result( ( detail ? os_list_server_details(subscription) : os_list_servers(subscription)) );
+		else if (!( strcasecmp( p2, "KEYS" ) ))
+			os_result( os_list_keypairs(subscription) );
 		else if (!( strcasecmp( p2, "FLAVORS" ) ))
 			os_result( ( detail ? os_list_flavor_details(subscription) : os_list_flavors(subscription)) );
 		else if (!( strcasecmp( p2, "IMAGES" ) ))
@@ -148,6 +150,17 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			return( 0 );
 		}
 	}
+	else if (!( strcasecmp(p1,"KEY" ) ))
+	{
+		if (!( nomfic = os_keypair_request(subscription, p2, p3 ) ))
+			return( failure(27,"cannot create keypair","request" ) );
+		else
+		{ 	
+			os_result( os_create_keypair(subscription, nomfic ) );
+			return( 0 );
+		}
+	}
+
 	else if (!( strcasecmp(p1,"PUBLICVM" ) ))
 	{
 		if (!( nomfic = os_create_image_request(subscription, p2, p3 ) ))
@@ -264,6 +277,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_get_limits( subscription ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			os_result( os_get_flavor( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "KEY" ) ))
+			os_result( os_get_keypair( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "IMAGE" ) ))
 			os_result( os_get_image( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GLANCE" ) ))
@@ -302,6 +317,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_delete_image( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_delete_address( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "KEY" ) ))
+			os_result( os_delete_keypair( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "FLAVOR" ) ))
 			os_result( os_delete_flavor( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "VOLUME" ) ))
@@ -407,13 +424,13 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.05");
-	printf("\n   Beta Version 25/01/2013");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.06");
+	printf("\n   Beta Version 19/04/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   VOLUME   <name> <size> <type> <zone> ");
 	printf("\n   ATTACH   <server> <volume> <device> ");
@@ -428,13 +445,14 @@ private	int	os_banner()
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   GET LIMITS ");
 	printf("\n   ADDRESS ");
+	printf("\n   KEY <name> <public_key> ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
 	printf("\n   COPY   [ GLANCE ] <id> <host> <tenant> <user> <password>");
 	printf("\n   HEAD   [ GLANCE ] <id> ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA | KEY ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id> | KEY <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");
