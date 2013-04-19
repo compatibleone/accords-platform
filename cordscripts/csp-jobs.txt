@@ -26,7 +26,7 @@
 		$url = $a[2];
 
 		$m = "<tr><td>"#$url#"<td>"#$action#"<td>"#$status#" "#$message#"<td>"#$start#"<td>"#$duration#"<td>";
-		$m = $m#"<img height=20 width="#$duration#" src='blue.png'></tr>";
+		$m = $m#"<img height=20 width="#$duration#" src='images/blue.png'></tr>";
 		$m.display();
 
 	}

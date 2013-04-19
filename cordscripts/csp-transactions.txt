@@ -156,7 +156,7 @@
 			/* ------------------------------------------------- */
 			if ( $items > 0 )
 			{
-				$message = "<tr><th><img src=blueusers.png>"#$account_name#"<th style='padding-right:1cm;'><div align=right>"#$items#"</div><th style='padding-right:1cm;'><div align=right>"#$total#"</div></tr>";
+				$message = "<tr><th><img src=images/blueusers.png>"#$account_name#"<th style='padding-right:1cm;'><div align=right>"#$items#"</div><th style='padding-right:1cm;'><div align=right>"#$total#"</div></tr>";
 				$message.display();
 				$grandtotal = $grandtotal + $total;
 				$grandtotal = $grandtotal.round(2);

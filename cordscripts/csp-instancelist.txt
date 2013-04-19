@@ -18,16 +18,16 @@ function InstanceList( $selection )
 		$w    = $service["occi.service.when"];
 		$when = $w.date();
 		$state = $service["occi.service.state"];
-		$sm = "<tr><td><img src=bluecloud.png>"#$id;
+		$sm = "<tr><td><img src=images/bluecloud.png>"#$id;
 		$sm = $sm#"<td>"#$sla#"<td><a href='dashboard.php?action=compile&output=HTML&script=csp-manifest.txt&option="#m#"'>"#$man#"</a><td>"#$when#"<td>";
 		$sm.display();
 		if ( $state != 0 )
 		{
-			$sm = "<td colspan=2><a href='"#$baseurl#"?action=stopservice&service=service/"#$id#"'><img width=64 height=64 src='stop.png'></a>";
+			$sm = "<td colspan=2><a href='"#$baseurl#"?action=stopservice&service=service/"#$id#"'><img width=64 height=64 src='images/stop.png'></a>";
 		}
 		else
 		{
-			$sm = "<td colspan=2><a href='"#$baseurl#"?action=startservice&service=service/"#$id#"'><img width=64 height=64 src='start.png'></a>";
+			$sm = "<td colspan=2><a href='"#$baseurl#"?action=startservice&service=service/"#$id#"'><img width=64 height=64 src='images/start.png'></a>";
 		}
 		$sm.display();
 	}
