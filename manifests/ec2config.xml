@@ -1,0 +1,6 @@
+<ec2configs>
+<ec2config
+ id="e1f892e3-ecf-4326-8866-9354b95d3b11" name="coips" description="Configuration of Account for coips" user=" " password=" " accesskey="your aws account access key" secretkey="your aws account secret key" authenticate="path to your ssh keypair for the vm" agent="CompatibleOne/Ec2Client/1.0a.0.01" host=" " version="v1.1" location="eu-west-1" namespace=" " base=" " tls="0" current="0" />
+<ec2config
+ id="e1f892e3-ec2-4326-8866-9354b95d3b11" name="amazonEc2" description="Configuration of Account for amazonec2" user=" " password=" " accesskey="your aws account access key" secretkey="your aws account secret key" authenticate="path to your ssh keypair for the vm" agent="CompatibleOne/Ec2Client/1.0a.0.01" host=" " version="v1.1" location="eu-west-1" namespace=" " base=" " tls="0" current="0" />
+</ec2configs>
