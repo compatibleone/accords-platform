@@ -59,6 +59,9 @@ endif
 if ENABLE_SLAM
 SUBDIRS += slam
 endif
+if ENABLE_TESTORGA
+SUBDIRS += testorga
+endif
 if ENABLE_COPAAS
 SUBDIRS += copaas
 endif

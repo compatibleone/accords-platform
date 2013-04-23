@@ -330,6 +330,15 @@ AM_CONDITIONAL([ENABLE_COPAAS], [test "$enable_copaas" = "yes"])
 AC_SUBST([CFLAGS_COPAAS], [-I\${abs_top_srcdir}/copaas/src])
 AC_SUBST([PATH_COPAAS], [${abs_top_srcdir}/copaas/src])
 
+AC_ARG_ENABLE([testorga],
+      [AS_HELP_STRING([--disable-testorga],
+		      [Disable testorga @<:@default=enable@:>@])],
+      [],
+      [enable_testorga=yes])
+AM_CONDITIONAL([ENABLE_TESTORGA], [test "$enable_testorga" = "yes"])
+AC_SUBST([CFLAGS_TESTORGA], [-I\${abs_top_srcdir}/testorga/src])
+AC_SUBST([PATH_TESTORGA], [${abs_top_srcdir}/testorga/src])
+
 AC_ARG_ENABLE([conagios],
       [AS_HELP_STRING([--disable-conagios],
 		      [Disable conagios @<:@default=enable@:>@])],
@@ -630,6 +639,7 @@ AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
 AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
 AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
 AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
+AC_CONFIG_FILES([testorga/Makefile testorga/src/Makefile])
 AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
 AC_CONFIG_FILES([cnprocci/Makefile cnprocci/src/Makefile])
 AC_CONFIG_FILES([eziprocci/Makefile eziprocci/src/Makefile])
@@ -699,6 +709,7 @@ echo "    - dcprocci                 : $enable_dcprocci"
 echo "    - osocciprocci             : $enable_osocciprocci"
 echo "    - slam                     : $enable_slam"
 echo "    - copaas                   : $enable_copaas"
+echo "    - testorga                 : $enable_testorga"
 echo "    - conagios                 : $enable_conagios"
 echo "    - paasprocci               : $enable_paasprocci"
 echo "    - cnprocci                 : $enable_cnprocci"
