@@ -869,10 +869,10 @@ private	struct	rest_response * snapshot_contract(
 /*	-----------------------------------------------------------	*/
 private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
 {
-	struct	occi_response 	* zptr;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
-	char 			* wptr;
+	struct	occi_response 	* zptr = NULL;
+	struct	occi_link_node  * nptr = NULL;
+	struct	cords_xlink	* lptr = NULL;
+	char 			* wptr = NULL;
 	char			buffer[2048];
 
 	buffer[0] = 0;
