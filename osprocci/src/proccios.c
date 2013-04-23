@@ -1185,7 +1185,7 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
 	}
 	if (!( filename = os_create_server_request( 
-		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone ) ))
+		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone, "none" ) ))
 	{
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );

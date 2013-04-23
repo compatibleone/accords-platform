@@ -22,6 +22,7 @@
 
 private char *	group=(char *) 0;
 private	int	detail=0;
+private	char *	keyname="none";
 private	int	debug=0;
 private	int	verbose=0;
 private	char *	tls=(char *) 0;
@@ -126,7 +127,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
-		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone ) ))
+		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone, keyname ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
 		{ 	
@@ -383,6 +384,8 @@ private	int	os_command(int argc, char * argv[] )
 				pass = argv[argi++];
 			else if (!( strcasecmp( aptr,"tenant" ) ))
 				tenant = argv[argi++];
+			else if (!( strcasecmp( aptr,"keyname" ) ))
+				keyname = argv[argi++];
 			else if (!( strcasecmp( aptr,"group" ) ))
 				group = argv[argi++];
 			else if (!( strcasecmp( aptr,"zone" ) ))
@@ -458,6 +461,7 @@ private	int	os_banner()
 	printf("\n     --user <username>     set account user name ");
 	printf("\n     --password <value>    set account password  ");
 	printf("\n     --tenant <value>      set account tenant    ");
+	printf("\n     --keyname <value>     set server keyname    ");
 	printf("\n     --host <hostname>     set host name         ");
 	printf("\n     --version <value>     set host version      ");
 	printf("\n     --agent   <name>      set test agent name   ");

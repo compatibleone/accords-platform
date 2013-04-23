@@ -1549,7 +1549,8 @@ public	char * os_create_server_request(
 		char * personality,	/* the source personality data	*/
 		char * resource,	/* the target personality file  */
 		char * group,		/* an eventual security group	*/
-		char * zone )		/* an eventual locality zone	*/
+		char * zone,		/* an eventual locality zone	*/
+		char * keyname )	/* an eventual key pair name	*/
 {
 	char *	sptr=(char *) 0;
 	char *	tptr=(char *) 0;
@@ -1590,8 +1591,27 @@ public	char * os_create_server_request(
 			if (!( strncmp( image, "http", strlen("http") ) ))
 				fprintf(h,"\timageRef=%c%s%c\n",0x0022,image,0x0022);
 			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
+
+			if ( rest_valid_string( keyname ) )
+			{
+				fprintf(h,"\tkey_name=%c%s%c\n",0x0022,keyname,0x0022);
+			}
+
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
+		else if (!( strcmp( subptr->Os.version, "v2" ) ))
+		{
+			/* ----------------------------------- */
+			/* check if full uri has been provided */
+			/* ----------------------------------- */
+			if (!( strncmp( image, "http", strlen("http") ) ))
+				fprintf(h,"\timageRef=%c%s%c\n",0x0022,image,0x0022);
+			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
+
+
+			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
+		}
+
 		if ( rest_valid_string( address ) )
 		{
 			fprintf(h,"\taccessIPv4=%c%s%c\n",0x0022,address,0x0022);
@@ -1599,7 +1619,8 @@ public	char * os_create_server_request(
 		if ( rest_valid_string( zone ) )
 		{
 			fprintf(h,"\tavailability_zone=%c%s%c\n",0x0022,zone,0x0022);
-		}			
+		}
+			
 		fprintf(h,"\tname=%c%s%c >\n",0x0022,identity,0x0022);
 
 		if ( rest_valid_string( group ) )
