@@ -1540,7 +1540,7 @@ public	char *	os_build_flavor_reference(struct os_subscription * sptr, char * np
 /*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 
-public	char * os_create_server_request(
+private	char * os_create_server_xml_request(
 		struct os_subscription * subptr,
 		char * identity,	/* the identity of the server 	*/
 		char * image,		/* the server image identifier  */
@@ -1563,8 +1563,6 @@ public	char * os_create_server_request(
 	FILE *	h;
 	int	bytes;
 	struct	rest_header * hptr;
-	if ( hack )
-		return( euca_data_hack( image, flavor, personality ) );
 	if (!( hptr = os_authenticate(subptr) ))
 		return((char *) 0);
 	else if (!( filename = rest_temporary_filename("xml")))
@@ -1608,6 +1606,11 @@ public	char * os_create_server_request(
 				fprintf(h,"\timageRef=%c%s%c\n",0x0022,image,0x0022);
 			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 
+
+			if ( rest_valid_string( keyname ) )
+			{
+				fprintf(h,"\tkey_name=%c%s%c\n",0x0022,keyname,0x0022);
+			}
 
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
@@ -1679,6 +1682,151 @@ public	char * os_create_server_request(
 		fclose(h);
 		return( filename );
 	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+
+private	char * os_create_server_json_request(
+		struct os_subscription * subptr,
+		char * identity,	/* the identity of the server 	*/
+		char * image,		/* the server image identifier  */
+		char * flavor,		/* the server machine flavour	*/
+		char * address,		/* the public IP address 	*/
+		char * personality,	/* the source personality data	*/
+		char * resource,	/* the target personality file  */
+		char * group,		/* an eventual security group	*/
+		char * zone,		/* an eventual locality zone	*/
+		char * keyname )	/* an eventual key pair name	*/
+{
+	char *	sptr=(char *) 0;
+	char *	tptr=(char *) 0;
+	char *	kptr=(char *) 0;
+	char *	dptr=(char *) 0;
+
+	char	encoded[8192];
+	char *	eptr=encoded;
+	char *	filename;
+	FILE *	h;
+	int	bytes;
+	struct	rest_header * hptr;
+	if (!( hptr = os_authenticate(subptr) ))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename("json")))
+		return( filename );
+	else if (!( h = fopen( filename,"wa" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		/* ---------------------------------------- */
+		/* generate server creation request element */
+		/* ---------------------------------------- */
+		fprintf(h,"{\"server\":{\"name\":\"%s\"",identity);
+
+		/* ----------------------------------- */
+		/* check if full uri has been provided */
+		/* ----------------------------------- */
+		if (!( strncmp( image, "http", strlen("http") ) ))
+			fprintf(h,",\"imageRef\":%c%s%c",0x0022,image,0x0022);
+		else	fprintf(h,",\"imageRef\":%c%s/images/%s%c",0x0022,subptr->Os.base,image,0x0022);
+
+		if ( rest_valid_string( keyname ) )
+		{
+			fprintf(h,",\"key_name\":%c%s%c",0x0022,keyname,0x0022);
+		}
+
+		fprintf(h,",\"flavorRef\":%c%s/flavors/%s%c",0x0022,subptr->Os.base,flavor,0x0022);
+
+		if ( rest_valid_string( address ) )
+		{
+			fprintf(h,",\"accessIPv4\":%c%s%c",0x0022,address,0x0022);
+		}
+		if ( rest_valid_string( zone ) )
+		{
+			fprintf(h,",\"availability_zone\":%c%s%c }\n",0x0022,zone,0x0022);
+		}
+			
+
+		if ( rest_valid_string( group ) )
+		{
+			fprintf(h,"\t<security_groups>\n");
+			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);
+			fprintf(h,"\t</security_groups>\n");
+		}			
+
+		/* ----------------------------- */
+		/* generate meta data statements */
+		/* ----------------------------- */
+		fprintf(h,"\t<metadata>\n");
+		fprintf(h,"\t\t<meta key='ServerName'>%s</meta>\n",identity);
+		if ( personality )
+		{
+			if (( sptr = allocate_string( personality )) != (char *) 0)
+			{
+				tptr = sptr;
+				while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
+				{
+					fprintf(h,"\t\t<meta key=\"%s\">%s</meta>\n",kptr,dptr);
+				}
+				liberate(tptr );
+			}
+		}
+		fprintf(h,"\t</metadata>\n");
+
+		/* ---------------------------- */
+		/* generate personality section */
+		/* ---------------------------- */
+		if (( personality ) && ( resource ) && ( use_personality_file ))
+		{
+			if (( strlen( personality ) )
+			&&  ( EncodeBase64( eptr, personality, strlen(personality) ) > 0 ))
+			{
+				fprintf(h,"<personality>\n");
+				fprintf(h,"<file path=%c%s%c>\n",0x0022,resource,0x0022);
+				bytes = 0;
+				while ( *eptr != 0 )
+				{
+					if (( bytes ) && (!( bytes % 48 )))
+					{
+						fprintf(h,"\n");
+						bytes = 0;
+					}
+					fprintf(h,"%c",*(eptr++));
+					bytes++;
+				}
+				if ( bytes ) fprintf(h,"\n");
+				fprintf(h,"</file>\n");
+				fprintf(h,"</personality>\n");
+			}
+		}
+		fprintf(h,"</server>\n");
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
+/*	------------------------------------------------------------	*/
+
+public	char * os_create_server_request(
+		struct os_subscription * subptr,
+		char * identity,	/* the identity of the server 	*/
+		char * image,		/* the server image identifier  */
+		char * flavor,		/* the server machine flavour	*/
+		char * address,		/* the public IP address 	*/
+		char * personality,	/* the source personality data	*/
+		char * resource,	/* the target personality file  */
+		char * group,		/* an eventual security group	*/
+		char * zone,		/* an eventual locality zone	*/
+		char * keyname )	/* an eventual key pair name	*/
+{
+	if ( hack )
+		return( euca_data_hack( image, flavor, personality ) );
+	else if (!( strcmp( subptr->Os.version, "v3" ) ))
+		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
+	else	return( os_create_server_xml_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
 }
 
 /*	------------------------------------------------------------	*/
