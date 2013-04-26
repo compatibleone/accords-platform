@@ -18,6 +18,9 @@ public	struct	url *
 public	char	*	
 	rest_temporary_filename(char * extension);
 
+public	char	*	
+	rest_key_file( char * name, char * value );
+
 public	char *	
 	rest_encode_credentials( char * username, char * password );
 

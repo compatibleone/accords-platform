@@ -25,6 +25,7 @@ private	int	detail=0;
 private	char *	keyname="none";
 private	int	debug=0;
 private	int	verbose=0;
+private	int	usejson=0;
 private	char *	tls=(char *) 0;
 private	char *	publisher=(char *) 0;
 private	char *	operator="accords";
@@ -87,6 +88,11 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	char	*	personality="";
 	char	*	resource=_CORDS_LAUNCH_CFG;
 	struct os_subscription * target=(struct os_subscription *) 0;
+	struct	os_response * rptr;
+	struct	data_element * dptr;
+	struct	data_element * eptr;
+	char *	vptr;
+	os_use_json( usejson );
 
 	if (!( p1 ))
 		return( failure( 30,"p1", "required") );
@@ -127,6 +133,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 
 	else if (!( strcasecmp(p1,"CREATE" ) ))
 	{
+		if (!( strcmp( keyname, "none" ) ))
+			keyname = (char *) 0;
 		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone, keyname ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
@@ -154,14 +162,23 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	else if (!( strcasecmp(p1,"KEY" ) ))
 	{
 		if (!( nomfic = os_keypair_request(subscription, p2, p3 ) ))
-			return( failure(27,"cannot create keypair","request" ) );
+			return( failure(27,"cannot create keypair","message" ) );
+		else if (!( rptr = os_create_keypair(subscription, nomfic ) ))
+			return( failure(28,"cannot create keypair","request" ) );
+		else if (!( dptr = rptr->jsonroot ))
+			return( failure(28,"cannot create keypair","jsonroot" ) );
+		else if (!( vptr = json_atribut( dptr, "private_key" ) ))
+			return( failure(28,"cannot create keypair","privatekey" ) );
+		else if (!( nomfic = rest_key_file( p2, vptr ) ))
+			return( failure(28,"cannot create keypair","create file" ) );
 		else
-		{ 	
-			os_result( os_create_keypair(subscription, nomfic ) );
+		{
+			printf("\nprivate key file: %s \n",nomfic);
+			liberate( nomfic );
+			os_result( rptr );
 			return( 0 );
 		}
 	}
-
 	else if (!( strcasecmp(p1,"PUBLICVM" ) ))
 	{
 		if (!( nomfic = os_create_image_request(subscription, p2, p3 ) ))
@@ -404,6 +421,8 @@ private	int	os_command(int argc, char * argv[] )
 				verbose = 1;
 			else if (!( strcasecmp( aptr,"debug" ) ))
 				debug=1;
+			else if (!( strcasecmp( aptr,"json" ) ))
+				usejson=1;
 			else if (!( strcasecmp( aptr, "echo" ) ))
 				json_set_echo(1);
 			else	return(failure(30,"incorrect","option"));
@@ -427,8 +446,8 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0b.0.06");
-	printf("\n   Beta Version 19/04/2013");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0c.0.01");
+	printf("\n   Beta Version 26/04/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
@@ -469,6 +488,7 @@ private	int	os_banner()
 	printf("\n     --detail              display detailed lists ");
 	printf("\n     --verbose             activate verbose messages ");
 	printf("\n     --debug               activate debug messages ");
+	printf("\n     --json                openstack json messages ");
 	printf("\n\n");
 	return( 0 );
 }

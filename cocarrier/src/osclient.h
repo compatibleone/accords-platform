@@ -64,6 +64,7 @@ public	struct	os_subscription * os_liberate_subscription(struct os_subscription 
 
 #define	_OS_NS_COMPUTE_V11	"http://docs.openstack.org/compute/api/v1.1"
 #define	_OS_NS_COMPUTE_V10	"http://docs.rackspacecloud.com/servers/api/v1.0"
+#define	_OS_NS_COMPUTE_V2	"http://docs.rackspacecloud.com/servers/api/v2"
 
 public	struct os_subscription * os_initialise_client( 
 		char * user, char * password, char * tenant, 

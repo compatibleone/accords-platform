@@ -1395,6 +1395,67 @@ public	char *	rest_allocate_uuid()
 }
 
 /*	------------------------------------------------	*/
+/*	  	r e s t _ k e y _ f i l e			*/
+/*	------------------------------------------------	*/
+public	char *	rest_key_file( char * nptr, char * vptr )
+{
+	int	i;
+	int	j;
+	int	c;
+	char	pemname[1024];
+	char	buffer[1024];
+	FILE *	h;
+
+	sprintf(pemname,"security/%s.pem",nptr);
+
+	if (!( h = fopen( pemname, "w" ) ))
+		return( (char *) 0);
+	else
+	{
+		/* step over header */
+		/* ---------------- */
+		for ( i=0; i< 31; i++ )
+			fputc( *(vptr++), h );
+		fputc( '\n', h );
+		if ( *vptr == 'n' ) vptr++;
+
+		/* 12 body lines */
+		/* ------------- */
+		for ( j=0; j < 12; j++ )
+		{
+			for ( i=0; i< 64; i++ )
+				fputc( *(vptr++), h );
+			if ( *vptr == 'n' ) vptr++;
+			fputc( '\n', h );
+		}
+
+		/* last line handling */
+		/* ------------------ */
+		for ( i=0; i< 64; i++ )
+		{
+			if ((c = *(vptr++)) == 'n' )
+				if ( *vptr == '-' )
+					break;
+			fputc( c, h );
+		}
+		if ( *vptr == 'n' ) vptr++;
+		fputc( '\n', h );
+
+		/* footer handling */
+		/* --------------- */
+		for ( i=0; i< 29; i++ )
+			fputc( *(vptr++), h );
+
+		fclose(h);
+
+		sprintf(buffer,"chmod 0600 %s",pemname);
+		system( buffer );
+
+		return( allocate_string( pemname ) );
+	}
+}
+
+/*	------------------------------------------------	*/
 /*	  r e s t _ t e m p o r a r y _ f i l e n a m e 	*/
 /*	------------------------------------------------	*/
 public	char *	rest_temporary_filename(char * extension)

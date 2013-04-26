@@ -24,7 +24,14 @@ char *                  occi_unquoted_value( char * sptr );
 
 private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
+private	int	usejson=0;		/* forces use of json message for server create	*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
+
+public	void	os_use_json( int v )
+{
+	usejson = v;
+	return;
+}
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o s _ r e s p o n s e			*/
@@ -1742,24 +1749,24 @@ private	char * os_create_server_json_request(
 		{
 			fprintf(h,",\"accessIPv4\":%c%s%c",0x0022,address,0x0022);
 		}
+		if ( 1 > 2 )
+		{
 		if ( rest_valid_string( zone ) )
 		{
-			fprintf(h,",\"availability_zone\":%c%s%c }\n",0x0022,zone,0x0022);
+			fprintf(h,",\"availability_zone\":%c%s%c\n",0x0022,zone,0x0022);
 		}
-			
-
+		}
 		if ( rest_valid_string( group ) )
 		{
-			fprintf(h,"\t<security_groups>\n");
-			fprintf(h,"\t<security_group name=%c%s%c/>\n",0x0022,group,0x0022);
-			fprintf(h,"\t</security_groups>\n");
+			fprintf(h,",\"security_groups\":[");
+			fprintf(h,"{\"name\":%c%s%c}]\n",0x0022,group,0x0022);
 		}			
 
 		/* ----------------------------- */
 		/* generate meta data statements */
 		/* ----------------------------- */
-		fprintf(h,"\t<metadata>\n");
-		fprintf(h,"\t\t<meta key='ServerName'>%s</meta>\n",identity);
+		fprintf(h,",\"metadata\": {");
+		fprintf(h,"\"ServerName\":%c%s%c",0x0022,identity,0x0022);
 		if ( personality )
 		{
 			if (( sptr = allocate_string( personality )) != (char *) 0)
@@ -1767,12 +1774,12 @@ private	char * os_create_server_json_request(
 				tptr = sptr;
 				while ( os_parse_metadata( &sptr, &kptr, &dptr ) != 0)
 				{
-					fprintf(h,"\t\t<meta key=\"%s\">%s</meta>\n",kptr,dptr);
+					fprintf(h,",\"%s\":\"%s\"\n",kptr,dptr);
 				}
 				liberate(tptr );
 			}
 		}
-		fprintf(h,"\t</metadata>\n");
+		fprintf(h,"}\n");
 
 		/* ---------------------------- */
 		/* generate personality section */
@@ -1782,8 +1789,8 @@ private	char * os_create_server_json_request(
 			if (( strlen( personality ) )
 			&&  ( EncodeBase64( eptr, personality, strlen(personality) ) > 0 ))
 			{
-				fprintf(h,"<personality>\n");
-				fprintf(h,"<file path=%c%s%c>\n",0x0022,resource,0x0022);
+				fprintf(h,",\"personality\":[\n");
+				fprintf(h,"{ \"path\":%c%s%c, \"contents\":\"",0x0022,resource,0x0022);
 				bytes = 0;
 				while ( *eptr != 0 )
 				{
@@ -1795,12 +1802,10 @@ private	char * os_create_server_json_request(
 					fprintf(h,"%c",*(eptr++));
 					bytes++;
 				}
-				if ( bytes ) fprintf(h,"\n");
-				fprintf(h,"</file>\n");
-				fprintf(h,"</personality>\n");
+				fprintf(h,"\"}]\n");
 			}
 		}
-		fprintf(h,"</server>\n");
+		fprintf(h,"}}\n");
 		fclose(h);
 		return( filename );
 	}
@@ -1824,7 +1829,9 @@ public	char * os_create_server_request(
 {
 	if ( hack )
 		return( euca_data_hack( image, flavor, personality ) );
-	else if (!( strcmp( subptr->Os.version, "v3" ) ))
+	else if (!( strcmp( subptr->Os.version, "v2" ) ))
+		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
+	else if ( usejson )
 		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
 	else	return( os_create_server_xml_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
 }
@@ -1882,6 +1889,17 @@ public	char * os_create_image_request(struct os_subscription * sptr,char * ident
 			fprintf(h,"\tserverId=%c%s%c />\n",0x0022,server,0x0022);
 		}
 		else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
+		{
+			fprintf(h,"<createImage xmlns=%c%s%c\n",0x0022,sptr->Os.namespace,0x0022);
+			fprintf(h,"\tname=%c%s%c\n>",0x0022,identity,0x0022);
+			fprintf(h,"\t<metadata>\n");
+			fprintf(h,"\t\t<meta key=%cactionAgent%c>OS Client</meta>\n",0x0022,0x0022);
+			fprintf(h,"\t\t<meta key=%ctimeStamp%c>%u</meta>\n",0x0022,0x0022,time((long *) 0));
+			fprintf(h,"\t\t<meta key=%coriginServer%c>%s</meta>\n",0x0022,0x0022,server);
+			fprintf(h,"\t</metadata>\n");
+			fprintf(h,"</createImage>\n");
+		}
+		else if (!( strcmp( sptr->Os.version, "v2" ) ))
 		{
 			fprintf(h,"<createImage xmlns=%c%s%c\n",0x0022,sptr->Os.namespace,0x0022);
 			fprintf(h,"\tname=%c%s%c\n>",0x0022,identity,0x0022);
@@ -1952,6 +1970,8 @@ public	struct	os_response *	os_create_image(struct os_subscription * sptr, char 
 	if (!( strcmp( sptr->Os.version, "v1.0" ) ))
 		sprintf(buffer,"/images");
 	else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
+		sprintf(buffer,"/servers/%s/action",id);
+	else if (!( strcmp( sptr->Os.version, "v2" ) ))
 		sprintf(buffer,"/servers/%s/action",id);
 	else	return( rptr );
 
@@ -3072,6 +3092,11 @@ public	struct os_subscription * os_initialise_client(
 	else if (!( strcmp( sptr->Os.version, "v1.1" ) ))
 	{
 	     if (!( sptr->Os.namespace = allocate_string(  _OS_NS_COMPUTE_V11 ) ))
+		return(os_liberate_subscription( sptr ));
+	}
+	else if (!( strcmp( sptr->Os.version, "v2" ) ))
+	{
+	     if (!( sptr->Os.namespace = allocate_string(  _OS_NS_COMPUTE_V2 ) ))
 		return(os_liberate_subscription( sptr ));
 	}
 	else	return(os_liberate_subscription( sptr ));
