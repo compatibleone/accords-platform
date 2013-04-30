@@ -7,8 +7,7 @@
 #   Jean-Philippe Braun <jpbraun@mandriva.com>
 #
 lib_LTLIBRARIES = libcocarrier.la
-EXTRA_DIST = dataelement.c dataelement.h \
-	eucahack.c osconfig.c 
+EXTRA_DIST = dataelement.c dataelement.h eucahack.c 
 
 libcocarrier_la_SOURCES = azclient.c azclient.h \
     list.c list.h \

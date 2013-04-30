@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='easiclouds' description='' version='0.1.0'>
+    	<!-- categories from service at port 8108 -->
+	<!--  Easi Clouds -->
+	<category term='easiclouds_application' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_application/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_application'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='easiclouds_postconf' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='nodes' type='int' required='false' immutable='false'/>
+	        <attribute name='links' type='int' required='false' immutable='false'/>
+	        <attribute name='extras' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_connection' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_connection/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_connection'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='type' type='string' required='false' immutable='false'/>
+	        <attribute name='number' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_description' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_description/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_description'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='label' type='string' required='false' immutable='false'/>
+	        <attribute name='value' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_extra' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_extra/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_extra'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_instance' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_instance/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_instance'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='address' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_keypair' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_keypair/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_keypair'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='keyname' type='string' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_link' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_link/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_link'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='from' type='string' required='false' immutable='false'/>
+	        <attribute name='to' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='extras' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_model' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_model/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_model'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='type' type='string' required='false' immutable='false'/>
+	        <attribute name='size' type='string' required='false' immutable='false'/>
+	        <attribute name='number' type='string' required='false' immutable='false'/>
+	        <attribute name='easiclouds_input' type='string' required='false' immutable='false'/>
+	        <attribute name='easiclouds_output' type='string' required='false' immutable='false'/>
+	        <attribute name='easiclouds_instances' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_node' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_node/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_node'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='tenant' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='servers' type='int' required='false' immutable='false'/>
+	        <attribute name='extras' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_parameters' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_parameters/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_parameters'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_postconf' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_postconf/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_postconf'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='type' type='string' required='false' immutable='false'/>
+	        <attribute name='parameters' type='string' required='false' immutable='false'/>
+	        <attribute name='models' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_metadata' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_metadata/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_metadata'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='label' type='string' required='false' immutable='false'/>
+	        <attribute name='value' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='easiclouds_server' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_server/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_server'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='image' type='string' required='false' immutable='false'/>
+	        <attribute name='flavor' type='string' required='false' immutable='false'/>
+	        <attribute name='configuration' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='metadatas' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+<!-- Start of "missing" categories. -->
+	<category term='eziconfig' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ezi_config/' rel='http://schemas.ogf.org/occi/core#resource' structname='ezi_config'>
+	    <attributes>
+	        <attribute name="name" type='string' required='false' immutable='false'/>
+	        <attribute name="description" type='string' required='false' immutable='false'/>
+	        <attribute name="user" type='string' required='false' immutable='false'/>
+	        <attribute name="password" type='string' required='false' immutable='false'/>
+	        <attribute name="authenticate" type='string' required='false' immutable='false'/>
+	        <attribute name="agent" type='string' required='false' immutable='false'/>
+	        <attribute name="host" type='string' required='false' immutable='false'/>
+	        <attribute name="iaas" type='string' required='false' immutable='false'/>
+	        <attribute name="version" type='string' required='false' immutable='false'/>
+	        <attribute name="namespace" type='string' required='false' immutable='false'/>
+	        <attribute name="base" type='string' required='false' immutable='false'/>
+	        <attribute name="tls" type='string' required='false' immutable='false'/>
+	        <attribute name="current" type='int' required='false' immutable='false'/>
+	        <attribute name="state" type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+	<category term='easiclouds' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ezi_config/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds'>
+	    <attributes>
+	        <attribute name="name" type='string' required='false' immutable='false'/>
+	        <attribute name="description" type='string' required='false' immutable='false'/>
+	        <attribute name="node" type='string' required='false' immutable='false'/>
+	        <attribute name="filename" type='string' required='false' immutable='false'/>
+	        <attribute name="account" type='string' required='false' immutable='false'/>
+	        <attribute name="profile" type='string' required='false' immutable='false'/>
+	        <attribute name="hostname" type='string' required='false' immutable='false'/>
+	        <attribute name="reference" type='string' required='false' immutable='false'/>
+	        <attribute name="workload" type='string' required='false' immutable='false'/>
+	        <attribute name="blob" type='string' required='false' immutable='false'/>
+	        <attribute name="price" type='string' required='false' immutable='false'/>
+	        <attribute name="application" type='string' required='false' immutable='false'/>
+	        <attribute name="state" type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+	<category term='easiclouds_input' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_input/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_input'>
+	    <attributes>
+	        <attribute name="name" type='string' required='false' immutable='false'/>
+	        <attribute name="label" type='string' required='false' immutable='false'/>
+	        <attribute name="value" type='string' required='false' immutable='false'/>
+	        <attribute name="state" type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+	<category term='easiclouds_output' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/easiclouds_output/' rel='http://schemas.ogf.org/occi/core#resource' structname='easiclouds_output'>
+	    <attributes>
+	        <attribute name="name" type='string' required='false' immutable='false'/>
+	        <attribute name="label" type='string' required='false' immutable='false'/>
+	        <attribute name="value" type='string' required='false' immutable='false'/>
+	        <attribute name="state" type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+<!-- End of "missing" categories. -->
+</model>
+</schema>

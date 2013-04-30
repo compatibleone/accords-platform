@@ -1,0 +1,19 @@
+---------------
+Strukt Sql 2013
+---------------
+
+This is the new version of strukt for the production of the mysql industrial grade database activated accords platform 
+category manager components.
+
+The option --mysql activates the production of use of the mysql database interface.
+
+The mysql database interface code is in the file occisql.c and should be compiled to produce occisql.o
+
+When amake is available, the makefile may be used for production, otherwise launch the build script.
+
+---
+IJM
+---
+
+
+

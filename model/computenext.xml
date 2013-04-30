@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='computenext' description='' version='0.1.0'>
+    	<!-- categories from service at port 8111 -->
+	<!-- categories from service at port 8112 -->
+	<!--  ComputeNext -->
+	<category term='computenext_configuration' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/computenext_configuration/' rel='http://schemas.ogf.org/occi/core#resource' structname='cn_config' headerfilename='cnconfig.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='apikey' type='string' required='false' immutable='false'/>
+	        <attribute name='apisec' type='string' required='false' immutable='false'/>
+	        <attribute name='authentication' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='base' type='string' required='false' immutable='false'/>
+	        <attribute name='tls' type='string' required='false' immutable='false'/>
+	        <attribute name='current' type='string' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='computenext' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/computenext/' rel='http://schemas.ogf.org/occi/core#resource' structname='computenext'>
+	    <attributes>
+	        <attribute name='profile' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='node' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='firewall' type='string' required='false' immutable='false'/>
+	        <attribute name='workload' type='string' required='false' immutable='false'/>
+	        <attribute name='transaction' type='string' required='false' immutable='false'/>
+	        <attribute name='image' type='string' required='false' immutable='false'/>
+	        <attribute name='instancetype' type='string' required='false' immutable='false'/>
+	        <attribute name='volumestorage' type='string' required='false' immutable='false'/>
+	        <attribute name='securitygroup' type='string' required='false' immutable='false'/>
+	        <attribute name='keypair' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='username' type='string' required='false' immutable='false'/>
+	        <attribute name='ipaddress' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='region' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='price' type='string' required='false' immutable='false'/>
+	        <attribute name='location' type='string' required='false' immutable='false'/>
+	        <attribute name='apikey' type='string' required='false' immutable='false'/>
+	        <attribute name='apisec' type='string' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#save'/>
+	    </actions>
+	</category>
+</model>
+</schema>

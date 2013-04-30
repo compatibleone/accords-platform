@@ -25,28 +25,21 @@
 #include "tlsload.h"
 
 private	struct pa_config Wpa = {
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
-
-	0
-
+        .id = (char *) 0,
+	.name = (char *) 0,
+	.description = (char *) 0,
+	.user = (char *) 0,
+	.password = (char *) 0,
+	.authenticate = (char *) 0,
+	.agent = (char *) 0,
+	.host = (char *) 0,
+	.version = (char *) 0,
+	.namespace = (char *) 0,
+	.base = (char *) 0,
+	.subscription = (char *) 0,
+	.certificate = (char *) 0,
+	.tls = (char *) 0,
+	.current = 0
 	};
 
 private struct jvm_struct * jvmp = NULL;

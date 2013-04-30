@@ -1,0 +1,9 @@
+# Get the directory that holds this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+STRUKT="$DIR/strukt --license $DIR/_license.h"
+
+# Run strukt to generate the X.c occiX.c and X.xsd files.
+$STRUKT --cords kind --crud $1
+mv $1.c occi$1.c
+$STRUKT --xml --occi $1
+$STRUKT --xml --schema $1

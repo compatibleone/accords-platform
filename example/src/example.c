@@ -32,8 +32,8 @@
 #include "exampleprocci.h"
 #include "exampleprocci.c"
 #include "occiexampleprocci.c"
-#include "contract.h"
-#include "contract.c"
+#include "example_contract.h"
+#include "example_contract.c"
 
 struct	accords_configuration Configuration = {
 	0,0,

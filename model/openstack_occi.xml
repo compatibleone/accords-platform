@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='openstack_occi' description='' version='0.1.0'>
+	<!-- categories from service at port 8096 -->
+	<!-- categories from service at port 8097 -->
+	<!--  Open Stack OCCI -->
+	<category term='occiopenstack' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/occiopenstack/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='flavor' type='string' required='false' immutable='false'/>
+	        <attribute name='original' type='string' required='false' immutable='false'/>
+	        <attribute name='image' type='string' required='false' immutable='false'/>
+	        <attribute name='profile' type='string' required='false' immutable='false'/>
+	        <attribute name='node' type='string' required='false' immutable='false'/>
+	        <attribute name='price' type='string' required='false' immutable='false'/>
+	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='number' type='string' required='false' immutable='false'/>
+	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
+	        <attribute name='reference' type='string' required='false' immutable='false'/>
+	        <attribute name='network' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='accessip' type='string' required='false' immutable='false'/>
+	        <attribute name='floating' type='string' required='false' immutable='false'/>
+	        <attribute name='floatingid' type='string' required='false' immutable='false'/>
+	        <attribute name='publicaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='privateaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='firewall' type='string' required='false' immutable='false'/>
+	        <attribute name='group' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='workload' type='string' required='false' immutable='false'/>
+	        <attribute name='blob' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#save'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#snapshot'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
+	    </actions>
+	</category>
+	<category term='occi_openstack_configuration' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/occi_openstack_configuration/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='user' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='authenticate' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='namespace' type='string' required='false' immutable='false'/>
+	        <attribute name='base' type='string' required='false' immutable='false'/>
+	        <attribute name='tls' type='string' required='false' immutable='false'/>
+	        <attribute name='current' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+</model>
+</schema>

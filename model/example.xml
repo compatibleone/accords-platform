@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='example' description='' version='0.1.0'>
+	<!-- Start of "missing" categories. -->
+	<category term='exampleprocci' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/exampleprocci/' rel='http://schemas.ogf.org/occi/core#resource' structname='exampleprocci'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='flavor' type='string' required='false' immutable='false'/>
+	        <attribute name='original' type='string' required='false' immutable='false'/>
+	        <attribute name='image' type='string' required='false' immutable='false'/>
+	        <attribute name='profile' type='string' required='false' immutable='false'/>
+	        <attribute name='node' type='string' required='false' immutable='false'/>
+	        <attribute name='price' type='string' required='false' immutable='false'/>
+	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='number' type='string' required='false' immutable='false'/>
+	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
+	        <attribute name='reference' type='string' required='false' immutable='false'/>
+	        <attribute name='network' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='accessip' type='string' required='false' immutable='false'/>
+	        <attribute name='floating' type='string' required='false' immutable='false'/>
+	        <attribute name='floatingid' type='string' required='false' immutable='false'/>
+	        <attribute name='publicaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='privateaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='firewall' type='string' required='false' immutable='false'/>
+	        <attribute name='group' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+	<!-- End of "missing" categories. -->
+</model>
+</schema>

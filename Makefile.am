@@ -11,17 +11,18 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = scripts
+SUBDIRS += tools
 SUBDIRS += manifests
 SUBDIRS += manpages
 
 if ENABLE_COXML
 SUBDIRS += coxml
 endif
-if ENABLE_OCCI
-SUBDIRS += occi
-endif
 if ENABLE_CORDS
 SUBDIRS += cords
+endif
+if ENABLE_OCCI
+SUBDIRS += occi
 endif
 if ENABLE_COCARRIER
 SUBDIRS += cocarrier

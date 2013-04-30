@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='pass' description='' version='0.1.0'>
+    	<!-- categories from service at port 8107 -->
+	<!--  PAAS -->
+	<category term='paas_application' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_application/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_application'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='environment' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_application_version' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_application_deployable' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_application_deployable/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_application_deployable'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='location' type='string' required='false' immutable='false'/>
+	        <attribute name='content_type' type='string' required='false' immutable='false'/>
+	        <attribute name='multitenancy_level' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_link' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_link/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_link'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='script' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='template' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_environment_template' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_application_manifest' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_application_manifest/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_application_manifest'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_application' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_environment' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_node' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_node/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_node'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='content_type' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_application_version' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_application_version/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_application_version'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='label' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_application_deployable' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_application_version_instance' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_variable' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_variable/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_variable'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='value' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_relation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_relation/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_relation'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_application_version_instance' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_application_version_instance/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_application_version_instance'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='default_instance' type='string' required='false' immutable='false'/>
+	        <attribute name='initial_stat' type='string' required='false' immutable='false'/>
+	        <attribute name='memory' type='string' required='false' immutable='false'/>
+	        <attribute name='disk' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_configuration' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_configuration/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_configuration'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas_environment_template' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_environment_template/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_environment_template'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='memory' type='string' required='false' immutable='false'/>
+	        <attribute name='disk' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_environment_relation' type='string' required='false' immutable='false'/>
+	        <attribute name='paas_environment_configuration' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+		<!-- categories from service at port 8110 -->
+	<!--  PAAS -->
+	<category term='paas_configuration' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_configuration/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
+	        <attribute name='user' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='subscription' type='string' required='false' immutable='false'/>
+	        <attribute name='tenant' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='port' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<!-- TODO Are paas_configuration and paas_config really the same thing; they differ only in the tls field. What about paconfig.h too? -->
+	<category term='paasconfig' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas_config/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas_config'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
+	        <attribute name='user' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='subscription' type='string' required='false' immutable='false'/>
+	        <attribute name='tenant' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='tls' type='string' required='false' immutable='false'/>
+	        <attribute name='port' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='paas' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/paas/' rel='http://schemas.ogf.org/occi/core#resource' structname='paas'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='environment' type='string' required='false' immutable='false'/>
+	        <attribute name='envfile' type='string' required='false' immutable='false'/>
+	        <attribute name='application' type='string' required='false' immutable='false'/>
+	        <attribute name='appfile' type='string' required='false' immutable='false'/>
+	        <attribute name='warfile' type='string' required='false' immutable='false'/>
+	        <attribute name='wardata' type='string' required='false' immutable='false'/>
+	        <attribute name='boundary' type='string' required='false' immutable='false'/>
+	        <attribute name='profile' type='string' required='false' immutable='false'/>
+	        <attribute name='node' type='string' required='false' immutable='false'/>
+	        <attribute name='price' type='string' required='false' immutable='false'/>
+	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='authorization' type='string' required='false' immutable='false'/>
+	        <attribute name='number' type='string' required='false' immutable='false'/>
+	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
+	        <attribute name='reference' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='publicaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='privateaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='workload' type='string' required='false' immutable='false'/>
+	        <attribute name='blob' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#save'/>
+	    </actions>
+	</category>
+</model>
+</schema>

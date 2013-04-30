@@ -103,7 +103,7 @@ AC_ARG_ENABLE([cords],
       [],
       [enable_cords=yes])
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
-AC_SUBST([CFLAGS_CORDS], [-I\${abs_top_srcdir}/cords/src])
+AC_SUBST([CFLAGS_CORDS], ["-I\${abs_top_srcdir}/cords/src -I\${abs_top_builddir}/cords/src"])
 AC_SUBST([LD_CORDS], ["-L\${abs_top_builddir}/cords/src -lcords"])
 
 AC_ARG_ENABLE([corest],
@@ -363,7 +363,7 @@ AC_ARG_ENABLE([cnprocci],
       [],
       [enable_cnprocci=yes])
 AM_CONDITIONAL([ENABLE_CNPROCCI], [test "$enable_cnprocci" = "yes"])
-AC_SUBST([CFLAGS_CNPROCCI], [-I\${abs_top_srcdir}/cnprocci/src])
+AC_SUBST([CFLAGS_CNPROCCI], ["-I\${abs_top_srcdir}/cnprocci/src -I\${abs_top_builddir}/cnprocci/src"])
 AC_SUBST([PATH_CNPROCCI], [${abs_top_srcdir}/cnprocci/src])
 
 AC_ARG_ENABLE([eziprocci],
@@ -610,6 +610,7 @@ AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
+AC_CONFIG_FILES([tools/Makefile tools/strukt/Makefile])
 AC_CONFIG_FILES([manifests/Makefile])
 AC_CONFIG_FILES([manpages/Makefile])
 AC_CONFIG_FILES([coxml/Makefile coxml/src/Makefile])

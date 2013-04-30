@@ -14,8 +14,6 @@ EXTRA_DIST = occic.c occic.h \
 	occirescat.h occiresolver.h \
 	occirespro.h \
 	urlpublic.h \
-	authitem.c authitem.h \
-	occitimer.c occitimer.h \
 	occiauth.h occiauth.c authcache.h
 
 libcocci_la_SOURCES = occiclient.c occiclient.h \
@@ -23,3 +21,8 @@ libcocci_la_SOURCES = occiclient.c occiclient.h \
 
 libcocci_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_PUBOCCI) $(CFLAGS_COCARRIER)
 libcocci_la_LDFLAGS = $(LD_COCARRIER) $(LD_OCCI) $(LD_CORDS) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
+
+# Create auto-generated model files
+model_h_files = authitem.h
+include $(top_srcdir)/tools/Makefile_generate_model.am
+occiclient.c: $(model_c_files)

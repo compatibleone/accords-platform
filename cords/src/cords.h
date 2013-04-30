@@ -34,6 +34,7 @@
 #include "action.h"
 #include "configuration.h"
 #include "release.h"
+#define _CORDS_CLOSED_TRANSACTION_STATE "1"
 #include "instruction.h"
 #include "value.h"
 #include "parameter.h"

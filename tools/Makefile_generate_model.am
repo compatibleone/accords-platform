@@ -1,0 +1,19 @@
+# Including this makefile in another makefile.am will add all the necessary rules to automatically build
+# the model files. The special variable 'model_h_files' must be defined before including this file.
+
+MODEL_CODEGEN = $(top_srcdir)/tools/codegen/codegen.py
+MODEL_STRUKT = $(top_builddir)/tools/strukt/strukt
+MODEL_STRUKT_WRAPPER = $(top_builddir)/tools/strukt/_strukt_wrapper
+
+model_c_files = $(patsubst %.h,%.c,$(model_h_files))
+
+model_all_files = $(model_c_files) $(model_h_files) $(patsubst %.h,%.xsd,$(model_h_files)) $(patsubst %.h,occi%.c,$(model_h_files))
+
+$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN)
+	$(MODEL_CODEGEN) -t Header -o . $(top_srcdir)/model -f $@
+
+$(model_c_files) : %.c : %.h
+	$(MAKE) -C $(top_builddir)/tools/strukt
+	$(MODEL_STRUKT_WRAPPER) $(subst .c,,$@)
+
+CLEANFILES = $(model_all_files)

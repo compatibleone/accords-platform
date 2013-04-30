@@ -30,25 +30,25 @@
 char subscriptionid[]=" ";
 
 private	struct az_config Waz = {
-	(char *) 0,
-	(char *) 0,
+	.id 			= (char *) 0,
+	.name			= (char *) 0,
 
-	(char *) 0,
-	(char *) 0,
+	.description	= (char *) 0,
+	.user 			= (char *) 0,
 
-	(char *) 0,
-	(char *) 0,
+	.password		= (char *) 0,
+	.authenticate	= (char *) 0,
 
-	(char *) 0,
-	(char *) 0,
+	.agent			= (char *) 0,
+	.host			= (char *) 0,
 
-	"2012-03-01",
-	_AZ_NS_COMPUTE,
-	_AZ_BASE,
-	subscriptionid,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
+	.version		= "2012-03-01",
+	.namespace		= _AZ_NS_COMPUTE,
+	.base			= _AZ_BASE,
+	.subscription	= subscriptionid,
+	.certificate	= (char *) 0,
+	.tls			= (char *) 0,
+	.hostedservice	= (char *) 0,
 
 	0
 
@@ -2260,7 +2260,7 @@ int searchWord(char *mot,char *line)
               i++;
 	      if(mot[i] == 0 || line[j]=='\n') 
 	      {
-		     return 1; // on a trouvé, le mot on retourne 1
+		     return 1; // on a trouvï¿½, le mot on retourne 1
 	      }		
         }
         else
@@ -2270,7 +2270,7 @@ int searchWord(char *mot,char *line)
       j++;
      }
 
-    return 0;	// si on a rien trouvé, on retourne 0
+    return 0;	// si on a rien trouvï¿½, on retourne 0
 }
 /******************************************************************************************************************************/
 /* Function to extract a substring from a string                                                                              */

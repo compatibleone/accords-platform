@@ -8,40 +8,14 @@
 #
 
 bin_PROGRAMS = coeasy
-EXTRA_DIST = easiclouds_application.c \
-easiclouds_connection.c \
-easiclouds_description.c \
-easiclouds_metadata.c \
-easiclouds_extra.c \
-easiclouds_instance.c \
-easiclouds_input.c \
-easiclouds_output.c \
-easiclouds_keypair.c \
-easiclouds_link.c \
-easiclouds_model.c \
-easiclouds_node.c \
-easiclouds_parameters.c \
-easiclouds_postconf.c \
-easiclouds_server.c \
-occieasiclouds_application.c \
-occieasiclouds_connection.c \
-occieasiclouds_description.c \
-occieasiclouds_metadata.c \
-occieasiclouds_extra.c \
-occieasiclouds_instance.c \
-occieasiclouds_input.c \
-occieasiclouds_output.c \
-occieasiclouds_keypair.c \
-occieasiclouds_link.c \
-occieasiclouds_model.c \
-occieasiclouds_node.c \
-occieasiclouds_parameters.c \
-occieasiclouds_postconf.c \
-occieasiclouds_server.c
+EXTRA_DIST = 
 
 coeasy_SOURCES = coeasy.c
 
 coeasy_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) $(CFLAGS_COMONS)
 coeasy_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
 
-
+# Create auto-generated model files
+model_h_files = easiclouds_application.h easiclouds_connection.h easiclouds_description.h easiclouds_extra.h easiclouds_instance.h easiclouds_keypair.h easiclouds_link.h easiclouds_metadata.h easiclouds_model.h easiclouds_node.h easiclouds_parameters.h easiclouds_postconf.h easiclouds_server.h easiclouds_input.h easiclouds_output.h
+include $(top_srcdir)/tools/Makefile_generate_model.am
+coeasy.c: $(model_c_files)

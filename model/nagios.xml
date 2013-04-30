@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='nagios' description='' version='0.1.0'>
+	<!-- categories from service at port 8109 -->
+	<!-- Nagios -->
+	<category term='nagios_command' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_command/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_command' headerfilename='nagioscommand.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='syntax' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_contact' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_contact/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_contact' headerfilename='nagioscontact.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='host_notification_period' type='string' required='false' immutable='false'/>
+	        <attribute name='service_notification_period' type='string' required='false' immutable='false'/>
+	        <attribute name='host_notification_options' type='string' required='false' immutable='false'/>
+	        <attribute name='service_notification_options' type='string' required='false' immutable='false'/>
+	        <attribute name='email' type='string' required='false' immutable='false'/>
+	        <attribute name='pager' type='string' required='false' immutable='false'/>
+	        <attribute name='addressx' type='string' required='false' immutable='false'/>
+	        <attribute name='host_notifications_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='service_notifications_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='can_submit_commands' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_status_information' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_nonstatus_information' type='int' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_contact_group' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_contact_group/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_contact_group' headerfilename='nagioscontactgroup.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='contacts' type='int' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_host' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_host/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_host' headerfilename='nagioshost.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='display_name' type='string' required='false' immutable='false'/>
+	        <attribute name='address' type='string' required='false' immutable='false'/>
+	        <attribute name='parents' type='int' required='false' immutable='false'/>
+	        <attribute name='hostgroups' type='int' required='false' immutable='false'/>
+	        <attribute name='check_command' type='string' required='false' immutable='false'/>
+	        <attribute name='initial_state' type='string' required='false' immutable='false'/>
+	        <attribute name='max_check_attempts' type='int' required='false' immutable='false'/>
+	        <attribute name='check_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='retry_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='active_checks_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='passive_checks_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='check_period' type='string' required='false' immutable='false'/>
+	        <attribute name='obsess_over_host' type='int' required='false' immutable='false'/>
+	        <attribute name='check_freshness' type='int' required='false' immutable='false'/>
+	        <attribute name='freshness_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='event_handler' type='string' required='false' immutable='false'/>
+	        <attribute name='event_handler_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='low_flap_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='high_flap_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='flap_detection_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='flap_detection_options' type='string' required='false' immutable='false'/>
+	        <attribute name='process_perf_data' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_status_information' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_nonstatus_information' type='int' required='false' immutable='false'/>
+	        <attribute name='contacts' type='int' required='false' immutable='false'/>
+	        <attribute name='contact_groups' type='int' required='false' immutable='false'/>
+	        <attribute name='notification_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='notification_period' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_options' type='string' required='false' immutable='false'/>
+	        <attribute name='notifications_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='stalking_options' type='string' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image_alt' type='string' required='false' immutable='false'/>
+	        <attribute name='vrml_image' type='string' required='false' immutable='false'/>
+	        <attribute name='statusmap_image' type='string' required='false' immutable='false'/>
+	        <attribute name='twod_coords' type='string' required='false' immutable='false'/>
+	        <attribute name='threed_coords' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_host_group' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_host_group/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_host_group' headerfilename='nagioshostgroup.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	        <attribute name='members' type='int' required='false' immutable='false'/>
+	        <attribute name='statis' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_service' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_service/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_service' headerfilename='nagiosservice.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='service_description' type='string' required='false' immutable='false'/>
+	        <attribute name='display_name' type='string' required='false' immutable='false'/>
+	        <attribute name='servicegroups' type='int' required='false' immutable='false'/>
+	        <attribute name='is_volatile' type='int' required='false' immutable='false'/>
+	        <attribute name='check_command' type='string' required='false' immutable='false'/>
+	        <attribute name='initial_state' type='string' required='false' immutable='false'/>
+	        <attribute name='max_check_attempts' type='int' required='false' immutable='false'/>
+	        <attribute name='check_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='retry_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='active_checks_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='passive_checks_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='check_period' type='string' required='false' immutable='false'/>
+	        <attribute name='obsess_over_service' type='int' required='false' immutable='false'/>
+	        <attribute name='check_freshness' type='int' required='false' immutable='false'/>
+	        <attribute name='freshness_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='event_handler' type='string' required='false' immutable='false'/>
+	        <attribute name='event_handler_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='low_flap_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='high_flap_threshold' type='int' required='false' immutable='false'/>
+	        <attribute name='flap_detection_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='flap_detection_options' type='string' required='false' immutable='false'/>
+	        <attribute name='process_perf_data' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_status_information' type='int' required='false' immutable='false'/>
+	        <attribute name='retain_nonstatus_information' type='int' required='false' immutable='false'/>
+	        <attribute name='notification_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='notification_period' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_options' type='string' required='false' immutable='false'/>
+	        <attribute name='notifications_enabled' type='int' required='false' immutable='false'/>
+	        <attribute name='contacts' type='int' required='false' immutable='false'/>
+	        <attribute name='contact_groups' type='int' required='false' immutable='false'/>
+	        <attribute name='stalking_options' type='string' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image_alt' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_service_group' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_service_group/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_service_group' headerfilename='nagiosservicegroup.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='members' type='int' required='false' immutable='false'/>
+	        <attribute name='servicegroup_members' type='int' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_time_period' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_time_period/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_time_period' headerfilename='nagiostimeperiod.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='alias' type='string' required='false' immutable='false'/>
+	        <attribute name='weekday' type='string' required='false' immutable='false'/>
+	        <attribute name='exception' type='string' required='false' immutable='false'/>
+	        <attribute name='timeperiods' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_host_dependency' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_host_dependency/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_host_dependency' headerfilename='nagioshostdependancy.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='dependent_host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='dependent_hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='inherits_parent' type='int' required='false' immutable='false'/>
+	        <attribute name='execution_failure_criteria' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_failure_criteria' type='string' required='false' immutable='false'/>
+	        <attribute name='dependency_period' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_host_escalation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_host_escalation/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_host_escalation' headerfilename='nagioshostescalation.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='escalation_period' type='string' required='false' immutable='false'/>
+	        <attribute name='escalation_options' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_interval' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_host_ext_info' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_host_ext_info/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_host_ext_info' headerfilename='nagioshostextinfo.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image_alt' type='string' required='false' immutable='false'/>
+	        <attribute name='vrml_image' type='string' required='false' immutable='false'/>
+	        <attribute name='statusmap_image' type='string' required='false' immutable='false'/>
+	        <attribute name='twod_coords' type='string' required='false' immutable='false'/>
+	        <attribute name='threed_coords' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_service_dependency' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_service_dependency/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_service_dependency' headerfilename='nagiosservicedependancy.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='dependent_host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='dependent_hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='dependent_service_description' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='service_description' type='string' required='false' immutable='false'/>
+	        <attribute name='inherits_parent' type='int' required='false' immutable='false'/>
+	        <attribute name='execution_failure_criteria' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_failure_criteria' type='string' required='false' immutable='false'/>
+	        <attribute name='dependancy_period' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_service_escalation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_service_escalation/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_service_escalation' headerfilename='nagiosserviceescalation.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='hostgroup_name' type='string' required='false' immutable='false'/>
+	        <attribute name='service_description' type='string' required='false' immutable='false'/>
+	        <attribute name='notification_interval' type='int' required='false' immutable='false'/>
+	        <attribute name='escalation_period' type='string' required='false' immutable='false'/>
+	        <attribute name='escalation_options' type='string' required='false' immutable='false'/>
+	        <attribute name='contacts' type='int' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='nagios_service_ext_info' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/nagios_service_ext_info/' rel='http://schemas.ogf.org/occi/core#resource' structname='nagios_service_ext_info' headerfilename='nagiosserviceextinfo.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='host_name' type='string' required='false' immutable='false'/>
+	        <attribute name='service_description' type='string' required='false' immutable='false'/>
+	        <attribute name='notes' type='string' required='false' immutable='false'/>
+	        <attribute name='notes_url' type='string' required='false' immutable='false'/>
+	        <attribute name='action_url' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image' type='string' required='false' immutable='false'/>
+	        <attribute name='icon_image_alt' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+</model>
+</schema>

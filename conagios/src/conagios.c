@@ -136,7 +136,7 @@ private	struct rest_extension * conagios_extension( void * v,struct rest_server 
 #include "nagiosserviceescalation.h"
 #include "nagiosservicegroup.h"
 #include "nagiosservice.h"
-#include "nagiosseviceextinfo.h"
+#include "nagiosserviceextinfo.h"
 #include "nagiostimeperiod.h"
 
 #include "nagioscommand.c"
@@ -151,7 +151,7 @@ private	struct rest_extension * conagios_extension( void * v,struct rest_server 
 #include "nagiosserviceescalation.c"
 #include "nagiosservicegroup.c"
 #include "nagiosservice.c"
-#include "nagiosseviceextinfo.c"
+#include "nagiosserviceextinfo.c"
 #include "nagiostimeperiod.c"
 
 #include "occinagioscommand.c"
@@ -166,7 +166,7 @@ private	struct rest_extension * conagios_extension( void * v,struct rest_server 
 #include "occinagiosserviceescalation.c"
 #include "occinagiosservicegroup.c"
 #include "occinagiosservice.c"
-#include "occinagiosseviceextinfo.c"
+#include "occinagiosserviceextinfo.c"
 #include "occinagiostimeperiod.c"
 
 /*	--------------------------------------------	*/
