@@ -1597,11 +1597,11 @@ private	char * os_create_server_xml_request(
 				fprintf(h,"\timageRef=%c%s%c\n",0x0022,image,0x0022);
 			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 
-			if ( rest_valid_string( keyname ) )
+			if (( rest_valid_string( keyname ) )
+			&&  (strcmp( keyname, "none" ) != 0 ))
 			{
 				fprintf(h,"\tkey_name=%c%s%c\n",0x0022,keyname,0x0022);
 			}
-
 			fprintf(h,"\tflavorRef=%c%s/flavors/%s%c\n",0x0022,subptr->Os.base,flavor,0x0022);
 		}
 		else if (!( strcmp( subptr->Os.version, "v2" ) ))
@@ -1614,7 +1614,8 @@ private	char * os_create_server_xml_request(
 			else	fprintf(h,"\timageRef=%c%s/images/%s%c\n",0x0022,subptr->Os.base,image,0x0022);
 
 
-			if ( rest_valid_string( keyname ) )
+			if (( rest_valid_string( keyname ) )
+			&&  ( strcmp( keyname, "none" ) != 0 ))
 			{
 				fprintf(h,"\tkey_name=%c%s%c\n",0x0022,keyname,0x0022);
 			}
@@ -1738,7 +1739,8 @@ private	char * os_create_server_json_request(
 			fprintf(h,",\"imageRef\":%c%s%c",0x0022,image,0x0022);
 		else	fprintf(h,",\"imageRef\":%c%s/images/%s%c",0x0022,subptr->Os.base,image,0x0022);
 
-		if ( rest_valid_string( keyname ) )
+		if (( rest_valid_string( keyname ) )
+		&&  (strcmp( keyname, "none" ) != 0 ))
 		{
 			fprintf(h,",\"key_name\":%c%s%c",0x0022,keyname,0x0022);
 		}

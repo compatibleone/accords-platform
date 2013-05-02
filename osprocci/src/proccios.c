@@ -959,7 +959,7 @@ private	void	remove_security_group(struct os_subscription * subptr, struct opens
 /*	------------------------------------------------------------------	*/
 /*		r e s o l v e _ o p e n s t a c k _ f i r e w a l l		*/
 /*	------------------------------------------------------------------	*/
-private	char *	resolve_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
+public 	char *	resolve_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response *	osptr;
 	struct	data_element * fptr;
@@ -999,7 +999,7 @@ private	char *	resolve_openstack_firewall(struct os_subscription * subptr, struc
 /*	----------------------------------------------------------------	*/
 /*		b u i l d _ o p e n s t a c k _ f i r e w a l l			*/
 /*	----------------------------------------------------------------	*/
-private	int	build_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
+public 	int	build_openstack_firewall(struct os_subscription * subptr, struct openstack * pptr )
 {
 	char *	filename;
 	struct	os_response *	osptr;
@@ -1028,6 +1028,7 @@ private	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 	}
 	else if ((status = get_standard_message( &firewall, pptr->firewall, _CORDS_CONTRACT_AGENT, default_tls() )) != 0)
 		return( 0 );
+	else
 	{
 
 		/* -------------------------- */

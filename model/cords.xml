@@ -404,8 +404,6 @@
 	        <attribute name='label' type='string' required='false' immutable='false'/>
 	        <attribute name='vlan' type='string' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
-	        <!-- Manually added p.23 Cords 2.14 -->
-	        <collection name='ports' category='http://scheme.compatibleone.fr/scheme/compatible#port' multiplicity='[0..*]'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
