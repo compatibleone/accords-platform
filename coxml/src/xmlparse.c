@@ -593,12 +593,14 @@ static	int	xml_get_token(
 				}
 			}
 		else if ( c == '"' ) {
-			quoting = c;
+			if (!( sptr->length ))
+			   quoting = c;
 			macro_xml_token_character(c);
 			continue;
 			}
 		else if ( c == 0x0027 ) {
-			quoting = c;
+			if (!( sptr->length ))
+			    quoting = c;
 			macro_xml_token_character(c);
 			continue;
 			}
