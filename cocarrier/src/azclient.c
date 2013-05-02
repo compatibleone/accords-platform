@@ -242,17 +242,17 @@ private	struct	az_response * az_check( struct rest_response * aptr )
 			return(rptr);
 		else if (!( rptr->content = allocate_string( hptr->value ) ))
 			return( rptr );
-		else if ((!( strcmp( rptr->content, "text/json" 	)))
-		     ||  (!( strcmp( rptr->content, "application/json" 	)))
-		     ||  (!( strcmp( rptr->content, "x-application/json"))))
+		else if ((!( strncmp( rptr->content, "text/json",strlen("text/json"))))
+		     ||  (!( strncmp( rptr->content, "application/json",strlen("application/json"))))
+		     ||  (!( strncmp( rptr->content, "x-application/json",strlen("x-application/json")))))
 		{
 			rptr->nature = _TEXT_JSON;
 			rptr->jsonroot = json_parse_file( aptr->body );
 			return( rptr );
 		}
-		else if ((!( strcmp( rptr->content, "text/xml" 		)))
-		     ||  (!( strcmp( rptr->content, "application/xml" 	)))
-		     ||  (!( strcmp( rptr->content, "x-application/xml"))))
+		else if ((!( strncmp( rptr->content, "text/xml", strlen("text/xml"))))
+		     ||  (!( strncmp( rptr->content, "application/xml",strlen("application/xml"))))
+		     ||  (!( strncmp( rptr->content, "x-application/xml",strlen("x-application/xml")))))
 		{
 			rptr->nature = _TEXT_XML;
 			rptr->xmlroot = document_parse_file( aptr->body );
