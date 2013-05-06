@@ -76,7 +76,7 @@ install: build
 	cp Certificates.crt `pwd`/debian/tmp/etc/cosacs/
 	cp `pwd`/debian/tmp/usr/bin/cosacs `pwd`/debian/tmp/usr/bin/cosacs-client
 	cp accounts.xml coips.xml metrics.xml slamtest.xml `pwd`/debian/tmp/etc/accords
-	cp scripts/amazon_manifest.xml  scripts/cords_ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords
+	cp scripts/amazon_manifest.xml manifests/ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords 
 	cp manifests/style.css `pwd`/debian/tmp/etc/accords
 	cp manifests/style.css `pwd`/debian/tmp/etc/cosacs
 	cp debian/cosacs.default `pwd`/debian/tmp/etc/default/cosacs
