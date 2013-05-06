@@ -62,14 +62,14 @@ struct	occi_production
 {
 	char *	path;
 	int	nature;
-	struct	occi_model * first;
-	struct	occi_model * last;
+	struct	occi_component * first;
+	struct	occi_component * last;
 } production = 
 {
 	"",
 	0,
-	(struct occi_model *) 0,
-	(struct occi_model *) 0
+	(struct occi_component *) 0,
+	(struct occi_component *) 0
 };
 
 
@@ -171,77 +171,19 @@ private	struct	occi_component *	allocate_occi_component()
 }
 
 /*	------------------------------------------------------------------	*/
-/*		l i b e r t e _ o c c i _ m o d e l 				*/
-/*	------------------------------------------------------------------	*/
-private	struct	occi_model *	liberate_occi_model(struct occi_model * mptr)
-{
-	struct	occi_component * cptr;
-	if ( cptr )
-	{
-		while ((cptr = mptr->first) != (struct occi_component *) 0)
-		{
-			mptr->first = cptr->next;
-			liberate_occi_component( cptr );
-		}
-		if ( mptr->name )
-			liberate( mptr->name );
-		liberate( mptr );
-	}
-	return((struct occi_model *) 0);
-}
-
-/*	------------------------------------------------------------------	*/
-/*		a l l o c a t e _ o c c i _ m o d e l 				*/
-/*	------------------------------------------------------------------	*/
-private	struct	occi_model *	allocate_occi_model()
-{
-	struct	occi_model * mptr;
-	if (!( mptr = allocate( sizeof( struct occi_model ) ) ))
-		return( mptr );
-	else
-	{
-		memset(mptr,0,sizeof( struct occi_model ));
-		return( mptr );
-	}
-}
-
-/*	------------------------------------------------------------------	*/
-/*			c o m o d e l _ a d d _ m o d e l			*/
-/*	------------------------------------------------------------------	*/
-private	struct	occi_model * comodel_add_model( char * nptr )
-{
-	struct	occi_model * mptr;
-	if (!( mptr = allocate_occi_model()))
-		return( mptr );
-	else if (!( mptr->name = allocate_string( nptr ) ))
-		return( liberate_occi_model( mptr ) );
-	else if (!( mptr->previous = production.last ))
-		production.first = mptr;
-	else	mptr->previous->next = mptr;
-	return((production.last = mptr));
-}
-
-/*	------------------------------------------------------------------	*/
 /*		c o m o d e l _ a d d _ c o m p o n e n t			*/
 /*	------------------------------------------------------------------	*/
 private	struct	occi_component * comodel_add_component( char * nptr )
 {
-	struct	occi_model * mptr;
 	struct	occi_component * cptr;
-	if (!( mptr = production.last ))
-	{
-		if (!( mptr = allocate_occi_model()))
-			return((struct occi_component *) 0);
-		else	production.first = production.last = mptr;
-	}
 	if (!( cptr = allocate_occi_component() ))
 		return( cptr );
 	else if (!( cptr->name = allocate_string( nptr ) ))
 		return( liberate_occi_component( cptr ) );
-	else if (!( cptr->previous = mptr->last ))
-		mptr->first = cptr;
+	else if (!( cptr->previous = production.last ))
+		production.first = cptr;
 	else	cptr->previous->next = cptr;
-	return((mptr->last = cptr));
+	return((production.last = cptr));
 }
 
 /*	------------------------------------------------------------------	*/
@@ -252,25 +194,21 @@ private	struct	occi_category * comodel_add_category( char * nptr )
 	struct	occi_component * cptr;
 	struct	occi_category * optr;
 
-	if (!( production.last ))
+	/* add category to component */
+	/* ------------------------- */
+	if (!( cptr = production.last ))
 		cptr = comodel_add_component( nptr );
-	else if (!( cptr = production.last->first ))
-		cptr = comodel_add_component( nptr );
-
 	if (!( cptr ))
 		return((struct occi_category *) 0);
 	else if (!( optr = allocate_occi_category() ))
 		return((struct occi_category *) 0);
 	else if (!( optr->id = allocate_string( nptr ) ))
 		return( liberate_occi_category( optr ) );
-	else
-	{
-		if (!( optr->previous = cptr->last ))
-			cptr->first = optr;
-		else	optr->previous->next = optr;
-		cptr->last = optr;
-		return( optr );
-	}
+	else if (!( optr->previous = cptr->last ))
+		cptr->first = optr;
+	else	optr->previous->next = optr;
+	cptr->last = optr;
+	return( optr );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -607,6 +545,7 @@ private	int	comodel_by_component( struct xml_element * eptr)
 		else
 		{
 			deserialise_component_configuration(&cptr->configuration,eptr);
+			cptr->isvalid=1;
 			if ( check_verbose() )
 				printf("comodel loaded component : %s\n",sptr);
 			if ((status = comodel_by_category( eptr->first )) != 0)
@@ -625,7 +564,6 @@ private	int	comodel_by_model( struct xml_element * eptr)
 	char *	sptr;
 	int	status;
 	struct	xml_atribut * aptr;
-	struct	occi_model * mptr;
 	for ( ; eptr != (struct xml_element *) 0; eptr = eptr->next )
 	{
 		if (!(aptr = document_atribut( eptr, "name" )))
@@ -634,18 +572,26 @@ private	int	comodel_by_model( struct xml_element * eptr)
 			continue;
 		else if (!( sptr = occi_unquoted_value( sptr )))
 			continue;
-		else if (!( mptr = comodel_add_model( sptr )) )
-			break;
 		else
 		{
 			if ( check_verbose() )
 				printf("comodel loaded model : %s\n",sptr);
-			if ((status = comodel_by_component( eptr->first )) != 0)
+			if ((status = comodel_by_category( eptr->first )) != 0)
 				break;
 			liberate( sptr );
 		}
 	}
 	return( 0 );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ s c h e m a 			*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_by_schema( struct xml_element * eptr)
+{
+	if ((eptr = document_element( eptr, "model" )) != (struct xml_element *) 0)
+		return( comodel_by_model( eptr ) );
+	else	return( 78 );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -683,56 +629,47 @@ private	int	comodel_prepare_strukt(int mode)
 private	int	comodel_c_production()
 {
 	int	status;
-	struct	occi_model 	* mptr;
 	struct	occi_component 	* cptr;
 	struct	occi_category 	* optr;
 	char 	makename[1024];
-	FILE *	mfh=(FILE *) 0;
 	char 	buffer[1024];
 	if ( check_verbose() )
 		printf("comodel c production\n");
 
-	for (	mptr=production.first;
-		mptr != (struct occi_model *) 0;
-		mptr = mptr->next )
+	for (	cptr=production.first;
+		cptr != (struct occi_component *) 0;
+		cptr = cptr->next )
 	{
-		sprintf(makename,"%s-launch.sh",(mptr->name ? mptr->name : "model"));
-		if (!( mfh = fopen( makename, "w" ) ))
-			continue;
-		else	fprintf(mfh,"#!/bin/bash\n#----------\n");
-		for (	cptr=mptr->first;
-			cptr != (struct occi_component *) 0;
-			cptr = cptr->next )
+		sprintf(buffer,"%s-configuration.xml",cptr->name);
+		if ( cptr->isvalid )
 		{
-			fprintf(mfh,"run-%s --config %s-configuration.xml %s/1.0a &\n",
-				cptr->name, cptr->name, cptr->name);
-			sprintf(buffer,"%s-configuration.xml",cptr->name);
+			/* --------------------------------------------------------------- */
+			/* generate the component source if component configuration loaded */
+			/* --------------------------------------------------------------- */
 			save_accords_configuration( &cptr->configuration, buffer );
 			generate_service_component( cptr->name, cptr->first );
-			for (	optr=cptr->first;
-				optr != (struct occi_category *) 0;
-				optr = optr->next )
-			{
-				if (!( comodel_category_filter( optr ) ))
-					continue;
-				else if ((status = comodel_generate_h( optr )) != 0)
-					return( status );
-				else if ((status = comodel_prepare_strukt(0)) != 0)
-					return(status);
-				else if ((status = process( optr->id )) != 0)
-					return( status );
-				else if ((status = comodel_prepare_strukt(1)) != 0)
-					return(status);
-				else if ((status = process( optr->id )) != 0)
-					return( status );
-				else if ((status = comodel_prepare_strukt(2)) != 0)
-					return(status);
-				else if ((status = schema( optr->id )) != 0)
-					return( status );
-			}
 		}
-		fprintf(mfh,"#end of file\n");
-		fclose(mfh);
+		for (	optr=cptr->first;
+			optr != (struct occi_category *) 0;
+			optr = optr->next )
+		{
+			if (!( comodel_category_filter( optr ) ))
+				continue;
+			else if ((status = comodel_generate_h( optr )) != 0)
+				return( status );
+			else if ((status = comodel_prepare_strukt(0)) != 0)
+				return(status);
+			else if ((status = process( optr->id )) != 0)
+				return( status );
+			else if ((status = comodel_prepare_strukt(1)) != 0)
+				return(status);
+			else if ((status = process( optr->id )) != 0)
+				return( status );
+			else if ((status = comodel_prepare_strukt(2)) != 0)
+				return(status);
+			else if ((status = schema( optr->id )) != 0)
+				return( status );
+		}
 	}
 	return( status );
 }
@@ -743,7 +680,6 @@ private	int	comodel_c_production()
 private	int	comodel_x_production()
 {
 	int	status;
-	struct	occi_model 	* mptr;
 	struct	occi_component 	* cptr;
 	struct	occi_category 	* optr;
 	char *	configuration;
@@ -753,32 +689,27 @@ private	int	comodel_x_production()
 	if ( check_verbose() )
 		printf("comodel c production\n");
 
-	for (	mptr=production.first;
-		mptr != (struct occi_model *) 0;
-		mptr = mptr->next )
+	for (	cptr=production.first;
+		cptr != (struct occi_component *) 0;
+		cptr = cptr->next )
 	{
-		for (	cptr=mptr->first;
-			cptr != (struct occi_component *) 0;
-			cptr = cptr->next )
+		if (!( configuration = serialise_component_configuration( &cptr->configuration ) ))
+			continue;
+		sprintf(buffer,"%s.xml",cptr->name);
+		if (!( h = fopen( buffer, "w") ))
+			return(46);
+		else
 		{
-			if (!( configuration = serialise_component_configuration( &cptr->configuration ) ))
-				continue;
-			sprintf(buffer,"%s.xml",cptr->name);
-			if (!( h = fopen( buffer, "w") ))
-				return(46);
-			else
+			fprintf(h,"<?xml version='1.0' encoding='UTF-8'?>\n");
+			fprintf(h,"<component %s>\n",configuration);
+			liberate( configuration );
+			for (	optr=cptr->first;
+				optr != (struct occi_category *) 0;
+				optr = optr->next )
 			{
-				fprintf(h,"<?xml version='1.0' encoding='UTF-8'?>\n");
-				fprintf(h,"<component %s>\n",configuration);
-				liberate( configuration );
-				for (	optr=cptr->first;
-					optr != (struct occi_category *) 0;
-					optr = optr->next )
-				{
-					comodel_xml_category(h,optr);
-				}
-				fprintf(h,"</component>\n",cptr->name);
+				comodel_xml_category(h,optr);
 			}
+			fprintf(h,"</component>\n",cptr->name);
 		}
 	}
 }
@@ -826,6 +757,8 @@ private	int	comodel_operation( char * sptr )
 		printf("parsing model description : %s\n",sptr);
 	if (!( document = document_parse_file( sptr )))
 		return( failure(40,"file parse failure",sptr) );
+	else if ((eptr = document_element( document, "schema" )) != (struct xml_element *) 0)
+		return( comodel_by_schema( eptr ) );
 	else if ((eptr = document_element( document, "model" )) != (struct xml_element *) 0)
 		return( comodel_by_model( eptr ) );
 	else if ((eptr = document_element( document, "component" )) != (struct xml_element *) 0)
@@ -853,6 +786,9 @@ private	int	co_model(int argc, char * argv[] )
 			aptr++;
 			switch( *(aptr++) )
 			{
+			case	'e'	:
+				set_xml_echo(1);
+				continue;
 			case	'v'	:
 				CoModel.verbose=1;
 				continue;

@@ -1025,7 +1025,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 		fprintf(h,"struct rest_response * aptr,  \n");
 		fprintf(h,"void * vptr )\n{\n");
 		fprintf(h,"\taptr = liberate_rest_response( aptr );\n");
-		fprintf(h,"\treturn( occi_%s_delete(optr,cptr,rptr));\n");
+		fprintf(h,"\treturn( occi_%s_delete(optr,cptr,rptr));\n",C.name);
 		fprintf(h,"}\n");
 #endif
 #ifdef	_CRUD_PUT
