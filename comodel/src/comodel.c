@@ -420,6 +420,118 @@ private	char *	comodel_attribute( struct xml_element * eptr, char * nptr )
 }
 
 /*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ c o l l e c t i o n		*/
+/*	------------------------------------------------------------------	*/
+struct	occi_category * comodel_by_collection( struct occi_category * optr, struct xml_element * dptr )
+{
+	char *	nptr;
+	char *	vptr;
+	int	required;
+	int	immutable;
+	if (!( nptr =  comodel_attribute(dptr,"name") ))
+		return((struct occi_category *) 0);
+	if (!( vptr =  comodel_attribute(dptr,"required") ))
+		required = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		required = 1;
+	else 	required = 0;
+
+	if (!( vptr =  comodel_attribute(dptr,"immutable") ))
+		immutable = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		immutable = 1;
+	else 	immutable = 0;
+
+	if (!( optr = occi_add_attribute( optr, nptr, required, immutable ) ))
+		return( optr );
+
+	if (!( vptr =  comodel_attribute(dptr,"index") ))
+		optr->last->indexed=0;
+	else if (!( strcasecmp(vptr,"true") ))
+		optr->last->indexed=1;
+	else 	optr->last->indexed=0;
+
+	optr->last->type = comodel_attribute(dptr,"type");
+	return( optr );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ i n s t a n c e 			*/
+/*	------------------------------------------------------------------	*/
+struct	occi_category * comodel_by_instance( struct occi_category * optr, struct xml_element * dptr )
+{
+	char *	nptr;
+	char *	vptr;
+	int	required;
+	int	immutable;
+	if (!( nptr =  comodel_attribute(dptr,"name") ))
+		return((struct occi_category *) 0);
+	if (!( vptr =  comodel_attribute(dptr,"required") ))
+		required = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		required = 1;
+	else 	required = 0;
+
+	if (!( vptr =  comodel_attribute(dptr,"immutable") ))
+		immutable = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		immutable = 1;
+	else 	immutable = 0;
+
+	if (!( optr = occi_add_attribute( optr, nptr, required, immutable ) ))
+		return( optr );
+
+	if (!( vptr =  comodel_attribute(dptr,"index") ))
+		optr->last->indexed=0;
+	else if (!( strcasecmp(vptr,"true") ))
+		optr->last->indexed=1;
+	else 	optr->last->indexed=0;
+
+	optr->last->type = comodel_attribute(dptr,"type");
+	return( optr );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ c a t e g o r y 			*/
+/*	------------------------------------------------------------------	*/
+struct	occi_category * comodel_by_attribute( struct occi_category * optr, struct xml_element * dptr )
+{
+	char *	nptr;
+	char *	vptr;
+	int	required;
+	int	immutable;
+	if (!( nptr =  comodel_attribute(dptr,"name") ))
+		return((struct occi_category *) 0);
+
+	if (!( vptr =  comodel_attribute(dptr,"required") ))
+		required = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		required = 1;
+	else 	required = 0;
+
+	if (!( vptr =  comodel_attribute(dptr,"immutable") ))
+		immutable = 0;
+	else if (!( strcasecmp(vptr,"true") ))
+		immutable = 1;
+	else 	immutable = 0;
+
+	if (!( optr = occi_add_attribute( optr, nptr, required, immutable ) ))
+		return( optr );
+
+	if (!( vptr =  comodel_attribute(dptr,"index") ))
+		optr->last->indexed=0;
+	else if (!( strcasecmp(vptr,"true") ))
+		optr->last->indexed=1;
+	else 	optr->last->indexed=0;
+
+	optr->last->type = comodel_attribute(dptr,"type");
+	optr->last->units = comodel_attribute(dptr,"units");
+	optr->last->validation = comodel_attribute(dptr,"validation");
+	optr->last->defaultvalue = comodel_attribute(dptr,"defaultvalue");
+	return( optr );
+}
+
+/*	------------------------------------------------------------------	*/
 /*			c o m o d e l _ b y _ c a t e g o r y 			*/
 /*	------------------------------------------------------------------	*/
 private	int	comodel_by_category( struct xml_element * eptr )
@@ -427,8 +539,6 @@ private	int	comodel_by_category( struct xml_element * eptr )
 	char *	nptr;
 	char *	vptr;
 	char *	sptr;
-	int	required;
-	int	immutable;
 	struct	xml_atribut * aptr;
 	struct	occi_category * optr;
 	struct	xml_element * dptr;
@@ -460,35 +570,25 @@ private	int	comodel_by_category( struct xml_element * eptr )
 				{
 					if (!( dptr->name ))
 						continue;
-					else if ( strcmp( dptr->name, "attribute" ) != 0 )
-						continue;
-					else if (!( nptr =  comodel_attribute(dptr,"name") ))
-						continue;
+					else if (!( strcmp( dptr->name, "attribute" )))
 					{
-						if (!( vptr =  comodel_attribute(dptr,"required") ))
-							required = 0;
-						else if (!( strcasecmp(vptr,"true") ))
-							required = 1;
-						else 	required = 0;
-						if (!( vptr =  comodel_attribute(dptr,"immutable") ))
-							immutable = 0;
-						else if (!( strcasecmp(vptr,"true") ))
-							immutable = 1;
-						else 	immutable = 0;
-
-						if (!( optr = occi_add_attribute( optr, nptr, required, immutable ) ))
+						if (!( optr = comodel_by_attribute( optr, dptr ) ))
 							break;
-
-						if (!( vptr =  comodel_attribute(dptr,"index") ))
-							optr->last->indexed=0;
-						else if (!( strcasecmp(vptr,"true") ))
-							optr->last->indexed=1;
-						else 	optr->last->indexed=0;
-						optr->last->type = comodel_attribute(dptr,"type");
-						optr->last->units = comodel_attribute(dptr,"units");
-						optr->last->validation = comodel_attribute(dptr,"validation");
-						optr->last->defaultvalue = comodel_attribute(dptr,"defaultvalue");
+						else	continue;
 					}
+					else if (!( strcmp( dptr->name, "instance" )))
+					{
+						if (!( optr = comodel_by_instance( optr, dptr ) ))
+							break;
+						else	continue;
+					}
+					else if (!( strcmp( dptr->name, "collection" )))
+					{
+						if (!( optr = comodel_by_collection( optr, dptr ) ))
+							break;
+						else	continue;
+					}
+					else	continue;
 				}
 			}
 

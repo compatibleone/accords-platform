@@ -441,45 +441,6 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#build'/>
 	    </actions>
 	</category>
-	<!--  Duplicate 
-	<category term='connection' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/connection/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <instance name='account' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
-	        <instance name='session' category='http://scheme.compatibleone.fr/scheme/compatible#session' multiplicity='[0..1]'/>
-	        <instance name='monitor' category='http://scheme.compatibleone.fr/scheme/compatible#monitor' multiplicity='[0..1]'/>
-	        <attribute name='pid' type='int' required='false' immutable='false'/>
-	        <instance name='probes' category='http://scheme.compatibleone.fr/scheme/compatible#probe' multiplicity='[0..*]'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#capture'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#consume'/>
-	    </actions>
-	</category>
-	<category term='packet' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/packet/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <instance name='connection' category='http://scheme.compatibleone.fr/scheme/compatible#connection' multiplicity='[0..1]'/>
-	        <instance name='probe' category='http://scheme.compatibleone.fr/scheme/compatible#probe' multiplicity='[0..1]'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <instance name='metric' category='http://scheme.compatibleone.fr/scheme/compatible#metric' multiplicity='[0..1]'/>
-	        <attribute name='data' type='string' required='false' immutable='false'/>
-	        <attribute name='sequence' type='int' required='false' immutable='false'/>
-	        <attribute name='samples' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	-->
 	<!-- No documentation or intances found of this type -->
 	<category term='iprange' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/iprange/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
@@ -564,45 +525,6 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#close'/>
 	    </actions>
 	</category>
-	<!--  Duplicates?
-	<category term='connection' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/connection/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='account' type='string' required='false' immutable='false'/>
-	        <attribute name='session' type='string' required='false' immutable='false'/>
-	        <attribute name='monitor' type='string' required='false' immutable='false'/>
-	        <attribute name='pid' type='int' required='false' immutable='false'/>
-	        <attribute name='probes' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#capture'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#consume'/>
-	    </actions>
-	</category>
-	<category term='packet' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/packet/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='connection' type='string' required='false' immutable='false'/>
-	        <attribute name='probe' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='metric' type='string' required='false' immutable='false'/>
-	        <attribute name='data' type='string' required='false' immutable='false'/>
-	        <attribute name='sequence' type='int' required='false' immutable='false'/>
-	        <attribute name='samples' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	 -->
 	<!-- categories from service at port 8092 -->
 	<category term='manifest' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/manifest/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
@@ -1038,45 +960,6 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
 	    </actions>
 	</category>
-	<!-- Duplicate
-	<category term='connection' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/connection/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='account' type='string' required='false' immutable='false'/>
-	        <attribute name='session' type='string' required='false' immutable='false'/>
-	        <attribute name='monitor' type='string' required='false' immutable='false'/>
-	        <attribute name='pid' type='int' required='false' immutable='false'/>
-	        <attribute name='probes' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#capture'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#consume'/>
-	    </actions>
-	</category>
-	<category term='packet' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/packet/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='connection' type='string' required='false' immutable='false'/>
-	        <attribute name='probe' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='metric' type='string' required='false' immutable='false'/>
-	        <attribute name='data' type='string' required='false' immutable='false'/>
-	        <attribute name='sequence' type='int' required='false' immutable='false'/>
-	        <attribute name='samples' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	 -->
 	<!-- categories from service at port 8105 -->
 	<category term='schedule' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/schedule/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
@@ -1276,45 +1159,6 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
 	    </actions>
 	</category>
-	<!-- Duplicate
-	<category term='connection' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/connection/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='account' type='string' required='false' immutable='false'/>
-	        <attribute name='session' type='string' required='false' immutable='false'/>
-	        <attribute name='monitor' type='string' required='false' immutable='false'/>
-	        <attribute name='pid' type='int' required='false' immutable='false'/>
-	        <attribute name='probes' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#capture'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#consume'/>
-	    </actions>
-	</category>
-	<category term='packet' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/packet/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='connection' type='string' required='false' immutable='false'/>
-	        <attribute name='probe' type='string' required='false' immutable='false'/>
-	        <attribute name='start' type='string' required='false' immutable='false'/>
-	        <attribute name='finish' type='string' required='false' immutable='false'/>
-	        <attribute name='metric' type='string' required='false' immutable='false'/>
-	        <attribute name='data' type='string' required='false' immutable='false'/>
-	        <attribute name='sequence' type='int' required='false' immutable='false'/>
-	        <attribute name='samples' type='int' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	 -->
 	<!-- categories from service at port 8286 -->
 	<category term='metadata' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/metadata/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
