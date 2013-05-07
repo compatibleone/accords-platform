@@ -63,6 +63,9 @@ endif
 if ENABLE_TESTORGA
 SUBDIRS += testorga
 endif
+if ENABLE_ORGABAS
+SUBDIRS += orgabas
+endif
 if ENABLE_COPAAS
 SUBDIRS += copaas
 endif
