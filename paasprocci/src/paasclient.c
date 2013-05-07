@@ -137,8 +137,24 @@ public	struct	paas_response * paas_result( struct rest_response *  aptr )
 private	struct	rest_header * paas_authenticate()
 {
 	struct	rest_header * hptr;
-	return( rest_create_header( _HTTP_ACCEPT, "application/xml" ) );
-	/* return( rest_create_header( "X-PAAS-AUTHORIZE", "None" ) ); */
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	char *	sptr;
+	if (!( hptr = rest_create_header( _HTTP_ACCEPT, "application/xml" ) ))
+		return( hptr );
+	else	foot = root = hptr;
+	if ((!( Paas.user )) || (!( Paas.pass )))
+		return( root );
+	else if (!( sptr = rest_encode_credentials( Paas.user, Paas.pass ) ))
+		return( root );
+	else if (!( hptr = rest_create_header( _HTTP_AUTHORIZATION, sptr ) ))
+		return( root );
+	else	
+	{
+		hptr->previous = root;
+		root->next = hptr;
+		return( root );
+	}
 }
 
 /*	-----------------------------------------	*/

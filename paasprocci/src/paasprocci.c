@@ -98,9 +98,9 @@ private	void	paasprocci_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	paasprocci_banner()
 {
-	printf("\n   CompatibleOne PAAS PROCCI : Version 1.0a.0.02");
-	printf("\n   Beta Version : 14/11/2012 ");
-	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne PAAS PROCCI : Version 1.0b.0.01");
+	printf("\n   Beta Version : 07/05/2013 ");
+	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
