@@ -85,8 +85,8 @@ AC_ARG_ENABLE([coxml],
       [],
       [enable_coxml=yes])
 AM_CONDITIONAL([ENABLE_COXML], [test "$enable_coxml" = "yes"])
-AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml/src])
-AC_SUBST([LD_COXML], ["-L\${abs_top_builddir}/coxml/src -lcoxml"])
+AC_SUBST([CFLAGS_COXML], [-I\${abs_top_srcdir}/coxml])
+AC_SUBST([LD_COXML], ["-L\${abs_top_builddir}/coxml -lcoxml"])
 
 AC_ARG_ENABLE([occi],
       [AS_HELP_STRING([--disable-occi],
@@ -94,8 +94,8 @@ AC_ARG_ENABLE([occi],
       [],
       [enable_occi=yes])
 AM_CONDITIONAL([ENABLE_OCCI], [test "$enable_occi" = "yes"])
-AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi/src])
-AC_SUBST([LD_OCCI], ["-L\${abs_top_builddir}/occi/src -locci"])
+AC_SUBST([CFLAGS_OCCI], [-I\${abs_top_srcdir}/occi])
+AC_SUBST([LD_OCCI], ["-L\${abs_top_builddir}/occi -locci"])
 
 AC_ARG_ENABLE([cords],
       [AS_HELP_STRING([--disable-cords],
@@ -103,8 +103,8 @@ AC_ARG_ENABLE([cords],
       [],
       [enable_cords=yes])
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
-AC_SUBST([CFLAGS_CORDS], ["-I\${abs_top_srcdir}/cords/src -I\${abs_top_builddir}/cords/src"])
-AC_SUBST([LD_CORDS], ["-L\${abs_top_builddir}/cords/src -lcords"])
+AC_SUBST([CFLAGS_CORDS], ["-I\${abs_top_srcdir}/cords -I\${abs_top_builddir}/cords"])
+AC_SUBST([LD_CORDS], ["-L\${abs_top_builddir}/cords -lcords"])
 
 AC_ARG_ENABLE([corest],
       [AS_HELP_STRING([--disable-corest],
@@ -112,8 +112,8 @@ AC_ARG_ENABLE([corest],
       [],
       [enable_corest=yes])
 AM_CONDITIONAL([ENABLE_COREST], [test "$enable_corest" = "yes"])
-AC_SUBST([CFLAGS_COREST], [-I\${abs_top_srcdir}/corest/src])
-AC_SUBST([LD_COREST], ["-L\${abs_top_builddir}/corest/src -lcorest"])
+AC_SUBST([CFLAGS_COREST], [-I\${abs_top_srcdir}/corest])
+AC_SUBST([LD_COREST], ["-L\${abs_top_builddir}/corest -lcorest"])
 
 AC_ARG_ENABLE([cocci],
       [AS_HELP_STRING([--disable-cocci],
@@ -121,8 +121,8 @@ AC_ARG_ENABLE([cocci],
       [],
       [enable_cocci=yes])
 AM_CONDITIONAL([ENABLE_COCCI], [test "$enable_cocci" = "yes"])
-AC_SUBST([CFLAGS_COCCI], [-I\${abs_top_srcdir}/cocci/src])
-AC_SUBST([LD_COCCI], ["-L\${abs_top_builddir}/cocci/src -lcocci"])
+AC_SUBST([CFLAGS_COCCI], [-I\${abs_top_srcdir}/cocci])
+AC_SUBST([LD_COCCI], ["-L\${abs_top_builddir}/cocci -lcocci"])
 
 AC_ARG_ENABLE([cocarrier],
       [AS_HELP_STRING([--disable-cocarrier],
@@ -130,8 +130,8 @@ AC_ARG_ENABLE([cocarrier],
       [],
       [enable_cocarrier=yes])
 AM_CONDITIONAL([ENABLE_COCARRIER], [test "$enable_cocarrier" = "yes"])
-AC_SUBST([CFLAGS_COCARRIER], [-I\${abs_top_srcdir}/cocarrier/src])
-AC_SUBST([LD_COCARRIER], ["-L\${abs_top_builddir}/cocarrier/src -lcocarrier"])
+AC_SUBST([CFLAGS_COCARRIER], [-I\${abs_top_srcdir}/cocarrier])
+AC_SUBST([LD_COCARRIER], ["-L\${abs_top_builddir}/cocarrier -lcocarrier"])
 
 AC_ARG_ENABLE([copabr],
       [AS_HELP_STRING([--disable-copabr],
@@ -139,8 +139,8 @@ AC_ARG_ENABLE([copabr],
       [],
       [enable_copabr=yes])
 AM_CONDITIONAL([ENABLE_COPABR], [test "$enable_copabr" = "yes"])
-AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr/src])
-AC_SUBST([LD_COPABR], ["-L\${abs_top_builddir}/copabr/src -lcopabr"])
+AC_SUBST([CFLAGS_COPABR], [-I\${abs_top_srcdir}/copabr])
+AC_SUBST([LD_COPABR], ["-L\${abs_top_builddir}/copabr -lcopabr"])
 
 AC_ARG_ENABLE([cocspi],
       [AS_HELP_STRING([--disable-cocspi],
@@ -148,8 +148,8 @@ AC_ARG_ENABLE([cocspi],
       [],
       [enable_cocspi=yes])
 AM_CONDITIONAL([ENABLE_COCSPI], [test "$enable_cocspi" = "yes"])
-AC_SUBST([CFLAGS_COCSPI], [-I\${abs_top_srcdir}/cocspi/src])
-AC_SUBST([LD_COCSPI], ["-L\${abs_top_builddir}/cocspi/src -lcocspi"])
+AC_SUBST([CFLAGS_COCSPI], [-I\${abs_top_srcdir}/cocspi])
+AC_SUBST([LD_COCSPI], ["-L\${abs_top_builddir}/cocspi -lcocspi"])
 
 AC_ARG_ENABLE([pubocci],
       [AS_HELP_STRING([--disable-pubocci],
@@ -157,8 +157,8 @@ AC_ARG_ENABLE([pubocci],
       [],
       [enable_pubocci=yes])
 AM_CONDITIONAL([ENABLE_PUBOCCI], [test "$enable_pubocci" = "yes"])
-AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci/src])
-AC_SUBST([LD_PUBOCCI], ["-L\${abs_top_builddir}/pubocci/src -lpubocci"])
+AC_SUBST([CFLAGS_PUBOCCI], [-I\${abs_top_srcdir}/pubocci])
+AC_SUBST([LD_PUBOCCI], ["-L\${abs_top_builddir}/pubocci -lpubocci"])
 
 AC_ARG_ENABLE([coss],
       [AS_HELP_STRING([--disable-coss],
@@ -166,8 +166,8 @@ AC_ARG_ENABLE([coss],
       [],
       [enable_coss=yes])
 AM_CONDITIONAL([ENABLE_COSS], [test "$enable_coss" = "yes"])
-AC_SUBST([CFLAGS_COSS], [-I\${abs_top_srcdir}/coss/src])
-AC_SUBST([PATH_COSS], [${abs_top_srcdir}/coss/src])
+AC_SUBST([CFLAGS_COSS], [-I\${abs_top_srcdir}/coss])
+AC_SUBST([PATH_COSS], [${abs_top_srcdir}/coss])
 
 AC_ARG_ENABLE([ezvm],
       [AS_HELP_STRING([--disable-ezvm],
@@ -175,8 +175,8 @@ AC_ARG_ENABLE([ezvm],
       [],
       [enable_ezvm=yes])
 AM_CONDITIONAL([ENABLE_EZVM], [test "$enable_ezvm" = "yes"])
-AC_SUBST([CFLAGS_EZVM], [-I\${abs_top_srcdir}/ezvm/src])
-AC_SUBST([PATH_EZVM], [${abs_top_srcdir}/ezvm/src])
+AC_SUBST([CFLAGS_EZVM], [-I\${abs_top_srcdir}/ezvm])
+AC_SUBST([PATH_EZVM], [${abs_top_srcdir}/ezvm])
 
 AC_ARG_ENABLE([cosacs],
       [AS_HELP_STRING([--disable-cosacs],
@@ -184,8 +184,8 @@ AC_ARG_ENABLE([cosacs],
       [],
       [enable_cosacs=yes])
 AM_CONDITIONAL([ENABLE_COSACS], [test "$enable_cosacs" = "yes"])
-AC_SUBST([CFLAGS_COSACS], [-I\${abs_top_srcdir}/cosacs/src])
-AC_SUBST([PATH_COSACS], [${abs_top_srcdir}/cosacs/src])
+AC_SUBST([CFLAGS_COSACS], [-I\${abs_top_srcdir}/cosacs])
+AC_SUBST([PATH_COSACS], [${abs_top_srcdir}/cosacs])
 
 AC_ARG_ENABLE([coips],
       [AS_HELP_STRING([--disable-coips],
@@ -193,8 +193,8 @@ AC_ARG_ENABLE([coips],
       [],
       [enable_coips=yes])
 AM_CONDITIONAL([ENABLE_COIPS], [test "$enable_coips" = "yes"])
-AC_SUBST([CFLAGS_COIPS], [-I\${abs_top_srcdir}/coips/src])
-AC_SUBST([PATH_COIPS], [${abs_top_srcdir}/coips/src])
+AC_SUBST([CFLAGS_COIPS], [-I\${abs_top_srcdir}/coips])
+AC_SUBST([PATH_COIPS], [${abs_top_srcdir}/coips])
 
 AC_ARG_ENABLE([cosched],
       [AS_HELP_STRING([--disable-cosched],
@@ -202,8 +202,8 @@ AC_ARG_ENABLE([cosched],
       [],
       [enable_cosched=yes])
 AM_CONDITIONAL([ENABLE_COSCHED], [test "$enable_cosched" = "yes"])
-AC_SUBST([CFLAGS_COSCHED], [-I\${abs_top_srcdir}/cosched/src])
-AC_SUBST([PATH_COSCHED], [${abs_top_srcdir}/cosched/src])
+AC_SUBST([CFLAGS_COSCHED], [-I\${abs_top_srcdir}/cosched])
+AC_SUBST([PATH_COSCHED], [${abs_top_srcdir}/cosched])
 
 AC_ARG_ENABLE([cops],
       [AS_HELP_STRING([--disable-cops],
@@ -211,8 +211,8 @@ AC_ARG_ENABLE([cops],
       [],
       [enable_cops=yes])
 AM_CONDITIONAL([ENABLE_COPS], [test "$enable_cops" = "yes"])
-AC_SUBST([CFLAGS_COPS], [-I\${abs_top_srcdir}/cops/src])
-AC_SUBST([PATH_COPS], [${abs_top_srcdir}/cops/src])
+AC_SUBST([CFLAGS_COPS], [-I\${abs_top_srcdir}/cops])
+AC_SUBST([PATH_COPS], [${abs_top_srcdir}/cops])
 
 AC_ARG_ENABLE([coees],
       [AS_HELP_STRING([--disable-coees],
@@ -220,8 +220,8 @@ AC_ARG_ENABLE([coees],
       [],
       [enable_coees=yes])
 AM_CONDITIONAL([ENABLE_COEES], [test "$enable_coees" = "yes"])
-AC_SUBST([CFLAGS_COEES], [-I\${abs_top_srcdir}/coees/src])
-AC_SUBST([PATH_COEES], [${abs_top_srcdir}/coees/src])
+AC_SUBST([CFLAGS_COEES], [-I\${abs_top_srcdir}/coees])
+AC_SUBST([PATH_COEES], [${abs_top_srcdir}/coees])
 
 AC_ARG_ENABLE([coobas],
       [AS_HELP_STRING([--disable-coobas],
@@ -229,8 +229,8 @@ AC_ARG_ENABLE([coobas],
       [],
       [enable_coobas=yes])
 AM_CONDITIONAL([ENABLE_COOBAS], [test "$enable_coobas" = "yes"])
-AC_SUBST([CFLAGS_COOBAS], [-I\${abs_top_srcdir}/coobas/src])
-AC_SUBST([PATH_COOBAS], [${abs_top_srcdir}/coobas/src])
+AC_SUBST([CFLAGS_COOBAS], [-I\${abs_top_srcdir}/coobas])
+AC_SUBST([PATH_COOBAS], [${abs_top_srcdir}/coobas])
 
 AC_ARG_ENABLE([comons],
       [AS_HELP_STRING([--disable-comons],
@@ -238,8 +238,8 @@ AC_ARG_ENABLE([comons],
       [],
       [enable_comons=yes])
 AM_CONDITIONAL([ENABLE_COMONS], [test "$enable_comons" = "yes"])
-AC_SUBST([CFLAGS_COMONS], [-I\${abs_top_srcdir}/comons/src])
-AC_SUBST([PATH_COMONS], [${abs_top_srcdir}/comons/src])
+AC_SUBST([CFLAGS_COMONS], [-I\${abs_top_srcdir}/comons])
+AC_SUBST([PATH_COMONS], [${abs_top_srcdir}/comons])
 
 AC_ARG_ENABLE([conets],
       [AS_HELP_STRING([--disable-conets],
@@ -247,8 +247,8 @@ AC_ARG_ENABLE([conets],
       [],
       [enable_conets=yes])
 AM_CONDITIONAL([ENABLE_CONETS], [test "$enable_conets" = "yes"])
-AC_SUBST([CFLAGS_CONETS], [-I\${abs_top_srcdir}/conets/src])
-AC_SUBST([PATH_CONETS], [${abs_top_srcdir}/conets/src])
+AC_SUBST([CFLAGS_CONETS], [-I\${abs_top_srcdir}/conets])
+AC_SUBST([PATH_CONETS], [${abs_top_srcdir}/conets])
 
 AC_ARG_ENABLE([publisher],
       [AS_HELP_STRING([--disable-publisher],
@@ -256,7 +256,7 @@ AC_ARG_ENABLE([publisher],
       [],
       [enable_publisher=yes])
 AM_CONDITIONAL([ENABLE_PUBLISHER], [test "$enable_publisher" = "yes"])
-AC_SUBST([PATH_PUBLISHER], [${abs_top_srcdir}/publisher/src])
+AC_SUBST([PATH_PUBLISHER], [${abs_top_srcdir}/publisher])
 
 AC_ARG_ENABLE([parser],
       [AS_HELP_STRING([--disable-parser],
@@ -264,8 +264,8 @@ AC_ARG_ENABLE([parser],
       [],
       [enable_parser=yes])
 AM_CONDITIONAL([ENABLE_PARSER], [test "$enable_parser" = "yes"])
-AC_SUBST([CFLAGS_PARSER], [-I\${abs_top_srcdir}/parser/src])
-AC_SUBST([PATH_PARSER], [${abs_top_srcdir}/parser/src])
+AC_SUBST([CFLAGS_PARSER], [-I\${abs_top_srcdir}/parser])
+AC_SUBST([PATH_PARSER], [${abs_top_srcdir}/parser])
 
 AC_ARG_ENABLE([broker],
       [AS_HELP_STRING([--disable-broker],
@@ -273,8 +273,8 @@ AC_ARG_ENABLE([broker],
       [],
       [enable_broker=yes])
 AM_CONDITIONAL([ENABLE_BROKER], [test "$enable_broker" = "yes"])
-AC_SUBST([CFLAGS_BROKER], [-I\${abs_top_srcdir}/broker/src])
-AC_SUBST([PATH_BROKER], [${abs_top_srcdir}/broker/src])
+AC_SUBST([CFLAGS_BROKER], [-I\${abs_top_srcdir}/broker])
+AC_SUBST([PATH_BROKER], [${abs_top_srcdir}/broker])
 
 AC_ARG_ENABLE([procci],
       [AS_HELP_STRING([--disable-procci],
@@ -282,8 +282,8 @@ AC_ARG_ENABLE([procci],
       [],
       [enable_procci=yes])
 AM_CONDITIONAL([ENABLE_PROCCI], [test "$enable_procci" = "yes"])
-AC_SUBST([CFLAGS_PROCCI], [-I\${abs_top_srcdir}/procci/src])
-AC_SUBST([PATH_PROCCI], [${abs_top_srcdir}/procci/src])
+AC_SUBST([CFLAGS_PROCCI], [-I\${abs_top_srcdir}/procci])
+AC_SUBST([PATH_PROCCI], [${abs_top_srcdir}/procci])
 
 AC_ARG_ENABLE([osprocci],
       [AS_HELP_STRING([--disable-osprocci],
@@ -291,8 +291,8 @@ AC_ARG_ENABLE([osprocci],
       [],
       [enable_osprocci=yes])
 AM_CONDITIONAL([ENABLE_OSPROCCI], [test "$enable_osprocci" = "yes"])
-AC_SUBST([CFLAGS_OSPROCCI], [-I\${abs_top_srcdir}/osprocci/src])
-AC_SUBST([PATH_OSPROCCI], [${abs_top_srcdir}/osprocci/src])
+AC_SUBST([CFLAGS_OSPROCCI], [-I\${abs_top_srcdir}/osprocci])
+AC_SUBST([PATH_OSPROCCI], [${abs_top_srcdir}/osprocci])
 
 AC_ARG_ENABLE([osocciprocci],
       [AS_HELP_STRING([--disable-osocciprocci],
@@ -300,8 +300,8 @@ AC_ARG_ENABLE([osocciprocci],
       [],
       [enable_osocciprocci=yes])
 AM_CONDITIONAL([ENABLE_OSOCCIPROCCI], [test "$enable_osocciprocci" = "yes"])
-AC_SUBST([CFLAGS_OSOCCIPROCCI], [-I\${abs_top_srcdir}/osocciprocci/src])
-AC_SUBST([PATH_OSOCCIPROCCI], [${abs_top_srcdir}/osocciprocci/src])
+AC_SUBST([CFLAGS_OSOCCIPROCCI], [-I\${abs_top_srcdir}/osocciprocci])
+AC_SUBST([PATH_OSOCCIPROCCI], [${abs_top_srcdir}/osocciprocci])
 
 AC_ARG_ENABLE([testosocci],
       [AS_HELP_STRING([--disable-testosocci],
@@ -309,8 +309,8 @@ AC_ARG_ENABLE([testosocci],
       [],
       [enable_testosocci=yes])
 AM_CONDITIONAL([ENABLE_TESTOSOCCI], [test "$enable_testosocci" = "yes"])
-AC_SUBST([CFLAGS_TESTOSOCCI], [-I\${abs_top_srcdir}/testosocci/src])
-AC_SUBST([PATH_TESTOSOCCI], [${abs_top_srcdir}/testosocci/src])
+AC_SUBST([CFLAGS_TESTOSOCCI], [-I\${abs_top_srcdir}/testosocci])
+AC_SUBST([PATH_TESTOSOCCI], [${abs_top_srcdir}/testosocci])
 
 AC_ARG_ENABLE([slam],
       [AS_HELP_STRING([--disable-slam],
@@ -318,8 +318,8 @@ AC_ARG_ENABLE([slam],
       [],
       [enable_slam=yes])
 AM_CONDITIONAL([ENABLE_SLAM], [test "$enable_slam" = "yes"])
-AC_SUBST([CFLAGS_SLAM], [-I\${abs_top_srcdir}/slam/src])
-AC_SUBST([PATH_SLAM], [${abs_top_srcdir}/slam/src])
+AC_SUBST([CFLAGS_SLAM], [-I\${abs_top_srcdir}/slam])
+AC_SUBST([PATH_SLAM], [${abs_top_srcdir}/slam])
 
 AC_ARG_ENABLE([copaas],
       [AS_HELP_STRING([--disable-copaas],
@@ -327,8 +327,8 @@ AC_ARG_ENABLE([copaas],
       [],
       [enable_copaas=yes])
 AM_CONDITIONAL([ENABLE_COPAAS], [test "$enable_copaas" = "yes"])
-AC_SUBST([CFLAGS_COPAAS], [-I\${abs_top_srcdir}/copaas/src])
-AC_SUBST([PATH_COPAAS], [${abs_top_srcdir}/copaas/src])
+AC_SUBST([CFLAGS_COPAAS], [-I\${abs_top_srcdir}/copaas])
+AC_SUBST([PATH_COPAAS], [${abs_top_srcdir}/copaas])
 
 AC_ARG_ENABLE([testorga],
       [AS_HELP_STRING([--disable-testorga],
@@ -336,8 +336,8 @@ AC_ARG_ENABLE([testorga],
       [],
       [enable_testorga=yes])
 AM_CONDITIONAL([ENABLE_TESTORGA], [test "$enable_testorga" = "yes"])
-AC_SUBST([CFLAGS_TESTORGA], [-I\${abs_top_srcdir}/testorga/src])
-AC_SUBST([PATH_TESTORGA], [${abs_top_srcdir}/testorga/src])
+AC_SUBST([CFLAGS_TESTORGA], [-I\${abs_top_srcdir}/testorga])
+AC_SUBST([PATH_TESTORGA], [${abs_top_srcdir}/testorga])
 
 AC_ARG_ENABLE([orgabas],
       [AS_HELP_STRING([--disable-orgabas],
@@ -345,8 +345,8 @@ AC_ARG_ENABLE([orgabas],
       [],
       [enable_orgabas=yes])
 AM_CONDITIONAL([ENABLE_ORGABAS], [test "$enable_orgabas" = "yes"])
-AC_SUBST([CFLAGS_ORGABAS], [-I\${abs_top_srcdir}/orgabas/src])
-AC_SUBST([PATH_ORGABAS], [${abs_top_srcdir}/orgabas/src])
+AC_SUBST([CFLAGS_ORGABAS], [-I\${abs_top_srcdir}/orgabas])
+AC_SUBST([PATH_ORGABAS], [${abs_top_srcdir}/orgabas])
 
 AC_ARG_ENABLE([conagios],
       [AS_HELP_STRING([--disable-conagios],
@@ -354,8 +354,8 @@ AC_ARG_ENABLE([conagios],
       [],
       [enable_conagios=yes])
 AM_CONDITIONAL([ENABLE_CONAGIOS], [test "$enable_conagios" = "yes"])
-AC_SUBST([CFLAGS_CONAGIOS], [-I\${abs_top_srcdir}/conagios/src])
-AC_SUBST([PATH_CONAGIOS], [${abs_top_srcdir}/conagios/src])
+AC_SUBST([CFLAGS_CONAGIOS], [-I\${abs_top_srcdir}/conagios])
+AC_SUBST([PATH_CONAGIOS], [${abs_top_srcdir}/conagios])
 
 AC_ARG_ENABLE([paasprocci],
       [AS_HELP_STRING([--disable-paasprocci],
@@ -363,8 +363,8 @@ AC_ARG_ENABLE([paasprocci],
       [],
       [enable_paasprocci=yes])
 AM_CONDITIONAL([ENABLE_PAASPROCCI], [test "$enable_paasprocci" = "yes"])
-AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci/src])
-AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci/src])
+AC_SUBST([CFLAGS_PAASPROCCI], [-I\${abs_top_srcdir}/paasprocci])
+AC_SUBST([PATH_PAASPROCCI], [${abs_top_srcdir}/paasprocci])
 
 AC_ARG_ENABLE([cnprocci],
       [AS_HELP_STRING([--disable-cnprocci],
@@ -372,8 +372,8 @@ AC_ARG_ENABLE([cnprocci],
       [],
       [enable_cnprocci=yes])
 AM_CONDITIONAL([ENABLE_CNPROCCI], [test "$enable_cnprocci" = "yes"])
-AC_SUBST([CFLAGS_CNPROCCI], ["-I\${abs_top_srcdir}/cnprocci/src -I\${abs_top_builddir}/cnprocci/src"])
-AC_SUBST([PATH_CNPROCCI], [${abs_top_srcdir}/cnprocci/src])
+AC_SUBST([CFLAGS_CNPROCCI], ["-I\${abs_top_srcdir}/cnprocci -I\${abs_top_builddir}/cnprocci"])
+AC_SUBST([PATH_CNPROCCI], [${abs_top_srcdir}/cnprocci])
 
 AC_ARG_ENABLE([eziprocci],
       [AS_HELP_STRING([--disable-eziprocci],
@@ -381,8 +381,8 @@ AC_ARG_ENABLE([eziprocci],
       [],
       [enable_eziprocci=yes])
 AM_CONDITIONAL([ENABLE_EZIPROCCI], [test "$enable_eziprocci" = "yes"])
-AC_SUBST([CFLAGS_EZIPROCCI], [-I\${abs_top_srcdir}/eziprocci/src])
-AC_SUBST([PATH_EZIPROCCI], [${abs_top_srcdir}/eziprocci/src])
+AC_SUBST([CFLAGS_EZIPROCCI], [-I\${abs_top_srcdir}/eziprocci])
+AC_SUBST([PATH_EZIPROCCI], [${abs_top_srcdir}/eziprocci])
 
 AC_ARG_ENABLE([coeasy],
       [AS_HELP_STRING([--disable-coeasy],
@@ -390,8 +390,8 @@ AC_ARG_ENABLE([coeasy],
       [],
       [enable_coeasy=yes])
 AM_CONDITIONAL([ENABLE_COEASY], [test "$enable_coeasy" = "yes"])
-AC_SUBST([CFLAGS_COEASY], [-I\${abs_top_srcdir}/coeasy/src])
-AC_SUBST([PATH_COEASY], [${abs_top_srcdir}/coeasy/src])
+AC_SUBST([CFLAGS_COEASY], [-I\${abs_top_srcdir}/coeasy])
+AC_SUBST([PATH_COEASY], [${abs_top_srcdir}/coeasy])
 
 AC_ARG_ENABLE([oaprocci],
       [AS_HELP_STRING([--disable-oaprocci],
@@ -399,8 +399,8 @@ AC_ARG_ENABLE([oaprocci],
       [],
       [enable_oaprocci=yes])
 AM_CONDITIONAL([ENABLE_OAPROCCI], [test "$enable_oaprocci" = "yes"])
-AC_SUBST([CFLAGS_OAPROCCI], [-I\${abs_top_srcdir}/oaprocci/src])
-AC_SUBST([PATH_OAPROCCI], [${abs_top_srcdir}/oaprocci/src])
+AC_SUBST([CFLAGS_OAPROCCI], [-I\${abs_top_srcdir}/oaprocci])
+AC_SUBST([PATH_OAPROCCI], [${abs_top_srcdir}/oaprocci])
 
 AC_ARG_ENABLE([comodel],
       [AS_HELP_STRING([--disable-comodel],
@@ -408,8 +408,8 @@ AC_ARG_ENABLE([comodel],
       [],
       [enable_comodel=yes])
 AM_CONDITIONAL([ENABLE_COMODEL], [test "$enable_comodel" = "yes"])
-AC_SUBST([CFLAGS_COMODEL], [-I\${abs_top_srcdir}/comodel/src])
-AC_SUBST([PATH_COMODEL], [${abs_top_srcdir}/comodel/src])
+AC_SUBST([CFLAGS_COMODEL], [-I\${abs_top_srcdir}/comodel])
+AC_SUBST([PATH_COMODEL], [${abs_top_srcdir}/comodel])
 
 AC_ARG_ENABLE([cool],
       [AS_HELP_STRING([--disable-cool],
@@ -417,8 +417,8 @@ AC_ARG_ENABLE([cool],
       [],
       [enable_cool=yes])
 AM_CONDITIONAL([ENABLE_COOL], [test "$enable_cool" = "yes"])
-AC_SUBST([CFLAGS_COOL], [-I\${abs_top_srcdir}/cool/src])
-AC_SUBST([PATH_COOL], [${abs_top_srcdir}/cool/src])
+AC_SUBST([CFLAGS_COOL], [-I\${abs_top_srcdir}/cool])
+AC_SUBST([PATH_COOL], [${abs_top_srcdir}/cool])
 
 AC_ARG_ENABLE([example],
       [AS_HELP_STRING([--disable-example],
@@ -426,8 +426,8 @@ AC_ARG_ENABLE([example],
       [],
       [enable_example=yes])
 AM_CONDITIONAL([ENABLE_EXAMPLE], [test "$enable_example" = "yes"])
-AC_SUBST([CFLAGS_EXAMPLE], [-I\${abs_top_srcdir}/example/src])
-AC_SUBST([PATH_EXAMPLE], [${abs_top_srcdir}/example/src])
+AC_SUBST([CFLAGS_EXAMPLE], [-I\${abs_top_srcdir}/example])
+AC_SUBST([PATH_EXAMPLE], [${abs_top_srcdir}/example])
 
 AC_ARG_ENABLE([dcprocci],
       [AS_HELP_STRING([--disable-dcprocci],
@@ -435,8 +435,8 @@ AC_ARG_ENABLE([dcprocci],
       [],
       [enable_dcprocci=yes])
 AM_CONDITIONAL([ENABLE_DCPROCCI], [test "$enable_dcprocci" = "yes"])
-AC_SUBST([CFLAGS_DCPROCCI], [-I\${abs_top_srcdir}/dcprocci/src])
-AC_SUBST([PATH_DCPROCCI], [${abs_top_srcdir}/dcprocci/src])
+AC_SUBST([CFLAGS_DCPROCCI], [-I\${abs_top_srcdir}/dcprocci])
+AC_SUBST([PATH_DCPROCCI], [${abs_top_srcdir}/dcprocci])
 
 AC_ARG_ENABLE([onprocci],
       [AS_HELP_STRING([--disable-onprocci],
@@ -444,8 +444,8 @@ AC_ARG_ENABLE([onprocci],
       [],
       [enable_onprocci=yes])
 AM_CONDITIONAL([ENABLE_ONPROCCI], [test "$enable_onprocci" = "yes"])
-AC_SUBST([CFLAGS_ONPROCCI], [-I\${abs_top_srcdir}/onprocci/src])
-AC_SUBST([PATH_ONPROCCI], [${abs_top_srcdir}/onprocci/src])
+AC_SUBST([CFLAGS_ONPROCCI], [-I\${abs_top_srcdir}/onprocci])
+AC_SUBST([PATH_ONPROCCI], [${abs_top_srcdir}/onprocci])
 
 AC_ARG_ENABLE([azprocci],
       [AS_HELP_STRING([--disable-azprocci],
@@ -453,8 +453,8 @@ AC_ARG_ENABLE([azprocci],
       [],
       [enable_azprocci=yes])
 AM_CONDITIONAL([ENABLE_AZPROCCI], [test "$enable_azprocci" = "yes"])
-AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci/src])
-AC_SUBST([PATH_AZPROCCI], [${abs_top_srcdir}/azprocci/src])
+AC_SUBST([CFLAGS_AZPROCCI], [-I\${abs_top_srcdir}/azprocci])
+AC_SUBST([PATH_AZPROCCI], [${abs_top_srcdir}/azprocci])
 
 AC_ARG_ENABLE([paprocci],
       [AS_HELP_STRING([--enable-paprocci],
@@ -517,8 +517,8 @@ AC_ARG_ENABLE([coidms],
       [enable_coidms=no] 
       )
 AM_CONDITIONAL([ENABLE_COIDMS], [test "$enable_coidms" = "yes"])
-AC_SUBST([CFLAGS_COIDMS], [-I\${abs_top_srcdir}/coidms/src])
-AC_SUBST([PATH_COIDMS], [${abs_top_srcdir}/coidms/src])
+AC_SUBST([CFLAGS_COIDMS], [-I\${abs_top_srcdir}/coidms])
+AC_SUBST([PATH_COIDMS], [${abs_top_srcdir}/coidms])
 # XXX FIXME: Autodetect libcurl presence
 AC_SUBST([LDFLAGS_COIDMS], ["-L/usr/include/curl -lcurl"])
 
@@ -535,7 +535,7 @@ AC_ARG_ENABLE([testos],
       [],
       [enable_testos=yes])
 AM_CONDITIONAL([ENABLE_TESTOS], [test "$enable_testos" = "yes"])
-AC_SUBST([CFLAGS_TESTOS], [-I\${abs_top_srcdir}/testos/src])
+AC_SUBST([CFLAGS_TESTOS], [-I\${abs_top_srcdir}/testos])
 
 AC_ARG_ENABLE([testdc],
       [AS_HELP_STRING([--disable-testdc],
@@ -543,7 +543,7 @@ AC_ARG_ENABLE([testdc],
       [],
       [enable_testdc=yes])
 AM_CONDITIONAL([ENABLE_TESTDC], [test "$enable_testdc" = "yes"])
-AC_SUBST([CFLAGS_TESTDC], [-I\${abs_top_srcdir}/testdc/src])
+AC_SUBST([CFLAGS_TESTDC], [-I\${abs_top_srcdir}/testdc])
 
 AC_ARG_ENABLE([teston],
       [AS_HELP_STRING([--disable-teston],
@@ -593,7 +593,7 @@ AC_ARG_ENABLE([fileserver],
       [],
       [enable_fileserver=yes])
 AM_CONDITIONAL([ENABLE_FILESERVER], [test "$enable_fileserver" = "yes"])
-AC_SUBST([PATH_FILESERVER], [${abs_top_srcdir}/fileserver/src])
+AC_SUBST([PATH_FILESERVER], [${abs_top_srcdir}/fileserver])
 
 AC_ARG_ENABLE([testresolver],
       [AS_HELP_STRING([--disable-testresolver],
@@ -622,61 +622,61 @@ AC_CONFIG_FILES([scripts/Makefile])
 AC_CONFIG_FILES([tools/Makefile tools/strukt/Makefile])
 AC_CONFIG_FILES([manifests/Makefile])
 AC_CONFIG_FILES([manpages/Makefile])
-AC_CONFIG_FILES([coxml/Makefile coxml/src/Makefile])
-AC_CONFIG_FILES([occi/Makefile occi/src/Makefile])
-AC_CONFIG_FILES([cords/Makefile cords/src/Makefile])
-AC_CONFIG_FILES([corest/Makefile corest/src/Makefile])
-AC_CONFIG_FILES([cocci/Makefile cocci/src/Makefile])
-AC_CONFIG_FILES([cocarrier/Makefile cocarrier/src/Makefile])
-AC_CONFIG_FILES([copabr/Makefile copabr/src/Makefile])
-AC_CONFIG_FILES([cocspi/Makefile cocspi/src/Makefile])
-AC_CONFIG_FILES([pubocci/Makefile pubocci/src/Makefile])
-AC_CONFIG_FILES([coss/Makefile coss/src/Makefile])
-AC_CONFIG_FILES([ezvm/Makefile ezvm/src/Makefile])
-AC_CONFIG_FILES([cops/Makefile cops/src/Makefile])
-AC_CONFIG_FILES([coees/Makefile coees/src/Makefile])
-AC_CONFIG_FILES([coobas/Makefile coobas/src/Makefile])
-AC_CONFIG_FILES([comons/Makefile comons/src/Makefile])
-AC_CONFIG_FILES([conets/Makefile conets/src/Makefile])
-AC_CONFIG_FILES([publisher/Makefile publisher/src/Makefile])
-AC_CONFIG_FILES([parser/Makefile parser/src/Makefile])
-AC_CONFIG_FILES([broker/Makefile broker/src/Makefile])
-AC_CONFIG_FILES([procci/Makefile procci/src/Makefile])
-AC_CONFIG_FILES([cosacs/Makefile cosacs/src/Makefile])
-AC_CONFIG_FILES([coips/Makefile coips/src/Makefile])
-AC_CONFIG_FILES([cosched/Makefile cosched/src/Makefile])
-AC_CONFIG_FILES([osprocci/Makefile osprocci/src/Makefile])
-AC_CONFIG_FILES([osocciprocci/Makefile osocciprocci/src/Makefile])
-AC_CONFIG_FILES([slam/Makefile slam/src/Makefile])
-AC_CONFIG_FILES([copaas/Makefile copaas/src/Makefile])
-AC_CONFIG_FILES([testorga/Makefile testorga/src/Makefile])
-AC_CONFIG_FILES([orgabas/Makefile orgabas/src/Makefile])
-AC_CONFIG_FILES([paasprocci/Makefile paasprocci/src/Makefile])
-AC_CONFIG_FILES([cnprocci/Makefile cnprocci/src/Makefile])
-AC_CONFIG_FILES([eziprocci/Makefile eziprocci/src/Makefile])
-AC_CONFIG_FILES([coeasy/Makefile coeasy/src/Makefile])
-AC_CONFIG_FILES([oaprocci/Makefile oaprocci/src/Makefile])
-AC_CONFIG_FILES([comodel/Makefile comodel/src/Makefile])
-AC_CONFIG_FILES([cool/Makefile cool/src/Makefile])
-AC_CONFIG_FILES([conagios/Makefile conagios/src/Makefile])
-AC_CONFIG_FILES([example/Makefile example/src/Makefile])
-AC_CONFIG_FILES([coidms/Makefile coidms/src/Makefile])
-AC_CONFIG_FILES([testosocci/Makefile testosocci/src/Makefile])
-AC_CONFIG_FILES([onprocci/Makefile onprocci/src/Makefile])
-AC_CONFIG_FILES([azprocci/Makefile azprocci/src/Makefile])
-AC_CONFIG_FILES([dcprocci/Makefile dcprocci/src/Makefile])
+AC_CONFIG_FILES([coxml/Makefile])
+AC_CONFIG_FILES([occi/Makefile])
+AC_CONFIG_FILES([cords/Makefile])
+AC_CONFIG_FILES([corest/Makefile])
+AC_CONFIG_FILES([cocci/Makefile])
+AC_CONFIG_FILES([cocarrier/Makefile])
+AC_CONFIG_FILES([copabr/Makefile])
+AC_CONFIG_FILES([cocspi/Makefile])
+AC_CONFIG_FILES([pubocci/Makefile])
+AC_CONFIG_FILES([coss/Makefile])
+AC_CONFIG_FILES([ezvm/Makefile])
+AC_CONFIG_FILES([cops/Makefile])
+AC_CONFIG_FILES([coees/Makefile])
+AC_CONFIG_FILES([coobas/Makefile])
+AC_CONFIG_FILES([comons/Makefile])
+AC_CONFIG_FILES([conets/Makefile])
+AC_CONFIG_FILES([publisher/Makefile])
+AC_CONFIG_FILES([parser/Makefile])
+AC_CONFIG_FILES([broker/Makefile])
+AC_CONFIG_FILES([procci/Makefile])
+AC_CONFIG_FILES([cosacs/Makefile])
+AC_CONFIG_FILES([coips/Makefile])
+AC_CONFIG_FILES([cosched/Makefile])
+AC_CONFIG_FILES([osprocci/Makefile])
+AC_CONFIG_FILES([osocciprocci/Makefile])
+AC_CONFIG_FILES([slam/Makefile])
+AC_CONFIG_FILES([copaas/Makefile])
+AC_CONFIG_FILES([testorga/Makefile])
+AC_CONFIG_FILES([orgabas/Makefile])
+AC_CONFIG_FILES([paasprocci/Makefile])
+AC_CONFIG_FILES([cnprocci/Makefile])
+AC_CONFIG_FILES([eziprocci/Makefile])
+AC_CONFIG_FILES([coeasy/Makefile])
+AC_CONFIG_FILES([oaprocci/Makefile])
+AC_CONFIG_FILES([comodel/Makefile])
+AC_CONFIG_FILES([cool/Makefile])
+AC_CONFIG_FILES([conagios/Makefile])
+AC_CONFIG_FILES([example/Makefile])
+AC_CONFIG_FILES([coidms/Makefile])
+AC_CONFIG_FILES([testosocci/Makefile])
+AC_CONFIG_FILES([onprocci/Makefile])
+AC_CONFIG_FILES([azprocci/Makefile])
+AC_CONFIG_FILES([dcprocci/Makefile])
 AC_CONFIG_FILES([paprocci/Makefile paprocci/src/Makefile paprocci/java/Makefile])
-AC_CONFIG_FILES([command/Makefile command/src/Makefile])
-AC_CONFIG_FILES([testdc/Makefile testdc/src/Makefile])
-AC_CONFIG_FILES([testos/Makefile testos/src/Makefile])
-AC_CONFIG_FILES([teston/Makefile teston/src/Makefile])
-AC_CONFIG_FILES([testhdfs/Makefile testhdfs/src/Makefile])
-AC_CONFIG_FILES([testcp/Makefile testcp/src/Makefile])
-AC_CONFIG_FILES([testcb/Makefile testcb/src/Makefile])
-AC_CONFIG_FILES([testaz/Makefile testaz/src/Makefile])
-AC_CONFIG_FILES([testcn/Makefile testcn/src/Makefile])
-AC_CONFIG_FILES([fileserver/Makefile fileserver/src/Makefile])
-AC_CONFIG_FILES([testresolver/Makefile testresolver/src/Makefile])
+AC_CONFIG_FILES([command/Makefile])
+AC_CONFIG_FILES([testdc/Makefile])
+AC_CONFIG_FILES([testos/Makefile])
+AC_CONFIG_FILES([teston/Makefile])
+AC_CONFIG_FILES([testhdfs/Makefile])
+AC_CONFIG_FILES([testcp/Makefile])
+AC_CONFIG_FILES([testcb/Makefile])
+AC_CONFIG_FILES([testaz/Makefile])
+AC_CONFIG_FILES([testcn/Makefile])
+AC_CONFIG_FILES([fileserver/Makefile])
+AC_CONFIG_FILES([testresolver/Makefile])
 AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
 AC_CONFIG_FILES([pyaccords/Makefile pyaccords/pysrc/Makefile pyaccords/pysrc/pypacksrc/Makefile])
 AC_CONFIG_FILES([pyaccordsSDK/Makefile pyaccordsSDK/pycompdev/Makefile pyaccordsSDK/pycompmanager/Makefile])
