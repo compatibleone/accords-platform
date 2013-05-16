@@ -2073,6 +2073,62 @@ public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struc
 }
 
 /*	------------------------------------------------------------	*/
+/*		 o c c i _ a c t i o n _ p o s t 			*/
+/*	------------------------------------------------------------	*/
+/*	This interface allows an action to be posted with parameters	*/
+/*	and respects the OCCI requirement of providing the action id	*/
+/*	headers to described the action kind/category information.	*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struct occi_request * rptr, struct rest_header * pptr )
+{
+	struct	occi_response * aptr=(struct occi_response *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	rest_response * zptr;
+	char *	body="";
+	char *	uri;
+
+	/* --------------------------------------------------------- */
+	/* if no action parameters then use the standard client POST */
+	/* --------------------------------------------------------- */
+	if (!( pptr ))
+		return( occi_client_post( cptr, rptr ) );
+
+	/* ----------------------------------------------------- */
+	/* create a POST message as for the standard client POST */
+	/* ----------------------------------------------------- */
+	else if (!( uri = occi_client_uri( cptr, (char *) 0 ) ))
+		return((struct occi_response *) 0);
+	else if (( rptr->first ) 
+	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+		return((struct occi_response *) 0);
+	else if ((OcciManager.headers)
+	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+		return((struct occi_response *) 0);
+
+	/* -------------------------------------------- */
+	/* append the action invocation parameters here */
+	/* -------------------------------------------- */
+	else if (!( hptr = occi_append_default( cptr, hptr, pptr ) ))
+		return((struct occi_response *) 0);
+
+	/* -------------------------------------------- */
+	/* continue with the standard client POST stuff */
+	/* -------------------------------------------- */
+	else if (( rptr->account )
+	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+		return((struct occi_response *) 0);
+	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
+		return((struct occi_response *) 0);
+	else if (!( zptr = rest_client_post_request(uri,cptr->tls,cptr->agent,body,hptr) ))
+		return((struct occi_response *) 0);
+	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+		return( aptr );
+	else if (!( aptr->host = serialise_url_host( cptr->target )))
+		return( aptr );
+	else	return( aptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*		     o c c i _ c l i e n t _ h e a d 			*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struct occi_request * rptr )

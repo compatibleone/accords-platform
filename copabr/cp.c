@@ -156,6 +156,20 @@ public	struct	occi_request *	cords_account_request( struct occi_client * cptr, c
 #endif
 }
 
+/*	-----------------------------------------	*/
+/*	 c o r d s _ a c t i o n _ r e q u e s t 	*/
+/*	-----------------------------------------	*/
+public	struct	occi_request *	cords_action_request( struct occi_client * cptr, char * category, int type )
+{
+	struct	occi_request * rptr;
+	if (!( rptr = cords_account_request( cptr, category, type ) ))
+		return( rptr );
+	/* ------------------------------------------------------------------------- */
+	/* TODO : overload the request category to use an action category definition */
+	/* ------------------------------------------------------------------------- */
+	else 	return( rptr );
+}
+
 /*	-------------------------------------------------------------------	*/
 /*	c o r d s _ r e t r i e v e _ n a m e d _ i n s t a n c e _ l i s t	*/
 /*	-------------------------------------------------------------------	*/
@@ -1008,6 +1022,22 @@ public	struct	occi_response * ll_cords_invoke_action( char * resource, char * ac
 	else 	return( occi_client_post( cptr, rptr ) );
 }
 
+/*	------------------------------------------------------------------------------	*/
+/*	   l l _ c o r d s _ i n v o k e _ a c t i o n _ w i t h _ p a r a m e t e r s	*/
+/*	------------------------------------------------------------------------------	*/
+public	struct	occi_response * ll_cords_invoke_action_with_parameters( char * resource, char * action, char * agent, char * tls, struct rest_header * hptr )
+{
+	struct	occi_request 	* rptr;
+	struct	occi_client	* cptr;
+	char	actihost[4096];
+	sprintf(actihost,"%s?action=%s",resource,action);
+	if (!( cptr = occi_create_client( actihost, agent, tls ) ))
+		return((struct occi_response *) 0);
+	else if (!(rptr = cords_action_request( cptr, cptr->target->object, _OCCI_NORMAL )))
+		return((struct occi_response *) 0);
+	else 	return( occi_action_post( cptr, rptr, hptr ) );
+}
+
 /*	---------------------------------------------------	*/
 /*	 	c o r d s _ i n v o k e _ a c t i o n 		*/
 /*	---------------------------------------------------	*/
@@ -1034,6 +1064,42 @@ public	struct	occi_response * cords_schedule_action( char * resource, char * act
 	{
 		eptr = occi_remove_elements( eptr );
 		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	}
+	else
+	{
+		eptr = occi_remove_elements( eptr );
+		return(zptr);
+	}
+}
+
+/*	-----------------------------------------------------------------------------	*/
+/*	 	c o r d s _ i n v o k e _ a c t i o n _ w i t h _ p a r a m e t e r s	*/
+/*	-----------------------------------------------------------------------------	*/
+/*	issues a POST request for the invocation of the   				*/
+/*	indicated action on the indicated resource instance				*/
+/*	----------------------------------------------------------------------------- 	*/	
+public	struct	occi_response * cords_schedule_action_with_parameters( char * resource, char * action, char * agent, char * tls, struct rest_header * hptr  )
+{
+	struct	occi_element 	* eptr;
+	struct	occi_response 	* zptr;
+	char	buffer[1024];
+	char *	scheduler=(char *) 0;
+	if (!( resource ))
+		return((struct occi_response *) 0);
+	else if (!( scheduler = occi_resolve_category_provider( _CORDS_SCHEDULE, agent, tls ) ))
+		return( ll_cords_invoke_action_with_parameters( resource, action, agent, tls, hptr ) );
+	else 	sprintf(buffer,"%s?action=%s",resource,action);
+
+	if (!( eptr = occi_create_element( "occi.schedule.operation", buffer ) ))
+		return( ll_cords_invoke_action( resource, action, agent, tls ) );
+	else	sprintf(buffer,"%s/%s/",scheduler,_CORDS_SCHEDULE);
+
+	/* TODO: use the HPTR to via something less simple */
+	/* ----------------------------------------------- */
+	if (!( zptr = occi_simple_post( buffer, eptr, agent, tls ) ))
+	{
+		eptr = occi_remove_elements( eptr );
+		return( ll_cords_invoke_action_with_parameters( resource, action, agent, tls, hptr ) );
 	}
 	else
 	{
@@ -1081,6 +1147,22 @@ public	struct	occi_response * cords_invoke_action( char * resource, char * actio
 	else if (!( strcasecmp( action, _CORDS_BUILD ) ))
 		return( cords_schedule_action( resource, action, agent, tls ) );
 	else	return( ll_cords_invoke_action( resource, action, agent, tls ) );
+}
+
+/*	---------------------------------------------------------------------		*/
+/*	c o r d s _ i n v o k e _ a c t i o n _ w i t h _ p a r a m e t e r s		*/
+/*	---------------------------------------------------------------------		*/
+public	struct	occi_response * cords_invoke_action_with_parameters( char * resource, char * action, char * agent, char * tls, struct rest_header * hptr )
+{
+	if (!( use_scheduler ))
+		return( ll_cords_invoke_action_with_parameters( resource, action, agent, tls, hptr ) );
+	else if (!( action ))	
+		return((struct occi_response *) 0);
+	else if (!( strcasecmp( action, _CORDS_START ) ))
+		return( cords_schedule_action_with_parameters( resource, action, agent, tls,hptr ) );
+	else if (!( strcasecmp( action, _CORDS_BUILD ) ))
+		return( cords_schedule_action_with_parameters( resource, action, agent, tls, hptr ) );
+	else	return( ll_cords_invoke_action_with_parameters( resource, action, agent, tls, hptr ) );
 }
 
 /*	---------------------------------------------------	*/	

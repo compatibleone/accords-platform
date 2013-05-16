@@ -98,6 +98,7 @@ public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct
 public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struct occi_request * rptr );
 public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struct occi_request * rptr );
 public	struct	occi_response *	occi_client_delete( struct occi_client * cptr, struct occi_request * rptr );
+public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struct occi_request * rptr, struct rest_header * hptr );
 public	struct	occi_response *	occi_remove_response( struct occi_response * aptr );
 public	struct	occi_response * allocate_occi_response();
 public	struct	occi_element  *	occi_request_element( struct occi_request * rptr, char * nptr, char * vptr );

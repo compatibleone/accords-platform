@@ -410,6 +410,22 @@ public	char *	occi_category_id( char * sptr )
 		return( allocate_string( last ) );
 	}
 }
+
+public	struct occi_category * occi_action_category( struct occi_category * cptr, char * action, char * scheme, char * rel )
+{
+	if (!( cptr ))
+		return( cptr);
+
+	else
+	{
+		cptr->id = action;
+		cptr->scheme = scheme;
+		cptr->class = "action";
+		cptr->rel = rel;
+		return( cptr );
+	}
+}
+	 
 		
 #endif	/* _occi_c */
 	/* ------- */
