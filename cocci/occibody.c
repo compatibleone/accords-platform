@@ -404,6 +404,7 @@ public	char *	occi_text_capacities(
 	char	buffer[2048];
 	char *	vptr;
 	char *	nptr;
+	struct	occi_action * actptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
 	struct	rest_header * contenttype=(struct rest_header *) 0;
 	struct	rest_header * hptr;
@@ -429,6 +430,20 @@ public	char *	occi_text_capacities(
 			{
 				fprintf(h,"Category: %s\n",mptr);
 				liberate( mptr );
+				for ( 	actptr = cptr->firstact;
+					actptr != (struct occi_action *) 0;
+					actptr = actptr->next )
+				{
+					if (!( actptr->binding ))
+						continue;
+					else if (!( mptr = occi_http_capacity( actptr->binding ) ))
+						continue;
+					else
+					{
+						fprintf(h,"Category: %s\n",mptr);
+						liberate( mptr );
+					}
+				}
 			}
 		}
 		fclose(h);

@@ -101,14 +101,57 @@ public	struct	occi_category * occi_create_resource_template( char * domain, char
 /*	---------------------------------------------------	*/
 public	struct	occi_category * occi_add_action(struct occi_category * cptr,char * name,char * parameters, void * target )
 {
+	struct	occi_parameter * pptr;
 	struct	occi_action * aptr;
+	char	scheme[4096];
+	char *	root=(char ) 0;
+	char *	sptr=(char ) 0;
+	char *	nptr=(char ) 0;
+	if (!( cptr ))
+		return( cptr );
+	else
+	{	
+		sprintf(scheme,"%s%s/action#",cptr->scheme,cptr->id);
+		for (	sptr=scheme;
+			*sptr != 0;
+			sptr++)
+			if ( *sptr == '#' ) break;
+		if ( *sptr == '#' )
+			*sptr = '/';
+	}
 	if (!( aptr = add_occi_action( cptr ) ))
 		return( occi_remove_category( cptr ) );
 	else if (!( aptr->name = allocate_string( name ) ))
 		return( occi_remove_category( cptr ) );
-	else
+	else if (!( aptr->binding = occi_create_category( 
+			( cptr->domain ? cptr->domain : "occi" ), name, 
+			scheme, "action", 
+			cptr->rel, "occi action" ) ))
+		return( occi_remove_category( cptr ) );
 	{
 		aptr->action = target;
+		if ((sptr = allocate_string(parameters)) != (char *) 0)
+		{
+			root = sptr;
+			while( *sptr != 0 )
+			{
+				while ( *sptr == ' ' ) sptr++;
+				if ( *sptr )
+				{
+					nptr = sptr;
+					while (( *sptr ) && ( *sptr != ' ' ) && ( *sptr != ',' )) sptr++;
+					if ( *sptr ) *(sptr++) =0;
+					if (!( pptr = add_occi_parameter( aptr )))
+						break;
+					else if (!( pptr->name = allocate_string( nptr ) ))
+					{
+						pptr = liberate_occi_parameter( pptr );
+						break;
+					}
+				}
+			}
+			liberate( root );
+		}
 		return( cptr );
 	}
 }

@@ -6,6 +6,7 @@ struct	occi_action
 	struct	occi_action 	* previous;
 	struct	occi_action 	* next;
 	struct	occi_category  	* parent;
+	struct	occi_category  	* binding;
 	struct	occi_parameter	* first;
 	struct	occi_parameter	* last;
 	char *	(*html_rendering)(struct occi_category * cptr,struct rest_header  * hptr );

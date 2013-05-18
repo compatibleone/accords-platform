@@ -471,6 +471,7 @@ private	struct rest_response * occi_get_capacities(
 		struct rest_client * cptr, 
 		struct rest_request * rptr )
 {
+	struct	occi_action * actptr;
 	struct rest_response * aptr;
 	char	* mptr;
 	char 	* ctptr;
@@ -536,6 +537,9 @@ private	struct rest_response * occi_get_capacities(
 			optr != (struct occi_category *) 0;
 			optr = optr->next )
 		{
+			/* ------------------------------- */
+			/* append the category description */
+			/* ------------------------------- */
 			if ( optr->access & _OCCI_SECRET )
 				continue;
 			else if (!( mptr = occi_http_capacity( optr ) ))
@@ -546,6 +550,23 @@ private	struct rest_response * occi_get_capacities(
 				return( rest_html_response( aptr, 500, "Server Failure" ) );
 			}
 			else	liberate( mptr );
+			/* --------------------------------------- */
+			/* append the action category descriptions */
+			/* --------------------------------------- */
+			for (	actptr=optr->firstact;
+				actptr != (struct occi_action *) 0;
+				actptr = actptr->next )
+			{
+				if (!( actptr->binding ))
+					continue;
+				else if (!( mptr = occi_http_capacity( actptr->binding ) ))
+					continue;
+				else if (!( hptr = rest_response_header( aptr, "Category", mptr ) ))
+				{
+					liberate( mptr );
+					return( rest_html_response( aptr, 500, "Server Failure" ) );
+				}
+			}
 		}
 		if (!( hptr = occi_accept_header( aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );

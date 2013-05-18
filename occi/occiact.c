@@ -35,6 +35,9 @@ public struct occi_action * liberate_occi_action(struct occi_action * sptr)
 			sptr->first = mptr->next;
 			mptr = liberate_occi_parameter( mptr );
 		}
+		if ( sptr->binding )
+			sptr->binding = liberate_occi_category( sptr->binding );
+
 		if ( sptr->name )
 			 sptr->name = liberate(sptr->name);
 		sptr = liberate( sptr );
@@ -53,6 +56,7 @@ public struct occi_action * reset_occi_action(struct occi_action * sptr)
 		sptr->previous = (struct occi_action*) 0;
 		sptr->next = (struct occi_action*) 0;
 		sptr->parent = (struct occi_category*) 0;
+		sptr->binding = (struct occi_category*) 0;
 		sptr->first = (struct occi_parameter*) 0;
 		sptr->last = (struct occi_parameter*) 0;
 		sptr->name = (char*) 0;

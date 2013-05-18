@@ -540,6 +540,44 @@ public	struct	occi_element  *	occi_response_elements(struct occi_response * rptr
 }
 
 /*	------------------------------------------------------------	*/
+/*	  o c c i _ r e s ol v e _ a c t i o n _ c a t e g o r y 	*/
+/*	------------------------------------------------------------	*/
+public	struct	occi_category * occi_resolve_action_category( struct occi_category * cptr, char * nptr )
+{
+	char *	sptr;
+	struct	occi_action * aptr;
+	/* ------------------------------------------ */
+	/* detect an ?action=name on the category url */
+	/* ------------------------------------------ */
+	for ( 	sptr=nptr; *sptr != 0; sptr++ )
+	{
+		if ( *sptr == '?' )
+		{
+			if ( strncmp( (sptr+1), "action=", strlen( "action=" ) ) != 0 )
+				break;
+			else	
+			{
+				/* ----------------------------------------- */
+				/* retrieve the corresponding action control */
+				/* ----------------------------------------- */
+				sptr+= (strlen( "action=" ) + 1);
+				for (	aptr=cptr->firstact;
+					aptr != (struct occi_action *) 0;
+					aptr = aptr->next )
+				{
+					/* --------------------------- */
+					/* return the category binding */
+					/* --------------------------- */
+					if (!( strcmp( aptr->name, sptr ) ))
+						return( aptr->binding );
+				}
+			}
+		}
+	}
+	return( cptr );
+}
+
+/*	------------------------------------------------------------	*/
 /*		o c c i _ r e s ol v e _ c a t e g o r y 		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_category * occi_resolve_category( struct occi_category * cptr, char * nptr )
@@ -557,7 +595,9 @@ public	struct	occi_category * occi_resolve_category( struct occi_category * cptr
 		else if (!( strncmp( nptr, cptr->location, strlen(cptr->location) ) ))
 			break;
 	}
-	return( cptr );
+	if (!( cptr ))
+		return( cptr );
+	else 	return( occi_resolve_action_category( cptr, nptr ) );
 }
 
 /*	------------------------------------------------------------	*/
