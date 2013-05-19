@@ -2127,19 +2127,12 @@ public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struc
 	char *	body="";
 	char *	uri;
 
-	/* --------------------------------------------------------- */
-	/* if no action parameters then use the standard client POST */
-	/* --------------------------------------------------------- */
-	if (!( pptr ))
-		return( occi_client_post( cptr, rptr ) );
-
 	/* ----------------------------------------------------- */
 	/* create a POST message as for the standard client POST */
 	/* ----------------------------------------------------- */
-	else if (!( uri = occi_client_uri( cptr, (char *) 0 ) ))
+	if (!( uri = occi_client_uri( cptr, (char *) 0 ) ))
 		return((struct occi_response *) 0);
-	else if (( rptr->first ) 
-	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+	else if  (!( hptr = occi_request_headers( cptr, rptr )))
 		return((struct occi_response *) 0);
 	else if ((OcciManager.headers)
 	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
@@ -2148,13 +2141,14 @@ public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struc
 	/* -------------------------------------------- */
 	/* append the action invocation parameters here */
 	/* -------------------------------------------- */
-	else if (!( hptr = occi_append_default( cptr, hptr, pptr ) ))
-		return((struct occi_response *) 0);
+	if ( pptr )
+		if (!( hptr = occi_append_default( cptr, hptr, pptr ) ))
+			return((struct occi_response *) 0);
 
 	/* -------------------------------------------- */
 	/* continue with the standard client POST stuff */
 	/* -------------------------------------------- */
-	else if (( rptr->account )
+	if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
 		return((struct occi_response *) 0);
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))

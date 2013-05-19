@@ -1019,7 +1019,7 @@ public	struct	occi_response * ll_cords_invoke_action( char * resource, char * ac
 		return((struct occi_response *) 0);
 	else if (!(rptr = cords_account_request( cptr, cptr->target->object, _OCCI_NORMAL )))
 		return((struct occi_response *) 0);
-	else 	return( occi_client_post( cptr, rptr ) );
+	else 	return( occi_action_post( cptr, rptr, (struct rest_header *) 0 ) );
 }
 
 /*	------------------------------------------------------------------------------	*/
