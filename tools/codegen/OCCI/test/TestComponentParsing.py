@@ -53,7 +53,7 @@ class TestComponentResolving(unittest.TestCase):
         
         op.parse(root)
         op.resolve([category])
-        result = op.components[0]
+        result = op.components[name]
         
         assert_that(result.category(category_name), is_(same_instance(category)))
         assert_that(category.set_component_was_called, is_(True))
@@ -79,6 +79,13 @@ class TestComponentParsing(unittest.TestCase):
     def tearDown(self):
         self.l.uninstall()
     
+    def test_that_empty_dictionary_is_returned_if_no_components_found(self):
+        op = ComponentParser()
+        
+        result = op.components
+        
+        assert_that(result, is_({}))
+    
     def test_that_parse_requires_an_outer_components_element(self):
         root = ET.Element('component')  #Note the lack of a final 's'
         op = ComponentParser()
@@ -86,7 +93,7 @@ class TestComponentParsing(unittest.TestCase):
         op.parse(root)
         result = op.components
         
-        assert_that(result, is_([]))
+        assert_that(result, is_({}))
         
     
     def test_that_parse_generates_a_component_if_xml_contains_component_element(self):
@@ -102,34 +109,37 @@ class TestComponentParsing(unittest.TestCase):
     
     def test_that_parse_generates_two_component_if_xml_contains_two_component_elements(self):
         root = ET.Element('components')
-        ET.SubElement(root, 'component', {'name':"don't care"})
-        ET.SubElement(root, 'component', {'name':"still don't care"})
+        name1 = "first"
+        name2 = "second"
+        ET.SubElement(root, 'component', {'name':name1})
+        ET.SubElement(root, 'component', {'name':name2})
         op = ComponentParser()
         
         op.parse(root)
         result = op.components
         
         assert_that(len(result), is_(2))
-        assert_that(type(result[0]), is_(type(Component)))
-        assert_that(type(result[1]), is_(type(Component)))
+        assert_that(type(result[name1]), is_(type(Component)))
+        assert_that(type(result[name2]), is_(type(Component)))
                 
-    def test_that_parse_generates_empty_list_if_xml_does_not_contain_components_element(self):
+    def test_that_parse_generates_empty_dictionary_if_xml_does_not_contain_components_element(self):
         root = ET.Element('model')
         op = ComponentParser()
         
         op.parse(root)
         result = op.components
         
-        assert_that(result, is_([]))
+        assert_that(result, is_({}))
         
     
     def test_that_parse_generates_a_component_with_attributes_if_specified(self):
         root = ET.Element('components')
-        ET.SubElement(root, 'component', { 'name':'example', 'random':'abc', 'random2':'123'})
+        component_name = 'example'
+        ET.SubElement(root, 'component', { 'name':component_name, 'random':'abc', 'random2':'123'})
         op = ComponentParser()
         
         op.parse(root)
-        result = op.components[0]
+        result = op.components[component_name]
         
         assert_that(result.attributes, is_not(None))
         assert_that(result.attributes, has_entry('name', 'example'))
@@ -143,7 +153,7 @@ class TestComponentParsing(unittest.TestCase):
         op = ComponentParser()
         
         op.parse(root)
-        result = op.components[0]
+        result = op.components[name]
         
         assert_that(result.name, is_(name))
 
@@ -154,24 +164,27 @@ class TestComponentParsing(unittest.TestCase):
         op = ComponentParser()
         
         op.parse(root)
-        result = op.components[0]
+        result = op.components[name]
         
         assert_that(result.category_names, is_not(None))
         assert_that(result.category_names, has_item(category))
         
     def test_that_parse_generates_a_component_including_two_categories_if_two_specified(self):
         root = ET.Element('components')
-        sample_component = ET.SubElement(root, 'component', {'name':"don't care"})
-        ET.SubElement(sample_component, 'category', {'name':"publication"})
-        ET.SubElement(sample_component, 'category', {'name':"enquiry"})
+        component_name = "example"
+        sample_component = ET.SubElement(root, 'component', {'name':component_name})
+        name1 = "publication"
+        name2 = "enquiry"
+        ET.SubElement(sample_component, 'category', {'name':name1})
+        ET.SubElement(sample_component, 'category', {'name':name2})
         op = ComponentParser()
         
         op.parse(root)
-        result = op.components[0]
+        result = op.components[component_name]
         
         assert_that(result.category_names, is_not(None))
-        assert_that(result.category_names, has_item('publication'))
-        assert_that(result.category_names, has_item('enquiry'))
+        assert_that(result.category_names, has_item(name1))
+        assert_that(result.category_names, has_item(name2))
         
     @unittest.expectedFailure
     def test_that_parse_raises_if_category_has_no_name(self):
@@ -192,6 +205,6 @@ class TestComponentParsing(unittest.TestCase):
         op.parse(root)
         result = op.components
         
-        assert_that(result, is_([]))
+        assert_that(result, is_({}))
         self.l.check(('root', 'WARNING', "Ignoring component definition with no name"))
         

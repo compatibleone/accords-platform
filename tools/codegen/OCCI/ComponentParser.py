@@ -8,7 +8,7 @@ class ComponentParser(XmlParser):
     _parse_type = "component"
         
     def __init__(self):
-        self._components = []
+        self._components = {}
         
     @property
     def components(self):
@@ -21,10 +21,10 @@ class ComponentParser(XmlParser):
         else:
             attributes = xmlmodel.attrib
             categories = [category.get('name') for category in xmlmodel.findall("category")]
-            self._components.append(Component(categories, name, attributes))
+            self._components[name] = Component(categories, name, attributes)
     
     def resolve(self, categories):
-        for component in self._components:
+        for name, component in self._components.items():
             for category_name in component.category_names:
                 category_link = [category_link for category_link in categories if category_link.catid == category_name]
                 if category_link:
