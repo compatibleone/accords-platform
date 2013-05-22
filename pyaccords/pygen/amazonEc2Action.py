@@ -24,8 +24,10 @@ import time
 import ntpath
 import pycompdev
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
+srcdirect = pypacksrc.srcpydir+"/pyaccords/pysrc/"
 sys.path.append(srcdirectory)
+sys.path.append(srcdirect)
 from ec2client import *  
 from amazonEc2Class import *
 """ Note:amazonEc2 is a python class to interface the accords category :amazonEc2.

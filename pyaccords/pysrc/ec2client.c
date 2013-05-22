@@ -276,6 +276,7 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 {
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
+	char * strcmptr = NULL;
 	int  status= 0;
         char srcdir[1024];
 	char * response;
@@ -433,15 +434,17 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	else strConcat(sendstr,pptr->agent,',');
 
 	sprintf(strtmp,"%d",pptr->when);
-	if(strValid(strcmp)) strConcat(sendstr,strtmp,',');
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
 	sprintf(strtmp,"%d",pptr->state);
-	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
 	//           python interface
-	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 	pythr = Py_NewInterpreter();
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
@@ -773,7 +776,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	else strConcat(sendstr,pptr->agent,',');
 
 	sprintf(strtmp,"%d",pptr->when);
-	if(strValid(strcmp)) strConcat(sendstr,strtmp,',');
+	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
 	sprintf(strtmp,"%d",pptr->state);
@@ -781,7 +784,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	else strConcat(sendstr," ",',');	
 
 	//           python interface
-	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 	pythr = Py_NewInterpreter();
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
@@ -1121,7 +1124,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	else strConcat(sendstr,pptr->agent,',');
 
 	sprintf(strtmp,"%d",pptr->when);
-	if(strValid(strcmp)) strConcat(sendstr,strtmp,',');
+	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
 	sprintf(strtmp,"%d",pptr->state);
@@ -1129,7 +1132,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	else strConcat(sendstr," ",',');	
 
 	//           python interface
-	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 	pythr = Py_NewInterpreter();
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
@@ -1445,7 +1448,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	else strConcat(sendstr,pptr->agent,',');
 
 	sprintf(strtmp,"%d",pptr->when);
-	if(strValid(strcmp)) strConcat(sendstr,strtmp,',');
+	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
 	sprintf(strtmp,"%d",pptr->state);
@@ -1453,7 +1456,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	else strConcat(sendstr," ",',');	
 
 	//           python interface
-	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 	pythr = Py_NewInterpreter();
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
@@ -1776,7 +1779,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		else strConcat(sendstr,pptr->agent,',');
 		
 		sprintf(strtmp,"%d",pptr->when);
-	 	if(strValid(strcmp)) strConcat(sendstr,strtmp,',');
+	 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 		else strConcat(sendstr," ",',');
 	
 		sprintf(strtmp,"%d",pptr->state);
@@ -1784,7 +1787,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		else strConcat(sendstr," ",',');
 
 		//           python interface
-		sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+		sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 		pythr = Py_NewInterpreter();
 		python_path(srcdir);
 		pName = PyString_FromString("amazonEc2Act");

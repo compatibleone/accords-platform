@@ -20,7 +20,9 @@
 import sys
 import pycompdev
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
+srcdirectoryc=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+sys.path.append(srcdirectoryc)
 sys.path.append(srcdirectory)
 from linkgwClass import *
 from client import OCCIclient

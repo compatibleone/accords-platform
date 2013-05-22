@@ -15,7 +15,9 @@
 import sys
 import time
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
+srcdirectoryc=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+sys.path.append(srcdirectoryc)
 sys.path.append(srcdirectory)
 import boto
 import boto.ec2

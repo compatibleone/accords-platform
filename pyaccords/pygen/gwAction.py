@@ -20,8 +20,8 @@
 import sys
 import pycompdev
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
-srcdirectoryc=pypacksrc.srcpydir+"/cocarrier/src/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
+srcdirectoryc=pypacksrc.srcpydir+"/pyaccords/pysrc/"
 sys.path.append(srcdirectory)
 sys.path.append(srcdirectoryc)
 from gwClass import *

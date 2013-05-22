@@ -20,8 +20,10 @@
 import sys
 import pycompdev
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
+srcdirectoryc = pypacksrc.srcpydir+"/pyaccords/pysrc/"
 sys.path.append(srcdirectory)
+sys.path.append(srcdirectoryc)
 from gwClass import *
 from client import OCCIclient
 """ Note: gw is a python class to interface the accords category :gw.

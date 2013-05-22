@@ -20,7 +20,7 @@
 import sys
 import pycompdev
 import pypacksrc
-srcdirectory=pypacksrc.srcpydir+"/pyaccords/pysrc/"
+srcdirectory=pypacksrc.srcpydir+"/pyaccords/pygen/"
 sys.path.append(srcdirectory)
 from amazonEc2Class import *
 """ Note: amazonEc2 is a python class to interface the accords category :amazonEc2.

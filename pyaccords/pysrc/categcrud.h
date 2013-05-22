@@ -3,11 +3,11 @@
 
 
 
-#include "amazonEc2Interface.c"
-#include "ec2configInterface.c"
-#include "gwInterface.c"
-#include "linkgwInterface.c"
-#include "intercloudGWInterface.c"
+#include "../pygen/amazonEc2Interface.c"
+#include "../pygen/ec2configInterface.c"
+#include "../pygen/gwInterface.c"
+#include "../pygen/linkgwInterface.c"
+#include "../pygen/intercloudGWInterface.c"
 #endif
 
 
