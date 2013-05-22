@@ -299,7 +299,6 @@ private	int	module_operation(
 	struct	occi_category * optr=(struct occi_category *) 0;
         
         int i;
-        struct occi_interface categoryInterface;
         int numOfact; 
         char categoryAction[1024];
         char packetfile[256];

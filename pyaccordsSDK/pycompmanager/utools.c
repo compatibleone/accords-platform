@@ -46,7 +46,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  
  if(indice)
  {
-  sprintf(pylistactionname,"#include \"%sAction.c\"",categoryName);
+  sprintf(pylistactionname,"#include \"../pygen/%sAction.c\"",categoryName);
   sprintf(pylistaction,"%s/%s",pathf,PY_ACT_LIST);
  }
 
@@ -75,7 +75,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  sprintf(occicordsname,"#include \"occi%s.c\"",categoryName);
  
  sprintf(pyint,"%s/%s",pathf,PY_CRUD_INCLUDE);
- sprintf(pyintname,"#include \"%sInterface.c\"",categoryName);
+ sprintf(pyintname,"#include \"../pygen/%sInterface.c\"",categoryName);
  
  if(indice) 
  {

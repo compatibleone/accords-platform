@@ -3,9 +3,9 @@ from distutils.core import setup, Extension
 module1 = Extension('pycompmanager', 
                      sources = ['pycompmanager.c','compmanager.c','list.c','utools.c'],
                      depends = ['compmanager.h','list.c'],
-                     include_dirs = ['../../coxml/src/'],
+                     include_dirs = ['../../coxml/'],
 		     libraries = ['coxml'],
-                     library_dirs = ['../../coxml/src/.libs/']
+                     library_dirs = ['../../coxml/.libs/']
                    )
 setup (name = 'pycompmanager',
         version = '1.0',
