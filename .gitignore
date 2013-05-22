@@ -204,7 +204,15 @@ testresolver/src/testresolver
 *.tgz
 paprocci/java/libs/*.jar
 testsuite/*.pyc
+tools/codegen/*.pyc
+tools/codegen/OCCI/*.pyc
+tools/codegen/OCCI/test/*.pyc
 paasprocci/src/paasprocci
 pyaccords/pysrc/pypacksrc/build/
 pyaccordsSDK/pycompdev/build/
 pyaccordsSDK/pycompmanager/build/
+build
+.cproject
+.project
+.pydevproject
+.settings
