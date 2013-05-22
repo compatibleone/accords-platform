@@ -140,6 +140,23 @@ class TestUsesResolving(unittest.TestCase):
         assert_that(backend.add_category_called, is_(True))
         assert_that(backend.categories, has_item(same_instance(category)))
         
+    def test_that_resolve_warns_if_component_include_is_not_in_components_list(self): 
+        component_name = 'nonexistant'
+        root = ET.Element('config')
+        uses = ET.SubElement(root, 'uses')
+        backend = 'db'
+        use = ET.SubElement(uses, 'use', {'backend':backend})
+        include = ET.SubElement(use, 'include')
+        ET.SubElement(include, 'component', {'name':component_name})
+        op = UsesParser()  
+        op.parse(root)      
+        category_name = "don't care"
+        op.resolve([MockCategory(category_name)], {})
+        
+        # TODO We don't care about the second method here.  Create a better matcher than l.check to allow checking for only a subset of the messages 
+        self.l.check(('root', 'WARNING', "Component '{0}' is included/excluded for backend {1}, but does not exist".format(component_name, backend)),
+                      ('root', 'WARNING', "Category '{0}' has no backend specified".format(category_name)))
+                
     
 class TestUsesParsing(unittest.TestCase):
     

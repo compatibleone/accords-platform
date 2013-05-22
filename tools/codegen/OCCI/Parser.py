@@ -64,6 +64,7 @@ class Parser(object):
             self._parse(f)
         # Resolve rels and collections/instances
         self.cats.resolve()
+        self.parsers.resolve(self.cats.list.values())
         return self.models
     
     def _addcoll(self, colls, cat):

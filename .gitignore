@@ -207,6 +207,7 @@ testsuite/*.pyc
 tools/codegen/*.pyc
 tools/codegen/OCCI/*.pyc
 tools/codegen/OCCI/test/*.pyc
+tools/codegen/system_test/*.pyc
 paasprocci/src/paasprocci
 pyaccords/pysrc/pypacksrc/build/
 pyaccordsSDK/pycompdev/build/
