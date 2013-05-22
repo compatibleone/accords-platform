@@ -2,15 +2,7 @@ import logging
 
 from Uses import Uses, CategoryUse, ComponentUse, PlatformUse
 from XmlParser import XmlParser
-
-class Backends(object):
-    
-    def __init__(self, backends):
-        self._backends = backends
-    
-    @property
-    def backends(self):
-        return self._backends
+from Backends import Backend
 
 class UsesParser(XmlParser):
     _parse_type = "uses"
@@ -21,6 +13,9 @@ class UsesParser(XmlParser):
         
     @property
     def uses(self):
+        '''
+        @return: Single Uses instance
+        '''
         return self._uses    
     
     def _parse_platform_use(self, backend, use_element):
@@ -59,34 +54,50 @@ class UsesParser(XmlParser):
     def _parse(self, xmlmodel):
         uses = self._parse_uses(xmlmodel)
         self._uses.add_uses(uses)
-        return self._uses
 
-    def _check_category(self, category, components):
-        if self._uses.backend_for(category, components) is None:
+    def _resolve_category(self, category, components, backends):
+        backend = self._uses.backend_for(category, components)
+        if backend is None:
             #TODO Should this be an error?
             logging.warn("Category '{0}' has no backend specified".format(category))
+        else:
+            if backend in backends:                
+                link_backend = backends[backend]
+                category.set_backend(link_backend)
+                link_backend.add_category(category)             
+            else:
+                logging.warn("Category '{0}' has link to nonexistant backend {1}".format(category, backend))
         
-    def resolve(self, category_names, components):
-        [self._check_category(category, components) for category in category_names]
+    def resolve(self, categories, components, backends = {}):
+        [self._resolve_category(category, components, backends) for category in categories]
 
 class BackendParser(XmlParser):
     _parse_type = "backends"
     _root_tag = "config"
+    
+    def __init__(self):
+        self._backends = {}
                 
     def _use_if_valid(self, backend):
         name = backend.get('name')
         plugin = backend.get('plugin')
-        # TODO Could parse any config elements here.  Plugin can be replaced by a more complicated object
-        # representing the config
+        params_element = backend.find('params')
+        if params_element is not None:
+            params = dict([(el.tag, el.text) for el in params_element])
+        else:
+            params = {}
         if name and plugin:
-            return (name, plugin)
+            return (name, Backend(plugin, params))
         logging.warn("Ignoring invalid backend definition, name = '{0}', plugin = '{1}'".format(name, plugin))
         return None        
         
-    def _parse_backends(self, xmlmodel):
-        pairs = [self._use_if_valid(backend) for backend in xmlmodel.findall("backend")]        
-        return dict(pair for pair in pairs if pair)
-            
     def _parse(self, xmlmodel):
-        backends = self._parse_backends(xmlmodel)
-        return Backends(backends)
+        pairs = [self._use_if_valid(backend) for backend in xmlmodel.findall("backend")]  
+        self._backends.update(pair for pair in pairs if pair)
+                
+    @property
+    def backends(self):
+        '''
+            @return: dictionary of <name:backend> pairs
+        '''
+        return self._backends

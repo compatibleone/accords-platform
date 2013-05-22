@@ -1,11 +1,14 @@
 import unittest
-from testfixtures import LogCapture
-
 import xml.etree.ElementTree as ET
-from hamcrest import assert_that, is_, is_not, has_entry, has_item
+
+from testfixtures import LogCapture
+from hamcrest import assert_that, is_, is_not, has_entry, has_item, same_instance
 
 from Component import Component
 from ComponentParser import ComponentParser
+
+from ParserMocks import MockCategory
+
 
 def _component_tree_with_category(category, name):
     root = ET.Element('components')
@@ -30,15 +33,31 @@ class TestComponentResolving(unittest.TestCase):
         assert_that(self.l.__str__(), is_("No logging captured"))
         
     def test_that_resolve_does_not_warn_if_all_categories_found(self):
-        category = 'something'
+        category_name = 'something'
+        category = MockCategory(category_name)
         name = 'sample component'
-        root = _component_tree_with_category(category, name)
+        root = _component_tree_with_category(category_name, name)
         op = ComponentParser()
         
         op.parse(root)
         op.resolve([category])
         
         assert_that(self.l.__str__(), is_("No logging captured"))
+        
+    def test_that_resolve_links_to_category(self):
+        category_name = 'something'
+        category = MockCategory(category_name)
+        name = 'sample component'
+        root = _component_tree_with_category(category_name, name)
+        op = ComponentParser()
+        
+        op.parse(root)
+        op.resolve([category])
+        result = op.components[0]
+        
+        assert_that(result.category(category_name), is_(same_instance(category)))
+        assert_that(category.set_component_was_called, is_(True))
+        assert_that(category.component, is_(same_instance(result)))
         
     def test_that_resolve_warns_if_category_referenced_which_does_not_exist(self):
         category = 'something'
@@ -137,8 +156,8 @@ class TestComponentParsing(unittest.TestCase):
         op.parse(root)
         result = op.components[0]
         
-        assert_that(result.categories, is_not(None))
-        assert_that(result.categories, has_item(category))
+        assert_that(result.category_names, is_not(None))
+        assert_that(result.category_names, has_item(category))
         
     def test_that_parse_generates_a_component_including_two_categories_if_two_specified(self):
         root = ET.Element('components')
@@ -150,9 +169,9 @@ class TestComponentParsing(unittest.TestCase):
         op.parse(root)
         result = op.components[0]
         
-        assert_that(result.categories, is_not(None))
-        assert_that(result.categories, has_item('publication'))
-        assert_that(result.categories, has_item('enquiry'))
+        assert_that(result.category_names, is_not(None))
+        assert_that(result.category_names, has_item('publication'))
+        assert_that(result.category_names, has_item('enquiry'))
         
     @unittest.expectedFailure
     def test_that_parse_raises_if_category_has_no_name(self):

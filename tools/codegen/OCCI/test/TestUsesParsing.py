@@ -1,14 +1,24 @@
 import unittest
-from testfixtures import LogCapture
-
 import xml.etree.ElementTree as ET
-from hamcrest import assert_that, is_, is_not, has_key
+
+from testfixtures import LogCapture
+from hamcrest import assert_that, is_, is_not, has_key, same_instance, has_item
 
 from Uses import Uses
 from ConfigParser import UsesParser
 from Component import Component
+from ParserMocks import MockCategory
 
-
+class MockBackend(object):
+    def __init__(self):
+        self.categories = []
+        self.add_category_called = False
+    
+    def add_category(self, category):
+        self.add_category_called = True
+        self.categories.append(category)
+        
+    
 def _build_tree_with_include_element(backend):
     root = ET.Element('config')
     uses = ET.SubElement(root, 'uses')
@@ -50,24 +60,23 @@ class TestUsesResolving(unittest.TestCase):
         use = ET.SubElement(uses, 'use', {'backend':backend})
         ET.SubElement(use, 'includeall')  
         op = UsesParser()
-        category = 'anything'
+        category = MockCategory()
         op.parse(root)
 
-        op.resolve([category], [])
+        op.resolve([category], [], {backend:MockBackend()})
         
-        assert_that(self.l.__str__(), is_("No logging captured"))
-        
+        assert_that(self.l.__str__(), is_("No logging captured"))        
     
     def test_that_resolving_does_not_warn_if_category_missing_backend_but_component_includes_it(self):
         backend = 'db'
-        category = 'publication'
+        category = MockCategory()
         example_component = Component(categories = [category]) 
         component_name = 'example'
         root = _build_tree_with_valid_component_include(backend, component_name)
         op = UsesParser()
         op.parse(root)        
         
-        op.resolve([category], {component_name:example_component})
+        op.resolve([category], {component_name:example_component}, {backend:MockBackend()})
         
         assert_that(self.l.__str__(), is_("No logging captured"))
         
@@ -88,6 +97,44 @@ class TestUsesResolving(unittest.TestCase):
         op.resolve([category], {component_name:example_component})
         
         self.l.check(('root', 'WARNING', "Category '{0}' has no backend specified".format(category)))
+        
+    def test_that_resolve_warns_if_category_linked_to_nonexistant_backend(self):
+        backend = 'db'
+        category = MockCategory()
+        root = _build_tree_with_valid_category_include(backend, category)
+        op = UsesParser()
+        op.parse(root)
+        
+        op.resolve([category], {})
+        
+        self.l.check(('root', 'WARNING', "Category '{0}' has link to nonexistant backend {1}".format(category, backend)))
+        
+    def test_that_resolve_links_categories_to_backend(self):
+        backend = 'db'
+        category = MockCategory()
+        root = _build_tree_with_valid_category_include(backend, category)
+        op = UsesParser()
+        op.parse(root)
+        example_backend = MockBackend()
+        
+        op.resolve([category], {}, {backend:example_backend})
+        
+        assert_that(category.set_backend_called, is_(True))
+        assert_that(category.backend, is_(same_instance(example_backend)))
+        
+    def test_that_resolve_links_backends_to_categories(self):
+        backend_name = 'db'
+        category = MockCategory()
+        root = _build_tree_with_valid_category_include(backend_name, category)
+        op = UsesParser()
+        op.parse(root)
+        backend = MockBackend()
+        
+        op.resolve([category], {}, {backend_name:backend})
+        
+        assert_that(backend.add_category_called, is_(True))
+        assert_that(backend.categories, has_item(same_instance(category)))
+        
     
 class TestUsesParsing(unittest.TestCase):
     
@@ -123,7 +170,8 @@ class TestUsesParsing(unittest.TestCase):
         ET.SubElement(root, 'uses')
         op = UsesParser()
         
-        result = op.parse(root)
+        op.parse(root)
+        result = op.uses
         
         assert_that(result, is_not(None))
         assert_that(type(result), is_(type(Uses)))

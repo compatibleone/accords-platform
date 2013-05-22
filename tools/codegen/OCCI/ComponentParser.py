@@ -22,11 +22,14 @@ class ComponentParser(XmlParser):
             attributes = xmlmodel.attrib
             categories = [category.get('name') for category in xmlmodel.findall("category")]
             self._components.append(Component(categories, name, attributes))
-        #TODO Eliminate return statement
-        return self._components
     
     def resolve(self, categories):
         for component in self._components:
-            for category in component.categories:
-                if category not in categories:
-                    logging.warn("Component '{0}' references undefined category '{1}'".format(component.name, category))
+            for category_name in component.category_names:
+                category_link = [category_link for category_link in categories if category_link.catid() == category_name]
+                if category_link:
+                    category = category_link[0]
+                    component.set_category_link(category_name, category)
+                    category.set_component(component)                    
+                else:
+                    logging.warn("Component '{0}' references undefined category '{1}'".format(component.name, category_name))

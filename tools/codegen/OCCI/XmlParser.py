@@ -4,8 +4,7 @@ class XmlParser(object):
             
     def parse(self, tree):
         if tree.tag == self._root_tag:
-            return [self._parse(xmlmodel) for xmlmodel in tree.findall(self._parse_type)]
-        return None
+            [self._parse(xmlmodel) for xmlmodel in tree.findall(self._parse_type)]
     
     def _parse(self, _):
         raise NotImplementedError("Abstract method")

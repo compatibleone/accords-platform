@@ -1,6 +1,16 @@
 import logging
 
 class Use(object):
+    '''
+    Convenience class for associating backends with categories.  Only exists during parsing of XML files.
+    
+    Not of use to the wider world directly - use the "Uses" instance for mapping of backends to categories
+    
+    Implements (along with its subclasses) a hierarchy of include/exclude rules:
+    category include/exclude has highest priority
+    component include/exclude applies if no category include/exclude specified
+    platform level includeall applies only if no other include/exclude specified 
+    '''
     _item_type = None
     
     def __init__(self, backend):
@@ -43,12 +53,12 @@ class ComponentUse(Use):
     
     def has(self, category, components):
         for component_name in self._includes:
-            if category in components[component_name].categories:
+            if category in components[component_name].category_names:
                 return True
     
     def applies_to(self, category, components):
         for component_name in (self._includes + self._excludes):
-            if category in components[component_name].categories:
+            if category in components[component_name].category_names:
                 return True
 
 class PlatformUse(Use):
@@ -61,7 +71,9 @@ class PlatformUse(Use):
         return (len(self._includes + self._excludes) > 0)
     
 class Uses(object):
-    
+    '''
+    Holds and manages access to all the "use" instances.
+    '''
     def __init__(self):
         self._uses = {}        
         
