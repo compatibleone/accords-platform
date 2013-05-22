@@ -74,16 +74,15 @@ Generate an ACCORDS component/OCCI Server
 Generated code location
 -----------------------
 
-* pyaccords/<category_name>Interface.py for the CRUD functions
-* pyaccords/<category_name>Action.py for the actions
+* pyaccords/pygen/<category_name>Interface.py for the CRUD functions
+* pyaccords/pygen/<category_name>Action.py for the actions
 
 * <component_name>/<component_name>.py for the module starting code.
 
 Launching the component
 -----------------------
 
-- step 1: Edit accords.xml and cords_user.xml to add the relevant stanza for
-  your component.      
+- step 1: setup the required configuration for your component (user, account, quota and sla if needed under the accords-platform)     
 - step 2: run the command:
   # python mycomponent.py --config config_file.xml CO-MYCOMPO-AGENT/1.0
 
