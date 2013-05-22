@@ -82,11 +82,11 @@ class Uses(object):
     def uses(self):
         return self._uses
     
-    def backend_for(self, category, components=[]):
+    def backend_for(self, category_name, components=[]):
         for (backend, use_set) in self._uses.items():
             for use in use_set:
-                if (use.applies_to(category, components)):
-                    return backend if use.has(category, components) else None
+                if (use.applies_to(category_name, components)):
+                    return backend if use.has(category_name, components) else None
         return None   
   
     def add_uses(self, uses):
