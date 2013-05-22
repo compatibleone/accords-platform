@@ -120,6 +120,8 @@ class Category(object):
         # Will hold the rel pointer once resolved
         self.relP = None
         self.headerFilename = headerFilename
+        self._component = None
+        self._backend = None
     
     def allAttrs(self):
         '''
@@ -232,3 +234,9 @@ class Category(object):
             filename = self.headerFilename
 
         return filename
+    
+    def set_component(self, component):
+        self._component = component
+
+    def set_backend(self, backend):
+        self._backend = backend
