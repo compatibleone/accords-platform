@@ -107,7 +107,6 @@ class Category(object):
         self.term = term
         self.scheme = scheme
         self.location = location
-        self.catid = scheme+term
         self.rel = rel
         self.klass = klass
         self.attrs = {}
@@ -184,6 +183,7 @@ class Category(object):
             ret.extend(self.relP.allMixins)
         return ret
         
+    @property
     def catid(self):
         '''
         Get the OCCI Category id

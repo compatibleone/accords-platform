@@ -26,7 +26,7 @@ class ComponentParser(XmlParser):
     def resolve(self, categories):
         for component in self._components:
             for category_name in component.category_names:
-                category_link = [category_link for category_link in categories if category_link.catid() == category_name]
+                category_link = [category_link for category_link in categories if category_link.catid == category_name]
                 if category_link:
                     category = category_link[0]
                     component.set_category_link(category_name, category)

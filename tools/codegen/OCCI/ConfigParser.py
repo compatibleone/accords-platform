@@ -56,17 +56,17 @@ class UsesParser(XmlParser):
         self._uses.add_uses(uses)
 
     def _resolve_category(self, category, components, backends):
-        backend = self._uses.backend_for(category.catid(), components)
+        backend = self._uses.backend_for(category.catid, components)
         if backend is None:
             #TODO Should this be an error?
-            logging.warn("Category '{0}' has no backend specified".format(category.catid()))
+            logging.warn("Category '{0}' has no backend specified".format(category.catid))
         else:
             if backend in backends:                
                 link_backend = backends[backend]
                 category.set_backend(link_backend)
                 link_backend.add_category(category)             
             else:
-                logging.warn("Category '{0}' has link to nonexistant backend {1}".format(category.catid(), backend))
+                logging.warn("Category '{0}' has link to nonexistant backend {1}".format(category.catid, backend))
         
     def resolve(self, categories, components, backends = {}):
         [self._resolve_category(category, components, backends) for category in categories]
