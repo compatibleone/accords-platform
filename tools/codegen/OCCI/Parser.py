@@ -15,6 +15,8 @@ import Collection
 import Model
 import logging
 
+from ParserCollection import ParserCollection
+
 class Parser(object):
     '''
     Parse a set of XML model files and return a Models object containing all the
@@ -51,6 +53,7 @@ class Parser(object):
         link.addattr(Attribute.Attribute("source", "string", "true", "false", None, "false"))
         link.addattr(Attribute.Attribute("target", "string", "true", "false", None, "false"))
         self.cats.add(link)
+        self.parsers = ParserCollection()
         
     def parse(self):
         '''
@@ -174,44 +177,49 @@ class Parser(object):
         logging.info("Processing "+f)
         try:
             tree = ET.parse(f)
-            root = tree.getroot()
+            root = tree.getroot()     
             # TODO schema version check etc.
-            # TODO checking for single model
-            # TODO warn about unknown XML nodes
-            try:
-                xmlmodel = root.find("model")
-                model = Model.Model(xmlmodel.get("name"), xmlmodel.get("description"), 
-                                    xmlmodel.get("version"), xmlmodel.get("namespace"))
-                logging.info("Model is "+model.name+" (v. "+model.version+")")
-            except:
-                logging.error("Problem processing model")
-                return
-            # Find all categories
-            for category in xmlmodel.findall("category"):
-                term = category.get("term")
-                if term == None:
-                    logging.warn("No category provided")
-                    continue
-                logging.info("Category "+term)
-                # Add a category
-                try:
-                    scheme, klass, location, rel, structName, headerFilename = category.get("scheme"), category.get("class"), category.get("location"), category.get("rel"), category.get("structname"), category.get("headerfilename")
-                    cat = Category.Category(term, scheme, location, rel, klass, model, structName, headerFilename)
-                    self._addattrs(category, cat)
-                    self._addactions(category, cat)
-                    self._addlinks(category, cat)
-                    self._addmixins(category, cat)
-                    model.add(cat)
-                    self.cats.add(cat)
-                except:
-                    logging.error("Problem processing category "+term)
-                    logging.error(sys.exc_info())
-            # Add this model to the models collection
-            self.models.add(model)
+            self._parse_models(root)
+            self.parsers.parse(root)
+            #TODO Check that at least one of the parsers read something
         except:
             logging.error("Problem parsing "+f)
             logging.error(sys.exc_info())
         
+    def _parse_models(self, root):       
+        # TODO checking for single model
+        # TODO warn about unknown XML nodes
+        try:
+            xmlmodel = root.find("model")
+            if xmlmodel is None:
+                return
+            model = Model.Model(xmlmodel.get("name"), xmlmodel.get("description"), 
+                                xmlmodel.get("version"), xmlmodel.get("namespace"))
+            logging.info("Model is "+model.name+" (v. "+model.version+")")
+        except:
+            logging.error("Problem processing model")
+            raise
+        # Find all categories
+        for category in xmlmodel.findall("category"):
+            term = category.get("term")
+            if term == None:
+                logging.warn("No category provided")
+                continue
+            logging.info("Category "+term)
+            # Add a category
+            try:
+                scheme, klass, location, rel, structName, headerFilename = category.get("scheme"), category.get("class"), category.get("location"), category.get("rel"), category.get("structname"), category.get("headerfilename")
+                cat = Category.Category(term, scheme, location, rel, klass, model, structName, headerFilename)
+                self._addattrs(category, cat)
+                self._addactions(category, cat)
+                self._addlinks(category, cat)
+                self._addmixins(category, cat)
+                model.add(cat)
+                self.cats.add(cat)
+            except:
+                logging.error("Problem processing category "+term)
+                logging.error(sys.exc_info())
+        # Add this model to the models collection
+        self.models.add(model)
         
-            
-        
+    
