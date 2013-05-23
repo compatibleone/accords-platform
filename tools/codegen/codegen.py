@@ -172,14 +172,14 @@ USAGE
         args = parser.parse_args()
 
         logging_verbose = args.verbose
-        input_paths = args.paths
+        input_file_paths = args.paths
         output_type = args.outputType
         output_dir = args.outputDst
         output_filename = args.file
         
         _set_logging_level(logging_verbose)
         
-        parse_and_generate_code(input_paths, output_type, output_dir, output_filename)
+        parse_and_generate_code(input_file_paths, output_type, output_dir, output_filename)
         
         return 0
     except KeyboardInterrupt:
