@@ -5,12 +5,11 @@ import cog
 from codegen import parse_and_generate_code as parse
 from codegen import category_for_file
 
+#TODO Get the input path and output path from cog globals
 _output_dir = "./tmp"
 _input_path = ['../model']
 
 def init():
-    # TODO Get input parameters from cogs globals
-    #input_file_paths = ["cords.xml", 'backend.xml', 'test_config.xml']
     global models
     models = parse(_input_path, None, _output_dir, None)
         
