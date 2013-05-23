@@ -80,7 +80,7 @@ def _parse_all_input_files(input_paths):
 
 def _check_output_file_exists_in_category_definitions(filename, models):
     if (filename != None):
-        for model in models.list.values():
+        for model in models.values():
             for cat in model.list.values():
                 if (cat.getOutputFilename() == filename):
                     return            

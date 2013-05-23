@@ -13,8 +13,7 @@ class Header(OCCI.Output.Output):
     '''
     A class to implement "-t Header" to output auto-generated header files.
     '''
-     
-
+   
     def _write_header_file(self, cat, structName, f):
         f.write("#ifndef _" + structName + "_h\n")
         f.write("#define _" + structName + "_h\n\n")
@@ -47,23 +46,22 @@ class Header(OCCI.Output.Output):
         Generate the header(s).
         '''
         
-        for model in self.models.list.values():
-            for cat in model.list.values():
-                assert isinstance(cat, OCCI.Category.Category)
+        for cat in self.models.categories():
+            assert isinstance(cat, OCCI.Category.Category)
 
-                # See if we're outputting a single category, or all categories.
-                if (self.output_filename != None):
-                    if (cat.getOutputFilename() != self.output_filename):
-                        continue
-                
-                # Create the C structure name and see if it has been overridden in the XML
-                structName = "cords_" + cat.term
-                if (cat.structName != None):
-                    structName = cat.structName
-                
-                # Write out the auto-generated header file.
-                with open((self.output_dir + cat.getOutputFilename()), "w") as f: 
-                    self._write_header_file(cat, structName, f)
+            # See if we're outputting a single category, or all categories.
+            if (self.output_filename != None):
+                if (cat.getOutputFilename() != self.output_filename):
+                    continue
+            
+            # Create the C structure name and see if it has been overridden in the XML
+            struct_name = "cords_" + cat.term
+            if (cat.structName != None):
+                struct_name = cat.structName
+            
+            # Write out the auto-generated header file.
+            with open((self.output_dir + cat.getOutputFilename()), "w") as f: 
+                self._write_header_file(cat, struct_name, f)
             
         return None
     
