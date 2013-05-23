@@ -78,7 +78,7 @@ def _parse_all_input_files(input_paths):
     models = op.parse()
     return models
 
-def _check_output_file_exists(filename, models):
+def _check_output_file_exists_in_category_definitions(filename, models):
     if (filename != None):
         for model in models.list.values():
             for cat in model.list.values():
@@ -108,7 +108,9 @@ def _check_output_directory(output_dir):
         sys.exit(1)
     if not os.path.isdir(output_dir):
         logging.error("Error: Output directory {0} is not a directory.".format(os.path.abspath(output_dir)))
-        sys.exit(1)
+        sys.exit(1)    
+    # Get directory in canonical form to help code down the line.
+    return os.path.abspath(output_dir) + "/"
 
 
 def _set_logging_level(logging_verbose):
@@ -116,6 +118,20 @@ def _set_logging_level(logging_verbose):
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
     else:
         logging.basicConfig(format='%(message)s')
+
+
+def _generate_output_file(output_dir, output_filename, output_type, models):
+    output_class = _check_output_type_and_get_class(output_type)
+    generator = output_class(models, output_filename, output_dir) # Generate output
+    generator.go()
+
+
+def parse_and_generate_code(input_paths, output_type, output_dir, output_filename):
+    output_dir = _check_output_directory(output_dir)
+    models = _parse_all_input_files(input_paths)
+    _check_output_file_exists_in_category_definitions(output_filename, models)
+    if output_type is not None:
+        _generate_output_file(output_dir, output_filename, output_type, models)
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
@@ -156,25 +172,14 @@ USAGE
         args = parser.parse_args()
 
         logging_verbose = args.verbose
-        output_dir = args.outputDst
-        output_filename = args.file
         input_paths = args.paths
         output_type = args.outputType
+        output_dir = args.outputDst
+        output_filename = args.file
         
         _set_logging_level(logging_verbose)
-        _check_output_directory(output_dir)                
-        # Get directory in canonical form to help code down the line.
-        output_dir = os.path.abspath(output_dir) + "/"
-                
-        models = _parse_all_input_files(input_paths)
-
-        _check_output_file_exists(output_filename, models)
         
-        if output_type is not None:
-            output_class = _check_output_type_and_get_class(output_type)
-            generator = output_class(models, output_filename, output_dir)            
-            # Generate output
-            generator.go()
+        parse_and_generate_code(input_paths, output_type, output_dir, output_filename)
         
         return 0
     except KeyboardInterrupt:
