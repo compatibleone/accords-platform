@@ -51,7 +51,7 @@ class Header(OCCI.Output.Output):
 
             # See if we're outputting a single category, or all categories.
             if (self.output_filename != None):
-                if (cat.getOutputFilename() != self.output_filename):
+                if not cat.for_file(self.output_filename):
                     continue
             
             # Create the C structure name and see if it has been overridden in the XML
@@ -60,7 +60,7 @@ class Header(OCCI.Output.Output):
                 struct_name = cat.structName
             
             # Write out the auto-generated header file.
-            with open((self.output_dir + cat.getOutputFilename()), "w") as f: 
+            with open((self.output_dir + self.output_filename), "w") as f: 
                 self._write_header_file(cat, struct_name, f)
             
         return None

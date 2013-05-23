@@ -222,19 +222,7 @@ class Category(object):
             @param coll: The Collection to add
         '''
         self.colls[coll.name] = coll
-    
-    def getOutputFilename(self):
-        '''
-        Get the output file name (auto or derived from legacy information)
-            @param cat: The category
-            @return The filename
-        '''
-        filename = (self.term + ".h")
-        if (self.headerFilename != None):
-            filename = self.headerFilename
-
-        return filename
-    
+        
     def set_component(self, component):
         self._component = component
 

@@ -80,10 +80,9 @@ def _parse_all_input_files(input_paths):
 
 def _check_output_file_exists_in_category_definitions(filename, models):
     if (filename != None):
-        for model in models.values():
-            for cat in model.list.values():
-                if (cat.getOutputFilename() == filename):
-                    return            
+        for cat in models.categories():
+            if cat.for_file(filename):
+                return            
         logging.error("Error: File argument '" + filename + "' is not valid.")
         sys.exit(1)
             
@@ -132,6 +131,7 @@ def parse_and_generate_code(input_paths, output_type, output_dir, output_filenam
     _check_output_file_exists_in_category_definitions(output_filename, models)
     if output_type is not None:
         _generate_output_file(output_dir, output_filename, output_type, models)
+    return models
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
