@@ -127,6 +127,7 @@ class Category(object):
         Get all the attributes for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.attrs
         if self.relP != None:
             ret.extend(self.relP.allAttrs)
@@ -137,6 +138,7 @@ class Category(object):
         Get all the collections for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.colls
         if self.relP != None:
             ret.extend(self.relP.allColls)
@@ -147,6 +149,7 @@ class Category(object):
         Get all the collections and attributes for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.attrs
         ret.extend(self.colls)
         if self.relP != None:
@@ -158,6 +161,7 @@ class Category(object):
         Get all the links for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.links
         if self.relP != None:
             ret.extend(self.relP.allLinks)
@@ -168,6 +172,7 @@ class Category(object):
         Get all the actions for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.actions
         if self.relP != None:
             ret.extend(self.relP.allActions)
@@ -178,6 +183,7 @@ class Category(object):
         Get all the mixins for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.mixins
         if self.relP != None:
             ret.extend(self.relP.allMixins)
