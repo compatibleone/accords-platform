@@ -12,15 +12,11 @@ class Output(object):
     '''
     # TODO consider mechanism to pass options into Output generators
 
-    def __init__(self, models, args):
+    def __init__(self, models, output_filename, output_dir):
         assert isinstance(models, OCCI.Model.Models)
-        '''
-        Constructor
-            @param models: The Models that have been parsed
-            @param outputDir: The target output directory
-        '''
         self.models = models
-        self.args = args
+        self.output_filename = output_filename
+        self.output_dir = output_dir
         
     def go(self):
         '''

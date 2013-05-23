@@ -13,14 +13,6 @@ class Header(OCCI.Output.Output):
     '''
     A class to implement "-t Header" to output auto-generated header files.
     '''
-
-    def __init__(self, models, args):
-        '''
-        Constructor
-            @param models: The parsed models
-            @param args: The command line arguments
-        '''
-        OCCI.Output.Output.__init__(self, models, args)
      
     def go(self):
         '''
@@ -32,8 +24,8 @@ class Header(OCCI.Output.Output):
                 assert isinstance(cat, OCCI.Category.Category)
 
                 # See if we're outputting a single category, or all categories.
-                if (self.args.file != None):
-                    if (cat.getOutputFilename() != self.args.file):
+                if (self.output_filename != None):
+                    if (cat.getOutputFilename() != self.output_filename):
                         continue
                 
                 # Create the C structure name and see if it has been overridden in the XML
@@ -42,7 +34,7 @@ class Header(OCCI.Output.Output):
                     structName = cat.structName
                 
                 # Write out the auto-generated header file.
-                f = open((self.args.outputDst + cat.getOutputFilename()), "w")
+                f = open((self.output_dir + cat.getOutputFilename()), "w")
                 f.write("#ifndef _" + structName + "_h\n")
                 f.write("#define _" + structName + "_h\n\n")
                 f.write("struct\t" + structName + "\n")

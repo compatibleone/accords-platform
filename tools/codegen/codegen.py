@@ -57,10 +57,10 @@ def get_class( kls ):
     return m
 
 
-def _parse_all_input_files(args):
+def _parse_all_input_files(input_paths):
     # Get all input files and pass to parser
     files = []
-    for inpath in args.paths:
+    for inpath in input_paths:
     # Get all files in this path
         if (os.path.exists(os.path.abspath(inpath))):
             mode = os.stat(inpath).st_mode
@@ -84,22 +84,38 @@ def _check_output_file_exists(filename, models):
             for cat in model.list.values():
                 if (cat.getOutputFilename() == filename):
                     return            
-    logging.error("Error: File argument '" + filename + "' is not valid.")
-    sys.exit(1)
+        logging.error("Error: File argument '" + filename + "' is not valid.")
+        sys.exit(1)
             
 
 def _check_output_type_and_get_class(output_type):
-    if output_type is not None:
-        try:
-            output_class = get_class("OCCI." + output_type + "." + output_type)
-    # Note issubclass can raise an exception hence wrap in try and exception raised
-    # if issubclass is False
-            if not issubclass(output_class, OCCI.Output.Output):
-                raise Exception()
-        except:
-            logging.error("Error: Output type " + output_type + " is not valid")
-            sys.exit(1)
+    try:
+        output_class = get_class("OCCI." + output_type + "." + output_type)
+# Note issubclass can raise an exception hence wrap in try and exception raised
+# if issubclass is False
+        if not issubclass(output_class, OCCI.Output.Output):
+            raise Exception()
+    except:
+        logging.error("Error: Output type " + output_type + " is not valid")
+        sys.exit(1)
     return output_class
+
+
+def _check_output_directory(output_dir):
+# Check the output directory and get it in canonical form
+    if not os.path.exists(output_dir):
+        logging.error("Error: Output directory {0} does not exist.".format(os.path.abspath(output_dir)))
+        sys.exit(1)
+    if not os.path.isdir(output_dir):
+        logging.error("Error: Output directory {0} is not a directory.".format(os.path.abspath(output_dir)))
+        sys.exit(1)
+
+
+def _set_logging_level(logging_verbose):
+    if (logging_verbose == True):
+        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+    else:
+        logging.basicConfig(format='%(message)s')
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
@@ -139,38 +155,26 @@ USAGE
         parser.add_argument(dest="paths", help="paths to folder(s) with source file(s) [default: %(default)s]", metavar="path", nargs='+')
         args = parser.parse_args()
 
-        # Configure logging
-        if (args.verbose == True):
-            logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-        else:
-            logging.basicConfig(format='%(message)s')
-
-
-        # Check the output directory and get it in canonical form
-        if not os.path.exists(args.outputDst):
-            logging.error("Error: Output directory does not exist.")
-            sys.exit(1)
-                
-        if not os.path.isdir(args.outputDst):
-            logging.error("Error: Output is not a directory.")
-            sys.exit(1)
-                
-        # Get directory in canonical form to help code down the line.
-        args.outputDst = os.path.abspath(args.outputDst) + "/"
-                
-        models = _parse_all_input_files(args)
-
-        _check_output_file_exists(args.file, models)
-
-        
+        logging_verbose = args.verbose
+        output_dir = args.outputDst
+        output_filename = args.file
+        input_paths = args.paths
         output_type = args.outputType
-        output_class = _check_output_type_and_get_class(output_type)
-            
-        # Instantiate the output class
-        generator = output_class(models, args)
         
-        # Generate output
-        generator.go()
+        _set_logging_level(logging_verbose)
+        _check_output_directory(output_dir)                
+        # Get directory in canonical form to help code down the line.
+        output_dir = os.path.abspath(output_dir) + "/"
+                
+        models = _parse_all_input_files(input_paths)
+
+        _check_output_file_exists(output_filename, models)
+        
+        if output_type is not None:
+            output_class = _check_output_type_and_get_class(output_type)
+            generator = output_class(models, output_filename, output_dir)            
+            # Generate output
+            generator.go()
         
         return 0
     except KeyboardInterrupt:

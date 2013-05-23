@@ -12,16 +12,7 @@ import logging
 class Graph(OCCI.Output.Output):
     '''
     Generate a graph of model relationships
-    '''
-
-    def __init__(self, models, args):
-        '''
-        Constructor
-            @param models: The parsed models
-            @param args: The command line arguments
-        '''
-        OCCI.Output.Output.__init__(self, models, args)
-        
+    '''       
         
     def go(self):
         '''
@@ -77,6 +68,6 @@ class Graph(OCCI.Output.Output):
         logging.info(edges)
         
         # and we are done
-        logging.info("Writing graph to "+self.args.outputDst + 'graph.png')
-        graph.write_png(self.args.outputDst + 'graph.png')
+        logging.info("Writing graph to "+self.output_dir + 'graph.png')
+        graph.write_png(self.output_dir + 'graph.png')
         return None
