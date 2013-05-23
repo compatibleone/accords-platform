@@ -23,4 +23,15 @@ class TestCategory(unittest.TestCase):
         
         assert_that(cat.for_file(term + ".h"), is_(True))
         
+    def test_that_struct_name_returns_cords_underscore_term_if_not_initialised(self):
+        term = "something"
+        cat = Category(term, None, None, None, None, None)
         
+        assert_that(cat.struct_name, is_("cords_" + term))
+        
+    def test_that_struct_name_returns_initialised_value_if_initialised(self):
+        term = "something"
+        struct_name = "something else"
+        cat = Category(term, None, None, None, None, None, structName = struct_name)
+        
+        assert_that(cat.struct_name, is_(struct_name))

@@ -14,10 +14,10 @@ class Header(OCCI.Output.Output):
     A class to implement "-t Header" to output auto-generated header files.
     '''
    
-    def _write_header_file(self, cat, structName, f):
-        f.write("#ifndef _" + structName + "_h\n")
-        f.write("#define _" + structName + "_h\n\n")
-        f.write("struct\t" + structName + "\n")
+    def _write_header_file(self, cat, struct_name, f):
+        f.write("#ifndef _" + struct_name + "_h\n")
+        f.write("#define _" + struct_name + "_h\n\n")
+        f.write("struct\t" + struct_name + "\n")
         f.write("{\n")
         f.write("\tchar *\tid;\n")
     # TODO - get all attributes (using Category.allAttrs)
@@ -50,18 +50,12 @@ class Header(OCCI.Output.Output):
             assert isinstance(cat, OCCI.Category.Category)
 
             # See if we're outputting a single category, or all categories.
-            if (self.output_filename != None):
-                if not cat.for_file(self.output_filename):
-                    continue
-            
-            # Create the C structure name and see if it has been overridden in the XML
-            struct_name = "cords_" + cat.term
-            if (cat.structName != None):
-                struct_name = cat.structName
+            if not cat.for_file(self.output_filename):
+                continue
             
             # Write out the auto-generated header file.
             with open((self.output_dir + self.output_filename), "w") as f: 
-                self._write_header_file(cat, struct_name, f)
+                self._write_header_file(cat, cat.struct_name, f)
             
         return None
     

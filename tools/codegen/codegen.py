@@ -71,21 +71,26 @@ def _parse_all_input_files(input_paths):
             if S_ISREG(mode):
                 files.append(inpath)
         else:
-            logging.warn("Ignoring (non-existent) input path " + inpath)
+            logging.warn("Ignoring (non-existent) input path " + os.path.abspath(inpath))
     
     op = OCCI.Parser.Parser(files)
 # Do the parse
     models = op.parse()
     return models
 
-def _check_output_file_exists_in_category_definitions(filename, models):
+def category_for_file(filename, models):
+    for cat in models.categories():
+        if cat.for_file(filename):
+            return cat     
+    return None
+
+def _check_category_for_file_exists(filename, models):
     if (filename != None):
-        for cat in models.categories():
-            if cat.for_file(filename):
-                return            
-        logging.error("Error: File argument '" + filename + "' is not valid.")
-        sys.exit(1)
-            
+        cat = category_for_file(filename, models) 
+        if cat is None:          
+            logging.error("Error: File argument '" + filename + "' is not valid.")
+            sys.exit(1)
+        return cat
 
 def _check_output_type_and_get_class(output_type):
     try:
@@ -128,7 +133,7 @@ def _generate_output_file(output_dir, output_filename, output_type, models):
 def parse_and_generate_code(input_paths, output_type, output_dir, output_filename):
     output_dir = _check_output_directory(output_dir)
     models = _parse_all_input_files(input_paths)
-    _check_output_file_exists_in_category_definitions(output_filename, models)
+    _check_category_for_file_exists(output_filename, models)
     if output_type is not None:
         _generate_output_file(output_dir, output_filename, output_type, models)
     return models

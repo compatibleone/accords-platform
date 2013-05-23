@@ -209,8 +209,8 @@ class Parser(object):
             logging.info("Category "+term)
             # Add a category
             try:
-                scheme, klass, location, rel, structName, headerFilename = category.get("scheme"), category.get("class"), category.get("location"), category.get("rel"), category.get("structname"), category.get("headerfilename")
-                cat = Category.Category(term, scheme, location, rel, klass, model, structName, headerFilename)
+                scheme, klass, location, rel, struct_name, headerFilename = category.get("scheme"), category.get("class"), category.get("location"), category.get("rel"), category.get("structname"), category.get("headerfilename")
+                cat = Category.Category(term, scheme, location, rel, klass, model, struct_name, headerFilename)
                 self._addattrs(category, cat)
                 self._addactions(category, cat)
                 self._addlinks(category, cat)
