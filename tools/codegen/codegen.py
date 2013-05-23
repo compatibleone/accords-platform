@@ -56,6 +56,51 @@ def get_class( kls ):
         m = getattr(m, comp)            
     return m
 
+
+def _parse_all_input_files(args):
+    # Get all input files and pass to parser
+    files = []
+    for inpath in args.paths:
+    # Get all files in this path
+        if (os.path.exists(os.path.abspath(inpath))):
+            mode = os.stat(inpath).st_mode
+        # TODO consider directory recursion
+        # Add all files in dir or specific file dependant on type
+            if S_ISDIR(mode):
+                files.extend(glob.glob(inpath + "/*"))
+            if S_ISREG(mode):
+                files.append(inpath)
+        else:
+            logging.warn("Ignoring (non-existent) input path " + inpath)
+    
+    op = OCCI.Parser.Parser(files)
+# Do the parse
+    models = op.parse()
+    return models
+
+def _check_output_file_exists(filename, models):
+    if (filename != None):
+        for model in models.list.values():
+            for cat in model.list.values():
+                if (cat.getOutputFilename() == filename):
+                    return            
+    logging.error("Error: File argument '" + filename + "' is not valid.")
+    sys.exit(1)
+            
+
+def _check_output_type_and_get_class(output_type):
+    if output_type is not None:
+        try:
+            output_class = get_class("OCCI." + output_type + "." + output_type)
+    # Note issubclass can raise an exception hence wrap in try and exception raised
+    # if issubclass is False
+            if not issubclass(output_class, OCCI.Output.Output):
+                raise Exception()
+        except:
+            logging.error("Error: Output type " + output_type + " is not valid")
+            sys.exit(1)
+    return output_class
+
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
     
@@ -113,55 +158,19 @@ USAGE
         # Get directory in canonical form to help code down the line.
         args.outputDst = os.path.abspath(args.outputDst) + "/"
                 
-        # Get all input files and pass to parser
-        files = []
-        for inpath in args.paths:
-            # Get all files in this path
-            if(os.path.exists(os.path.abspath(inpath))):
-                mode = os.stat(inpath).st_mode
-                # TODO consider directory recursion
-                # Add all files in dir or specific file dependant on type
-                if S_ISDIR(mode):
-                    files.extend(glob.glob(inpath+"/*"))
-                if S_ISREG(mode):
-                    files.append(inpath)
-            else:
-                logging.warn("Ignoring (non-existent) input path " + inpath)
-        op = OCCI.Parser.Parser(files)
-         
-        # Do the parse
-        models = op.parse()
+        models = _parse_all_input_files(args)
 
-        # If a file/category has been specified, check it exists.
-        if (args.file != None):
-            found = False
-            for model in models.list.values():
-                for cat in model.list.values():
-                    if (cat.getOutputFilename() == args.file):
-                        found = True
-                        break
-                
-            if not found:
-                logging.error("Error: File argument '" + args.file + "' is not valid.")
-                sys.exit(1)
+        _check_output_file_exists(args.file, models)
+
         
-        # Get output class type and check sensible
-        if args.outputType is not None:
-            try:
-                output_class = get_class("OCCI."+args.outputType+"."+args.outputType)
-                # Note issubclass can raise an exception hence wrap in try and exception raised
-                # if issubclass is False
-                if not issubclass(output_class, OCCI.Output.Output):
-                    raise Exception()
-            except:
-                logging.error("Error: Output type "+args.outputType+" is not valid")
-                sys.exit(1)
+        output_type = args.outputType
+        output_class = _check_output_type_and_get_class(output_type)
             
-            # Instantiate the output class
-            generator = output_class(models, args)
-            
-            # Generate output
-            generator.go()
+        # Instantiate the output class
+        generator = output_class(models, args)
+        
+        # Generate output
+        generator.go()
         
         return 0
     except KeyboardInterrupt:
