@@ -14,6 +14,34 @@ class Header(OCCI.Output.Output):
     A class to implement "-t Header" to output auto-generated header files.
     '''
      
+
+    def _write_header_file(self, cat, structName, f):
+        f.write("#ifndef _" + structName + "_h\n")
+        f.write("#define _" + structName + "_h\n\n")
+        f.write("struct\t" + structName + "\n")
+        f.write("{\n")
+        f.write("\tchar *\tid;\n")
+    # TODO - get all attributes (using Category.allAttrs)
+    # TODO - Use templating for header generation
+        for name, attr in cat.attrs.items():
+            if attr.scope is OCCI.Scope.All:
+                varType = self.getCtype(attr.attrtype)
+                if (attr.legacytype != None):
+                    varType = attr.legacytype
+                f.write("\t" + varType + "\t" + name + ";\n")
+        
+        for name, coll in cat.colls.items():
+            if coll.scope is OCCI.Scope.All:
+                varType = "char *"
+                if (coll.multiplicity.max is OCCI.Cardinality.Unbounded):
+                    varType = "int"
+                if (coll.legacytype != None):
+                    varType = coll.legacytype
+                f.write("\t" + varType + "\t" + name + ";\n")
+        
+        f.write("};\n\n")
+        f.write("#endif\n")
+
     def go(self):
         '''
         Generate the header(s).
@@ -34,41 +62,8 @@ class Header(OCCI.Output.Output):
                     structName = cat.structName
                 
                 # Write out the auto-generated header file.
-                f = open((self.output_dir + cat.getOutputFilename()), "w")
-                f.write("#ifndef _" + structName + "_h\n")
-                f.write("#define _" + structName + "_h\n\n")
-                f.write("struct\t" + structName + "\n")
-                f.write("{\n")
-                
-                f.write("\tchar *\tid;\n")            
-                
-                # TODO - get all attributes (using Category.allAttrs)
-                # TODO - Use templating for header generation
-                
-                for name, attr in cat.attrs.items():
-                    if attr.scope is OCCI.Scope.All:
-                        varType = self.getCtype(attr.attrtype)
-                        
-                        if (attr.legacytype != None):
-                            varType = attr.legacytype
-
-                        f.write("\t" + varType + "\t" + name + ";\n")
-                            
-                for name, coll in cat.colls.items():
-                    if coll.scope is OCCI.Scope.All:
-                        varType = "char *"
-                        
-                        if (coll.multiplicity.max is OCCI.Cardinality.Unbounded):
-                            varType = "int"
-    
-                        if (coll.legacytype != None):
-                            varType = coll.legacytype
-                        
-                        f.write("\t" + varType + "\t" + name + ";\n")
-            
-                f.write("};\n\n")
-                f.write("#endif\n")
-                f.close();
+                with open((self.output_dir + cat.getOutputFilename()), "w") as f: 
+                    self._write_header_file(cat, structName, f)
             
         return None
     
