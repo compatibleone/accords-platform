@@ -9,6 +9,8 @@ import OCCI.Output
 import OCCI.Cardinality
 import OCCI.Scope
 
+import codegen_types.ctypes as ctypes
+
 class Header(OCCI.Output.Output):
     '''
     A class to implement "-t Header" to output auto-generated header files.
@@ -24,7 +26,7 @@ class Header(OCCI.Output.Output):
     # TODO - Use templating for header generation
         for name, attr in cat.attrs.items():
             if attr.scope is OCCI.Scope.All:
-                varType = self.getCtype(attr.attrtype)
+                varType = ctypes.from_platform_type(attr.attrtype)
                 if (attr.legacytype != None):
                     varType = attr.legacytype
                 f.write("\t" + varType + "\t" + name + ";\n")
@@ -58,15 +60,3 @@ class Header(OCCI.Output.Output):
                 self._write_header_file(cat, cat.struct_name, f)
             
         return None
-    
-    def getCtype(self, atype):
-        '''
-        Helper function to get the C type of an attribute.
-            @param atype: The attribute node's type attribute.
-        '''
-        if (atype == "string"):
-            return "char *"
-        elif (atype == "int"):
-            return "int"
-        else:
-            return "unknown"
