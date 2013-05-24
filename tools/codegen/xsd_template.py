@@ -5,6 +5,9 @@ import cog
 from codegen import parse_and_generate_code as parse
 from codegen import category_for_file
 
+# Example invocation from tools directiory:
+# python -m cogapp -ed -D cog_category_file=publication.h -o tmp/output.xsd cog/templates/schema.xsd
+
 #TODO Get the input path and output path from cog globals
 _output_dir = "./tmp"
 _input_path = ['../model']
