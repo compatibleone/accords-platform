@@ -58,9 +58,13 @@ class ComponentUse(Use):
     
     def applies_to(self, category, components):
         for component_name in (self._includes + self._excludes):
-            if category in components[component_name].category_names:
+            component = components.get(component_name)
+            if component is None:
+                logging.warn("Component '{0}' is included/excluded for backend {1}, but does not exist".format(component_name, self._backend))
+                return False
+            if category in component.category_names:
                 return True
-
+            
 class PlatformUse(Use):
     _item_type = "Platform"
     
@@ -82,11 +86,11 @@ class Uses(object):
     def uses(self):
         return self._uses
     
-    def backend_for(self, category, components=[]):
+    def backend_for(self, category_name, components=[]):
         for (backend, use_set) in self._uses.items():
             for use in use_set:
-                if (use.applies_to(category, components)):
-                    return backend if use.has(category, components) else None
+                if (use.applies_to(category_name, components)):
+                    return backend if use.has(category_name, components) else None
         return None   
   
     def add_uses(self, uses):

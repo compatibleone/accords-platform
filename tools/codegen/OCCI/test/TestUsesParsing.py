@@ -1,5 +1,6 @@
 import unittest
-import xml.etree.ElementTree as ET
+from xml.dom import minidom
+from xml.etree import ElementTree as ET
 
 from testfixtures import LogCapture
 from hamcrest import assert_that, is_, is_not, has_key, same_instance, has_item
@@ -9,6 +10,10 @@ from ConfigParser import UsesParser
 from Component import Component
 from ParserMocks import MockCategory
 
+def _dump_xml_as_file(root, filename):
+    with open(filename, 'w+') as f:
+        f.write(minidom.parseString(ET.tostring(root)).toprettyxml(encoding="utf-8"))
+            
 class MockBackend(object):
     def __init__(self):
         self.categories = []
@@ -29,7 +34,7 @@ def _build_tree_with_include_element(backend):
 
 def _build_tree_with_valid_category_include(backend, category_to_include):
     include, root = _build_tree_with_include_element(backend)
-    ET.SubElement(include, 'category', {'name':category_to_include})
+    ET.SubElement(include, 'category', {'name':category_to_include.catid})
     return root
 
 def _build_tree_with_valid_component_include(backend, component_to_include):
@@ -47,11 +52,11 @@ class TestUsesResolving(unittest.TestCase):
         
     def test_that_resolving_warns_about_missing_category_backend_if_no_includes_found(self):
         op = UsesParser()
-        category = 'anything'
+        category = MockCategory()
         
         op.resolve([category], [])
         
-        self.l.check(('root', 'WARNING', "Category '{0}' has no backend specified".format(category)))
+        self.l.check(('root', 'WARNING', "Category '{0}' has no backend specified".format(category.catid)))
         
     def test_that_resolving_does_not_warn_if_category_missing_backend_but_include_all_specified(self):
         root = ET.Element('config')
@@ -70,7 +75,7 @@ class TestUsesResolving(unittest.TestCase):
     def test_that_resolving_does_not_warn_if_category_missing_backend_but_component_includes_it(self):
         backend = 'db'
         category = MockCategory()
-        example_component = Component(categories = [category]) 
+        example_component = Component(categories = [category.catid]) 
         component_name = 'example'
         root = _build_tree_with_valid_component_include(backend, component_name)
         op = UsesParser()
@@ -81,8 +86,8 @@ class TestUsesResolving(unittest.TestCase):
         assert_that(self.l.__str__(), is_("No logging captured"))
         
     def test_that_component_level_exclude_overrides_include_all(self):
-        category = 'anything'      
-        example_component = Component(categories = [category]) 
+        category = MockCategory()      
+        example_component = Component(categories = [category.catid]) 
         component_name = 'example'
         root = ET.Element('config')
         uses = ET.SubElement(root, 'uses')
@@ -96,7 +101,7 @@ class TestUsesResolving(unittest.TestCase):
         
         op.resolve([category], {component_name:example_component})
         
-        self.l.check(('root', 'WARNING', "Category '{0}' has no backend specified".format(category)))
+        self.l.check(('root', 'WARNING', "Category '{0}' has no backend specified".format(category.catid)))
         
     def test_that_resolve_warns_if_category_linked_to_nonexistant_backend(self):
         backend = 'db'
@@ -107,7 +112,7 @@ class TestUsesResolving(unittest.TestCase):
         
         op.resolve([category], {})
         
-        self.l.check(('root', 'WARNING', "Category '{0}' has link to nonexistant backend {1}".format(category, backend)))
+        self.l.check(('root', 'WARNING', "Category '{0}' has link to nonexistant backend {1}".format(category.catid, backend)))
         
     def test_that_resolve_links_categories_to_backend(self):
         backend = 'db'
@@ -135,6 +140,23 @@ class TestUsesResolving(unittest.TestCase):
         assert_that(backend.add_category_called, is_(True))
         assert_that(backend.categories, has_item(same_instance(category)))
         
+    def test_that_resolve_warns_if_component_include_is_not_in_components_list(self): 
+        component_name = 'nonexistant'
+        root = ET.Element('config')
+        uses = ET.SubElement(root, 'uses')
+        backend = 'db'
+        use = ET.SubElement(uses, 'use', {'backend':backend})
+        include = ET.SubElement(use, 'include')
+        ET.SubElement(include, 'component', {'name':component_name})
+        op = UsesParser()  
+        op.parse(root)      
+        category_name = "don't care"
+        op.resolve([MockCategory(category_name)], {})
+        
+        # TODO We don't care about the second method here.  Create a better matcher than l.check to allow checking for only a subset of the messages 
+        self.l.check(('root', 'WARNING', "Component '{0}' is included/excluded for backend {1}, but does not exist".format(component_name, backend)),
+                      ('root', 'WARNING', "Category '{0}' has no backend specified".format(category_name)))
+                
     
 class TestUsesParsing(unittest.TestCase):
     
@@ -200,19 +222,19 @@ class TestUsesParsing(unittest.TestCase):
         
     def test_that_category_is_added_to_includes_for_backend_if_include_specified_in_use_element(self):
         backend = 'db'
-        category = 'publication'
+        category = MockCategory()
         root = _build_tree_with_valid_category_include(backend, category)
         op = UsesParser()
         
         op.parse(root)
         result = op.uses
         
-        assert_that(result.backend_for(category), is_(backend))
+        assert_that(result.backend_for(category.catid), is_(backend))
 
     def test_that_parsing_two_uses_elements_with_a_category_include_each_includes_both(self):
         backend = 'db'
-        category1 = 'publication'
-        category2 = 'another'
+        category1 = MockCategory('publication')
+        category2 = MockCategory('another')
         root1 = _build_tree_with_valid_category_include(backend, category1)
         root2 = _build_tree_with_valid_category_include(backend, category2)
         op = UsesParser()
@@ -221,8 +243,8 @@ class TestUsesParsing(unittest.TestCase):
         op.parse(root2)
         result = op.uses 
         
-        assert_that(result.backend_for(category1), is_(backend))
-        assert_that(result.backend_for(category2), is_(backend))
+        assert_that(result.backend_for(category1.catid), is_(backend))
+        assert_that(result.backend_for(category2.catid), is_(backend))
     
     def test_that_category_is_added_to_included_in_backend_with_include_all_specified(self):
         root = ET.Element('config')

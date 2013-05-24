@@ -6,23 +6,15 @@ Created on 4 Apr 2013
 
 import Category
 
-class Models(object):
-    '''
-    Hold all the models
-    '''
+class Models(dict):
     
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        self.list = {}
-        
     def add(self, model):
-        '''
-        Add a model
-            @param model: The Model to add
-        '''
-        self.list[model.name] = model
+        self[model.name] = model
+        
+    def categories(self):        
+        for model in self.values():
+            for cat in model.list.values():
+                yield(cat)
 
 class Model(Category.CategoriesBase):
     '''
