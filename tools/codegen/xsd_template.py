@@ -23,8 +23,5 @@ def _type_conversion(type_name):
 def category_xsd(category_file):
     category = category_for_file(category_file, models)   
     cog.outl('<xsd:complexType name="{0}">'.format(category.struct_name))
-    cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format('id', 'string'))
-    for name, attr in category.attrs.items():
-        cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format(name, _type_conversion(attr.attrtype)))
-    for name in category.colls.keys():
-        cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format(name, 'string'))
+    for name, type_name in category.backend_type_list():
+        cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format(name, _type_conversion(type_name)))
