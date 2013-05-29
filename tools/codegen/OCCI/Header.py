@@ -26,9 +26,8 @@ class Header(OCCI.Output.Output):
     # TODO - Use templating for header generation
         for name, attr in cat.attrs.items():
             if attr.scope is OCCI.Scope.All:
-                varType = ctypes.from_platform_type(attr.attrtype)
-                if (attr.legacytype != None):
-                    varType = attr.legacytype
+                #TODO Templating functions should check legacy type as well
+                varType = attr.legacytype if attr.legacytype != None else ctypes.from_platform_type(attr.attrtype)
                 f.write("\t" + varType + "\t" + name + ";\n")
         
         for name, coll in cat.colls.items():
