@@ -9,85 +9,53 @@ import OCCI.Output
 import OCCI.Cardinality
 import OCCI.Scope
 
+import codegen_types.ctypes as ctypes
+
 class Header(OCCI.Output.Output):
     '''
     A class to implement "-t Header" to output auto-generated header files.
     '''
+   
+    def _write_header_file(self, cat, struct_name, f):
+        f.write("#ifndef _" + struct_name + "_h\n")
+        f.write("#define _" + struct_name + "_h\n\n")
+        f.write("struct\t" + struct_name + "\n")
+        f.write("{\n")
+        f.write("\tchar *\tid;\n")
+    # TODO - get all attributes (using Category.allAttrs)
+    # TODO - Use templating for header generation
+        for name, attr in cat.attrs.items():
+            if attr.scope is OCCI.Scope.All:
+                #TODO Templating functions should check legacy type as well
+                varType = attr.legacytype if attr.legacytype != None else ctypes.from_platform_type(attr.attrtype)
+                f.write("\t" + varType + "\t" + name + ";\n")
+        
+        for name, coll in cat.colls.items():
+            if coll.scope is OCCI.Scope.All:
+                varType = "char *"
+                if (coll.multiplicity.max is OCCI.Cardinality.Unbounded):
+                    varType = "int"
+                if (coll.legacytype != None):
+                    varType = coll.legacytype
+                f.write("\t" + varType + "\t" + name + ";\n")
+        
+        f.write("};\n\n")
+        f.write("#endif\n")
 
-    def __init__(self, models, args):
-        '''
-        Constructor
-            @param models: The parsed models
-            @param args: The command line arguments
-        '''
-        OCCI.Output.Output.__init__(self, models, args)
-     
     def go(self):
         '''
         Generate the header(s).
         '''
         
-        for model in self.models.list.values():
-            for cat in model.list.values():
-                assert isinstance(cat, OCCI.Category.Category)
+        for cat in self.models.categories():
+            assert isinstance(cat, OCCI.Category.Category)
 
-                # See if we're outputting a single category, or all categories.
-                if (self.args.file != None):
-                    if (cat.getOutputFilename() != self.args.file):
-                        continue
-                
-                # Create the C structure name and see if it has been overridden in the XML
-                structName = "cords_" + cat.term
-                if (cat.structName != None):
-                    structName = cat.structName
-                
-                # Write out the auto-generated header file.
-                f = open((self.args.outputDst + cat.getOutputFilename()), "w")
-                f.write("#ifndef _" + structName + "_h\n")
-                f.write("#define _" + structName + "_h\n\n")
-                f.write("struct\t" + structName + "\n")
-                f.write("{\n")
-                
-                f.write("\tchar *\tid;\n")            
-                
-                # TODO - get all attributes (using Category.allAttrs)
-                # TODO - Use templating for header generation
-                
-                for name, attr in cat.attrs.items():
-                    if attr.scope is OCCI.Scope.All:
-                        varType = self.getCtype(attr.attrtype)
-                        
-                        if (attr.legacytype != None):
-                            varType = attr.legacytype
-
-                        f.write("\t" + varType + "\t" + name + ";\n")
-                            
-                for name, coll in cat.colls.items():
-                    if coll.scope is OCCI.Scope.All:
-                        varType = "char *"
-                        
-                        if (coll.multiplicity.max is OCCI.Cardinality.Unbounded):
-                            varType = "int"
-    
-                        if (coll.legacytype != None):
-                            varType = coll.legacytype
-                        
-                        f.write("\t" + varType + "\t" + name + ";\n")
+            # See if we're outputting a single category, or all categories.
+            if not cat.for_file(self.output_filename):
+                continue
             
-                f.write("};\n\n")
-                f.write("#endif\n")
-                f.close();
+            # Write out the auto-generated header file.
+            with open((self.output_dir + self.output_filename), "w") as f: 
+                self._write_header_file(cat, cat.struct_name, f)
             
         return None
-    
-    def getCtype(self, atype):
-        '''
-        Helper function to get the C type of an attribute.
-            @param atype: The attribute node's type attribute.
-        '''
-        if (atype == "string"):
-            return "char *"
-        elif (atype == "int"):
-            return "int"
-        else:
-            return "unknown"

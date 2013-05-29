@@ -8,6 +8,7 @@ class MockCategory(object):
         self.set_component_was_called = False
         self.set_backend_called = False
         
+    @property
     def catid(self):
         return self.name
     
