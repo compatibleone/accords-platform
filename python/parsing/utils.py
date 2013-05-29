@@ -33,16 +33,23 @@ def _find_all_ids_of_entries(response):
     matches = re.finditer(_find_id_regex, response)
     return [match.groups()[1] for match in matches]
     
-#TODO This doesn't work properly...since all values have the same key, only the last is actually used
-# Could do separate gets for each request, and then manually union them!
 def _headers_with_attributes(attributes, authorization = None):
-    #comma_separated_attributes = ','.join(('{0}={1}'.format(name, value) for name, value in attributes.items()))
-    #headers = {'X-OCCI-Attribute':comma_separated_attributes}
-    attributes = [['X-OCCI-ATTRIBUTE', '{0}={1}'.format(name, value)] for name, value in attributes.items()]
+    attributes_entries = []
+    attr_list = attributes.items()
+    # This is a horrible hack.  The requests interface doesn't allow sending the same attribute multiple times in the headers.
+    # However it doesn't escape the passed in values, so we can manually insert extra headers by prepending them with \r\n, and
+    # passing them in as part of the original header.  Urgh!
+    if len(attr_list) > 0:
+        name, value = attr_list[0]
+        first_value = '{0}={1}'.format(name, value)
+        values = ['\r\nX-OCCI-ATTRIBUTE: {0}={1}'.format(name, value) for name, value in attr_list[1:]]
+        values.insert(0, first_value)
+        values_string = ''.join(values)
+        attributes_entries = [['X-OCCI-ATTRIBUTE', values_string]]
     authorization_header = []
     if authorization is not None:
-        authorization_header = [['X-OCCI-AUTHORIZE', authorization]] 
-    headers = dict(attributes + authorization_header)
+        attributes_entries.append(['X-OCCI-AUTHORIZE', authorization])
+    headers = dict(attributes_entries)
     #headers = dict([['X-OCCI-Attribute: {0}'.format(name), '={0}'.format(value)] for name, value in attributes.items()])
     return headers
     
@@ -140,9 +147,7 @@ class Provisioner(object):
     def get_marketplace_users(self):
         all = self.get_all() #TODO Is this required?  C parser does it
         
-        # TODO Skip where since for now it seems that where is always marketplace 
-        #attributes = {'occi.publication.where':'marketplace', 'occi.publication.what':'user'}
-        attributes = {'occi.publication.what':'user'}
+        attributes = {'occi.publication.where':'marketplace', 'occi.publication.what':'user'}
         r = self._get(_publication_loc, filters = attributes)
         
         return _find_all_ids_of_entries(r.text) if r.status_code is requests.codes.ok else None
