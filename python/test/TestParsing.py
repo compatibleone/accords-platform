@@ -54,17 +54,35 @@ class TestBasicLookupFunctions(unittest.TestCase):
         
 class TestManifestConstruction(unittest.TestCase):
     def setUp(self):
-        self.dut = parsing.utils.Provisioner()
+        self.dut = parsing.utils.Provisioner()       
+        self.dut.clean()       
      
     #TODO 
     @unittest.skip 
     def test_that_lookup_all_resources_returns_ok(self):
         assert_that(self.dut.lookup_all(), is_(True))
         
-    def test_that_manifest_cn_any_does_not_exist_after_clean(self):
-        
-        self.dut.clean()        
+    def test_that_manifest_cn_any_does_not_exist_after_clean(self):  
         id = self.dut.find_id('manifest', 'cn_any')
         
         assert_that(id, is_(None))
+        
+    def test_that_manifest_is_created_by_make_manifest(self):
+        self.dut.make_manifest()
+        
+        id = self.dut.find_id('manifest', 'cn_any')
+        assert_that(id, is_not(None))
+        
+    def test_that_update_entry_returns_id_when_entry_does_not_exist(self):
+        id = self.dut.update_entry('manifest', 'cn_any')
+        
+        assert_that(id, is_not(None))        
+        
+    def test_that_update_entry_returns_id_when_entry_does_exist(self):
+        self.dut.make_manifest()
+        
+        id = self.dut.update_entry('manifest', 'cn_any')
+        
+        assert_that(id, is_not(None))
+        
         

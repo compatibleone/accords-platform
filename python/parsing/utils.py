@@ -69,11 +69,19 @@ class Provisioner(object):
         r = self._get(_publication_loc, ident)
         return _find_attribute_in_response(r.text, _find_server_regex)
 
-    def _get(self, category, ident = '', filters = {}, root = _request_root + ':' + publication_port):
+    def _request_args(self, category, root, ident, filters):
         headers = _headers_with_attributes(filters, self.auth_string)
         url = _location(root, category, ident)
+        return url, headers
+    
+    def _get(self, category, ident = '', filters = {}, root = _request_root + ':' + publication_port):
+        url, headers = self._request_args(category, root, ident, filters)
         return requests.get(url, headers = headers)
 
+    def _post(self, category, ident = '', filters = {}, root = _request_root + ':' + publication_port):
+        url, headers = self._request_args(category, root, ident, filters)
+        return requests.post(url, headers = headers)
+    
     def find_root_of_category(self, category):
         r = self._get(_publication_loc, filters = {'occi.publication.what':category})
         if r.status_code is not requests.codes.ok:
@@ -84,17 +92,29 @@ class Provisioner(object):
             raise LookupError("Conflicting servers found for category '{0}'".format(category))
         return servers[0]
     
+
+    def _filters(self, category, entry):
+        return {'occi.{0}.name'.format(category):entry}
+
     def _request_entry(self, category, entry):
-        root = self.find_root_of_category(category)
-        
-        r = self._get(category, filters = {'occi.{0}.name'.format(category):entry}, root = root)
+        root = self.find_root_of_category(category)        
+        r = self._get(category, filters = self._filters(category, entry), root = root)
         ident = None if r.status_code is not requests.codes.ok else _find_id_of_entry(r.text)
         return ident, root
-            
+    
+    def _post_entry(self, category, entry):
+        root = self.find_root_of_category(category)
+        r = self._post(category, filters = self._filters(category, entry), root = root)
+        ident = None if r.status_code is not requests.codes.ok else _find_id_of_entry(r.text)
+        return ident, root
+        
     def find_id(self, category, entry):    
         ident, _ = self._request_entry(category, entry)
         return ident
-        
+    
+    def _make_id(self, category, entry):
+        ident, _ = self._post_entry(category, entry)
+        return ident        
 
     def _location_of_entry(self, category, entry):
         ident, root = self._request_entry(category, entry)
@@ -131,3 +151,14 @@ class Provisioner(object):
         location = self._location_of_entry('manifest', 'cn_any')
         if location is not None:
             r = requests.delete(location)
+            
+    def make_manifest(self):
+        return self._make_id('manifest', 'cn_any')
+    
+    def update_entry(self, category, entry):
+        ident = self.find_id(category, entry)
+        if ident is None:
+            ident = self._make_id(category, entry)
+        return(ident)
+        
+        
