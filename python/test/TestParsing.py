@@ -10,7 +10,7 @@ class TestInterface(unittest.TestCase):
     '''Tests basic communication with the servers'''
     
     def test_that_get_all_on_publication_server_returns_status_okay(self):
-        r = parsing.utils.get_all(parsing.utils.publication_port)
+        r = parsing.utils.get_all()
         
         assert_that(r.status_code, is_(requests.codes.ok))
 
@@ -21,9 +21,30 @@ class TestParsing(unittest.TestCase):
     '''
     
     def test_that_find_users_returns_list_of_users(self):
-        r = parsing.utils.get_all(parsing.utils.publication_port)
+        users = parsing.utils.get_marketplace_users()
         
-        assert_that(r.status_code, is_(requests.codes.ok))
+        assert_that(len(users), is_(greater_than(0)))
+        
+    @unittest.expectedFailure
+    def test_that_find_marketplace_users_doesnt_find_users_if_where_is_not_marketplace(self):
+        self.fail("Currently don't have a way to filter on multiple attributes")
+    
+    def test_that_find_root_returns_correct_uri_for_user_category(self):
+        server = parsing.utils.find_root_of_category('user')
+        
+        assert_that(server, is_('http://127.0.0.1:8087'))
+        
+    def test_the_find_root_returns_none_for_nonsense_category(self):
+        server = parsing.utils.find_root_of_category('random-rubbish')
+        
+        assert_that(server, is_(None))
+        
+    def test_that_find_id_returns_id_for_user_test_parser(self):
+        id = parsing.utils.find_id('user', 'test-parser')
+        
+        assert_that(id, is_not(None))
+        
+        
     
 #     def test_that_post_creates_new_entry_and_returns_id(self):        
 #         r = requests.post(_request_root)
@@ -116,9 +137,7 @@ class TestParsing(unittest.TestCase):
 #         assert_that(r.status_code, is_(requests.codes.not_found))
 #         
 # 
-#     def _headers_with_attribute(self, name, value):
-#         put_headers = {'X-OCCI-Attribute':('occi.publication.{0}={1}'.format(name, value))}
-#         return put_headers
+
 # 
 #     def test_that_put_reports_updated_entry(self):
 #         id = self._create_entry()
