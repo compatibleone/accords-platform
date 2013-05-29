@@ -32,4 +32,4 @@ class ComponentParser(XmlParser):
                     component.set_category_link(category_name, category)
                     category.set_component(component)                    
                 else:
-                    logging.warn("Component '{0}' references undefined category '{1}'".format(component.name, category_name))
+                    logging.warn("Component '{0}' references undefined category '{1}'".format(name, category_name))

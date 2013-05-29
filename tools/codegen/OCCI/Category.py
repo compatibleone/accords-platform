@@ -234,3 +234,22 @@ class Category(object):
 
     def set_backend(self, backend):
         self._backend = backend
+        
+    def for_file(self, filename):
+        if self.headerFilename is not None:
+            return filename == self.headerFilename
+        return filename == (self.term + ".h") 
+    
+    @property
+    def struct_name(self):        
+        return "cords_" + self.term if self.structName is None else self.structName
+
+    def backend_type_list(self):
+        '''
+        List of all types needed to be stored in the backend representation of this category
+        '''
+        yield('id', 'string')   # All backends store an id for each category
+        for name, attr in self.attrs.items():
+            yield(name, attr.attrtype)            
+        for name in self.colls.keys():
+            yield(name, 'string')
