@@ -61,10 +61,6 @@ def _headers_with_attributes(attributes, authorization = None):
     #headers = dict([['X-OCCI-Attribute: {0}'.format(name), '={0}'.format(value)] for name, value in attributes.items()])
     return headers
     
-
-def _filter_by_name(category, entry):
-    return _filter_by_key(category, 'name', entry)
-
 def _filter_by_source(source):
     return _filter_by_key('link', 'source', source)
 
@@ -141,14 +137,15 @@ class Provisioner(object):
         links = [self._read_attribute_from_location(root, 'link', ident, 'target') for ident in idents]
         return links
 
-    def _add_filter(self, attributes, category, entry):
+    def _add_filter(self, attributes, category, entry, key):
         filters = dict(['occi.{0}.{1}'.format(category, name), value] for name, value in attributes.items())
-        filters.update(_filter_by_name(category, entry))
+        filters.update(_filter_by_key(category, key, entry))
         return filters
 
-    def _make_request_args(self, category, entry, attributes = {}):
+    def _make_request_args(self, category, entry, attributes = {}, key = 'name'):
         root = self.find_root_of_category(category)
-        attributes = self._add_filter(attributes, category, entry)
+        # TODO Move the filter higher up the stack
+        attributes = self._add_filter(attributes, category, entry, key)
         return attributes, root
 
     def _post_common(self, category, attributes, root):
@@ -160,8 +157,9 @@ class Provisioner(object):
         root = _root()
         attributes = _filter_by_source(source)
         attributes.update({'occi.link.target':target})
-        return self._post_common('link', attributes, root)        
+        return self._post_common('link', attributes, root)            
 
+    #TODO Merge with vanilla post
     def _post_entry(self, category, entry, attributes = {}):
         attributes, root = self._make_request_args(category, entry, attributes)
         return self._post_common(category, attributes, root)
@@ -178,8 +176,8 @@ class Provisioner(object):
     # TODO Post and Put etc. should take full urls as parameters, not build them up themselves, unless necessary
     def _post_id(self, category, entry, attributes = {}):
         ident, root = self._post_entry(category, entry, attributes)
-        return _location(root, category, ident)     
-    
+        return _location(root, category, ident)   
+        
     def _put_id(self, category, ident, entry, attributes = {}):
         ident, root = self._put_entry(category, ident, entry, attributes)
         return _location(root, category, ident) 
@@ -258,7 +256,11 @@ class Provisioner(object):
         self.update_entry('infrastructure', 'cn_any:any', {'compute':compute_url, 'storage':storage_url, 'network':network_url, 'state':'0'})
         self.update_entry('image', 'cn_any:ubuntu', {'agent':'none'})
         system_url = self.update_entry('system', 'ubuntu', {'state':'0'})
-        self.update_entry('image', 'cn_any:ubuntu', {'agent':'none', 'state':'0', 'packages':'0', 'system':system_url, 'vm':'cordscript: vm.new(id.value,provider.value); vm.build();'})
+        image_url = self.update_entry('image', 'cn_any:ubuntu', {'agent':'none', 'state':'0', 'packages':'0', 'system':system_url, 'vm':'cordscript: vm.new(id.value,provider.value); vm.build();'})
+        self._make_vm(image_url, 'onapp')
+        
+        return True
+        
         
         
     def make_links_for_network(self, network_url, port_urls):
@@ -274,3 +276,11 @@ class Provisioner(object):
         ident, root = self._post_link(source, target)
         return _location(root, 'link', ident)
         
+    def _make_vm(self, image_url, provider):
+        attributes = {'image':image_url, 'provider':provider}
+        return self.post('vm', attributes)
+    
+    def post(self, category, attributes):        
+        root = self.find_root_of_category(category)
+        ident, root = self._post_common(category, attributes, root)
+        return _location(root, category, ident)

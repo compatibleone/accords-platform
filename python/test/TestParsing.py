@@ -149,6 +149,10 @@ class TestManifestConstruction(unittest.TestCase):
         link_targets = self.dut.read_link_targets(network_id)
         assert_that(link_targets, is_([]))
         
+    def test_that_update_all_succeeds(self):
+        success = self.dut.update_all()
+        
+        assert_that(success, is_(True))
     #TODO Test for writing VM
         
     
