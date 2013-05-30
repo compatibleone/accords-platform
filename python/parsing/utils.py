@@ -48,6 +48,9 @@ def _headers_with_attributes(attributes, authorization = None):
     # However it doesn't escape the passed in values, so we can manually insert extra headers by prepending them with \r\n, and
     # passing them in as part of the original header.  Urgh!
     if len(attr_list) > 0:
+        for name, value in attr_list:
+            if value is None:
+                raise ValueError("Illegal None value for attribute '{0}'".format(name))
         name, value = attr_list[0]
         first_value = '{0}="{1}"'.format(name, value)
         values = ['\r\nX-OCCI-ATTRIBUTE: {0}="{1}"'.format(name, value) for name, value in attr_list[1:]]
@@ -67,14 +70,12 @@ def _filter_by_source(source):
 def _filter_by_key(category, key, target):
     return {'occi.{0}.{1}'.format(category, key):target}
     
-class Provisioner(object):
-    user_name = 'test-parser'
-    
+class Provisioner(object):    
     def __init__(self):
         self.auth_string = None
     
-    def _authorize(self):
-        self.auth_string = self.authorize(self.user_name)        
+    def _authorize(self, user_name = 'test-parser'):
+        self.auth_string = self.authorize(user_name)        
             
     def get_all(self):
         return self._get(_all_loc)
@@ -82,22 +83,18 @@ class Provisioner(object):
     def _find_server_of_category(self, ident):
         r = self._get(_publication_loc, ident)
         return _find_attribute_in_response(r.text, _find_server_regex)
-
-    def _request_args(self, category, root, ident, attributes):
-        headers = _headers_with_attributes(attributes, self.auth_string)
-        url = _location(root, category, ident)
-        return url, headers
     
     def _get(self, category, ident = '', attributes = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, attributes)
+        headers = _headers_with_attributes(attributes, self.auth_string)
+        url = _location(root, category, ident)
         return requests.get(url, headers = headers)
 
-    def _post(self, category, ident = '', attributes = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, attributes)
+    def _post(self, url, attributes = {}):
+        headers = _headers_with_attributes(attributes, self.auth_string)
         return requests.post(url, headers = headers)
     
-    def _put(self, category, ident = '', attributes = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, attributes)
+    def _put(self, url, attributes = {}):
+        headers = _headers_with_attributes(attributes, self.auth_string)
         return requests.put(url, headers = headers)
     
     def find_root_of_category(self, category):
@@ -148,16 +145,16 @@ class Provisioner(object):
         attributes = self._add_filter(attributes, category, entry, key)
         return attributes, root
 
-    def _post_common(self, category, attributes, root):
-        r = self._post(category, attributes = attributes, root = root)
-        ident = None if r.status_code is not requests.codes.ok else _find_id_of_entry(r.text)
-        return ident, root
+    def _post_common(self, category, attributes, root, action = ''):
+        url = _location(root, category) + action
+        r = self._post(url, attributes = attributes)
+        return None if r.status_code is not requests.codes.ok else _location(root, category,  _find_id_of_entry(r.text))
     
     def _post_link(self, source, target):
         root = _root()
         attributes = _filter_by_source(source)
         attributes.update({'occi.link.target':target})
-        return self._post_common('link', attributes, root)            
+        return self._post_common('link', attributes, root)  
 
     #TODO Merge with vanilla post
     def _post_entry(self, category, entry, attributes = {}):
@@ -166,24 +163,23 @@ class Provisioner(object):
       
     def _put_entry(self, category, ident, entry, attributes = {}):
         attributes, root = self._make_request_args(category, entry, attributes)
-        r = self._put(category, ident, attributes = attributes, root = root)
+        r = self._put(_location(root, category, ident), attributes = attributes)
         return ident, root
       
-    def find_id(self, category, entry):    
+    def locate(self, category, entry):    
         ident, root = self._request_single_entry_id(category, entry)
         return _location(root, category, ident)
     
     # TODO Post and Put etc. should take full urls as parameters, not build them up themselves, unless necessary
     def _post_id(self, category, entry, attributes = {}):
-        ident, root = self._post_entry(category, entry, attributes)
-        return _location(root, category, ident)   
+        return self._post_entry(category, entry, attributes)  
         
     def _put_id(self, category, ident, entry, attributes = {}):
         ident, root = self._put_entry(category, ident, entry, attributes)
         return _location(root, category, ident) 
 
     def authorize(self, user):
-        auth_location = self.find_id('user', user)
+        auth_location = self.locate('user', user)
         if auth_location is None:
             raise LookupError("Unable to find entry for user '{0}'".format(entry))
         authentication_server = self.find_root_of_category('authorization')
@@ -209,7 +205,7 @@ class Provisioner(object):
             r = requests.delete(location)
 
     def _clean(self, category, name):
-        self._delete(self.find_id(category, name))
+        self._delete(self.locate(category, name))
             
     def _clean_links(self, source):
         idents, root = self._request_link_ids(source)
@@ -240,8 +236,24 @@ class Provisioner(object):
         return self._read_attribute_from_location(root, category, ident, attr_name)
 
     
+
+    def _schedule_build_operation(self, vm_url):
+        return self.post('schedule', {'operation':'{0}?action=build'.format(vm_url)})
+
+
+    def _update_node(self, infrastructure_url, image_url, firewall_value):
+        node_url = self.update_entry('node', 'cn_any', {'type':'simple', 'access':'public', 'scope':'normal', 'provider':'onapp', 'state':'0', 'infrastructure':infrastructure_url, 'image':image_url, 'operator':"any", 'category':'manifest', 
+                'entry':'none', 'firewall':firewall_value})
+        return node_url
+
+
+    def _update_manifest(self, configuration_url, release_url, interface_url, account_url, security_url, plan_value):
+        return self.update_entry('manifest', 'cn_any', {'state':'0', 'configuration':configuration_url, 'release':release_url, 'interface':interface_url, 'account':account_url, 'security':security_url, 'nodes':'1', 
+                'plan':plan_value})
+
     def update_all(self):
-        self.update_entry('manifest', 'cn_any')
+        self._authorize()
+        manifest_url = self.update_entry('manifest', 'cn_any')
         self.update_entry('node', 'cn_any', {'type':'simple', 'access':'public', 'scope':'normal', 'provider':'onapp'})
         self.update_entry('infrastructure', 'cn_any:any')
         compute_url = self.update_entry('compute', 'cn_any:small', {'architecture':'x86_64', 'cores':'1', 'memory':'1G', 'speed':'1G'})
@@ -252,35 +264,62 @@ class Provisioner(object):
                     self.update_entry('port', 'ssh', {'protocol':'tcp', 'from':'22', 'to':'22', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'}), \
                     self.update_entry('port', 'cosacs', {'protocol':'tcp', 'from':'8286', 'to':'8286', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'}) \
                     ]
-        self.make_links_for_network(network_url, port_url)
-        self.update_entry('infrastructure', 'cn_any:any', {'compute':compute_url, 'storage':storage_url, 'network':network_url, 'state':'0'})
+        self.make_links(network_url, port_url)
+        infrastructure_url = self.update_entry('infrastructure', 'cn_any:any', {'compute':compute_url, 'storage':storage_url, 'network':network_url, 'state':'0'})
         self.update_entry('image', 'cn_any:ubuntu', {'agent':'none'})
         system_url = self.update_entry('system', 'ubuntu', {'state':'0'})
         image_url = self.update_entry('image', 'cn_any:ubuntu', {'agent':'none', 'state':'0', 'packages':'0', 'system':system_url, 'vm':'cordscript: vm.new(id.value,provider.value); vm.build();'})
-        self._make_vm(image_url, 'onapp')
+        vm_url = self._make_vm(image_url, 'onapp')
+        self._schedule_build_operation(vm_url)
+        self.update_entry('image', 'cn_any:ubuntu', {'agent':'none', 'state':'0', 'packages':'0', 'system':system_url, 'vm':vm_url})
+        node_url = self._update_node(infrastructure_url, image_url, 'cordscript: firewall.new(id.value); firewall.build();')
+        firewall_url = self.post('firewall', {'node':node_url})
+        self._schedule_build_operation(firewall_url)
+        node_url = self._update_node(infrastructure_url, image_url, firewall_url)
+        configuration_url = self.post_put('configuration')       
+        release_url = self.post_put('release')
+        interface_url = self.post_put('interface')
+        account_url = self.update_entry('account', 'jc', {'state':'0', 'users':'1'})
+        security_url = self.post_put('security')
+        self.make_links(manifest_url, [node_url])
+        self._update_manifest(configuration_url, release_url, interface_url, account_url, security_url, 'cordscript: plan.new(id.value,name.value);')
+        plan_url = self.update_entry('plan', 'cn_any', {'manifest':manifest_url})
+        self._update_manifest(configuration_url, release_url, interface_url, account_url, security_url, plan_url)
+        self._delete(self.auth_string)
         
+        #self.post('plan', action = '{0}?action=instance'.format(plan_url))
         return True
         
         
-        
-    def make_links_for_network(self, network_url, port_urls):
-        self._clean_links(network_url)
-        for port in port_urls:
-            self.make_link(network_url, port)
+    def make_links(self, source_url, target_urls):
+        self._clean_links(source_url)
+        for target in target_urls:
+            self.make_link(source_url, target)
     
     def read_link_targets(self, source):
         return self._request_link_targets(source)
     
     def make_link(self, source, target):
         #TODO Make _post_link return full url
-        ident, root = self._post_link(source, target)
-        return _location(root, 'link', ident)
+        return self._post_link(source, target) 
         
     def _make_vm(self, image_url, provider):
         attributes = {'image':image_url, 'provider':provider}
         return self.post('vm', attributes)
     
-    def post(self, category, attributes):        
+    #TODO This is easily testible - do so!
+    def post(self, category, attributes = {}, action = ''):        
         root = self.find_root_of_category(category)
-        ident, root = self._post_common(category, attributes, root)
-        return _location(root, category, ident)
+        return self._post_common(category, attributes, root, action)
+    
+    def post_put(self, category):
+        #Don't know why this is done as a post then a put, but that's what the c parser does! 
+        location = self.post(category)
+        self._put(location)
+        return location
+    
+    def broker(self):
+        plan_url = self.locate('plan', 'cn_any')
+        self._authorize('test-broker')        
+        self.post('plan', action = '{0}?action=instance'.format(plan_url))
+        self._delete(self.auth_string)
