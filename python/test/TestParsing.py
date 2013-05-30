@@ -43,9 +43,9 @@ class TestBasicLookupFunctions(unittest.TestCase):
         self.assertRaises(LookupError, self.dut.find_root_of_category, 'random-rubbish')
         
     def test_that_find_id_returns_id_for_user_test_parser(self):
-        id = self.dut.find_id('user', 'test-parser')
+        ident = self.dut.find_id('user', 'test-parser')
         
-        assert_that(id, is_not(None))
+        assert_that(ident, is_not(None))
         
     def test_that_authorize_returns_authorization_location(self):
         authorization = self.dut.authorize('test-parser')
@@ -55,7 +55,7 @@ class TestBasicLookupFunctions(unittest.TestCase):
 class TestManifestConstruction(unittest.TestCase):
     def setUp(self):
         self.dut = parsing.utils.Provisioner()       
-        self.dut.clean()       
+        self.dut.clean_all()       
      
     #TODO 
     @unittest.skip 
@@ -63,26 +63,51 @@ class TestManifestConstruction(unittest.TestCase):
         assert_that(self.dut.lookup_all(), is_(True))
         
     def test_that_manifest_cn_any_does_not_exist_after_clean(self):  
-        id = self.dut.find_id('manifest', 'cn_any')
+        ident = self.dut.find_id('manifest', 'cn_any')
         
-        assert_that(id, is_(None))
+        assert_that(ident, is_(None))
         
     def test_that_manifest_is_created_by_make_manifest(self):
         self.dut.make_manifest()
         
-        id = self.dut.find_id('manifest', 'cn_any')
-        assert_that(id, is_not(None))
+        ident = self.dut.find_id('manifest', 'cn_any')
+        assert_that(ident, is_not(None))
         
     def test_that_update_entry_returns_id_when_entry_does_not_exist(self):
-        id = self.dut.update_entry('manifest', 'cn_any')
+        ident = self.dut.update_entry('manifest', 'cn_any')
         
-        assert_that(id, is_not(None))        
+        assert_that(ident, is_not(None))        
         
     def test_that_update_entry_returns_id_when_entry_does_exist(self):
         self.dut.make_manifest()
         
-        id = self.dut.update_entry('manifest', 'cn_any')
+        ident = self.dut.update_entry('manifest', 'cn_any')
         
-        assert_that(id, is_not(None))
+        assert_that(ident, is_not(None))
+        
+    def test_that_update_entry_returns_same_id_as_original_when_entry_does_exist(self):
+        ident = self.dut.make_manifest()
+        
+        new_ident = self.dut.update_entry('manifest', 'cn_any')
+        
+        assert_that(new_ident, is_(ident))
+        
+    def test_that_update_entry_updates_values_when_entry_does_not_exist(self):
+        self.dut.update_entry('node', 'cn_any', {'type':'simple'})
+        
+        type_set = self.dut.read_attribute('node', 'cn_any', 'type')        
+        assert_that(type_set, is_('simple'))
+        
+    def test_that_update_entry_updates_values_when_entry_does_exist(self):
+        self.dut.update_entry('node', 'cn_any', {'type':'something'})
+        self.dut.update_entry('node', 'cn_any', {'type':'something_else'})
+        
+        type_set = self.dut.read_attribute('node', 'cn_any', 'type')        
+        assert_that(type_set, is_('something_else'))
+    
+    def test_that_read_attribute_returns_test_parser_for_name_on_user_test_parser(self):
+        attr = self.dut.read_attribute('user', 'test-parser', 'name')
+        
+        assert_that(attr, is_('test-parser'))
         
         
