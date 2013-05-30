@@ -149,6 +149,8 @@ class TestManifestConstruction(unittest.TestCase):
         link_targets = self.dut.read_link_targets(network_id)
         assert_that(link_targets, is_([]))
         
+    #TODO Test for writing VM
+        
     
     def test_that_make_link_returns_url_to_link(self):
         network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})

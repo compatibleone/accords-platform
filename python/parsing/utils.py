@@ -49,8 +49,8 @@ def _headers_with_attributes(attributes, authorization = None):
     # passing them in as part of the original header.  Urgh!
     if len(attr_list) > 0:
         name, value = attr_list[0]
-        first_value = '{0}={1}'.format(name, value)
-        values = ['\r\nX-OCCI-ATTRIBUTE: {0}={1}'.format(name, value) for name, value in attr_list[1:]]
+        first_value = '{0}="{1}"'.format(name, value)
+        values = ['\r\nX-OCCI-ATTRIBUTE: {0}="{1}"'.format(name, value) for name, value in attr_list[1:]]
         values.insert(0, first_value)
         values_string = ''.join(values)
         attributes_entries = [['X-OCCI-ATTRIBUTE', values_string]]
@@ -63,10 +63,13 @@ def _headers_with_attributes(attributes, authorization = None):
     
 
 def _filter_by_name(category, entry):
-    return {'occi.{0}.name'.format(category):entry}
+    return _filter_by_key(category, 'name', entry)
 
 def _filter_by_source(source):
-    return {'occi.link.source':source}
+    return _filter_by_key('link', 'source', source)
+
+def _filter_by_key(category, key, target):
+    return {'occi.{0}.{1}'.format(category, key):target}
     
 class Provisioner(object):
     user_name = 'test-parser'
@@ -84,25 +87,25 @@ class Provisioner(object):
         r = self._get(_publication_loc, ident)
         return _find_attribute_in_response(r.text, _find_server_regex)
 
-    def _request_args(self, category, root, ident, filters):
-        headers = _headers_with_attributes(filters, self.auth_string)
+    def _request_args(self, category, root, ident, attributes):
+        headers = _headers_with_attributes(attributes, self.auth_string)
         url = _location(root, category, ident)
         return url, headers
     
-    def _get(self, category, ident = '', filters = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, filters)
+    def _get(self, category, ident = '', attributes = {}, root = _root()):
+        url, headers = self._request_args(category, root, ident, attributes)
         return requests.get(url, headers = headers)
 
-    def _post(self, category, ident = '', filters = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, filters)
+    def _post(self, category, ident = '', attributes = {}, root = _root()):
+        url, headers = self._request_args(category, root, ident, attributes)
         return requests.post(url, headers = headers)
     
-    def _put(self, category, ident = '', filters = {}, root = _root()):
-        url, headers = self._request_args(category, root, ident, filters)
+    def _put(self, category, ident = '', attributes = {}, root = _root()):
+        url, headers = self._request_args(category, root, ident, attributes)
         return requests.put(url, headers = headers)
     
     def find_root_of_category(self, category):
-        r = self._get(_publication_loc, filters = {'occi.publication.what':category})
+        r = self._get(_publication_loc, attributes = {'occi.publication.what':category})
         if r.status_code is not requests.codes.ok:
             raise LookupError("Couldn't find server for category '{0}'".format(category))
         ids = _find_all_ids_of_entries(r.text)
@@ -124,13 +127,13 @@ class Provisioner(object):
         raise LookupError("Too many ids found for entry '{0}'".format(entry))
          
     def _request_entry_ids(self, category, entry):
-        root = self.find_root_of_category(category)        
-        r = self._get(category, filters = _filter_by_name(category, entry), root = root)
+        attributes, root = self._make_request_args(category, entry)     
+        r = self._get(category, attributes = attributes, root = root)
         return self._extract_ids_from_response(r), root   
     
     def _request_link_ids(self, source):
         root = _root()        
-        r = self._get('link', filters = _filter_by_source(source), root = root)
+        r = self._get('link', attributes = _filter_by_source(source), root = root)
         return self._extract_ids_from_response(r), root           
     
     def _request_link_targets(self, source):
@@ -138,34 +141,34 @@ class Provisioner(object):
         links = [self._read_attribute_from_location(root, 'link', ident, 'target') for ident in idents]
         return links
 
-    def _update_attributes(self, attributes, category, entry):
+    def _add_filter(self, attributes, category, entry):
         filters = dict(['occi.{0}.{1}'.format(category, name), value] for name, value in attributes.items())
         filters.update(_filter_by_name(category, entry))
         return filters
 
-    def _make_update_args(self, category, entry, attributes):
+    def _make_request_args(self, category, entry, attributes = {}):
         root = self.find_root_of_category(category)
-        filters = self._update_attributes(attributes, category, entry)
-        return filters, root
+        attributes = self._add_filter(attributes, category, entry)
+        return attributes, root
 
-    def _post_common(self, category, filters, root):
-        r = self._post(category, filters = filters, root = root)
+    def _post_common(self, category, attributes, root):
+        r = self._post(category, attributes = attributes, root = root)
         ident = None if r.status_code is not requests.codes.ok else _find_id_of_entry(r.text)
         return ident, root
     
     def _post_link(self, source, target):
         root = _root()
-        filters = _filter_by_source(source)
-        filters.update({'occi.link.target':target})
-        return self._post_common('link', filters, root)        
+        attributes = _filter_by_source(source)
+        attributes.update({'occi.link.target':target})
+        return self._post_common('link', attributes, root)        
 
     def _post_entry(self, category, entry, attributes = {}):
-        filters, root = self._make_update_args(category, entry, attributes)
-        return self._post_common(category, filters, root)
+        attributes, root = self._make_request_args(category, entry, attributes)
+        return self._post_common(category, attributes, root)
       
     def _put_entry(self, category, ident, entry, attributes = {}):
-        filters, root = self._make_update_args(category, entry, attributes)
-        r = self._put(category, ident, filters = filters, root = root)
+        attributes, root = self._make_request_args(category, entry, attributes)
+        r = self._put(category, ident, attributes = attributes, root = root)
         return ident, root
       
     def find_id(self, category, entry):    
@@ -199,7 +202,7 @@ class Provisioner(object):
         all = self.get_all() #TODO Is this required?  C parser does it
         
         attributes = {'occi.publication.where':'marketplace', 'occi.publication.what':'user'}
-        r = self._get(_publication_loc, filters = attributes)
+        r = self._get(_publication_loc, attributes = attributes)
         
         return _find_all_ids_of_entries(r.text) if r.status_code is requests.codes.ok else None
     
@@ -243,17 +246,25 @@ class Provisioner(object):
         self.update_entry('manifest', 'cn_any')
         self.update_entry('node', 'cn_any', {'type':'simple', 'access':'public', 'scope':'normal', 'provider':'onapp'})
         self.update_entry('infrastructure', 'cn_any:any')
-        self.update_entry('compute', 'cn_any:small', {'architecture':'x86_64', 'cores':'1', 'memory':'1G', 'speed':'1G'})
-        self.update_entry('storage', 'cn_any:small', {'size':'10G'})
-        network_id = self.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
-        port_id = self.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
-        self.update_entry('port', 'ssh', {'protocol':'tcp', 'from':'22', 'to':'22', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'})
-        self.update_entry('port', 'cosacs', {'protocol':'tcp', 'from':'8286', 'to':'8286', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'})
+        compute_url = self.update_entry('compute', 'cn_any:small', {'architecture':'x86_64', 'cores':'1', 'memory':'1G', 'speed':'1G'})
+        storage_url = self.update_entry('storage', 'cn_any:small', {'size':'10G'})
+        network_url = self.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_url = [ \
+                    self.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'}),
+                    self.update_entry('port', 'ssh', {'protocol':'tcp', 'from':'22', 'to':'22', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'}), \
+                    self.update_entry('port', 'cosacs', {'protocol':'tcp', 'from':'8286', 'to':'8286', 'direction':'inout', 'state':'0', 'range':'0.0.0.0/0'}) \
+                    ]
+        self.make_links_for_network(network_url, port_url)
+        self.update_entry('infrastructure', 'cn_any:any', {'compute':compute_url, 'storage':storage_url, 'network':network_url, 'state':'0'})
+        self.update_entry('image', 'cn_any:ubuntu', {'agent':'none'})
+        system_url = self.update_entry('system', 'ubuntu', {'state':'0'})
+        self.update_entry('image', 'cn_any:ubuntu', {'agent':'none', 'state':'0', 'packages':'0', 'system':system_url, 'vm':'cordscript: vm.new(id.value,provider.value); vm.build();'})
         
-    def make_links_for_network(self, network_id, port_ids):
-        self._clean_links(network_id)
-        for port in port_ids:
-            self.make_link(network_id, port)
+        
+    def make_links_for_network(self, network_url, port_urls):
+        self._clean_links(network_url)
+        for port in port_urls:
+            self.make_link(network_url, port)
     
     def read_link_targets(self, source):
         return self._request_link_targets(source)
