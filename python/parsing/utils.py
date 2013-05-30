@@ -185,10 +185,7 @@ class Provisioner(object):
     def clean_all(self):
         clean_pairs = [['manifest', 'cn_any'], ['node', 'cn_any']]
         [self._clean(category, name) for category, name in clean_pairs]
-            
-    def make_manifest(self):
-        return self._post_id('manifest', 'cn_any')
-    
+                
     def update_entry(self, category, entry, attributes = {}):
         ident = self.find_id(category, entry)
         if ident is None:
@@ -203,3 +200,8 @@ class Provisioner(object):
         if r.status_code is not requests.codes.ok:
             raise LookupError('Could not find entry {0}/{1}'.format(category, entry))
         return _find_attribute_in_response(r.text, _attr_regex(category, attr_name))
+    
+    def update_all(self):
+        self.update_entry('manifest', 'cn_any')
+        self.update_entry('node', 'cn_any', {'type':'simple', 'access':'public', 'scope':'normal', 'provider':'onapp'})
+        

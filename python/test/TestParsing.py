@@ -67,8 +67,8 @@ class TestManifestConstruction(unittest.TestCase):
         
         assert_that(ident, is_(None))
         
-    def test_that_manifest_is_created_by_make_manifest(self):
-        self.dut.make_manifest()
+    def test_that_manifest_is_created_by_update_entry_manifest(self):
+        self.dut.update_entry('manifest', 'cn_any')
         
         ident = self.dut.find_id('manifest', 'cn_any')
         assert_that(ident, is_not(None))
@@ -79,14 +79,14 @@ class TestManifestConstruction(unittest.TestCase):
         assert_that(ident, is_not(None))        
         
     def test_that_update_entry_returns_id_when_entry_does_exist(self):
-        self.dut.make_manifest()
+        self.dut.update_entry('manifest', 'cn_any')
         
         ident = self.dut.update_entry('manifest', 'cn_any')
         
         assert_that(ident, is_not(None))
         
     def test_that_update_entry_returns_same_id_as_original_when_entry_does_exist(self):
-        ident = self.dut.make_manifest()
+        ident = self.dut.update_entry('manifest', 'cn_any')
         
         new_ident = self.dut.update_entry('manifest', 'cn_any')
         
@@ -109,5 +109,14 @@ class TestManifestConstruction(unittest.TestCase):
         attr = self.dut.read_attribute('user', 'test-parser', 'name')
         
         assert_that(attr, is_('test-parser'))
+        
+    def test_that_update_entry_can_update_multiple_attributes_at_once(self):
+        self.dut.update_entry('node', 'cn_any', {'type':'simple', 'access':'public'})
+        
+        type_set = self.dut.read_attribute('node', 'cn_any', 'type')        
+        assert_that(type_set, is_('simple'))
+        access_set = self.dut.read_attribute('node', 'cn_any', 'access')
+        assert_that(access_set, is_('public'))
+        
         
         
