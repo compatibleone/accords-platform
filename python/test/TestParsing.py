@@ -2,7 +2,7 @@ import unittest
 import os
 import requests
 
-from hamcrest import assert_that, is_, is_not, greater_than
+from hamcrest import assert_that, is_, is_not, greater_than, has_item
 
 import parsing.utils
 
@@ -56,12 +56,7 @@ class TestManifestConstruction(unittest.TestCase):
     def setUp(self):
         self.dut = parsing.utils.Provisioner()       
         self.dut.clean_all()       
-     
-    #TODO 
-    @unittest.skip 
-    def test_that_lookup_all_resources_returns_ok(self):
-        assert_that(self.dut.lookup_all(), is_(True))
-        
+             
     def test_that_manifest_cn_any_does_not_exist_after_clean(self):  
         ident = self.dut.find_id('manifest', 'cn_any')
         
@@ -117,6 +112,62 @@ class TestManifestConstruction(unittest.TestCase):
         assert_that(type_set, is_('simple'))
         access_set = self.dut.read_attribute('node', 'cn_any', 'access')
         assert_that(access_set, is_('public'))
+        
+    def test_that_update_entry_can_update_attribute_with_colon_in_name(self):
+        self.dut.update_entry('infrastructure', 'cn_any:any')
+        
+        name_set = self.dut.read_attribute('infrastructure', 'cn_any:any', 'name')        
+        assert_that(name_set, is_('cn_any:any'))
+        
+    def test_that_make_links_for_network_creates_link_to_port_specified(self):
+        network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        
+        self.dut.make_links_for_network(network_id, [port_id])
+        
+        link_target = self.dut.read_link_targets(network_id)
+        assert_that(link_target, has_item(port_id))
+        
+    def test_that_make_links_for_network_creates_links_to__multiple_ports_if_specified(self):
+        network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        port_id2 = self.dut.update_entry('port', 'something_else', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        
+        self.dut.make_links_for_network(network_id, [port_id, port_id2])
+        
+        link_targets = self.dut.read_link_targets(network_id)
+        assert_that(link_targets, has_item(port_id))
+        assert_that(link_targets, has_item(port_id2))
+        
+    def test_that_make_links_for_network_deletes_all_links_for_network_first(self):
+        network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        self.dut.make_links_for_network(network_id, [port_id])
+        
+        self.dut.make_links_for_network(network_id, [])
+        
+        link_targets = self.dut.read_link_targets(network_id)
+        assert_that(link_targets, is_([]))
+        
+    
+    def test_that_make_link_returns_url_to_link(self):
+        network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        
+        url = self.dut.make_link(network_id, port_id)
+        
+        assert_that(url, is_not(None))
+        
+    def test_that_make_link_creates_link_with_specified_source_and_target(self):
+        network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
+        port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
+        
+        self.dut.make_link(network_id, port_id)
+        
+        link_target = self.dut.read_link_targets(network_id)
+        assert_that(link_target, has_item(port_id))
+        
+        
         
         
         
