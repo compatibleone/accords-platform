@@ -34,12 +34,21 @@ def _find_location_id_in_response(response, regex):
     return _get_match(match, 1)
 
 _find_id_regex = u"X-OCCI-Location: (\S+)/(\S+)\n"
+_find_url_regex = u"X-OCCI-Location: (\S+)\n"
 def _find_id_of_entry(response):
     return _find_location_id_in_response(response, _find_id_regex)
 
-def _find_all_ids_of_entries(response):        
+def _find_all_ids_of_entries(response):    
     matches = re.finditer(_find_id_regex, response)
-    return [match.groups()[1] for match in matches]
+    return [match.groups()[1] for match in matches]    
+    #return _find_all(response, _find_id_regex)
+
+def _find_all(text, regex):
+    matches = re.finditer(regex, text)
+    return [match.groups()[0] for match in matches]
+    
+def _find_all_urls_of_entries(response):
+    return None if response.status_code is not requests.codes.ok else _find_all(response.text, _find_url_regex)
     
 def _headers_with_attributes(attributes, authorization = None):
     attributes_entries = []
@@ -77,10 +86,10 @@ class Provisioner(object):
     def _authorize(self, user_name = 'test-parser'):
         self.auth_string = self.authorize(user_name)        
             
-    def get_all(self):
-        return self._get(_all_loc)
+    def get_all(self, root = _root()):
+        return self._get(_all_loc, root = root)
 
-    def _find_server_of_category(self, ident):
+    def _get_server_from_publication_entry(self, ident):
         r = self._get(_publication_loc, ident)
         return _find_attribute_in_response(r.text, _find_server_regex)
     
@@ -102,14 +111,12 @@ class Provisioner(object):
         if r.status_code is not requests.codes.ok:
             raise LookupError("Couldn't find server for category '{0}'".format(category))
         ids = _find_all_ids_of_entries(r.text)
-        servers = [self._find_server_of_category(ident) for ident in ids]
-        if len(servers) is 0 or any(server != servers[0] for server in servers):
+        servers = [self._get_server_from_publication_entry(ident) for ident in ids]
+        if len(servers) is 0:
+            raise LookupError("No servers found for category '{0}'".format(category))
+        if any(server != servers[0] for server in servers):
             raise LookupError("Conflicting servers found for category '{0}'".format(category))
         return servers[0]
-       
-    def _extract_ids_from_response(self, response):
-        idents = None if response.status_code is not requests.codes.ok else _find_all_ids_of_entries(response.text)
-        return idents 
 
     def _request_single_entry_id(self, category, entry):
         idents, root = self._request_entry_ids(category, entry)
@@ -117,8 +124,12 @@ class Provisioner(object):
             return None, root
         if len(idents) is 1:
             return idents[0], root
-        raise LookupError("Too many ids found for entry '{0}'".format(entry))
-         
+        raise LookupError("Expected single entry for '{0}', found multiple".format(entry))
+        
+    def _extract_ids_from_response(self, response):
+        idents = None if response.status_code is not requests.codes.ok else _find_all_ids_of_entries(response.text)
+        return idents 
+        
     def _request_entry_ids(self, category, entry):
         attributes, root = self._make_request_args(category, entry)     
         r = self._get(category, attributes = attributes, root = root)
@@ -145,10 +156,16 @@ class Provisioner(object):
         attributes = self._add_filter(attributes, category, entry, key)
         return attributes, root
 
+
+    def _url(self, response, category, root):
+        if response.status_code is not requests.codes.ok:
+            raise LookupError("Unable to extract url: http response was error")
+        return _location(root, category, _find_id_of_entry(response.text))
+
     def _post_common(self, category, attributes, root, action = ''):
         url = _location(root, category) + action
         r = self._post(url, attributes = attributes)
-        return None if r.status_code is not requests.codes.ok else _location(root, category,  _find_id_of_entry(r.text))
+        return self._url(r, category, root)
     
     def _post_link(self, source, target):
         root = _root()
@@ -169,6 +186,10 @@ class Provisioner(object):
     def locate(self, category, entry):    
         ident, root = self._request_single_entry_id(category, entry)
         return _location(root, category, ident)
+    
+    def locate_all(self, category, entry): 
+        idents, root = self._request_entry_ids(category, entry)
+        return [_location(root, category, ident) for ident in idents]
     
     # TODO Post and Put etc. should take full urls as parameters, not build them up themselves, unless necessary
     def _post_id(self, category, entry, attributes = {}):
@@ -198,14 +219,17 @@ class Provisioner(object):
         attributes = {'occi.publication.where':'marketplace', 'occi.publication.what':'user'}
         r = self._get(_publication_loc, attributes = attributes)
         
-        return _find_all_ids_of_entries(r.text) if r.status_code is requests.codes.ok else None
+        return self._extract_ids_from_response(r)
     
     def _delete(self, location):
         if location is not None:
             r = requests.delete(location)
 
     def _clean(self, category, name):
-        self._delete(self.locate(category, name))
+        urls = self.locate_all(category, name)
+        if urls is not None:
+            for url in urls:
+                self._delete(url)   
             
     def _clean_links(self, source):
         idents, root = self._request_link_ids(source)
@@ -214,7 +238,7 @@ class Provisioner(object):
                 self._delete(_location(root, 'link', ident))        
 
     def clean_all(self):
-        clean_pairs = [['manifest', 'cn_any'], ['node', 'cn_any']]
+        clean_pairs = [['manifest', 'cn_any'], ['node', 'cn_any'], ['plan', 'cn_any']]
         [self._clean(category, name) for category, name in clean_pairs]
                 
     def update_entry(self, category, entry, attributes = {}):
@@ -225,6 +249,7 @@ class Provisioner(object):
             ident = self._put_id(category, ident, entry, attributes)
         return(ident)
 
+    # TODO Update this to accept urls?
     def _read_attribute_from_location(self, root, category, ident, attr_name):
         r = self._get(category, root = root, ident = ident)
         if r.status_code is not requests.codes.ok:
@@ -315,11 +340,12 @@ class Provisioner(object):
     def post_put(self, category):
         #Don't know why this is done as a post then a put, but that's what the c parser does! 
         location = self.post(category)
-        self._put(location)
-        return location
+        r = self._put(location)        
+        # Can't extract url from response, since for these operations, server does not include url of updated item in response
+        return None if r.status_code is not requests.codes.ok else location
     
     def broker(self):
-        plan_url = self.locate('plan', 'cn_any')
-        self._authorize('test-broker')        
-        self.post('plan', action = '{0}?action=instance'.format(plan_url))
+        self._authorize('test-broker')
+        plan_id, _ = self._request_single_entry_id('plan', 'cn_any')   
+        self.post('plan', action = '{0}?action=instance'.format(plan_id))            
         self._delete(self.auth_string)

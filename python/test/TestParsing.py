@@ -10,7 +10,10 @@ class TestInterface(unittest.TestCase):
     '''Tests basic communication with the servers'''
     def setUp(self):
         self.dut = parsing.utils.Provisioner()
-    
+
+    def tearDown(self):
+        self.dut.clean_all()
+            
     def test_that_get_all_on_publication_server_returns_status_okay(self):
         r = self.dut.get_all()
         
@@ -24,6 +27,9 @@ class TestBasicLookupFunctions(unittest.TestCase):
     
     def setUp(self):
         self.dut = parsing.utils.Provisioner()
+        
+    def tearDown(self):
+        self.dut.clean_all()
         
     def test_that_find_users_returns_list_of_users(self):
         users = self.dut.get_marketplace_users()
@@ -42,10 +48,10 @@ class TestBasicLookupFunctions(unittest.TestCase):
     def test_the_find_root_raises_for_nonsense_category(self):        
         self.assertRaises(LookupError, self.dut.find_root_of_category, 'random-rubbish')
         
-    def test_that_find_id_returns_id_for_user_test_parser(self):
-        ident = self.dut.find_id('user', 'test-parser')
+    def test_that_locate_returns_url_for_user_test_parser(self):
+        url = self.dut.locate('user', 'test-parser')
         
-        assert_that(ident, is_not(None))
+        assert_that(url, is_not(None))
         
     def test_that_authorize_returns_authorization_location(self):
         authorization = self.dut.authorize('test-parser')
@@ -55,17 +61,20 @@ class TestBasicLookupFunctions(unittest.TestCase):
 class TestManifestConstruction(unittest.TestCase):
     def setUp(self):
         self.dut = parsing.utils.Provisioner()       
-        self.dut.clean_all()       
+        self.dut.clean_all()   
+        
+    def tearDown(self):
+        self.dut.clean_all()    
              
     def test_that_manifest_cn_any_does_not_exist_after_clean(self):  
-        ident = self.dut.find_id('manifest', 'cn_any')
+        url = self.dut.locate('manifest', 'cn_any')
         
-        assert_that(ident, is_(None))
+        assert_that(url, is_(None))
         
     def test_that_manifest_is_created_by_update_entry_manifest(self):
         self.dut.update_entry('manifest', 'cn_any')
         
-        ident = self.dut.find_id('manifest', 'cn_any')
+        ident = self.dut.locate('manifest', 'cn_any')
         assert_that(ident, is_not(None))
         
     def test_that_update_entry_returns_id_when_entry_does_not_exist(self):
@@ -119,32 +128,32 @@ class TestManifestConstruction(unittest.TestCase):
         name_set = self.dut.read_attribute('infrastructure', 'cn_any:any', 'name')        
         assert_that(name_set, is_('cn_any:any'))
         
-    def test_that_make_links_for_network_creates_link_to_port_specified(self):
+    def test_that_make_links_creates_link_to_port_specified(self):
         network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
         port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
         
-        self.dut.make_links_for_network(network_id, [port_id])
+        self.dut.make_links(network_id, [port_id])
         
         link_target = self.dut.read_link_targets(network_id)
         assert_that(link_target, has_item(port_id))
         
-    def test_that_make_links_for_network_creates_links_to__multiple_ports_if_specified(self):
+    def test_that_make_links_creates_links_to__multiple_ports_if_specified(self):
         network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
         port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
         port_id2 = self.dut.update_entry('port', 'something_else', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
         
-        self.dut.make_links_for_network(network_id, [port_id, port_id2])
+        self.dut.make_links(network_id, [port_id, port_id2])
         
         link_targets = self.dut.read_link_targets(network_id)
         assert_that(link_targets, has_item(port_id))
         assert_that(link_targets, has_item(port_id2))
         
-    def test_that_make_links_for_network_deletes_all_links_for_network_first(self):
+    def test_that_make_links_deletes_all_links_for_network_first(self):
         network_id = self.dut.update_entry('network', 'compatibleone', {'label':'ethernet', 'vlan':'100M'})
         port_id = self.dut.update_entry('port', 'http', {'protocol':'tcp', 'from':'80', 'to':'80', 'direction':'inout', 'state':'0'})
-        self.dut.make_links_for_network(network_id, [port_id])
+        self.dut.make_links(network_id, [port_id])
         
-        self.dut.make_links_for_network(network_id, [])
+        self.dut.make_links(network_id, [])
         
         link_targets = self.dut.read_link_targets(network_id)
         assert_that(link_targets, is_([]))
@@ -173,7 +182,8 @@ class TestManifestConstruction(unittest.TestCase):
         link_target = self.dut.read_link_targets(network_id)
         assert_that(link_target, has_item(port_id))
         
-        
+    def test_that_update_entry_raises_if_specified_attribute_value_is_none(self):
+        self.assertRaises(ValueError, self.dut.update_entry, 'compute', 'random', {'architecture':None})
         
         
         
