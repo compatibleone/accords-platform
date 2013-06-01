@@ -1,4 +1,3 @@
-
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
 	<xsd:annotation>
@@ -11,6 +10,7 @@
 
 	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/cordstypes.xsd"/>
 	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/quotatypes.xsd"/>
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/saas.xsd"/>
 
 	<xsd:element name="agreement" type="cordsAgreement"/>
 
@@ -49,6 +49,7 @@
 		<xsd:choice>
 			<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="provider" type="cordsProvider" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="provider" type="cordsFederation" minOccurs="0" maxOccurs="1"/>
 			<xsd:element name="guarantee" type="cordsGuarantee" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="variable" type="cordsVariable" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:choice>
@@ -104,5 +105,4 @@
 	</xsd:complexType>
 
 </xsd:schema>
-
 
