@@ -733,6 +733,7 @@ public	struct	occi_request  *	occi_create_request( struct occi_client * cptr, ch
 public	struct	occi_response *	occi_remove_response( struct occi_response * aptr )
 {
 	struct	occi_element * eptr;
+	char *	filename;
 	if ( aptr )
 	{
 		while ((eptr = aptr->first) != (struct occi_element *) 0)
@@ -741,7 +742,20 @@ public	struct	occi_response *	occi_remove_response( struct occi_response * aptr 
 			occi_remove_element( eptr );
 		}
 		if ( aptr->response )
+		{
+			if (aptr->response->type == _FILE_BODY)
+				filename = allocate_string(aptr->response->body);
+			else	filename = (char *) 0;
 			liberate_rest_response( aptr->response );
+			if (!( check_debug() ))
+			{
+				if ( filename )
+				{
+					unlink( filename );
+					liberate( filename );
+				}
+			}
+		}
 		if ( aptr->name )
 			aptr->name = liberate( aptr->name );
 		if ( aptr->host )
