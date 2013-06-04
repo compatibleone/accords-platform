@@ -107,7 +107,6 @@ class Category(object):
         self.term = term
         self.scheme = scheme
         self.location = location
-        self.catid = scheme+term
         self.rel = rel
         self.klass = klass
         self.attrs = {}
@@ -128,6 +127,7 @@ class Category(object):
         Get all the attributes for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.attrs
         if self.relP != None:
             ret.extend(self.relP.allAttrs)
@@ -138,6 +138,7 @@ class Category(object):
         Get all the collections for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.colls
         if self.relP != None:
             ret.extend(self.relP.allColls)
@@ -148,6 +149,7 @@ class Category(object):
         Get all the collections and attributes for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.attrs
         ret.extend(self.colls)
         if self.relP != None:
@@ -159,6 +161,7 @@ class Category(object):
         Get all the links for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.links
         if self.relP != None:
             ret.extend(self.relP.allLinks)
@@ -169,6 +172,7 @@ class Category(object):
         Get all the actions for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.actions
         if self.relP != None:
             ret.extend(self.relP.allActions)
@@ -179,11 +183,13 @@ class Category(object):
         Get all the mixins for a given item
             @return list:
         '''
+        raise NotImplementedError("Not clear what the functionality should be here")
         ret = self.mixins
         if self.relP != None:
             ret.extend(self.relP.allMixins)
         return ret
         
+    @property
     def catid(self):
         '''
         Get the OCCI Category id
@@ -222,21 +228,28 @@ class Category(object):
             @param coll: The Collection to add
         '''
         self.colls[coll.name] = coll
-    
-    def getOutputFilename(self):
-        '''
-        Get the output file name (auto or derived from legacy information)
-            @param cat: The category
-            @return The filename
-        '''
-        filename = (self.term + ".h")
-        if (self.headerFilename != None):
-            filename = self.headerFilename
-
-        return filename
-    
+        
     def set_component(self, component):
         self._component = component
 
     def set_backend(self, backend):
         self._backend = backend
+        
+    def for_file(self, filename):
+        if self.headerFilename is not None:
+            return filename == self.headerFilename
+        return filename == (self.term + ".h") 
+    
+    @property
+    def struct_name(self):        
+        return "cords_" + self.term if self.structName is None else self.structName
+
+    def backend_type_list(self):
+        '''
+        List of all types needed to be stored in the backend representation of this category
+        '''
+        yield('id', 'string')   # All backends store an id for each category
+        for name, attr in self.attrs.items():
+            yield(name, attr.attrtype)            
+        for name in self.colls.keys():
+            yield(name, 'string')

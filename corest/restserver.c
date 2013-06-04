@@ -546,6 +546,10 @@ private	struct rest_response * rest_transmit_response(
 		{
 		case	_FILE_BODY	:
 			rest_response_file( cptr, aptr->body );		
+			if (!( check_debug() ))
+			{
+				unlink( aptr->body );
+			}
 			break;
 		case	_TEXT_BODY	:
 			rest_response_string( cptr, aptr->body, "\0" );		

@@ -1,0 +1,46 @@
+<xsd:schema xmlns:xsd="http://www.w3c.org/2001/XMLSchema">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Compatible One Resource and Request Description Schema Version 2.12
+			Provisionary Version 3rd June 2013
+			Software as a Service and Federation for SLA manager
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:include schemaLocation="http://www.compatibleone.fr/schemes/quotatypes.xsd"/>
+
+	<xsd:complexType name="cordsSaaS">
+		<xsd:sequence>
+			<xsd:element name="manifest" type="cordsManifest" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="vendor" type="xsd:string"/>
+		<xsd:attribute name="manifest" type="xsd:string"/>
+		<xsd:attribute name="template" type="xsd:string"/>
+		<xsd:attribute name="price" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsFederation">
+		<xsd:sequence>
+			<xsd:element name="saas" type="cordsSaaS" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="provider" type="cordsProvider" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+		<xsd:attribute name="publisher" type="xsd:string"/>
+		<xsd:attribute name="user" type="xsd:string"/>
+		<xsd:attribute name="password" type="xsd:string"/>
+		<xsd:attribute name="security" type="xsd:string"/>
+		<xsd:attribute name="tls" type="xsd:string"/>
+		<xsd:attribute name="authorization" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+		<xsd:attribute name="status" type="xsd:integer"/>
+	</xsd:complexType>
+
+</xsd:schema>
+

@@ -7,6 +7,11 @@ from hamcrest import assert_that, is_, is_not, has_key, has_entry
 from ConfigParser import BackendParser
 from Backend import Backend
 
+def _dump_xml_as_file(root, filename):
+    from xml.dom import minidom
+    with open(filename, 'w+') as f:
+        f.write(minidom.parseString(ET.tostring(root)).toprettyxml(encoding="utf-8"))
+        
 def _create_valid_backend():    
     root = ET.Element('config')
     backends = ET.SubElement(root, 'backends')
@@ -38,7 +43,7 @@ class TestBackendParsing(unittest.TestCase):
         plugin = 'mysql'
         ET.SubElement(backends, 'backend', {'name':name, 'plugin':plugin})
         op = BackendParser()
-        
+        _dump_xml_as_file(root, 'backend.xml')
         op.parse(root)
         result = op.backends
         
