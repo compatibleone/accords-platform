@@ -1402,7 +1402,7 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 {
 	int	status;
 	struct	xml_atribut * aptr;
-
+	struct	occi_response * zptr;
 	if ((status = cords_instance_identifier( dptr, _CORDS_CONFIGURATION )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_CONFIGURATION));
 
@@ -1427,10 +1427,13 @@ private	int	cords_terminate_request( struct xml_element * dptr, char * agent,cha
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved manifest ID element"));
 
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating manifest category"));
-
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------------	*/
@@ -1581,6 +1584,7 @@ private	int	cords_image_production( struct xml_element * dptr, char * agent,char
 private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char * tls )
 {
 	int	status;
+	struct	occi_response * zptr;
 	struct	xml_atribut * aptr;
 
 	if ((status = cords_instance_identifier( dptr, _CORDS_SYSTEM )) != 0)
@@ -1591,10 +1595,14 @@ private	int	cords_terminate_image( struct xml_element * dptr, char * agent,char 
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
 
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!(zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
 
-	else	return( cords_image_production( dptr, agent, tls ) );
+	else
+	{
+		occi_remove_response( zptr );
+		return( cords_image_production( dptr, agent, tls ) );
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -1604,14 +1612,19 @@ private	int	cords_terminate_network( struct xml_element * dptr, char * agent,cha
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 
 	if ((status = cords_append_links(dptr,_CORDS_PORT,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"PORT linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!(zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating NETWORK category"));
-	else	return( 0 );
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -1621,14 +1634,19 @@ private	int	cords_terminate_package( struct xml_element * dptr, char * agent,cha
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 
 	if ((status = cords_append_links(dptr,_CORDS_PORT,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"PORT linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating PACKAGE category"));
-	else	return( 0 );
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -1638,6 +1656,7 @@ private	int	cords_terminate_infrastructure( struct xml_element * dptr, char * ag
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 
 	if ((status = cords_instance_identifier( dptr, _CORDS_COMPUTE )) != 0)
 		return(cords_append_error(dptr,status,_CORDS_COMPUTE));
@@ -1647,9 +1666,13 @@ private	int	cords_terminate_infrastructure( struct xml_element * dptr, char * ag
 		return(cords_append_error(dptr,status,_CORDS_NETWORK));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating INFRASTRUCTURE category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 
@@ -1673,7 +1696,7 @@ private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char *
 	int	status;
 	struct	xml_atribut * aptr;
 	char 		    * nodetype="simple";
-
+	struct	occi_response * zptr;
 	/* ----------------------------------------------------------------------- */
 	/* attempt to retrieve an eventual node type which may be more than simple */
 	/* ----------------------------------------------------------------------- */
@@ -1725,9 +1748,13 @@ private	int	cords_terminate_node( struct xml_element * dptr, char * agent,char *
 	/* -------------------------------------------------- */
 	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
-	else	return( 0 );
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	-----------------------------------------------------	*/
@@ -1737,13 +1764,18 @@ private	int	cords_terminate_configuration( struct xml_element * dptr, char * age
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 	if ((status = cords_append_links(dptr,_CORDS_ACTION,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"ACTION linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating CONFIGURATION  category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	-----------------------------------------------------	*/
@@ -1753,13 +1785,18 @@ private	int	cords_terminate_release( struct xml_element * dptr, char * agent,cha
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 	if ((status = cords_append_links(dptr,_CORDS_ACTION,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"ACTION linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating RELEASE category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	-----------------------------------------------------	*/
@@ -1769,13 +1806,18 @@ private	int	cords_terminate_interface( struct xml_element * dptr, char * agent,c
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 	if ((status = cords_append_links(dptr,_CORDS_ACTION,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"interface ACTION linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved interface ID element"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating interface category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -1785,13 +1827,18 @@ private	int	cords_terminate_account( struct xml_element * dptr, char * agent,cha
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 	if (( status = cords_append_links(dptr,_CORDS_USER,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"account USER linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
 	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating ACCOUNT category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -1813,13 +1860,18 @@ private	int	cords_terminate_instance( struct xml_element * dptr, char * agent,ch
 {
 	int	status;
 	struct	xml_atribut * aptr;
+	struct	occi_response * zptr;
 	if ((status = cords_append_links(dptr,_CORDS_CONTRACT,agent,tls)) != 0)
 		return(cords_append_error(dptr,status,"CONTRACT linkage failure"));
 	else if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element ID"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating SERVICE category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -1830,6 +1882,7 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 	int	status;
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
+	struct	occi_response * zptr;
 	char 		    * nodetype="simple";
 
 	/* ----------------------------------------------------------------------- */
@@ -1870,9 +1923,13 @@ private	int	cords_terminate_contract( struct xml_element * dptr, char * agent,ch
 
 	if (!( aptr = document_atribut( dptr, _CORDS_ID ) ))
 		return(cords_append_error(dptr,701,"unresolved element"));
-	else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+	else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 		return(cords_append_error(dptr,704,"updating category"));
-	else	return(0);
+	else
+	{
+		occi_remove_response( zptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------	*/
@@ -2454,6 +2511,7 @@ private	int	cords_terminate_xsd(
 	struct xml_element * wptr,
 	struct xml_element * dptr, char * agent,char * tls )
 {
+	struct	occi_response * zptr;
 	int	status;
 	char *	vptr;
 	char *	nptr;
@@ -2633,9 +2691,13 @@ private	int	cords_terminate_xsd(
 
 			if ( modifications )
 			{
-				if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+				if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 					return(cords_append_error(dptr,704,"updating category"));
-				else	modifications=0;
+				else
+				{
+					occi_remove_response( zptr );
+					modifications=0;
+				}
 			}
 
 			/* ------------------------------------- */
@@ -2645,9 +2707,13 @@ private	int	cords_terminate_xsd(
 			
 			if (!( modifications ))
 				return( 0 );
-			else if (!( cords_update_category( dptr, aptr->value, agent,tls ) ))
+			else if (!( zptr = cords_update_category( dptr, aptr->value, agent,tls ) ))
 				return(cords_append_error(dptr,704,"updating category"));
-			else	return(0);
+			else
+			{
+				occi_remove_response( zptr );
+				return(0);
+			}
 		}
 	}
 }
@@ -2872,17 +2938,22 @@ private	int 	ll_cords_parse_element(
 
 	  	 	else if (!(status = cords_resolve_location( zptr, document )))
 			{
+				zptr = occi_remove_response( zptr );
 				/* ------------------------------------------ */
 				/* retrieve the instance and integrate fields */
 				/* ------------------------------------------ */
 				if (!( aptr = document_atribut( document, _CORDS_ID )))
 					return(cords_append_error(document,705,"resolving category id"));
 				else if (( yptr = cords_retrieve_category( document, aptr->value, agent,tls )) != (struct occi_response *) 0)
+				{
 					if (!( yptr = cords_integrate_fields( document, yptr, "occi", agent, tls ) ))
 						return(cords_append_error(document,705,"integrating category"));
+					else	yptr = occi_remove_response( yptr );
+				}
 			}
 			else
 			{
+				zptr = occi_remove_response( zptr );
 				/* ----------------------------- */
 				/* attempt to create an instance */
 				/* ----------------------------- */
@@ -2890,15 +2961,17 @@ private	int 	ll_cords_parse_element(
 					return(cords_append_error(document,706,"creating category"));
 				else if ((status = cords_resolve_location( zptr, document )) != 0)
 					return(cords_append_error(document,status,"resolving location"));
+				else	zptr = occi_remove_response( zptr );
 				/* ------------------------------------------ */
 				/* retrieve the instance and integrate fields */
 				/* ------------------------------------------ */
-				else if (!( aptr = document_atribut( document, _CORDS_ID )))
+				if (!( aptr = document_atribut( document, _CORDS_ID )))
 					return(cords_append_error(document,705,"resolving category id"));
 				else if (( yptr = cords_retrieve_category( document, aptr->value, agent,tls )) != (struct occi_response *) 0)
 				{
 					if (!( yptr = cords_integrate_fields( document, yptr, "occi", agent, tls ) ))
 						return(cords_append_error(document,705,"integrating category"));
+					else	yptr = occi_remove_response( yptr );
 				}
 			}
 		}
@@ -2935,7 +3008,11 @@ private	int 	ll_cords_parse_element(
 				if (!( zptr = cords_create_category( document, agent,tls )))
 					return(cords_append_error(document,706,"creating category"));
 				else if ((status = cords_resolve_location( zptr, document )) != 0)
+				{
+					zptr = occi_remove_response( zptr );
 					return(cords_append_error(document,status,"resolving location"));
+				}
+				else	zptr = occi_remove_response( zptr );
 			}
 		}
 	}

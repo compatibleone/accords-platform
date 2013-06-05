@@ -682,7 +682,10 @@ public	int	create_easiclouds_contract(
 		if (!( yptr = cords_retrieve_named_instance_list( "easiclouds_application", "occi.easiclouds_application.name", contract.manifest.id, _CORDS_CONTRACT_AGENT,default_tls() ) ))
 			return( terminate_ezi_contract( 1404, &contract ) );
 		else if (!( contract.manifest.message = cords_retrieve_named_instance( yptr, _CORDS_CONTRACT_AGENT, default_tls() )))
+		{
+			yptr = occi_remove_response( yptr );
 			return( terminate_ezi_contract( 1405, &contract ) );
+		}
 		else	yptr = occi_remove_response( yptr );
 	}
 	/* ------------------------------------------------------------------------------ */

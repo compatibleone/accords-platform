@@ -22,7 +22,10 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 	if (!( yptr = cords_retrieve_named_instance_list( _CORDS_USER, "occi.user.name", user, agent,tls ) ))
 		return( (char *) 0 );
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent,tls )))
+	{
+		yptr = occi_remove_response( yptr );
 		return( (char *) 0 );
+	}
 	else
 	{
 		/* ------------------------------------------------- */

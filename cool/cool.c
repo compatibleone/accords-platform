@@ -2266,7 +2266,7 @@ private	int	cool_test_occi( char * url )
 	else	
 	{
 		cool_log_message("cool occi server ok",0);
-		rptr = liberate_rest_response( rptr );
+		rptr = liberate_rest_response_body( rptr );
 		return(1);
 	}
 }

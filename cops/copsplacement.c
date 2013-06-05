@@ -233,7 +233,10 @@ private	int	algorithm_based_placement(
 	if (!( yptr = cords_retrieve_named_instance_list( _CORDS_ALGORITHM, "occi.algorithm.name", pptr->algorithm, agent,tls ) ))
 		return( 404 );
 	else if (!( uptr = cords_retrieve_named_instance( yptr, agent, tls )))
+	{
+		yptr = occi_remove_response( yptr );
 		return( 404 );
+	}
 	else
 	{
 		for (	eptr = uptr->first;

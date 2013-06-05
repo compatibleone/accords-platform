@@ -248,7 +248,12 @@ public	struct xml_element * document_parse_url( char * url )
 		return( document );
 	else if (!( rptr->body ))
 		return( document );
-	else	return((document = document_parse_file( rptr->body )));
+	else	
+	{
+		document = document_parse_file( rptr->body );
+		liberate_rest_response_body( rptr );
+		return( document );
+	}
 }
 
 /*	---------------------------------------------------	*/

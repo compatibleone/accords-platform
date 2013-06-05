@@ -561,6 +561,28 @@ private	struct rest_response * rest_transmit_response(
 	return( aptr );
 }
 
+/*	-----------------------------------------------------	*/
+/*	l i b e r a t e _ r e s t _ r e s p o n s e _ b o d y	*/
+/*	-----------------------------------------------------	*/
+public	struct	rest_response * liberate_rest_response_body( struct rest_response * rptr )
+{
+	char *	filename;
+	if (rptr->type == _FILE_BODY)
+		filename = allocate_string(rptr->body);
+	else	filename = (char *) 0;
+	liberate_rest_response( rptr );
+	if (!( check_debug() ))
+	{
+		if ( filename )
+		{
+			printf("restserver: delete temporary(%s)\n",filename);
+			unlink( filename );
+			liberate( filename );
+		}
+	}
+	return((struct rest_response *) 0);	
+}
+
 /*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ s t a t u s 		*/
 /*	------------------------------------------------	*/
@@ -753,7 +775,7 @@ public	struct	rest_response *	rest_liberate_response( struct rest_response * apt
 {
 	if ( aptr )
 	{
-		liberate_rest_response( aptr );
+		liberate_rest_response_body( aptr );
 	}
 	return((struct rest_response *) 0);
 }		
@@ -1470,6 +1492,7 @@ public	char *	rest_temporary_filename(char * extension)
 		if (!( tptr = allocate_string( tempfilestub ) ))
 			return( tptr );
 	sprintf(namebuffer,"%s%s.%s",tempfilepath,tptr,( extension ? extension : "tmp" ));
+	printf("restserver: temporary filename(%s)\n",namebuffer);
 	return( allocate_string( namebuffer ) );
 }
 

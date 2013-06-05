@@ -121,6 +121,7 @@ public	void
 	rest_add_http_prefix(char * buffer, int buflen, char * host );
 
 public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
+public	struct	rest_response * liberate_rest_response_body( struct rest_response * rptr );
 
 public	int	rest_valid_string( char * vptr );
 public	int	rest_valid_string_value( char * sptr, char * vptr );

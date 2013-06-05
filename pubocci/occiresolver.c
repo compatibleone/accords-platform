@@ -689,9 +689,15 @@ public	char *	occi_resolve_category_price( char * category, char * operator, cha
 		/* a null or wild operator selects this  */
 		/* ------------------------------------- */
 		else if (!( operator ))
+		{
+			aptr = occi_remove_response( aptr );
 			return( host );
+		}
 		else if ( *operator == '*' )
+		{
+			aptr = occi_remove_response( aptr );
 			return( host );
+		}
 
 		/* ------------------------------------- */
 		/* attempt to locate the category price  */

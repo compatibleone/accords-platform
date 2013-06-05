@@ -736,26 +736,14 @@ public	struct	occi_response *	occi_remove_response( struct occi_response * aptr 
 	char *	filename;
 	if ( aptr )
 	{
+		printf("occiclient: remove response\n");
 		while ((eptr = aptr->first) != (struct occi_element *) 0)
 		{
 			aptr->first = eptr->next;
 			occi_remove_element( eptr );
 		}
 		if ( aptr->response )
-		{
-			if (aptr->response->type == _FILE_BODY)
-				filename = allocate_string(aptr->response->body);
-			else	filename = (char *) 0;
-			liberate_rest_response( aptr->response );
-			if (!( check_debug() ))
-			{
-				if ( filename )
-				{
-					unlink( filename );
-					liberate( filename );
-				}
-			}
-		}
+			aptr->response = liberate_rest_response_body( aptr->response );
 		if ( aptr->name )
 			aptr->name = liberate( aptr->name );
 		if ( aptr->host )
@@ -1135,7 +1123,7 @@ public	struct	occi_response *	occi_create_old_json_response(
 /*	------------------------------------------------------------	*/
 public	struct	occi_response *	occi_create_response( 
 	struct occi_request * rptr, 
-	struct rest_response * zptr )
+	struct rest_response * zptr, char * from )
 {
 	struct	rest_header * hptr;
 	struct	occi_response * aptr;
@@ -1152,6 +1140,7 @@ public	struct	occi_response *	occi_create_response(
 		return( occi_remove_response( aptr ) );
 	else
 	{
+		printf("occiclient: occi_create_response(%s)\n",from);
 		aptr->type = rptr->type;
 		aptr->response = zptr;
 		aptr->category = rptr->category;
@@ -1591,7 +1580,7 @@ public	struct	occi_client *	occi_load_categories( struct occi_client * cptr )
 
 	cptr = occi_analyse_categories( cptr, rptr );
 
-	rptr = liberate_rest_response( rptr );
+	rptr = liberate_rest_response_body( rptr );
 	return( cptr );
 }
 
@@ -1874,7 +1863,7 @@ public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_get_request(uri,cptr->tls,cptr->agent, hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr, "GET" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );
@@ -2033,7 +2022,7 @@ public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_put_request(uri,cptr->tls,cptr->agent,body,hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr, "PUT" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );
@@ -2062,7 +2051,7 @@ public	struct	occi_response *	occi_client_delete( struct occi_client * cptr, str
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_delete_request(uri,cptr->tls,cptr->agent,hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr, "DELETE" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );
@@ -2119,7 +2108,7 @@ public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_post_request(uri,cptr->tls,cptr->agent,body,hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr, "POST" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );
@@ -2169,7 +2158,7 @@ public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_post_request(uri,cptr->tls,cptr->agent,body,hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr,"ACTION" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );
@@ -2198,7 +2187,7 @@ public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if (!( zptr = rest_client_head_request(uri,cptr->tls,cptr->agent,hptr) ))
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr ) ))
+	else if (!( aptr = occi_create_response( rptr, zptr, "HEAD" ) ))
 		return( aptr );
 	else if (!( aptr->host = serialise_url_host( cptr->target )))
 		return( aptr );

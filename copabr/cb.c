@@ -1427,7 +1427,10 @@ private	char * 	cords_create_provider( struct xml_element * dptr , char * agent,
 	/* get the first of the matching set */
 	/* --------------------------------- */
 	else if (!( zptr = cords_retrieve_named_instance( yptr, agent, tls )))
+	{
+		yptr = occi_remove_response( yptr );
 		return((char *) 0);
+	}
 	else	yptr = occi_remove_response( yptr );
 
 	/* ---------------------------------- */
