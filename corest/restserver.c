@@ -575,7 +575,8 @@ public	struct	rest_response * liberate_rest_response_body( struct rest_response 
 	{
 		if ( filename )
 		{
-			printf("restserver: delete temporary(%s)\n",filename);
+			if ( check_verbose() )
+				printf("restserver: delete temporary(%s)\n",filename);
 			unlink( filename );
 			liberate( filename );
 		}
@@ -1492,7 +1493,8 @@ public	char *	rest_temporary_filename(char * extension)
 		if (!( tptr = allocate_string( tempfilestub ) ))
 			return( tptr );
 	sprintf(namebuffer,"%s%s.%s",tempfilepath,tptr,( extension ? extension : "tmp" ));
-	printf("restserver: temporary filename(%s)\n",namebuffer);
+	if ( check_verbose() )
+		printf("restserver: temporary filename(%s)\n",namebuffer);
 	return( allocate_string( namebuffer ) );
 }
 

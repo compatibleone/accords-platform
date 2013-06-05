@@ -736,7 +736,6 @@ public	struct	occi_response *	occi_remove_response( struct occi_response * aptr 
 	char *	filename;
 	if ( aptr )
 	{
-		printf("occiclient: remove response\n");
 		while ((eptr = aptr->first) != (struct occi_element *) 0)
 		{
 			aptr->first = eptr->next;
@@ -1140,7 +1139,6 @@ public	struct	occi_response *	occi_create_response(
 		return( occi_remove_response( aptr ) );
 	else
 	{
-		printf("occiclient: occi_create_response(%s)\n",from);
 		aptr->type = rptr->type;
 		aptr->response = zptr;
 		aptr->category = rptr->category;
