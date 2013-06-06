@@ -76,15 +76,16 @@ install: build
 	cp Certificates.crt `pwd`/debian/tmp/etc/cosacs/
 	cp `pwd`/debian/tmp/usr/bin/cosacs `pwd`/debian/tmp/usr/bin/cosacs-client
 	cp accounts.xml coips.xml metrics.xml slamtest.xml `pwd`/debian/tmp/etc/accords
-	cp scripts/amazon_manifest.xml manifests/ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords 
+	cp scripts/amazon_manifest.xml manifests/ec2config.xml  scripts/cords_user.xml  scripts/publication.xml `pwd`/debian/tmp/etc/accords
 	cp manifests/style.css `pwd`/debian/tmp/etc/accords
 	cp manifests/style.css `pwd`/debian/tmp/etc/cosacs
 	cp debian/cosacs.default `pwd`/debian/tmp/etc/default/cosacs
 	cd debian/tmp/etc/accords && chmod 600 Certificates.crt coips.xml cords_user.xml openssl.cnf *_config.xml
 	sed -i  -e 's/\(jamie\|fabio\|admin\)@compatibleone.fr/REPLACE.BY.YOUR@EMAIL.COM/g' \
 		debian/tmp/etc/accords/cords_user.xml
+	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pygen
 	mkdir -p debian/tmp/usr/lib/python2.7/pyaccords/pysrc #debian/tmp/usr/lib/python2.7/cocarrier
-	cp pyaccords/*.py debian/tmp/usr/lib/python2.7/pyaccords/
+	cp pyaccords/pygen/*.py debian/tmp/usr/lib/python2.7/pyaccords/
 	cp pyaccords/pysrc/*.py debian/tmp/usr/lib/python2.7/pyaccords/pysrc/
 	#cp cocarrier/src/*.py debian/tmp/usr/lib/python2.7/cocarrier/
 	rm -f `find debian/tmp/ -name \*.pyc`
