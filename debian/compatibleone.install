@@ -7,5 +7,7 @@ usr/bin/accords-config
 usr/bin/testcp
 usr/bin/testresolver
 usr/bin/command
+usr/bin/comodel
+usr/bin/strukt
 usr/share/doc/compatibleone-accords/CompatibleOne-Howto.txt
 usr/share/doc/compatibleone-accords/*.csp

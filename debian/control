@@ -393,13 +393,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version}
 Description: CompatibleOne Accords Platform - EasyClouds subsystem
  CompatibleOne Accords Platform - EasyClouds subsystem package
 
-Package: compatibleone-comodel
-Section: net
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, compatibleone (>= ${binary:Version})
-Description: CompatibleOne Accords Platform - Model Generator
- CompatibleOne Accords Platform - comodel subsystem package
-
 Package: compatibleone-paasprocci
 Section: net
 Architecture: any
