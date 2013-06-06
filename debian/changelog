@@ -1,3 +1,10 @@
+compatibleone-accords (1.0-10) unstable; urgency=low
+
+  * Add compatibleone-oaprocci package.
+  * fix to build from the new github repository.
+
+ -- Vincent Renardias <vincent@renardias.com>  Thu, 06 Jun 2013 10:42:12 +0200
+
 compatibleone-accords (1.0-9) unstable; urgency=low
 
   * Upstream code update (new codegen code).
