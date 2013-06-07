@@ -24,6 +24,44 @@
 	        <attribute name='zone' type='string' required='false' immutable='false'/>
 	        <attribute name='price' type='string' required='false' immutable='false'/>
 	        <attribute name='location' type='string' required='false' immutable='false'/>
+		<!-- OnappMarket::OnApp:VM attributes
+		    :cpu_shares                             - New attribute
+		    :disk_type_of_format                    - New attribute
+		    :template_id                            - image
+		    :initial_root_password                  - New attribute
+		    :initial_root_password_encryption_key   - New attribute
+		    :memory                                 - New attribute
+		    :cpus                                   - New attribute
+		    :host_name                              - New attribute
+		    :disk_size                              - New attribute
+		    :swap_size                              - New attribute
+		    :required_automatic_backup              - New attribute
+		    :required_virtual_machine_build         - New attribute
+		    :required_virtual_machine_startup       - New attribute
+		    :required_ip_address_assignment         - New attribute
+		    :label                                  - New attribute
+		    :description                            - description
+		    :instance_id                            - id
+		    :resource_id                            - provider (ideally as RAW id not as URL)
+		    :local_id                               - New attribute
+		    :type                                   - Ignore
+		    :api                                    - Ignore
+		-->
+		<attribute name='cpu_shares' type='string' required='false' immutable='false'/>
+		<attribute name='disk_type_of_format' type='string' required='false' immutable='false'/>
+		<attribute name='initial_root_password' type='string' required='false' immutable='false'/>
+		<attribute name='initial_root_password_encryption_key' type='string' required='false' immutable='false'/>
+		<attribute name='memory' type='string' required='false' immutable='false'/>
+		<attribute name='cpus' type='string' required='false' immutable='false'/>
+		<attribute name='host_name' type='string' required='false' immutable='false'/>
+		<attribute name='disk_size' type='string' required='false' immutable='false'/>
+		<attribute name='swap_size' type='string' required='false' immutable='false'/>
+		<attribute name='required_automatic_backup' type='string' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_build' type='string' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_startup' type='string' required='false' immutable='false'/>
+		<attribute name='required_ip_address_assignment' type='string' required='false' immutable='false'/>
+		<attribute name='label' type='string' required='false' immutable='false'/>
+		<attribute name='local_id' type='string' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	    </actions>
@@ -55,8 +93,8 @@
 				failover_disabled   - Failover Disabled (bool)
 				credentials         - JSON args
 				cpus                - int
-				total_memory        - int
-				store_size          - int
+				total_memory        - memory size e.g. 40G or 38646M or 0.64T
+				store_size          - storage size e.g. 20T
 				type                - Not relevant
 				user_id             - Creating (OnApp Market) user id
 				resource_id         - Same as id of OCCI category
@@ -81,8 +119,8 @@
 	        <attribute name='failover_disabled' type='int' required='false' immutable='false'/>
 	        <attribute name='credentials' type='string' required='false' immutable='false'/>
 	        <attribute name='cpus' type='int' required='false' immutable='false'/>
-	        <attribute name='total_memory' type='int' required='false' immutable='false'/>
-	        <attribute name='store_size' type='int' required='false' immutable='false'/>
+	        <attribute name='total_memory' type='string' required='false' immutable='false'/>
+	        <attribute name='store_size' type='string' required='false' immutable='false'/>
 	        <attribute name='user_id' type='string' required='false' immutable='false'/>
 	        <attribute name='local_id' type='string' required='false' immutable='false'/>
 	        <attribute name='label' type='string' required='false' immutable='false'/>
