@@ -12,6 +12,8 @@
 public	char * login_occi_user( char * user,	char * password, char * agent, char * tls )
 {
 	char	buffer[4096];
+	char	when[64];
+	char	ttl[64];
 	struct	occi_element  * header;
 	struct	occi_element  * eptr;
 	struct	occi_response * yptr;
@@ -50,7 +52,19 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 		/* create authorization for the authenticated user */
 		/* ----------------------------------------------- */
 		sprintf(buffer,"%s%s",uptr->host,uptr->name);
+		sprintf(when,"%u",time((long *) 0));
+		sprintf(ttl,"%u",3600);
 		if (!( header = occi_create_element( "occi.authorization.user", buffer ) ))
+		{
+			uptr = occi_remove_response( uptr );
+			return((char *) 0);
+		}
+		else if (!( header = occi_append_element( header, "occi.authorization.from", when ) ))
+		{
+			uptr = occi_remove_response( uptr );
+			return((char *) 0);
+		}
+		else if (!( header = occi_append_element( header, "occi.authorization.ttl", ttl ) ))
 		{
 			uptr = occi_remove_response( uptr );
 			return((char *) 0);
