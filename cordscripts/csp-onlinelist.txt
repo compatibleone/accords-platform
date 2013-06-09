@@ -1,0 +1,29 @@
+function OnlineList( $selector )
+{
+	$baseurl   = "dashboard.php";
+
+	$users = authorization.list( $selector );
+
+	"<table width='100%'><tr><td class=section colspan=3><b>authorized users</b></td></tr>".display();
+	"<tr><td class=title>Date<td class=title>Authorization<td class=title>Name</tr>".display();
+
+	foreach ( $users as $aid )
+	{
+		$arecord = $aid.get();
+		$id      = $arecord["occi.core.id"];
+		$who     = $arecord["occi.authorization.user"];
+		$when    = $arecord["occi.authorization.from"];
+		$when = $when.date();
+		$urec = $who.get();
+		$name = $urec["occi.user.name"];
+		$role = $urec["occi.user.role"];
+
+		$m = "<tr><td>"#$when#"<td><a href='"#$baseurl#"?action=compile&script=csp-user.txt&output=HTML&option="#$aid#"'>"#$name#"</a><td>"#$role#"</tr>";
+		$m.display();
+	}
+
+	"</table>".display();
+	return;
+
+}
+

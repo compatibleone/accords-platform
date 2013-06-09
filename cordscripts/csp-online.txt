@@ -1,0 +1,21 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-online.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the list of manifests parsed into the system allowing access for inspection of each      */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-onlinelist.txt";
+
+	HtmlHeader("Accords Platform Online Users",$1);
+
+	"<tr><td colspan=6>".display();
+	OnlineList( " " );
+	"</td></tr>".display();
+
+	HtmlFooter();
+
+
+
+
+

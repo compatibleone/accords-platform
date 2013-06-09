@@ -1680,7 +1680,7 @@ private	void	member_operation( struct cordscript_instruction * iptr, struct cord
 }
 
 /*	------------------------------------------------------------------	*/
-/*		t r a n s a c t i o n _ d a t e _ a n d _ t i m e 		*/
+/*		d a t e _ o p e r a t i o n					*/
 /*	------------------------------------------------------------------	*/
 private	void	date_operation( struct cordscript_instruction * iptr, struct cordscript_value * vptr )
 {
@@ -1711,6 +1711,28 @@ private	void	date_operation( struct cordscript_instruction * iptr, struct cordsc
 	push_value( iptr->context, string_value( buffer ) );
 	return;
 }
+
+/*	------------------------------------------------------------------	*/
+/*		t i m e _ o p e r a t i o n					*/
+/*	------------------------------------------------------------------	*/
+private	void	time_operation( struct cordscript_instruction * iptr, struct cordscript_value * vptr )
+{
+	int 	tt;
+	char 	buffer[256];
+	struct	tm * tptr;
+	time_t t;
+	if ((!( vptr )) ||  ( check_value_type( vptr->value ) != _INTEGER_VALUE ))
+	{
+		if (!( strcmp( vptr->value, "now" ) ))
+			t = (time_t) time((long *) 0);
+		else	t = 0;
+	}
+	else	t = 0;
+	sprintf(buffer,"%u",t);
+	push_value( iptr->context, string_value( buffer ) );
+	return;
+}
+
 
 /*	----------------	*/
 /*	round_operation		*/
@@ -1822,7 +1844,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"debug",	_DEBUG_FUNCTION,	-1 },
 	{	"new",		_NEW_FUNCTION,		-1 },
 	{	"open",		_OPEN_FUNCTION,		-1 },
-	{	"eval",		_EVAL_FUNCTION,		-1 }
+	{	"eval",		_EVAL_FUNCTION,		-1 },
+	{	"time",		_TIME_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2127,6 +2150,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			return( eval_next( iptr, argv ) );
 		case	_DATE_FUNCTION		:
 			date_operation( iptr, vptr );
+			return( eval_next( iptr, argv ) );
+		case	_TIME_FUNCTION		:
+			time_operation( iptr, vptr );
 			return( eval_next( iptr, argv ) );
 		case	_CUT_FUNCTION		:
 			cut_operation( iptr, vptr->value, argv[0] );

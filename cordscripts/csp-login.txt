@@ -1,0 +1,45 @@
+/* ----------------------------------------------------	*/
+/* csp-login.txt 					*/
+/* ----------------------------------------------------	*/
+/* this script performs a standard login operation for 	*/
+/* the user identified by the command line parameters  	*/
+/* ----------------------------------------------------	*/
+
+$un = $1;
+if ( $un.length() > 0 )
+{
+	$up = $2;
+	if ($up.length() > 0)
+	{
+		$ul = user.list('occi.user.name="'#$un#'"');
+		foreach ( $ul as $uid )
+		{
+			$ur = $uid.get();
+			$pw = $ur["occi.user.password"];
+			if ( $pw == $up )
+			{
+				$s = {};
+				$r = '"occi.authorization.user":"'#$uid#'"';
+				$s = $s + $r;
+				$secs = "now".time();
+				$r = '"occi.authorization.from":"'#$secs#'"';
+				$s = $s + $r;
+				$r = '"occi.authorization.ttl":"300"';
+				$s = $s + $r;
+				$aid = authorization.post( $s );
+				$aid.display();
+				return;
+			}
+		}
+		"error: incorrect password or user name".display();
+	}
+	else
+	{
+		"error: you must specify the user password".display();
+	}
+}
+else
+{
+	"error: you must specify the user log name".display();
+}
+

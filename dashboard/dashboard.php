@@ -8,7 +8,6 @@ require_once( "services.php"    );
 require_once( "pagemanager.php" );
 require_once( "stdform.php"  	);
 require_once( "roles.php"    	);
-global $configdir;
 
 $pageman = new page_manager;
 
@@ -266,8 +265,7 @@ function user_login( $n, $p )
 	$qn = "\"".$n."\"";
 	$qp = "\"".$p."\"";
 	$a = array();
-	global $configdir;
-	exec("grep name $configdir/cords_user.xml",&$a);
+	exec("grep name cords_user.xml",&$a);
 	foreach ($a as $l )
 	{
 		$un = "";
@@ -287,6 +285,8 @@ function user_login( $n, $p )
 		if (( $un == $qn ) && ( $up == $qp ))
 		{
 			$r = explode("\"",$ur);
+			$a = array();
+			$result = exec("bash ./dashboard-command run csp-login.txt ".$un." ".$up,&$a);
 			return( $r[1] );
 		}
 	}
