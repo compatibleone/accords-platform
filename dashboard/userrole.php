@@ -21,28 +21,28 @@ class user_role extends role
 	{
 		$this->page->tabpage = $t;
 
-		$tabimage1 = "tabsla.png";
-		$tabimage2 = "tabprovisioning.png";
-		$tabimage3 = "tabfinancial.png";
-		$tabimage4 = "tabscript.png";
-		$tabimage5 = "tabmenu.png";
+		$tabimage1 = "images/tabsla.png";
+		$tabimage2 = "images/tabprovisioning.png";
+		$tabimage3 = "images/tabfinancial.png";
+		$tabimage4 = "images/tabscript.png";
+		$tabimage5 = "images/tabmenu.png";
 
 		switch ( $this->page->tabpage )
 		{
 		case	5 :
-			$tabimage5 = "actmenu.png";
+			$tabimage5 = "images/actmenu.png";
 			break;
 		case	4 :
-			$tabimage4 = "actscript.png";
+			$tabimage4 = "images/actscript.png";
 			break;
 		case	3 :
-			$tabimage3 = "actfinancial.png";
+			$tabimage3 = "images/actfinancial.png";
 			break;
 		case	2 :
-			$tabimage2 = "actprovisioning.png";
+			$tabimage2 = "images/actprovisioning.png";
 			break;
 		case	1 :
-			$tabimage1 = "actsla.png";
+			$tabimage1 = "images/actsla.png";
 			break;
 		}
 
@@ -429,7 +429,7 @@ class user_role extends role
 		{
 		case	"4"	:
 			$this->page->comment("This page gives access to the Accords Platform Script Upload and Execution Operations");
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local cordscript document for upload, compile and execution";
 			print "<th colspan=4>\n";
 			require "compile.php";
@@ -438,11 +438,11 @@ class user_role extends role
 		case	"1"	:
 			$this->page->comment("This page gives access to the Accords Platform Manifest and Service Level Agreement Parsing Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='parser.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=parser\"><img width='128' height='158' src='images/parser.png'></a></th>\n";
 			print "<th class=description>Use this option to select a local manifest document for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "upload.php";
-			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='agreement.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=manifest\"><img width='128' height='158' src='images/agreement.png'></a></th>\n";
 			print "<th class=description>Use this option to create a service level agreement for upload and parsing into the Accords Platform OCCI database";
 			print "<th colspan=4>\n";
 			require "sla.php";
@@ -451,7 +451,7 @@ class user_role extends role
 		case	"2"	:
 			$this->page->comment("This page gives access to Accords Platform Service Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='broker.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/broker.png'></a></th>\n";
 			print "<th class=description>Use this option to broker and launch a service instance from a selected provisioning plan.";
 			print "<th colspan=4>";
 			print "<form action='dashboard.php' method='POST'>\n";
@@ -470,7 +470,7 @@ class user_role extends role
 			print "</tr>\n";
 
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='stop.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=stop\"><img width='128' height='158' src='images/stop.png'></a></th>\n";
 	print "<th class=description>Use this option to terminate an active service instance and release all deployed resources. The service may be restarted using the appropriate service maintenance operation.";
 	print "<th colspan=4>";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -490,7 +490,7 @@ class user_role extends role
 	print "</table></div>\n";
 	print "</form></tr>";
 			$this->page->separator();
-	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='start.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=start\"><img width='128' height='158' src='images/start.png'></a></th>\n";
 	print "<th class=description>Use this option to restart a terminated service instance and deploy all provisioned resources.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -510,7 +510,7 @@ class user_role extends role
 	print "</form><p>\n";
 			$this->page->separator();
 
-	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='check2.png'></a></th>\n";
+	print "<tr><th class=category><a href=\"dashboard.php?action=save\"><img width='128' height='158' src='images/check2.png'></a></th>\n";
 	print "<th class=description>Use this option to snapshot or save the state of the machine images of the contracts of a service.";
 	print "<th colspan=4>\n";
 	print "<form action='dashboard.php' method='POST'>\n";
@@ -533,7 +533,7 @@ class user_role extends role
 		case	"3"	:
 			$this->page->comment("This page gives access to the Accords Platform Account Management Operations");
 			$this->page->separator();
-			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='invoice.png'></a></th>\n";
+			print "<tr><th class=category><a href=\"dashboard.php?action=broker\"><img width='128' height='158' src='images/invoice.png'></a></th>\n";
 			print "<th class=description>Use this option to collect the transactions for a specifed account and generate the invoice.";
 			print "<p>This option also permits the selection of a particular invoice for consultation, update processing or closure.";
 			print "<th colspan=4>\n";
