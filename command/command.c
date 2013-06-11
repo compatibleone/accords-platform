@@ -1229,6 +1229,39 @@ private	char *	detect_command_file( char * stub, char * ext )
 /*	--------------------------------------------------------	*/
 /*		c o m m a n d _ g e t _ f i l e n a m e 		*/
 /*	--------------------------------------------------------	*/
+private	char *	default_get_filename( char * command )
+{
+	FILE *	h;
+	char	buffer[1024];
+	char *	filename;
+	if ((!( strcasecmp( command, "parser" 	) ))
+	||  (!( strcasecmp( command, "broker" 	) ))
+	||  (!( strcasecmp( command, "start" 	) ))
+	||  (!( strcasecmp( command, "stop" 	) ))
+	||  (!( strcasecmp( command, "save" 	) ))
+	||  (!( strcasecmp( command, "snapshot" ) ))
+	||  (!( strcasecmp( command, "delete" 	) ))
+	||  (!( strcasecmp( command, "invoke" 	) ))
+	||  (!( strcasecmp( command, "run" 	) )))
+	{
+		sprintf(buffer,"%s.html",command);
+		if (!( h = fopen( buffer, "w") ))
+			return( (char *) 0 );
+		else
+		{
+			fprintf(h,"<html><head><title>%s:%s</title></head>\n",command,buffer);
+			fprintf(h,"<body><div align=center><h1>%s:%s</h1>\n",command,buffer);
+			fprintf(h,"</div></body></html>\n");
+			fclose( h );
+			return( allocate_string( buffer ) );
+		}
+	}
+	else	return((char *) 0);
+}
+
+/*	--------------------------------------------------------	*/
+/*		c o m m a n d _ g e t _ f i l e n a m e 		*/
+/*	--------------------------------------------------------	*/
 private	char *	command_get_filename( char * command )
 {
 	char *	filename;
@@ -1248,6 +1281,38 @@ private	char *	command_get_filename( char * command )
 			return( filename );
 	}
 	else	return((char *) 0);
+}
+
+
+/*	------------------------------------------------------------------	*/
+/*			c o m m a n d s e r v e r _ g e t _ f i l e 		*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * commandserver_get_file( 
+		struct rest_client * cptr, 
+		char *filename,
+		struct rest_response * aptr )
+{
+	struct	stat info;
+	char	length[64];
+	char	buffer[1024];
+	char *	nptr;
+	if ( stat( filename,&info ) < 0 )
+		return( rest_html_response( aptr, 404, "File Not Found" ) );
+	else
+	{
+		sprintf(length,"%u",info.st_size);
+		if (!( rest_response_header(aptr,"Content-Length",length) ))
+			return( rest_html_response( aptr, 500, "Server Failure" ) );
+		else if (!( rest_response_header(aptr,"Content-Type","text/html") ))
+			return( rest_html_response( aptr, 500, "Server Failure" ) );
+		else if (!( nptr = allocate_string( filename ) ))
+			return( rest_html_response( aptr, 500, "Server Failure" ) );
+		else
+		{
+			rest_response_body(aptr,nptr,0 );
+			return( rest_response_status( aptr, 200, "OK" ) );
+		}
+	}
 }
 
 
@@ -1273,9 +1338,12 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 			command++;
 		for ( 	sptr = command; *sptr != '/'; sptr++);
 		*(sptr++) = 0;
-		if (!( filename = command_get_filename( command )))
+		if (( filename = command_get_filename( command )) != (char *) 0)
+			return( commandserver_get_file( cptr, filename, aptr ) );
 			return( rest_html_response( aptr, 400, "Incorrect Request" ) );
-		else	return( rest_html_response( aptr, 200, "OK" ) );
+		if (!( filename = default_get_filename( command )))
+			return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+		else	return( commandserver_get_file( cptr, filename, aptr ) );
 	}
 }
 
