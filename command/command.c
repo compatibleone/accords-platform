@@ -39,6 +39,7 @@ private	int	threads=1;
 private	int	authorise=0;
 private	char *	user=(char *) 0;
 private	char *	password=(char *) 0;
+private	int	echo=0;
 
 public	char *	default_operator()	{	return( operator );	}
 public	char *	default_zone()		{	return( zone );		}
@@ -748,12 +749,98 @@ private	int	run_json_verification( char * filename )
 	}
 }
 
+struct	cords_parser_config
+{
+	char *	accept;
+	char *	publisher;
+	char *	host;
+	char *	agent;
+	char *	result;
+	char *	tls;
+	char *	zone;
+	char *	operator;
+	int	xsd;
+} Cp = 	{
+	(char *) 0,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_PARSER_AGENT,
+	(char *) 0,
+	(char *) 0,
+	"europe",
+	"accords",
+	1
+	};
+
+/*	-----------------------------------------------------	*/
+/*	t e s t _ c o r d s _ p a r s e r _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+private	int	ll_cords_parser_operation( char * filename )
+{
+	char *dirc, *basec, *bname, *dname;
+	struct	xml_element * dptr;
+	char	nameplan[512];
+	if (!( Cp.host ))
+		return( failure(1,"requires","publication host"));
+	else if (!( Cp.agent ))
+		return( failure(2,"requires","parser agent name"));
+	else if (!( filename ))
+		return( failure(3,"requires","cords filename"));
+	else if (!( dptr = cords_document_parser( Cp.host, filename, Cp.agent, Cp.tls, Cp.xsd ) ))
+		return( failure(4,"parse error",filename));
+	else if (!( Cp.result ))
+	{
+		if (!( dirc = allocate_string( filename ) ))
+			return( failure(5,"allocation",filename));
+		else if (!( basec = allocate_string( filename ) ))
+			return( failure(6,"allocation",filename));
+
+		dname = dirname(dirc);
+		bname = basename(basec);
+		sprintf(nameplan,"%s/plan_%s",dname, bname);
+		dirc = liberate( dirc );
+		basec = liberate( basec );
+		if (!( Cp.result = allocate_string( nameplan ) ))
+			return( failure(4,"allocation","result filename"));
+	}
+	dptr = cords_serialise_document( dptr, Cp.result );
+	return( cords_check_parser_errors( Cp.result ) );
+}
+
+/*	-----------------------------------------------------	*/
+/*	t e s t _ c o r d s _ p a r s e r _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+private	int	cords_parser_operation( char * filename )
+{
+	int	status;
+	char *	auth;
+
+	if ( Cp.accept )
+	{
+		occi_client_accept( Cp.accept );
+	}
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	set_xml_echo(echo);
+
+	if (!( auth = login_occi_user( "test-parser","co-system",Cp.agent, Cp.tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	status = ll_cords_parser_operation( filename );
+
+	(void) logout_occi_user( "test-parser","co-system",Cp.agent, auth, Cp.tls );	
+
+	return( status );
+}
+
 /*	-----------------------------------	*/
 /*	   c o m m a n d _ p a r s e  r		*/
 /*	-----------------------------------	*/
-private	int	command_parser( char * action, char * instance )
+private	int	command_parser( char * filename, char * instance )
 {
-	return(0);
+	return( cords_parser_operation( filename ) );
 }
 
 struct	cords_broker_config
@@ -1031,6 +1118,18 @@ private	int	ll_sla_broker_operation( char * filename )
 }
 
 /*	-------------------------------------------	*/
+/*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
+/*	-------------------------------------------	*/
+private	int	cords_script_interpreter( char * filename )
+{
+	char *	argv[10];
+	int	argc=0;
+	argv[0] = (char *) 0;
+	run_cordscript_interpreter( filename, argc, argv );
+	return( 200 );
+}
+
+/*	-------------------------------------------	*/
 /*	c o r d s _ b r o k e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
 private	int	cords_broker_operation( char * filename )
@@ -1038,7 +1137,6 @@ private	int	cords_broker_operation( char * filename )
 	int	status;
 	char *	auth;
 
-	if ( Cb.accept )
 	{
 		occi_client_accept( Cb.accept );
 	}
@@ -1125,11 +1223,26 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
 }
 
+
+/*	------------------------------------------------------------------	*/
+/*			i s _ v a l i d _ b o d y				*/
+/*	------------------------------------------------------------------	*/
+private	char * 	is_valid_body( struct rest_request * rptr )
+{
+	if (!( rptr ))
+		return((char *) 0);
+	else if ( rptr->type != _FILE_BODY )
+		return((char *) 0);
+	else	return( rptr->body );
+}
+
 /*	------------------------------------------------------------------	*/
 /*		c o m m a n d s e r v e r_ p o s t 				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * invoke_rest_command(struct rest_response * aptr, struct rest_client * cptr, struct rest_request * rptr )
 {
+	int	status;
+	char *	filename;
 	char *	command;
 	char *	sptr;
 	if (!( command = allocate_string( rptr->object ) ))
@@ -1140,9 +1253,21 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	*(sptr++) = 0;
 
 	if (!( strcasecmp( command, "parser" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
+	{
+		if (!( filename = is_valid_body( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_parser_operation( filename )) != 200)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	else if (!( strcasecmp( command, "broker" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
+	{
+		if (!( filename = is_valid_body( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_broker_operation( filename )) != 200)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	else if (!( strcasecmp( command, "start" ) ))
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( strcasecmp( command, "stop" ) ))
@@ -1156,7 +1281,13 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	else if (!( strcasecmp( command, "invoke" ) ))
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!( strcasecmp( command, "run" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
+	{
+		if (!( filename = is_valid_body( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		if ((status = cords_script_interpreter( filename )) != 200)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
 
 }

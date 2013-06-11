@@ -25,6 +25,7 @@
 #include "restclient.h"
 #include "json.h"
 #include "document.h"
+#include <libgen.h>
 
 #endif	/* _command_h */
 	/* ---------- */
