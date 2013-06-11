@@ -1209,18 +1209,74 @@ struct rest_extension * xptr)
 }
 
 
+/*	---------------------------------------------------------	*/
+/*		d e t e c t _ c o m m a n d _ f i l e 			*/
+/*	---------------------------------------------------------	*/
+private	char *	detect_command_file( char * stub, char * ext )
+{
+	char	buffer[1024];
+	FILE *	h;
+	sprintf(buffer,"%s.%s",stub,ext);
+	if (!( h = fopen( buffer,"r" )))
+		return((char *) 0);
+	else
+	{
+		fclose(h);
+		return( allocate_string( buffer ) );
+	}
+}	
+
+/*	--------------------------------------------------------	*/
+/*		c o m m a n d _ g e t _ f i l e n a m e 		*/
+/*	--------------------------------------------------------	*/
+private	char *	command_get_filename( char * command )
+{
+	char *	filename;
+	if ((!( strcasecmp( command, "parser" 	) ))
+	||  (!( strcasecmp( command, "broker" 	) ))
+	||  (!( strcasecmp( command, "start" 	) ))
+	||  (!( strcasecmp( command, "stop" 	) ))
+	||  (!( strcasecmp( command, "save" 	) ))
+	||  (!( strcasecmp( command, "snapshot" ) ))
+	||  (!( strcasecmp( command, "delete" 	) ))
+	||  (!( strcasecmp( command, "invoke" 	) ))
+	||  (!( strcasecmp( command, "run" 	) )))
+	{
+		if ((filename = detect_command_file( command, "html" ) ))
+			return( filename );
+		else if ((filename = detect_command_file( command, "htm" ) ))
+			return( filename );
+	}
+	else	return((char *) 0);
+}
+
+
 /*	------------------------------------------------------------------	*/
 /*		c o m m a n d s e r v e r_ g e t 				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * commandserver_get( void * v,struct rest_client * cptr, struct rest_request * rptr )
 {
+	char *	filename;
+	char *	command;
+	char *	sptr;
 	struct	rest_response * aptr;
-	printf("   Fs GET Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	printf("   %s GET Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
 		return( rest_html_response( aptr, 400, "Unexpected Request Body" ) );
-	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+	else
+	{
+		if (!( command = allocate_string( rptr->object ) ))
+			return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
+		else if ( *command == '/' )
+			command++;
+		for ( 	sptr = command; *sptr != '/'; sptr++);
+		*(sptr++) = 0;
+		if (!( filename = command_get_filename( command )))
+			return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+		else	return( rest_html_response( aptr, 200, "OK" ) );
+	}
 }
 
 
@@ -1300,7 +1356,7 @@ private	struct rest_response * commandserver_post(  void * v,struct rest_client 
 	struct	xml_element   * document;
 	FILE 		      * target;
 	
-	printf("   Fs POST Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	printf("   %s POST Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if (!( rptr->body  ))
@@ -1315,7 +1371,7 @@ private	struct rest_response * commandserver_put(  void * v,struct rest_client *
 		struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   Fs PUT Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	printf("   %s PUT Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if (!( rptr->body ))
@@ -1330,7 +1386,7 @@ private	struct rest_response * commandserver_delete(  void * v,struct rest_clien
 		struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   Fs DELETE Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	printf("   %s DELETE Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
@@ -1344,7 +1400,7 @@ private	struct rest_response * commandserver_delete(  void * v,struct rest_clien
 private	struct rest_response * commandserver_head(  void * v,struct rest_client * cptr, struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   Fs HEAD Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	printf("   %s HEAD Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
@@ -1355,7 +1411,7 @@ private	struct rest_response * commandserver_head(  void * v,struct rest_client 
 /*	-----------------------------------	*/
 /*	   c o m m a n d _ o n l i n e 		*/
 /*	-----------------------------------	*/
-private	int	command_online( char * agent, char * other )
+private	int	command_online( char * aname, char * other )
 {
 	int	status=0;
 	struct	rest_interface  CsI = 
@@ -1379,7 +1435,7 @@ private	int	command_online( char * agent, char * other )
 	if (!( authorise ))
 		CsI.authorise = (void *) 0;
 
-	return( rest_server(  agent, port, tls, threads, & CsI ) );
+	return( rest_server(  (agent=aname), port, tls, threads, & CsI ) );
 }
 
 /*	-----------------------------------	*/
