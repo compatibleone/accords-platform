@@ -1,0 +1,42 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-resolver.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This script displays the list of manifests parsed into the system allowing access for inspection of each      */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+
+	HtmlHeader("Accords Platform Resolver : ",$2);
+
+	"<tr><td colspan=6>".display();
+
+	$list = publication.list('occi.publication.what="'.$2.'"');
+
+	"<table width='100%'><tr><td class=section><b>service endpoints</b></td></tr>".display();
+	"<tr><td class=title>Service</tr>".display();
+
+	foreach ( $list as $item )
+	{
+		$what = $item.get();
+		$cat  = $what["occi.publication.what"];
+		$why  = $what["occi.publication.why"];
+		"<tr><td><a href='".display();
+		$why.display();
+		"/".display();
+		$cat.display();
+		"/'>".display();
+		$why.display();
+		"/".display();
+		$cat.display();
+		"/</a></td></tr>".display();
+	}
+	"</table>".display();
+
+	"</td></tr>".display();
+
+	HtmlFooter();
+
+
+
+
+

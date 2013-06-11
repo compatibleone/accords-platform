@@ -15,6 +15,9 @@ function	OperationMenu()
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-federations.txt&ouput=HTML'>Federation</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-penalties.txt&ouput=HTML'>Penalties</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-events.txt&ouput=HTML'>Events</a>".display();
+	"<tr>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-resolver.txt&ouput=HTML'>Publications</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-online.txt&ouput=HTML'>Authorizations</a>".display();
 	return;
 }
 
