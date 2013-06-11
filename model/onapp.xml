@@ -25,25 +25,26 @@
 	        <attribute name='price' type='string' required='false' immutable='false'/>
 	        <attribute name='location' type='string' required='false' immutable='false'/>
 		<!-- OnappMarket::OnApp:VM attributes
-		    :cpu_shares                             - New attribute
-		    :disk_type_of_format                    - New attribute
-		    :template_id                            - image
-		    :initial_root_password                  - New attribute
-		    :initial_root_password_encryption_key   - New attribute
-		    :memory                                 - New attribute
-		    :cpus                                   - New attribute
-		    :host_name                              - New attribute
-		    :disk_size                              - New attribute
-		    :swap_size                              - New attribute
-		    :required_automatic_backup              - New attribute
-		    :required_virtual_machine_build         - New attribute
-		    :required_virtual_machine_startup       - New attribute
-		    :required_ip_address_assignment         - New attribute
-		    :label                                  - New attribute
+		    :cpu_shares                             - New attribute - OnApp VM param
+		    :disk_type_of_format                    - New attribute - OnApp VM param
+		    :template_id                            - image         
+		    :initial_root_password                  - New attribute - OnApp VM param
+		    :initial_root_password_encryption_key   - New attribute - OnApp VM param
+		    :memory                                 - New attribute - Maps to compute memory
+		    :cpus                                   - New attribute - Maps to compute CPUs
+		    :host_name                              - New attribute - Maps to compute host name
+		    :disk_size                              - New attribute - Maps to storage size
+		    :swap_size                              - New attribute - OnApp VM param
+		    :required_automatic_backup              - New attribute - OnApp VM param
+		    :required_virtual_machine_build         - New attribute - OnApp VM param
+		    :required_virtual_machine_startup       - New attribute - OnApp VM param
+		    :required_ip_address_assignment         - New attribute - OnApp VM param
+		    :label                                  - New attribute - OnApp VM param
 		    :description                            - description
 		    :instance_id                            - id
 		    :resource_id                            - provider (ideally as RAW id not as URL)
-		    :local_id                               - New attribute
+		    :local_id                               - New attribute - this is the Supplier VM id
+		    :user_id                                - New attribute - this is the Market VM owner/user id
 		    :type                                   - Ignore
 		    :api                                    - Ignore
 		-->
@@ -62,6 +63,7 @@
 		<attribute name='required_ip_address_assignment' type='string' required='false' immutable='false'/>
 		<attribute name='label' type='string' required='false' immutable='false'/>
 		<attribute name='local_id' type='string' required='false' immutable='false'/>
+		<attribute name='user_id' type='string' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	    </actions>
