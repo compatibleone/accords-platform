@@ -1249,8 +1249,31 @@ private	char *	default_get_filename( char * command )
 			return( (char *) 0 );
 		else
 		{
-			fprintf(h,"<html><head><title>%s:%s</title></head>\n",command,buffer);
-			fprintf(h,"<body><div align=center><h1>%s:%s</h1>\n",command,buffer);
+			fprintf(h,"<html><head><title>%s:%s</title>\n",agent,command);
+
+			fprintf(h,"</head><body><div align=center><h1>%s:%s</h1>\n",agent,command);
+			fprintf(h,"<form method=POST action=%s>\n",command);
+			fprintf(h,"<table class=%s>\n",command);
+			if (!( strcasecmp( command, "parser" ) ))
+			{
+				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename width=48></tr>\n");
+
+			}
+			else if (!( strcasecmp( command, "broker" ) ))
+			{
+				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename width=48></tr>\n");
+			}		
+			else if (!( strcasecmp( command, "run" ) ))
+			{
+				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename width=48></tr>\n");
+			}
+			else
+			{
+				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
+			}		
+			fprintf(h,"<tr><th>Submit Operation<th><input type=submit name=%s value=%s></tr>\n");
+			fprintf(h,"</table>\n");
+			fprintf(h,"</form>\n");
 			fprintf(h,"</div></body></html>\n");
 			fclose( h );
 			return( allocate_string( buffer ) );
@@ -1652,4 +1675,3 @@ public	int	main( int argc, char * argv[] )
 	/* ---------- */
 #endif	/* _command_c */
 	/* ---------- */
-
