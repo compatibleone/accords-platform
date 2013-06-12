@@ -34,6 +34,11 @@ private	char *	publisher="http://127.0.0.1:8086";
 private	char *	operator="accords";
 private	char *	zone="europe";
 private	char *	tls=(char *) 0;
+private	int	port=80;
+private	int	threads=1;
+private	int	authorise=0;
+private	char *	user=(char *) 0;
+private	char *	password=(char *) 0;
 
 public	char *	default_operator()	{	return( operator );	}
 public	char *	default_zone()		{	return( zone );		}
@@ -41,6 +46,8 @@ public	char *	default_publisher()	{	return( publisher );	}
 public	char *	default_tls()		{	return( tls );		}
 public	int	check_verbose()		{	return( verbose );	}
 public	int	check_debug()		{	return( debug );	}
+
+public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
 
 /*	-----------------------------------	*/
 /*		f a i l u r e			*/
@@ -742,6 +749,509 @@ private	int	run_json_verification( char * filename )
 }
 
 /*	-----------------------------------	*/
+/*	   c o m m a n d _ p a r s e  r		*/
+/*	-----------------------------------	*/
+private	int	command_parser( char * action, char * instance )
+{
+	return(0);
+}
+
+struct	cords_broker_config
+{
+	char *	accept;
+	char *	publisher;
+	char *	host;
+	char *	agent;
+	char *	result;
+	char *	tls;
+	char *	zone;
+	char *	operator;
+	char *	security;
+	int	deployment;
+} Cb = 	{
+	(char * ) 0,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_BROKER_AGENT,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	(char *) 0,
+	1
+	};
+
+
+
+/*	-----------------------------------------------------	*/
+/*		c o r d s _ i n s t a n c e _ p l a n		*/
+/*	-----------------------------------------------------	*/
+private	int	cords_instance_plan( char * host, char * plan, char * agent, char * result )
+{
+	struct	occi_response * zptr;
+	char	*	sptr;
+	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
+	if (!( sptr = occi_unquoted_value( plan )))
+		return(500);
+	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, Cb.tls ) ))
+		return(501);
+	else
+	{
+		zptr = occi_remove_response( zptr );
+		return( 0 );
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*	   c o r d s _ i n s t a n c e _ a g r e e m e n t	*/
+/*	-----------------------------------------------------	*/
+private	int	cords_instance_agreement( char * host, char * name, char * sla, char * manifest, char * plan,  char * agent, char * result )
+{
+	struct	occi_response * zptr;
+	char	*	namev;
+	char	*	planv;
+	char 	*	slav;
+	char  	*	manv;
+	char 	*	ihost;
+	char 	*	aptr;
+	int		i;
+	int		j;
+	FILE	*	h;
+	struct	occi_client * kptr;
+	struct	occi_request* qptr;
+	struct	occi_element* dptr;
+	struct	occi_response* yptr;
+	char	buffer[1024];
+
+	/* ------------------- */
+	/* prepare environment */
+	/* ------------------- */
+	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
+
+	/* ------------------- */
+	/* validate parameters */
+	/* ------------------- */
+	if (!( manv = occi_unquoted_value( manifest )))
+		return(531);
+	else if (!( slav = occi_unquoted_value( sla  )))
+		return(532);
+	else if (!( planv = occi_unquoted_value( plan )))
+		return(533);
+	else if (!( namev = occi_unquoted_value( name )))
+		return(533);
+
+	/* ------------------------------------------- */
+	/* resolve a service category instance manager */
+	/* ------------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
+		return(478);
+
+	/* ------------------------------------------ */
+	/* url for service category instance creation */ 
+	/* ------------------------------------------ */
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,_CORDS_SERVICE);
+		liberate( ihost );
+	}
+
+	/* ------------------------------------------ */
+	/* create the SLA controlled service instance */
+	/* ------------------------------------------ */
+	if (!( kptr = occi_create_client( buffer, agent, default_tls() ) ))
+		return(546);
+	else if (!( qptr = cords_account_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return(550);
+	}
+	else if ((!(dptr=occi_request_element(qptr,"occi.service.plan"  	, planv ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.manifest"   	, manv  ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.name"   	, namev ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.service.sla"  		, slav 	) )))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(551);
+	}
+	else if (!( yptr = occi_client_post( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(552);
+	}
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(553);
+	}
+	/* -------------------------------------- */
+	/* duplicate the host before the clean up */
+	/* -------------------------------------- */
+	else if (!( ihost = allocate_string( ihost ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(554);
+	}
+	else
+	{
+		/* ------------------------------- */
+		/* clean up after service creation */
+		/* ------------------------------- */
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+	
+		/* -------------------------------- */
+		/* start the SLA controlled service */
+		/* -------------------------------- */
+		rest_add_http_prefix(buffer,1024,ihost);
+
+		if (!( Cb.deployment ))
+		{
+			for ( j=0,i=0; *(ihost+i) != 0; i++)
+				if ( *(ihost+i) == '/' )
+					j = (i+1);
+			sprintf(buffer,"service/%s",(ihost+j));
+			printf("%s\n",buffer);
+			if ((h = fopen(buffer,"w")) != (FILE *) 0)
+			{
+				fprintf(h,"{}\n");
+				fclose(h);
+			}
+			ihost = liberate( ihost );
+			return( 0 );
+		}
+		else 
+		{
+			ihost = liberate( ihost );
+			if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
+				return(503);
+			else
+			{
+				zptr = occi_remove_response( zptr );
+				return( 0 );
+			}
+		}
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*	   l l _ s l a _ b r o k e r _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+/*	this function will provision an instance of service	*/
+/*	as described by the input document which will provide 	*/
+/*	plan identifier that will be used to resolve to the	*/
+/*	manifest description of the service. The operation	*/
+/*	can be initated on either a manifest document type or	*/
+/*	for the new agreement document type under sla control	*/
+/*	-----------------------------------------------------	*/
+private	int	ll_sla_broker_operation( char * filename )
+{
+	struct	occi_response * zptr;
+	struct	xml_element * dptr;
+	struct	xml_element * eptr;
+	struct	xml_element * fptr;
+	struct	xml_element * tptr;
+	struct	xml_element * xptr;
+	struct	xml_atribut * aptr;
+	struct	xml_atribut * gptr;
+	struct	xml_atribut * mptr;
+	struct	xml_atribut * pptr;
+	char *	nptr;
+	char	nameplan[512];
+	int	status;
+
+	/* ------------------- */
+	/* validate parameters */
+	/* ------------------- */
+	if (!(nptr = Cb.result))
+		sprintf((nptr=nameplan),"instance_%s",filename);
+	if (!( Cb.host ))
+		return( failure(1,"requires","publication host"));
+	else if (!( Cb.agent ))
+		return( failure(2,"requires","parser agent name"));
+	else if (!( filename ))
+		return( failure(3,"requires","cords filename"));
+
+	/* -------------------------- */
+	/* process the input document */
+	/* -------------------------- */
+	else if (!( dptr = document_parse_file( filename ) ))
+		return( failure(4,"parse error",filename));
+
+	/* ----------------------------- */
+	/* detect manifest document type */
+	/* ----------------------------- */
+	if (( eptr = document_element( dptr, _CORDS_MANIFEST )) != (struct xml_element *) 0)
+	{
+		if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
+			return( failure(6,"failure resolving plan",filename));
+		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
+			return( failure(status,"failure provisioning plan",aptr->value));
+		else	return( 0 );
+	}
+
+	/* ------------------------------ */
+	/* detect agreement document type */
+	/* ------------------------------ */
+	else if (!( fptr = document_element( dptr, _CORDS_AGREEMENT ) ))
+		return( failure(5,"expected manifest or agreement document",filename));
+	else if (!( gptr = document_atribut( fptr, _CORDS_ID ) ))
+		return( failure(5,"missing agreement identifier",filename));
+	else if (!( tptr = document_element( fptr, _CORDS_TERMS ) ))
+		return( failure(5,"missing agreement terms",filename));
+	else
+	{
+		for ( 	eptr = (struct xml_element *) 0,
+			xptr = document_element( tptr, _CORDS_TERM );
+			xptr != (struct xml_element *) 0;
+			tptr = xptr->next )
+		{
+			if (!( eptr = document_element( xptr, _CORDS_MANIFEST ) ))
+				continue;
+			else	break;
+		}
+		if (!( eptr ))
+			return( failure(5,"missing manifest element",filename));
+		else if (!( mptr = document_atribut( eptr, _CORDS_ID ) ))
+			return( failure(5,"missing manifest identifier",filename));
+		else if (!( pptr = document_atribut( eptr, _CORDS_ID ) ))
+			return( failure(5,"missing manifest name",filename));
+		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
+			return( failure(6,"missing plan identifier",filename));
+		else if ((status = cords_instance_agreement( Cb.host, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
+			return( failure(status,"failure to provision plan",aptr->value));
+		else	return( 0 );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	c o r d s _ b r o k e r _ o p e r a t i o n	*/
+/*	-------------------------------------------	*/
+private	int	cords_broker_operation( char * filename )
+{
+	int	status;
+	char *	auth;
+
+	if ( Cb.accept )
+	{
+		occi_client_accept( Cb.accept );
+	}
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-broker","co-system",Cb.agent, Cb.tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	status = ll_sla_broker_operation( filename );
+
+	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
+
+	return( status );
+}
+
+/*	-----------------------------------	*/
+/*	   c o m m a n d _ b r o k e  r		*/
+/*	-----------------------------------	*/
+private	int	command_broker( char * filename, char * other )
+{
+	return(cords_broker_operation( filename ));
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r _ i n i t i a l i s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_server * commandserver_initialise(  void * v,struct rest_server * sptr )
+{
+	struct	rest_extension * xptr;
+	if (!( xptr = rest_add_extension( sptr ) ))
+		return((struct rest_server *) 0);
+	else
+	{
+		xptr->net = (struct connection *) 0;
+		return( sptr );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r _ a u t h o r i s e 			*/
+/*	------------------------------------------------------------------	*/
+private	int	commandserver_authorise(  void * v,struct rest_client * cptr, char * username, char * password)
+{
+	if ( check_verbose )
+		printf("   REST Authentication of %s \n",username); 
+	if (!( authorise ))
+		return(1);
+	else if (!( user ))
+		return(1);
+	else if ( strcmp( username, user ) )
+		return(0);
+	else if ( strcmp( password, password ) )
+		return(0);
+	else if (!( cptr->user = allocate_string( username ) ))
+		return(0);
+	else if (!( cptr->pass = allocate_string( password ) ))
+		return(0);
+	else	return(1);
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ e x t e n s i o n 			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_extension * commandserver_extension( void * v,struct rest_server * sptr, 
+struct rest_extension * xptr)
+{
+	return( xptr );
+}
+
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ g e t 				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * commandserver_get( void * v,struct rest_client * cptr, struct rest_request * rptr )
+{
+	struct	rest_response * aptr;
+	printf("   Fs GET Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	if (!( aptr = rest_allocate_response(cptr) ))
+		return( aptr );
+	else if ( rptr->body  )
+		return( rest_html_response( aptr, 400, "Unexpected Request Body" ) );
+	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ p o s t 				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * invoke_rest_command(struct rest_response * aptr, struct rest_client * cptr, struct rest_request * rptr )
+{
+	char *	command;
+	char *	sptr;
+	if (!( command = allocate_string( rptr->object ) ))
+		return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
+	else if ( *command == '/' )
+		command++;
+	for ( 	sptr = command; *sptr != '/'; sptr++);
+	*(sptr++) = 0;
+
+	if (!( strcasecmp( command, "parser" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "broker" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "start" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "stop" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "save" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "snapshot" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "delete" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "invoke" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else if (!( strcasecmp( command, "run" ) ))
+		return( rest_html_response( aptr, 200, "OK" ) );
+	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+
+}
+
+private	struct rest_response * commandserver_post(  void * v,struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	rest_response * aptr;
+	struct	rest_header   * hptr;
+	struct	xml_element   * document;
+	FILE 		      * target;
+	
+	printf("   Fs POST Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	if (!( aptr = rest_allocate_response(cptr) ))
+		return( aptr );
+	else if (!( rptr->body  ))
+		return( rest_html_response( aptr, 404, "Expected Body" ) );
+	else	return( invoke_rest_command( aptr, cptr, rptr ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ p u t				*/
+/*	------------------------------------------------------------------	*/	
+private	struct rest_response * commandserver_put(  void * v,struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	rest_response * aptr;
+	printf("   Fs PUT Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	if (!( aptr = rest_allocate_response(cptr) ))
+		return( aptr );
+	else if (!( rptr->body ))
+		return( rest_html_response( aptr, 400, "Put Requires a Body" ) );
+	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ d e l e t e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * commandserver_delete(  void * v,struct rest_client * cptr, 
+		struct rest_request * rptr )
+{
+	struct	rest_response * aptr;
+	printf("   Fs DELETE Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	if (!( aptr = rest_allocate_response(cptr) ))
+		return( aptr );
+	else if ( rptr->body  )
+		return( rest_html_response( aptr, 400, "Unexpected Request Body" ) );
+	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m m a n d s e r v e r_ h e a d				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * commandserver_head(  void * v,struct rest_client * cptr, struct rest_request * rptr )
+{
+	struct	rest_response * aptr;
+	printf("   Fs HEAD Request : %s %s %s \n",rptr->method,rptr->object,rptr->version);
+	if (!( aptr = rest_allocate_response(cptr) ))
+		return( aptr );
+	else if ( rptr->body  )
+		return( rest_html_response( aptr, 400, "Unexpected Request Body" ) );
+	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
+}
+
+/*	-----------------------------------	*/
+/*	   c o m m a n d _ o n l i n e 		*/
+/*	-----------------------------------	*/
+private	int	command_online( char * agent, char * other )
+{
+	int	status=0;
+	struct	rest_interface  CsI = 
+	{
+		(void *) 0,
+		commandserver_initialise,
+		commandserver_authorise,
+		commandserver_get,
+		commandserver_post,
+		commandserver_put,
+		commandserver_delete,
+		commandserver_head,
+		commandserver_extension,
+		(void *) 0,
+		(void *) 0,
+		(void *) 0,
+		(void *) 0
+
+	};
+
+	if (!( authorise ))
+		CsI.authorise = (void *) 0;
+
+	return( rest_server(  agent, port, tls, threads, & CsI ) );
+}
+
+/*	-----------------------------------	*/
 /*		o p e r a t i o n		*/
 /*	-----------------------------------	*/
 private	int	operation( int argc, char * argv[] )
@@ -762,6 +1272,12 @@ private	int	operation( int argc, char * argv[] )
 				command = aptr;
 				continue;
 			}
+			else if (!( strcasecmp( command, "PARSER" ) ))
+				return( command_parser( aptr, argv[argi] ) );
+			else if (!( strcasecmp( command, "BROKER" ) ))
+				return( command_broker( aptr, argv[argi] ) );
+			else if (!( strcasecmp( command, "ONLINE" ) ))
+				return( command_online( aptr, argv[argi] ) );
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[argi] ) );
 			else if (!( strcasecmp( command, "ANALYSE" ) ))
@@ -804,8 +1320,16 @@ private	int	operation( int argc, char * argv[] )
 					noauth = 1;
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
+				else if (!( strcmp( aptr, "port" ) ))
+					port = atoi(argv[argi++]);
+				else if (!( strcmp( aptr, "threads" ) ))
+					threads = atoi(argv[argi++]);
 				else if (!( strcmp( aptr, "tls" ) ))
 					tls = argv[argi++];
+				else if (!( strcmp( aptr, "user" ) ))
+					user = argv[argi++];
+				else if (!( strcmp( aptr, "password" ) ))
+					password = argv[argi++];
 				else if (!( strcmp( aptr, "publisher" ) ))
 					publisher = argv[argi++];
 				else if (!( strcmp( aptr, "agent" ) ))
@@ -825,10 +1349,13 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0b.0.04");
-	printf("\n   Beta Version : 05/02/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.01");
+	printf("\n   Beta Version : 12/06/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
+	printf("\n         command <options> PARSER      <xml_file> ");
+	printf("\n         command <options> BROKER      <xml_file> ");
+	printf("\n         command <options> ONLINE      <hostinfo> ");
 	printf("\n         command <options> START       <service_file> ");
 	printf("\n         command <options> RESTART     <service_file> ");
 	printf("\n         command <options> STOP        <service_file> ");
@@ -851,6 +1378,9 @@ private	int	banner()
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
+	printf("\n         --port <number>              set online port number \n");
+	printf("\n         --user <name>                set online user name \n");
+	printf("\n         --paasword <value>           set online password \n");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
