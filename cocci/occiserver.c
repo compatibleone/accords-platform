@@ -472,6 +472,7 @@ private	struct rest_response * occi_get_capacities(
 		struct rest_request * rptr )
 {
 	struct	occi_action * actptr;
+	struct	occi_category * foot;
 	struct rest_response * aptr;
 	char	* mptr;
 	char 	* ctptr;
@@ -533,7 +534,7 @@ private	struct rest_response * occi_get_capacities(
 	}
 	else if ( accept_string_includes( ctptr, _OCCI_TEXT_OCCI ) )
 	{
-		for (	;
+		for (	foot=optr;
 			optr != (struct occi_category *) 0;
 			optr = optr->next )
 		{
@@ -568,6 +569,7 @@ private	struct rest_response * occi_get_capacities(
 				}
 			}
 		}
+		optr = foot;
 		if (!( hptr = occi_accept_header( aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
 
@@ -1726,6 +1728,10 @@ private	struct rest_response * occi_head(
 		return( occi_failure(cptr,  400, "Bad Request : No Category" ) );
 	else if (!( occi_check_request_authorization( rptr, optr ) ))	
 		return( occi_authorization_failure( cptr, rptr ) );
+	else if (!( strcmp( rptr->object, "/-/" ) ))
+		return( occi_get_capacities( optr, cptr, rptr ) );
+	else if (!( strcmp( rptr->object, "/" ) ))
+		return( occi_redirect(cptr,  301, "Redirected to Capacities", "/-/" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_head( optr, cptr, rptr ) );
