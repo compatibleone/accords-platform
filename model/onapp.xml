@@ -45,6 +45,7 @@
 		    :resource_id                            - provider (ideally as RAW id not as URL)
 		    :local_id                               - New attribute - this is the Supplier VM id
 		    :user_id                                - New attribute - this is the Market VM owner/user id
+		    :created_at                             - Date it was created (UNIX timestamp)
 		    :type                                   - Ignore
 		    :api                                    - Ignore
 		-->
@@ -53,17 +54,18 @@
 		<attribute name='initial_root_password' type='string' required='false' immutable='false'/>
 		<attribute name='initial_root_password_encryption_key' type='string' required='false' immutable='false'/>
 		<attribute name='memory' type='string' required='false' immutable='false'/>
-		<attribute name='cpus' type='string' required='false' immutable='false'/>
+		<attribute name='cpus' type='int' required='false' immutable='false'/>
 		<attribute name='host_name' type='string' required='false' immutable='false'/>
 		<attribute name='disk_size' type='string' required='false' immutable='false'/>
 		<attribute name='swap_size' type='string' required='false' immutable='false'/>
-		<attribute name='required_automatic_backup' type='string' required='false' immutable='false'/>
-		<attribute name='required_virtual_machine_build' type='string' required='false' immutable='false'/>
-		<attribute name='required_virtual_machine_startup' type='string' required='false' immutable='false'/>
-		<attribute name='required_ip_address_assignment' type='string' required='false' immutable='false'/>
+		<attribute name='required_automatic_backup' type='int' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_build' type='int' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_startup' type='int' required='false' immutable='false'/>
+		<attribute name='required_ip_address_assignment' type='int' required='false' immutable='false'/>
 		<attribute name='label' type='string' required='false' immutable='false'/>
 		<attribute name='local_id' type='string' required='false' immutable='false'/>
 		<attribute name='user_id' type='string' required='false' immutable='false'/>
+		<attribute name='created_at' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	    </actions>
@@ -107,6 +109,7 @@
 				location_city       - Location City
 				location_country    - Location Country
 				location_region     - Location Region
+				created_at          - Date it was created at (UNIX timestamp)
 				api                 - Never Stored
 				is_active           - Is this active ?			
 	        -->
@@ -131,6 +134,7 @@
 	        <attribute name='location_country' type='string' required='false' immutable='false'/>
 	        <attribute name='location_region' type='string' required='false' immutable='false'/>
 	        <attribute name='is_active' type='int' required='false' immutable='false'/>
+	        <attribute name='created_at' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
