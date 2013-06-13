@@ -1340,8 +1340,7 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 		*(sptr++) = 0;
 		if (( filename = command_get_filename( command )) != (char *) 0)
 			return( commandserver_get_file( cptr, filename, aptr ) );
-			return( rest_html_response( aptr, 400, "Incorrect Request" ) );
-		if (!( filename = default_get_filename( command )))
+		else if (!( filename = default_get_filename( command )))
 			return( rest_html_response( aptr, 400, "Incorrect Request" ) );
 		else	return( commandserver_get_file( cptr, filename, aptr ) );
 	}
