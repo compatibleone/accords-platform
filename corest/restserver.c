@@ -795,6 +795,51 @@ private	char * rest_html_failure( int status, char * message )
 /*	------------------------------------------------	*/
 /*	   r e s t _ h t m l _ r e s p o n s e 			*/
 /*	------------------------------------------------	*/
+public	struct rest_response * rest_file_response( struct rest_response  * aptr, char * filename, char * type )
+{
+	struct	stat info;
+	char	buffer[64];
+	struct	rest_header * hptr;
+
+	if (!( filename ))
+		return( aptr );
+	else if (!( filename = allocate_string( filename ) ))
+		return( aptr );
+
+	if (!( aptr ))
+		if (!( aptr = allocate_rest_response() ))
+			return( aptr );
+	if ( aptr->message )
+		aptr->message = liberate( aptr->message );
+
+	if (!( aptr->message = allocate_string( "OK" ) ))
+		return( aptr );
+	else	aptr->status = 200;
+
+	if (!( aptr->version ))
+		if (!( aptr->version = allocate_string("HTTP/1.1") ))
+			return( aptr );
+
+	if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, type ) ))
+		return( aptr );
+	else if ( stat( filename,&info ) < 0 )
+		return( aptr );
+	else
+	{
+		sprintf(buffer,"%u",info.st_size);
+		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, buffer ) ))
+			return( aptr );
+		else 
+		{
+			rest_response_body( aptr, filename, _FILE_BODY );
+			return( aptr );
+		}
+	}
+}
+
+/*	------------------------------------------------	*/
+/*	   r e s t _ h t m l _ r e s p o n s e 			*/
+/*	------------------------------------------------	*/
 public	struct rest_response * rest_html_response( struct rest_response  * aptr, int status, char * message )
 {
 	struct	rest_header * hptr;

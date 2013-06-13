@@ -1252,7 +1252,7 @@ private	char *	default_get_filename( char * command )
 			fprintf(h,"<html><head><title>%s:%s</title>\n",agent,command);
 
 			fprintf(h,"</head><body><div align=center><h1>%s:%s</h1>\n",agent,command);
-			fprintf(h,"<form method=POST action=%s>\n",command);
+			fprintf(h,"<form method=POST action=%s enctype='multipart/form-data'>\n",command);
 			fprintf(h,"<table class=%s>\n",command);
 			if (!( strcasecmp( command, "parser" ) ))
 			{
@@ -1271,7 +1271,7 @@ private	char *	default_get_filename( char * command )
 			{
 				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
 			}		
-			fprintf(h,"<tr><th>Submit Operation<th><input type=submit name=%s value=%s></tr>\n");
+			fprintf(h,"<tr><th>Submit Operation<th><input type=submit name=%s value=%s></tr>\n",command,command);
 			fprintf(h,"</table>\n");
 			fprintf(h,"</form>\n");
 			fprintf(h,"</div></body></html>\n");
@@ -1303,7 +1303,7 @@ private	char *	command_get_filename( char * command )
 		else if ((filename = detect_command_file( command, "htm" ) ))
 			return( filename );
 	}
-	else	return((char *) 0);
+	return((char *) 0);
 }
 
 
@@ -1359,7 +1359,12 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 			return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
 		else if ( *command == '/' )
 			command++;
-		for ( 	sptr = command; *sptr != '/'; sptr++);
+		sptr = command;
+		while( *sptr )
+		{
+			if ( *sptr == '/' ) break;
+			else sptr++;
+		}
 		*(sptr++) = 0;
 		if (( filename = command_get_filename( command )) != (char *) 0)
 			return( commandserver_get_file( cptr, filename, aptr ) );
@@ -1369,17 +1374,183 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 	}
 }
 
+/*	------------------------------------------------------------------	*/
+/*				f i l e g e t l i n e				*/
+/*	------------------------------------------------------------------	*/
+private	char *	filegetline( FILE * h, char * buffer, int bufmax )
+{
+	int	c;
+	int	i=0;
+	while (1)
+	{
+		switch (( c = fgetc(h) ))
+		{
+		case	0	:
+		case	-1	:
+			if (!( i )) 
+				return((char *) 0);
+			else	break;
+		case	'\r'	:
+			continue;
+		case	'\n'	:
+			break;
+		default		:
+			if ( i < bufmax )
+			{
+				buffer[i++] = c;
+				continue;
+			}
+			else	return((char *) 0);
+		}
+		buffer[i++] = 0;
+		return( buffer );
+	}
+}
+
+private	int	check_boundary( char * sptr, char * rptr )
+{
+	while ( *sptr == '-' ) sptr++;
+	while ( *rptr == '-' ) rptr++;
+	return( strcmp( sptr, rptr ) );
+}
 
 /*	------------------------------------------------------------------	*/
 /*			i s _ v a l i d _ b o d y				*/
 /*	------------------------------------------------------------------	*/
 private	char * 	is_valid_body( struct rest_request * rptr )
 {
+	char *	boundary;
+	FILE *	h=(FILE *) 0;
+	FILE *	th=(FILE*) 0;
+	char	buffer[8193];
+	char *	sptr;
+	char *	target;
+	struct	rest_header * hptr;
 	if (!( rptr ))
 		return((char *) 0);
 	else if ( rptr->type != _FILE_BODY )
 		return((char *) 0);
-	else	return( rptr->body );
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( rptr->body );
+	else if (!( boundary = hptr->value ))
+		return( rptr->body );
+	else if ( strncmp( boundary, "multipart/form-data; boundary=", strlen( "multipart/form-data; boundary=" )) != 0 )
+		return( rptr->body );
+	else if (!( h = fopen( rptr->body , "r" ) ))
+		return( rptr->body );
+	else
+	{
+		boundary += strlen( "multipart/form-data; boundary=" );
+		while (1)
+		{
+			if (!( sptr = filegetline( h, buffer, 8192 ) ))
+			{
+				fclose(h);
+				return( rptr->body );
+			}
+			else if (!( check_boundary( sptr, boundary ) ))
+				break;
+			else	continue;
+		}
+		if (!( sptr = filegetline( h, buffer, 8192 ) ))
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else if ( strncasecmp( sptr, "Content-Disposition:", strlen("Content-Disposition:" )) != 0 )
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else	sptr += strlen("Content-Disposition:" );
+		while ( *sptr == ' ' ) sptr++;
+		if ( strncasecmp( sptr, "form-data;", strlen("form-data;" )) != 0 )
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else	sptr += strlen("form-data;" );
+		while ( *sptr == ' ' ) sptr++;
+		if ( strncasecmp( sptr, "name=\"filename\";", strlen("name=\"filename\";" )) != 0 )
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else	sptr += strlen("name=\"filename\";" );
+		while ( *sptr == ' ' ) sptr++;
+		if ( strncasecmp( sptr, "filename=", strlen("filename=" )) != 0 )
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else	sptr += strlen("filename=" );
+		if (!( sptr = allocate_string( sptr )))
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else if (!( sptr = occi_unquoted_value( sptr ) ))
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else	target = sptr;
+		while (1)
+		{
+			if (!( sptr = filegetline( h, buffer, 8192 ) ))
+			{
+				fclose(h);
+				return( rptr->body );
+			}
+			else if (!( strlen( sptr ) ))
+				break;
+			else	continue;
+		}
+		/* start of the target file */
+		/* ------------------------ */
+		if (!( th = fopen( target, "w" ) ))
+		{
+			fclose(h);
+			return( rptr->body );
+		}
+		else
+		{
+			while ((sptr = filegetline( h, buffer, 8192 )) != (char *) 0)
+			{
+				if (!( check_boundary( sptr, boundary ) ))
+					break;
+				else	fprintf(th,"%s\n",sptr);
+			}
+			fclose(th);
+			fclose(h);
+			return( target );
+		}		
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o r d s _ p a r s e r _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_parser_response( struct rest_response * aptr, char * filename )
+{
+	struct	rest_header * hptr;
+	char	buffer[2048];
+	char	filesize[256];
+
+	sprintf(buffer,"plan_%s",filename);
+	return( rest_file_response( aptr, buffer, "application/xml" ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o r d s _ b r o k e r _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_broker_response( struct rest_response * aptr, char * filename )
+{
+	struct	rest_header * hptr;
+	char	buffer[2048];
+	char	filesize[256];
+
+	return( rest_file_response( aptr, filename, "application/json" ) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -1395,16 +1566,21 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 		return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
 	else if ( *command == '/' )
 		command++;
-	for ( 	sptr = command; *sptr != '/'; sptr++);
+	sptr = command;
+	while( *sptr )
+	{
+		if ( *sptr == '/' ) break;
+		else sptr++;
+	}
 	*(sptr++) = 0;
 
 	if (!( strcasecmp( command, "parser" ) ))
 	{
 		if (!( filename = is_valid_body( rptr ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_parser_operation( filename )) != 200)
+		else if ((status = cords_parser_operation( filename )) != 0)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( cords_parser_response( aptr, filename ) );
 	}
 	else if (!( strcasecmp( command, "broker" ) ))
 	{
@@ -1412,7 +1588,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if ((status = cords_broker_operation( filename )) != 200)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( cords_broker_response( aptr, filename ) );
 	}
 	else if (!( strcasecmp( command, "start" ) ))
 		return( rest_html_response( aptr, 200, "OK" ) );

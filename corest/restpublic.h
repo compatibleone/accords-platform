@@ -122,6 +122,7 @@ public	void
 
 public	struct	rest_response *	rest_liberate_response( struct rest_response * aptr);
 public	struct	rest_response * liberate_rest_response_body( struct rest_response * rptr );
+public	struct rest_response * rest_file_response( struct rest_response  * aptr, char * filename, char * type );
 
 public	int	rest_valid_string( char * vptr );
 public	int	rest_valid_string_value( char * sptr, char * vptr );
