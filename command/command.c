@@ -1129,6 +1129,48 @@ private	int	cords_script_interpreter( char * filename )
 	return( 200 );
 }
 
+/*	------------------------------------------------	*/
+/*	c o r d s _ r e s o l v e r _ o p e r a t i o n		*/
+/*	------------------------------------------------	*/
+private	int	cords_resolver_operation( char * category )
+{
+	int	status;
+	char *	auth;
+
+	occi_client_accept( Cb.accept );
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-broker","co-system",Cb.agent, Cb.tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
+
+	return( status );
+}
+
+/*	------------------------------------------------	*/
+/*	c o r d s _ s e r v i c e  _ o p e r a t i o n		*/
+/*	------------------------------------------------	*/
+private	int	cords_service_operation( char * command, char * service )
+{
+	int	status;
+	char *	auth;
+
+	occi_client_accept( Cb.accept );
+
+	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+
+	if (!( auth = login_occi_user( "test-command","co-system",Cb.agent, Cb.tls ) ))
+		return(403);
+	else 	(void) occi_client_authentication( auth );
+
+	(void) logout_occi_user( "test-command","co-system",Cb.agent, auth, Cb.tls );	
+
+	return( status );
+}
+
 /*	-------------------------------------------	*/
 /*	c o r d s _ b r o k e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
@@ -1137,9 +1179,7 @@ private	int	cords_broker_operation( char * filename )
 	int	status;
 	char *	auth;
 
-	{
-		occi_client_accept( Cb.accept );
-	}
+	occi_client_accept( Cb.accept );
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
@@ -1236,13 +1276,10 @@ private	char *	default_get_filename( char * command )
 	char *	filename;
 	if ((!( strcasecmp( command, "parser" 	) ))
 	||  (!( strcasecmp( command, "broker" 	) ))
-	||  (!( strcasecmp( command, "start" 	) ))
-	||  (!( strcasecmp( command, "stop" 	) ))
-	||  (!( strcasecmp( command, "save" 	) ))
-	||  (!( strcasecmp( command, "snapshot" ) ))
-	||  (!( strcasecmp( command, "delete" 	) ))
-	||  (!( strcasecmp( command, "invoke" 	) ))
-	||  (!( strcasecmp( command, "run" 	) )))
+	||  (!( strcasecmp( command, "resolver" ) ))
+	||  (!( strcasecmp( command, "service" 	) ))
+	||  (!( strcasecmp( command, "" 	) ))
+	||  (!( strcasecmp( command, "script" 	) )))
 	{
 		sprintf(buffer,"%s.html",command);
 		if (!( h = fopen( buffer, "w") ))
@@ -1252,28 +1289,50 @@ private	char *	default_get_filename( char * command )
 			fprintf(h,"<html><head><title>%s:%s</title>\n",agent,command);
 
 			fprintf(h,"</head><body><div align=center><h1>%s:%s</h1>\n",agent,command);
-			fprintf(h,"<form method=POST action=%s enctype='multipart/form-data'>\n",command);
+			if ( strcasecmp( command, "" ) )
+				fprintf(h,"<form method=POST action=%s enctype='multipart/form-data'>\n",command);
 			fprintf(h,"<table class=%s>\n",command);
 			if (!( strcasecmp( command, "parser" ) ))
 			{
 				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Parse Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
 			{
 				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Broker Service<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
-			else if (!( strcasecmp( command, "run" ) ))
+			else if (!( strcasecmp( command, "resolver" ) ))
+			{
+				fprintf(h,"<tr><th>Specify Category<th><input type=text name=category width=48></tr>\n");
+				fprintf(h,"<tr><th>Resolve Category Endpoints<th><input type=submit name=%s value=%s></tr>\n","command",command);
+			}		
+			else if (!( strcasecmp( command, "script" ) ))
 			{
 				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Run Script<th><input type=submit name=%s value=%s></tr>\n","command",command);
+			}
+			else if (!( strcasecmp( command, "service" ) ))
+			{
+				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
+				fprintf(h,"<tr><th>Start Service<th><input type=submit name=%s value=%s></tr>\n","service","start");
+				fprintf(h,"<tr><th>Stop  Service<th><input type=submit name=%s value=%s></tr>\n","service","stop");
+				fprintf(h,"<tr><th>Save  Service<th><input type=submit name=%s value=%s></tr>\n","service","save");
+				fprintf(h,"<tr><th>Snapshot Service<th><input type=submit name=%s value=%s></tr>\n","service","snapshot");
+				fprintf(h,"<tr><th>Delete Service<th><input type=submit name=%s value=%s></tr>\n","service","delete");
 			}
 			else
 			{
-				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/resolver\">Command Resolver</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/parser\">Command Parser</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/broker\">Command Broker</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/service\">Command Service</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/script\">Command Script</a></th></tr>\n");
 			}		
-			fprintf(h,"<tr><th>Submit Operation<th><input type=submit name=%s value=%s></tr>\n",command,command);
 			fprintf(h,"</table>\n");
-			fprintf(h,"</form>\n");
+			if ( strcasecmp( command, "" ) )
+				fprintf(h,"</form>\n");
 			fprintf(h,"</div></body></html>\n");
 			fclose( h );
 			return( allocate_string( buffer ) );
@@ -1290,13 +1349,9 @@ private	char *	command_get_filename( char * command )
 	char *	filename;
 	if ((!( strcasecmp( command, "parser" 	) ))
 	||  (!( strcasecmp( command, "broker" 	) ))
-	||  (!( strcasecmp( command, "start" 	) ))
-	||  (!( strcasecmp( command, "stop" 	) ))
-	||  (!( strcasecmp( command, "save" 	) ))
-	||  (!( strcasecmp( command, "snapshot" ) ))
-	||  (!( strcasecmp( command, "delete" 	) ))
-	||  (!( strcasecmp( command, "invoke" 	) ))
-	||  (!( strcasecmp( command, "run" 	) )))
+	||  (!( strcasecmp( command, "resolver"	) ))
+	||  (!( strcasecmp( command, "service" 	) ))
+	||  (!( strcasecmp( command, "script" 	) )))
 	{
 		if ((filename = detect_command_file( command, "html" ) ))
 			return( filename );
@@ -1415,116 +1470,272 @@ private	int	check_boundary( char * sptr, char * rptr )
 }
 
 /*	------------------------------------------------------------------	*/
-/*			i s _ v a l i d _ b o d y				*/
+/*			g e t _ m u l t i p a r t _ f o r m			*/
 /*	------------------------------------------------------------------	*/
-private	char * 	is_valid_body( struct rest_request * rptr )
+private	char * get_multipart_data( struct rest_header * form, char * nptr )
 {
+	struct	rest_header * hptr;
+	for (	hptr = form;
+		hptr != (struct rest_header * ) 0;
+		hptr = hptr->next )
+	{
+		if (!( hptr->name ))
+			continue;
+		else if (!( strcmp( hptr->name, nptr ) ))
+			return( hptr->value );
+		else	continue;
+	}
+	return( (char *) 0) ;
+
+}
+
+/*	------------------------------------------------------------------	*/
+/*		s c a n _ t o _ m u l t i p a r t _ w h i t e			*/
+/*	------------------------------------------------------------------	*/
+private	int	scan_to_multipart_white( FILE * h, char * buffer )
+{
+	char * sptr;
+	while (1)
+	{
+		if (!( sptr = filegetline( h, buffer, 8192 ) ))
+			return( 0 );
+		else if (!( strlen( sptr ) ))
+			return(1);
+		else	continue;
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o n s u m e _ t o _ b o u n d a r y				*/
+/*	------------------------------------------------------------------	*/
+private	int	consume_to_boundary( FILE * h, struct rest_header * hptr, char * buffer, char * boundary )
+{
+	int	status=0;
+	char *	sptr;
+	while ((sptr = filegetline( h, buffer, 8192 )) != (char *) 0)
+	{
+		if (!( check_boundary( sptr, boundary ) ))
+			break;
+		else if (!( status ))
+		{
+			hptr->value = allocate_string( sptr );
+			status=1;
+		}
+	}
+	return( status );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			g e t _ m u l t i p a r t _ f o r m			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_header * get_multipart_form( struct rest_request * rptr )
+{
+	struct	rest_header * root=(struct rest_header *) 0;
+	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+
 	char *	boundary;
 	FILE *	h=(FILE *) 0;
 	FILE *	th=(FILE*) 0;
 	char	buffer[8193];
 	char *	sptr;
+	char *	nptr;
 	char *	target;
-	struct	rest_header * hptr;
 	if (!( rptr ))
-		return((char *) 0);
+		return((struct rest_header *) 0);
 	else if ( rptr->type != _FILE_BODY )
-		return((char *) 0);
+		return((struct rest_header *) 0);
 	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
-		return( rptr->body );
+		return((struct rest_header *) 0);
 	else if (!( boundary = hptr->value ))
-		return( rptr->body );
+		return((struct rest_header *) 0);
 	else if ( strncmp( boundary, "multipart/form-data; boundary=", strlen( "multipart/form-data; boundary=" )) != 0 )
-		return( rptr->body );
+		return((struct rest_header *) 0);
 	else if (!( h = fopen( rptr->body , "r" ) ))
-		return( rptr->body );
+		return((struct rest_header *) 0);
 	else
 	{
+		boundary += strlen( "multipart/form-data; boundary=" );
 		boundary += strlen( "multipart/form-data; boundary=" );
 		while (1)
 		{
 			if (!( sptr = filegetline( h, buffer, 8192 ) ))
 			{
 				fclose(h);
-				return( rptr->body );
+				return((struct rest_header *) 0);
 			}
 			else if (!( check_boundary( sptr, boundary ) ))
 				break;
 			else	continue;
 		}
-		if (!( sptr = filegetline( h, buffer, 8192 ) ))
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else if ( strncasecmp( sptr, "Content-Disposition:", strlen("Content-Disposition:" )) != 0 )
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else	sptr += strlen("Content-Disposition:" );
-		while ( *sptr == ' ' ) sptr++;
-		if ( strncasecmp( sptr, "form-data;", strlen("form-data;" )) != 0 )
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else	sptr += strlen("form-data;" );
-		while ( *sptr == ' ' ) sptr++;
-		if ( strncasecmp( sptr, "name=\"filename\";", strlen("name=\"filename\";" )) != 0 )
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else	sptr += strlen("name=\"filename\";" );
-		while ( *sptr == ' ' ) sptr++;
-		if ( strncasecmp( sptr, "filename=", strlen("filename=" )) != 0 )
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else	sptr += strlen("filename=" );
-		if (!( sptr = allocate_string( sptr )))
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else if (!( sptr = occi_unquoted_value( sptr ) ))
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else	target = sptr;
 		while (1)
 		{
+			/* ------------------------------------ */
+			/* for each multipart form data element */
+			/* ------------------------------------ */
 			if (!( sptr = filegetline( h, buffer, 8192 ) ))
 			{
 				fclose(h);
-				return( rptr->body );
+				return(root);
 			}
-			else if (!( strlen( sptr ) ))
-				break;
-			else	continue;
-		}
-		/* start of the target file */
-		/* ------------------------ */
-		if (!( th = fopen( target, "w" ) ))
-		{
-			fclose(h);
-			return( rptr->body );
-		}
-		else
-		{
-			while ((sptr = filegetline( h, buffer, 8192 )) != (char *) 0)
+			else if ( strncasecmp( sptr, "Content-Disposition:", strlen("Content-Disposition:" )) != 0 )
 			{
-				if (!( check_boundary( sptr, boundary ) ))
-					break;
-				else	fprintf(th,"%s\n",sptr);
+				fclose(h);
+				return(root);
 			}
-			fclose(th);
-			fclose(h);
-			return( target );
-		}		
+			else	sptr += strlen("Content-Disposition:" );
+			while ( *sptr == ' ' ) sptr++;
+			if ( strncasecmp( sptr, "form-data;", strlen("form-data;" )) != 0 )
+			{
+				fclose(h);
+				return(root);
+			}
+			else	sptr += strlen("form-data;" );
+			while ( *sptr == ' ' ) sptr++;
+
+
+			/* ------------------------------ */
+			/* detect the name of the element */
+			/* ------------------------------ */
+			if ( strncasecmp( sptr, "name=", strlen("name=" )) != 0 )
+			{
+				fclose(h);
+				return(root);
+			}
+			else	sptr += strlen("name=" );
+
+			/* ------------------------------------ */
+			/* step over string to semicolon or end */
+			/* ------------------------------------ */
+			while ( *sptr == ' ' ) sptr++;
+			nptr = sptr;
+			while ( *sptr ) { if ( *sptr == ';' ) break; else sptr++; }
+			if ( *sptr ) 
+			{
+				*(sptr++) = 0;
+				while ( *sptr == ' ' ) sptr++;
+			}
+			/* ---------------------------------------- */
+			/* add a multipart form element to the list */
+			/* ---------------------------------------- */
+			if ((!( hptr = allocate_rest_header() ))
+			||  (!( hptr->name = allocate_string( nptr ) ))
+			||  (!( hptr->name = occi_unquoted_value( hptr->name ) )) )
+			{
+				fclose(h);
+				return( root );
+			}
+			else if (!( hptr->previous = foot ))
+				root = hptr;
+			else	foot->next = hptr;
+			foot = hptr;
+
+			/* ------------------------ */
+			/* detect the variable name */
+			/* ------------------------ */
+			if (!( strcmp( hptr->name, "filename" ) ))
+			{
+				if ( strncasecmp( sptr, "filename=", strlen("filename=" )) != 0 )
+				{
+					fclose(h);
+					return(root);
+				}
+				else	sptr += strlen("filename=" );
+				if (!( sptr = allocate_string( sptr )))
+				{
+					fclose(h);
+					return(root);
+				}
+				else if (!( sptr = occi_unquoted_value( sptr ) ))
+				{
+					fclose(h);
+					return(root);
+				}
+				else	target = sptr;
+
+				if (!( scan_to_multipart_white(h,buffer)))
+				{
+					fclose(h);
+					return( root );
+				}
+				/* start of the target file */
+				/* ------------------------ */
+				else if (!( th = fopen( target, "w" ) ))
+				{
+					fclose(h);
+					return(root);
+				}
+				else
+				{
+					while ((sptr = filegetline( h, buffer, 8192 )) != (char *) 0)
+					{
+						if (!( check_boundary( sptr, boundary ) ))
+							break;
+						else	fprintf(th,"%s\n",sptr);
+					}
+					fclose(th);
+					if (!( hptr->value = allocate_string( target ) ))
+					{
+						fclose(h);
+						return( root );
+					}
+					else	continue;
+				}		
+			}
+			else if (!( strcmp( hptr->name, "command" ) ))
+			{
+				if (!( scan_to_multipart_white(h,buffer)))
+				{
+					fclose(h);
+					return( root );
+				}
+				else if (!( consume_to_boundary( h, hptr, buffer, boundary ) ))
+				{
+					fclose(h);
+					return( root );
+				}
+			}
+
+			else if (!( strcmp( hptr->name, "category" ) ))
+			{
+				if (!( scan_to_multipart_white(h,buffer)))
+				{
+					fclose(h);
+					return( root );
+				}
+				else if (!( consume_to_boundary( h, hptr, buffer, boundary ) ))
+				{
+					fclose(h);
+					return( root );
+				}
+			}
+			else if (!( strcmp( hptr->name, "service" ) ))
+			{
+				if (!( scan_to_multipart_white(h,buffer)))
+				{
+					fclose(h);
+					return( root );
+				}
+				else if (!( consume_to_boundary( h, hptr, buffer, boundary ) ))
+				{
+					fclose(h);
+					return( root );
+				}
+			}
+			else
+			{
+				if (!( scan_to_multipart_white(h,buffer)))
+				{
+					fclose(h);
+					return( root );
+				}
+				else if (!( consume_to_boundary( h, hptr, buffer, boundary ) ))
+				{
+					fclose(h);
+					return( root );
+				}
+			}
+		}
 	}
 }
 
@@ -1554,14 +1765,41 @@ private	struct rest_response * cords_broker_response( struct rest_response * apt
 }
 
 /*	------------------------------------------------------------------	*/
+/*		c o r d s _ r e s o l v e r _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_resolver_response( struct rest_response * aptr, char * filename )
+{
+	struct	rest_header * hptr;
+	char	buffer[2048];
+	char	filesize[256];
+
+	return( rest_file_response( aptr, filename, "application/json" ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o r d s _ s e r v i c e _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_service_response( struct rest_response * aptr, char * filename )
+{
+	struct	rest_header * hptr;
+	char	buffer[2048];
+	char	filesize[256];
+
+	return( rest_file_response( aptr, filename, "application/json" ) );
+}
+
+/*	------------------------------------------------------------------	*/
 /*		c o m m a n d s e r v e r_ p o s t 				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * invoke_rest_command(struct rest_response * aptr, struct rest_client * cptr, struct rest_request * rptr )
 {
 	int	status;
 	char *	filename;
+	char *	service;
+	char *	category;
 	char *	command;
 	char *	sptr;
+	struct	rest_header * form;
 	if (!( command = allocate_string( rptr->object ) ))
 		return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
 	else if ( *command == '/' )
@@ -1576,7 +1814,13 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 
 	if (!( strcasecmp( command, "parser" ) ))
 	{
-		if (!( filename = is_valid_body( rptr ) ))
+		if (!( form = get_multipart_form( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ( strcmp( filename, command ) )
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "filename" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if ((status = cords_parser_operation( filename )) != 0)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
@@ -1584,29 +1828,55 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	}
 	else if (!( strcasecmp( command, "broker" ) ))
 	{
-		if (!( filename = is_valid_body( rptr ) ))
+		if (!( form = get_multipart_form( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ( strcmp( filename, command ) )
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "filename" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if ((status = cords_broker_operation( filename )) != 200)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
 		else	return( cords_broker_response( aptr, filename ) );
 	}
-	else if (!( strcasecmp( command, "start" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "stop" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "save" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "snapshot" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "delete" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "invoke" ) ))
-		return( rest_html_response( aptr, 200, "OK" ) );
-	else if (!( strcasecmp( command, "run" ) ))
+	else if (!( strcasecmp( command, "resolver" ) ))
 	{
-		if (!( filename = is_valid_body( rptr ) ))
+		if (!( form = get_multipart_form( rptr ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		if ((status = cords_script_interpreter( filename )) != 200)
+		else if (!( filename = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ( strcmp( filename, command ) )
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( category = get_multipart_data( form, "category" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_resolver_operation( category )) != 200)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( cords_resolver_response( aptr, filename ) );
+	}
+	else if (!( strcasecmp( command, "service" ) ))
+	{
+		if (!( form = get_multipart_form( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( command = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( service = get_multipart_data( form, "service" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_service_operation( command, service )) != 200)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( cords_service_response( aptr, filename ) );
+	}
+	else if (!( strcasecmp( command, "script" ) ))
+	{
+		if (!( form = get_multipart_form( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ( strcmp( filename, command ) )
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "filename" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_script_interpreter( filename )) != 200)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
 		else	return( rest_html_response( aptr, 200, "OK" ) );
 	}
