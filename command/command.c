@@ -1172,22 +1172,47 @@ private	char * 	cords_resolver_operation( char * category )
 /*	------------------------------------------------	*/
 /*	c o r d s _ s e r v i c e  _ o p e r a t i o n		*/
 /*	------------------------------------------------	*/
-private	int	cords_service_operation( char * command, char * service )
+private char * 	cords_service_operation( char * command, char * service )
 {
 	int	status;
 	char *	auth;
-
-	occi_client_accept( Cb.accept );
-
+	struct	occi_response * zptr;
+	char *	filename;
+	char 	buffer[4096];
+	FILE *	h;
+	struct	occi_element * eptr;
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-command","co-system",agent, tls ) ))
-		return(403);
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+		return((char *)0);
 	else 	(void) occi_client_authentication( auth );
 
-	(void) logout_occi_user( "test-command","co-system",agent, auth, tls );	
+	sprintf(buffer,"%s?action=%s",service,command);
 
-	return( status );
+	if (( zptr =  cords_invoke_action( buffer, command, agent, default_tls())) != (struct occi_response *) 0)
+	{
+		if ((filename = rest_temporary_filename( "tmp" )) != (char *) 0)
+		{
+			if ((h = fopen( filename, "w")) != (FILE *) 0)
+			{
+				fprintf(h,"<html><head><title>service command response : %s</title></head>\n",command);
+				fprintf(h,"<body><h1>Service Command : %s?action=%s</h1><table>\n",service,command);
+				for (	eptr=zptr->first;
+					eptr != (struct occi_element *) 0;
+					eptr = eptr->next)
+				{
+					fprintf(h,"<tr><th>%s<th>%s</tr>\n",eptr->name,eptr->value);
+				}
+				fclose(h);
+			}
+		}
+		zptr = occi_remove_response( zptr );
+	}
+	else 	filename = (char *) 0;
+
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+
+	return( filename );
 }
 
 /*	-------------------------------------------	*/
@@ -1335,11 +1360,11 @@ private	char *	default_get_filename( char * command )
 			else if (!( strcasecmp( command, "service" ) ))
 			{
 				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
-				fprintf(h,"<tr><th>Start Service<th><input type=submit name=%s value=%s></tr>\n","service","start");
-				fprintf(h,"<tr><th>Stop  Service<th><input type=submit name=%s value=%s></tr>\n","service","stop");
-				fprintf(h,"<tr><th>Save  Service<th><input type=submit name=%s value=%s></tr>\n","service","save");
-				fprintf(h,"<tr><th>Snapshot Service<th><input type=submit name=%s value=%s></tr>\n","service","snapshot");
-				fprintf(h,"<tr><th>Delete Service<th><input type=submit name=%s value=%s></tr>\n","service","delete");
+				fprintf(h,"<tr><th>Start Service<th><input type=submit name=%s value=%s></tr>\n","command","start");
+				fprintf(h,"<tr><th>Stop  Service<th><input type=submit name=%s value=%s></tr>\n","command","stop");
+				fprintf(h,"<tr><th>Save  Service<th><input type=submit name=%s value=%s></tr>\n","command","save");
+				fprintf(h,"<tr><th>Snapshot Service<th><input type=submit name=%s value=%s></tr>\n","command","snapshot");
+				fprintf(h,"<tr><th>Delete Service<th><input type=submit name=%s value=%s></tr>\n","command","delete");
 			}
 			else
 			{
@@ -1803,7 +1828,7 @@ private	struct rest_response * cords_service_response( struct rest_response * ap
 	char	buffer[2048];
 	char	filesize[256];
 
-	return( rest_file_response( aptr, filename, "application/json" ) );
+	return( rest_file_response( aptr, filename, "text/html" ) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -1880,8 +1905,8 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( service = get_multipart_data( form, "service" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_service_operation( command, service )) != 200)
-			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else if (!(filename = cords_service_operation( command, service )))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else	return( cords_service_response( aptr, filename ) );
 	}
 	else if (!( strcasecmp( command, "script" ) ))
