@@ -1132,22 +1132,41 @@ private	int	cords_script_interpreter( char * filename )
 /*	------------------------------------------------	*/
 /*	c o r d s _ r e s o l v e r _ o p e r a t i o n		*/
 /*	------------------------------------------------	*/
-private	int	cords_resolver_operation( char * category )
+private	char * 	cords_resolver_operation( char * category )
 {
+	char *	filename;
 	int	status;
 	char *	auth;
+	struct	occi_response * rptr;
+	FILE * h;
+	struct	occi_element * eptr;
 
 	occi_client_accept( Cb.accept );
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",Cb.agent, Cb.tls ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( rptr = occi_resolver( category, agent ) ))
+		return( (char *) 0 );
+	else if (!( filename = rest_temporary_filename( ".html" ) ))
+		return( filename );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( (char *) 0 );
+	else
+	{
+		fprintf(h,"<html><head><title>resolver response</title></head><body><h1>Endpoints for : %s</h1>\n",category);
+		fprintf(h,"<table>\n");
+		for ( 	eptr = rptr->first;
+			eptr != (struct occi_element * )0;
+			eptr = eptr->next )
+		{
+			fprintf(h,"<tr><th><a href=\"%s/%s/\">,%s/%s/</a></th></tr>\n",eptr->value,category,eptr->value,category);
+		}
 
-	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
+		fprintf(h,"</table></div></body></html>\n");
+		fclose(h);
+		return( filename );
+	}
 
-	return( status );
 }
 
 /*	------------------------------------------------	*/
@@ -1556,7 +1575,6 @@ private	struct rest_header * get_multipart_form( struct rest_request * rptr )
 	else
 	{
 		boundary += strlen( "multipart/form-data; boundary=" );
-		boundary += strlen( "multipart/form-data; boundary=" );
 		while (1)
 		{
 			if (!( sptr = filegetline( h, buffer, 8192 ) ))
@@ -1773,7 +1791,7 @@ private	struct rest_response * cords_resolver_response( struct rest_response * a
 	char	buffer[2048];
 	char	filesize[256];
 
-	return( rest_file_response( aptr, filename, "application/json" ) );
+	return( rest_file_response( aptr, filename, "text/html" ) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -1850,8 +1868,8 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( category = get_multipart_data( form, "category" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_resolver_operation( category )) != 200)
-			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else if (!(filename = cords_resolver_operation( category )))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else	return( cords_resolver_response( aptr, filename ) );
 	}
 	else if (!( strcasecmp( command, "service" ) ))
