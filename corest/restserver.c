@@ -1633,12 +1633,15 @@ private	struct rest_request *	rest_consume_body(
 	{
 		while ( bytes )
 		{
-			if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+			if ((cptr->bytes - cptr->consumed) > 0)
 			{
-				/* TODO FAILURE */
-				break;
+				if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+				{
+					/* TODO FAILURE */
+					break;
+				}
+				else 	bytes -= (cptr->bytes - cptr->consumed);
 			}
-			else 	bytes -= (cptr->bytes - cptr->consumed);
 
 			if (!( bytes ))
 				break;

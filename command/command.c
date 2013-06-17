@@ -786,7 +786,7 @@ private	int	ll_cords_parser_operation( char * filename )
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = cords_document_parser( Cp.host, filename, Cp.agent, Cp.tls, Cp.xsd ) ))
+	else if (!( dptr = cords_document_parser( Cp.host, filename, agent, tls, Cp.xsd ) ))
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
@@ -824,13 +824,13 @@ private	int	cords_parser_operation( char * filename )
 
 	set_xml_echo(echo);
 
-	if (!( auth = login_occi_user( "test-parser","co-system",Cp.agent, Cp.tls ) ))
+	if (!( auth = login_occi_user( "test-parser","co-system",agent, tls ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_cords_parser_operation( filename );
 
-	(void) logout_occi_user( "test-parser","co-system",Cp.agent, auth, Cp.tls );	
+	(void) logout_occi_user( "test-parser","co-system",agent, auth, tls );	
 
 	return( status );
 }
@@ -880,7 +880,7 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( sptr = occi_unquoted_value( plan )))
 		return(500);
-	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, Cb.tls ) ))
+	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, tls ) ))
 		return(501);
 	else
 	{
@@ -1060,7 +1060,7 @@ private	int	ll_sla_broker_operation( char * filename )
 		sprintf((nptr=nameplan),"instance_%s",filename);
 	if (!( Cb.host ))
 		return( failure(1,"requires","publication host"));
-	else if (!( Cb.agent ))
+	else if (!( agent ))
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
@@ -1078,7 +1078,7 @@ private	int	ll_sla_broker_operation( char * filename )
 	{
 		if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"failure resolving plan",filename));
-		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_plan( Cb.host, aptr->value, agent, nptr )) != 0)
 			return( failure(status,"failure provisioning plan",aptr->value));
 		else	return( 0 );
 	}
@@ -1111,7 +1111,7 @@ private	int	ll_sla_broker_operation( char * filename )
 			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( Cb.host, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( Cb.host, pptr->value, gptr->value, mptr->value, aptr->value, agent, nptr )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
@@ -1181,11 +1181,11 @@ private	int	cords_service_operation( char * command, char * service )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-command","co-system",Cb.agent, Cb.tls ) ))
+	if (!( auth = login_occi_user( "test-command","co-system",agent, tls ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	(void) logout_occi_user( "test-command","co-system",Cb.agent, auth, Cb.tls );	
+	(void) logout_occi_user( "test-command","co-system",agent, auth, tls );	
 
 	return( status );
 }
@@ -1202,13 +1202,13 @@ private	int	cords_broker_operation( char * filename )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",Cb.agent, Cb.tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_sla_broker_operation( filename );
 
-	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
 
 	return( status );
 }
