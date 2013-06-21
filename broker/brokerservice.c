@@ -206,7 +206,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 		if (!( h = fopen(buffer,"w")))
 			return(46);
 
-		fprintf(h,"{ %s: %c%s%c, contracts: [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
+		fprintf(h,"{ \"%s\" : %c%s%c, \"contracts\" : [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
 	}
 
 	/* ----------------------------------------------------- */
@@ -271,7 +271,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 
 		if ( generate_service_report )
 		{
-			fprintf(h,"{ %s: %c%s%c, attributs: { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
+			fprintf(h,"{ \"%s\" : %c%s%c, \"attributs\" : { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
 		}
 
 		/* ------------------------------------------------- */
@@ -371,7 +371,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 		if (!( h = fopen(buffer,"w")))
 			return(46);
 
-		fprintf(h,"{ %s: %c%s%c, contracts: [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
+		fprintf(h,"{ \"%s\" : %c%s%c, \"contracts\" : [\n",_CORDS_SERVICE,0x0022,id,0x0022 );
 	}
 
 	/* ----------------------------------------------------- */
@@ -413,7 +413,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 
 		if ( generate_service_report )
 		{
-			fprintf(h,"{ %s: %c%s%c, attributs: { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
+			fprintf(h,"{ \"%s\" : %c%s%c, \"attributs\" : { ",_CORDS_CONTRACT,0x0022,lptr->target,0x0022);
 		}
 
 		/* ------------------------------------------------- */
