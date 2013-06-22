@@ -709,12 +709,19 @@ public	struct	rest_request * rest_client_content_type(
 /*	------------------------------------------------	*/
 private	struct	rest_request *	rest_client_body( struct rest_request * rptr, char * filename )
 {
+	struct	rest_header * hptr;
 	if (!( rptr ))
 		return( rptr );
 	else if (!( filename ))
 		return( rptr );
 	else if (!( strlen( filename ) ))
+	{
+		if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		{
+			rest_request_header( rptr, _HTTP_CONTENT_LENGTH, "0" );
+		}
 		return( rptr );
+	}
 	else if (!( rest_client_content_length( rptr, filename ) ))
 		return( rptr );
 	else if (!( rest_client_content_type( rptr, filename ) ))
