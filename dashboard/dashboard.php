@@ -18,7 +18,7 @@ function parse_manifest($manifest,$p)
 {
 	$p->file_inspect( $manifest, $p );
 	$a = array();
-	$result = exec("bash ./dashboard-parser --verbose ".$manifest,&$a);
+	$result = exec("bash ./dashboard-parser --verbose ".$manifest,$a);
 	$p->command_output( "Manifest Parsing", $a );
 	return( "parse" );
 }
@@ -29,7 +29,7 @@ function parse_manifest($manifest,$p)
 function compile_cordscript($script,$p,$n,$o)
 {
 	$a = array();
-	$result = exec("bash ./dashboard-command run ".$script." \"".$o."\"",&$a);
+	$result = exec("bash ./dashboard-command run ".$script." \"".$o."\"",$a);
 	if ( $n == 'text' )
 	{	
 	$p->command_output( "Script Compilation and Execution", $a );
@@ -265,7 +265,7 @@ function user_login( $n, $p )
 	$qn = "\"".$n."\"";
 	$qp = "\"".$p."\"";
 	$a = array();
-	exec("grep name cords_user.xml",&$a);
+	exec("grep name cords_user.xml",$a);
 	foreach ($a as $l )
 	{
 		$un = "";
@@ -286,7 +286,7 @@ function user_login( $n, $p )
 		{
 			$r = explode("\"",$ur);
 			$a = array();
-			$result = exec("bash ./dashboard-command run csp-login.txt ".$un." ".$up,&$a);
+			$result = exec("bash ./dashboard-command run csp-login.txt ".$un." ".$up,$a);
 			return( $r[1] );
 		}
 	}
@@ -315,7 +315,7 @@ function new_user()
 	if ( $manifest != "" )
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-parser --verbose ".$manifest,&$a);
+		$result = exec("bash ./dashboard-parser --verbose ".$manifest,$a);
 	}
 }
 
