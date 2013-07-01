@@ -930,6 +930,14 @@ public	struct	os_response *	os_list_floating_ips(struct os_subscription * sptr )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ l i s t _ p o o l s			*/ 
+/*	------------------------------------------------------------	*/
+public	struct	os_response *	os_list_pools(struct os_subscription * sptr )
+{
+	return( os_list_operation(sptr, "/os-floating-ip-pools" ) );
+}
+
+/*	------------------------------------------------------------	*/
 /*	   o s _ l i s t _ f l o a t i n g _ i p _ d e t a i l s	*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_list_floating_ip_details(struct os_subscription * sptr )
@@ -2004,6 +2012,26 @@ public	struct	os_response *	os_create_image(struct os_subscription * sptr, char 
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ p o o l _ m e s s a g e 			*/
+/*	------------------------------------------------------------	*/
+public	char * 	os_pool_message(struct os_subscription * sptr,char * poolname)
+{
+	FILE * h;
+	char *	filename;
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( filename );
+	else if (!( h = fopen( filename,"w") ))
+		return( (char *) 0 );
+	else
+	{
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		fprintf(h,"<pool>%s</pool>\n",(poolname? poolname : "nova"));
+		fclose(h);
+		return( filename );
+	}
+}
+
+/*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _  a d d r e s s 		*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_create_address(struct os_subscription * sptr)
@@ -2012,10 +2040,29 @@ public	struct	os_response *	os_create_address(struct os_subscription * sptr)
 	struct	url		*	uptr;
 	char	buffer[1024];
 	char 			*	nptr;
+	char 			*	filename=(char *) 0;
+	char			*	poolname=(char *) 0;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	sprintf(buffer,"/os-floating-ips");
 
-	if (!( hptr = os_authenticate(sptr) ))
+	if (!( rptr = os_list_pools( sptr ) ))
+		return( rptr );
+	else if (!( rptr->jsonroot ))
+		poolname="nova";
+	else if (!( poolname = json_atribut( rptr->jsonroot, "name" ) ))
+		poolname = "nova";
+
+	if ( poolname )
+		poolname = allocate_string( poolname );
+
+	rest_log_message( "poolname" );
+	rest_log_message( poolname );
+	rptr = liberate_os_response( rptr );
+
+		
+	if (!( filename = os_pool_message( sptr, poolname ) ))
+		return( rptr );
+	else if (!( hptr = os_authenticate(sptr) ))
 		return( rptr );
 	else if (!( uptr = analyse_url( sptr->Os.base )))
 		return( rptr );
@@ -2026,7 +2073,7 @@ public	struct	os_response *	os_create_address(struct os_subscription * sptr)
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, (char *) 0, hptr ) ))
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( rptr );

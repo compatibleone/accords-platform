@@ -104,6 +104,7 @@ public	struct	os_response *
 
 public	struct	os_response *	os_list_servers	(struct os_subscription *  sptr );
 public	struct	os_response *	os_list_flavors(struct os_subscription *  sptr );
+public	struct	os_response *	os_list_pools(struct os_subscription *  sptr );
 public	struct	os_response *	os_list_images  (struct os_subscription *  sptr );
 public	struct	os_response *	os_list_server_metadata(struct os_subscription *  sptr, char * id );
 public	struct	os_response *	os_list_image_metadata(struct os_subscription *  sptr, char * id );

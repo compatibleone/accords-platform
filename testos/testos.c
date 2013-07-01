@@ -123,6 +123,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( ( detail ? os_list_security_group_details(subscription) : os_list_security_groups(subscription)) );
 		else if (!( strcasecmp( p2, "TYPES" ) ))
 			os_result( os_list_volume_types(subscription ) );
+		else if (!( strcasecmp( p2, "POOLS" ) ))
+			os_result( os_list_pools(subscription ) );
 		else if (!( strcasecmp( p2, "VOLUMES" ) ))
 			os_result( ( detail ? os_list_volume_details(subscription,p3) : os_list_volumes(subscription,p3)) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
@@ -452,7 +454,7 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | ADDRESSES | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | ADDRESSES | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   VOLUME   <name> <size> <type> <zone> ");
 	printf("\n   ATTACH   <server> <volume> <device> ");
