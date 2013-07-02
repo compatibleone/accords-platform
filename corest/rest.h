@@ -52,6 +52,8 @@
 #define	_HTTP_AUTHORIZATION	"Authorization"
 #define	_HTTP_WWW_AUTHENTICATE	"WWW-Authenticate"
 #define	_HTTP_PROXY_AUTHENTICATE "PROXY-Authenticate"
+#define	_HTTP_TRANSFER_ENCODING	"Transfer-Encoding"
+#define	_HTTP_CHUNKED		"Chunked"
 #define	_HTTP_BASIC		"Basic realm=*"
 
 #define	_HTTP_MOVED		301

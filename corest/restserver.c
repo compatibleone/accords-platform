@@ -1193,6 +1193,41 @@ private	int	rest_consume_byte( struct rest_client * cptr )
 }
 
 /*	------------------------------------------------	*/
+/*		r e s t _ o o n s u m e _ e o l 		*/
+/*	------------------------------------------------	*/
+private	int	rest_consume_eol( struct rest_client * cptr )
+{
+	int	c;
+	while ((c = rest_consume_byte( cptr )) != -1 )
+	{
+		if ( c == '\n' )
+			break;
+		else	continue;
+	}
+	return( c );
+}
+
+/*	------------------------------------------------	*/
+/*	 r e s t _ c o n s u m e _ c h u n k _ s i z e 		*/
+/*	------------------------------------------------	*/
+private	int	rest_consume_chunk_size( struct rest_client * cptr ) 
+{
+	char buffer[1024];
+	int	c;
+	int	i=0;
+	while ((c = rest_consume_byte( cptr )) != -1)
+	{
+		if ( c == '\n' )
+			break;
+		else if ( c == '\r' )
+			continue;
+		else	buffer[i++] = c;
+	}
+	buffer[i] = 0;
+	return( strtol( buffer,(char **) 0, 16 ) );
+}
+
+/*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ t o k e n 		*/
 /*	------------------------------------------------	*/
 private	char *	rest_consume_token( struct rest_client  * cptr, int terminator )	
@@ -1597,20 +1632,21 @@ private	char *	rest_content_extension( char * sptr )
 	else	return( "tmp" );
 }
 
+
 /*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ b o d y      		*/
 /*	------------------------------------------------	*/
 private	struct rest_request *	rest_consume_body(
 		struct rest_client  * cptr, 
-		struct rest_request * rptr)
+		struct rest_request * rptr,
+		struct rest_header  * hptr )
 {
 	char	*	xptr;
 	FILE	*	h;
 	char	*	nptr;
 	int		bytes=0;
-	struct	rest_header * hptr;
 
-	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+	if (!( hptr ))
 		return( rptr );
 	else if (!( hptr->value ))
 		return( rptr );
@@ -1657,20 +1693,98 @@ private	struct rest_request *	rest_consume_body(
 	}
 }
 
+/*	------------------------------------------------	*/
+/*	     r e s t _ c o n s u m e _ c h u n k s 		*/
+/*	------------------------------------------------	*/
+private	struct rest_request *	rest_consume_chunks(
+		struct rest_client  * cptr, 
+		struct rest_request * rptr,
+		struct rest_header  * hptr )
+{
+	char	*	xptr;
+	FILE	*	h;
+	char	*	nptr;
+	int		bytes=0;
+
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( rptr );
+	else if (!( xptr = rest_content_extension( hptr->value )))
+		return( rptr );
+	else if (!( nptr = rest_temporary_filename(xptr)))
+		return( rptr );
+	else	rest_request_body( rptr, nptr, _FILE_BODY );
+
+	if (!( h = fopen( rptr->body,"wb" ) ))
+	{
+		/* TODO FAILURE */
+		return( rptr );
+	}
+	else
+	{
+		while ((bytes = rest_consume_chunk_size( cptr )) != 0)
+		{
+			while ( bytes )
+			{
+				if ((cptr->bytes - cptr->consumed) > 0)
+				{
+					if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+					{
+						/* TODO FAILURE */
+						break;
+					}
+					else 	bytes -= (cptr->bytes - cptr->consumed);
+				}
+	
+				if (!( bytes ))
+					break;
+
+				else if ( rest_client_read( cptr ) <= 0 )
+				{
+					/* OK NO MORE */
+					break;
+				}
+			}
+			if ( bytes )
+				break;
+			else if ( rest_consume_eol( cptr ) != '\n' )
+				break;
+		}
+		fclose(h);
+		return( rptr );
+	}
+}
+
+/*	------------------------------------------------	*/
+/*	     r e s t _ d e t e c t _ b o d y      		*/
+/*	------------------------------------------------	*/
+private	struct rest_request *	rest_detect_body( 
+		struct rest_client  * cptr, 
+		struct rest_request * rptr)
+{
+	struct	rest_header * hptr;
+	if (( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH )) != (struct rest_header *) 0)
+		return( rest_consume_body( cptr, rptr, hptr ) );
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_TRANSFER_ENCODING )))
+		return( rptr );
+	else if (!( strcasecmp( hptr->value, _HTTP_CHUNKED ) ))
+		return( rest_consume_chunks( cptr, rptr, hptr ) );
+	else	return( rptr );
+}
+
 /*	---------------------------------------------------	*/
 /*	r e s t _ c o n s u m e _ r e s p o n s e _ b o d y     */
 /*	---------------------------------------------------	*/
 private	struct rest_response *	rest_consume_response_body(
 		struct rest_client  * cptr, 
-		struct rest_response * rptr)
+		struct rest_response * rptr,
+		struct rest_header * hptr )
 {
 	FILE	*	h;
 	char	*	xptr;
 	char	*	nptr;
 	int		bytes=0;
-	struct	rest_header * hptr;
 
-	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+	if (!( hptr ))
 		return( rptr );
 	else if (!( hptr->value ))
 		return( rptr );
@@ -1714,6 +1828,81 @@ private	struct rest_response *	rest_consume_response_body(
 	}
 }
 
+/*	-------------------------------------------------------		*/
+/*	r e s t _ c o n s u m e _ r e s p o n s e _ c h u n k s		*/ 
+/*	-------------------------------------------------------		*/
+private	struct rest_response *	rest_consume_response_chunks(
+		struct rest_client  * cptr, 
+		struct rest_response * rptr,
+		struct rest_header * hptr )
+{
+	FILE	*	h;
+	char	*	xptr;
+	char	*	nptr;
+	int		bytes=0;
+
+	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
+		return( rptr );
+	else if (!( xptr = rest_content_extension( hptr->value )))
+		return( rptr );
+	else if (!( nptr = rest_temporary_filename(xptr)))
+		return( rptr );
+	else	rest_response_body( rptr, nptr, _FILE_BODY );
+
+	if (!( h = fopen( rptr->body,"wb" ) ))
+	{
+		/* TODO FAILURE */
+		return( rptr );
+	}
+	else
+	{
+		while ((bytes = rest_consume_chunk_size( cptr )) != 0)
+		{
+			while ( bytes )
+			{
+				if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+				{
+					/* TODO FAILURE */
+					break;
+				}
+				else 	bytes -= (cptr->bytes - cptr->consumed);
+	
+				if (!( bytes ))
+					break;
+	
+				if (!( rest_client_read( cptr ) ))
+				{
+					/* OK NO MORE */
+					break;
+				}
+			}
+			if ( bytes )
+				break;
+			else if ( rest_consume_eol( cptr ) != '\n' )
+				break;
+		}
+		fclose(h);
+		return( rptr );
+	}
+}
+
+/*	-------------------------------------------------	*/
+/*	r e s t _ d e t e c t _ r e s p o n s e _ b o d y      	*/
+/*	-------------------------------------------------	*/
+private	struct rest_response *	rest_detect_response_body( 
+		struct rest_client  * cptr, 
+		struct rest_response * rptr)
+{
+	struct	rest_header * hptr;
+	if (( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH )) != (struct rest_header *) 0)
+		return( rest_consume_response_body( cptr, rptr, hptr ) );
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_TRANSFER_ENCODING )))
+		return( rptr );
+	else if (!( strcasecmp( hptr->value, _HTTP_CHUNKED ) ))
+		return( rest_consume_response_chunks( cptr, rptr, hptr ) );
+	else	return( rptr );
+}
+
 /*	------------------------------------------------	*/
 /*	     r e s t _ c o n s u m e _ r e q u e s t		*/
 /*	------------------------------------------------	*/
@@ -1735,7 +1924,7 @@ private	struct rest_request *	rest_consume_request( struct rest_client * cptr, i
 
 	rest_show_request( rptr );
 
-	if (!( rptr = rest_consume_body( cptr, rptr )))
+	if (!( rptr = rest_detect_body( cptr, rptr )))
 		return( rptr );
 	else	return( rptr ); 
 }
@@ -1756,7 +1945,7 @@ private	struct	rest_response * rest_consume_response( struct rest_client * cptr 
 		return( aptr );
 	else if (!( aptr = rest_consume_response_head( cptr, aptr )))
 		return( aptr );
-	else if (!( aptr = rest_consume_response_body( cptr, aptr )))
+	else if (!( aptr = rest_detect_response_body( cptr, aptr )))
 		return( aptr );
 	else	return( aptr ); 
 }
