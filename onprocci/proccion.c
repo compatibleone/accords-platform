@@ -184,6 +184,7 @@ private	int	reset_opennebula_server( struct opennebula * pptr )
 /*	--------------------------------------------------------	*/
 private	int	connect_opennebula_server( struct on_response * rptr,struct opennebula * pptr )
 {
+	int	pending=60*60;
 	char *	version;
 	struct	on_response * zptr;
 	struct	on_response * yptr;
@@ -246,6 +247,9 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 			}
 			if (!( strcmp( vptr, "PENDING" )))
 			{
+				if (!( pending ))
+					return( 444 );
+				else	pending--;
 				sleep(1);
 				if ( zptr )
 					zptr = liberate_on_response( zptr );
@@ -260,6 +264,8 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 				break;
 			else if (!( strcmp( vptr, "FAILED" )))
 				return( 666 );
+			else if (!( strcmp( vptr, "DONE" )))
+				return( 777 );
 		}
 
 		if ( pptr->hostname ) pptr->hostname = liberate( pptr->hostname );
