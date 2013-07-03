@@ -25,6 +25,7 @@ char *                  occi_unquoted_value( char * sptr );
 private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int	usejson=0;		/* forces use of json message for server create	*/
+private	int	quantum_xml=0;		/* use xml for quantum otherwise json		*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
 public	void	os_use_json( int v )
@@ -653,6 +654,40 @@ public	int	check_keystone_authorization(struct os_subscription * sptr)
 						return( 0 );
 					}
 				}
+				else if (!( strcasecmp( tptr, "network" ) ))
+				{
+					liberate( tptr );
+					if (!( gptr = document_element( eptr, "endpoint" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					if (!( aptr = document_atribut( gptr, "publicURL" ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( aptr->value ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.network = allocate_string( aptr->value ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+					else if (!( sptr->KeyStone.network = occi_unquoted_value( sptr->KeyStone.network ) ))
+					{
+						document = document_drop( document );
+						rptr = liberate_rest_response( rptr );
+						return( 0 );
+					}
+				}
 				else if (!( strcasecmp( tptr, "volume" ) ))
 				{
 					liberate( tptr );
@@ -920,6 +955,73 @@ private struct	os_response *	os_list_operation(struct os_subscription * sptr, ch
 	}
 	else	return( rptr );
 }
+
+/*	------------------------------------------------------------	*/
+/*	     o s _ n e t w o r k _ l i s t _ o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+private struct	os_response *	os_network_list_operation(struct os_subscription * sptr, char * buffer )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+
+	char 	url[1024];
+
+	sprintf(url,"v2.0%s",buffer);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.network )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, url ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*	o s _ n e t w o r k _ r e t r i e v e _ o p e r a t i o n	*/
+/*	---------------------------------------------------------	*/
+public	struct	os_response *	os_network_retrieve_operation(struct os_subscription *  sptr, char * what )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char				buffer[1024];
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+
+	sprintf(buffer,"v2.0%s",what);
+
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.network )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_get_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
 
 /*	------------------------------------------------------------	*/
 /*			o s _ l i s t _ f l o a t i n g _ i p s		*/
@@ -2262,6 +2364,128 @@ private	struct	os_response *	os_create_operation(struct os_subscription * sptr, 
 }
 
 /*	------------------------------------------------------------	*/
+/*			o s _ u p d a t e _  o p e r a t i o n		*/
+/*	------------------------------------------------------------	*/
+private	struct	os_response *	os_update_operation(struct os_subscription * sptr, char * buffer, char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->Os.base )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent,filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	   o s _ n e t w o r k _ d e l e t e _ o p e r a t i o n	*/
+/*	------------------------------------------------------------	*/
+private	struct	os_response *	os_network_delete_operation(struct os_subscription * sptr,  char * what )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				buffer[1024];
+	sprintf(buffer,"v2.0%s",what);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.network )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_delete_request( nptr, sptr->Os.tls, sptr->Os.agent, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	   o s _ n e t w o r k _ c r e a t e _  o p e r a t i o n	*/
+/*	------------------------------------------------------------	*/
+private	struct	os_response *	os_network_create_operation(struct os_subscription * sptr, char * what, char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				buffer[1024];
+	sprintf(buffer,"v2.0%s",what);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.network )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr,buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_post_request( nptr, sptr->Os.tls, sptr->Os.agent, filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	  o s _ n e t w o r k _ u p d a t e _  o p e r a t i o n	*/
+/*	------------------------------------------------------------	*/
+private	struct	os_response *	os_network_update_operation(struct os_subscription * sptr, char * what, char * filename )
+{
+	struct	os_response	*	rptr=(struct os_response *) 0;
+	struct	url		*	uptr;
+	char 			*	nptr;
+	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
+	char				buffer[1024];
+	sprintf(buffer,"v2.0%s",what);
+	if (!( hptr = os_authenticate(sptr) ))
+		return( rptr );
+	else if (!( uptr = analyse_url( sptr->KeyStone.network )))
+		return( rptr );
+	else if (!( uptr = validate_url( uptr ) ))
+		return( rptr );
+	else if (!( nptr = serialise_url( uptr, buffer ) ))
+	{
+		uptr = liberate_url( uptr );
+		return( rptr );
+	}
+	else if (!( rptr = os_client_put_request( nptr, sptr->Os.tls, sptr->Os.agent,filename, hptr ) ))
+	{
+		uptr = liberate_url( uptr );
+		liberate( nptr );
+		return( rptr );
+	}
+	else	return( rptr );
+}
+
+
+/*	------------------------------------------------------------	*/
 /*			o s _ c r e a t e _ v o l u m e  		*/
 /*	------------------------------------------------------------	*/
 public	struct	os_response *	os_create_volume(struct os_subscription *  sptr, char * name, char * size, char * type, char * zone )
@@ -3064,6 +3288,318 @@ public	struct	os_response *	os_delete_security_rule( struct os_subscription * sp
 	sprintf(buffer,"/os-security-group-rules/%s",id);
 	return( os_delete_operation(sptr, buffer ) );
 }
+
+
+/* ----------- */
+/* QUANTUM API */
+/* ----------- */
+
+/*	-----------------------------------		*/
+/*	o s _ n e t w o r k _ m e s s a g e 		*/
+/*	-----------------------------------		*/
+private	char *	os_network_message( struct os_subscription *  sptr, char * name, int state )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<network name=\"%s\" admin_state_up=\"%s\"/>\n",name,(state ? "true" : "false"));
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"{\"network\":{\"name\":\"%s\",\"admin_state_up\":\"%s\"}}\n",name,(state ? "true" : "false"));
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
+/*	---------------------------------		*/
+/*	o s _ s u b n e t _ m e s s a g e 		*/
+/*	---------------------------------		*/
+private	char *	os_subnet_message( struct os_subscription *  sptr, char * netid, int version, char * cidr )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+				0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<subnet network_id=\"%s\" version=\"%u\" cidr=\"%s\"/>\n",netid,version,cidr);
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"{\"subnet\":{\"network_id\":\"%s\",\"version\":\"%u\",\"cidr\":\"%s\"}}\n",netid,version,cidr);
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
+/*	-----------------------------		*/
+/*	o s _ p o r t _ m e s s a g e 		*/
+/*	-----------------------------		*/
+private	char *	os_port_message( struct os_subscription *  sptr, char * name, char * netid, char * devid, char * grpid, int state )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);	
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+				0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<port ");
+			if ( rest_valid_string( name ) != 0 )
+			{
+				fprintf(h," name=\"%s\"",name);
+			}
+			if ( rest_valid_string( netid ) != 0 )
+			{
+				fprintf(h," network_id=\"%s\"",netid);
+			}
+			if ( rest_valid_string( devid ) != 0 )
+			{
+				fprintf(h," device_id=\"%s\"",devid);
+			}
+			fprintf(h," admin_state_up=\"%s\">\n",(state ? "true" : "false"));
+			if ( rest_valid_string( grpid ) != 0 )
+			{
+				fprintf(h,"<security_group>%s</security_group>\n",grpid);
+			}
+			fprintf(h,"</port>\n");
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);	
+		else
+		{
+			fprintf(h,"{\"port\":{");
+			fprintf(h,"\"name\":\"%s\"",(name?name:"portname"));
+			if ( rest_valid_string( netid ) != 0 )
+			{
+				fprintf(h,",\"network_id\":\"%s\"",netid);
+			}
+			if ( rest_valid_string( devid ) != 0 )
+			{
+				fprintf(h,",\"device_id\":\"%s\"",devid);
+			}
+			fprintf(h,",\"admin_state_up\":\"%s\"\n",(state ? "true" : "false"));
+			if ( rest_valid_string( grpid ) != 0 )
+			{
+				fprintf(h,",\"security_group\":[\"%s\"]\n",grpid);
+			}
+			fprintf(h,"}}\n");
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
+
+
+/*	---------------------------------------	*/
+/*	o s _ l i s t _ n e t w o r k s		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_list_networks(struct os_subscription *  sptr)
+{
+	return( os_network_list_operation( sptr, "/networks" ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ n e t w o r k s 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state )
+{
+	char *	filename;
+	if (!( filename = os_network_message( sptr, name, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_create_operation( sptr, "/networks", filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ u p d a t e _ n e t w o r k s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/networks/%s",netid);
+	char *	filename;
+	if (!( filename = os_network_message( sptr, name, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ d e l e t e _ n e t w o r k s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_delete_network(struct os_subscription *  sptr, char * netid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/networks/%s",netid);
+	return( os_network_delete_operation(sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ r e t r i e v e _ n e t w o r k s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_retrieve_network(struct os_subscription *  sptr, char * netid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/networks/%s",netid);
+	return( os_network_retrieve_operation( sptr, buffer ) );
+}
+
+
+/*	---------------------------------------	*/
+/*	o s _ l i s t _ s u b n e t s		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_list_subnets(struct os_subscription *  sptr)
+{
+	return( os_network_list_operation( sptr, "/subnets" ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ s u b n e t s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * netid, int version, char * cidr )
+{
+	char *	filename;
+	if (!( filename = os_subnet_message( sptr, netid, version, cidr )))
+		return((struct os_response *) 0);
+	else	return( os_network_create_operation( sptr, "/subnets", filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ d e l e t e _ s u b n e t s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_delete_subnet(struct os_subscription *  sptr, char * subid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/subnets/%s",subid);
+	return( os_network_delete_operation(sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ r e t r i e v e _ s u b n e t s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_retrieve_subnet(struct os_subscription *  sptr, char * subid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/subnets/%s",subid);
+	return( os_network_retrieve_operation( sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ u p d a t e _ s u b n e t s 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * netid, int version, char * cidr )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/subnets/%s",subid);
+	char *	filename;
+	if (!( filename = os_subnet_message( sptr, netid, version, cidr )))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
+
+
+
+/*	---------------------------------------	*/
+/*	o s _ l i s t _ p o r t s 		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_list_ports(struct os_subscription *  sptr)
+{
+	return( os_network_list_operation( sptr, "/ports" ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ p o r t s		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_create_port(struct os_subscription *  sptr, char * name, char * netid, char * devid, char * grpid, int state )
+{
+	char *	filename;
+	if (!( filename = os_port_message( sptr, name, netid, devid, grpid, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_create_operation( sptr, "/ports", filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ d e l e t e _ p o r t s 		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_delete_port(struct os_subscription *  sptr, char * portid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/ports/%s",portid);
+	return( os_network_delete_operation(sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ r e t r i e v e _ p o r t s 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_retrieve_port(struct os_subscription *  sptr, char * portid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/ports/%s",portid);
+	return( os_network_retrieve_operation( sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ u p d a t e _ p o r t s		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_update_port(struct os_subscription *  sptr, char * portid, char * name, char * netid, char * devid, char * grpid, int state )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/ports/%s",portid);
+	char *	filename;
+	if (!( filename = os_port_message( sptr, name, netid, devid, grpid, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
+
+
 
 /*	------------------------------------------------------------	*/
 /*		o s _ l i b e r a t e _ s u b s c r i p t i o n		*/

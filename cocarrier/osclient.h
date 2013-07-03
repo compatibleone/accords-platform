@@ -49,6 +49,7 @@ struct	keystone_config
 	char *	host;
 	char *	glance;
 	char *	volume;
+	char *	network;
 };
 
 struct	os_subscription
@@ -173,6 +174,27 @@ public	struct	os_response *	os_get_keypair(struct os_subscription *  sptr, char 
 public	struct	os_response *	os_delete_keypair(struct os_subscription *  sptr, char * name );
 public	struct	os_response *	os_list_keypairs(struct os_subscription *  sptr );
 public	char *	os_keypair_request( struct os_subscription *  sptr, char * name, char * value );
+
+
+/* quantum extension */
+/* ----------------- */
+public	struct	os_response *	os_list_networks(struct os_subscription *  sptr);
+public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state );
+public	struct	os_response *	os_delete_network(struct os_subscription *  sptr, char * netid );
+public	struct	os_response *	os_retrieve_network(struct os_subscription *  sptr, char * netid ); 
+public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state );
+
+public	struct	os_response *	os_list_subnets(struct os_subscription *  sptr);
+public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * netid, int version, char * cidr );
+public	struct	os_response *	os_delete_subnet(struct os_subscription *  sptr, char * subid );
+public	struct	os_response *	os_retrieve_subnet(struct os_subscription *  sptr, char * subid ); 
+public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * netid, int version, char * cidr );
+
+public	struct	os_response *	os_list_ports(struct os_subscription *  sptr);
+public	struct	os_response *	os_create_port(struct os_subscription *  sptr, char * name, char * netid, char * devid, char * grpid, int state );
+public	struct	os_response *	os_delete_port(struct os_subscription *  sptr, char * portid );
+public	struct	os_response *	os_retrieve_port(struct os_subscription *  sptr, char * portid ); 
+public	struct	os_response *	os_update_port(struct os_subscription *  sptr, char * portid, char * name, char * netid, char * devid, char * grpid, int state );
 
 
 #endif	/* _os_client_h */

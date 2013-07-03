@@ -97,6 +97,21 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	if (!( p1 ))
 		return( failure( 30,"p1", "required") );
 
+	else if (!( strcasecmp(p1,"NETWORK" ) ))
+	{
+		os_result( os_create_network(subscription,p2, (p3 ? atoi(p3) : 0 ) ) );
+		return(0);
+	}
+	else if (!( strcasecmp(p1,"SUBNET" ) ))
+	{
+		os_result( os_create_subnet(subscription,p2, (p3 ? atoi(p3) : 4), p4 ) );
+		return(0);
+	}
+	else if (!( strcasecmp(p1,"PORT" ) ))
+	{
+		os_result( os_create_port(subscription,p2, p3, p4, p5, (p6 ? atoi(p6) : 0) ) );
+		return(0);
+	}
 	else if (!( strcasecmp(p1,"ADDRESS" ) ))
 	{
 		os_result( os_create_address(subscription) );
@@ -125,6 +140,12 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_list_volume_types(subscription ) );
 		else if (!( strcasecmp( p2, "POOLS" ) ))
 			os_result( os_list_pools(subscription ) );
+		else if (!( strcasecmp( p2, "NETWORKS" ) ))
+			os_result( os_list_networks(subscription ) );
+		else if (!( strcasecmp( p2, "SUBNETS" ) ))
+			os_result( os_list_subnets(subscription ) );
+		else if (!( strcasecmp( p2, "PORTS" ) ))
+			os_result( os_list_ports(subscription ) );
 		else if (!( strcasecmp( p2, "VOLUMES" ) ))
 			os_result( ( detail ? os_list_volume_details(subscription,p3) : os_list_volumes(subscription,p3)) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
@@ -303,6 +324,12 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_get_image( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GLANCE" ) ))
 			os_result( os_get_glance( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+			os_result( os_retrieve_network( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "SUBNET" ) ))
+			os_result( os_retrieve_subnet( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "PORT" ) ))
+			os_result( os_retrieve_port( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_get_address( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
@@ -324,6 +351,21 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 				return( failure(33,p1,p2) );
 			else	os_result( os_update_server_metadata( subscription,p3, p4, p5 ) );
 		}
+		else if (!( strcasecmp(p1,"NETWORK" ) ))
+		{
+			os_result( os_update_network(subscription,p2, p3, (p4 ? atoi(p4) : 0 ) ) );
+			return(0);
+		}
+		else if (!( strcasecmp(p1,"SUBNET" ) ))
+		{
+			os_result( os_update_subnet(subscription,p2, p3, (p4 ? atoi(p4) : 4), p5 ) );
+			return(0);
+		}
+		else if (!( strcasecmp(p1,"PORT" ) ))
+		{
+			os_result( os_update_port(subscription,p2, p3, p4, p5, p6, (p7 ? atoi(p7) : 0) ) );
+			return(0);
+		}
 		else	return( failure(33, p1, p2 ) );
 		return( 0 );
 	}
@@ -343,6 +385,12 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_delete_flavor( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "VOLUME" ) ))
 			os_result( os_delete_volume( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "NETWORK" ) ))
+			os_result( os_delete_network( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "SUBNET" ) ))
+			os_result( os_delete_subnet( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "PORT" ) ))
+			os_result( os_delete_port( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			os_result( os_delete_security_group( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "RULE" ) ))
@@ -448,18 +496,21 @@ private	int	os_command(int argc, char * argv[] )
 
 private	int	os_banner()
 {
-	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0c.0.01");
-	printf("\n   Beta Version 26/04/2013");
+	printf("\n   CO-OS : CompatibleOne OpenStack Client Test : Version 1.0d.0.01");
+	printf("\n   Beta Version 05/07/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | ADDRESSES | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | ADDRESSES | NETWORKS | SUBNETS | PORTS | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   VOLUME   <name> <size> <type> <zone> ");
 	printf("\n   ATTACH   <server> <volume> <device> ");
 	printf("\n   DETACH   <server> <volume> ");
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
+	printf("\n   NETWORK  <name> <state> ");
+	printf("\n   SUBNET   <net> <version> <cidr> ");
+	printf("\n   PORT     <name> <net> <dev> <grp> <state> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   PUBLICVM <name> <server> ");
@@ -474,9 +525,14 @@ private	int	os_banner()
 	printf("\n   ASSOCIATE <address> <serverid>   ");
 	printf("\n   COPY   [ GLANCE ] <id> <host> <tenant> <user> <password>");
 	printf("\n   HEAD   [ GLANCE ] <id> ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | GROUP | METADATA | KEY ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | NETWORK | SUBNET | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id> | KEY <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
+	printf("\n   PUT NETWORK  <net>    <name> <state> ");
+	printf("\n   PUT SUBNET   <subnet> <net> <version> <cidr> ");
+	printf("\n   PUT PORT     <port>   <name> <net> <dev> <grp> <state> ");
+	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id>    ] ");
+	printf("\n   DELETE [ KEY <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
+	printf("\n   DELETE [ NETWORK <id> | SUBNET <id> | PORT <id>  ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

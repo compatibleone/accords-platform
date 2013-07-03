@@ -80,6 +80,8 @@ public	int	rest_valid_string( char * vptr )
 		return( 0 );
 	else if (!( strcmp( vptr, "(null)" ) ))
 		return( 0 );
+	else if (!( strcmp( vptr, "null" ) ))
+		return( 0 );
 	else if (!( strcmp( vptr, "(none)" ) ))
 		return( 0 );
 	else	return( 1 );
