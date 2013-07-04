@@ -3333,6 +3333,45 @@ private	char *	os_network_message( struct os_subscription *  sptr, char * name, 
 	}
 }
 
+/*	-----------------------------------------	*/
+/*	o s _ f l o a t i n g i p _ m e s s a g e 	*/
+/*	-----------------------------------------	*/
+private	char *	os_floatingip_message( struct os_subscription *  sptr, char * netid, char * portid )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<floatingips/>");
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			if ( rest_valid_string(portid) )
+				fprintf(h,"{\"floatingip\":{\"floating_network_id\":\"%s\",\"port_id\":\"%s\"}}\n",netid,portid);
+			else	fprintf(h,"{\"floatingip\":{\"floating_network_id\":\"%s\"}}\n",netid);
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
 /*	---------------------------------		*/
 /*	o s _ s u b n e t _ m e s s a g e 		*/
 /*	---------------------------------		*/
@@ -3440,7 +3479,42 @@ private	char *	os_port_message( struct os_subscription *  sptr, char * name, cha
 	}
 }
 
+public	struct	os_response *	os_list_floatingips(struct os_subscription *  sptr)
+{
+	return( os_network_list_operation( sptr, "/floatingips" ) );
+}
 
+public	struct	os_response *	os_create_floatingip(struct os_subscription *  sptr, char * netid, char * portid )
+{
+	char *	filename;
+	if (!( filename = os_floatingip_message( sptr, netid, portid ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_create_operation( sptr, "/floatingips", filename ) );
+}
+
+public	struct	os_response *	os_delete_floatingip(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/floatingips/%s",id);
+	return( os_network_delete_operation(sptr, buffer ) );
+}
+
+public	struct	os_response *	os_retrieve_floatingip(struct os_subscription *  sptr, char * id )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/floatingips/%s",id);
+	return( os_network_retrieve_operation(sptr, buffer ) );
+}
+
+public	struct	os_response *	os_update_floatingip(struct os_subscription *  sptr, char * id, char * netid, char * portid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/floatingips/%s",id);
+	char *	filename;
+	if (!( filename = os_floatingip_message( sptr, netid, portid ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
 
 /*	---------------------------------------	*/
 /*	o s _ l i s t _ n e t w o r k s		*/

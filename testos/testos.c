@@ -112,6 +112,11 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		os_result( os_create_port(subscription,p2, p3, p4, p5, (p6 ? atoi(p6) : 0) ) );
 		return(0);
 	}
+	else if (!( strcasecmp(p1,"FLOATINGIP" ) ))
+	{
+		os_result( os_create_floatingip(subscription, p2, p3 ) );
+		return(0);
+	}
 	else if (!( strcasecmp(p1,"ADDRESS" ) ))
 	{
 		os_result( os_create_address(subscription) );
@@ -140,6 +145,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_list_volume_types(subscription ) );
 		else if (!( strcasecmp( p2, "POOLS" ) ))
 			os_result( os_list_pools(subscription ) );
+		else if (!( strcasecmp( p2, "FLOATINGIPS" ) ))
+			os_result( os_list_floatingips(subscription) );
 		else if (!( strcasecmp( p2, "NETWORKS" ) ))
 			os_result( os_list_networks(subscription ) );
 		else if (!( strcasecmp( p2, "SUBNETS" ) ))
@@ -326,6 +333,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_get_glance( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
 			os_result( os_retrieve_network( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "FLOATINGIP" ) ))
+			os_result( os_retrieve_floatingip( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "SUBNET" ) ))
 			os_result( os_retrieve_subnet( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "PORT" ) ))
@@ -354,6 +363,11 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		else if (!( strcasecmp(p1,"NETWORK" ) ))
 		{
 			os_result( os_update_network(subscription,p2, p3, (p4 ? atoi(p4) : 0 ),(p5 ? atoi(p5) : 0 ) ) );
+			return(0);
+		}
+		else if (!( strcasecmp(p1,"FLOATINGIP" ) ))
+		{
+			os_result( os_update_floatingip(subscription,p2, p3, p4 ) );
 			return(0);
 		}
 		else if (!( strcasecmp(p1,"SUBNET" ) ))
@@ -387,6 +401,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_delete_volume( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "NETWORK" ) ))
 			os_result( os_delete_network( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "FLOATINGIP" ) ))
+			os_result( os_delete_floatingip( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "SUBNET" ) ))
 			os_result( os_delete_subnet( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "PORT" ) ))
@@ -502,7 +518,7 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | ADDRESSES | NETWORKS | SUBNETS | PORTS | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | FLOATINGIPS | ADDRESSES | NETWORKS | SUBNETS | PORTS | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   VOLUME   <name> <size> <type> <zone> ");
 	printf("\n   ATTACH   <server> <volume> <device> ");
@@ -519,20 +535,22 @@ private	int	os_banner()
 	printf("\n   GLANCE PRIVATE <id> ");
 	printf("\n   SNAPSHOT <name> <server> ");
 	printf("\n   GET LIMITS ");
+	printf("\n   FLOATINGIP <net> <port> ");
 	printf("\n   ADDRESS ");
 	printf("\n   KEY <name> <public_key> ");
 	printf("\n   METADATA  <id>  <names=values>   ");
 	printf("\n   ASSOCIATE <address> <serverid>   ");
 	printf("\n   COPY   [ GLANCE ] <id> <host> <tenant> <user> <password>");
 	printf("\n   HEAD   [ GLANCE ] <id> ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | NETWORK | SUBNET | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | FLOATINGIP | NETWORK | SUBNET | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
 	printf("\n   PUT NETWORK  <net>    <name> <state> <external> ");
 	printf("\n   PUT SUBNET   <subnet> <net> <version> <cidr> ");
 	printf("\n   PUT PORT     <port>   <name> <net> <dev> <grp> <state> ");
+	printf("\n   PUT FLOATINGIP <ip> <net> <port> ");
 	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id>    ] ");
 	printf("\n   DELETE [ KEY <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
-	printf("\n   DELETE [ NETWORK <id> | SUBNET <id> | PORT <id>  ] ");
+	printf("\n   DELETE [ NETWORK <id> | SUBNET <id> | PORT <id> | FLOATINGIP <id> ] ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

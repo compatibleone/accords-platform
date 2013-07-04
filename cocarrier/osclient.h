@@ -196,6 +196,12 @@ public	struct	os_response *	os_delete_port(struct os_subscription *  sptr, char 
 public	struct	os_response *	os_retrieve_port(struct os_subscription *  sptr, char * portid ); 
 public	struct	os_response *	os_update_port(struct os_subscription *  sptr, char * portid, char * name, char * netid, char * devid, char * grpid, int state );
 
+public	struct	os_response *	os_list_floatingips(struct os_subscription *  sptr);
+public	struct	os_response *	os_create_floatingip(struct os_subscription *  sptr, char * netid, char * portid );
+public	struct	os_response *	os_delete_floatingip(struct os_subscription *  sptr, char * id );
+public	struct	os_response *	os_retrieve_floatingip(struct os_subscription *  sptr, char * id ); 
+public	struct	os_response *	os_update_floatingip(struct os_subscription *  sptr, char * id, char * netid, char * portid );
+
 
 #endif	/* _os_client_h */
 	/* ------------ */
