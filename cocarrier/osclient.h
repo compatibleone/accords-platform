@@ -179,10 +179,10 @@ public	char *	os_keypair_request( struct os_subscription *  sptr, char * name, c
 /* quantum extension */
 /* ----------------- */
 public	struct	os_response *	os_list_networks(struct os_subscription *  sptr);
-public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state );
+public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state,int external );
 public	struct	os_response *	os_delete_network(struct os_subscription *  sptr, char * netid );
 public	struct	os_response *	os_retrieve_network(struct os_subscription *  sptr, char * netid ); 
-public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state );
+public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state, int external );
 
 public	struct	os_response *	os_list_subnets(struct os_subscription *  sptr);
 public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * netid, int version, char * cidr );

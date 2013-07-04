@@ -99,7 +99,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 
 	else if (!( strcasecmp(p1,"NETWORK" ) ))
 	{
-		os_result( os_create_network(subscription,p2, (p3 ? atoi(p3) : 0 ) ) );
+		os_result( os_create_network(subscription,p2, (p3 ? atoi(p3) : 0 ),(p4 ? atoi(p4) : 0 ) ) );
 		return(0);
 	}
 	else if (!( strcasecmp(p1,"SUBNET" ) ))
@@ -353,7 +353,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		}
 		else if (!( strcasecmp(p1,"NETWORK" ) ))
 		{
-			os_result( os_update_network(subscription,p2, p3, (p4 ? atoi(p4) : 0 ) ) );
+			os_result( os_update_network(subscription,p2, p3, (p4 ? atoi(p4) : 0 ),(p5 ? atoi(p5) : 0 ) ) );
 			return(0);
 		}
 		else if (!( strcasecmp(p1,"SUBNET" ) ))
@@ -508,7 +508,7 @@ private	int	os_banner()
 	printf("\n   ATTACH   <server> <volume> <device> ");
 	printf("\n   DETACH   <server> <volume> ");
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
-	printf("\n   NETWORK  <name> <state> ");
+	printf("\n   NETWORK  <name> <state> <external> ");
 	printf("\n   SUBNET   <net> <version> <cidr> ");
 	printf("\n   PORT     <name> <net> <dev> <grp> <state> ");
 	printf("\n   GROUP    <name> ");
@@ -527,7 +527,7 @@ private	int	os_banner()
 	printf("\n   HEAD   [ GLANCE ] <id> ");
 	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | NETWORK | SUBNET | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
-	printf("\n   PUT NETWORK  <net>    <name> <state> ");
+	printf("\n   PUT NETWORK  <net>    <name> <state> <external> ");
 	printf("\n   PUT SUBNET   <subnet> <net> <version> <cidr> ");
 	printf("\n   PUT PORT     <port>   <name> <net> <dev> <grp> <state> ");
 	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id>    ] ");

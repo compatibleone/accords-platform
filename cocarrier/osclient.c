@@ -3297,7 +3297,7 @@ public	struct	os_response *	os_delete_security_rule( struct os_subscription * sp
 /*	-----------------------------------		*/
 /*	o s _ n e t w o r k _ m e s s a g e 		*/
 /*	-----------------------------------		*/
-private	char *	os_network_message( struct os_subscription *  sptr, char * name, int state )
+private	char *	os_network_message( struct os_subscription *  sptr, char * name, int state, int external )
 {
 	char *	filename;
 	FILE *	h;
@@ -3311,7 +3311,7 @@ private	char *	os_network_message( struct os_subscription *  sptr, char * name, 
 		{
 			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
 			0x0022,0x0022,0x0022,0x0022);
-			fprintf(h,"<network name=\"%s\" admin_state_up=\"%s\"/>\n",name,(state ? "true" : "false"));
+			fprintf(h,"<network name=\"%s\" router_external=\"%s\" admin_state_up=\"%s\"/>\n",name,(external?"true":"false"),(state ? "true" : "false"));
 			fclose(h);
 			return( filename );
 		}
@@ -3324,7 +3324,9 @@ private	char *	os_network_message( struct os_subscription *  sptr, char * name, 
 			return((char *) 0);
 		else
 		{
-			fprintf(h,"{\"network\":{\"name\":\"%s\",\"admin_state_up\":\"%s\"}}\n",name,(state ? "true" : "false"));
+			if ( external )
+				fprintf(h,"{\"network\":{\"name\":\"%s\",\"router:external\":\"%s\",\"admin_state_up\":\"%s\"}}\n",name,(external ? "true" : "false"),(state ? "true" : "false"));
+			else	fprintf(h,"{\"network\":{\"name\":\"%s\",\"admin_state_up\":\"%s\"}}\n",name,(state ? "true" : "false"));
 			fclose(h);
 			return( filename );
 		}
@@ -3451,10 +3453,10 @@ public	struct	os_response *	os_list_networks(struct os_subscription *  sptr)
 /*	---------------------------------------	*/
 /*	o s _ c r e a t e _ n e t w o r k s 	*/
 /*	---------------------------------------	*/
-public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state )
+public	struct	os_response *	os_create_network(struct os_subscription *  sptr, char * name, int state, int external )
 {
 	char *	filename;
-	if (!( filename = os_network_message( sptr, name, state ) ))
+	if (!( filename = os_network_message( sptr, name, state, external ) ))
 		return((struct os_response *) 0);
 	else	return( os_network_create_operation( sptr, "/networks", filename ) );
 }
@@ -3462,12 +3464,12 @@ public	struct	os_response *	os_create_network(struct os_subscription *  sptr, ch
 /*	---------------------------------------	*/
 /*	o s _ u p d a t e _ n e t w o r k s	*/
 /*	---------------------------------------	*/
-public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state )
+public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state, int external )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/networks/%s",netid);
 	char *	filename;
-	if (!( filename = os_network_message( sptr, name, state ) ))
+	if (!( filename = os_network_message( sptr, name, state, external ) ))
 		return((struct os_response *) 0);
 	else	return( os_network_update_operation( sptr, buffer, filename ) );
 }
