@@ -61,6 +61,7 @@ private	struct	os_config * resolve_os_configuration( char * sptr )
 	return((struct os_config *) 0);
 }
 
+
 /*	--------------------------------------------------------	*/
 /* 	   r e s o l v e _ o p e n s t a c k _ v e r s i o n 		*/
 /*	--------------------------------------------------------	*/
@@ -475,6 +476,27 @@ private	int	openstack_build_failure( struct openstack * pptr, int status, char *
 }
 
 /*	--------------------------------------------------------	*/
+/*		o s _ s e t _ h o s t _ a d d r e s s 			*/
+/*	--------------------------------------------------------	*/
+public	int	os_set_host_address( struct openstack * pptr )
+{
+	/* ------------------------------------------------------------ */
+	/* set the host name field now to the public or private address */
+	/* ------------------------------------------------------------ */
+	if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
+	{
+		if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
+			return( 910 );
+	}
+	else if (( pptr->privateaddr ) && ( strlen( pptr->privateaddr ) != 0))
+	{
+		if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
+			return( 910 );
+	}
+	return( 0 );
+}
+
+/*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ o p e n s t a c k _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
 private	int	connect_openstack_server( 
@@ -487,6 +509,7 @@ private	int	connect_openstack_server(
 	struct	os_response * yptr;
 	char *	vptr;
 	int	building=0;
+	int	status=0;
 
 	if (!( pptr ))
 		return( 118 );
@@ -629,19 +652,10 @@ private	int	connect_openstack_server(
 				return( openstack_build_failure( pptr, 910, "Allocation Failure : publicaddr" ) );
 		}
 
-		/* ------------------------------------------------------------ */
-		/* set the host name field now to the public or private address */
-		/* ------------------------------------------------------------ */
-		if (( pptr->publicaddr ) && ( strlen( pptr->publicaddr ) != 0))
-		{
-			if (!( pptr->hostname = allocate_string( pptr->publicaddr ) ))
-				return( openstack_build_failure( pptr, 910, "Allocation Failure : publicaddr" ) );
-		}
-		else if (( pptr->privateaddr ) && ( strlen( pptr->privateaddr ) != 0))
-		{
-			if (!( pptr->hostname = allocate_string( pptr->privateaddr ) ))
-				return( openstack_build_failure( pptr, 910, "Allocation Failure : publicaddr" ) );
-		}
+		if (!( pptr->quantum ))
+			if ((status = os_set_host_address( pptr )) != 0)
+				return( openstack_build_failure( pptr, status, "Allocation Failure " ) );
+
 
 		/* ------------------------------------------------- */
 		/* The instance is ready for use ( or more or less ) */
@@ -817,6 +831,8 @@ private	int	os_resolve_access_address(  struct os_subscription * subptr, struct 
 		return( 0 );
 	else if ( os_use_conets( subptr ) )
 		return( conets_access_address( pptr ) );
+	else if ( pptr->quantum )
+		return( 0 );
 	else	return( nova_access_address(subptr, pptr ) );
 }
 
@@ -838,6 +854,8 @@ private	int	associate_server_address(
 	struct	os_response * osptr;
 	if (!( pptr ))
 		return( 1001 );
+	else if ( pptr->quantum )
+		return( 0 );
 	else if (!( rest_valid_string( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_create_address_request( subptr, pptr->floating ) ))
@@ -892,6 +910,8 @@ private	int	disassociate_server_address( struct os_subscription * subptr, struct
 	struct	os_response * osptr;
 	if (!( pptr ))
 		return( 1001 );
+	else if ( pptr->quantum )
+		return( 0 );
 	else if (!( rest_valid_string( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_remove_address_request( subptr,pptr->floating ) ))
@@ -917,10 +937,13 @@ private	int	disassociate_server_address( struct os_subscription * subptr, struct
 private	void	release_floating_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response * osptr;
-	if ( pptr->floatingid )
+	if (!( pptr->quantum ))
 	{
-		if ((osptr = os_delete_address( subptr, pptr->floatingid )) != (struct os_response *) 0)
-			osptr = liberate_os_response( osptr );
+		if ( pptr->floatingid )
+		{
+			if ((osptr = os_delete_address( subptr, pptr->floatingid )) != (struct os_response *) 0)
+				osptr = liberate_os_response( osptr );
+		}
 	}
 	return;
 }
@@ -931,14 +954,17 @@ private	void	release_floating_address( struct os_subscription * subptr, struct o
 private	void	remove_floating_address( struct os_subscription * subptr, struct openstack * pptr )
 {
 	struct	os_response * osptr;
-	if ( pptr->floatingid )
+	if (!( pptr->quantum ))
 	{
-		if ((osptr = os_delete_address( subptr,pptr->floatingid )) != (struct os_response *) 0)
-			osptr = liberate_os_response( osptr );
-		pptr->floatingid = liberate( pptr->floatingid );
+		if ( pptr->floatingid )
+		{
+			if ((osptr = os_delete_address( subptr,pptr->floatingid )) != (struct os_response *) 0)
+				osptr = liberate_os_response( osptr );
+			pptr->floatingid = liberate( pptr->floatingid );
+		}
+		if ( pptr->floating )
+			pptr->floating = liberate( pptr->floating );
 	}
-	if ( pptr->floating )
-		pptr->floating = liberate( pptr->floating );
 	return;
 }
 
@@ -1187,7 +1213,8 @@ private	struct	rest_response * start_openstack(
 		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
 	}
 	if (!( filename = os_create_server_request( 
-		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, pptr->firewall, pptr->zone, "none" ) ))
+		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, 
+		(pptr->quantum ? (char *) 0 : pptr->firewall), pptr->zone, "none" ) ))
 	{
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );
@@ -1231,7 +1258,17 @@ private	struct	rest_response * start_openstack(
 		/* -------------------------------------------- */
 		/* attempt to associate the floating IP address */
 		/* -------------------------------------------- */
-		if ( pptr->floating )
+		if ( pptr->quantum )
+		{
+			if (!(status = connect_quantum_network( subptr, pptr )))
+			{
+				subptr = os_liberate_subscription( subptr );
+				personality = liberate( personality );
+				openstack_build_failure( pptr, 911, "OS Failure : Connecting Quantum Address" );
+			 	return( rest_html_response( aptr, status, "Bad Request : Connect Quantum Network" ) );
+			}
+		}
+		else if ( pptr->floating )
 		{
 			if ((status = associate_server_address( subptr, pptr )) != 0 )
 			{

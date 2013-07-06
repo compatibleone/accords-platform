@@ -8,22 +8,30 @@
 /*	support functions for use when the quantum	*/
 /*	networking interface is detected and is to 	*/
 /*	be used instead of the essex floating ips	*/
-/*	API which is no longer operational.			*/
+/*	API which is no longer operational.		*/
 /*	-------------------------------------------	*/
 
 /*	-----------------------------------		*/
-/*		r e s o l v e _ j s o n _ i d 		*/
+/*	   r e s o l v e _ j s o n _ a t b 		*/
 /*	-----------------------------------		*/
-private	char * resolve_json_id( struct os_response * zptr )
+private	char * resolve_json_atb( struct os_response * zptr, char * nptr )
 {
 	char * result=(char *) 0;
 	if (!( zptr ))
-			return( (char *) 0 );
+		return( (char *) 0 );
 	else if (!( zptr->jsonroot ))
-			return( (char *) 0 );
-	else if (!( result = json_atribut( zptr->jsonroot, "id" ) ))
-			return( (char *) 0 );
+		return( (char *) 0 );
+	else if (!( result = json_atribut( zptr->jsonroot, nptr ) ))
+		return( (char *) 0 );
 	else	return( allocate_string( result ) );
+}
+
+/*	-----------------------------------		*/
+/*	   r e s o l v e _ j s o n _ i d 		*/
+/*	-----------------------------------		*/
+private	char * resolve_json_id( struct os_response * zptr )
+{
+	return( resolve_json_atb( zptr, "id" ) );
 }
 
 /*	-----------------------------------------	*/
@@ -36,24 +44,24 @@ private	char *	resolve_named_network( struct os_response * zptr, char * nptr )
 	char * vptr;
 
 	if (!( zptr ))
-			return( (char *) 0 );
+		return( (char *) 0 );
 	else if (!( zptr->jsonroot ))
-			return( (char *) 0 );
+		return( (char *) 0 );
 	else if (!( eptr = json_element( zptr->jsonroot, "networks" ) ))
-			return( (char *) 0 );
+		return( (char *) 0 );
 	else
 	{
 		for ( 	dptr=eptr->first;
-				dptr != ( struct data_element *) 0;
-				dptr = dptr->next )
+			dptr != ( struct data_element *) 0;
+			dptr = dptr->next )
 		{	
-				if (!( vptr = json_atribut( dptr, "name" ) ))
-						continue;
-				else if ( strcmp( vptr, nptr ) != 0 )
-						continue;
-				else if (!( vptr = json_atribut( dptr, "id" ) ))
-						continue;
-				else 	return( allocate_string( vptr ) );
+			if (!( vptr = json_atribut( dptr, "name" ) ))
+				continue;
+			else if ( strcmp( vptr, nptr ) != 0 )
+				continue;
+			else if (!( vptr = json_atribut( dptr, "id" ) ))
+				continue;
+			else 	return( allocate_string( vptr ) );
 		}
 		return((char *) 0 );
 	}
@@ -64,7 +72,7 @@ private	char *	resolve_named_network( struct os_response * zptr, char * nptr )
 /*	-----------------------------------		*/
 public	is_quantum_network( struct os_subscription * sptr )
 {
-		return( sptr->KeyStone.quantum );
+	return( sptr->KeyStone.quantum );
 }
 	
 /*	-------------------------------------------	*/
@@ -73,15 +81,15 @@ public	is_quantum_network( struct os_subscription * sptr )
 public	int reset_quantum_network( struct openstack * pptr )
 {
 	if ( pptr->privatenet )
-			pptr->privatenet = liberate( pptr->privatenet );
+		pptr->privatenet = liberate( pptr->privatenet );
 	if ( pptr->publicnet )
-			pptr->publicnet = liberate( pptr->publicnet );
+		pptr->publicnet = liberate( pptr->publicnet );
 	if ( pptr->port )
-			pptr->port = liberate( pptr->port );
+		pptr->port = liberate( pptr->port );
 	if ( pptr->subnet )
-			pptr->subnet = liberate( pptr->subnet );
+		pptr->subnet = liberate( pptr->subnet );
 	if ( pptr->address )
-			pptr->address = liberate( pptr->address );
+		pptr->address = liberate( pptr->address );
 	return(0);
 }
 
@@ -216,6 +224,7 @@ public	int resolve_quantum_network( struct os_subscription * sptr, struct openst
 public	int	connect_quantum_network( struct os_subscription * sptr, struct openstack * pptr )
 {
 	struct	os_response * zptr;
+	int	status=0;
 
 	/* --------------------------- */
 	/* create local port to server */
@@ -234,6 +243,25 @@ public	int	connect_quantum_network( struct os_subscription * sptr, struct openst
 	/* --------------------------- */
 	if (!( zptr = os_create_floatingip( sptr, pptr->publicnet, pptr->port ) ))
 		return( 0 );
+
+	else if (!( pptr->privateaddr = resolve_json_atb( zptr, "fixed_ip_address" )))
+	{
+		zptr = liberate_os_response( zptr );
+		return( 0 );
+	}
+
+	else if (!( pptr->publicaddr = resolve_json_atb( zptr, "floating_ip_address" )))
+	{
+		zptr = liberate_os_response( zptr );
+		return( 0 );
+	}
+
+	else if ((status = os_set_host_address( pptr )) != 0)
+	{
+		zptr = liberate_os_response( zptr );
+		return( 0 );
+	}
+
 	else if (!( pptr->address = resolve_json_id( zptr ) ))
 	{
 		zptr = liberate_os_response( zptr );
