@@ -62,6 +62,8 @@ struct	os_image_infos
 	char *	updated;
 };
 
+#include "quantum.c"
+
 /*	-----------------------------------------------------------------	*/
 /*	     t e r m i n a t e _ o p e n s t a c k _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
@@ -459,6 +461,7 @@ public	int	create_openstack_contract(
 	struct	cords_os_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	struct	occi_response * zptr;
 	int	status;
 	char *	vptr;
 
@@ -469,6 +472,15 @@ public	int	create_openstack_contract(
 		memset( &contract, 0, sizeof( struct cords_os_contract ));
 		contract.subscription = subptr;
 	}
+
+	/* ------------------------------- */
+	/* recover the account description */
+	/* ------------------------------- */
+	if (!( zptr = occi_simple_get( pptr->account, agent, tls ) ))
+		return( terminate_openstack_contract( 1169, &contract ) );
+	else if (!( pptr->accountname = occi_extract_atribut( zptr, "occi", _CORDS_ACCOUNT, _CORDS_NAME ) ))
+		return( terminate_openstack_contract( 1169, &contract ) );
+	else	zptr = occi_remove_response( zptr );
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -575,17 +587,25 @@ public	int	create_openstack_contract(
 		else if (!( pptr->image = resolve_contract_image( subptr, &contract ) ))
 			return( terminate_openstack_contract( 1187, &contract ) );
 		else if (!( pptr->workload = os_build_image_reference( subptr, pptr->image ) ))
-			return( terminate_openstack_contract( 1187, &contract ) );
+			return( terminate_openstack_contract( 1188, &contract ) );
 		else if (!( pptr->blob = os_build_glance_reference( subptr, pptr->image ) ))
-			return( terminate_openstack_contract( 1187, &contract ) );
+			return( terminate_openstack_contract( 1189, &contract ) );
 	}
 
 	/* --------------------------------------- */
 	/* duplicate the original image identifier */
 	/* --------------------------------------- */
 	if (!( pptr->original = allocate_string( pptr->image ) ))
-		return( terminate_openstack_contract( 1188, &contract ) );
+		return( terminate_openstack_contract( 1190, &contract ) );
+	else
 	{
+		/* -------------------------------------------- */
+		/* detect presence of quantum network interface */
+		/* -------------------------------------------- */
+		if ((pptr->quantum = is_quantum_network( subptr )) != 0)
+			if (!( resolve_quantum_network( subptr, pptr ) ))
+				return( terminate_openstack_contract( 1191, &contract ) );
+
 		/* ----------------------------------------------- */
 		/* resolve any price informatino for this category */
 		/* ----------------------------------------------- */

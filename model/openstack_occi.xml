@@ -14,6 +14,7 @@
 	        <attribute name='node' type='string' required='false' immutable='false'/>
 	        <attribute name='price' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='accountname' type='string' required='false' immutable='false'/>
 	        <attribute name='number' type='string' required='false' immutable='false'/>
 	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
 	        <attribute name='reference' type='string' required='false' immutable='false'/>
@@ -24,6 +25,12 @@
 	        <attribute name='floatingid' type='string' required='false' immutable='false'/>
 	        <attribute name='publicaddr' type='string' required='false' immutable='false'/>
 	        <attribute name='privateaddr' type='string' required='false' immutable='false'/>
+	        <attribute name='quantum' type='int' required='false' immutable='false'/>
+	        <attribute name='publicnet' type='string' required='false' immutable='false'/>
+	        <attribute name='privatenet' type='string' required='false' immutable='false'/>
+	        <attribute name='port' type='string' required='false' immutable='false'/>
+	        <attribute name='subnet' type='string' required='false' immutable='false'/>
+	        <attribute name='address' type='string' required='false' immutable='false'/>
 	        <attribute name='firewall' type='string' required='false' immutable='false'/>
 	        <attribute name='group' type='string' required='false' immutable='false'/>
 	        <attribute name='zone' type='string' required='false' immutable='false'/>

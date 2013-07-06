@@ -687,6 +687,7 @@ public	int	check_keystone_authorization(struct os_subscription * sptr)
 						rptr = liberate_rest_response( rptr );
 						return( 0 );
 					}
+					else	sptr->KeyStone.quantum = 1;
 				}
 				else if (!( strcasecmp( tptr, "volume" ) ))
 				{
@@ -3333,6 +3334,80 @@ private	char *	os_network_message( struct os_subscription *  sptr, char * name, 
 	}
 }
 
+/*	-----------------------------------		*/
+/*	o s _ r o u t e r _ m e s s a g e 		*/
+/*	-----------------------------------		*/
+private	char *	os_router_message( struct os_subscription *  sptr, char * name, char * netid, int state )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<router name=\"%s\" admin_state_up=\"%s\"/>\n",name,(state ? "true" : "false"));
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+ 		{
+			fprintf(h,"{\"router\":{\"name\":\"%s\",\"admin_state_up\":\"%s\",\"external_gateway_info\":{\"network_id\":\"%s\"}}}\n",name,(state ? "true":"false"),netid);
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
+/*	-----------------------------------		*/
+/*	o s _ interface _ m e s s a g e 		*/
+/*	-----------------------------------		*/
+private	char *	os_interface_message( struct os_subscription *  sptr, char * netid )
+{
+	char *	filename;
+	FILE *	h;
+	if ( quantum_xml )
+	{
+		if (!( filename = rest_temporary_filename( "xml" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+		{
+			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
+			0x0022,0x0022,0x0022,0x0022);
+			fprintf(h,"<subnet_id name=\"%s\"/>\n",netid);
+			fclose(h);
+			return( filename );
+		}
+	}
+	else
+	{
+		if (!( filename = rest_temporary_filename( "json" ) ))
+			return( filename );
+		else if (!( h = fopen( filename, "w" ) ))
+			return((char *) 0);
+		else
+ 		{
+			fprintf(h,"{\"subnet_id\":\"%s\"}\n",netid);
+			fclose(h);
+			return( filename );
+		}
+	}
+}
+
 /*	-----------------------------------------	*/
 /*	o s _ f l o a t i n g i p _ m e s s a g e 	*/
 /*	-----------------------------------------	*/
@@ -3375,7 +3450,7 @@ private	char *	os_floatingip_message( struct os_subscription *  sptr, char * net
 /*	---------------------------------		*/
 /*	o s _ s u b n e t _ m e s s a g e 		*/
 /*	---------------------------------		*/
-private	char *	os_subnet_message( struct os_subscription *  sptr, char * netid, int version, char * cidr )
+private	char *	os_subnet_message( struct os_subscription *  sptr, char * name, char * netid, int version, char * cidr )
 {
 	char *	filename;
 	FILE *	h;
@@ -3389,7 +3464,7 @@ private	char *	os_subnet_message( struct os_subscription *  sptr, char * netid, 
 		{
 			fprintf(h,"<?xml version=%c1.0%c encoding=%cUTF-8%c?>\n",
 				0x0022,0x0022,0x0022,0x0022);
-			fprintf(h,"<subnet network_id=\"%s\" version=\"%u\" cidr=\"%s\"/>\n",netid,version,cidr);
+			fprintf(h,"<subnet name=\"%s\" network_id=\"%s\" ip_version=\"%u\" cidr=\"%s\"/>\n",name,netid,version,cidr);
 			fclose(h);
 			return( filename );
 		}
@@ -3402,7 +3477,7 @@ private	char *	os_subnet_message( struct os_subscription *  sptr, char * netid, 
 			return((char *) 0);
 		else
 		{
-			fprintf(h,"{\"subnet\":{\"network_id\":\"%s\",\"version\":\"%u\",\"cidr\":\"%s\"}}\n",netid,version,cidr);
+			fprintf(h,"{\"subnet\":{\"name\":\"%s\",\"network_id\":\"%s\",\"ip_version\":\"%u\",\"cidr\":\"%s\"}}\n",name,netid,version,cidr);
 			fclose(h);
 			return( filename );
 		}
@@ -3580,10 +3655,10 @@ public	struct	os_response *	os_list_subnets(struct os_subscription *  sptr)
 /*	---------------------------------------	*/
 /*	o s _ c r e a t e _ s u b n e t s	*/
 /*	---------------------------------------	*/
-public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * netid, int version, char * cidr )
+public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * name, char * netid, int version, char * cidr )
 {
 	char *	filename;
-	if (!( filename = os_subnet_message( sptr, netid, version, cidr )))
+	if (!( filename = os_subnet_message( sptr, name, netid, version, cidr )))
 		return((struct os_response *) 0);
 	else	return( os_network_create_operation( sptr, "/subnets", filename ) );
 }
@@ -3611,12 +3686,12 @@ public	struct	os_response *	os_retrieve_subnet(struct os_subscription *  sptr, c
 /*	---------------------------------------	*/
 /*	o s _ u p d a t e _ s u b n e t s 	*/
 /*	---------------------------------------	*/
-public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * netid, int version, char * cidr )
+public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * name, char * netid, int version, char * cidr )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/subnets/%s",subid);
 	char *	filename;
-	if (!( filename = os_subnet_message( sptr, netid, version, cidr )))
+	if (!( filename = os_subnet_message( sptr, name, netid, version, cidr )))
 		return((struct os_response *) 0);
 	else	return( os_network_update_operation( sptr, buffer, filename ) );
 }
@@ -3671,6 +3746,86 @@ public	struct	os_response *	os_update_port(struct os_subscription *  sptr, char 
 	sprintf(buffer,"/ports/%s",portid);
 	char *	filename;
 	if (!( filename = os_port_message( sptr, name, netid, devid, grpid, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
+
+
+/*	---------------------------------------	*/
+/*	o s _ l i s t _ r o u t e r s 		*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_list_routers(struct os_subscription *  sptr)
+{
+	return( os_network_list_operation( sptr, "/routers" ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ i n t e r f a c e 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_create_interface(struct os_subscription *  sptr, char * netid, char * subnet )
+{
+	char	buffer[1024];
+	char *	filename;
+	sprintf(buffer,"/routers/%s/add_router_interface",netid);
+	if (!( filename = os_interface_message( sptr, subnet ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ i n t e r f a c e 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_delete_interface(struct os_subscription *  sptr, char * netid, char * subnet )
+{
+	char	buffer[1024];
+	char *	filename;
+	sprintf(buffer,"/routers/%s/remove_router_interface",netid);
+	if (!( filename = os_interface_message( sptr, subnet ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_update_operation( sptr, buffer, filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ c r e a t e _ r o u t e r s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_create_router(struct os_subscription *  sptr, char * name, char * netid, int state )
+{
+	char *	filename;
+	if (!( filename = os_router_message( sptr, name, netid, state ) ))
+		return((struct os_response *) 0);
+	else	return( os_network_create_operation( sptr, "/routers", filename ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ d e l e t e _ r o u t e r s 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_delete_router(struct os_subscription *  sptr, char * routerid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/routers/%s",routerid);
+	return( os_network_delete_operation(sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ r e t r i e v e _ r o u t e r s 	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_retrieve_router(struct os_subscription *  sptr, char * routerid )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/routers/%s",routerid);
+	return( os_network_retrieve_operation( sptr, buffer ) );
+}
+
+/*	---------------------------------------	*/
+/*	o s _ u p d a t e _ r o u t e r s	*/
+/*	---------------------------------------	*/
+public	struct	os_response *	os_update_router(struct os_subscription *  sptr, char * routerid, char * name, char * netid, int state )
+{
+	char	buffer[1024];
+	sprintf(buffer,"/routers/%s",routerid);
+	char *	filename;
+	if (!( filename = os_router_message( sptr, name, netid, state ) ))
 		return((struct os_response *) 0);
 	else	return( os_network_update_operation( sptr, buffer, filename ) );
 }

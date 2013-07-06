@@ -104,7 +104,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	}
 	else if (!( strcasecmp(p1,"SUBNET" ) ))
 	{
-		os_result( os_create_subnet(subscription,p2, (p3 ? atoi(p3) : 4), p4 ) );
+		os_result( os_create_subnet(subscription,p2, p3, (p4 ? atoi(p4) : 4), p5 ) );
 		return(0);
 	}
 	else if (!( strcasecmp(p1,"PORT" ) ))
@@ -112,6 +112,18 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		os_result( os_create_port(subscription,p2, p3, p4, p5, (p6 ? atoi(p6) : 0) ) );
 		return(0);
 	}
+	else if (!( strcasecmp(p1,"ROUTER" ) ))
+	{
+		os_result( os_create_router(subscription,p2,p3,(p4?atoi(p4):0) ) );
+		return(0);
+	}
+
+	else if (!( strcasecmp(p1,"INTERFACE" ) ))
+	{
+		os_result( os_create_interface(subscription,p2,p3) );
+		return(0);
+	}
+
 	else if (!( strcasecmp(p1,"FLOATINGIP" ) ))
 	{
 		os_result( os_create_floatingip(subscription, p2, p3 ) );
@@ -153,6 +165,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_list_subnets(subscription ) );
 		else if (!( strcasecmp( p2, "PORTS" ) ))
 			os_result( os_list_ports(subscription ) );
+		else if (!( strcasecmp( p2, "ROUTERS" ) ))
+			os_result( os_list_routers(subscription ) );
 		else if (!( strcasecmp( p2, "VOLUMES" ) ))
 			os_result( ( detail ? os_list_volume_details(subscription,p3) : os_list_volumes(subscription,p3)) );
 		else if (!( strcasecmp( p2, "METADATA" ) ))
@@ -339,6 +353,8 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_retrieve_subnet( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "PORT" ) ))
 			os_result( os_retrieve_port( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "ROUTER" ) ))
+			os_result( os_retrieve_router( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "ADDRESS" ) ))
 			os_result( os_get_address( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
@@ -372,12 +388,17 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 		}
 		else if (!( strcasecmp(p1,"SUBNET" ) ))
 		{
-			os_result( os_update_subnet(subscription,p2, p3, (p4 ? atoi(p4) : 4), p5 ) );
+			os_result( os_update_subnet(subscription,p2, p3, p4,(p5 ? atoi(p5) : 4), p6 ) );
 			return(0);
 		}
 		else if (!( strcasecmp(p1,"PORT" ) ))
 		{
 			os_result( os_update_port(subscription,p2, p3, p4, p5, p6, (p7 ? atoi(p7) : 0) ) );
+			return(0);
+		}
+		else if (!( strcasecmp(p1,"ROUTER" ) ))
+		{
+			os_result( os_update_router(subscription,p2, p3,p4,(p5?atoi(p5):0) ) );
 			return(0);
 		}
 		else	return( failure(33, p1, p2 ) );
@@ -407,6 +428,10 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 			os_result( os_delete_subnet( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "PORT" ) ))
 			os_result( os_delete_port( subscription,p3 ) );
+		else if (!( strcasecmp( p2, "ROUTER" ) ))
+			os_result( os_delete_router( subscription,p3 ) );
+		else if (!( strcasecmp(p1,"INTERFACE" ) ))
+			os_result( os_delete_interface(subscription,p2,p3) );
 		else if (!( strcasecmp( p2, "GROUP" ) ))
 			os_result( os_delete_security_group( subscription,p3 ) );
 		else if (!( strcasecmp( p2, "RULE" ) ))
@@ -518,15 +543,17 @@ private	int	os_banner()
 	printf("\n");
 	printf("\n   CRUD Operations ");
 	printf("\n");
-	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | FLOATINGIPS | ADDRESSES | NETWORKS | SUBNETS | PORTS | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
+	printf("\n   LIST [ SERVERS | IMAGES | FLAVORS | POOLS | FLOATINGIPS | ADDRESSES | NETWORKS | SUBNETS | ROUTER | PORTS | KEYS | GROUPS | VOLUMES | TYPES | METADATA  <id> ]  ");
 	printf("\n   CREATE   <name> <image> <flavor> <ip> ");
 	printf("\n   VOLUME   <name> <size> <type> <zone> ");
 	printf("\n   ATTACH   <server> <volume> <device> ");
 	printf("\n   DETACH   <server> <volume> ");
 	printf("\n   FLAVOR   <name> <ram> <cpus> <disk> ");
 	printf("\n   NETWORK  <name> <state> <external> ");
-	printf("\n   SUBNET   <net> <version> <cidr> ");
+	printf("\n   SUBNET   <name> <net> <version> <cidr> ");
 	printf("\n   PORT     <name> <net> <dev> <grp> <state> ");
+	printf("\n   ROUTER   <name> <network> <state>");
+	printf("\n   INTERFACE <router> <subnet> ");
 	printf("\n   GROUP    <name> ");
 	printf("\n   RULE     <group> <protocol> <from> <to> ");
 	printf("\n   PUBLICVM <name> <server> ");
@@ -542,15 +569,17 @@ private	int	os_banner()
 	printf("\n   ASSOCIATE <address> <serverid>   ");
 	printf("\n   COPY   [ GLANCE ] <id> <host> <tenant> <user> <password>");
 	printf("\n   HEAD   [ GLANCE ] <id> ");
-	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | FLOATINGIP | NETWORK | SUBNET | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
+	printf("\n   GET    [ SERVER | FLAVOR | IMAGE | GLANCE | FLOATINGIP | NETWORK | SUBNET | ROUTER | PORT | GROUP | METADATA | KEY ] <id> [ <name> ] ");
 	printf("\n   PUT    [ SERVER <id> | METADATA <id> <name> <value> ] ");
 	printf("\n   PUT NETWORK  <net>    <name> <state> <external> ");
 	printf("\n   PUT SUBNET   <subnet> <net> <version> <cidr> ");
 	printf("\n   PUT PORT     <port>   <name> <net> <dev> <grp> <state> ");
+	printf("\n   PUT ROUTER   <router> <name> <network> <state> ");
 	printf("\n   PUT FLOATINGIP <ip> <net> <port> ");
 	printf("\n   DELETE [ SERVER <id> | IMAGE <id> | VOLUME <id> | ADDRESS <id>    ] ");
 	printf("\n   DELETE [ KEY <id> | GROUP <id> | RULE <id> | METADATA <id> <name> ] ");
 	printf("\n   DELETE [ NETWORK <id> | SUBNET <id> | PORT <id> | FLOATINGIP <id> ] ");
+	printf("\n   DELETE INTERFACE <router> <subnet> ");
 	printf("\n");
 	printf("\n   Options");
 	printf("\n     --user <username>     set account user name ");

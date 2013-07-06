@@ -50,12 +50,11 @@ struct	keystone_config
 	char *	glance;
 	char *	volume;
 	char *	network;
+	int		quantum;
 };
 
 struct	os_subscription
 {
-
-
 	struct	os_config 	Os;
 	struct	keystone_config KeyStone;
 };
@@ -185,10 +184,10 @@ public	struct	os_response *	os_retrieve_network(struct os_subscription *  sptr, 
 public	struct	os_response *	os_update_network(struct os_subscription *  sptr, char * netid, char * name, int state, int external );
 
 public	struct	os_response *	os_list_subnets(struct os_subscription *  sptr);
-public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * netid, int version, char * cidr );
+public	struct	os_response *	os_create_subnet(struct os_subscription *  sptr, char * name, char * netid, int version, char * cidr );
 public	struct	os_response *	os_delete_subnet(struct os_subscription *  sptr, char * subid );
 public	struct	os_response *	os_retrieve_subnet(struct os_subscription *  sptr, char * subid ); 
-public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * netid, int version, char * cidr );
+public	struct	os_response *	os_update_subnet(struct os_subscription *  sptr, char * subid, char * name, char * netid, int version, char * cidr );
 
 public	struct	os_response *	os_list_ports(struct os_subscription *  sptr);
 public	struct	os_response *	os_create_port(struct os_subscription *  sptr, char * name, char * netid, char * devid, char * grpid, int state );
@@ -196,12 +195,20 @@ public	struct	os_response *	os_delete_port(struct os_subscription *  sptr, char 
 public	struct	os_response *	os_retrieve_port(struct os_subscription *  sptr, char * portid ); 
 public	struct	os_response *	os_update_port(struct os_subscription *  sptr, char * portid, char * name, char * netid, char * devid, char * grpid, int state );
 
+public	struct	os_response *	os_list_routers(struct os_subscription *  sptr);
+public	struct	os_response *	os_create_router(struct os_subscription *  sptr, char * name, char * netid, int state );
+public	struct	os_response *	os_delete_router(struct os_subscription *  sptr, char * routerid );
+public	struct	os_response *	os_retrieve_router(struct os_subscription *  sptr, char * routerid ); 
+public	struct	os_response *	os_update_router(struct os_subscription *  sptr, char * routerid, char * name, char * netid, int state );
+
 public	struct	os_response *	os_list_floatingips(struct os_subscription *  sptr);
 public	struct	os_response *	os_create_floatingip(struct os_subscription *  sptr, char * netid, char * portid );
 public	struct	os_response *	os_delete_floatingip(struct os_subscription *  sptr, char * id );
 public	struct	os_response *	os_retrieve_floatingip(struct os_subscription *  sptr, char * id ); 
 public	struct	os_response *	os_update_floatingip(struct os_subscription *  sptr, char * id, char * netid, char * portid );
 
+public	struct	os_response *	os_create_interface(struct os_subscription *  sptr, char * netid, char * subnet );
+public	struct	os_response *	os_delete_interface(struct os_subscription *  sptr, char * netid, char * subnet );
 
 #endif	/* _os_client_h */
 	/* ------------ */

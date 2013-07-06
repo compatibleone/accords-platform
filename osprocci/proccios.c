@@ -272,6 +272,7 @@ private	int	reset_openstack_server( struct openstack * pptr )
 		pptr->publicaddr = allocate_string("");
 		pptr->privateaddr = allocate_string("");
 		pptr->state = _OCCI_IDLE;
+		reset_quantum_network( pptr );
 	}
 	return(0);
 }

@@ -8,7 +8,7 @@
 #
 
 bin_PROGRAMS = osprocci
-EXTRA_DIST = proccios.c oscontract.c
+EXTRA_DIST = proccios.c oscontract.c quantum.c
 
 osprocci_SOURCES = osprocci.c
 
