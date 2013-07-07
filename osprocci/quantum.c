@@ -270,6 +270,53 @@ public	int	connect_quantum_network( struct os_subscription * sptr, struct openst
 	else	zptr = liberate_os_response( zptr );
 
 	return( 1 );
+
+}
+
+/*	---------------------------------------------------	*/
+/*	d i s c o n n e c t _ q u a n t u m _ n e t w o r k	*/
+/*	---------------------------------------------------	*/
+public	int	disconnect_quantum_network( struct os_subscription * sptr, struct openstack * pptr )
+{
+	struct	os_response * zptr;
+	int	status=0;
+
+	if ( pptr->address )
+	{
+		/* ----------------------------- */
+		/* delete ip from public netowrk */
+		/* ----------------------------- */
+		if (( zptr = os_delete_floatingip( sptr, pptr->address )) != (struct os_response*) 0)
+			zptr = liberate_os_response( zptr );
+
+		if ( pptr->address )
+			pptr->address = liberate( pptr->address );
+
+		if ( pptr->privateaddr )
+			pptr->privateaddr = liberate( pptr->privateaddr );
+
+		if ( pptr->publicaddr )
+			pptr->publicaddr = liberate( pptr->publicaddr );
+
+		if ( pptr->hostname )
+			pptr->hostname = liberate( pptr->hostname );
+	}
+
+	if ( pptr->port )
+	{
+
+		/* --------------------------- */
+		/* delete local port to server */
+		/* --------------------------- */
+		if (( zptr = os_delete_port(sptr, pptr->port)) != (struct os_response *) 0)
+			zptr = liberate_os_response( zptr );
+
+
+		if ( pptr->port )
+			pptr->port = liberate( pptr->port );
+	}
+
+	return( 1 );
 }
 
 	/* ------------- */

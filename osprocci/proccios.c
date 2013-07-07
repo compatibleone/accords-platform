@@ -911,7 +911,7 @@ private	int	disassociate_server_address( struct os_subscription * subptr, struct
 	if (!( pptr ))
 		return( 1001 );
 	else if ( pptr->quantum )
-		return( 0 );
+		return( disconnect_quantum_network( subptr, pptr ) );
 	else if (!( rest_valid_string( pptr->floating ) ))
 		return( 1002 );
 	else if (!( nomfic = os_remove_address_request( subptr,pptr->floating ) ))
