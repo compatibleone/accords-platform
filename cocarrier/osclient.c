@@ -3545,7 +3545,7 @@ private	char *	os_port_message( struct os_subscription *  sptr, char * name, cha
 			fprintf(h,",\"admin_state_up\":\"%s\"\n",(state ? "true" : "false"));
 			if ( rest_valid_string( grpid ) != 0 )
 			{
-				fprintf(h,",\"security_group\":[\"%s\"]\n",grpid);
+				fprintf(h,",\"security_groups\":[\"%s\"]\n",grpid);
 			}
 			fprintf(h,"}}\n");
 			fclose(h);
