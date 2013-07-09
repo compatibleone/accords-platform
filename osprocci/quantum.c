@@ -80,10 +80,6 @@ public	is_quantum_network( struct os_subscription * sptr )
 /*	-------------------------------------------	*/
 public	int reset_quantum_network( struct openstack * pptr )
 {
-	if ( pptr->privatenet )
-		pptr->privatenet = liberate( pptr->privatenet );
-	if ( pptr->publicnet )
-		pptr->publicnet = liberate( pptr->publicnet );
 	if ( pptr->port )
 		pptr->port = liberate( pptr->port );
 	if ( pptr->subnet )

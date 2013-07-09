@@ -1595,7 +1595,12 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ------------------------------------------ */
 		/* disconnect the floating IP from the server */
 		/* ------------------------------------------ */
-		if ( pptr->floatingid )
+		if ( pptr->quantum )
+		{
+			occi_flush_client( pptr->hostname, _COSACS_PORT );
+			disconnect_quantum_network( subptr, pptr );
+		}
+		else if ( pptr->floatingid )
 		{
 			occi_flush_client( pptr->floating, _COSACS_PORT );
 			release_floating_address( subptr,pptr );
