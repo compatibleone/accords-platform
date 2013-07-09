@@ -1267,6 +1267,7 @@ private	struct	rest_response * start_openstack(
 				openstack_build_failure( pptr, 911, "OS Failure : Connecting Quantum Address" );
 			 	return( rest_html_response( aptr, status, "Bad Request : Connect Quantum Network" ) );
 			}
+			else	status=0;
 		}
 		else if ( pptr->floating )
 		{

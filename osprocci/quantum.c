@@ -67,6 +67,38 @@ private	char *	resolve_named_network( struct os_response * zptr, char * nptr )
 	}
 }
 
+/*	------------------------------------	*/
+/*	r e s o l v e _ s e r ve r _ p o r t 	*/
+/*	------------------------------------	*/
+private	char *	resolve_server_port( struct os_response * zptr, char * id )
+{
+	struct data_element * dptr;
+	struct data_element * eptr;
+	char * vptr;
+	if (!( zptr ))
+		return( (char *) 0 );
+	else if (!( zptr->jsonroot ))
+		return( (char *) 0 );
+	else if (!( eptr = json_element( zptr->jsonroot, "networks" ) ))
+		return( (char *) 0 );
+	else
+	{
+		for ( 	dptr=eptr->first;
+			dptr != ( struct data_element *) 0;
+			dptr = dptr->next )
+		{	
+			if (!( vptr = json_atribut( dptr, "device_id" ) ))
+				continue;
+			else if ( strcmp( vptr, id ) != 0 )
+				continue;
+			else if (!( vptr = json_atribut( dptr, "id" ) ))
+				continue;
+			else 	return( allocate_string( vptr ) );
+		}
+		return((char *) 0 );
+	}
+}
+
 /*	-----------------------------------		*/
 /*	i s _ q u a n t u m _ n e t w o r k 	*/
 /*	-----------------------------------		*/
@@ -221,16 +253,22 @@ public	int	connect_quantum_network( struct os_subscription * sptr, struct openst
 {
 	struct	os_response * zptr;
 	int	status=0;
-
-	/* --------------------------- */
-	/* create local port to server */
-	/* --------------------------- */
-	if (!( zptr = os_create_port(sptr, pptr->id, pptr->privatenet, pptr->number, pptr->group, 1 )))
+	
+	if (!( zptr = os_list_ports( sptr )))
 		return( 0 );
-	else if (!( pptr->port = resolve_json_id( zptr ) ))
+	else if (!( pptr->port = resolve_server_port( zptr, pptr->number ) ))
 	{
-		zptr = liberate_os_response( zptr );
-		return( 0 );
+		/* --------------------------- */
+		/* create local port to server */
+		/* --------------------------- */
+		if (!( zptr = os_create_port(sptr, pptr->id, pptr->privatenet, pptr->number, pptr->group, 1 )))
+			return( 0 );
+		else if (!( pptr->port = resolve_json_id( zptr ) ))
+		{
+			zptr = liberate_os_response( zptr );
+			return( 0 );
+		}
+		else	zptr = liberate_os_response( zptr );
 	}
 	else	zptr = liberate_os_response( zptr );
 
