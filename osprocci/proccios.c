@@ -1214,7 +1214,7 @@ private	struct	rest_response * start_openstack(
 	}
 	if (!( filename = os_create_server_request( 
 		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, 
-		(pptr->quantum ? (char *) 0 : pptr->firewall), pptr->zone, "none" ) ))
+		pptr->firewall, pptr->zone, "none" ) ))
 	{
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );

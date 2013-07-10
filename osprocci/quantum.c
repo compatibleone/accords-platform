@@ -79,7 +79,7 @@ private	char *	resolve_server_port( struct os_response * zptr, char * id )
 		return( (char *) 0 );
 	else if (!( zptr->jsonroot ))
 		return( (char *) 0 );
-	else if (!( eptr = json_element( zptr->jsonroot, "networks" ) ))
+	else if (!( eptr = json_element( zptr->jsonroot, "ports" ) ))
 		return( (char *) 0 );
 	else
 	{
@@ -253,10 +253,11 @@ public	int	connect_quantum_network( struct os_subscription * sptr, struct openst
 {
 	struct	os_response * zptr;
 	int	status=0;
+	char *	portid=(char *) 0;
 	
 	if (!( zptr = os_list_ports( sptr )))
 		return( 0 );
-	else if (!( pptr->port = resolve_server_port( zptr, pptr->number ) ))
+	else if (!( portid = resolve_server_port( zptr, pptr->number ) ))
 	{
 		/* --------------------------- */
 		/* create local port to server */
@@ -269,13 +270,14 @@ public	int	connect_quantum_network( struct os_subscription * sptr, struct openst
 			return( 0 );
 		}
 		else	zptr = liberate_os_response( zptr );
+		portid = pptr->port;
 	}
 	else	zptr = liberate_os_response( zptr );
 
 	/* --------------------------- */
 	/* create ip on public netowrk */
 	/* --------------------------- */
-	if (!( zptr = os_create_floatingip( sptr, pptr->publicnet, pptr->port ) ))
+	if (!( zptr = os_create_floatingip( sptr, pptr->publicnet, portid ) ))
 		return( 0 );
 
 	else if (!( pptr->privateaddr = resolve_json_atb( zptr, "fixed_ip_address" )))
