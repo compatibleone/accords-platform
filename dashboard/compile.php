@@ -16,7 +16,7 @@ global $configdir;
 		print "<tr><td colspan=2><div align=left><b>Run Script</b></div>\n";
 		print "<tr><td colspan=2><ul>\n";
 		$a = array();
-		exec("ls $configdir/csp-*",&$a);
+		exec("ls $configdir/csp-*",$a);
 		foreach ( $a as $l )
 		{
 			print "<li><a href='/accords/dashboard.php?action=compile&output=HTML&script=".$l."'>".$l."</a>\n";
@@ -30,7 +30,7 @@ global $configdir;
 		print "<tr><td colspan=2><div align=left><b>Run Script with Options</b></div>\n";
 		print "<tr><td>Script<td><div align=center><select class='output' name='script'>\n";
 		$a = array();
-		exec("ls $configdir/csp-*",&$a);
+		exec("ls $configdir/csp-*",$a);
 		foreach ( $a as $l )
 		{
 			print "<option value='".$l."'>".$l."</option>\n";
@@ -47,7 +47,7 @@ global $configdir;
 		print "<tr><td colspan=2><div align=left><b>Inspect Script</b></div>\n";
 		print "<tr><td>Script<td><div align=center><select class='output' name='script'>\n";
 		$a = array();
-		exec("ls $configdir/csp-*",&$a);
+		exec("ls $configdir/csp-*",$a);
 		foreach ( $a as $l )
 		{
 			print "<option value='".$l."'>".$l."</option>\n";

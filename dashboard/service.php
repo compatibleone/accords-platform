@@ -12,7 +12,7 @@
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t $configdir/service/*",&$a);
+	exec("ls -t $configdir/service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -33,7 +33,7 @@
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t $configdir/service/*",&$a);
+	exec("ls -t $configdir/service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -53,7 +53,7 @@
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t $configdir/service/*",&$a);
+	exec("ls -t $configdir/service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";

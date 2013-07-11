@@ -12,7 +12,7 @@ public function create($p)
 	if ( $_REQUEST['upload'] != "" )
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-broker --no-deployment --verbose ".$_REQUEST['upload'],&$a);
+		$result = exec("bash ./dashboard-broker --no-deployment --verbose ".$_REQUEST['upload'],$a);
 		$p->command_output( "Instance Plan", $a );
 		return( "instance" );
 	}
@@ -24,7 +24,7 @@ public function create($p)
 public function stop($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose stop ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose stop ".$_REQUEST['service'],$a);
 	$p->command_output( "Stop Service", $a );
 	return( "stop" );
 }
@@ -35,7 +35,7 @@ public function stop($p)
 public function save($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose save ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose save ".$_REQUEST['service'],$a);
 	$p->command_output( "Save Service", $a );
 	return( "save service" );
 }
@@ -46,7 +46,7 @@ public function save($p)
 public function delete($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose delete ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose delete ".$_REQUEST['service'],$a);
 	$p->command_output( "Delete Service", $a );
 	return( "delete service" );
 }
@@ -58,7 +58,7 @@ public function delete($p)
 public function snapshot($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose snapshot ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose snapshot ".$_REQUEST['service'],$a);
 	$p->command_output( "Snapshot Service", $a );
 	return( "restart service" );
 }
@@ -69,7 +69,7 @@ public function snapshot($p)
 public function restart($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose restart ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose restart ".$_REQUEST['service'],$a);
 	$p->command_output( "Restart Service", $a );
 	return( "restart service" );
 }
@@ -80,7 +80,7 @@ public function restart($p)
 public function start($p)
 {
 	$a = array();
-	exec("bash ./dashboard-command --verbose start ".$_REQUEST['service'],&$a);
+	exec("bash ./dashboard-command --verbose start ".$_REQUEST['service'],$a);
 	$p->command_output( "Start Service", $a );
 	return( "stop" );
 }

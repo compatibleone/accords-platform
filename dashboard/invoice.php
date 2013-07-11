@@ -84,7 +84,7 @@ public function create($p)
 	if ( $_REQUEST['account'] != "" )
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-invoice ".$_REQUEST['account'],&$a);
+		$result = exec("bash ./dashboard-invoice ".$_REQUEST['account'],$a);
 		$this->invoice_output( "Invoice", $a, $_REQUEST['account'],$p);
 		return( "invoice" );
 	}

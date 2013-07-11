@@ -6,7 +6,7 @@ global $configdir;
 	print "<tr><th>Name<td><select name=nodetype>\n";
 	print "<option value=public>none</option>\n";
 	$a = array();
-	exec("grep name $configdir/cords_node.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_node.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='$l'>$l</option>\n";
@@ -24,7 +24,7 @@ global $configdir;
 	print "<tr><th>Type<td><select name=nodetype>\n";
 	print "<option value=public>simple</option>\n";
 	$a = array();
-	exec("grep name $configdir/cords_manifest.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",&$a);
+	exec("grep name $configdir/cords_manifest.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='$l'>$l</option>\n";

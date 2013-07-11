@@ -37,7 +37,7 @@ class	page_manager
 		global $configdir;
 		$this->user = $u;
 		$a = array();
-		exec( "grep name $configdir/cords_account.xml | grep jamie | cut -f 2 -d = | cut -f 2 -d '\"'",&$a);
+		exec( "grep name $configdir/cords_account.xml | grep jamie | cut -f 2 -d = | cut -f 2 -d '\"'",$a);
 		$this->account = $a[0];
 	}
 
@@ -243,7 +243,7 @@ class	page_manager
 	public	function analyse_log($p)
 	{
 		$a = array();
-		$v = exec( "bash $configdir/dashboard-analyse", &$a);
+		$v = exec( "bash $configdir/dashboard-analyse", $a);
 		$p->html_output( "Log Analysis", $a );
 		return("analyse");
 	}
@@ -251,7 +251,7 @@ class	page_manager
 	public	function delete_log($p)
 	{
 		$a = array();
-		$v = exec( "rm $configdir/co-log -f", &$a);
+		$v = exec( "rm $configdir/co-log -f", $a);
 		return("delete");
 	}
 
@@ -424,7 +424,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Plan<td><select style='width: 50mm;' name='upload'>\n";
 			$a = array();
-			exec("ls $configdir/plan_sla-*.xml",&$a);
+			exec("ls $configdir/plan_sla-*.xml",$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -446,7 +446,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Account<td><select style='width: 50mm;' name='account'>\n";
 			$a = array();
-			exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep name $configdir/cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -461,7 +461,7 @@ class	page_manager
 			print "<table width='100%'>";
 			print "<tr><td>Invoice<td><select style='width: 50mm;' name='invoice'>\n";
 			$a = array();
-			exec("grep document $configdir/cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep document $configdir/cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
