@@ -84,6 +84,39 @@ private	struct rest_response * occi_head(
 		struct rest_client * cptr, 
 		struct rest_request * rptr );
 
+
+public	struct rest_response * occi_alert(
+		void * vptr,
+		struct rest_client * cptr, 
+		struct rest_response * rptr,
+		int status, 
+		char * message, char * nature, 
+		char * agent, char * tls );
+
+private	struct rest_response *  (*occi_alert_relay)(
+		void * i, 
+		struct rest_client * cptr, 
+		struct rest_response * rptr, 
+		int status, char * message, 
+		char * nature, 
+		char * agent, char * tls)=occi_alert;;
+
+
+/*	---------------------------------------------------------	*/
+/*		s e t _ o c c i _ a l e r t _ r e l a y 		*/
+/*	---------------------------------------------------------	*/
+public	void	set_occi_alert_relay( struct rest_response *  (*relay)(
+		void * i, 
+		struct rest_client * cptr, 
+		struct rest_response * rptr, 
+		int status, char * message, 
+		char * nature, 
+		char * agent, char * tls))
+{
+	occi_alert_relay = relay;
+	return;
+}
+
 /*	---------------------------------------------------------	*/
 /*			o c c i _ f a i l u r e				*/
 /*	---------------------------------------------------------	*/
@@ -1801,9 +1834,9 @@ public	int	occi_process_atributs(
 }
 
 /*	-------------------------------------------------------		*/
-/*		    	o c c i _ a l e r t			*/
+/*		    	o c c i _ a l e r t				*/
 /*	-------------------------------------------------------		*/
-private	struct rest_response * occi_alert(
+public	struct rest_response * occi_alert(
 		void * vptr,
 		struct rest_client * cptr, 
 		struct rest_response * rptr,
@@ -1814,6 +1847,7 @@ private	struct rest_response * occi_alert(
 	struct	occi_category 	* optr;
 
 	char	ecode[32];
+	char	etime[32];
 	char	*	ihost;
 	struct	occi_client * kptr;
 	struct	occi_request * qptr;
@@ -1829,7 +1863,11 @@ private	struct rest_response * occi_alert(
 
 	if (!( optr = vptr ))
 		return(rptr);
-	else	sprintf(ecode,"%u",status);
+	else
+	{
+		sprintf(ecode,"%u",status);
+		sprintf(etime,"%u",time((long *) 0));
+	}
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_ALERT, agent, tls ) ))
 		return(rptr);
@@ -1850,7 +1888,8 @@ private	struct rest_response * occi_alert(
 	else if ((!(dptr=occi_request_element(qptr,"occi.alert.source"      , agent   ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.nature"      , nature  ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.status"      , ecode   ) ))
-	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.message"     , message ) )))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.created"     , etime   ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.subject"     , message ) )))
 	{
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
@@ -2098,7 +2137,7 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		(void *) 0,
 		occi_security,
 		(void *) 0,
-		occi_alert
+		occi_alert_relay
 	};
 
 	set_default_agent( nptr );

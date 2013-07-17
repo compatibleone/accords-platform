@@ -217,10 +217,28 @@ public	struct  occi_link_node * occi_next_category_link(
 		struct occi_link_node * nptr, 
 		char * category, 
 		char * id );
+
 public 	struct rest_response *	occi_content_type( 
 	struct occi_category * cptr,
 	struct rest_request * qptr, 
 	struct rest_response * rptr );
+
+public	void	set_occi_alert_relay( struct rest_response *  (*relay)(
+		void * i, 
+		struct rest_client * cptr, 
+		struct rest_response * rptr, 
+		int status, char * message, 
+		char * nature, 
+		char * agent, char * tls));
+
+public	struct rest_response *  occi_alert(
+		void * i, 
+		struct rest_client * cptr, 
+		struct rest_response * rptr, 
+		int status, char * message, 
+		char * nature, 
+		char * agent, char * tls);
+
 
 #endif	/* _occi_h */
 	/* ------- */

@@ -140,8 +140,27 @@ private	struct rest_extension * osprocci_extension( void * v,struct rest_server 
 
 #include "proccios.c"
 
+
 /*	------------------------------------------------------------------	*/
-/*			o s p r o c c i _ o p e r a t i o n				*/
+/*		o s p r o c c i _ a l e r t _ r e l a y				*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response *  osprocci_alert_relay(
+		void * i, 
+		struct rest_client * cptr, 
+		struct rest_response * rptr, 
+		int status, char * message, 
+		char * nature, 
+		char * agent, char * tls)
+{
+	/* detect and convert REST Alerts */
+	/* ------------------------------ */
+	if (!( strcmp( agent, "REST" ) ))
+		return( occi_alert( i, cptr, rptr, status, message, nature, "openstack", tls ) );
+	else	return( occi_alert( i, cptr, rptr, status, message, nature, agent, tls ) );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			o s p r o c c i _ o p e r a t i o n			*/
 /*	------------------------------------------------------------------	*/
 private	int	osprocci_operation( char * nptr )
 {
@@ -170,6 +189,8 @@ private	int	osprocci_operation( char * nptr )
 	last = optr;
 
 	rest_initialise_log( OsProcci.monitor );
+
+	set_occi_alert_relay( osprocci_alert_relay );
 
 	if (!( OsProcci.identity ))
 		return( occi_server(  nptr, OsProcci.restport, OsProcci.tls, OsProcci.threads, first, (char *) 0 ) );
