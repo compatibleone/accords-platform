@@ -18,6 +18,7 @@ function	OperationMenu()
 	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-resolver.txt&ouput=HTML'>Publications</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-online.txt&ouput=HTML'>Authorizations</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-alerts.txt&ouput=HTML'>Alerts</a>".display();
 	return;
 }
 
