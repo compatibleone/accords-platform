@@ -54,6 +54,7 @@ public struct rest_response * reset_rest_response(struct rest_response * sptr)
 	{
 		sptr->first = (struct rest_header*) 0;
 		sptr->last = (struct rest_header*) 0;
+		sptr->request = (struct rest_request *) 0;
 		sptr->status =  0;
 		sptr->version = (char*) 0;
 		sptr->message = (char*) 0;

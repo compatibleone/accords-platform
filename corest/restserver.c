@@ -490,16 +490,19 @@ public	struct	rest_header * liberate_rest_headers( struct rest_header * hptr )
 /*	------------------------------------------------	*/
 private	struct rest_response * rest_transmit_response(
 		struct rest_client  * cptr, 
-		struct rest_response* aptr)
+		struct rest_response* aptr,
+		struct rest_request * rptr)
 {
 	struct	rest_header * hptr;
 
 	if (!( cptr ))	return( aptr );
 	if (!( aptr ))	return( aptr );
 
+	aptr->request = rptr;
+
 	/* launch an alert if required and possible */
 	/* ---------------------------------------- */
-	if ( aptr->status >= 500 )
+	if ( aptr->status >= 400 )
 		if ( cptr->server != (struct rest_server *) 0)
 			if ( cptr->server->method.alert )
 				(void) (*cptr->server->method.alert )
@@ -2018,7 +2021,7 @@ private	int	rest_process_message(
 	{
 		aptr->version = allocate_string( rptr->version );
 		rest_log_debug("rest: transmit response");
-		rest_transmit_response( cptr, aptr );
+		rest_transmit_response( cptr, aptr, rptr );
 		rest_log_debug("rest: liberate request");
 		rest_liberate_response_file( aptr );
 		liberate_rest_request( rptr );
