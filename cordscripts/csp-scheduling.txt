@@ -94,7 +94,7 @@ include "csp-header.txt";
 		$ratio = $duration / $max;
 		$width = 100 * $ratio;
 		$width = $width.round(0);
-		$m = "<td><image height='20' width='"#$width#"%' src='blue.png'></tr>";
+		$m = "<td><image height='20' width='"#$width#"%' src='images/blue.png'></tr>";
 		$m.display();
 	}
 
