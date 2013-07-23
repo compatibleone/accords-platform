@@ -234,7 +234,8 @@ public	void	set_occi_alert_relay( struct rest_response *  (*relay)(
 public	struct rest_response *  occi_alert(
 		void * i, 
 		struct rest_client * cptr, 
-		struct rest_response * rptr, 
+		struct rest_response * rptr,
+		char *name,
 		int status, char * message, 
 		char * nature, 
 		char * agent, char * tls);

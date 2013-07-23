@@ -154,17 +154,18 @@ private	struct rest_response *  osprocci_alert_relay(
 {
 	struct	rest_request * rptr;
 	char subject[2048];
+	char *name = NULL;
 
 	/* detect and convert REST Alerts */
 	/* ------------------------------ */
 	if ((!( agent )) || ( strcmp( agent, "REST" ) != 0 ))
-		return( occi_alert( i, cptr, aptr, status, message, nature, agent, tls ) );
+		return( occi_alert( i, cptr, aptr, name, status, message, nature, agent, tls ) );
 	else if ((!( aptr )) || (!( rptr = aptr->request )))
-		return( occi_alert( i, cptr, aptr, status, message, nature, agent, tls ) );
+		return( occi_alert( i, cptr, aptr, name, status, message, nature, agent, tls ) );
 	else
 	{
 		sprintf(subject,"%s %s %s",rptr->method,rptr->object,message);
-		return( occi_alert( i, cptr, aptr, status, subject, nature, "openstack", tls ) );
+		return( occi_alert( i, cptr, aptr, name, status, subject, nature, "openstack", tls ) );
 	}
 }
 

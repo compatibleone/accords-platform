@@ -89,8 +89,17 @@ public	struct rest_response * occi_alert(
 		void * vptr,
 		struct rest_client * cptr, 
 		struct rest_response * rptr,
+		char * name,
 		int status, 
 		char * message, char * nature, 
+		char * agent, char * tls );
+
+private	struct rest_response * occi_alert_relay_impl(
+		void * vptr,
+		struct rest_client * cptr,
+		struct rest_response * rptr,
+		int status,
+		char * message, char * nature,
 		char * agent, char * tls );
 
 private	struct rest_response *  (*occi_alert_relay)(
@@ -99,7 +108,7 @@ private	struct rest_response *  (*occi_alert_relay)(
 		struct rest_response * rptr, 
 		int status, char * message, 
 		char * nature, 
-		char * agent, char * tls)=occi_alert;;
+		char * agent, char * tls)=&occi_alert_relay_impl;
 
 
 /*	---------------------------------------------------------	*/
@@ -1840,6 +1849,7 @@ public	struct rest_response * occi_alert(
 		void * vptr,
 		struct rest_client * cptr, 
 		struct rest_response * rptr,
+		char * name,
 		int status, 
 		char * message, char * nature, 
 		char * agent, char * tls )
@@ -1860,6 +1870,11 @@ public	struct rest_response * occi_alert(
 	struct	cordscript_element * lptr;
 	struct	cordscript_element * rvalue;
 	char	buffer[2048];
+
+	if (name == NULL)
+	{
+		name = "";
+	}
 
 	if (!( optr = vptr ))
 		return(rptr);
@@ -1886,6 +1901,7 @@ public	struct rest_response * occi_alert(
 	}
 
 	else if ((!(dptr=occi_request_element(qptr,"occi.alert.source"      , agent   ) ))
+	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.name"        , name  ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.nature"      , nature  ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.status"      , ecode   ) ))
 	     ||  (!(dptr=occi_request_element(qptr,"occi.alert.created"     , etime   ) ))
@@ -1910,6 +1926,19 @@ public	struct rest_response * occi_alert(
 	}
 }
 
+/*	-------------------------------------------------------		*/
+/*		    	o c c i _ a l e r t				*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * occi_alert_relay_impl(
+		void * vptr,
+		struct rest_client * cptr,
+		struct rest_response * rptr,
+		int status,
+		char * message, char * nature,
+		char * agent, char * tls )
+{
+	return occi_alert(vptr, cptr, rptr, NULL, status, message, nature, agent, tls);
+}
 
 private	struct occi_category * append_category_list( struct occi_category * lptr, struct occi_category * cptr )
 {
