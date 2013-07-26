@@ -42,7 +42,7 @@ static	char *	Mnemonix[MAX_MNEMONIC] = {
 
 static	int	Mnemonich[MAX_MNEMONIC] = {
 	'<',	'>',	'&',
-	'…',	'Š',	'‚',	'‡'	
+	'\x85',	'\x8a',	'\x82',	'\x87'
 	};
 
 
@@ -899,6 +899,322 @@ int	xml_parse( char * nptr, struct xml_relay * fptr, void * aptr )
 			}
 		}
 }
+
+/* Attribute handling. */
+static size_t translate_string_with_string_impl(char const * startpos, char const *input, char *buffer, int buffersize, char const *replace, char const *with)
+{
+	char const *pos;
+	char const *previous = input;
+	size_t copy_length;
+	size_t total_length = 0;
+	size_t const with_length = with == NULL ? 0 : strlen(with);
+	size_t const replace_length = replace == NULL ? 0 : strlen(replace);
+	size_t const diff_length = with_length > replace_length ? with_length - replace_length : replace_length - with_length;
+	size_t const input_over_length = input == NULL ? 0 : strnlen(input, buffersize+1);
+	size_t const input_length = input_over_length > buffersize ? buffersize : input_over_length;
+	size_t overflow_required = 0;
+
+	if (buffer == NULL || input == NULL)
+	{
+		return 0;
+	}
+
+	if (replace == NULL)
+	{
+		if (with == NULL)
+		{
+			return 0;
+		}
+		else
+		{
+			replace = "";
+		}
+	}
+	else if (with == NULL)
+	{
+		with = "";
+	}
+
+	pos = startpos;
+//	pos = strstr(input, replace);
+
+	if (pos == NULL) // If replace isn't in input
+	{
+		strncpy(buffer, input, input_length);
+		total_length = input_length;
+
+		if (input_over_length > input_length) // If more in input string
+		{
+			overflow_required += 1;
+
+		} // Ends if more in input string
+	} // Ends if replace isn't in input
+	else // Else replace in input
+	{
+		while (pos != NULL)
+		{
+			if (pos != previous) // If intervening chunk
+			{
+				copy_length = pos-previous;
+
+				if (copy_length <= (buffersize - total_length)) // If room for next chunk
+				{
+					strncpy(buffer+total_length, previous, copy_length);
+					previous += copy_length;
+					total_length += copy_length;
+
+				} // Ends if room for next chunk
+				else // Else no room for next chunk
+				{
+					strncpy(buffer+total_length, previous, (buffersize - total_length));
+					overflow_required += copy_length - (buffersize - total_length);
+					total_length = buffersize;
+					break;
+
+				} // Ends else not enough room for next chunk
+			} // Ends if intervening chunk
+
+			if (with_length < (buffersize - total_length)) // If room for replacement string
+			{
+				strncpy(buffer+total_length, with, with_length);
+				total_length += with_length;
+
+				if (1 <= (buffersize - total_length)) // If room for another character
+				{
+					if (pos == previous && *replace == '\0' && *pos != '\0') // If replacing empty string and not off end of input
+					{
+						*(buffer + total_length) = *pos;
+						++pos;
+						++total_length;
+
+					} // Ends if replacing empty string and not off end of input
+				} // Ends if room for another character
+				else // Else not enough room for another character
+				{
+					++overflow_required;
+
+				} // Ends else not enough room for another character
+
+				pos += replace_length;
+				previous = pos;
+
+				if (pos-input >= buffersize)
+				{
+					overflow_required += (pos-input)-buffersize;
+					strncpy(buffer + total_length, pos, (pos - input) - buffersize);
+					total_length = buffersize;
+					break;
+				}
+				else if (*pos == '\0')
+				{
+					break;
+				}
+
+				// Without "strnstr()" there's no way to avoid run off end of input buffer here.
+				pos = strstr(pos, replace);
+				if (pos > (input+input_length)) // If pos beyond acceptable input length
+				{
+					// Everything from where we are to end of acceptable input buffer.
+					copy_length = input_length - (previous-input);
+					strncpy(buffer+total_length, previous, copy_length);
+					*(buffer + total_length + copy_length) = '\0';
+					// Now what ? Assume input is valid and use pos to ask for bigger buffer (optimistic).
+					total_length = buffersize;
+					overflow_required += ((pos-previous) - copy_length);
+					//previous = (input + input_length - 1);
+					break;
+
+				} // Ends if pos beyond acceptable input length
+
+			} // Ends if room for replacement string
+			else // Else no room for replacement string
+			{
+				strncpy(buffer+total_length, previous, (buffersize - total_length));
+				overflow_required += with_length - (buffersize - total_length);
+				total_length = buffersize;
+				break;
+
+			} // Ends else no room for replacement string
+		} // Ends loop over chunks of input string
+
+		if (total_length < buffersize) // If still space in buffer
+		{
+			copy_length = input_length - (previous-input);
+			if (copy_length > 0) // If input string has final chunk
+			{
+				if (total_length + copy_length < buffersize) // If room in buffer for final chunk
+				{
+					strncpy(buffer+total_length, previous, copy_length);
+					total_length += copy_length;
+
+					if (input_over_length > input_length) // If there's more input than what we access
+					{
+						// Need to try again with an output buffer bigger than
+						// input buffer.
+						// Note that if input is shrinking this isn't really a
+						// requirement, but hard to track how much more input we
+						// could squeeze in having removed characters.
+						total_length = buffersize;
+						overflow_required += (input_over_length - input_length);
+
+					} // Ends if there's more input than what we access
+
+				} // Ends if room in buffer for final chunk
+				else // Else insufficient room in buffer for final chunk
+				{
+					strncpy(buffer+total_length, previous, buffersize - total_length);
+					overflow_required += copy_length - (buffersize - total_length);
+					total_length = buffersize;
+
+				} // Ends else insufficient room in buffer for final chunk
+
+			} // Ends if input string has final chunk
+			else if (*replace == '\0' && *input != '\0') // Else if replacing empty string and input wasn't empty string
+			{
+				// Append with.
+				strncpy(buffer+total_length, with, with_length);
+				total_length += with_length;
+
+			} // Ends else if replacing empty string and input wasn't empty string
+		} // Ends if still space in buffer
+		else if (input_over_length > buffersize) // Else if input longer than buffer
+		{
+			if (overflow_required == 0) // If no overflow registered yet
+			{
+				overflow_required += input_over_length - buffersize;
+
+			} // Ends if no overflow registered yet
+
+		} // Ends else if input longer than buffer
+	} // Ends else replace in input
+
+	buffer[buffersize-1] = '\0';
+
+	if (total_length < buffersize) // If didn't fill buffer
+	{
+		buffer[total_length] = '\0';
+
+	} // Ends if didn't fill buffer
+
+	if (total_length == buffersize && overflow_required == 0) // If string fits exactly in buffer
+	{
+		// That means the buffer was 1 character too short.
+		++overflow_required;
+
+	} // Ends if string fits exactly in buffer
+
+	if (overflow_required != 0)
+	{
+		// Add an extra for null terminator.
+		++overflow_required;
+	}
+
+	return total_length + overflow_required;
+}
+
+size_t translate_string_with_string(char const *input, char *buffer, int buffersize, char const *replace, char const *with)
+{
+	char const *startpos;
+
+	if (buffer == NULL || input == NULL)
+	{
+		return 0;
+	}
+
+	startpos = strstr(input, replace);
+	return translate_string_with_string_impl(startpos, input, buffer, buffersize, replace, with);
+}
+
+size_t translate_string_with_string_startpos(char const * startpos, char const *input, char *buffer, int buffersize, char const *replace, char const *with)
+{
+	return translate_string_with_string_impl(startpos, input, buffer, buffersize, replace, with);
+}
+
+void fprintf_xml_string_attribute(FILE *h, char const *format, char const *attribute)
+{
+	static size_t const buffersize = 1024;
+	char buffer[buffersize];
+
+	size_t convert_size;
+	size_t old_convert_size;
+	char *pbuffer = buffer;
+	char const *startpos;
+
+	buffer[0] = '\0';
+
+	startpos = strstr(attribute, "\"");
+
+	if (startpos == NULL)
+	{
+		fprintf(h, format, attribute);
+	}
+	else
+	{
+		convert_size = translate_string_with_string_startpos(startpos, attribute, pbuffer, buffersize, "\"", "&quot;");
+		old_convert_size = buffersize;
+
+		while (convert_size > old_convert_size)
+		{
+			if (pbuffer == buffer)
+			{
+				pbuffer = (char *)malloc(convert_size);
+			}
+			else
+			{
+				old_convert_size = convert_size;
+				pbuffer = (char *)realloc(pbuffer, convert_size);
+			}
+			convert_size = translate_string_with_string_startpos(startpos, attribute, pbuffer, buffersize, "\"", "&quot;");
+		}
+
+		fprintf(h, format, pbuffer);
+
+		if (pbuffer != buffer)
+		{
+			free(pbuffer);
+		}
+	}
+
+}
+
+char  * unserialize_xml_string_attribute_value(char *value)
+{
+	size_t convert_size;
+	size_t old_convert_size;
+	char *pbuffer;
+	char const *startpos;
+	char *result;
+	size_t value_length;
+
+	startpos = strstr(value, "&quot;");
+
+	if (startpos == NULL)
+	{
+		result = value;
+	}
+	else
+	{
+		value_length = strlen(value);
+		pbuffer = (char *)allocate(value_length);
+
+		convert_size = translate_string_with_string_startpos(startpos, value, pbuffer, value_length, "&quot;", "\"");
+		old_convert_size = value_length;
+
+		while (convert_size > old_convert_size)
+		{
+			liberate(pbuffer);
+			pbuffer = (char *)allocate(convert_size);
+			old_convert_size = convert_size;
+			convert_size = translate_string_with_string_startpos(startpos, value, pbuffer, value_length, "&quot;", "\"");
+		}
+
+		liberate(value);
+		result = pbuffer;
+	}
+
+	return result;
+}
+
 
 #endif	/* _xml_parse_c */
 	/* ------------ */

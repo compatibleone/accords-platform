@@ -318,20 +318,21 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 			continue;
 		else
 		{
-		fprintf(h,"\t\tfprintf(h,%c %s=%cc%c,0x0022);\n",
-			0x0022,iptr->name,0x0025,0x0022);
-		if ( iptr->indirection )
-		{
-			fprintf(h,"\t\tfprintf(h,%c%cs%c,(pptr->%s?pptr->%s:%c%c));\n",
-				0x0022,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
-		}
-		else
-		{
-			fprintf(h,"\t\tfprintf(h,%c%cu%c,pptr->%s);\n",
-				0x0022,0x0025,0x0022,iptr->name);
-		}
-		fprintf(h,"\t\tfprintf(h,%c%cc%c,0x0022);\n",
-			0x0022,0x0025,0x0022);
+			fprintf(h,"\t\tfprintf(h,%c %s=%cc%c,0x0022);\n",
+				0x0022,iptr->name,0x0025,0x0022);
+			if ( iptr->indirection )
+			{
+				fprintf(h, "\t\tfprintf_xml_string_attribute(h, \"%%s\", (pptr->%s?pptr->%s:\"\"));\n",
+					iptr->name, iptr->name
+				);
+			}
+			else
+			{
+				fprintf(h,"\t\tfprintf(h,%c%cu%c,pptr->%s);\n",
+					0x0022,0x0025,0x0022,iptr->name);
+			}
+			fprintf(h,"\t\tfprintf(h,%c%cc%c,0x0022);\n",
+				0x0022,0x0025,0x0022);
 		}
 	}
 
