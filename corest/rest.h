@@ -83,6 +83,7 @@ struct	rest_interface
 	struct rest_response *  (*alert)(void * i, 
 					struct rest_client * cptr, 
 					struct rest_response * rptr, 
+					char * name,
 					int status, char * message, 
 					char * nature, 
 					char * agent, char * tls);

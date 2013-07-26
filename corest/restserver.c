@@ -506,7 +506,7 @@ private	struct rest_response * rest_transmit_response(
 		if ( cptr->server != (struct rest_server *) 0)
 			if ( cptr->server->method.alert )
 				(void) (*cptr->server->method.alert )
-				( cptr->server->method.instance, cptr, aptr,
+				( cptr->server->method.instance, cptr, aptr,NULL,
 				aptr->status, aptr->message, "ALERT","REST",default_tls());
 
 

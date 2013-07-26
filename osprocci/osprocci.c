@@ -148,13 +148,13 @@ private	struct rest_response *  osprocci_alert_relay(
 		void * i, 
 		struct rest_client * cptr, 
 		struct rest_response * aptr, 
+		char * name,
 		int status, char * message, 
 		char * nature, 
 		char * agent, char * tls)
 {
 	struct	rest_request * rptr;
 	char subject[2048];
-	char *name = NULL;
 
 	/* detect and convert REST Alerts */
 	/* ------------------------------ */

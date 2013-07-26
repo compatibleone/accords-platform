@@ -98,6 +98,7 @@ private	struct rest_response * occi_alert_relay_impl(
 		void * vptr,
 		struct rest_client * cptr,
 		struct rest_response * rptr,
+		char * name,
 		int status,
 		char * message, char * nature,
 		char * agent, char * tls );
@@ -106,6 +107,7 @@ private	struct rest_response *  (*occi_alert_relay)(
 		void * i, 
 		struct rest_client * cptr, 
 		struct rest_response * rptr, 
+		char * name,
 		int status, char * message, 
 		char * nature, 
 		char * agent, char * tls)=&occi_alert_relay_impl;
@@ -118,6 +120,7 @@ public	void	set_occi_alert_relay( struct rest_response *  (*relay)(
 		void * i, 
 		struct rest_client * cptr, 
 		struct rest_response * rptr, 
+		char * name,
 		int status, char * message, 
 		char * nature, 
 		char * agent, char * tls))
@@ -1933,11 +1936,12 @@ private	struct rest_response * occi_alert_relay_impl(
 		void * vptr,
 		struct rest_client * cptr,
 		struct rest_response * rptr,
+		char * name,
 		int status,
 		char * message, char * nature,
 		char * agent, char * tls )
 {
-	return occi_alert(vptr, cptr, rptr, NULL, status, message, nature, agent, tls);
+	return occi_alert(vptr, cptr, rptr, name, status, message, nature, agent, tls);
 }
 
 private	struct occi_category * append_category_list( struct occi_category * lptr, struct occi_category * cptr )
