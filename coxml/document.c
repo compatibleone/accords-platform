@@ -70,6 +70,10 @@ private	int	document_atb_value( struct xml_application * xptr, char * token )
 		return( 48 );
 	else if (!( aptr->value = allocate_string( token ) ))
 		return( 27 );
+	else if (! (aptr->value = unserialize_xml_string_attribute_value(aptr->value)))
+	{
+		return ( 27 );
+	}
 	else	return(0);
 }
 
