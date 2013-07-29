@@ -179,7 +179,7 @@ private	int	os_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	{
 		if (!( strcmp( keyname, "none" ) ))
 			keyname = (char *) 0;
-		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone, keyname ) ))
+		if (!( nomfic = os_create_server_request(subscription, p2, p3, p4, p5, personality, resource, group, zone, keyname, (char *) 0 ) ))
 			return( failure(27,"cannot create server","request" ) );
 		else
 		{ 	
