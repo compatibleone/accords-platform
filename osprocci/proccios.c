@@ -943,7 +943,10 @@ private	void	release_floating_address( struct os_subscription * subptr, struct o
 		{
 			if ((osptr = os_delete_address( subptr, pptr->floatingid )) != (struct os_response *) 0)
 				osptr = liberate_os_response( osptr );
+			pptr->floatingid = liberate( pptr->floatingid );
 		}
+		if ( pptr->floating )
+			pptr->floating = liberate( pptr->floating );
 	}
 	return;
 }
@@ -1214,7 +1217,7 @@ private	struct	rest_response * start_openstack(
 	}
 	if (!( filename = os_create_server_request( 
 		subptr, pptr->name, pptr->image, pptr->flavor, pptr->accessip, personality, resource, 
-		pptr->firewall, pptr->zone, "none" ) ))
+		pptr->firewall, pptr->zone, "none",(subptr->KeyStone.network ? pptr->privatenet:(char *) 0) ) ))
 	{
 		release_floating_address( subptr,pptr );
 		subptr = os_liberate_subscription( subptr );
