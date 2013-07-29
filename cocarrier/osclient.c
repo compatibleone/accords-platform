@@ -26,6 +26,7 @@ private	int	rate_recovery=120;	/* time to wait for rate limiting recovery	*/
 private	int	hack=0;			/* forces the use of the EUCA scripts		*/
 private	int	usejson=0;		/* forces use of json message for server create	*/
 private	int	quantum_xml=0;		/* use xml for quantum otherwise json		*/
+private	int	compute_v2=0;		/* allows use of nova compute v2 messages	*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
 
 public	void	os_use_json( int v )
@@ -1668,7 +1669,8 @@ private	char * os_create_server_xml_request(
 		char * resource,	/* the target personality file  */
 		char * group,		/* an eventual security group	*/
 		char * zone,		/* an eventual locality zone	*/
-		char * keyname )	/* an eventual key pair name	*/
+		char * keyname,		/* an eventual key pair name	*/
+		char * network )	/* quantum network identifier	*/
 {
 	char *	sptr=(char *) 0;
 	char *	tptr=(char *) 0;
@@ -1797,6 +1799,15 @@ private	char * os_create_server_xml_request(
 				fprintf(h,"</personality>\n");
 			}
 		}
+		if ( compute_v2 )
+		{
+			if ( rest_valid_string( network ) )
+			{
+				fprintf(h,"\t<networks>\n");
+				fprintf(h,"\t<network uuid=\"%s\"></network>\n",network);
+				fprintf(h,"\t</networks>\n");
+			}			
+		}
 		fprintf(h,"</server>\n");
 		fclose(h);
 		return( filename );
@@ -1817,7 +1828,8 @@ private	char * os_create_server_json_request(
 		char * resource,	/* the target personality file  */
 		char * group,		/* an eventual security group	*/
 		char * zone,		/* an eventual locality zone	*/
-		char * keyname )	/* an eventual key pair name	*/
+		char * keyname,		/* an eventual key pair name	*/
+		char * network) 	/* quantum network identifie	*/
 {
 	char *	sptr=(char *) 0;
 	char *	tptr=(char *) 0;
@@ -1849,6 +1861,11 @@ private	char * os_create_server_json_request(
 		if (!( strncmp( image, "http", strlen("http") ) ))
 			fprintf(h,",\"imageRef\":%c%s%c",0x0022,image,0x0022);
 		else	fprintf(h,",\"imageRef\":%c%s/images/%s%c",0x0022,subptr->Os.base,image,0x0022);
+
+		if ( rest_valid_string( network ) )
+		{
+			fprintf(h,", \"networks\":[{\"uuid\":\"%s\"}]",network);
+		}
 
 		if (( rest_valid_string( keyname ) )
 		&&  (strcmp( keyname, "none" ) != 0 ))
@@ -1938,15 +1955,16 @@ public	char * os_create_server_request(
 		char * resource,	/* the target personality file  */
 		char * group,		/* an eventual security group	*/
 		char * zone,		/* an eventual locality zone	*/
-		char * keyname )	/* an eventual key pair name	*/
+		char * keyname,		/* an eventual key pair name	*/
+		char * network )	/* quantum network identifier	*/
 {
 	if ( hack )
 		return( euca_data_hack( image, flavor, personality ) );
 	else if (!( strcmp( subptr->Os.version, "v2" ) ))
-		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
+		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname, network ));
 	else if ( usejson )
-		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
-	else	return( os_create_server_xml_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname ));
+		return( os_create_server_json_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname,network ));
+	else	return( os_create_server_xml_request( subptr, identity, image, flavor, address, personality, resource, group, zone, keyname, network ));
 }
 
 /*	------------------------------------------------------------	*/
