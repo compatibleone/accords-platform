@@ -72,7 +72,7 @@ public	struct os_subscription * os_initialise_client(
 public	char * os_create_server_request(
 	struct os_subscription *  sptr, 
 	char * identity, char * flavor, char * image, char * address, char * personality, 
-	char * resource, char * group, char * zone, char * keyname );
+	char * resource, char * group, char * zone, char * keyname, char * network );
 public	char * os_create_metadata_request(struct os_subscription *  sptr, char * values );
 public	char * os_create_meta_request(struct os_subscription *  sptr, char * key, char * value );
 public	char * os_create_image_request(struct os_subscription *  sptr,char * identity, char * server );
