@@ -93,6 +93,12 @@ struct	xml_parser	{
 /*	--------------------------	*/
 int	xml_parse( char * filename, struct xml_relay * interfaceitem, void * application );
 
+/* Attribute handling. */
+size_t translate_string_with_string(char const *input, char *buffer, int buffersize, char const *replace, char const *with);
+size_t translate_string_with_string_startpos(char const * startpos, char const *input, char *buffer, int buffersize, char const *replace, char const *with);
+void fprintf_xml_string_attribute(FILE *h, char const *format, char const *attribute);
+char * unserialize_xml_string_attribute_value(char *value);
+
 /*	--------------------------------------	*/
 /*	Call back functions for data retrieval	*/
 /*	--------------------------------------	*/
