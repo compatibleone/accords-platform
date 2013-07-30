@@ -76,6 +76,8 @@
 
 		$aid     = $record["occi.service.account"];
 		$account = $aid.get();
+		$vid     = $record["occi.service.vender"];
+		$vender  = $vid.get();
 		$slaid   = $record["occi.service.sla"];
 		$sla     = $slaid.get();
 		$manid   = $record["occi.service.manifest"];
@@ -86,8 +88,16 @@
 		$m = $m#"<td><b>Account</b><td>"#$name;
 		$name = $sla["occi.agreement.name"];
 		$m = $m#"<td><b>Agreement</b><td>"#$name;
+		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
+		$m.display();
+
+
+		$m = "<tr>";
+		$name = $vender["occi.account.name"];
+		$m = $m#"<td><b>Vender</b><td>"#$name;
 		$name = $manifest["occi.manifest.name"];
 		$m = $m#"<td><b>Manifest</b><td>"#$name;
+		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
 		$m.display();
 
 		$m = "<tr>";

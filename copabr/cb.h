@@ -73,6 +73,9 @@ struct	cords_provisioning
 	struct	occi_response 	* sla;
 	char			* accID;
 	char			* accName;
+	struct	occi_response 	* vender;
+	char			* venID;
+	char			* venName;
 	struct	occi_response 	* account;
 	char			* secID;
 	struct	occi_response 	* security;
@@ -135,7 +138,7 @@ public 	struct	occi_element * cords_first_link( struct occi_response * zptr );
 public 	struct 	occi_element * cords_next_link( struct occi_element * eptr );
 
 public	struct	xml_element  * cords_build_service( 
-	char * 	name, char * plan, char * manifest, char * sla, char * account, char * tarification );
+	char * 	name, char * plan, char * manifest, char * sla, char * account, char * vender, char * tarification );
 
 private	struct	xml_element * 	cords_build_contract( 
 	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider, int flags );
@@ -153,6 +156,7 @@ public	char *	cords_service_broker(
 	char *	plan,
 	char * 	manifest, 
 	char *	sla,
+	char ** vender,
 	char * 	agent, 
 	char * 	tls, 
 	struct xml_element ** root );

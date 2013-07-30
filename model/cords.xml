@@ -668,6 +668,7 @@
 	        <instance name='manifest' category='http://scheme.compatibleone.fr/scheme/compatible#manifest' multiplicity='[0..1]'/>
 	        <instance name='plan' category='http://scheme.compatibleone.fr/scheme/compatible#plan' multiplicity='[0..1]'/>
 	        <instance name='account' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
+	        <instance name='vender' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
 	        <instance name='sla' category='http://scheme.compatibleone.fr/scheme/compatible#agreement' multiplicity='[0..1]'/>
 	        <instance name='price' category='http://scheme.compatibleone.fr/scheme/compatible#price' multiplicity='[0..1]'/>
 	        <instance name='session' category='http://scheme.compatibleone.fr/scheme/compatible#session' multiplicity='[0..1]'/>
@@ -939,7 +940,7 @@
 	        <attribute name='name' type='string' required='false' immutable='false'/>
 	        <attribute name='description' type='string' required='false' immutable='false'/>
 	        <instance name='manifest' category='http://scheme.compatibleone.fr/scheme/compatible#manifest' multiplicity='[0..1]'/>
-	        <attribute name='vendor' type='string' required='false' immutable='false'/>
+	        <attribute name='vender' type='string' required='false' immutable='false'/>
 	        <attribute name='template' type='string' required='false' immutable='false'/>
 	        <instance name='price' category='http://scheme.compatibleone.fr/scheme/compatible#price' multiplicity='[0..1]'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>

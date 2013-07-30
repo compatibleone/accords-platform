@@ -171,6 +171,10 @@ private	char * 	cords_terminate_provisioning(
 		pptr->secID = liberate( pptr->secID );
 	if ( pptr->security )
 		pptr->security = occi_remove_response( pptr->security );
+	if ( pptr->venID )
+		pptr->venID = liberate( pptr->venID );
+	if ( pptr->venName )
+		pptr->venName = liberate( pptr->venName );
 	if ( pptr->accID )
 		pptr->accID = liberate( pptr->accID );
 	if ( pptr->accName )
@@ -3218,7 +3222,8 @@ public	struct	xml_element * cords_instance_node(
 public	struct	xml_element * 	cords_build_service(
 	char * plan, 	char * name, 
 	char * manifest, char * sla,
-	char * account,	char * tarif)
+	char * account,	char * vender,
+	char * tarif)
 {
 	struct	occi_response * zptr;
 	char *	vptr;
@@ -3234,6 +3239,8 @@ public	struct	xml_element * 	cords_build_service(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_MANIFEST , manifest ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_ACCOUNT , account ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, _CORDS_VENDER , vender ) ))
 		return(document_drop( eptr ));
 	else if ((plan) && (!( aptr = document_add_atribut( eptr, _CORDS_PLAN , plan ) )))
 		return(document_drop( eptr ));
@@ -3680,23 +3687,38 @@ private	char *	cords_brokering_account(
 {
 	int	status;
 
-	if (!( sla ))
+	/* ------------------------------------------- */
+	/* collect manifest owner / vender information */
+	/* ------------------------------------------- */
+	if (!( CbC->venID  = occi_extract_atribut( CbC->manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT ))) 
+		return( cords_terminate_provisioning( 905, CbC ) );
+	else if (!( CbC->account = cords_retrieve_instance( host, CbC->venID, agent, tls )))
+		return( cords_terminate_provisioning( 905, CbC ) );
+	else if (!( CbC->venName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+		return( cords_terminate_provisioning( 905, CbC ) );
+
+	/* ----------------------------------------- */
+	/* differentiate between agreement brokering */
+	/* ----------------------------------------- */
+	else if (!( sla ))
 	{
-		/* -------------------------------------------------- */
-		/* retrieve the account information instance and name */
-		/* -------------------------------------------------- */
-		if (( CbC->accID  = occi_extract_atribut( CbC->manifest, Operator.domain, _CORDS_MANIFEST, _CORDS_ACCOUNT )) 
-				!= (char *) 0)
-		{
-			if (!( CbC->account = cords_retrieve_instance( host, CbC->accID, agent, tls )))
-				return( cords_terminate_provisioning( 905, CbC ) );
-			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
-				return( cords_terminate_provisioning( 905, CbC ) );
-			else	return( allocate_string( CbC->accID ) );
-		}
+		/* --------------------------------------------------- */
+		/* duplicate vender information as payment information */
+		/* --------------------------------------------------- */
+		if (!( CbC->accID = allocate_string( CbC->venID ) ))
+			return( cords_terminate_provisioning( 905, CbC ) );
+		else if (!( CbC->accName = allocate_string( CbC->venName ) ))
+			return( cords_terminate_provisioning( 905, CbC ) );
+		else	return( allocate_string( CbC->accID ) );
 	}
 	else
 	{
+		/* --------------------------------------- */
+		/* swap the message from account to vender */
+		/* --------------------------------------- */
+		CbC->vender = CbC->account;
+		CbC->account= (struct occi_response *) 0;
+
 		/* -------------------------------------------------- */
 		/* retrieve the S.L.A   information instance and name */
 		/* -------------------------------------------------- */
@@ -3710,17 +3732,14 @@ private	char *	cords_brokering_account(
 		/* -------------------------------------------------- */
 		/* retrieve the account information instance and name */
 		/* -------------------------------------------------- */
-		if (( CbC->accID  = occi_extract_atribut( CbC->sla, Operator.domain, _CORDS_AGREEMENT, _CORDS_INITIATOR ))
-				!= (char *) 0)
-		{
-			if (!( CbC->account = cords_retrieve_instance( host, CbC->accID, agent, tls )))
-				return( cords_terminate_provisioning( 905, CbC ) );
-			else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
-				return( cords_terminate_provisioning( 905, CbC ) );
-			else	return( allocate_string( CbC->accID ) );
-		}
+		else if (!( CbC->accID  = occi_extract_atribut( CbC->sla, Operator.domain, _CORDS_AGREEMENT, _CORDS_INITIATOR )))
+			return( cords_terminate_provisioning( 905, CbC ) );
+		else if (!( CbC->account = cords_retrieve_instance( host, CbC->accID, agent, tls )))
+			return( cords_terminate_provisioning( 905, CbC ) );
+		else if (!( CbC->accName  = occi_extract_atribut( CbC->account, Operator.domain, _CORDS_ACCOUNT, _CORDS_NAME ))) 
+			return( cords_terminate_provisioning( 905, CbC ) );
+		else	return( allocate_string( CbC->accID ) );
 	}
-	return("OK");
 }
 
 /*	-------------------------------------------------------		*/
@@ -3997,6 +4016,7 @@ public	char *	cords_service_broker(
 	char *	plan,
 	char * 	manifest, 
 	char *	sla,
+	char ** vender,
 	char * 	agent, 
 	char * 	tls, 
 	struct xml_element ** root )
@@ -4076,7 +4096,7 @@ public	char *	cords_service_broker(
 	/* -------------------------------------- */
 	/* build the service description document */
 	/* -------------------------------------- */
-	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.accID ) ))
+	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.venID, CbC.accID ) ))
 		return( cords_terminate_provisioning( 909, &CbC ) );
 
 	/* ------------------------ */
@@ -4144,10 +4164,25 @@ public	char *	cords_service_broker(
 	&&  ((status = cords_broker_interface( host, CbC.document, CbC.interface, agent, tls )) != 0))
 		return( cords_terminate_provisioning( status, &CbC ) );
 
-	else
+	else if (!( CbC.venID ))
 	{
 		cords_terminate_provisioning( 0, &CbC );
 		return( resultid );
+	}
+
+	else 
+	{
+		/* ---------------------------------------- */
+		/* return vender information when available */
+		/* ---------------------------------------- */
+		if ( *vender ) *vender = liberate( *vender );
+		if (!( *vender = allocate_string( CbC.venID ) ))
+			return( cords_terminate_provisioning( 927, &CbC ) );
+		else
+		{
+			cords_terminate_provisioning( 0, &CbC );
+			return( resultid );
+		}
 	}
 }
 
@@ -4238,7 +4273,7 @@ public	char *	cords_manifest_broker(
 	/* ---------------------------------- */
 	/* build the service control document */
 	/* ---------------------------------- */
-	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.accID ) ))
+	if (!( CbC.document = cords_build_service( CbC.planID, CbC.namePlan, CbC.reqID, CbC.slaID, CbC.accID, CbC.venID, CbC.accID ) ))
 		return( cords_terminate_provisioning( 909, &CbC ) );
 
 	else if (!( CbC.instance = cords_create_category( CbC.document, agent, tls ) ))

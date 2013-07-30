@@ -109,6 +109,7 @@
 #define	_CORDS_DESCRIPTION	"description"
 #define	_CORDS_SECURITY		"security"
 #define	_CORDS_ACCOUNT		"account"
+#define	_CORDS_VENDER		"vender"
 #define	_CORDS_USER		"user"
 
 /*	------------------------	*/

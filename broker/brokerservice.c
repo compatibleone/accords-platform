@@ -911,6 +911,7 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 			pptr->plan,
 			pptr->manifest,
 			pptr->sla,
+			&pptr->vender,
 			_CORDS_CONTRACT_AGENT,
 			default_tls(), 
 			(struct xml_element **) 0 ) ))
