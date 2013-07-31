@@ -1247,7 +1247,7 @@ private char * 	cords_service_operation( char * command, char * service )
 				fprintf(h,"<html><head><title>service command response : %s</title>\n",command);
 				cords_rcs_style(h,"style.css");
 				fprintf(h,"</head>\n<body><div align=center><h1>Service Command</h1>\n");
-				fprintf(h,"<table><tr><th colspane=2>%s?action=%s</th></tr>\n",service,command);
+				fprintf(h,"<table><tr><th colspan=2>%s?action=%s</th></tr>\n",service,command);
 				for (	eptr=zptr->first;
 					eptr != (struct occi_element *) 0;
 					eptr = eptr->next)
