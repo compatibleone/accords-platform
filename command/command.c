@@ -60,6 +60,7 @@ public	char *	default_tls()		{	return(Command.tls);		}
 public	char *	default_identity()	{	return(Command.identity);	}
 public	char *	default_zone()		{	return(Command.zone);		}
 
+private	void	default_service_table( FILE * h, char * service );
 public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
 
 /*	-----------------------------------	*/
@@ -1245,13 +1246,15 @@ private char * 	cords_service_operation( char * command, char * service )
 			{
 				fprintf(h,"<html><head><title>service command response : %s</title>\n",command);
 				cords_rcs_style(h,"style.css");
-				fprintf(h,"</head>\n<body><div align=center><h1>Service Command : %s?action=%s</h1><table>\n",service,command);
+				fprintf(h,"</head>\n<body><div align=center><h1>Service Command</h1>\n");
+				fprintf(h,"<table><tr><th colspane=2>%s?action=%s</th></tr>\n",service,command);
 				for (	eptr=zptr->first;
 					eptr != (struct occi_element *) 0;
 					eptr = eptr->next)
 				{
 					fprintf(h,"<tr><th>%s<th>%s</tr>\n",eptr->name,eptr->value);
 				}
+				default_service_table( h, service );
 				fprintf(h,"</table></div></body></html>\n");
 				fclose(h);
 			}
@@ -1361,6 +1364,23 @@ private	char *	detect_command_file( char * stub, char * ext )
 }	
 
 /*	--------------------------------------------------------	*/
+/*		d e f a u l t _ s e r v i c e _ t a b l e		*/
+/*	--------------------------------------------------------	*/
+private	void	default_service_table( FILE * h, char * service )
+{
+	fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48");
+	if ( service )
+		fprintf(h," value=\"%s\"",service);
+	fprintf(h,"></tr>\n");
+	fprintf(h,"<tr><th>Start Service<th><input type=submit name=%s value=%s></tr>\n","command","start");
+	fprintf(h,"<tr><th>Stop  Service<th><input type=submit name=%s value=%s></tr>\n","command","stop");
+	fprintf(h,"<tr><th>Save  Service<th><input type=submit name=%s value=%s></tr>\n","command","save");
+	fprintf(h,"<tr><th>Snapshot Service<th><input type=submit name=%s value=%s></tr>\n","command","snapshot");
+	fprintf(h,"<tr><th>Delete Service<th><input type=submit name=%s value=%s></tr>\n","command","delete");
+	return;
+}
+
+/*	--------------------------------------------------------	*/
 /*		c o m m a n d _ g e t _ f i l e n a m e 		*/
 /*	--------------------------------------------------------	*/
 private	char *	default_get_filename( char * command )
@@ -1409,12 +1429,7 @@ private	char *	default_get_filename( char * command )
 			}
 			else if (!( strcasecmp( command, "service" ) ))
 			{
-				fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48></tr>\n");
-				fprintf(h,"<tr><th>Start Service<th><input type=submit name=%s value=%s></tr>\n","command","start");
-				fprintf(h,"<tr><th>Stop  Service<th><input type=submit name=%s value=%s></tr>\n","command","stop");
-				fprintf(h,"<tr><th>Save  Service<th><input type=submit name=%s value=%s></tr>\n","command","save");
-				fprintf(h,"<tr><th>Snapshot Service<th><input type=submit name=%s value=%s></tr>\n","command","snapshot");
-				fprintf(h,"<tr><th>Delete Service<th><input type=submit name=%s value=%s></tr>\n","command","delete");
+				default_service_table( h, (char *) 0);
 			}
 			else
 			{
