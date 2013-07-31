@@ -55,11 +55,14 @@ chmod uog+x dashboard-parser
 echo "/usr/local/bin/testcb --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-broker
 chmod uog+x dashboard-broker
 
-echo "/usr/local/bin/command --publisher $var invoice \$1 " > ./dashboard-invoice
+echo "/usr/local/bin/command --config accords.xml invoice \$1 " > ./dashboard-invoice
 chmod uog+x dashboard-invoice
 
-echo "/usr/local/bin/command --publisher $var \$1 \$2 \$3 \$4 " > ./dashboard-command
-chmod uog+x dashboard-invoice
+echo "/usr/local/bin/command --config accords.xml analyse co-log " > ./dashboard-analyse
+chmod uog+x dashboard-analyse
+
+echo "/usr/local/bin/command --config accords.xml \$1 \$2 \$3 \$4 " > ./dashboard-command
+chmod uog+x dashboard-command
 
 chmod uog+rw . rest service co-log
 chmod uog+r security security/*
