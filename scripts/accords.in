@@ -168,6 +168,7 @@ _co_platform() {
     _co_run_serv parser "accords parser services"
     _co_run_serv broker "accords broker services"
     _co_run_serv procci "accords procci services"
+    _co_run_serv command "accords remote command server"
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
@@ -396,6 +397,7 @@ _co_stop() {
     _stop_service azprocci
     _stop_service ec2procci
     _stop_service cosched
+    _stop_service command
     _stop_service procci
     _stop_service broker
     _stop_service parser
@@ -452,6 +454,10 @@ _run_cosacs() {
 
 _run_cool() {
     cool --config $target CO-OL/1.0
+}
+
+_run_command() {
+    @bindir@/command --config $target ONLINE CO-RCS/1.0
 }
 
 _run_coss() {
@@ -721,6 +727,7 @@ _accords_config() {
     _mkpro cnprocci
     _mkpro eziprocci
     _mkpro oaprocci
+    _mkcfg command
     _mkcosacs cosacs
 
     _termnag
@@ -1224,6 +1231,9 @@ case `basename $0` in
 	;;
     run-cool)
 	_run_cool $*
+	;;
+    run-command)
+	_run_command $*
 	;;
     run-publisher)
 	_run_publisher $*

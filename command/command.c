@@ -19,34 +19,46 @@
 #define	_command_c
 
 #include "command.h"
+#include "accords.h"
 #include "cordslang.h"
 #include "occiresolver.h"
 #include "occilogin.h"
 #include "cp.h"
 #include "json.h"
 
-private	int	verbose=0;
-private	int	debug=0;
 private	int	noauth=0;
 
+struct	accords_configuration Command = {
+	0,0,
+	0,0,0,0,
+	(char *) 0,
+	(char *) 0,
+	_CORDS_DEFAULT_PUBLISHER,
+	_CORDS_DEFAULT_OPERATOR,
+	_CORDS_DEFAULT_USER,
+	_CORDS_DEFAULT_PASSWORD,
+	"http",  80,
+	"xmpp",  8000,
+	"domain",
+	"command.xml",
+	"europe",
+	"storage",
+	"command",
+	(struct occi_category *) 0,
+	(struct occi_category *) 0
+	};
+
 private	char *	agent="CO-COMMAND/1.0";
-private	char *	publisher="http://127.0.0.1:8086";
-private	char *	operator="accords";
-private	char *	zone="europe";
-private	char *	tls=(char *) 0;
-private	int	port=80;
-private	int	threads=1;
 private	int	authorise=0;
-private	char *	user=(char *) 0;
-private	char *	password=(char *) 0;
 private	int	echo=0;
 
-public	char *	default_operator()	{	return( operator );	}
-public	char *	default_zone()		{	return( zone );		}
-public	char *	default_publisher()	{	return( publisher );	}
-public	char *	default_tls()		{	return( tls );		}
-public	int	check_verbose()		{	return( verbose );	}
-public	int	check_debug()		{	return( debug );	}
+public	int	check_debug()		{	return(Command.debug);		}
+public	int	check_verbose()		{	return(Command.verbose);	}
+public	char *	default_publisher()	{	return(Command.publisher);	}
+public	char *	default_operator()	{	return(Command.operator);	}
+public	char *	default_tls()		{	return(Command.tls);		}
+public	char *	default_identity()	{	return(Command.identity);	}
+public	char *	default_zone()		{	return(Command.zone);		}
 
 public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
 
@@ -67,6 +79,18 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
+/*	---------------------------------------------	*/  
+/*		c o m m a n d _ l o a d 		*/
+/*	---------------------------------------------	*/
+/*	this function loads command    configuration	*/
+/*	from the xml configuration file.		*/
+/*	---------------------------------------------	*/  
+private	void	command_load()
+{
+	load_accords_configuration( &Command, "command" );
+	return;
+}
+
 #include "cspi.h"
 #include "colog.c"
 
@@ -80,7 +104,7 @@ private	int	ll_cords_service_action( char * id, char * action )
 	char *	result;
 	char *	sptr;
 
-	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( Command.publisher, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
@@ -132,7 +156,7 @@ private	int	ll_cords_service_delete( char * id )
 	char *	result;
 	char *	sptr;
 
-	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( Command.publisher, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
@@ -181,7 +205,7 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 {
 	struct	occi_response * rptr;
 	char buffer[2048];
-	if ( verbose )
+	if ( check_verbose() )
 	{
 		printf("\nCosacs { Host=%s,",host);
 		printf(" Command=%s",command);
@@ -190,7 +214,7 @@ private	int	cosacs_command_tool( char * host, char * command ,char * category, c
 	}
 	sprintf(buffer,"%s://%s:%u/%s/%s",rest_http_prefix(),host,_COSACS_PORT,category,item);
 
-	if ( verbose )
+	if ( check_verbose() )
 		printf("   %s %s\n",command,buffer);
 
 	if (!( strcasecmp( command, "LIST" ) ))
@@ -262,7 +286,7 @@ private	int	occi_service_operation( char * filename, char * body )
 	struct	rest_header * hptr=(struct rest_header * ) 0;
 	struct	rest_response * rptr;
 
-	if ( verbose )
+	if ( check_verbose() )
 		printf("\nOCCI infile=%s\n",filename);
 
 	/* ------------------- */
@@ -303,7 +327,7 @@ private	int	occi_service_operation( char * filename, char * body )
 			}
 		}
 		version = allocate_string( xptr );
-		if ( verbose )
+		if ( check_verbose() )
 			printf("\nmethod=%s\nobject=%s\nversion=%s\n",
 				(method  ? method : "<null method>"), 
 				(object  ? object : "<null object>"),
@@ -329,7 +353,7 @@ private	int	occi_service_operation( char * filename, char * body )
 			else 	foot = hptr;
 			if (!( root ))
 				root = hptr;
-			if ( verbose )
+			if ( check_verbose() )
 				printf("header(%s=%s)\n",hptr->name,hptr->value);
 		}
 	}
@@ -350,14 +374,14 @@ private	int	occi_service_operation( char * filename, char * body )
 
 	if (!( rptr ))
 	{
-		if ( verbose )
+		if ( check_verbose() )
 			printf("request failure\n");
 		return(0);
 	}
 	else
 	{
 		sprintf(buffer,"%s.response",filename);
-		if ( verbose )
+		if ( check_verbose() )
 			printf("OCCI outfile=%s\n",buffer);
 		if (!( h = fopen( buffer, "w" ) ))
 			return( 0 );
@@ -396,7 +420,7 @@ private	int	cosacs_service_operation( char * service, char * syntax )
 	else if (!( syntax ))
 		return( failure(  30,"expected syntax", "" ) );
 
-	else if ( verbose )
+	else if ( check_verbose() )
 		printf("\n Cosacs Service %s { %s } \n",service, syntax );
 	if (!( dptr = json_parse_file( service )))
 		return( failure(  40,"parsing json", service ) );
@@ -454,7 +478,7 @@ private	int	ll_invoice_operation( char * account, char * other )
 	struct	occi_response * yptr;
 	char *	sptr;
 	char	buffer[2048];
-	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( Command.publisher, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
 		return(failure(40,"unknown account",account));
@@ -538,7 +562,7 @@ private	int	service_operation( char * command, char * service, char * syntax )
 		return( 32 );
 	else if (!( h = fopen( service, "r" ) ))
 		return( 40 );
-	else if (!( publisher ))
+	else if (!( Command.publisher ))
 		return( failure( 0, "publisher", "undefined" ) );
 	{
 		fclose(h);
@@ -550,7 +574,7 @@ private	int	service_operation( char * command, char * service, char * syntax )
 				id = (service+1);
 		}
 
-		if ( verbose )
+		if ( check_verbose() )
 			printf("\n Service %s { %s } \n",command,id);
 
 		if (!( strcasecmp( command, "START" ) ))
@@ -582,7 +606,7 @@ private	int	ll_command_transaction( char * account, char * price, char * referen
 	char *	accountid=(char *) 0;
 	char *	priceid=(char *) 0;
 
-	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( Command.publisher, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
 		return(failure(78,"unknown account",account));
@@ -713,7 +737,7 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 	char 			* auth=(char *) 0;
 	struct occi_response 	* zptr;
 
-	initialise_occi_resolver( publisher, (char *) 0, (char *) 0, (char *) 0 );
+	initialise_occi_resolver( Command.publisher, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( noauth ))
 	{
@@ -786,7 +810,7 @@ private	int	ll_cords_parser_operation( char * filename )
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = cords_document_parser( Cp.host, filename, agent, tls, Cp.xsd ) ))
+	else if (!( dptr = cords_document_parser( Cp.host, filename, agent, default_tls(), Cp.xsd ) ))
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
@@ -824,13 +848,13 @@ private	int	cords_parser_operation( char * filename )
 
 	set_xml_echo(echo);
 
-	if (!( auth = login_occi_user( "test-parser","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-parser","co-system",agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_cords_parser_operation( filename );
 
-	(void) logout_occi_user( "test-parser","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-parser","co-system",agent, auth, default_tls() );	
 
 	return( status );
 }
@@ -880,7 +904,7 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( sptr = occi_unquoted_value( plan )))
 		return(500);
-	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, tls ) ))
+	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, default_tls() ) ))
 		return(501);
 	else
 	{
@@ -1129,6 +1153,28 @@ private	int	cords_script_interpreter( char * filename )
 	return( 200 );
 }
 
+/*	------------------------------------------------------------	*/
+/*	  		c o r d s _ r c s _ s t y l e 			*/
+/*	------------------------------------------------------------	*/
+private	void	cords_rcs_style( FILE * h, char * filename )
+{
+	FILE * css;
+	int	c;
+	if (!( filename ))
+		return;
+	else if (!( css = fopen( filename,"r" ) ))
+		return;
+	else	
+	{
+		fprintf(h,"<style type='text/css' media=SCREEN>\n");
+		while ((c = fgetc(css)) > 0)
+			fputc(c,h);
+		fclose(css);
+		fprintf(h,"</style>\n");
+		return;
+	}
+}
+
 /*	------------------------------------------------	*/
 /*	c o r d s _ r e s o l v e r _ o p e r a t i o n		*/
 /*	------------------------------------------------	*/
@@ -1153,13 +1199,15 @@ private	char * 	cords_resolver_operation( char * category )
 		return( (char *) 0 );
 	else
 	{
-		fprintf(h,"<html><head><title>resolver response</title></head><body><h1>Endpoints for : %s</h1>\n",category);
+		fprintf(h,"<html><head><title>resolver response</title>");
+		cords_rcs_style(h,"style.css");
+		fprintf(h,"</head><body><div align=center><h1>Endpoints for : %s</h1>\n",category);
 		fprintf(h,"<table>\n");
 		for ( 	eptr = rptr->first;
 			eptr != (struct occi_element * )0;
 			eptr = eptr->next )
 		{
-			fprintf(h,"<tr><th><a href=\"%s/%s/\">,%s/%s/</a></th></tr>\n",eptr->value,category,eptr->value,category);
+			fprintf(h,"<tr><th><a href=\"%s/%s/\">%s/%s/</a></th></tr>\n",eptr->value,category,eptr->value,category);
 		}
 
 		fprintf(h,"</table></div></body></html>\n");
@@ -1183,7 +1231,7 @@ private char * 	cords_service_operation( char * command, char * service )
 	struct	occi_element * eptr;
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 		return((char *)0);
 	else 	(void) occi_client_authentication( auth );
 
@@ -1195,14 +1243,16 @@ private char * 	cords_service_operation( char * command, char * service )
 		{
 			if ((h = fopen( filename, "w")) != (FILE *) 0)
 			{
-				fprintf(h,"<html><head><title>service command response : %s</title></head>\n",command);
-				fprintf(h,"<body><h1>Service Command : %s?action=%s</h1><table>\n",service,command);
+				fprintf(h,"<html><head><title>service command response : %s</title>\n",command);
+				cords_rcs_style(h,"style.css");
+				fprintf(h,"</head>\n<body><div align=center><h1>Service Command : %s?action=%s</h1><table>\n",service,command);
 				for (	eptr=zptr->first;
 					eptr != (struct occi_element *) 0;
 					eptr = eptr->next)
 				{
 					fprintf(h,"<tr><th>%s<th>%s</tr>\n",eptr->name,eptr->value);
 				}
+				fprintf(h,"</table></div></body></html>\n");
 				fclose(h);
 			}
 		}
@@ -1210,7 +1260,7 @@ private char * 	cords_service_operation( char * command, char * service )
 	}
 	else 	filename = (char *) 0;
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 	return( filename );
 }
@@ -1227,13 +1277,13 @@ private	int	cords_broker_operation( char * filename )
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
-	if (!( auth = login_occi_user( "test-broker","co-system",agent, tls ) ))
+	if (!( auth = login_occi_user( "test-broker","co-system",agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
 	status = ll_sla_broker_operation( filename );
 
-	(void) logout_occi_user( "test-broker","co-system",agent, auth, tls );	
+	(void) logout_occi_user( "test-broker","co-system",agent, auth, default_tls() );	
 
 	return( status );
 }
@@ -1266,15 +1316,15 @@ private	struct rest_server * commandserver_initialise(  void * v,struct rest_ser
 /*	------------------------------------------------------------------	*/
 private	int	commandserver_authorise(  void * v,struct rest_client * cptr, char * username, char * password)
 {
-	if ( check_verbose )
+	if ( check_verbose() )
 		printf("   REST Authentication of %s \n",username); 
 	if (!( authorise ))
 		return(1);
-	else if (!( user ))
+	else if (!( Command.user ))
 		return(1);
-	else if ( strcmp( username, user ) )
+	else if ( strcmp( username, Command.user ) )
 		return(0);
-	else if ( strcmp( password, password ) )
+	else if ( strcmp( password, Command.password ) )
 		return(0);
 	else if (!( cptr->user = allocate_string( username ) ))
 		return(0);
@@ -1331,7 +1381,7 @@ private	char *	default_get_filename( char * command )
 		else
 		{
 			fprintf(h,"<html><head><title>%s:%s</title>\n",agent,command);
-
+			cords_rcs_style(h,"style.css");
 			fprintf(h,"</head><body><div align=center><h1>%s:%s</h1>\n",agent,command);
 			if ( strcasecmp( command, "" ) )
 				fprintf(h,"<form method=POST action=%s enctype='multipart/form-data'>\n",command);
@@ -1447,7 +1497,8 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 	char *	command;
 	char *	sptr;
 	struct	rest_response * aptr;
-	printf("   %s GET Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
+	if ( check_verbose() )
+		printf("   %s GET Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
@@ -1935,7 +1986,8 @@ private	struct rest_response * commandserver_post(  void * v,struct rest_client 
 	struct	xml_element   * document;
 	FILE 		      * target;
 	
-	printf("   %s POST Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
+	if ( check_verbose() )
+		printf("   %s POST Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if (!( rptr->body  ))
@@ -1950,7 +2002,8 @@ private	struct rest_response * commandserver_put(  void * v,struct rest_client *
 		struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   %s PUT Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
+	if ( check_verbose() )
+		printf("   %s PUT Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if (!( rptr->body ))
@@ -1965,7 +2018,8 @@ private	struct rest_response * commandserver_delete(  void * v,struct rest_clien
 		struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   %s DELETE Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
+	if ( check_verbose() )
+		printf("   %s DELETE Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
@@ -1979,7 +2033,8 @@ private	struct rest_response * commandserver_delete(  void * v,struct rest_clien
 private	struct rest_response * commandserver_head(  void * v,struct rest_client * cptr, struct rest_request * rptr )
 {
 	struct	rest_response * aptr;
-	printf("   %s HEAD Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
+	if ( check_verbose() )
+		printf("   %s HEAD Request : %s %s %s \n",agent,rptr->method,rptr->object,rptr->version);
 	if (!( aptr = rest_allocate_response(cptr) ))
 		return( aptr );
 	else if ( rptr->body  )
@@ -2014,7 +2069,8 @@ private	int	command_online( char * aname, char * other )
 	if (!( authorise ))
 		CsI.authorise = (void *) 0;
 
-	return( rest_server(  (agent=aname), port, tls, threads, & CsI ) );
+	return( rest_server(  (agent=aname), Command.restport, default_tls(), Command.threads, & CsI ) );
+
 }
 
 /*	-----------------------------------	*/
@@ -2022,14 +2078,15 @@ private	int	command_online( char * aname, char * other )
 /*	-----------------------------------	*/
 private	int	operation( int argc, char * argv[] )
 {
-	int	argi=1;
+	int	argi=0;
 	char *	aptr;
 	int	status;
 	char *	syntax=(char *) 0;
 	char *	command=(char *) 0;
+	command_load();
 	while ( argi < argc )
 	{
-		if (!( aptr = argv[argi++] ))
+		if (!( aptr = argv[++argi] ))
 			break;
 		else if ( *aptr != '-' )
 		{
@@ -2078,32 +2135,15 @@ private	int	operation( int argc, char * argv[] )
 			if ( *aptr == '-' )
 			{
 				aptr++;
-				if (!( strcmp( aptr, "verbose" ) ))
-					verbose = 1;
-				else if (!( strcmp( aptr, "debug" ) ))
-					debug = 1;
-				else if (!( strcmp( aptr, "noauth" ) ))
+				if (!( strcmp( aptr, "noauth" ) ))
 					noauth = 1;
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
-				else if (!( strcmp( aptr, "port" ) ))
-					port = atoi(argv[argi++]);
-				else if (!( strcmp( aptr, "threads" ) ))
-					threads = atoi(argv[argi++]);
-				else if (!( strcmp( aptr, "tls" ) ))
-					tls = argv[argi++];
-				else if (!( strcmp( aptr, "user" ) ))
-					user = argv[argi++];
-				else if (!( strcmp( aptr, "password" ) ))
-					password = argv[argi++];
-				else if (!( strcmp( aptr, "publisher" ) ))
-					publisher = argv[argi++];
 				else if (!( strcmp( aptr, "agent" ) ))
 					agent = argv[argi++];
-				else	
-				{
+				else if (!( argi = accords_configuration_option( aptr, argi, argv )))
 					return( failure( 30, "incorrect command option", aptr ) );
-				}
+				continue;
 			}
 		}	
 	}
@@ -2115,8 +2155,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.01");
-	printf("\n   Beta Version : 12/06/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.02");
+	printf("\n   Beta Version : 31/07/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2146,7 +2186,7 @@ private	int	banner()
 	printf("\n         --echo                       activate source echo ");
 	printf("\n         --port <number>              set online port number \n");
 	printf("\n         --user <name>                set online user name \n");
-	printf("\n         --paasword <value>           set online password \n");
+	printf("\n         --password <value>           set online password \n");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
