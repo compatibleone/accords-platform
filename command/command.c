@@ -2101,17 +2101,20 @@ private	int	operation( int argc, char * argv[] )
 				continue;
 			}
 			else if (!( strcasecmp( command, "PARSER" ) ))
-				return( command_parser( aptr, argv[argi] ) );
+				return( command_parser( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "BROKER" ) ))
-				return( command_broker( aptr, argv[argi] ) );
+				return( command_broker( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "ONLINE" ) ))
-				return( command_online( aptr, argv[argi] ) );
+				return( command_online( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "INVOKE" ) ))
-				return( invoke_action( aptr, argv[argi] ) );
+				return( invoke_action( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "ANALYSE" ) ))
 				return( colog_analysis( aptr ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
+			{
+				argi++;
 				return( run_cordscript_interpreter( aptr, argc-argi, &argv[argi] ) );
+			}
 			else if (!( strcasecmp( command, "JSON" ) ))
 			{
 				if (!( run_json_verification( aptr ) ))
@@ -2121,10 +2124,15 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "ACCOUNT" ) ))
 				return( create_account( aptr ) );
 			else if (!( strcasecmp( command, "USER" ) ))
+			{
+				argi++;
 				return( create_user( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3], argv[argi+4] ) );
+			}
 			else if (!( strcasecmp( command, "TRANSACTION" ) )) 
+			{
+				argi++;
 				return( command_transaction( aptr, argv[argi], argv[argi+1], argv[argi+2 ], argv[argi+3] ) );
-
+			}
 			else if ((!( strcasecmp( command, "COSACS" ))) && (!( syntax )))
 			{
 				syntax = aptr;
