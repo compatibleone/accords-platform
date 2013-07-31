@@ -7,7 +7,7 @@ function	VendorMenu($account)
 	$m.display();
 	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-agreements.txt&ouput=HTML&option="#$account#"'>Agreements</a>";
 	$m.display();
-	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-services.txt&ouput=HTML&option="#$account#"'>Services</a>";
+	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-service.txt&ouput=HTML&option="#$account#"'>Services</a>";
 	$m.display();
 	$m = "<td class=title><a class=option href='dashboard.php?action=compile&script=csp-sales.txt&ouput=HTML&option="#$account#"'>Sales</a>";
 	$m.display();
