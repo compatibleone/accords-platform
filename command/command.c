@@ -1254,8 +1254,11 @@ private char * 	cords_service_operation( char * command, char * service )
 				{
 					fprintf(h,"<tr><th>%s<th>%s</tr>\n",eptr->name,eptr->value);
 				}
+				fprintf(h,"</table><p>\n");
+				fprintf(h,"<form method=POST action=%s enctype='multipart/form-data'>\n","service");
+				fprintf(h,"<table>");
 				default_service_table( h, service );
-				fprintf(h,"</table></div></body></html>\n");
+				fprintf(h,"</table></form></div></body></html>\n");
 				fclose(h);
 			}
 		}
