@@ -1407,37 +1407,41 @@ private	struct rest_request *	rest_consume_head(
 	struct	rest_header * hptr;
 	while (1)
 	{
-
-		switch (cptr->buffer[cptr->consumed])
+		if ((cptr->bytes - cptr->consumed) > 0)
 		{
-		case	0	:
+			switch (cptr->buffer[cptr->consumed])
+			{
+			case	0	:
+				break;
+			case	' '	:
+			case	'\t'	:
+				if (!( hptr = rest_append_header( rptr->last, rest_consume_line( cptr )) ))
+				{
+					drop_rest_header( hptr );
+					liberate( nptr );
+					break;
+				}
+				else	continue;
+			default		:
+				if (!(nptr = rest_consume_token(cptr,':')))
+					break;
+				else if (!( hptr = add_rest_header( rptr ) ))
+					break;
+				else if (!( hptr->value = rest_consume_value( cptr ) ))
+				{
+					drop_rest_header( hptr );
+					liberate( nptr );
+					break;
+				}
+				else	hptr->name = nptr;
+				if ( rest_check_debug() )
+					printf("%s: %s\n",hptr->name,hptr->value);
+				continue;
+			}
 			break;
-		case	' '	:
-		case	'\t'	:
-			if (!( hptr = rest_append_header( rptr->last, rest_consume_line( cptr )) ))
-			{
-				drop_rest_header( hptr );
-				liberate( nptr );
-				break;
-			}
-			else	continue;
-		default		:
-			if (!(nptr = rest_consume_token(cptr,':')))
-				break;
-			else if (!( hptr = add_rest_header( rptr ) ))
-				break;
-			else if (!( hptr->value = rest_consume_value( cptr ) ))
-			{
-				drop_rest_header( hptr );
-				liberate( nptr );
-				break;
-			}
-			else	hptr->name = nptr;
-			if ( rest_check_debug() )
-				printf("%s: %s\n",hptr->name,hptr->value);
-			continue;
 		}
-		break;
+		else if ( rest_client_read( cptr ) <= 0 )
+			break;
 	}
 	return( rptr );
 }
@@ -1453,37 +1457,41 @@ private	struct rest_response *	rest_consume_response_head(
 	struct	rest_header * hptr;
 	while (1)
 	{
-
-		switch (cptr->buffer[cptr->consumed])
+		if ((cptr->bytes - cptr->consumed) > 0)
 		{
-		case	0	:
+			switch (cptr->buffer[cptr->consumed])
+			{
+			case	0	:
+				break;
+			case	' '	:
+			case	'\t'	:
+				if (!( hptr = rest_append_header( rptr->last, rest_consume_line( cptr )) ))
+				{
+					drop_rest_header( hptr );
+					liberate( nptr );
+					break;
+				}
+				else	continue;
+			default		:
+				if (!(nptr = rest_consume_token(cptr,':')))
+					break;
+				else if (!( hptr = add_response_header( rptr ) ))
+					break;
+				else if (!( hptr->value = rest_consume_value( cptr ) ))
+				{
+					drop_rest_header( hptr );
+					liberate( nptr );
+					break;
+				}
+				else	hptr->name = nptr;
+				if ( rest_check_debug() )
+					printf("%s: %s\n",hptr->name,hptr->value);
+				continue;
+			}
 			break;
-		case	' '	:
-		case	'\t'	:
-			if (!( hptr = rest_append_header( rptr->last, rest_consume_line( cptr )) ))
-			{
-				drop_rest_header( hptr );
-				liberate( nptr );
-				break;
-			}
-			else	continue;
-		default		:
-			if (!(nptr = rest_consume_token(cptr,':')))
-				break;
-			else if (!( hptr = add_response_header( rptr ) ))
-				break;
-			else if (!( hptr->value = rest_consume_value( cptr ) ))
-			{
-				drop_rest_header( hptr );
-				liberate( nptr );
-				break;
-			}
-			else	hptr->name = nptr;
-			if ( rest_check_debug() )
-				printf("%s: %s\n",hptr->name,hptr->value);
-			continue;
 		}
-		break;
+		else if ( rest_client_read( cptr ) <= 0 )
+			break;
 	}
 	return( rptr );
 }

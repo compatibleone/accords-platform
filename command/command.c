@@ -2048,6 +2048,7 @@ private	struct rest_response * commandserver_head(  void * v,struct rest_client 
 private	int	command_online( char * aname, char * other )
 {
 	int	status=0;
+
 	struct	rest_interface  CsI = 
 	{
 		(void *) 0,
@@ -2062,14 +2063,18 @@ private	int	command_online( char * aname, char * other )
 		(void *) 0,
 		(void *) 0,
 		(void *) 0,
+		(void *) 0,
 		(void *) 0
-
 	};
 
 	if (!( authorise ))
 		CsI.authorise = (void *) 0;
 
-	return( rest_server(  (agent=aname), Command.restport, default_tls(), Command.threads, & CsI ) );
+	if ( Command.threads )	
+		rest_thread_control(1);
+	else	rest_thread_control(0);
+
+	return( rest_server(  (agent=aname), Command.restport, default_tls(), 0, & CsI ) );
 
 }
 
