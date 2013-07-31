@@ -583,7 +583,7 @@ _make_security_files() {
 	_mksecs coeasy 1
 	_mksecs conagios 1
 	_mksecs paasprocci 1
-	_mksecs command
+	_mksecs command 1
     
 	_mksect testcp 1
 	_mksect testpa 1
@@ -593,7 +593,7 @@ _make_security_files() {
 	_mksect testcn 1
 	_mksect testhdfs 1
 	_mksect testresolver 1
-	_mksect command 1
+
 }
 
 _accords_config() {
@@ -791,7 +791,7 @@ _mksect() {
     echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
     echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
     echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
-    echo "     option='"$optiont"' />" >> $secdir/${module}Tls.xml
+    echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
     chmod 0640 $secdir/${module}Tls.xml
 }
 
