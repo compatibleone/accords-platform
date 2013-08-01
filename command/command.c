@@ -17,7 +17,7 @@
 /* -------------------------------------------------------------------- */
 #ifndef	_command_c
 #define	_command_c
-
+#include <fcntl.h>
 #include "command.h"
 #include "accords.h"
 #include "cordslang.h"
@@ -1143,15 +1143,23 @@ private	int	ll_sla_broker_operation( char * filename )
 }
 
 /*	-------------------------------------------	*/
-/*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
+/*		c o r d s _ c o p y _ f i l e 		*/
 /*	-------------------------------------------	*/
-private	int	cords_script_interpreter( char * filename )
+private	void	cords_copy_file( FILE * h, char * filename )
 {
-	char *	argv[10];
-	int	argc=0;
-	argv[0] = (char *) 0;
-	run_cordscript_interpreter( filename, argc, argv );
-	return( 200 );
+	FILE * hh;
+	int	c;
+	if (!( filename ))
+		return;
+	else if (!( hh = fopen( filename,"r" ) ))
+		return;
+	else	
+	{
+		while ((c = fgetc(hh)) > 0)
+			fputc(c,h);
+		fclose(hh);
+		return;
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -1159,20 +1167,53 @@ private	int	cords_script_interpreter( char * filename )
 /*	------------------------------------------------------------	*/
 private	void	cords_rcs_style( FILE * h, char * filename )
 {
-	FILE * css;
-	int	c;
-	if (!( filename ))
-		return;
-	else if (!( css = fopen( filename,"r" ) ))
-		return;
-	else	
+	fprintf(h,"<style type='text/css' media=SCREEN>\n");
+	cords_copy_file( h, filename );
+	fprintf(h,"</style>\n");
+	return;
+}
+
+/*	-------------------------------------------	*/
+/*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
+/*	-------------------------------------------	*/
+private	char *	cords_script_interpreter( char * filename )
+{
+	FILE *	h;
+	int	holdout=-1;
+	int	newout=-1;
+	int	realout=-1;
+	char *	result;
+	char *	newfile;
+	char *	argv[10];
+	int	argc=0;
+	argv[0] = (char *) 0;
+	if (!( result = rest_temporary_filename( ".html" )))
+		return( (char *) 0 );
+	else if (!( newfile = rest_temporary_filename( ".html" )))
+		return( (char *) 0 );
+	else if (!( h = fopen( result, "w" ) ))
+		return( (char *) 0 );
 	{
-		fprintf(h,"<style type='text/css' media=SCREEN>\n");
-		while ((c = fgetc(css)) > 0)
-			fputc(c,h);
-		fclose(css);
-		fprintf(h,"</style>\n");
-		return;
+		fprintf(h,"<html><head><title>corsdscript execution response</title>");
+		cords_rcs_style(h,"style.css");
+		fprintf(h,"</head><body><div align=center><h1>Script Execution</h1>\n");
+		fprintf(h,"<table><tr><th>%s</th><tr><td>\n",filename);
+		holdout = dup(1);
+		close(1);
+		if ((newout = open(newfile, O_CREAT | O_RDWR, 0666 )) >= 0)
+		{
+			run_cordscript_interpreter( filename, argc, argv );
+			
+			close(newout);
+		}
+		realout = dup( holdout );
+		close( holdout );
+		cords_copy_file( h, newfile );
+		unlink( newfile );
+		fprintf(h,"</td></tr></table></div></body></html>\n");
+		fclose( h );
+
+		return( result );
 	}
 }
 
@@ -1901,6 +1942,18 @@ private	struct rest_response * cords_service_response( struct rest_response * ap
 }
 
 /*	------------------------------------------------------------------	*/
+/*		c o r d s _ s c r i p t _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_script_response( struct rest_response * aptr, char * filename )
+{
+	struct	rest_header * hptr;
+	char	buffer[2048];
+	char	filesize[256];
+
+	return( rest_file_response( aptr, filename, "text/html" ) );
+}
+
+/*	------------------------------------------------------------------	*/
 /*		c o m m a n d s e r v e r_ p o s t 				*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * invoke_rest_command(struct rest_response * aptr, struct rest_client * cptr, struct rest_request * rptr )
@@ -1988,9 +2041,9 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( filename = get_multipart_data( form, "filename" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_script_interpreter( filename )) != 200)
+		else if (!(filename = cords_script_interpreter( filename )))
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( rest_html_response( aptr, 200, "OK" ) );
+		else	return( cords_service_response( aptr, filename ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
 
