@@ -6,7 +6,7 @@ LD_FLAGS =  -locci -lpubocci -lcoxml -lcorest -lcords -lcocci -lcocarrier -lcopa
 
 LD_JFLAGS = $(JAVA_HOME)/jre/lib/i386/client/libjvm.so
 
-LD_INCLUDES = -I../../occi/src/ -I../../cocarrier/src/ -I../../corest/src/ -I../../cocci/src/ -I../../cords/src/ -I../../copabr/src/ -I../../coxml/src/  -I ../../broker/src -I../../pubocci/src/ -I../../jaccords/jsrc/
+LD_INCLUDES = -I../../occi/ -I../../cocarrier/ -I../../corest/ -I../../cocci/ -I../../cords/ -I../../copabr/ -I../../coxml/  -I ../../broker/ -I../../pubocci/ -I../../jaccords/jsrc/
 
 default:
 	@echo jaccordsSDK $(PROJECTNAME)
