@@ -1,6 +1,6 @@
 #ifndef _JCATEGACCESS_H
 #define _JCATEGACCESS_H
-#include "../../occi/src/occi.h"
+#include "../../occi/occi.h"
 
 struct{
 	const char * name;
