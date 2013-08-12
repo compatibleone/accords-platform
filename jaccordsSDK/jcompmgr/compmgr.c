@@ -895,7 +895,7 @@ int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int f
   		fprintf(f,"#include \"jtools.h\"\n\n");
   		for(j=0;j<4;j++)
   		{
-      			fprintf(f,"private int %s_%s(struct occi_category * optr, void * vptr)\n",categoryName,funcName[j]);
+      			fprintf(f,"private int %s_%s(struct occi_category * optr, void * vptr, struct rest_request * rptr)\n",categoryName,funcName[j]);
       			fprintf(f,"{\n");
       			fprintf(f,"\tstruct occi_kind_node * nptr;\n");
       			if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
