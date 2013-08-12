@@ -12,7 +12,7 @@ compilejava:
 
 compilec:
 	@echo Creating C library...
-	gcc -o lib$(PROJECTNAME).so $(PROJECTNAME).c compmgr.c jutools.c jlist.c -shared -fpic -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I../../coxml/src -lcoxml 
+	gcc -o lib$(PROJECTNAME).so $(PROJECTNAME).c compmgr.c jutools.c jlist.c -shared -fpic -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I../../coxml -lcoxml 
 clean:
 	rm *.class
 	rm *.so
