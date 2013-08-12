@@ -1713,7 +1713,7 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
     		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    		fprintf(f,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr);\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);\n");
     		if(!flag)
     		{
       			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
@@ -1826,7 +1826,7 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
     		if(!flag) fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
     		else fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-    		fprintf(f,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr);\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);\n");
     		if(!flag) fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
     		else fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
     		fprintf(f,"\tsprintf(cptr->buffer,\"%%s%%s%%s\",reqhost,optr->location,pptr->id);\n");
@@ -1859,7 +1859,7 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
 		if(!flag) fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
 		else fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
 		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-		fprintf(f,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr);\n");
+		fprintf(f,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);\n");
 		if(!flag) 
 		{
 			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
@@ -1922,7 +1922,7 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
 			fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
 		}
 		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-		fprintf(f,"\tif (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr);\n");
+		fprintf(f,"\tif (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);\n");
 		if(!flag)
 		{
 			fprintf(f,"\tdrop_cords_%s_node( nptr );\n",categoryName);
@@ -2019,7 +2019,7 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
 		fprintf(f,"\t\t\tcontinue;\n");
 		fprintf(f,"\t\t\t}\n");
 		fprintf(f,"\t\telse	{\n");
-		fprintf(f,"\t\t\tif (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr); }\n");
+		fprintf(f,"\t\t\tif (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }\n");
 		fprintf(f,"\t\t\tsptr = nptr->next;\n");
 		if(!flag) fprintf(f,"\t\t\tdrop_cords_%s_node( nptr );\n",categoryName);
 		else fprintf(f,"\t\t\tdrop_%s_node( nptr );\n",categoryName);
