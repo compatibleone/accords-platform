@@ -71,6 +71,7 @@ void fillInAccordsConfiguration(struct accords_configuration *componentModule, c
         componentModule->config=configFile;                    /* configuration file                   */
         componentModule->zone="europe";                        /* host location                        */
 	componentModule->storage="storage";                    /* data storage                         */
+	componentModule->component=moduleName;
         componentModule->firstcat=(struct occi_category *) 0;
         componentModule->lastcat=(struct  occi_category *) 0;
 
