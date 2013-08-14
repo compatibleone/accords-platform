@@ -136,8 +136,8 @@ Class examples
 	$ make install
 
 # After creating a category you find two files under accords-platform/jaccords/
-	- <categoryName>Interface.java: for implementing crud (create, retrieve, update, delete) interface for the new category.
-	- <categoryNameAction.java: for implementing actions for the new category.
+	- J<categoryName>Interface.java: for implementing crud (create, retrieve, update, delete) interface for the new category.
+	- J<categoryNameAction.java: for implementing actions for the new category.
 
 # Next when the new module has been created
 	- A new folder named <moduleName> is created under accords-platform.
