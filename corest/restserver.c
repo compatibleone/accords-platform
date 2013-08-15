@@ -444,7 +444,7 @@ private	void	rest_show_request( struct rest_request * rptr)
 				hptr != (struct rest_header *) 0;
 				hptr = hptr->next )
 				if ( hptr->name )
-					printf("   %s: %s \n",hptr->name,hptr->value);
+					printf("   %s: %s",hptr->name,hptr->value);
 		}
 	}
 	return;
@@ -1871,29 +1871,79 @@ private	struct rest_response *	rest_consume_response_chunks(
 	{
 		while ((bytes = rest_consume_chunk_size( cptr )) != 0)
 		{
-			while ( bytes )
+			if (bytes > (cptr->bytes - cptr->consumed)) // If more bytes in chunk than in buffer
 			{
-				if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+				while (bytes > (cptr->bytes - cptr->consumed))
+				{
+					// Write whatever remains in buffer to file.
+					if (fwrite((cptr->buffer+cptr->consumed), (cptr->bytes - cptr->consumed), 1, h) <= 0)
+					{
+						/* TODO FAILURE */
+					}
+
+					// Mark that many bytes as done.
+					bytes -= (cptr->bytes - cptr->consumed);
+
+					// Read some more data.
+					if (!rest_client_read(cptr)) // If failed to read more data
+					{
+						/* TODO FAILURE Report error that couldn't read remaining bytes */
+						break;
+
+					} // Ends if failed to read more data
+
+				} // Ends while more bytes in chunk than in buffer
+
+				if (bytes > 0) // If still need to write bytes
+				{
+					if ((cptr->bytes - cptr->consumed) < bytes) // If don't have enough bytes in buffer
+					{
+						/* TODO - Report error that couldn't get all the bytes */
+
+					}
+					else // Else enough bytes in buffer
+					{
+						// Write the remaining bytes to the file.
+						if (fwrite((cptr->buffer+cptr->consumed), bytes, 1, h) <= 0)
+						{
+							/* TODO FAILURE */
+						}
+						else
+						{
+							// Mark the remaining bytes as consumed.
+							cptr->consumed += bytes;
+							bytes = 0;
+						}
+
+					} // Ends else enough bytes in buffer
+				} // Ends if still need to write bytes
+			} // Ends if more bytes in chunk than in buffer
+			else // Else all bytes in buffer
+			{
+				// Write the remaining bytes to the file.
+				if (fwrite((cptr->buffer+cptr->consumed), bytes, 1, h) <= 0)
 				{
 					/* TODO FAILURE */
-					break;
 				}
-				else 	bytes -= (cptr->bytes - cptr->consumed);
-	
-				if (!( bytes ))
-					break;
-	
-				if (!( rest_client_read( cptr ) ))
+				else
 				{
-					/* OK NO MORE */
-					break;
+					// Mark the remaining bytes as consumed.
+					cptr->consumed += bytes;
+					bytes = 0;
 				}
+
+			} // Ends else all bytes in buffer
+
+			if ( rest_consume_eol( cptr ) != '\n' )
+			{
+				/* TODO Report error in missing \r\n */
+				break;
 			}
-			if ( bytes )
-				break;
-			else if ( rest_consume_eol( cptr ) != '\n' )
-				break;
 		}
+
+		/* Now get the headers encoded at the end of the chunk sequences. */
+		rest_consume_response_head(cptr, rptr);
+
 		fclose(h);
 		return( rptr );
 	}

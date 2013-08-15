@@ -138,6 +138,9 @@ endif
 if ENABLE_OAPROCCI
 SUBDIRS += oaprocci
 endif
+if ENABLE_DUMMYPROCCI
+SUBDIRS += dummyprocci
+endif
 if ENABLE_COMODEL
 SUBDIRS += comodel
 endif
@@ -149,6 +152,9 @@ SUBDIRS += paprocci
 endif
 if ENABLE_COMMAND
 SUBDIRS += command
+endif
+if ENABLE_TESTOCCI
+SUBDIRS += testocci
 endif
 if ENABLE_TESTOS
 SUBDIRS += testos
@@ -173,6 +179,9 @@ SUBDIRS += fileserver
 endif
 if ENABLE_TESTRESOLVER
 SUBDIRS += testresolver
+endif
+if ENABLE_TESTREST
+SUBDIRS += testrest
 endif
 if ENABLE_TESTSUITE
 SUBDIRS += testsuite

@@ -56,6 +56,7 @@ bash build-provision azprocci 8087
 bash build-provision cnprocci 8087
 bash build-provision eziprocci 8087
 bash build-provision oaprocci 8087
+bash build-provision dummyprocci 8087
 echo "<configuration name=\"accords:provisioning\"/>" >> accords-provisioning.xml
 echo "<security name=\"accords:security\"/>" >> accords-provisioning.xml
 echo "<account name=\"accords:account\"/>" >> accords-provisioning.xml

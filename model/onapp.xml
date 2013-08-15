@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema version='0.1.0'>
 <model name='onapp' description='' version='0.1.0'>
+	<category term='onapp_extras' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/onapp_extras/' rel='http://schemas.ogf.org/occi/core#resource'>
+	  <attributes>
+	    <!-- OnappMarket::OnApp:VM attributes
+		    :cpu_shares                             - New attribute - OnApp VM param
+		    :disk_type_of_format                    - New attribute - OnApp VM param   
+		    :initial_root_password                  - New attribute - OnApp VM param
+		    :initial_root_password_encryption_key   - New attribute - OnApp VM param
+		    :swap_size                              - New attribute - OnApp VM param
+		    :required_automatic_backup              - New attribute - OnApp VM param
+		    :required_virtual_machine_build         - New attribute - OnApp VM param
+		    :required_virtual_machine_startup       - New attribute - OnApp VM param
+		    :required_ip_address_assignment         - New attribute - OnApp VM param
+		    :label                                  - New attribute - OnApp VM param
+		-->
+		<attribute name='name' type='string' required='false' immutable='false'/>
+		<attribute name='cpu_shares' type='string' required='false' immutable='false'/>
+		<attribute name='disk_type_of_format' type='string' required='false' immutable='false'/>
+		<attribute name='initial_root_password' type='string' required='false' immutable='false'/>
+		<attribute name='initial_root_password_encryption_key' type='string' required='false' immutable='false'/>
+		<attribute name='swap_size' type='string' required='false' immutable='false'/>
+		<attribute name='required_automatic_backup' type='int' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_build' type='int' required='false' immutable='false'/>
+		<attribute name='required_virtual_machine_startup' type='int' required='false' immutable='false'/>
+		<attribute name='required_ip_address_assignment' type='int' required='false' immutable='false'/>
+		<attribute name='label' type='string' required='false' immutable='false'/>
+	  </attributes>
+	</category>
 	<category term='onapp' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/onapp/' rel='http://schemas.ogf.org/occi/core#resource' structname='onapp'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
@@ -48,6 +75,7 @@
 		    :created_at                             - Date it was created (UNIX timestamp)
 		    :type                                   - Ignore
 		    :api                                    - Ignore
+		    :build_state                            - String - building, active or deleted
 		-->
 		<attribute name='cpu_shares' type='string' required='false' immutable='false'/>
 		<attribute name='disk_type_of_format' type='string' required='false' immutable='false'/>
@@ -66,6 +94,7 @@
 		<attribute name='local_id' type='string' required='false' immutable='false'/>
 		<attribute name='user_id' type='string' required='false' immutable='false'/>
 		<attribute name='created_at' type='int' required='false' immutable='false'/>
+		<attribute name='build_state' type='string' required='true' immutable='false'/>
 	    </attributes>
 	    <actions>
 	    </actions>
@@ -87,7 +116,7 @@
 	        <attribute name='current' type='int' required='false' immutable='false'/>
 	        <!-- Attributes from OnApp hypervisors 
 				cloud_id            - Local cloud id 
-				zone_id             - Local zone id (int)
+				zone_id             - Local zone id (int) - NOTE REMOVED
 				hypervisor_type     - Hypervisor type
 				net_zone_id         - Network zone id (int)
 				net_zone_label      - Network label
@@ -102,7 +131,7 @@
 				type                - Not relevant
 				user_id             - Creating (OnApp Market) user id
 				resource_id         - Same as id of OCCI category
-				local_id            - Locally referenced id
+				local_id            - Locally referenced id - equivalent to zone_id
 				description         - Same as Description
 				label               - Short label
 				location_name       - Location Name
@@ -111,10 +140,11 @@
 				location_region     - Location Region
 				created_at          - Date it was created at (UNIX timestamp)
 				api                 - Never Stored
-				is_active           - Is this active ?			
+				is_active           - Is this active ?
+				deleted                                - Has it been deleted			
 	        -->
 	        <attribute name='cloud_id' type='string' required='false' immutable='false'/>
-	        <attribute name='zone_id' type='int' required='false' immutable='false'/>
+	        <!--<attribute name='zone_id' type='int' required='false' immutable='false'/>-->
 	        <attribute name='hypervisor_type' type='string' required='false' immutable='false'/>
 	        <attribute name='net_zone_id' type='int' required='false' immutable='false'/>
 	        <attribute name='net_zone_label' type='string' required='false' immutable='false'/>
@@ -135,6 +165,7 @@
 	        <attribute name='location_region' type='string' required='false' immutable='false'/>
 	        <attribute name='is_active' type='int' required='false' immutable='false'/>
 	        <attribute name='created_at' type='int' required='false' immutable='false'/>
+	        <attribute name='deleted' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>

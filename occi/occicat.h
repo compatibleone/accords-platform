@@ -30,7 +30,7 @@ struct	occi_category
 public	struct	occi_category * allocate_occi_category();
 public	struct	occi_category * liberate_occi_category(struct occi_category * sptr);
 
-
+public	void	                dump_occi_category(FILE *h, struct occi_category *pcategory);
 
 #endif 	
 
