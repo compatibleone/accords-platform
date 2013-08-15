@@ -18,6 +18,8 @@
 <cords_user
  id="3d960eb3-oapr-4bdd-a7a7-20e9coms85f3" name="service-oaprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="3d960eb3-dumm-4bdd-a7a7-20e9coms85f3" name="service-dummyprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="3d960eb3-copa-4bdd-a7a7-20e9coms85f3" name="service-copaas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="3d960eb3-cona-4bdd-a7a7-20e9coms56e4" name="service-conagios" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
@@ -99,6 +101,8 @@
  id="6ca6fd44-00b0-4120-8d69-2a522f175280" name="pcprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
 <cords_user
  id="4cade59c-c86d-4774-b829-dca8857f3730" name="oaprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
+<cords_user
+ id="d8ddbef3-2d92-4553-8efb-6afd9b5ae868" name="dummyprocci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
 <cords_user
  id="8e5b411d-0762-4474-88b3-02599d671dcd" name="ec2procci" password="" role="admin" email="" account="" authorization="" when="0" state="0" />
 </cords_users>

@@ -25,3 +25,4 @@ bash build-install paasprocci $1
 bash build-install cnprocci $1
 bash build-install eziprocci $1
 bash build-install oaprocci $1
+bash build-install dummyprocci $1

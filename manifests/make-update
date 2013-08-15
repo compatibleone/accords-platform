@@ -22,6 +22,7 @@ bash build-update dcprocci account-dcprocci.xml quota-dcprocci.xml sla-dcprocci.
 bash build-update cnprocci account-cnprocci.xml quota-cnprocci.xml sla-cnprocci.xml
 bash build-update eziprocci account-eziprocci.xml quota-eziprocci.xml sla-eziprocci.xml
 bash build-update oaprocci account-oaprocci.xml quota-oaprocci.xml sla-oaprocci.xml
+bash build-update dummyprocci account-dummyprocci.xml quota-dummyprocci.xml sla-dummyprocci.xml
 bash build-update osocciprocci account-osocciprocci.xml quota-osocciprocci.xml sla-osocciprocci.xml
 bash build-update paprocci account-paprocci.xml quota-paprocci.xml sla-paprocci.xml
 bash build-update paasprocci account-paasprocci.xml quota-paasprocci.xml sla-paasprocci.xml

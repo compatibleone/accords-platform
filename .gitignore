@@ -1,5 +1,6 @@
 *~
 aclocal.m4
+.autotools
 azprocci/Makefile.in
 azprocci/src/azprocci
 azprocci/src/Makefile.in

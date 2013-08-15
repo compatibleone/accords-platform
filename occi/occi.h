@@ -88,10 +88,11 @@ public	char *	get_default_account_id();
 #define	_OCCI_PROVIDER	 	256	/* publish resources provider 		*/
 #define	_OCCI_CONTRACT	 	512	/* publish resources under contract	*/
 
-#define	_OCCI_IDLE		0	/* the resource is idle			*/
+#define	_OCCI_IDLE  		0	/* the resource is idle			*/
 #define	_OCCI_ACTIVE		1	/* the resource is active		*/
 #define	_OCCI_RUNNING		1	/* the resource is active and running	*/
 #define	_OCCI_SUSPENDED		2	/* the resource is active but paused	*/
+#define	_OCCI_INVALID  		4	/* the resource should never have this value */
 
 #define	_OCCI_AUTHORIZE		"X-OCCI-AUTHORIZE"
 #define	_OCCI_ACCOUNT		"X-OCCI-ACCOUNT"

@@ -31,6 +31,7 @@ else
 	bash build-security cnprocci 1 $1
 	bash build-security eziprocci 1 $1
 	bash build-security oaprocci 1 $1
+	bash build-security dummyprocci 1 $1
 fi
 
 

@@ -2469,6 +2469,52 @@ public	struct	occi_response * occi_delete_link( char * from, char * to, char * a
 	else	return(zptr);
 }
 
+public void dump_occi_category(FILE *h, struct occi_category *pcategory)
+{
+	/* Go to the front. */
+	struct occi_category *previous = pcategory;
+	char nopad = '\0';
+	char *pad = &nopad;
+	int const maxpadsize = 2;
+	int padsize = 0;
+
+	if ( ! (pad = malloc(1 * sizeof(*pad)) ))
+		pad = &nopad;
+	else
+		*pad = '\0';
+	if (previous != NULL) while (previous->previous != NULL) previous = previous->previous;
+
+	while (previous != NULL)
+	{
+		fprintf(h, "\n%s{\n%s  \"id\" : \"%s\"\n%s ,\"class\" : \"%s\"\n%s}"
+		, pad, pad
+		, previous->id
+		, pad
+		, previous->class
+		, pad
+		);
+		previous = previous->next;
+
+		if ( previous != NULL && pad != &nopad ) {
+			padsize += 2;
+			pad = realloc(pad, (padsize+1) * sizeof(*pad));
+
+			if ( pad == NULL )
+				pad = &nopad;
+			else {
+				int padfiller = 0;
+				for (; padfiller < maxpadsize; ++padfiller) {
+					pad[padsize - maxpadsize + padfiller] = ' ';
+				}
+				pad[padsize] = '\0';
+			}
+		}
+	}
+
+	if ( pad != NULL && pad != &nopad )
+		free(pad);
+}
+
 #include "stdnode.c"
 
 #endif 	/* _occi_client_c */
