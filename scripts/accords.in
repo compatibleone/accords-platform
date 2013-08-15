@@ -223,6 +223,7 @@ _co_provision()
     _co_run_prov cnprocci accords "accords compute next services" 10 10 1000 10 10
     _co_run_prov eziprocci accords "accords easiclouds services" 10 10 1000 10 10
     _co_run_prov oaprocci accords "accords on app services" 10 10 1000 10 10
+    _co_run_prov dummyprocci accords "accords dummy services" 10 10 1000 10 10
     _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
     _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
 
@@ -386,13 +387,14 @@ _co_stop() {
     _stop_service cosacs
     _stop_service slam
     _stop_service paasprocci
-    _stop_service oaprocci
     _stop_service onprocci
     _stop_service osocciprocci
     _stop_service cnprocci
     _stop_service eziprocci
     _stop_service dcprocci
     _stop_service osprocci
+    _stop_service oaprocci
+    _stop_service dummyprocci
     _stop_service paprocci
     _stop_service azprocci
     _stop_service ec2procci
@@ -533,6 +535,10 @@ _run_oaprocci() {
     oaprocci --config $target CO-OAPROCCI/1.0
 }
 
+_run_dummyprocci() {
+    dummyprocci --config $target CO-DUMMYPROCCI/1.0
+}
+
 _run_parser() {
     parser --config $target CO-PARSER/1.0
 }
@@ -578,6 +584,7 @@ _make_security_files() {
 	_mksecs cnprocci 1
 	_mksecs eziprocci 1
 	_mksecs oaprocci 1
+	_mksecs dummyprocci 1
 	_mksecs slam 1
 	_mksecs copaas 1
 	_mksecs coeasy 1
@@ -593,7 +600,7 @@ _make_security_files() {
 	_mksect testcn 1
 	_mksect testhdfs 1
 	_mksect testresolver 1
-
+	_mksect command 1
 }
 
 _accords_config() {
@@ -666,6 +673,7 @@ _accords_config() {
 		_mkcert cnprocci
 		_mkcert eziprocci
 		_mkcert oaprocci
+		_mkcert dummyprocci
 		_mkcert slam
 		_mkcert copaas
 		_mkcert coeasy
@@ -727,6 +735,7 @@ _accords_config() {
     _mkpro cnprocci
     _mkpro eziprocci
     _mkpro oaprocci
+    _mkpro dummyprocci
     _mkcfg command
     _mkcosacs cosacs
 
@@ -1216,6 +1225,9 @@ case `basename $0` in
 	;;
     run-oaprocci)
 	_run_oaprocci $*
+	;;
+    run-dummyprocci)
+	_run_dummyprocci $*
 	;;
     run-parser)
 	_run_parser $*

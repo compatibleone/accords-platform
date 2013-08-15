@@ -24,7 +24,7 @@ struct	macro_conversions {
 	char *	macro;
 	};
 
-#define	MAXMACMAN	25
+#define	MAXMACMAN	26
 struct	macro_conversions MacMan[MAXMACMAN] = {
 		0x0085 /* '…' */	,	(char *) "&agrave;", 
 		0x00A0 /* ' ' */	,	(char *) "&aacute;", 
@@ -53,13 +53,14 @@ struct	macro_conversions MacMan[MAXMACMAN] = {
 		/* ------------------------------------------------------------- */
 		0x003C /* '<' */	,	(char *) "&lt;",
 		0x003E /* '>' */	,	(char *) "&gt;",
-		0x0026 /* '&' */	,	(char *) "&amp;"
+		0x0026 /* '&' */	,	(char *) "&amp;",
+		0x0022 /* '"' */	,	(char *) "&quot;"
 		};
 
-private	int	MaxMacMan=(MAXMACMAN-3);
+private	int	MaxMacMan=(MAXMACMAN-4);
 public	void	use_html_macros()
 {
-	MaxMacMan = (MAXMACMAN-3);
+	MaxMacMan = (MAXMACMAN-4);
 	return;
 }
 

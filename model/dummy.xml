@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version='0.1.0'>
+<model name='dummy' description='' version='0.1.0'>
+	<category term='dummy' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/dummy/' rel='http://schemas.ogf.org/occi/core#resource' structname='dummy'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='profile' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	        <attribute name='node' type='string' required='false' immutable='false'/>
+	        <attribute name='access' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='firewall' type='string' required='false' immutable='false'/>
+	        <attribute name='image' type='string' required='false' immutable='false'/>
+	        <attribute name='original' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='username' type='string' required='false' immutable='false'/>
+	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='ipaddress' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='region' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='price' type='string' required='false' immutable='false'/>
+	        <attribute name='location' type='string' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	    </actions>
+	</category>
+
+	<category term='dummy_config' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/dummy_config/' rel='http://schemas.ogf.org/occi/core#resource' structname='dummy_config' headerfilename='dummyconfig.h'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='user' type='string' required='false' immutable='false'/>
+	        <attribute name='password' type='string' required='false' immutable='false'/>
+	        <attribute name='authentication' type='string' required='false' immutable='false'/>
+	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
+	        <attribute name='version' type='string' required='false' immutable='false'/>
+	        <attribute name='base' type='string' required='false' immutable='false'/>
+	        <attribute name='tls' type='string' required='false' immutable='false'/>
+	        <attribute name='current' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+</model>
+</schema>

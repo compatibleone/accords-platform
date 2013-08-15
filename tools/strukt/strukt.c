@@ -742,7 +742,7 @@ void	schema_footer( FILE * h, char * nptr )
 	return;
 }
 
-void	file_header( FILE * h, char * nptr, char * iptr)
+void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
 {
 	char	buffer[1024];
 	if ( C.genrest )
@@ -761,6 +761,7 @@ void	file_header( FILE * h, char * nptr, char * iptr)
 		fprintf(h,"\n#include %c%s%c\n",0x0022,"element.h",0x0022);
 	}
 	fprintf(h,"\n#include %c%s%c\n",0x0022,iptr,0x0022);
+	fprintf(h,"#include %c%s%c\n",0x0022, filter_name, 0x0022);
 	return;
 }
 
@@ -776,19 +777,21 @@ void	file_footer( FILE * h, char * nptr)
 	return;
 }
 
-int	process( char * nptr )
+int	process( char * struct_name )
 {
 	int	status;
 	int	c;
 	int	l;
-	char	sn[512];
+	char	occi_header_filename[512];
+	char	filter_filename[512];
 	char	tn[512];
 	char 	token[512];
 	FILE * sh;
-	sprintf(sn,"%s.h",nptr);
-	sprintf(tn,"%s.c",nptr);
-	if (!( sh = fopen( sn, "r" )))
-		return( failure(40,"file not found",sn) );
+	sprintf(occi_header_filename,"%s.h",struct_name);
+	sprintf(filter_filename, "%s_occi_filter.h", struct_name);
+	sprintf(tn,"%s.c", struct_name);
+	if (!( sh = fopen( occi_header_filename, "r" )))
+		return( failure(40,"file not found",occi_header_filename) );
 	else if (!( C.target = fopen( tn, "w" )))
 	{
 		fclose(sh);
@@ -796,7 +799,7 @@ int	process( char * nptr )
 	}
 	else
 	{
-		file_header( C.target, tn, sn );
+		file_header( C.target, tn, occi_header_filename, filter_filename);
 		while ((c = remove_white_space( sh )))
 		{
 			if ( is_punctuation(c) )

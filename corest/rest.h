@@ -108,6 +108,8 @@ struct	rest_client
 	struct 	rest_server	* server;	/* used for method access */
 };
 
+public void dump_rest_client(FILE *h, struct rest_client *cptr);
+
 struct	rest_extension
 {
 	struct	rest_extension	* previous;

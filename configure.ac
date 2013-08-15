@@ -402,6 +402,15 @@ AM_CONDITIONAL([ENABLE_OAPROCCI], [test "$enable_oaprocci" = "yes"])
 AC_SUBST([CFLAGS_OAPROCCI], [-I\${abs_top_srcdir}/oaprocci])
 AC_SUBST([PATH_OAPROCCI], [${abs_top_srcdir}/oaprocci])
 
+AC_ARG_ENABLE([dummyprocci],
+      [AS_HELP_STRING([--disable-dummyprocci],
+		      [Disable dummyprocci @<:@default=enable@:>@])],
+      [],
+      [enable_dummyprocci=yes])
+AM_CONDITIONAL([ENABLE_DUMMYPROCCI], [test "$enable_dummyprocci" = "yes"])
+AC_SUBST([CFLAGS_DUMMYPROCCI], [-I\${abs_top_srcdir}/dummyprocci])
+AC_SUBST([PATH_DUMMYPROCCI], [${abs_top_srcdir}/dummyprocci])
+
 AC_ARG_ENABLE([comodel],
       [AS_HELP_STRING([--disable-comodel],
 		      [Disable comodel @<:@default=enable@:>@])],
@@ -602,6 +611,20 @@ AC_ARG_ENABLE([testresolver],
       [enable_testresolver=yes])
 AM_CONDITIONAL([ENABLE_TESTRESOLVER], [test "$enable_testresolver" = "yes"])
 
+AC_ARG_ENABLE([testocci],
+      [AS_HELP_STRING([--disable-testocci],
+          [Disable testocci @<:@default=enable@:>@])],
+      [],
+      [enable_testocci=yes])
+AM_CONDITIONAL([ENABLE_TESTOCCI], [test "$enable_testocci" = "yes"])
+
+AC_ARG_ENABLE([testrest],
+      [AS_HELP_STRING([--disable-testrest],
+		      [Disable testrest @<:@default=enable@:>@])],
+      [],
+      [enable_testrest=yes])
+AM_CONDITIONAL([ENABLE_TESTREST], [test "$enable_testrest" = "yes"])
+
 AC_ARG_ENABLE([testsuite],
       [AS_HELP_STRING([--enable-testsuite],
 		      [Enable testsuite @<:@default=disable@:>@])],
@@ -656,6 +679,7 @@ AC_CONFIG_FILES([cnprocci/Makefile])
 AC_CONFIG_FILES([eziprocci/Makefile])
 AC_CONFIG_FILES([coeasy/Makefile])
 AC_CONFIG_FILES([oaprocci/Makefile])
+AC_CONFIG_FILES([dummyprocci/Makefile])
 AC_CONFIG_FILES([comodel/Makefile])
 AC_CONFIG_FILES([cool/Makefile])
 AC_CONFIG_FILES([conagios/Makefile])
@@ -677,6 +701,8 @@ AC_CONFIG_FILES([testaz/Makefile])
 AC_CONFIG_FILES([testcn/Makefile])
 AC_CONFIG_FILES([fileserver/Makefile])
 AC_CONFIG_FILES([testresolver/Makefile])
+AC_CONFIG_FILES([testocci/Makefile])
+AC_CONFIG_FILES([testrest/Makefile])
 AC_CONFIG_FILES([testsuite/Makefile testsuite/basic/Makefile testsuite/platform/Makefile])
 AC_CONFIG_FILES([pyaccords/Makefile pyaccords/pysrc/Makefile pyaccords/pysrc/pypacksrc/Makefile])
 AC_CONFIG_FILES([pyaccordsSDK/Makefile pyaccordsSDK/pycompdev/Makefile pyaccordsSDK/pycompmanager/Makefile])
@@ -728,6 +754,7 @@ echo "    - cnprocci                 : $enable_cnprocci"
 echo "    - eziprocci                : $enable_eziprocci"
 echo "    - coeasy                   : $enable_coeasy"
 echo "    - oaprocci                 : $enable_oaprocci"
+echo "    - dummyprocci              : $enable_dummyprocci"
 echo "    - comodel                  : $enable_comodel"
 echo "    - cool                     : $enable_cool"
 echo "    - example                  : $enable_example"
@@ -748,6 +775,8 @@ echo "    - testaz                   : $enable_testaz"
 echo "    - testcn                   : $enable_testcn"
 echo "    - fileserver               : $enable_fileserver"
 echo "    - testresolver             : $enable_testresolver"
+echo "    - testocci                 : $enable_testocci"
+echo "    - testrest                 : $enable_testrest"
 echo "    - testsuite                : $enable_testsuite"
 echo "    - pyaccords                : $enable_pyaccords"
 echo ""

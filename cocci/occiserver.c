@@ -1804,9 +1804,9 @@ public	int	occi_process_atributs(
 		)
 
 {
-	char	*	mptr;
-	char	*	nptr;
-	char 	*	vptr;
+	char	*	full_attribute;
+	char	*	attribute_value ;
+	char 	*	start ;
 	struct	rest_header * hptr;
 
 	for ( 	hptr = rest_resolve_header( rptr->first, _OCCI_ATTRIBUTE );
@@ -1817,28 +1817,28 @@ public	int	occi_process_atributs(
 			continue;
 		else if (!( hptr->value ))
 			continue;
-		else if (!( mptr = allocate_string( hptr->value ) ))
+		else if (!( full_attribute = allocate_string( hptr->value ) ))
 			return(0);
 		else
 		{
-			for ( nptr=mptr; *nptr == ' '; nptr++);
-			for ( vptr=nptr; *vptr != 0; vptr++ )
+			for ( attribute_value = full_attribute; *attribute_value  == ' '; attribute_value ++);
+			for ( start = attribute_value ; *start  != 0; start ++ )
 			{
-				if ( *vptr == '=' )
+				if ( *start  == '=' )
 				{
-					*(vptr++) = 0;
+					*(start ++) = 0;
 					break;
 				}
 			}	
-			for ( ; *vptr == ' '; vptr++);
-			if ((!( vptr = allocate_string( vptr ) ))
-			||  (!( vptr = occi_unquoted_value( vptr ) )))
+			for ( ; *start  == ' '; start ++);
+			if ((!( start  = allocate_string( start  ) ))
+			||  (!( start  = occi_unquoted_value( start  ) )))
 				return(0);
 			else
 			{
-				(*method)(optr,pptr, nptr, vptr);
-				liberate( mptr );
-				liberate( vptr );
+				(*method)(optr,pptr, attribute_value , start );
+				liberate( full_attribute );
+				liberate( start  );
 			}
 		}
 	}

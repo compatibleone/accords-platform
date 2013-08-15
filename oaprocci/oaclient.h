@@ -18,15 +18,24 @@ struct  oa_response
 {
         int     nature;
         char *  content;
+
         struct  rest_response * response;
         struct  xml_element * xmlroot;
         struct  data_element * jsonroot;
 };
 
+#define	_CORDS_OA_AGENT "OnAppProcci/1.0"
 
-public struct	oa_response * oa_liberate_response( struct oa_response * rptr );
+struct oa_response * oa_create_server(struct oa_config * poaconfig, char * filename );
+char * oa_create_server_request(
+  struct oa_config * poaconfig
+, struct onapp *ponapp);
 
-public struct	oa_config * oa_initialise_client( char * user, char * pass, char * host, char * agent, char * version, char * tls );
+struct oa_response * oa_stop_server(struct oa_config * poaconfig, struct onapp *ponapp);
+
+public struct oa_response * liberate_oa_response( struct oa_response * rptr );
+
+public struct oa_config * oa_initialise_client( char * user, char * pass, char * host, char * agent, char * version, char * tls );
 
 	/* ----------- */
 #endif 	/* _oaclient_h */

@@ -6,6 +6,7 @@ bash provider-sla dcprocci dcprocci 30 30 3000 30 30
 bash provider-sla cnprocci cnprocci 30 30 3000 30 30
 bash provider-sla eziprocci eziprocci 30 30 3000 30 30
 bash provider-sla oaprocci oaprocci 30 30 3000 30 30
+bash provider-sla dummyprocci dummyprocci 30 30 3000 30 30
 bash provider-sla paasprocci paasprocci 30 30 3000 30 30
 bash provider-sla osocciprocci osocciprocci 30 30 3000 30 30
 

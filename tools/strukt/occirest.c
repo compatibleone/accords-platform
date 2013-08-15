@@ -346,19 +346,19 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\treturn;\n");
 	fprintf(h,"}\n");
 
-	/* ------------------ */
-	/* generate set field */
-	/* ------------------ */
-	title(h,"occi category rest interface method set field");
-	fprintf(h,"private void set_%s_field(\n",C.name);
-	fprintf(h,"\tstruct occi_category * cptr,void * optr, char * nptr, char * vptr)\n");
+	/* ------------------------ */
+	/* generate activate filter */
+	/* ------------------------ */
+	title(h,"occi category rest interface method activate filter");
+	fprintf(h,"private void activate_%s_filter_on_field(\n",C.name);
+	fprintf(h,"\tstruct occi_category * cptr,void * target_void, char * field_name)\n");
 	fprintf(h,"{\n");
-	fprintf(h,"\tstruct %s * pptr;\n",C.name);
+	fprintf(h,"\tstruct %s_occi_filter * target;\n",C.name);
 	fprintf(h,"\tchar prefix[1024];\n");
-	fprintf(h,"\tif (!( pptr = optr )) return;\n");
+	fprintf(h,"\tif (!( target = target_void )) return;\n");
 	fprintf(h,"\tsprintf(prefix,%c%cs.%cs.%c,cptr->domain,cptr->id);\n",0x0022,0x0025,0x0025,0x0022);
-	fprintf(h,"\tif (!( strncmp( nptr, prefix, strlen(prefix) ) )) {\n");
-	fprintf(h,"\t\tnptr += strlen(prefix);\n");
+	fprintf(h,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
+	fprintf(h,"\t\tfield_name += strlen(prefix);\n");
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -375,29 +375,81 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 			continue;
 		else if (!( strncmp( iptr->name, "last", strlen("last") ) ))
 			continue;
-		fprintf(h,"\t\tif (!( strcmp( nptr, %c%s%c ) ))\n",0x0022,iptr->name,0x0022);
-		if ( iptr->indirection )
-			fprintf(h,"\t\t\tpptr->%s = allocate_string(vptr);\n",iptr->name);
-		else	fprintf(h,"\t\t\tpptr->%s = atoi(vptr);\n",iptr->name);
+		fprintf(h,"\t\tif (!( strcmp( field_name, %c%s%c ) ))\n",0x0022,iptr->name,0x0022);
+		fprintf(h,"\t\t\ttarget->%s = 1;\n",iptr->name);
 	}
 	fprintf(h,"\t\t}\n");
 	fprintf(h,"\treturn;\n");
+	fprintf(h,"}\n");
+
+	/* ------------------ */
+	/* generate set field */
+	/* ------------------ */
+	title(h,"occi category rest interface method set field");
+	fprintf(h,"private void set_%s_field(\n",C.name);
+	fprintf(h,"\tstruct occi_category * cptr,void * target_void, char * field_name, char * value)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\tstruct %s * pptr;\n",C.name);
+	fprintf(h,"\tchar prefix[1024];\n");
+	fprintf(h,"\tif (!( pptr = target_void )) return;\n");
+	fprintf(h,"\tsprintf(prefix,%c%cs.%cs.%c,cptr->domain,cptr->id);\n",0x0022,0x0025,0x0025,0x0022);
+	fprintf(h,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
+	fprintf(h,"\t\tfield_name += strlen(prefix);\n");
+	for ( 	iptr= C.first;
+		iptr != (struct item *) 0;
+		iptr = iptr->next )
+	{
+		if (!( strcmp( iptr->name, "previous" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "next" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "id" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "parent" ) ))
+			continue;
+		else if (!( strncmp( iptr->name, "first", strlen("first") ) ))
+			continue;
+		else if (!( strncmp( iptr->name, "last", strlen("last") ) ))
+			continue;
+		fprintf(h,"\t\tif (!( strcmp( field_name, %c%s%c ) ))\n",0x0022,iptr->name,0x0022);
+		if ( iptr->indirection )
+			fprintf(h,"\t\t\tpptr->%s = allocate_string(value);\n",iptr->name);
+		else	fprintf(h,"\t\t\tpptr->%s = atoi(value);\n",iptr->name);
+	}
+	fprintf(h,"\t\t}\n");
+	fprintf(h,"\treturn;\n");
+	fprintf(h,"}\n");
+
+
+	/* ------------------ */
+	/* generate set filter on field */
+	/* ------------------ */
+	title(h,"occi category rest interface method set filter on field");
+	fprintf(h,"private void set_%s_filter_on_field(\n",C.name);
+	fprintf(h,"\tstruct occi_category * category, void * target_void, char * field_name, char * value)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\tstruct %s_occi_filter *filter = target_void;\n",C.name);
+	fprintf(h, "\tset_%s_field(category, filter->attributes, field_name, value);\n", C.name);
+	fprintf(h, "\tactivate_%s_filter_on_field(category, filter, field_name);\n", C.name);
 	fprintf(h,"}\n");
 
 	/* -------------------- */
 	/* generate filter info */
 	/* -------------------- */
 	title(h,"occi category filter info");
-	fprintf(h,"private struct %s * filter_%s_info(\n",C.name,C.name);
+	fprintf(h,"private int filter_%s_info(\n",C.name,C.name);
+	fprintf(h,"\tstruct %s_occi_filter *filter,\n", C.name);
 	fprintf(h,"\tstruct occi_category * optr,\n");
 	fprintf(h,"\tstruct rest_request  * rptr,\n");
 	fprintf(h,"\tstruct rest_response * aptr) {\n");
-	fprintf(h,"\tstruct %s * pptr;\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = allocate_%s()))\n",C.name);
-	fprintf(h,"\t\treturn( pptr );\n");
-	fprintf(h,"\telse if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_%s_field) ))\n",C.name);
-	fprintf(h,"\t\treturn( liberate_%s(pptr));\n",C.name);
-	fprintf(h,"\telse\treturn( pptr );\n");
+	fprintf(h,"\t*filter = (const struct %s_occi_filter) {0};\n",C.name);
+	fprintf(h,"\tif (!( filter->attributes = allocate_%s()))\n",C.name);
+	fprintf(h,"\t\treturn 0;\n");
+	fprintf(h,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_%s_filter_on_field) )) {\n",C.name);
+	fprintf(h,"\t\tliberate_%s(filter->attributes);\n", C.name);
+	fprintf(h,"\t\treturn 0;\n");
+	fprintf(h,"\t}\n");
+	fprintf(h,"\telse\treturn( 1 );\n");
 	fprintf(h,"}\n");
 
 	/* -------------------- */
@@ -405,7 +457,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	/* -------------------- */
 	title(h,"occi category filter pass");
 	fprintf(h,"private int pass_%s_filter(\n",C.name);
-	fprintf(h,"\tstruct %s * pptr,struct %s * fptr) {\n",C.name,C.name);
+	fprintf(h,"\tstruct %s * pptr, struct %s_occi_filter *filter) {\n",C.name,C.name);
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -422,16 +474,15 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 			continue;
 		else if ( iptr->indirection )
 		{
-			fprintf(h,"\tif (( fptr->%s )\n",iptr->name);
-			fprintf(h,"\t&&  (strlen( fptr->%s ) != 0)) {\n",iptr->name);
+			fprintf(h,"\tif ( filter->%s ) {\n",iptr->name);
 			fprintf(h,"\t\tif (!( pptr->%s ))\n",iptr->name);
 			fprintf(h,"\t\t\treturn(0);\n");
-			fprintf(h,"\t\telse if ( strcmp(pptr->%s,fptr->%s) != 0)\n",iptr->name,iptr->name);
+			fprintf(h,"\t\telse if ( strcmp(pptr->%s,filter->attributes->%s) != 0)\n",iptr->name,iptr->name);
 			fprintf(h,"\t\t\treturn(0);\n\t\t}\n");
 		}
 		else
 		{
-			fprintf(h,"\tif (( fptr->%s ) && ( pptr->%s != fptr->%s )) return(0);\n",
+			fprintf(h,"\tif (filter->%s && (pptr->%s != filter->attributes->%s)) return(0);\n",
 				iptr->name,iptr->name,iptr->name);
 		}
 	}
@@ -730,7 +781,8 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct rest_header * hptr;\n");
 	fprintf(h,"\tstruct occi_%s_node * sptr;\n",C.klass);
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
-	fprintf(h,"\tstruct %s * fptr;\n",C.name);
+	fprintf(h,"\tstruct %s_occi_filter filter;\n",C.name);
+
 	fprintf(h,"\tchar * reqhost;\n");
 	fprintf(h,"\tint reqport=0;\n");
 
@@ -738,7 +790,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request%c ) );\n",
 		0x0022,0x0022);
 	fprintf(h,"\telse reqport = rptr->port;\n");
-	fprintf(h,"\tif (!( fptr = filter_%s_info( optr, rptr, aptr ) ))\n",C.name);
+	fprintf(h,"\tif (!( filter_%s_info(&filter, optr, rptr, aptr ) ))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request%c ) );\n",
 		0x0022,0x0022);
 	fprintf(h,"\tfor ( sptr = %s_first;\n",C.name);
@@ -747,15 +799,18 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 
 	fprintf(h,"\t\tif (!( pptr = sptr->contents ))\n");
 	fprintf(h,"\t\t\tcontinue;\n");
-	fprintf(h,"\t\tif (!( pass_%s_filter( pptr, fptr ) ))\n",C.name);
+	fprintf(h,"\t\tif (!( pass_%s_filter( pptr, &filter) ))\n",C.name);
 	fprintf(h,"\t\t\tcontinue;\n");
 	fprintf(h,"\t\tsprintf(cptr->buffer,%c%cs:%cu%cs%cs%c,reqhost,reqport,optr->location,pptr->id);\n",
 			0x0022,0x0025,0x0025,0x0025,0x0025,0x0022);
-	fprintf(h,"\t\tif (!( hptr = rest_response_header( aptr, %cX-OCCI-Location%c,cptr->buffer) ))\n",
+	fprintf(h,"\t\tif (!( hptr = rest_response_header( aptr, %cX-OCCI-Location%c,cptr->buffer) )) {\n",
 			0x0022,0x0022);
+	fprintf(h,"\t\t\tliberate_%s(filter.attributes);\n", C.name);
 	fprintf(h,"\t\t\treturn( rest_html_response( aptr, 500, %cServer Failure%c ) );\n",
 			0x0022,0x0022);
 	fprintf(h,"\t\t}\n");
+	fprintf(h,"\t}\n");
+	fprintf(h,"\tliberate_%s(filter.attributes);\n", C.name);
 
 	fprintf(h,"\tif (!( occi_success( aptr ) ))\n");
 	fprintf(h,"\t\treturn( rest_response_status( aptr, 500, %cServer Failure%c ) );\n",
@@ -778,15 +833,15 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_%s_node * nptr;\n",C.klass);
 	fprintf(h,"\tstruct occi_%s_node * sptr;\n",C.klass);
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
-	fprintf(h,"\tstruct %s * fptr;\n",C.name);
+	fprintf(h,"\tstruct %s_occi_filter filter;\n",C.name);
 	fprintf(h,"\tiptr = optr->callback;\n");
-	fprintf(h,"\tif (!( fptr = filter_%s_info( optr, rptr, aptr ) ))\n",C.name);
+	fprintf(h,"\tif (!( filter_%s_info(&filter, optr, rptr, aptr ) ))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request%c ) );\n",
 		0x0022,0x0022);
 	fprintf(h,"\tnptr=%s_first;\n",C.name);
 	fprintf(h,"\twhile (nptr != (struct occi_%s_node *) 0) {\n",C.klass);
 	fprintf(h,"\t\tif ((!( pptr = nptr->contents ))\n");
-	fprintf(h,"\t\t||  (!( pass_%s_filter( pptr, fptr ) ))) {\n",C.name);
+	fprintf(h,"\t\t||  (!( pass_%s_filter( pptr, &filter) ))) {\n",C.name);
 	fprintf(h,"\t\t\tnptr = nptr->next;\n");
 	fprintf(h,"\t\t\tcontinue;\n");
 	fprintf(h,"\t\t\t}\n");
@@ -795,8 +850,9 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\t\t\tsptr = nptr->next;\n");
 	fprintf(h,"\t\t\tdrop_%s_node( nptr );\n",C.name);
 	fprintf(h,"\t\t\tnptr = sptr;\n");
-	fprintf(h,"\t\t\t}\n");
 	fprintf(h,"\t\t}\n");
+	fprintf(h,"\t}\n");
+	fprintf(h,"\tliberate_%s(filter.attributes);\n", C.name);
 	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
 	fprintf(h,"\tif (!( occi_success( aptr ) ))\n");
 	fprintf(h,"\t\treturn( rest_response_status( aptr, 500, %cServer Failure%c ) );\n",

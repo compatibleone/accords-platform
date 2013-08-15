@@ -513,7 +513,7 @@ private	void rest_request_flush( struct rest_client * cptr )
 	{
 		if ( show_rest_request )
 		{
-			printf("\n%s\n",cptr->buffer );
+			printf("\n===Start Rest Request===\n%s===End Rest Request===\n",cptr->buffer );
 		}
 		rest_client_write( cptr );
 		rest_request_start( cptr );
@@ -1139,6 +1139,12 @@ public	struct	rest_response *
 		char * target2, char * tls2, char * nptr2, struct rest_header * hptr2 )
 {
 	return((struct rest_response *) 0);
+}
+
+void dump_rest_client(FILE *h, struct rest_client *cptr)
+{
+	/* rest_client *cptr */
+	fprintf(h, "client: %d %s\n", cptr->server->port, cptr->server->name);
 }
 
 #endif	/* _restclient_c */

@@ -15,6 +15,8 @@ struct	rest_request
 	char			* host;
 };
 
+void dump_rest_request(FILE *h, struct rest_request *rptr);
+
 #endif
 
 
