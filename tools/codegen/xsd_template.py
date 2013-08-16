@@ -6,17 +6,11 @@ from codegen import parse_and_generate_code as parse
 from codegen import category_for_file
 
 # Example invocation from tools directiory:
-# python -m cogapp -ed -D cog_category_file=publication.h -o tmp/output.xsd cog/templates/schema.xsd
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir="../model" -o tmp/output.xsd cog/templates/schema.xsd
 
-#TODO Get the input path and output path from cog globals
-_output_dir = "./tmp"
-_input_path = ['../model']
-
-def init():
+def init_models(model_dir):
     global models
-    models = parse(_input_path, None, _output_dir, None)
-        
-init()
+    models = parse([model_dir], None, None, None)
 
 def _type_conversion(type_name):
     if type_name == "int":

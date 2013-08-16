@@ -131,10 +131,10 @@ def _generate_output_file(output_dir, output_filename, output_type, models):
 
 
 def parse_and_generate_code(input_paths, output_type, output_dir, output_filename):
-    output_dir = _check_output_directory(output_dir)
     models = _parse_all_input_files(input_paths)
     _check_category_for_file_exists(output_filename, models)
     if output_type is not None:
+        output_dir = _check_output_directory(output_dir)
         _generate_output_file(output_dir, output_filename, output_type, models)
     return models
 
