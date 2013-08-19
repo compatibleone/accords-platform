@@ -244,11 +244,12 @@ class Category(object):
     def struct_name(self):        
         return "cords_" + self.term if self.structName is None else self.structName
 
-    def backend_type_list(self):
+    def backend_type_list(self, include_id = True):
         '''
         List of all types needed to be stored in the backend representation of this category
         '''
-        yield('id', 'string')   # All backends store an id for each category
+        if include_id:
+            yield('id', 'string')   # All backends store an id for each category
         for name, attr in self.attrs.items():
             yield(name, attr.attrtype)            
         for name in self.colls.keys():
