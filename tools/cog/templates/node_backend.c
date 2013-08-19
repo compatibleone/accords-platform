@@ -5,7 +5,10 @@
 [[[cog t.filename_root(cog_category_file)]]]
 [[[end]]] 
 _backend.h"
-#include "node_backend.h"
+#include "
+[[[cog t.filename_root(cog_category_file)]]]
+[[[end]]] 
+_node_backend.h"
 
 private pthread_mutex_t list_
 [[[cog t.category_name(cog_category_file)]]]
