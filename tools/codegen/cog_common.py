@@ -14,8 +14,10 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c 
 
 
-def init_models(model_dir):
+def init_models(model_dir, filename):
     global models
+    global category_file
+    category_file = filename
     models = parse([model_dir], None, None, None)
 
 def _type_conversion(type_name):
@@ -23,26 +25,26 @@ def _type_conversion(type_name):
         return "integer"
     return type_name
 
-def _category_name(category_file):
+def _category_name():
     return category_for_file(category_file, models).struct_name 
 
-def category_name(category_file):
+def category_name():
     cog.inline()
-    cog.out(_category_name(category_file))   
+    cog.out(_category_name())   
 
-def category_xsd(category_file):
+def category_xsd():
     category = category_for_file(category_file, models)   
     cog.outl('<xsd:complexType name="{0}">'.format(category.struct_name))
     for name, type_name in category.backend_type_list():
         cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format(name, _type_conversion(type_name)))
 
 
-def node_h_guard(category_file):
+def node_h_guard():
     category = category_for_file(category_file, models)
     
     _generic_h_guard('{0}_node_backend'.format(category.struct_name))
     
-def category_h_guard(category_file):
+def category_h_guard():
     category = category_for_file(category_file, models)
     
     _generic_h_guard(category.struct_name)
@@ -51,7 +53,7 @@ def _name_root(filename):
     filename_root, _ = os.path.splitext(filename)
     return filename_root.lower()
 
-def filename_root(category_file):
+def filename_root():
     cog.inline()
     cog.out(_name_root(category_file))
 
@@ -61,22 +63,22 @@ def _generic_h_guard(filename):
     cog.outl('#ifndef {0}'.format(guard))    
     cog.outl('#define {0}'.format(guard))
     
-def category_h_struct(category_file):
+def category_h_struct():
     category = category_for_file(category_file, models)
     
     cog.outl('struct {0}'.format(category.struct_name)) 
         
-def category_h_members(category_file):
+def category_h_members():
     category = category_for_file(category_file, models)
     
     for name, type_name in category.backend_type_list():
         cog.outl('{0} {1};'.format(ctypes.from_platform_type(type_name), name))
 
-def node_interface_declaration(category_file):
-    name = _category_name(category_file)
+def node_interface_declaration():
+    name = _category_name()
     cog.outl("struct {0}_backend_interface *{1}_node_interface_func();".format(name, name))
     
-def h_include(category_file):
+def h_include():
     cog.outl("#include \"{0}\"".format(category_file.lower()))
     
 def _check_pass_filter(name, type_name):    
@@ -99,28 +101,28 @@ def _check_string_passes_filter(name):
 def _check_int_passes_filter(name):
     cog.outl("    if (( fptr->{0} ) && ( pptr->{1} != fptr->{2} )) return(0);".format(name, name, name))
     
-def pass_category_filter(category_file):
+def pass_category_filter():
     category = category_for_file(category_file, models)
-    category_name = _category_name(category_file)
+    category_name = _category_name()
     cog.outl("private int pass_{0}_filter(".format(category_name))
     cog.outl("    struct {0} * pptr,struct {1} * fptr) {{".format(category_name, category_name))
     for name, type_name in category.backend_type_list():
         _check_pass_filter(name, type_name)
         
-def load_attributes(category_file):
+def load_attributes():
     _format_category(category_file,
                      "if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)",
                      "    {1}->{0} = document_atribut_string(aptr);",
                      "    {1}->{0} = document_atribut_value(aptr);")
                  
-def save_attributes(category_file):
+def save_attributes():
     _format_category(category_file,
                      "fprintf(h,\" {0}=%c\",0x0022);",
                      "fprintf(h,\"%s\",(pptr->{0}?pptr->{0}:\"\"));",
                      "fprintf(h,\"%u\",pptr->{0});",
                      "fprintf(h,\"%c\",0x0022);")
         
-def clone(category_file):
+def clone():
     _format_category(category_file, 
                      "if (original->{0}) {{",
                      "    success = success && (copy->{0} = allocate_string(original->{0}));",
