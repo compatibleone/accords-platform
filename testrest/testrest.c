@@ -9,7 +9,6 @@
 //#include "broker.h"
 #include "restresponse.h"
 #include "rest.h"
-// Test can I push to CompatibleOne ?
 //#include "occi.h"
 //#include "document.h"
 //#include "cordspublic.h"
