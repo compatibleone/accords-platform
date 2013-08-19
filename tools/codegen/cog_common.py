@@ -108,39 +108,36 @@ def pass_category_filter(category_file):
         _check_pass_filter(name, type_name)
         
 def load_attributes(category_file):
-    category = category_for_file(category_file, models)
-    for name, type_name in category.backend_type_list():
-        cog.outl("if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)".format(name))
-        if (type_name == "string"):
-            cog.outl("    {0}->{1} = document_atribut_string(aptr);".format(_name_root(category_file), name))
-        elif(type_name == "int"):
-            cog.outl("    {0}->{1} = document_atribut_value(aptr);".format(_name_root(category_file), name))
-        else:
-            raise(ValueError('Unexpected type {0}'.format(type_name)))
-
+    _format_category(category_file,
+                     "if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)",
+                     "    {1}->{0} = document_atribut_string(aptr);",
+                     "    {1}->{0} = document_atribut_value(aptr);")
+                 
 def save_attributes(category_file):
-    category = category_for_file(category_file, models)
-    for name, type_name in category.backend_type_list():
-        cog.outl("fprintf(h,\" {0}=%c\",0x0022);".format(name))
-        if (type_name == "string"):
-            cog.outl("fprintf(h,\"%s\",(pptr->{0}?pptr->{1}:\"\"));".format(name, name))
-        elif(type_name == "int"):
-            cog.outl("fprintf(h,\"%u\",pptr->{0});".format(name))
-        else:
-            raise(ValueError('Unexpected type {0}'.format(type_name)))
-        cog.outl("fprintf(h,\"%c\",0x0022);")
+    _format_category(category_file,
+                     "fprintf(h,\" {0}=%c\",0x0022);",
+                     "fprintf(h,\"%s\",(pptr->{0}?pptr->{0}:\"\"));",
+                     "fprintf(h,\"%u\",pptr->{0});",
+                     "fprintf(h,\"%c\",0x0022);")
         
 def clone(category_file):
+    _format_category(category_file, 
+                     "if (original->{0}) {{",
+                     "    success = success && (copy->{0} = allocate_string(original->{0}));",
+                     "    copy->{0} = original->{0};",
+                     "}")                    
+
+def _format_category(category_file, prefix, string_format, int_format, suffix = None):
     category = category_for_file(category_file, models)
     for name, type_name in category.backend_type_list():
-        cog.outl("if (original->{0}) {{".format(name))
+        cog.outl(prefix.format(name))
         if (type_name == "string"):
-            cog.outl("    success = success && (copy->{0} = allocate_string(original->{1}));".format(name, name))
+            cog.outl(string_format.format(name, _name_root(category_file)))
         elif(type_name == "int"):
-            cog.outl("    copy->{0} = original->{1};".format(name, name))
+            cog.outl(int_format.format(name, _name_root(category_file)))
         else:
             raise(ValueError('Unexpected type {0}'.format(type_name)))
-        cog.outl("}")
-        
+        if suffix:
+            cog.outl(suffix)
     
         
