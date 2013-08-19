@@ -6,6 +6,6 @@
 {
 	[[[cog t.category_h_members(cog_category_file) ]]]
 	[[[end]]]
-}
+};
 
 #endif
