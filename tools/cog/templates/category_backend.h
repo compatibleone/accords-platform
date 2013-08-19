@@ -1,5 +1,13 @@
-#ifndef _publication_backend_h
-#define _publication_backend_h
+[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file) ]]]
+[[[end]]]
+#ifndef _
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_h
+#define _
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_h
 
 typedef struct id_list_t
 {
@@ -7,26 +15,83 @@ typedef struct id_list_t
 	char **ids;
 } id_list;
 
-typedef struct publication_list_t
+typedef struct 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_list_t
 {
 	int count;
-	struct cords_publication **publications;
-} publication_list;
+	struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ **
+[[[cog t.filename_root()]]]
+[[[end]]] 
+s;
+} 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_list;
 
-struct	publication_backend_interface
+struct	
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_interface
 {
 	void (*init)();
 	void (*finalise)();
-	struct cords_publication *(*create)  (int allocate_uuid, struct cords_publication *initial_publication);
-	struct cords_publication *(*retrieve_from_id)(char *id);
-	publication_list (*retrieve_from_filter)(struct cords_publication *filter);
-	void (*update)  (char *id, struct cords_publication *updated_publication);
+	struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *(*create)  (int allocate_uuid, struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *initial_
+[[[cog t.filename_root()]]]
+[[[end]]] 
+);
+	struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *(*retrieve_from_id)(char *id);
+	
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_list (*retrieve_from_filter)(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *filter);
+	void (*update)  (char *id, struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *updated_
+[[[cog t.filename_root()]]]
+[[[end]]] 
+);
 	void (*del)     (char *id);
-	void (*delete_all_matching_filter) (struct cords_publication *filter);	// Delete all publications matching filter
-	id_list (*list) (struct cords_publication *filter); // Return all ids of publications matching filter
+	void (*delete_all_matching_filter) (struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *filter);	// Delete all 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+s matching filter
+	id_list (*list) (struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *filter); // Return all ids of 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+s matching filter
 };
 
 void free_id_list(id_list *list);
-void free_publication_list(publication_list *list);
+void free_
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_list(
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_list *list);
 
 #endif
