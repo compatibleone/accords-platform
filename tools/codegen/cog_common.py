@@ -67,12 +67,16 @@ def category_h_struct():
     cog.outl('struct {0}'.format(category.struct_name)) 
         
 def category_h_members():
-    for name, type_name in category.backend_type_list():
-        cog.outl('{0} {1};'.format(ctypes.from_platform_type(type_name), name))
+    try:
+        for name, type_name in category.backend_type_list():
+            cog.outl('{0} {1};'.format(ctypes.from_platform_type(type_name), name))
+    except ValueError:
+        # We know more details here than in ctypes.from_platform type, so catch and add details
+        raise(ValueError('Unexpected type {0} for member "{1}" of category "{2}"'.format(type_name, name, _category_name())))
 
 def category_filters():
     cog.outl('struct {0} *attributes;'.format(_category_name()))
-    for name, type_name in category.backend_type_list():
+    for name, _ in category.backend_type_list():
         cog.outl('int {0};'.format(name))
     
 
@@ -172,7 +176,7 @@ def _format_category(prefix = None, string_format = None, int_format = None, suf
         elif(type_name == "int"):
             cog.outl(int_format.format(name, _name_root(category_file), _category_name()))
         else:
-            raise(ValueError('Unexpected type {0}'.format(type_name)))
+            raise(ValueError('Unexpected type {0} for member "{1}" of category "{2}"'.format(type_name, name, _category_name())))
         _output_lines(suffix)
     
 def _output_lines(lines, *args):       
