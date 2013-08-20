@@ -14,8 +14,18 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occi.c  
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h    
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.c cog/templates/category.c      
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occicategory_unsplit.c
 
+
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir="../model" -o tmp/output.xsd cog/templates/schema.xsd
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.h cog/templates/category.h 
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.h cog/templates/node_backend.h
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.c cog/templates/node_backend.c
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occi.c  
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_backend.h cog/templates/category_backend.h
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_occi_filter.h cog/templates/category_filter.h 
 
 def init_models(model_dir, filename):
     global models
@@ -151,7 +161,7 @@ def occi_builder():
                      "if (!( optr = occi_add_attribute(optr, \"{0}\",0,0) ))",
                      "    return(optr);",
                      include_id = False)
-    
+        
 def occi_headers():
     _format_category(["if (!( hptr = allocate_rest_header()))",
                       "    return(first);",
@@ -165,16 +175,38 @@ def occi_headers():
                      "sprintf(buffer,\"occi.{2}.{0}='%u'\\r\\n\",sptr->{0});",
                      ["if (!( hptr->value = allocate_string(buffer)))",
                       "    return(first); "],
-                     include_id = False)
-        
+                     include_id = False)        
 
+def liberate():
+    _format_category(None,
+                     ["if ( sptr->{0} )",
+                     "    sptr->{0} = liberate(sptr->{0});"])
+    
+def reset():
+    _format_category(None,
+                     "sptr->{0} = (char*) 0;",
+                     "sptr->{0} =  0;")
+    
+def xmlin():
+    _format_category(["else if (!( strcmp(wptr->name,\"{0}\") ))",
+                      "{{"],
+                     "    if ( wptr->value ) {{ sptr->{0} = allocate_string(wptr->value); }}",
+                     "    if ( wptr->value ) {{ sptr->{0} = atoi(wptr->value); }}",
+                     "}}",
+                     include_id = False)
+    
+def rest_print():
+    _format_category(None,
+                     "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%s'\\r\\n\",prefix,nptr,(sptr->{0}?sptr->{0}:\"\"));",
+                     "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%u'\\r\\n\",prefix,nptr,sptr->{0});")
+    
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
     for name, type_name in category.backend_type_list(include_id):
         _output_lines(prefix, name)
         if (type_name == "string"):
-            cog.outl(string_format.format(name, _name_root(category_file), _category_name()))
+            _output_lines(string_format, name, _name_root(category_file), _category_name())
         elif(type_name == "int"):
-            cog.outl(int_format.format(name, _name_root(category_file), _category_name()))
+            _output_lines(int_format, name, _name_root(category_file), _category_name())
         else:
             raise(ValueError('Unexpected type {0} for member "{1}" of category "{2}"'.format(type_name, name, _category_name())))
         _output_lines(suffix)
