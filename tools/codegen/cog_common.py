@@ -13,14 +13,17 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.h cog/templates/node_backend.h
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occi.c  
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h  
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h    
 
 
 def init_models(model_dir, filename):
     global models
     global category_file
+    global category
     category_file = filename
     models = parse([model_dir], None, None, None)
+    category = category_for_file(category_file, models)
 
 def _type_conversion(type_name):
     if type_name == "int":
@@ -28,27 +31,22 @@ def _type_conversion(type_name):
     return type_name
 
 def _category_name():
-    return category_for_file(category_file, models).struct_name 
+    return category.struct_name 
 
 def category_name():
     cog.inline()
     cog.out(_category_name())   
 
-def category_xsd():
-    category = category_for_file(category_file, models)   
+def category_xsd(): 
     cog.outl('<xsd:complexType name="{0}">'.format(category.struct_name))
     for name, type_name in category.backend_type_list():
         cog.outl(r'    <xsd:attribute name="{0}" type="xsd:{1}"/>'.format(name, _type_conversion(type_name)))
 
 
 def node_h_guard():
-    category = category_for_file(category_file, models)
-    
     _generic_h_guard('{0}_node_backend'.format(category.struct_name))
     
 def category_h_guard():
-    category = category_for_file(category_file, models)
-    
     _generic_h_guard(category.struct_name)
     
 def _name_root(filename):
@@ -66,15 +64,17 @@ def _generic_h_guard(filename):
     cog.outl('#define {0}'.format(guard))
     
 def category_h_struct():
-    category = category_for_file(category_file, models)
-    
     cog.outl('struct {0}'.format(category.struct_name)) 
         
 def category_h_members():
-    category = category_for_file(category_file, models)
-    
     for name, type_name in category.backend_type_list():
         cog.outl('{0} {1};'.format(ctypes.from_platform_type(type_name), name))
+
+def category_filters():
+    cog.outl('struct {0} *attributes;'.format(_category_name()))
+    for name, type_name in category.backend_type_list():
+        cog.outl('int {0};'.format(name))
+    
 
 def node_interface_declaration():
     name = _category_name()
@@ -104,7 +104,6 @@ def _check_int_passes_filter(name):
     cog.outl("    if (( fptr->{0} ) && ( pptr->{1} != fptr->{2} )) return(0);".format(name, name, name))
     
 def pass_category_filter():
-    category = category_for_file(category_file, models)
     category_name = _category_name()
     cog.outl("private int pass_{0}_filter(".format(category_name))
     cog.outl("    struct {0} * pptr,struct {1} * fptr) {{".format(category_name, category_name))
@@ -126,7 +125,7 @@ def clone():
     _format_category("if (original->{0}) {{",
                      "    success = success && (copy->{0} = allocate_string(original->{0}));",
                      "    copy->{0} = original->{0};",
-                     "}")                    
+                     "}}")                    
 
 def set_field():
     _format_category("if (!( strcmp( nptr, \"{0}\" ) ))",
@@ -166,7 +165,6 @@ def occi_headers():
         
 
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
-    category = category_for_file(category_file, models)
     for name, type_name in category.backend_type_list(include_id):
         _output_lines(prefix, name)
         if (type_name == "string"):
