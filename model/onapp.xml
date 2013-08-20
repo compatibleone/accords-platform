@@ -141,7 +141,8 @@
 				created_at          - Date it was created at (UNIX timestamp)
 				api                 - Never Stored
 				is_active           - Is this active ?
-				deleted                                - Has it been deleted			
+				deleted             - Has it been deleted	
+				backup_supported	- Is back up of VMs supported?	
 	        -->
 	        <attribute name='cloud_id' type='string' required='false' immutable='false'/>
 	        <!--<attribute name='zone_id' type='int' required='false' immutable='false'/>-->
@@ -166,6 +167,7 @@
 	        <attribute name='is_active' type='int' required='false' immutable='false'/>
 	        <attribute name='created_at' type='int' required='false' immutable='false'/>
 	        <attribute name='deleted' type='int' required='false' immutable='false'/>
+	        <attribute name='backup_supported' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
