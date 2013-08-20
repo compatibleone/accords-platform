@@ -5,6 +5,7 @@ Created on 28 Mar 2013
 '''
 
 import logging
+import Scope
 
 class CategoriesBase(object):
     '''
@@ -251,6 +252,8 @@ class Category(object):
         if include_id:
             yield('id', 'string')   # All backends store an id for each category
         for name, attr in self.attrs.items():
-            yield(name, attr.attrtype)            
-        for name in self.colls.keys():
-            yield(name, 'string')
+            if attr.scope is Scope.All and attr.legacytype == None:
+                yield(name, attr.attrtype)            
+        for name, coll in self.colls.items():
+            if coll.scope is Scope.All:
+                yield(name, 'string')
