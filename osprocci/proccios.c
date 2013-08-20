@@ -1613,26 +1613,29 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ------------------------------------------ */
 		/* launch the deletion of the server instance */
 		/* ------------------------------------------ */
-		if ((osptr=os_delete_server( subptr,pptr->number )) != (struct os_response *) 0)
+		if ( rest_valid_string( pptr->number ) )
 		{
-			/* ----------------------------- */
-			/* await server instance removal */
-			/* ----------------------------- */
-			do
+			if ((osptr=os_delete_server( subptr,pptr->number )) != (struct os_response *) 0)
 			{
-				if (!( osptr ))
-					break;
-				else if (!( osptr->response ))
-					break;
-				else if ( osptr->response->status > 299 )
-					break;
-				else
+				/* ----------------------------- */
+				/* await server instance removal */
+				/* ----------------------------- */
+				do
 				{
-					sleep(1);
-					osptr = liberate_os_response( osptr );
+					if (!( osptr ))
+						break;
+					else if (!( osptr->response ))
+						break;
+					else if ( osptr->response->status > 299 )
+						break;
+					else
+					{
+						sleep(1);
+						osptr = liberate_os_response( osptr );
+					}
 				}
+				while ((osptr=os_get_server( subptr, pptr->number )) != (struct os_response *) 0);
 			}
-			while ((osptr=os_get_server( subptr, pptr->number )) != (struct os_response *) 0);
 		}
 		/* ------------------------------------------- */
 		/* ensure release of the allocated floating IP */
