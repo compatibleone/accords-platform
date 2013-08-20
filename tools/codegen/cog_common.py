@@ -68,7 +68,7 @@ def filename_root():
     cog.out(_name_root(category_file))
 
 def _generic_h_guard(filename):
-    guard = '{0}_h'.format(_name_root(filename))
+    guard = '_{0}_h'.format(_name_root(filename))
     
     cog.outl('#ifndef {0}'.format(guard))    
     cog.outl('#define {0}'.format(guard))

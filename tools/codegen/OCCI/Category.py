@@ -6,6 +6,7 @@ Created on 28 Mar 2013
 
 import logging
 import Scope
+import Cardinality
 
 class CategoriesBase(object):
     '''
@@ -256,4 +257,5 @@ class Category(object):
                 yield(name, attr.attrtype)            
         for name, coll in self.colls.items():
             if coll.scope is Scope.All:
-                yield(name, 'string')
+                type = 'int' if coll.multiplicity.max is Cardinality.Unbounded else 'string'
+                yield(name, type)
