@@ -1799,7 +1799,7 @@ private	char * os_create_server_xml_request(
 				fprintf(h,"</personality>\n");
 			}
 		}
-		if ( compute_v2 )
+		if ( subptr->KeyStone.quantum )
 		{
 			if ( rest_valid_string( network ) )
 			{
@@ -1862,9 +1862,12 @@ private	char * os_create_server_json_request(
 			fprintf(h,",\"imageRef\":%c%s%c",0x0022,image,0x0022);
 		else	fprintf(h,",\"imageRef\":%c%s/images/%s%c",0x0022,subptr->Os.base,image,0x0022);
 
-		if ( rest_valid_string( network ) )
+		if ( subptr->KeyStone.quantum )
 		{
-			fprintf(h,", \"networks\":[{\"uuid\":\"%s\"}]",network);
+			if ( rest_valid_string( network ) )
+			{
+				fprintf(h,", \"networks\":[{\"uuid\":\"%s\"}]",network);
+			}
 		}
 
 		if (( rest_valid_string( keyname ) )
@@ -1881,11 +1884,12 @@ private	char * os_create_server_json_request(
 		}
 		if ( 1 > 2 )
 		{
-		if ( rest_valid_string( zone ) )
-		{
-			fprintf(h,",\"availability_zone\":%c%s%c\n",0x0022,zone,0x0022);
+			if ( rest_valid_string( zone ) )
+			{
+				fprintf(h,",\"availability_zone\":%c%s%c\n",0x0022,zone,0x0022);
+			}
 		}
-		}
+
 		if ( rest_valid_string( group ) )
 		{
 			fprintf(h,",\"security_groups\":[");
