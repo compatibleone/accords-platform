@@ -44,7 +44,10 @@ _c_
 _occi_filter.h"
 
 /*	----------------------------------------------------	*/
-/*	l i b e r a t e _ c o r d s _ p u b l i c a t i o n 	*/
+/*	l i b e r a t e _ 
+[[[cog t.split_category_name()]]]
+[[[end]]] 
+	*/
 /*	----------------------------------------------------	*/
 public struct 
 [[[cog t.category_name()]]]
@@ -71,7 +74,10 @@ public struct
 }
 
 /*	----------------------------------------------	*/
-/*	r e s e t _ c o r d s _ p u b l i c a t i o n 	*/
+/*	r e s e t _ 
+[[[cog t.split_category_name()]]]
+[[[end]]] 
+	*/
 /*	----------------------------------------------	*/
 public struct 
 [[[cog t.category_name()]]]
@@ -94,7 +100,10 @@ public struct
 }
 
 /*	----------------------------------------------------	*/
-/*	a l l o c a t e _ c o r d s _ p u b l i c a t i o n 	*/
+/*	a l l o c a t e _ 
+[[[cog t.split_category_name()]]]
+[[[end]]] 
+	*/
 /*	----------------------------------------------------	*/
 public struct 
 [[[cog t.category_name()]]]
@@ -122,7 +131,10 @@ public struct
 [[[end]]]
  
 /*	----------------------------------------------	*/
-/*	x m l i n _ c o r d s _ p u b l i c a t i o n 	*/
+/*	x m l i n _ 
+[[[cog t.split_category_name()]]]
+[[[end]]] 
+	*/
 /*	----------------------------------------------	*/
 public int xmlin_
 [[[cog t.category_name()]]]
@@ -149,7 +161,10 @@ public int xmlin_
 }
 
 /*	------------------------------------------------------	*/
-/*	r e s t _ o c c i _ c o r d s _ p u b l i c a t i o n 	*/
+/*	r e s t _ o c c i _ 
+[[[cog t.split_category_name()]]]
+[[[end]]] 
+	*/
 /*	------------------------------------------------------	*/
 public int rest_occi_
 [[[cog t.category_name()]]]

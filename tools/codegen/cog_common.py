@@ -50,6 +50,11 @@ def _category_name():
 def category_name():
     cog.inline()
     cog.out(_category_name())   
+    
+def split_category_name():
+    cog.inline()
+    split_name = ' '.join(_category_name())
+    cog.out(split_name)
 
 def category_xsd(): 
     cog.outl('<xsd:complexType name="{0}">'.format(category.struct_name))
