@@ -118,7 +118,9 @@ public struct
 [[[end]]] 
 (sptr) );
 }
-
+[[[cog t.authorization_special_code()]]]
+[[[end]]]
+ 
 /*	----------------------------------------------	*/
 /*	x m l i n _ c o r d s _ p u b l i c a t i o n 	*/
 /*	----------------------------------------------	*/
