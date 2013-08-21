@@ -4,8 +4,8 @@ import xml.etree.ElementTree as ET
 from testfixtures import LogCapture
 from hamcrest import assert_that, is_, is_not, has_entry, has_item, same_instance
 
-from Component import Component
-from ComponentParser import ComponentParser
+from codegen.OCCI.Component import Component
+from codegen.OCCI.ComponentParser import ComponentParser
 
 from ParserMocks import MockCategory
 

@@ -4,8 +4,8 @@ from testfixtures import LogCapture
 import xml.etree.ElementTree as ET
 from hamcrest import assert_that, is_, is_not, has_key, has_entry
 
-from ConfigParser import BackendParser
-from Backend import Backend
+from codegen.OCCI.ConfigParser import BackendParser
+from codegen.OCCI.Backend import Backend
 
 def _dump_xml_as_file(root, filename):
     from xml.dom import minidom

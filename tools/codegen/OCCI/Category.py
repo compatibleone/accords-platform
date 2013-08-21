@@ -7,6 +7,7 @@ Created on 28 Mar 2013
 import logging
 import Scope
 import Cardinality
+from codegen.codegen_types import ctypes
 
 class CategoriesBase(object):
     '''
@@ -251,11 +252,13 @@ class Category(object):
         List of all types needed to be stored in the backend representation of this category
         '''
         if include_id:
-            yield('id', 'string')   # All backends store an id for each category
+            yield('id', 'char *')   # All backends store an id for each category
         for name, attr in self.attrs.items():
             if attr.scope is Scope.All and attr.legacytype == None:
-                yield(name, attr.attrtype)            
+                yield(name, ctypes.from_platform_type(attr.attrtype))            
         for name, coll in self.colls.items():
             if coll.scope is Scope.All:
-                type = 'int' if coll.multiplicity.max is Cardinality.Unbounded else 'string'
+                type = 'int' if coll.multiplicity.max is Cardinality.Unbounded else 'char *'
+                if (coll.legacytype != None):
+                    type = coll.legacytype
                 yield(name, type)

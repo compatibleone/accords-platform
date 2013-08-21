@@ -36,6 +36,8 @@ def init_models(model_dir, filename):
     category = category_for_file(category_file, models)
 
 def _type_conversion(type_name):
+    if type_name == "char *":
+        return "string"
     if type_name == "int":
         return "integer"
     return type_name
@@ -79,7 +81,7 @@ def category_h_struct():
 def category_h_members():
     try:
         for name, type_name in category.backend_type_list():
-            cog.outl('{0} {1};'.format(ctypes.from_platform_type(type_name), name))
+            cog.outl('{0} {1};'.format(type_name, name))
     except ValueError:
         # We know more details here than in ctypes.from_platform type, so catch and add details
         raise(ValueError('Unexpected type {0} for member "{1}" of category "{2}"'.format(type_name, name, _category_name())))
@@ -190,7 +192,7 @@ def rest_print():
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
     for name, type_name in category.backend_type_list(include_id):
         _output_lines(prefix, name)
-        if (type_name == "string"):
+        if (type_name == "char *"):
             _output_lines(string_format, name, _name_root(category_file), _category_name())
         elif(type_name == "int"):
             _output_lines(int_format, name, _name_root(category_file), _category_name())
