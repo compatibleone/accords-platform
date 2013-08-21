@@ -19,13 +19,15 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occicategory_unsplit.c
 
 
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir="../model" -o tmp/output.xsd cog/templates/schema.xsd
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occi.c  
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir="../model" -o tmp/authitem.xsd cog/templates/schema.xsd
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.h cog/templates/category.h 
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.h cog/templates/node_backend.h
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.c cog/templates/node_backend.c
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occi.c  
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_backend.h cog/templates/category_backend.h
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_occi_filter.h cog/templates/category_filter.h 
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_occi_filter.h cog/templates/category_filter.h
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occicategory_unsplit.c 
+# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.c cog/templates/category.c
 
 def init_models(model_dir, filename):
     global models
@@ -40,7 +42,7 @@ def _type_conversion(type_name):
         return "string"
     if type_name == "int":
         return "integer"
-    return type_name
+    return "string"
 
 def _category_name():
     return category.struct_name 
@@ -174,10 +176,19 @@ def liberate():
                      "    sptr->{0} = liberate(sptr->{0});"])
     
 def reset():
-    _format_category(None,
-                     "sptr->{0} = (char*) 0;",
-                     "sptr->{0} =  0;")
+#     _format_category(None,
+#                      "sptr->{0} = (char*) 0;",
+#                      "sptr->{0} =  0;",
+#                      skip_legacy_types = False)
     
+    for name, type_name in category.backend_type_list(skip_legacy_types = False):
+        if type_name == "int":
+            cog.outl("sptr->{0} = 0;".format(name)) # It would actually be harmless to cast to int.  However for compatibility with Strukt, and ease of comparing output, we suppress it
+        else:
+            cog.outl("sptr->{0} = ({1}) 0;".format(name, type_name))
+        
+        
+        
 def xmlin():
     _format_category(["else if (!( strcmp(wptr->name,\"{0}\") ))",
                       "{{"],
@@ -192,7 +203,7 @@ def rest_print():
                      "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%u'\\r\\n\",prefix,nptr,sptr->{0});")
     
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
-    for name, type_name in category.backend_type_list(include_id):
+    for name, type_name in category.backend_type_list(include_id, skip_legacy_types = True):
         _output_lines(prefix, name)
         if (type_name == "char *"):
             _output_lines(string_format, name, _name_root(category_file), _category_name())

@@ -247,15 +247,17 @@ class Category(object):
     def struct_name(self):        
         return "cords_" + self.term if self.structName is None else self.structName
 
-    def backend_type_list(self, include_id = True):
+    def backend_type_list(self, include_id = True, skip_legacy_types = False):
         '''
         List of all types needed to be stored in the backend representation of this category
         '''
         if include_id:
             yield('id', 'char *')   # All backends store an id for each category
         for name, attr in self.attrs.items():
-            if attr.scope is Scope.All and attr.legacytype == None:
-                yield(name, ctypes.from_platform_type(attr.attrtype))            
+            if attr.scope is Scope.All:
+                type = ctypes.from_platform_type(attr.attrtype) if attr.legacytype == None else attr.legacytype
+                if not skip_legacy_types or attr.legacytype == None:
+                    yield(name, type)
         for name, coll in self.colls.items():
             if coll.scope is Scope.All:
                 type = 'int' if coll.multiplicity.max is Cardinality.Unbounded else 'char *'
