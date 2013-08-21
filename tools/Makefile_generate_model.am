@@ -4,16 +4,52 @@
 MODEL_CODEGEN = $(top_srcdir)/tools/codegen/codegen.py
 MODEL_STRUKT = $(top_builddir)/tools/strukt/strukt
 MODEL_STRUKT_WRAPPER = $(top_builddir)/tools/strukt/_strukt_wrapper
+MODEL_COG = python -m cogapp -ed
+COG_TEMPLATES = $(top_srcdir)/tools/cog/templates/
+
+COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
+
+schema_files = $(patsubst %.h,%.xsd,$(model_h_files))
+model_backend_h_files = $(patsubst %.h,%_backend.h,$(model_h_files))
+node_backend_c_files = $(patsubst %.h,%_node_backend.c,$(model_h_files))
+node_backend_h_files = $(patsubst %.h,%_node_backend.h,$(model_h_files))
+occi_c_files = $(patsubst %.h,occi%.c,$(model_h_files))
+occi_filter_files = $(patsubst %.h, %_occi_filter.h,$(model_h_files))
 
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
-model_all_files = $(model_c_files) $(model_h_files) $(patsubst %.h,%.xsd,$(model_h_files)) $(patsubst %.h,occi%.c,$(model_h_files))
+#model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(model_backend_h_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files)
+model_all_files = $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(occi_filter_files)
 
-$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN)
-	$(MODEL_CODEGEN) -t Header -o . $(top_srcdir)/model -f $@
+$(schema_files) : %.xsd : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.xsd,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)schema.xsd
+	
+$(node_backend_h_files) : %_node_backend.h : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_node_backend.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)node_backend.h
+	
+$(node_backend_c_files) : %_node_backend.c : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_node_backend.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)node_backend.c
 
-$(model_c_files) : %.c : %.h
-	$(MAKE) -C $(top_builddir)/tools/strukt
-	$(MODEL_STRUKT_WRAPPER) $(subst .c,,$@)
+$(occi_c_files) : occi%.c : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi%.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occicategory_unsplit.c
+	
+$(model_backend_h_files) : %_backend.h : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_backend.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category_backend.h
+
+$(occi_filter_files) : %_occi_filter.h : %.h 
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_occi_filter.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category_filter.h
+	
+$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON)
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$@ -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.h
+	
+# TODO Replace generation of .c files with cog
+#$(model_c_files) : %.c : %.h %_backend.h %.xsd %_node_backend.h %_node_backend.c occi%.c %_occi_filter.h
+$(model_c_files) : %.c : %.h %.xsd occi%.c %_occi_filter.h
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.c,%.h, $@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.c
+	
+#$(MAKE) -C $(top_builddir)/tools/strukt
+#$(MODEL_STRUKT_WRAPPER) $(subst .c,,$@)
 
 CLEANFILES = $(model_all_files)
+
+

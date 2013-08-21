@@ -101,26 +101,23 @@ def h_include():
     
 def pass_category_filter():
     category_name = _category_name()
-    cog.outl("private int pass_{0}_filter(".format(category_name))
-    cog.outl("    struct {0} * pptr,struct {1} * fptr) {{".format(category_name, category_name))
     _format_category(None,                      
-                     ["    if ((fptr->{0})",
-                      "    && (strlen( fptr->{0} ) != 0)) {{",
+                     ["    if (filter->{0}) {{",
                       "        if(!( pptr->{0} ))",
                       "            return(0);",
-                      "        else if ( strcmp(pptr->{0},fptr->{0}) != 0)",
+                      "        else if ( strcmp(pptr->{0},filter->attributes->{0}) != 0)",
                       "            return(0);",
-                      "        }}"],
-                      "    if (( fptr->{0} ) && ( pptr->{0} != fptr->{0} )) return(0);")                 
+                      "    }}"],
+                      "    if ( filter->{0} && ( pptr->{0} != filter->attributes->{0} )) return(0);")                 
         
 def load_attributes():
     _format_category("if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)",
-                     "    {1}->{0} = document_atribut_string(aptr);",
-                     "    {1}->{0} = document_atribut_value(aptr);")
+                     "    pptr->{0} = document_atribut_string(aptr);",
+                     "    pptr->{0} = document_atribut_value(aptr);")
                  
 def save_attributes():
     _format_category("fprintf(h,\" {0}=%c\",0x0022);",
-                     "fprintf(h,\"%s\",(pptr->{0}?pptr->{0}:\"\"));",
+                     "fprintf_xml_string_attribute(h,\"%s\",(pptr->{0}?pptr->{0}:\"\"));",
                      "fprintf(h,\"%u\",pptr->{0});",
                      "fprintf(h,\"%c\",0x0022);")
         
@@ -131,9 +128,14 @@ def clone():
                      "}}")                    
 
 def set_field():
-    _format_category("if (!( strcmp( nptr, \"{0}\" ) ))",
-                     "    pptr->{0} = allocate_string(vptr);",
-                     "    pptr->{0} = atoi(vptr);",
+    _format_category("if (!( strcmp( field_name, \"{0}\" ) ))",
+                     "    pptr->{0} = allocate_string(value);",
+                     "    pptr->{0} = atoi(value);",
+                     include_id = False) 
+    
+def activate_filter():
+    _format_category(["if (!( strcmp( field_name, \"{0}\" ) ))",
+                      "    target->{0} = 1;"],
                      include_id = False)      
     
 def occi_response():
@@ -150,7 +152,7 @@ def occi_builder():
                      "if (!( optr = occi_add_attribute(optr, \"{0}\",0,0) ))",
                      "    return(optr);",
                      include_id = False)
-        
+    
 def occi_headers():
     _format_category(["if (!( hptr = allocate_rest_header()))",
                       "    return(first);",
