@@ -61,7 +61,7 @@ def category_h_guard():
     
 def _name_root(filename):
     filename_root, _ = os.path.splitext(filename)
-    return filename_root.lower()
+    return filename_root
 
 def filename_root():
     cog.inline()
@@ -97,32 +97,19 @@ def node_interface_declaration():
 def h_include():
     cog.outl("#include \"{0}\"".format(category_file.lower()))
     
-def _check_pass_filter(name, type_name):    
-    if (type_name == "string"):
-        _check_string_passes_filter(name)
-    elif (type_name == "int"):
-        _check_int_passes_filter(name)
-    else:
-        raise(ValueError('Unexpected type {0}'.format(type_name)))
-    
-def _check_string_passes_filter(name):    
-    cog.outl("    if ((fptr->{0})".format(name))
-    cog.outl("    && (strlen( fptr->{0} ) != 0)) {{".format(name))
-    cog.outl("        if(!( pptr->{0} ))".format(name))
-    cog.outl("            return(0);")
-    cog.outl("        else if ( strcmp(pptr->{0},fptr->{1}) != 0)".format(name, name))
-    cog.outl("            return(0);")
-    cog.outl("        }")
-    
-def _check_int_passes_filter(name):
-    cog.outl("    if (( fptr->{0} ) && ( pptr->{1} != fptr->{2} )) return(0);".format(name, name, name))
-    
 def pass_category_filter():
     category_name = _category_name()
     cog.outl("private int pass_{0}_filter(".format(category_name))
     cog.outl("    struct {0} * pptr,struct {1} * fptr) {{".format(category_name, category_name))
-    for name, type_name in category.backend_type_list():
-        _check_pass_filter(name, type_name)
+    _format_category(None,                      
+                     ["    if ((fptr->{0})",
+                      "    && (strlen( fptr->{0} ) != 0)) {{",
+                      "        if(!( pptr->{0} ))",
+                      "            return(0);",
+                      "        else if ( strcmp(pptr->{0},fptr->{0}) != 0)",
+                      "            return(0);",
+                      "        }}"],
+                      "    if (( fptr->{0} ) && ( pptr->{0} != fptr->{0} )) return(0);")                 
         
 def load_attributes():
     _format_category("if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)",
