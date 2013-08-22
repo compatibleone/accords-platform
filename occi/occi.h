@@ -105,6 +105,7 @@ public	char *	get_default_account_id();
 #define	_OCCI_TEXT_OCCI		"text/occi"
 #define	_OCCI_MIME_OCCI		"text/occi"
 #define	_OCCI_TEXT_HTML		"text/html"
+#define	_OCCI_ANY		"*/*"
 
 #define	_OCCI_OCCI_PHP		"application/php+occi"
 #define	_OCCI_APP_PHP		"application/php"
