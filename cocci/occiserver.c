@@ -685,7 +685,7 @@ public 	struct rest_response *	occi_content_type(
 		return( rptr );
 	else if (!( hptr = rest_resolve_header( qptr->first, _HTTP_ACCEPT ) ))
 		return( rptr );	
-	else if (!( strcasecmp( hptr->value, _OCCI_ANY     ) ))
+	else if (!( strncasecmp( hptr->value, _OCCI_ANY, strlen(_OCCI_ANY) ) ))
 		return( rptr );
 	else if (!( strcasecmp( hptr->value, _OCCI_TEXT_OCCI ) ))
 		return( rptr );
