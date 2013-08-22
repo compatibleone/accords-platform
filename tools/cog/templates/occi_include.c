@@ -5,3 +5,8 @@
 [[[cog t.filename_root()]]]
 [[[end]]]
 _rest.c"
+
+#include "
+[[[cog t.filename_root()]]]
+[[[end]]]
+_node_backend.c"

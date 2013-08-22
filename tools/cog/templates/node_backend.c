@@ -260,8 +260,19 @@ _control );
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-[[[cog t.pass_category_filter()]]]
-[[[end]]]
+private int pass_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_filter(
+	struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ * pptr, struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter) {
+	[[[cog t.pass_category_filter()]]]
+	[[[end]]]
 	return(1);
 }
 

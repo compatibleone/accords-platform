@@ -157,6 +157,14 @@ struct	occi_interface
 	int	(*retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
 	int	(*update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
 	int	(*delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*pre_create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr); // TODO Should pre_create have any value passed with it?
+	int	(*pre_retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*pre_update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*pre_delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*post_create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*post_retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*post_update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
+	int	(*post_delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr); // TODO Is a post-delete callback useful?
 };
 
 public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title );

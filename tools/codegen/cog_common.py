@@ -12,7 +12,7 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.h cog/templates/category.h 
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.h cog/templates/node_backend.h
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occi.c  
+# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occi_publication_rest.c cog/templates/occi.c  
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h
 # python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.c cog/templates/category.c      
@@ -52,6 +52,9 @@ def _type_conversion(type_name):
 def _category_name():
     return category.struct_name 
 
+def _filename_root():
+    return _name_root(category_file)
+
 def category_name():
     cog.inline()
     cog.out(_category_name())   
@@ -79,7 +82,7 @@ def _name_root(filename):
 
 def filename_root():
     cog.inline()
-    cog.out(_name_root(category_file))
+    cog.out(_filename_root())
 
 def _generic_h_guard(filename):
     guard = '_{0}_h'.format(_name_root(filename))
@@ -109,7 +112,7 @@ def node_interface_declaration():
     cog.outl("struct {0}_backend_interface *{1}_node_interface_func();".format(name, name))
     
 def h_include():
-    cog.outl("#include \"{0}\"".format(category_file.lower()))
+    cog.outl("#include \"{0}\"".format(category_file))
     
 def pass_category_filter():
     category_name = _category_name()
@@ -124,8 +127,8 @@ def pass_category_filter():
         
 def load_attributes():
     _format_category("if ((aptr = document_atribut( vptr, \"{0}\" )) != (struct xml_atribut *) 0)",
-                     "    pptr->{0} = document_atribut_string(aptr);",
-                     "    pptr->{0} = document_atribut_value(aptr);")
+                     "    {1}->{0} = document_atribut_string(aptr);",
+                     "    {1}->{0} = document_atribut_value(aptr);")
                  
 def save_attributes():
     _format_category("fprintf(h,\" {0}=%c\",0x0022);",
@@ -220,9 +223,9 @@ def _format_category(prefix = None, string_format = None, int_format = None, suf
     for name, type_name in category.backend_type_list(include_id, skip_legacy_types = True):
         _output_lines(prefix, name)
         if (type_name == "char *"):
-            _output_lines(string_format, name, _name_root(category_file), _category_name())
+            _output_lines(string_format, name, _filename_root(), _category_name())
         elif(type_name == "int"):
-            _output_lines(int_format, name, _name_root(category_file), _category_name())
+            _output_lines(int_format, name, _filename_root(), _category_name())
         else:
             raise(ValueError('Unexpected type {0} for member "{1}" of category "{2}"'.format(type_name, name, _category_name())))
         _output_lines(suffix)
@@ -351,16 +354,7 @@ private struct rest_response * {0}_post_mixin(
     struct occi_category * optr, struct rest_client * cptr,
     struct rest_request * rptr, struct rest_response * aptr,char * id)
 {{
-    struct rest_header * hptr;
-    struct occi_interface * iptr;
-    struct occi_kind_node * nptr;
-    struct {0} * pptr;
-    char * reqhost;
-    if (!( nptr = locate_{0}_node(id)))
-        return( rest_html_response( aptr, 404, "Not Found") );
-    else if (!( pptr = nptr->contents ))
-        return( rest_html_response( aptr, 404, "Not Found") );
-    else    return( rest_html_response( aptr, 400, "Bad Request"));
+    return (bad_request_response(aptr, id));
 }}
 
 /*    ----------------------------------------------------------------------------------------------    */
@@ -373,20 +367,21 @@ private struct rest_response * {0}_post_action(
     struct rest_header * hptr;
     struct occi_interface * iptr;
     struct occi_action * fptr;
-    struct occi_kind_node * nptr;
-    struct {0} * pptr;
+    struct {0} * {1};
     char * reqhost;
     char * mptr;
-    if (!( nptr = locate_{0}_node(id)))
-        return( rest_html_response( aptr, 404, "Not Found") );
-    else if (!( pptr = nptr->contents ))
-        return( rest_html_response( aptr, 404, "Not Found") );
+    if (!( {1} = backend->retrieve_from_id(id) ))
+        return( not_found_html_response(aptr) );
     mptr = (rptr->parameters+strlen("action="));
     for ( fptr=optr->firstact;
         fptr != (struct occi_action *) 0;
         fptr = fptr->next )
-        if (!( strncmp( mptr, fptr->name, strlen( fptr->name )) ))
-            return( occi_invoke_action(fptr,optr,cptr,rptr,aptr,pptr) );
+        if (!( strncmp( mptr, fptr->name, strlen( fptr->name )) )) {{
+            struct rest_response *retVal = occi_invoke_action(fptr,optr,cptr,rptr,aptr,{1});
+            liberate_{0}({1});
+            return(retVal);
+        }}
+    liberate_{0}({1});
     return( rest_html_response( aptr, 400, "Incorrect Action Request"));
 }}
-""".format(_category_name()))
+""".format(_category_name(), _filename_root()))
