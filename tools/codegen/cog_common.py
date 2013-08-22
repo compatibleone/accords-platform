@@ -29,6 +29,11 @@ import codegen_types.ctypes as ctypes
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occicategory_unsplit.c 
 # python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.c cog/templates/category.c
 
+# python -m cogapp -ed -D cog_category_file=xlink.h -D model_dir='../model' -o tmp/occixlink.c cog/templates/occicategory_unsplit.c
+
+def _link_special_case():
+    return _category_name() == "cords_xlink"
+
 def init_models(model_dir, filename):
     global models
     global category_file
@@ -159,6 +164,10 @@ def occi_builder():
                      "if (!( optr = occi_add_attribute(optr, \"{0}\",0,0) ))",
                      "    return(optr);",
                      include_id = False)
+    if not _link_special_case():
+        cog.out( 
+"""if (!( optr = occi_add_action( optr,"DELETE","",delete_action_{0})))
+    return( optr );""".format(_category_name()))
     
 def occi_headers():
     _format_category(["if (!( hptr = allocate_rest_header()))",
@@ -283,3 +292,101 @@ public struct occi_authorization_item * drop_occi_authorization_item(struct occi
 def authorization_special_code():
     if _category_name() == "occi_authorization_item":
         cog.out(authorization_code)
+        
+def node_type():
+    cog.inline()
+    if _link_special_case():
+        cog.out("link")
+    else:
+        cog.out("kind")
+        
+def node_category():
+    cog.inline()
+    if _link_special_case():
+        cog.out("link")
+    else:
+        cog.out(_category_name())
+    
+def post_actions():    
+    if not _link_special_case():
+        cog.out(
+"""else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
+    return({0}_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
+    return({0}_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
+    return({0}_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );""".format(_category_name()))
+        
+def scheme_kind():
+    cog.inline()
+    if _link_special_case():
+        cog.out("link")
+    else:
+        cog.out("resource")
+        
+def crud_delete_action():
+    if not _link_special_case():
+        cog.out(
+"""/*    ------------------------------------    */
+/*    c r u d   d e l e t e   a c t i o n     */
+/*    ------------------------------------    */
+private struct rest_response * delete_action_{0}(struct occi_category * optr, 
+struct rest_client * cptr,  
+struct rest_request * rptr,  
+struct rest_response * aptr,  
+void * vptr )
+{{
+    aptr = liberate_rest_response( aptr );
+    return( occi_{0}_delete(optr,cptr,rptr));
+}}
+""".format(_category_name()))
+
+def post_mixin_and_action():
+    if not _link_special_case():
+        cog.out(
+"""/*    --------------------------------------------------------------------------------------------    */
+/*    o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n     */
+/*    --------------------------------------------------------------------------------------------    */
+private struct rest_response * {0}_post_mixin(
+    struct occi_category * optr, struct rest_client * cptr,
+    struct rest_request * rptr, struct rest_response * aptr,char * id)
+{{
+    struct rest_header * hptr;
+    struct occi_interface * iptr;
+    struct occi_kind_node * nptr;
+    struct {0} * pptr;
+    char * reqhost;
+    if (!( nptr = locate_{0}_node(id)))
+        return( rest_html_response( aptr, 404, "Not Found") );
+    else if (!( pptr = nptr->contents ))
+        return( rest_html_response( aptr, 404, "Not Found") );
+    else    return( rest_html_response( aptr, 400, "Bad Request"));
+}}
+
+/*    ----------------------------------------------------------------------------------------------    */
+/*    o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n     */
+/*    ----------------------------------------------------------------------------------------------    */
+private struct rest_response * {0}_post_action(
+    struct occi_category * optr, struct rest_client * cptr,
+    struct rest_request * rptr, struct rest_response * aptr,char * id)
+{{
+    struct rest_header * hptr;
+    struct occi_interface * iptr;
+    struct occi_action * fptr;
+    struct occi_kind_node * nptr;
+    struct {0} * pptr;
+    char * reqhost;
+    char * mptr;
+    if (!( nptr = locate_{0}_node(id)))
+        return( rest_html_response( aptr, 404, "Not Found") );
+    else if (!( pptr = nptr->contents ))
+        return( rest_html_response( aptr, 404, "Not Found") );
+    mptr = (rptr->parameters+strlen("action="));
+    for ( fptr=optr->firstact;
+        fptr != (struct occi_action *) 0;
+        fptr = fptr->next )
+        if (!( strncmp( mptr, fptr->name, strlen( fptr->name )) ))
+            return( occi_invoke_action(fptr,optr,cptr,rptr,aptr,pptr) );
+    return( rest_html_response( aptr, 400, "Incorrect Action Request"));
+}}
+""".format(_category_name()))

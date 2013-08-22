@@ -72,23 +72,41 @@ private pthread_mutex_t list_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * 
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * 
+_first = (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_last  = (struct occi_kind_node *) 0;
-public struct  occi_kind_node * occi_first_
-[[[cog t.category_name()]]]
+_last  = (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
+public struct  occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * occi_first_
+[[[cog t.node_category()]]]
 [[[end]]] 
 _node() { return( 
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first ); }
-public struct  occi_kind_node * occi_last_
-[[[cog t.category_name()]]]
+public struct  occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * occi_last_
+[[[cog t.node_category()]]]
 [[[end]]] 
 _node() { return( 
 [[[cog t.category_name()]]]
@@ -98,10 +116,16 @@ _last ); }
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_drop_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_node(struct occi_kind_node * nptr) {
+_node(struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		
@@ -115,14 +139,26 @@ _first = nptr->next;
 [[[end]]] 
 _last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
-		liberate_occi_kind_node( nptr );
+		liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node( nptr );
 		}
-	return((struct occi_kind_node *)0);
+	return((struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *)0);
 }
-private struct occi_kind_node * drop_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * drop_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_node(struct occi_kind_node * nptr) {
+_node(struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr) {
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -141,11 +177,17 @@ _control );
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(char * id) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -154,7 +196,10 @@ _node(char * id) {
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-		nptr != (struct occi_kind_node *) 0;
+		nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
 		else if (!( pptr->id )) continue;
@@ -162,11 +207,17 @@ _first;
 		}
 	return( nptr );
 }
-private struct occi_kind_node * locate_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(char * id) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -185,27 +236,45 @@ _control );
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_add_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(int mode) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  * pptr;
-	if (!( nptr = allocate_occi_kind_node() ))
+	if (!( nptr = allocate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node() ))
 		return( nptr );
 	else	{
 		if (!( nptr->contents = allocate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 ()))
-			return( liberate_occi_kind_node(nptr) );
+			return( liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node(nptr) );
 		if (!( pptr = nptr->contents ))
-			return( liberate_occi_kind_node(nptr) );
+			return( liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node(nptr) );
 		else if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))
-			return( liberate_occi_kind_node(nptr) );
+			return( liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node(nptr) );
 		else	{
 			if (!( nptr->previous = 
 [[[cog t.category_name()]]]
@@ -224,11 +293,17 @@ _last = nptr;
 			}
 		}
 }
-private struct occi_kind_node * add_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * add_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(int mode) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -261,7 +336,10 @@ _nodes() {
 	char * fn=autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_name;	struct occi_kind_node * nptr;
+_name;	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -314,7 +392,10 @@ _nodes() {
 	char * fn=autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_name;	struct occi_kind_node * nptr;
+_name;	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -333,7 +414,10 @@ s>\n");
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-		nptr != (struct occi_kind_node *) 0;
+		nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
 		fprintf(h,"<
@@ -522,7 +606,10 @@ _get_item(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -558,7 +645,10 @@ _post_link(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -574,70 +664,9 @@ _node(id)))
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
-/*	--------------------------------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/
-/*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_mixin(
-	struct occi_category * optr, struct rest_client * cptr,
-	struct rest_request * rptr, struct rest_response * aptr,char * id)
-{
-	struct rest_header * hptr;
-	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	char * reqhost;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
-		return( rest_html_response( aptr, 404, "Not Found") );
-	else if (!( pptr = nptr->contents ))
-		return( rest_html_response( aptr, 404, "Not Found") );
-	else	return( rest_html_response( aptr, 400, "Bad Request"));
-}
-
-/*	----------------------------------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/
-/*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_action(
-	struct occi_category * optr, struct rest_client * cptr,
-	struct rest_request * rptr, struct rest_response * aptr,char * id)
-{
-	struct rest_header * hptr;
-	struct occi_interface * iptr;
-	struct occi_action * fptr;
-	struct occi_kind_node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	char * reqhost;
-	char * mptr;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
-		return( rest_html_response( aptr, 404, "Not Found") );
-	else if (!( pptr = nptr->contents ))
-		return( rest_html_response( aptr, 404, "Not Found") );
-	mptr = (rptr->parameters+strlen("action="));
-	for ( fptr=optr->firstact;
-		fptr != (struct occi_action *) 0;
-		fptr = fptr->next )
-		if (!( strncmp( mptr, fptr->name, strlen( fptr->name )) ))
-			return( occi_invoke_action(fptr,optr,cptr,rptr,aptr,pptr) );
-	return( rest_html_response( aptr, 400, "Incorrect Action Request"));
-}
-
+[[[cog t.post_mixin_and_action()]]]
+[[[end]]]
+ 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
@@ -650,7 +679,10 @@ _post_item(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -698,7 +730,10 @@ _put_item(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -738,7 +773,10 @@ _head_item(
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
 	struct rest_header * hptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -765,7 +803,10 @@ _delete_item(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -801,7 +842,10 @@ _get_list(
 	struct rest_request * rptr, struct rest_response * aptr)
 {
 	struct rest_header * hptr;
-	struct occi_kind_node * sptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * sptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -824,7 +868,10 @@ _info(&filter, optr, rptr, aptr ) ))
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-		sptr != (struct occi_kind_node *) 0;
+		sptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
@@ -863,8 +910,14 @@ _delete_all(
 {
 	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct occi_kind_node * nptr;
-	struct occi_kind_node * sptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * sptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -883,7 +936,10 @@ _info(&filter, optr, rptr, aptr ) ))
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-	while (nptr != (struct occi_kind_node *) 0) {
+	while (nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0) {
 		if ((!( pptr = nptr->contents ))
 		||  (!( pass_
 [[[cog t.category_name()]]]
@@ -1005,21 +1061,8 @@ _post_item( optr, cptr, rptr, aptr ) );
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
-	else if (!( strncmp( rptr->parameters, "action=", strlen("action=")) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
-	else if (!( strncmp( rptr->parameters, "mixin=", strlen("mixin=")) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
-	else if (!( strncmp( rptr->parameters, "link=", strlen("link=")) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+	[[[cog t.post_actions()]]]
+	[[[end]]]
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
@@ -1115,24 +1158,8 @@ _head;
 	return;
 }
 
-/*	------------------------------------	*/
-/*	c r u d   d e l e t e   a c t i o n 	*/
-/*	------------------------------------	*/
-private struct rest_response * delete_action_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(struct occi_category * optr, 
-struct rest_client * cptr,  
-struct rest_request * rptr,  
-struct rest_response * aptr,  
-void * vptr )
-{
-	aptr = liberate_rest_response( aptr );
-	return( occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete(optr,cptr,rptr));
-}
+[[[cog t.crud_delete_action()]]]
+[[[end]]]
 
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
@@ -1146,8 +1173,14 @@ public struct occi_category * occi_
 [[[end]]] 
 _builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
-	char * d="kind";
-	char * e="http://scheme.ogf.org/occi/resource#";
+	char * d="
+[[[cog t.node_type()]]]
+[[[end]]] 
+";
+	char * e="http://scheme.ogf.org/occi/
+[[[cog t.scheme_kind()]]]
+[[[end]]]
+#";
 	char * f="CompatibleOne OCCI resource 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -1160,12 +1193,7 @@ _builder(char * a,char * b) {
 [[[end]]] 
 _mt(optr->interface);
 		[[[cog t.occi_builder()]]]
-		[[[end]]]
-		if (!( optr = occi_add_action( optr,"DELETE","",delete_action_
-[[[cog t.category_name()]]]
-[[[end]]] 
-)))
-			return( optr );
+		[[[end]]]		
 		autoload_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -1205,7 +1233,10 @@ _occi_headers(struct
 	sprintf(buffer,"
 [[[cog t.category_name()]]]
 [[[end]]] 
-; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\r\n");
+; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='
+[[[cog t.node_type()]]]
+[[[end]]] 
+';\r\n");
 	if (!( hptr->value = allocate_string(buffer)))
 		return(first);
 	[[[cog t.occi_headers()]]]
